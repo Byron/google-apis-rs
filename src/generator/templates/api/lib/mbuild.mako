@@ -387,7 +387,7 @@ match result {
          Error::HttpError(_)
         |Error::Io(_)
         |Error::MissingAPIKey
-        |Error::MissingToken(_)
+        |Error::MissingToken
         |Error::Cancelled
         |Error::UploadSizeLimitExceeded(_, _)
         |Error::Failure(_)
@@ -706,14 +706,14 @@ else {
 
         loop {
             % if default_scope:
-            let token = match ${auth_call}.token(&self.${api.properties.scopes}.keys().collect::<Vec<_>>()[..]).await {
-                Ok(token) => token.clone(),
-                Err(err) => {
-                    match  dlg.token(&err) {
+            let token = match ${auth_call}.get_token(&self.${api.properties.scopes}.keys().collect::<Vec<_>>()[..]).await {
+                Some(token) => token.clone(),
+                None => {
+                    match dlg.token() {
                         Some(token) => token,
                         None => {
                             ${delegate_finish}(false);
-                            return Err(client::Error::MissingToken(err))
+                            return Err(client::Error::MissingToken)
                         }
                     }
                 }

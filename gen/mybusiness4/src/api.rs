@@ -72,7 +72,7 @@ use crate::client;
 ///          Error::HttpError(_)
 ///         |Error::Io(_)
 ///         |Error::MissingAPIKey
-///         |Error::MissingToken(_)
+///         |Error::MissingToken
 ///         |Error::Cancelled
 ///         |Error::UploadSizeLimitExceeded(_, _)
 ///         |Error::Failure(_)
@@ -87,7 +87,7 @@ use crate::client;
 #[derive(Clone)]
 pub struct MyBusiness<S> {
     pub client: hyper::Client<S, hyper::body::Body>,
-    pub auth: oauth2::authenticator::Authenticator<S>,
+    pub auth: Box<dyn client::Authy>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
@@ -97,10 +97,10 @@ impl<'a, S> client::Hub for MyBusiness<S> {}
 
 impl<'a, S> MyBusiness<S> {
 
-    pub fn new(client: hyper::Client<S, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<S>) -> MyBusiness<S> {
+    pub fn new<A: client::Authy>(client: hyper::Client<S, hyper::body::Body>, auth: A) -> MyBusiness<S> {
         MyBusiness {
             client,
-            auth: authenticator,
+            auth: Box::new(auth),
             _user_agent: "google-api-rust-client/4.0.1".to_string(),
             _base_url: "https://mybusiness.googleapis.com/".to_string(),
             _root_url: "https://mybusiness.googleapis.com/".to_string(),

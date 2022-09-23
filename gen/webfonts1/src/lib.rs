@@ -106,7 +106,7 @@
 //!          Error::HttpError(_)
 //!         |Error::Io(_)
 //!         |Error::MissingAPIKey
-//!         |Error::MissingToken(_)
+//!         |Error::MissingToken
 //!         |Error::Cancelled
 //!         |Error::UploadSizeLimitExceeded(_, _)
 //!         |Error::Failure(_)
@@ -191,6 +191,7 @@ pub extern crate hyper_rustls;
 extern crate serde;
 extern crate serde_json;
 // Re-export the yup_oauth2 crate, that is required to call some methods of the hub and the client
+#[cfg(feature = "yup-oauth2")]
 pub extern crate yup_oauth2 as oauth2;
 extern crate mime;
 extern crate url;

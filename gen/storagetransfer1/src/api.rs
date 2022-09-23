@@ -91,7 +91,7 @@ impl Default for Scope {
 ///          Error::HttpError(_)
 ///         |Error::Io(_)
 ///         |Error::MissingAPIKey
-///         |Error::MissingToken(_)
+///         |Error::MissingToken
 ///         |Error::Cancelled
 ///         |Error::UploadSizeLimitExceeded(_, _)
 ///         |Error::Failure(_)
@@ -106,7 +106,7 @@ impl Default for Scope {
 #[derive(Clone)]
 pub struct Storagetransfer<S> {
     pub client: hyper::Client<S, hyper::body::Body>,
-    pub auth: oauth2::authenticator::Authenticator<S>,
+    pub auth: Box<dyn client::Authy>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
@@ -116,10 +116,10 @@ impl<'a, S> client::Hub for Storagetransfer<S> {}
 
 impl<'a, S> Storagetransfer<S> {
 
-    pub fn new(client: hyper::Client<S, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<S>) -> Storagetransfer<S> {
+    pub fn new<A: client::Authy>(client: hyper::Client<S, hyper::body::Body>, auth: A) -> Storagetransfer<S> {
         Storagetransfer {
             client,
-            auth: authenticator,
+            auth: Box::new(auth),
             _user_agent: "google-api-rust-client/4.0.1".to_string(),
             _base_url: "https://storagetransfer.googleapis.com/".to_string(),
             _root_url: "https://storagetransfer.googleapis.com/".to_string(),
@@ -1612,14 +1612,14 @@ where
 
 
         loop {
-            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
-                Ok(token) => token.clone(),
-                Err(err) => {
-                    match  dlg.token(&err) {
+            let token = match self.hub.auth.get_token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+                Some(token) => token.clone(),
+                None => {
+                    match dlg.token() {
                         Some(token) => token,
                         None => {
                             dlg.finished(false);
-                            return Err(client::Error::MissingToken(err))
+                            return Err(client::Error::MissingToken)
                         }
                     }
                 }
@@ -1897,14 +1897,14 @@ where
 
 
         loop {
-            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
-                Ok(token) => token.clone(),
-                Err(err) => {
-                    match  dlg.token(&err) {
+            let token = match self.hub.auth.get_token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+                Some(token) => token.clone(),
+                None => {
+                    match dlg.token() {
                         Some(token) => token,
                         None => {
                             dlg.finished(false);
-                            return Err(client::Error::MissingToken(err))
+                            return Err(client::Error::MissingToken)
                         }
                     }
                 }
@@ -2178,14 +2178,14 @@ where
 
 
         loop {
-            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
-                Ok(token) => token.clone(),
-                Err(err) => {
-                    match  dlg.token(&err) {
+            let token = match self.hub.auth.get_token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+                Some(token) => token.clone(),
+                None => {
+                    match dlg.token() {
                         Some(token) => token,
                         None => {
                             dlg.finished(false);
-                            return Err(client::Error::MissingToken(err))
+                            return Err(client::Error::MissingToken)
                         }
                     }
                 }
@@ -2440,14 +2440,14 @@ where
 
 
         loop {
-            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
-                Ok(token) => token.clone(),
-                Err(err) => {
-                    match  dlg.token(&err) {
+            let token = match self.hub.auth.get_token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+                Some(token) => token.clone(),
+                None => {
+                    match dlg.token() {
                         Some(token) => token,
                         None => {
                             dlg.finished(false);
-                            return Err(client::Error::MissingToken(err))
+                            return Err(client::Error::MissingToken)
                         }
                     }
                 }
@@ -2717,14 +2717,14 @@ where
 
 
         loop {
-            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
-                Ok(token) => token.clone(),
-                Err(err) => {
-                    match  dlg.token(&err) {
+            let token = match self.hub.auth.get_token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+                Some(token) => token.clone(),
+                None => {
+                    match dlg.token() {
                         Some(token) => token,
                         None => {
                             dlg.finished(false);
-                            return Err(client::Error::MissingToken(err))
+                            return Err(client::Error::MissingToken)
                         }
                     }
                 }
@@ -3023,14 +3023,14 @@ where
 
 
         loop {
-            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
-                Ok(token) => token.clone(),
-                Err(err) => {
-                    match  dlg.token(&err) {
+            let token = match self.hub.auth.get_token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+                Some(token) => token.clone(),
+                None => {
+                    match dlg.token() {
                         Some(token) => token,
                         None => {
                             dlg.finished(false);
-                            return Err(client::Error::MissingToken(err))
+                            return Err(client::Error::MissingToken)
                         }
                     }
                 }
@@ -3295,14 +3295,14 @@ where
 
 
         loop {
-            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
-                Ok(token) => token.clone(),
-                Err(err) => {
-                    match  dlg.token(&err) {
+            let token = match self.hub.auth.get_token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+                Some(token) => token.clone(),
+                None => {
+                    match dlg.token() {
                         Some(token) => token,
                         None => {
                             dlg.finished(false);
-                            return Err(client::Error::MissingToken(err))
+                            return Err(client::Error::MissingToken)
                         }
                     }
                 }
@@ -3561,14 +3561,14 @@ where
 
 
         loop {
-            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
-                Ok(token) => token.clone(),
-                Err(err) => {
-                    match  dlg.token(&err) {
+            let token = match self.hub.auth.get_token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+                Some(token) => token.clone(),
+                None => {
+                    match dlg.token() {
                         Some(token) => token,
                         None => {
                             dlg.finished(false);
-                            return Err(client::Error::MissingToken(err))
+                            return Err(client::Error::MissingToken)
                         }
                     }
                 }
@@ -3818,14 +3818,14 @@ where
 
 
         loop {
-            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
-                Ok(token) => token.clone(),
-                Err(err) => {
-                    match  dlg.token(&err) {
+            let token = match self.hub.auth.get_token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+                Some(token) => token.clone(),
+                None => {
+                    match dlg.token() {
                         Some(token) => token,
                         None => {
                             dlg.finished(false);
-                            return Err(client::Error::MissingToken(err))
+                            return Err(client::Error::MissingToken)
                         }
                     }
                 }
@@ -4112,14 +4112,14 @@ where
 
 
         loop {
-            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
-                Ok(token) => token.clone(),
-                Err(err) => {
-                    match  dlg.token(&err) {
+            let token = match self.hub.auth.get_token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+                Some(token) => token.clone(),
+                None => {
+                    match dlg.token() {
                         Some(token) => token,
                         None => {
                             dlg.finished(false);
-                            return Err(client::Error::MissingToken(err))
+                            return Err(client::Error::MissingToken)
                         }
                     }
                 }
@@ -4404,14 +4404,14 @@ where
 
 
         loop {
-            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
-                Ok(token) => token.clone(),
-                Err(err) => {
-                    match  dlg.token(&err) {
+            let token = match self.hub.auth.get_token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+                Some(token) => token.clone(),
+                None => {
+                    match dlg.token() {
                         Some(token) => token,
                         None => {
                             dlg.finished(false);
-                            return Err(client::Error::MissingToken(err))
+                            return Err(client::Error::MissingToken)
                         }
                     }
                 }
@@ -4696,14 +4696,14 @@ where
 
 
         loop {
-            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
-                Ok(token) => token.clone(),
-                Err(err) => {
-                    match  dlg.token(&err) {
+            let token = match self.hub.auth.get_token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+                Some(token) => token.clone(),
+                None => {
+                    match dlg.token() {
                         Some(token) => token,
                         None => {
                             dlg.finished(false);
-                            return Err(client::Error::MissingToken(err))
+                            return Err(client::Error::MissingToken)
                         }
                     }
                 }
@@ -4970,14 +4970,14 @@ where
 
 
         loop {
-            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
-                Ok(token) => token.clone(),
-                Err(err) => {
-                    match  dlg.token(&err) {
+            let token = match self.hub.auth.get_token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+                Some(token) => token.clone(),
+                None => {
+                    match dlg.token() {
                         Some(token) => token,
                         None => {
                             dlg.finished(false);
-                            return Err(client::Error::MissingToken(err))
+                            return Err(client::Error::MissingToken)
                         }
                     }
                 }
@@ -5244,14 +5244,14 @@ where
 
 
         loop {
-            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
-                Ok(token) => token.clone(),
-                Err(err) => {
-                    match  dlg.token(&err) {
+            let token = match self.hub.auth.get_token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+                Some(token) => token.clone(),
+                None => {
+                    match dlg.token() {
                         Some(token) => token,
                         None => {
                             dlg.finished(false);
-                            return Err(client::Error::MissingToken(err))
+                            return Err(client::Error::MissingToken)
                         }
                     }
                 }
@@ -5548,14 +5548,14 @@ where
 
 
         loop {
-            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
-                Ok(token) => token.clone(),
-                Err(err) => {
-                    match  dlg.token(&err) {
+            let token = match self.hub.auth.get_token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+                Some(token) => token.clone(),
+                None => {
+                    match dlg.token() {
                         Some(token) => token,
                         None => {
                             dlg.finished(false);
-                            return Err(client::Error::MissingToken(err))
+                            return Err(client::Error::MissingToken)
                         }
                     }
                 }
@@ -5840,14 +5840,14 @@ where
 
 
         loop {
-            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
-                Ok(token) => token.clone(),
-                Err(err) => {
-                    match  dlg.token(&err) {
+            let token = match self.hub.auth.get_token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+                Some(token) => token.clone(),
+                None => {
+                    match dlg.token() {
                         Some(token) => token,
                         None => {
                             dlg.finished(false);
-                            return Err(client::Error::MissingToken(err))
+                            return Err(client::Error::MissingToken)
                         }
                     }
                 }

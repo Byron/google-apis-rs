@@ -25,7 +25,7 @@ mime = "^ 0.2.0"
 serde = "^ 1.0"
 serde_json = "^ 1.0"
 serde_derive = "^ 1.0"
-yup-oauth2 = "^ 7.0"
+yup-oauth2 = { version = "^ 7.0", optional = true }
 itertools = "^ 0.10"
 strsim = "^0.5"
 clap = "^2.0"
@@ -40,3 +40,6 @@ tower-service = "^0.3.1"
 [dependencies.google-bigtableadmin2]
 path = "../bigtableadmin2"
 version = "4.0.1+20220222"
+
+[features]
+default = ["yup-oauth2"]

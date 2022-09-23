@@ -73,7 +73,7 @@ use crate::client;
 ///          Error::HttpError(_)
 ///         |Error::Io(_)
 ///         |Error::MissingAPIKey
-///         |Error::MissingToken(_)
+///         |Error::MissingToken
 ///         |Error::Cancelled
 ///         |Error::UploadSizeLimitExceeded(_, _)
 ///         |Error::Failure(_)
@@ -88,7 +88,7 @@ use crate::client;
 #[derive(Clone)]
 pub struct Spectrum<S> {
     pub client: hyper::Client<S, hyper::body::Body>,
-    pub auth: oauth2::authenticator::Authenticator<S>,
+    pub auth: Box<dyn client::Authy>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
@@ -98,10 +98,10 @@ impl<'a, S> client::Hub for Spectrum<S> {}
 
 impl<'a, S> Spectrum<S> {
 
-    pub fn new(client: hyper::Client<S, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<S>) -> Spectrum<S> {
+    pub fn new<A: client::Authy>(client: hyper::Client<S, hyper::body::Body>, auth: A) -> Spectrum<S> {
         Spectrum {
             client,
-            auth: authenticator,
+            auth: Box::new(auth),
             _user_agent: "google-api-rust-client/4.0.1".to_string(),
             _base_url: "https://www.googleapis.com/spectrum/v1explorer/paws/".to_string(),
             _root_url: "https://www.googleapis.com/".to_string(),

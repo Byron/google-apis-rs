@@ -142,7 +142,7 @@ match result {
          Error::HttpError(_)
         |Error::Io(_)
         |Error::MissingAPIKey
-        |Error::MissingToken(_)
+        |Error::MissingToken
         |Error::Cancelled
         |Error::UploadSizeLimitExceeded(_, _)
         |Error::Failure(_)
