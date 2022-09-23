@@ -1,7 +1,9 @@
 use std::error;
 use std::error::Error as StdError;
 use std::fmt::{self, Display};
+use std::future::Future;
 use std::io::{self, Cursor, Read, Seek, SeekFrom, Write};
+use std::pin::Pin;
 use std::str::FromStr;
 use std::thread::sleep;
 use std::time::Duration;
@@ -110,8 +112,7 @@ pub trait Delegate: Send {
     /// impending failure.
     /// The given Error provides information about why the token couldn't be acquired in the
     /// first place
-    fn token(&mut self, err: &oauth2::Error) -> Option<oauth2::AccessToken> {
-        let _ = err;
+    fn token(&mut self) -> Option<String> {
         None
     }
 
@@ -228,7 +229,7 @@ pub enum Error {
     MissingAPIKey,
 
     /// We required a Token, but didn't get one from the Authenticator
-    MissingToken(oauth2::Error),
+    MissingToken,
 
     /// The delgate instructed to cancel the operation
     Cancelled,
@@ -272,8 +273,8 @@ impl Display for Error {
                 writeln!(f, "Bad Request: {}", message)?;
                 Ok(())
             }
-            Error::MissingToken(ref err) => {
-                writeln!(f, "Token retrieval failed with error: {}", err)
+            Error::MissingToken => {
+                writeln!(f, "Token retrieval failed.")
             }
             Error::Cancelled => writeln!(f, "Operation cancelled by delegate"),
             Error::FieldClash(field) => writeln!(
@@ -784,4 +785,76 @@ pub async fn get_body_as_string(res_body: &mut hyper::Body) -> String {
     let res_body_buf = hyper::body::to_bytes(res_body).await.unwrap();
     let res_body_string = String::from_utf8_lossy(&res_body_buf);
     res_body_string.to_string()
+}
+
+pub trait Authy: AuthyClone {
+    fn get_token<'a>(&'a self, _scopes: &'a [&str]) -> Pin<Box<dyn Future<Output=Option<String>> + 'a>> {
+        async fn x() -> Option<String> {
+            None
+        }
+
+        Box::pin(x())
+    }
+}
+
+pub trait AuthyClone {
+    fn clone_box(&self) -> Box<dyn Authy>;
+}
+
+impl<T> AuthyClone for T
+where
+    T: 'static + Authy + Clone,
+{
+    fn clone_box(&self) -> Box<dyn Authy> {
+        Box::new(self.clone())
+    }
+}
+
+impl Clone for Box<dyn Authy> {
+    fn clone(&self) -> Box<dyn Authy> {
+        self.clone_box()
+    }
+}
+
+impl Authy for String {
+    fn get_token<'a>(&'a self, _scopes: &'a [&str]) -> Pin<Box<dyn Future<Output=Option<String>> + 'a>> {
+        async fn ident(s: &str) -> Option<String> {
+            Some(s.to_string())
+        }
+        Box::pin(ident(self))
+    }
+}
+
+impl Authy for () {}
+
+#[cfg(feature = "yup-oauth2")]
+mod yup_oauth2_impl {
+    use core::future::Future;
+    use core::pin::Pin;
+
+    use super::Authy;
+
+    use tower_service::Service;
+    use yup_oauth2::authenticator::Authenticator;
+    use tokio::io::{AsyncRead, AsyncWrite};
+    use http::Uri;
+    use hyper::client::connect::Connection;
+
+    async fn helper<S>(auth: &Authenticator<S>, scopes: &[&str]) -> Option<String> where
+        S: Service<Uri> + Clone + Send + Sync + 'static,
+        S::Response: Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+        S::Future: Send + Unpin + 'static,
+        S::Error: Into<Box<dyn std::error::Error + Send + Sync>> {
+        auth.token(scopes).await.ok().map(|t| t.as_str().to_string())
+    }
+
+    impl<S> Authy for Authenticator<S> where
+        S: Service<Uri> + Clone + Send + Sync + 'static,
+        S::Response: Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+        S::Future: Send + Unpin + 'static,
+        S::Error: Into<Box<dyn std::error::Error + Send + Sync>> {
+        fn get_token<'a>(&'a self, scopes: &'a [&str]) -> Pin<Box<dyn Future<Output=Option<String>> + 'a>> {
+            Box::pin(helper(self, scopes))
+        }
+    }
 }

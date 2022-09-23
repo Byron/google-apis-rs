@@ -32,7 +32,7 @@ mime = "^ 0.2.0"
 serde = "^ 1.0"
 serde_json = "^ 1.0"
 serde_derive = "^ 1.0"
-yup-oauth2 = "^ 7.0"
+yup-oauth2 = { version = "^ 7.0", optional = true }
 itertools = "^ 0.10"
 % for dep in cargo.get('dependencies', list()):
 ${dep}
@@ -41,7 +41,7 @@ ${dep}
 <%
   api_name = util.library_name()
   crate_name_we_depend_on = None
-  
+
   if make.depends_on_suffix is not None:
     crate_name_we_depend_on = library_to_crate_name(api_name, suffix=make.depends_on_suffix)
 %>\
@@ -53,3 +53,6 @@ ${dep}
 path = "../${api_name}"
 version = "${util.crate_version()}"
 % endif
+
+[features]
+default = ["yup-oauth2"]

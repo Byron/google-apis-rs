@@ -30,7 +30,7 @@ use http::Uri;
 use hyper::client::connect;
 use tokio::io::{AsyncRead, AsyncWrite};
 use tower_service;
-use crate::client;
+use crate::{client, client::Authy};
 
 // ##############
 // UTILITIES ###
@@ -55,7 +55,7 @@ ${lib.hub_usage_example(c)}\
 #[derive(Clone)]
 pub struct ${hub_type}${ht_params} {
     pub client: hyper::Client<S, hyper::body::Body>,
-    pub auth: oauth2::authenticator::Authenticator<S>,
+    pub auth: Box<dyn client::Authy>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
@@ -65,10 +65,10 @@ impl<'a, ${', '.join(HUB_TYPE_PARAMETERS)}> client::Hub for ${hub_type}${ht_para
 
 impl<'a, ${', '.join(HUB_TYPE_PARAMETERS)}> ${hub_type}${ht_params} {
 
-    pub fn new(client: hyper::Client<S, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<S>) -> ${hub_type}${ht_params} {
+    pub fn new<A: 'static + client::Authy>(client: hyper::Client<S, hyper::body::Body>, auth: A) -> ${hub_type}${ht_params} {
         ${hub_type} {
             client,
-            auth: authenticator,
+            auth: Box::new(auth),
             _user_agent: "${default_user_agent}".to_string(),
             _base_url: "${baseUrl}".to_string(),
             _root_url: "${rootUrl}".to_string(),
