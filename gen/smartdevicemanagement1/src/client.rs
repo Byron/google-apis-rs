@@ -275,8 +275,8 @@ impl Display for Error {
                 writeln!(f, "Bad Request: {}", message)?;
                 Ok(())
             }
-            Error::MissingToken(ref err) => {
-                writeln!(f, "Token retrieval failed with error: {}", err)
+            Error::MissingToken => {
+                writeln!(f, "Token retrieval failed.")
             }
             Error::Cancelled => writeln!(f, "Operation cancelled by delegate"),
             Error::FieldClash(field) => writeln!(
@@ -789,13 +789,32 @@ pub async fn get_body_as_string(res_body: &mut hyper::Body) -> String {
     res_body_string.to_string()
 }
 
-trait Authy {
+pub trait Authy: AuthyClone {
     fn get_token<'a>(&'a self, _scopes: &'a [&str]) -> Pin<Box<dyn Future<Output=Option<String>> + 'a>> {
         async fn x() -> Option<String> {
             None
         }
 
         Box::pin(x())
+    }
+}
+
+pub trait AuthyClone {
+    fn clone_box(&self) -> Box<dyn Authy>;
+}
+
+impl<T> AuthyClone for T
+where
+    T: 'static + Authy + Clone,
+{
+    fn clone_box(&self) -> Box<dyn Authy> {
+        Box::new(self.clone())
+    }
+}
+
+impl Clone for Box<dyn Authy> {
+    fn clone(&self) -> Box<dyn Authy> {
+        self.clone_box()
     }
 }
 

@@ -13,7 +13,7 @@ use http::Uri;
 use hyper::client::connect;
 use tokio::io::{AsyncRead, AsyncWrite};
 use tower_service;
-use crate::client;
+use crate::{client, client::Authy};
 
 // ##############
 // UTILITIES ###
@@ -119,7 +119,7 @@ impl<'a, S> client::Hub for AlertCenter<S> {}
 
 impl<'a, S> AlertCenter<S> {
 
-    pub fn new<A: client::Authy>(client: hyper::Client<S, hyper::body::Body>, auth: A) -> AlertCenter<S> {
+    pub fn new<A: 'static + client::Authy>(client: hyper::Client<S, hyper::body::Body>, auth: A) -> AlertCenter<S> {
         AlertCenter {
             client,
             auth: Box::new(auth),
@@ -939,7 +939,7 @@ where
 
 
         loop {
-            let token = match self.hub.auth.get_token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.get_token(&self._scopes.keys().map(String::as_str).collect::<Vec<_>>()[..]).await {
                 Some(token) => token.clone(),
                 None => {
                     match dlg.token() {
@@ -1226,7 +1226,7 @@ where
 
 
         loop {
-            let token = match self.hub.auth.get_token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.get_token(&self._scopes.keys().map(String::as_str).collect::<Vec<_>>()[..]).await {
                 Some(token) => token.clone(),
                 None => {
                     match dlg.token() {
@@ -1493,7 +1493,7 @@ where
 
 
         loop {
-            let token = match self.hub.auth.get_token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.get_token(&self._scopes.keys().map(String::as_str).collect::<Vec<_>>()[..]).await {
                 Some(token) => token.clone(),
                 None => {
                     match dlg.token() {
@@ -1748,7 +1748,7 @@ where
 
 
         loop {
-            let token = match self.hub.auth.get_token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.get_token(&self._scopes.keys().map(String::as_str).collect::<Vec<_>>()[..]).await {
                 Some(token) => token.clone(),
                 None => {
                     match dlg.token() {
@@ -2013,7 +2013,7 @@ where
 
 
         loop {
-            let token = match self.hub.auth.get_token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.get_token(&self._scopes.keys().map(String::as_str).collect::<Vec<_>>()[..]).await {
                 Some(token) => token.clone(),
                 None => {
                     match dlg.token() {
@@ -2283,7 +2283,7 @@ where
 
 
         loop {
-            let token = match self.hub.auth.get_token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.get_token(&self._scopes.keys().map(String::as_str).collect::<Vec<_>>()[..]).await {
                 Some(token) => token.clone(),
                 None => {
                     match dlg.token() {
@@ -2553,7 +2553,7 @@ where
 
 
         loop {
-            let token = match self.hub.auth.get_token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.get_token(&self._scopes.keys().map(String::as_str).collect::<Vec<_>>()[..]).await {
                 Some(token) => token.clone(),
                 None => {
                     match dlg.token() {
@@ -2820,7 +2820,7 @@ where
 
 
         loop {
-            let token = match self.hub.auth.get_token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.get_token(&self._scopes.keys().map(String::as_str).collect::<Vec<_>>()[..]).await {
                 Some(token) => token.clone(),
                 None => {
                     match dlg.token() {
@@ -3121,7 +3121,7 @@ where
 
 
         loop {
-            let token = match self.hub.auth.get_token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.get_token(&self._scopes.keys().map(String::as_str).collect::<Vec<_>>()[..]).await {
                 Some(token) => token.clone(),
                 None => {
                     match dlg.token() {
@@ -3373,7 +3373,7 @@ where
 
 
         loop {
-            let token = match self.hub.auth.get_token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.get_token(&self._scopes.keys().map(String::as_str).collect::<Vec<_>>()[..]).await {
                 Some(token) => token.clone(),
                 None => {
                     match dlg.token() {
@@ -3628,7 +3628,7 @@ where
 
 
         loop {
-            let token = match self.hub.auth.get_token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.get_token(&self._scopes.keys().map(String::as_str).collect::<Vec<_>>()[..]).await {
                 Some(token) => token.clone(),
                 None => {
                     match dlg.token() {

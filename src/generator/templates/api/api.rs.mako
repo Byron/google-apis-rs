@@ -30,7 +30,7 @@ use http::Uri;
 use hyper::client::connect;
 use tokio::io::{AsyncRead, AsyncWrite};
 use tower_service;
-use crate::client;
+use crate::{client, client::Authy};
 
 // ##############
 // UTILITIES ###
@@ -65,7 +65,7 @@ impl<'a, ${', '.join(HUB_TYPE_PARAMETERS)}> client::Hub for ${hub_type}${ht_para
 
 impl<'a, ${', '.join(HUB_TYPE_PARAMETERS)}> ${hub_type}${ht_params} {
 
-    pub fn new<A: client::Authy>(client: hyper::Client<S, hyper::body::Body>, auth: A) -> ${hub_type}${ht_params} {
+    pub fn new<A: 'static + client::Authy>(client: hyper::Client<S, hyper::body::Body>, auth: A) -> ${hub_type}${ht_params} {
         ${hub_type} {
             client,
             auth: Box::new(auth),

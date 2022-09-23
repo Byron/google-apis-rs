@@ -706,7 +706,7 @@ else {
 
         loop {
             % if default_scope:
-            let token = match ${auth_call}.get_token(&self.${api.properties.scopes}.keys().collect::<Vec<_>>()[..]).await {
+            let token = match ${auth_call}.get_token(&self.${api.properties.scopes}.keys().map(String::as_str).collect::<Vec<_>>()[..]).await {
                 Some(token) => token.clone(),
                 None => {
                     match dlg.token() {
