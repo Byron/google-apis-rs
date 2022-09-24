@@ -32,7 +32,9 @@ mime = "^ 0.2.0"
 serde = "^ 1.0"
 serde_json = "^ 1.0"
 serde_derive = "^ 1.0"
-yup-oauth2 = { version = "^ 7.0", optional = true }
+## TODO: Make yup-oauth2 optional
+## yup-oauth2 = { version = "^ 7.0", optional = true }
+yup-oauth2 = "^ 7.0"
 itertools = "^ 0.10"
 % for dep in cargo.get('dependencies', list()):
 ${dep}
@@ -54,5 +56,6 @@ path = "../${api_name}"
 version = "${util.crate_version()}"
 % endif
 
-[features]
-default = ["yup-oauth2"]
+## TODO: Make yup-oauth2 optional
+# [features]
+# default = ["yup-oauth2"]
