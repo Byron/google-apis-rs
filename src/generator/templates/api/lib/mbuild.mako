@@ -387,7 +387,7 @@ match result {
          Error::HttpError(_)
         |Error::Io(_)
         |Error::MissingAPIKey
-        |Error::MissingToken
+        |Error::MissingToken(_)
         |Error::Cancelled
         |Error::UploadSizeLimitExceeded(_, _)
         |Error::Failure(_)
@@ -710,7 +710,7 @@ else {
                 // TODO: remove Ok / Err branches
                 Ok(Some(token)) => token.clone(),
                 Ok(None) => {
-                    let err = oauth2::OtherError("unknown error occurred while generating oauth2 token".into());
+                    let err = oauth2::Error::OtherError(anyhow::Error::msg("unknown error occurred while generating oauth2 token"));
                     match dlg.token(&err) {
                         Some(token) => token,
                         None => {

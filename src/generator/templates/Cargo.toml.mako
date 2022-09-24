@@ -26,6 +26,8 @@ path = "src/main.rs"
 % endif
 
 [dependencies]
+## TODO: temporary, remove when yup-oauth2 is optional
+anyhow = "^ 1.0"
 hyper-rustls = "0.23.0"
 ## Must match the one hyper uses, otherwise there are duplicate similarly named `Mime` structs
 mime = "^ 0.2.0"
