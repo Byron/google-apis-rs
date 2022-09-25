@@ -5,7 +5,212 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## Unreleased
+## 4.0.0 (2022-09-25)
+
+<csr-id-38f086ebb59b16d9e6be6747a38def03ae114aa0/>
+<csr-id-f2363df5b5014e265647f33124ba4d0af6c7144a/>
+<csr-id-4603769ca6fb33877dd15eedf5ea3dd1fbcdb152/>
+<csr-id-b7d2e021f104a84914137e02ee1f0abf3ad082bd/>
+<csr-id-7ef8049d2907b54f71566d5e8fb69538deed3a0c/>
+<csr-id-a0d6551deab6017ef1904eaf48ced0627eb29ae2/>
+<csr-id-9e92a3c1880d35e9da529e4cc44400d9d052a91f/>
+<csr-id-9330ca140a82561da406d4f9ba1f4a4421d7e92c/>
+<csr-id-eff8aac1edd20d83e7272e604440e978a3d1282b/>
+<csr-id-d6d8d6037e853a2edd8358438de188ec91cdbdb0/>
+<csr-id-deaf8f5049c5abadd855a7d9a9f4dd86bbc8e5b6/>
+<csr-id-92c80e238ec3c3ab3b2e65944d755ed7cdc6949d/>
+<csr-id-282eb1c41728d4a0628ef00aa257d91b3a1cdfd2/>
+<csr-id-77c26b7e6c08a16814b547335995565aca25509f/>
+<csr-id-f947a4552fad3d1c27b13cc3636922f6d170a9b2/>
+<csr-id-1dd5eadac1cd9a8aea817067f6ef3c968feab794/>
+<csr-id-fc4ff6fe8b31b2a6c49ab1de4f4e74e0675d3a81/>
+<csr-id-9cff80836244ec600dafac1994943ed562107af0/>
+<csr-id-83b916e8f94112effb3c213eaae38d78cb1aa291/>
+<csr-id-d0eb8f3d9a8aa5cfdf9527a7989cc457f9d69612/>
+<csr-id-87c15a7406bb84d71255942a7d47cdf34fcecfc6/>
+<csr-id-d18714e9b2a76cebbe8c6004cddb95e77b9e04be/>
+<csr-id-6cad082b7632393cf1415c48023a4733534482cb/>
+<csr-id-364fc9eb185c8c2887cf9dd87bd1ce7a11efb575/>
+<csr-id-26f57948a6631d42570f96498c2418ab457fcf4b/>
+<csr-id-1756d7dec47a5080cd90169b36ee226ea5f4a0e4/>
+<csr-id-0e6ecb997c60ef6927bbb514f783a2f30eef3952/>
+<csr-id-8876209143c06bb164bdf4d297667ab0467de161/>
+<csr-id-d3c1faf1f4900373f50004a9388200e96c1a06c9/>
+<csr-id-fd6815997d9429af2a744b87eaea8e316e4e7708/>
+<csr-id-7a4d59d19768377a7e14cc90b66674293bd1a0a8/>
+<csr-id-ab4410d9130ef50df7fe100c2b7d04420b189fd3/>
+<csr-id-ac325e4de06bbab638b90a1698c028f25569a4ec/>
+<csr-id-629b1c21438b31976f20e2761eb6f9b30abaa036/>
+<csr-id-64be0168811a42bc9820b44aed8f88b7a60524ad/>
+<csr-id-7fe6e698ba0de70aa96cffa803cdb7f705fc9843/>
+<csr-id-73038b2c668dbbbe1a1b8e82dd1246d031ec0b35/>
+<csr-id-75316f4c8400bd778050c44b1574babb074fa82c/>
+<csr-id-52a1dd23c12cadc809297e2561bf9212954ea0c1/>
+<csr-id-684233ccee8ef89e17332f2992b80c5ffbc1bf4a/>
+<csr-id-a0a264f4c36da6e26515b1399bf75ca199c14316/>
+<csr-id-ad919460cdcadfa4c812bee54563138c21da554f/>
+<csr-id-06caa1de02a9a6b8b8d843bb45bad02efd7a9790/>
+<csr-id-e04b6d023dcc906b9135037355ae05e9ef043e1b/>
+<csr-id-d9970513cbf27f2a2128cac843abbff350ecc9c8/>
+<csr-id-7cf4034a415b14195d54e79cd2781e7f175cdbad/>
+<csr-id-dd63b0fa672b106890a2086f0d997cd965517fc9/>
+<csr-id-c3bd076c0faf39e2b07662ce2407c4cb61931a35/>
+<csr-id-0d3adb658b47bb9e1bdd6b370e738aad06e238d4/>
+<csr-id-4258fd559035952b9a7c9e1f3292833fdb03557c/>
+<csr-id-96e07a35da8e06253228f16f473f571d80acd112/>
+<csr-id-43d028950e8f3b1d1b7f001161de66feab314bc8/>
+<csr-id-73f0e83086ba168f354a3395911409b4f2b91856/>
+<csr-id-bc582e57612821e71ec056d4f213db3a4ff2bb83/>
+<csr-id-8f59b9ba79668223214a7f0ec6362b17e09c760e/>
+<csr-id-36db66bf3ce1881b4e352bcc934917d4e4926b4e/>
+<csr-id-4a92a47bed1f61d52453192e6ab2c823b860f17b/>
+<csr-id-569e8029e1dd9c7c2d45325ad6f034955534d8e6/>
+<csr-id-93d053b2d6d7a51db7ee2e2c53b66ecf6f45f1dd/>
+<csr-id-c4c49015f507ee0d80afef3cdd02dd44751c1dcd/>
+<csr-id-d2495405c5cfcf2d761bfc95b697789bbcc7774b/>
+<csr-id-8a20d778a93258a08f2f062bec9e281ee402876a/>
+<csr-id-45d86f31f2f8aaf3a67f2c39c928435407f27ddc/>
+<csr-id-13ed4eaecb827099d8000dc9733e39709ef02342/>
+<csr-id-33771a6dc7137be3aa47cd4329859814afaa7cd0/>
+<csr-id-df2dc4784aaa988c7c1e2bc2598b538fa33e8aec/>
+<csr-id-527ffa35c23186a1253365448469030aae313b0c/>
+<csr-id-2a2e7bfc9a6ae870acc2901527fb69c41895fb08/>
+<csr-id-38c3d9a34dcdb947324b02876a5d2f3ef4e614e2/>
+<csr-id-2b37fc4d353f8a6f139eef70cc5254140675facc/>
+<csr-id-b9f237eec04ca2547cc8c53deb149e88aea1d2cb/>
+<csr-id-e7721ce53bafc70ea4de3d14920739649c06c492/>
+<csr-id-ae276438ae7dbc4cb141c8f216834435976e80f0/>
+<csr-id-091d3f7e81de1f4ca2a6e07da836667c972b052d/>
+<csr-id-5d1039e85fc1e8edada512ec16969e5fec901bb1/>
+<csr-id-c6f92057582c576129db6f8ca27ee824df201c5d/>
+<csr-id-864fe8424d83889ebe3aff69f0ada27c43a5bbc3/>
+<csr-id-e5dc49f87411377a6b655efdffde14159cea5fc8/>
+<csr-id-3e2216c4454d34a6ef080c5bb7d64b0b451bdecd/>
+<csr-id-95e9187c842c8c301bfff8a3c228e9da189f580a/>
+<csr-id-320d769c6f97460547395990efc07a441be9a927/>
+<csr-id-8d7a49891f8e6db1c528ce4b212029612c077472/>
+<csr-id-ca5dca7af93f7feef1b81237a9c7c1d5b07e1577/>
+<csr-id-8aefeb37d98e49be7f2ad88597f5e93087d99aa6/>
+<csr-id-e0de1b4c108ebfd37f6b7ebea4bf1109445d2661/>
+<csr-id-930ce6d5c2bf9776b4fdcb8c8dd00753cf7aa47d/>
+<csr-id-d2c12c296410be706c66bab824543f32be38da2d/>
+<csr-id-a25b593969c972586a71101f1e6866b22db6c89e/>
+<csr-id-df301c1c75fd60239fc93c50e6a6a4dd9d627f9d/>
+<csr-id-b3fd15edec924c844f02aea4adfdcbe57d06681f/>
+<csr-id-b0c0196f502a93d42053f9e6d54999e648631ac6/>
+<csr-id-5094f61c883cb05034b3d95171bc63af027e97b5/>
+<csr-id-be0faf0e1dd02c2efe4e8f903b948ae38596f04a/>
+<csr-id-ab672c41f97ee1aa5e1ef69c68d3cfeebf9a9774/>
+<csr-id-426b096ef8ebea1bf34b4b7bdbb2660ef7e7f921/>
+<csr-id-52e58154a2c5d151871894ca86e67743aa5d0cc8/>
+<csr-id-8732b5f8694a7c1f489347d12b79d72f4c68882e/>
+<csr-id-1e5a6bbee8b461595269dc60b9cd92a6e2fc606d/>
+<csr-id-900c2bfde917383295761e6b743ce465e242333a/>
+<csr-id-75076acf16fc7263bea4b6b4fe063ef38cd6a44c/>
+<csr-id-5cba22f0c6717574af77756324eae08431dd3cdb/>
+<csr-id-06e1d4bff6311cda4cd7feb2e94a921bf26cd5e5/>
+<csr-id-8295bf3c2dc310aeae293dc7287e2efe8d651abd/>
+<csr-id-e3f4fcadad5310ad79d91a1ce449e1ee9f3d0c74/>
+<csr-id-e1772d979d98c7d0d5c7fe14f0e81d6b5cc7ee18/>
+<csr-id-6a7654d433acd39b26ada579664a3833ef28a708/>
+<csr-id-5612d004b9fab6be352b4013f882a7a1dee2eb6b/>
+<csr-id-862842f62166f2c84efa24cf1e09ef644e3ceacf/>
+<csr-id-a8d333f91681010f9c5a52c50339d9d36ea49dc3/>
+<csr-id-aecda18821cb39edc8ccb6dd3f286b1c4ce626bc/>
+<csr-id-08d65ba62b025fac9c2db3db3842b86510c03d51/>
+<csr-id-62b63b251ac13fb945c444bd100b97fc7846a3c8/>
+<csr-id-e46535917ceeb9ba8cce2cbab39ae1e3f82942ac/>
+<csr-id-defbeaa630661400e212f598c98bc60596afa5fb/>
+<csr-id-6393bbf7f69f63e1291dc5b2cbd71a79bfdac2cc/>
+<csr-id-337f167e6c9cfd464231bbbac9ea4503f9c77e00/>
+<csr-id-7d58d66025ea58088950a0914bfb910a35a16748/>
+<csr-id-1180314275b62979376ba5ebacf34763ef6ca610/>
+<csr-id-31f22b1535feaa031586bdb6d16e2a306fd62a38/>
+<csr-id-d0fb7a5ccc5729303b5aca2419ac06abf12e0133/>
+<csr-id-d1cf8360f979df5c53fe32a34c0cddc246a072f1/>
+<csr-id-3484fecf9cf19c0a09f6241f8beea2d62d637cf7/>
+<csr-id-d6ddff240d1fefac28549efad78648d98e4ed9a4/>
+<csr-id-1f9dc06a57f45c8be216602661b68a0adce5beca/>
+<csr-id-ed0debe999c201a82be5134b3dbec7bd5400085e/>
+<csr-id-e434563215b6b8cddc0aaa6a6c5ef48d6e7aedbb/>
+<csr-id-5e5f0dcc662160a378387a91a0719407dde503c9/>
+<csr-id-296debda85e0afb22261b61ab671325f539e01ff/>
+<csr-id-9ba25af48b8c7794bb8f28475b821fdf957a0efd/>
+<csr-id-23119a06d263f130d9797f73c12c34eed3ba5102/>
+<csr-id-ad6dd7758e08e72cf3df3cee87df41286e9d5f0a/>
+<csr-id-1d44d794eba6d7c371c10205e6f1d8b416748035/>
+<csr-id-3e70a896742dd682a55394be6936811eaad27111/>
+<csr-id-9e6c9537a527528debd0c68a5fe4494291facdbd/>
+<csr-id-8375dd0508c6e09761f79f8b47379cc240a0c7c4/>
+<csr-id-294da41a308e4f4125db876c5b24084ae8cfcb5f/>
+<csr-id-362781e6014a2b050f69f5487b33aba8434c14a0/>
+<csr-id-5ebb34ed5839c6c9f588a95e5661b68d07c02d4d/>
+<csr-id-ab2290192ea790744851deb60e396ca908b6d190/>
+<csr-id-fb80b056ac6cc8eee1972eec979a7f810861f8b8/>
+<csr-id-d8acd607aea2e4bed548695e46fe541cb72ee904/>
+<csr-id-cc1bfd19c8aecb4a62bf68f3bf7db650eb8fc29d/>
+<csr-id-5165ff68dfe3d67f3bdcf8fee0a0d3aedee0fa33/>
+<csr-id-caaf62e51dae4b3f5a405008958a60a83c9aed43/>
+<csr-id-4bfdc9fd015b95bf9f3bcd311818de6cee342c9e/>
+<csr-id-9abf0eb64a96544b6db313690e4b3267c6987df7/>
+<csr-id-2c2585d16d5dd346fb16809db05495be93ab571b/>
+<csr-id-0bc6d216c3be583cfc58143e136a16e573d7277f/>
+<csr-id-9377220c59cf9a8a29720b0528b9263e9e947580/>
+<csr-id-7b81646f43c1c4de5165c5b3e9e7ea5c836eb664/>
+<csr-id-874cfb6f680cd601271befa66e86a54c59e3618b/>
+<csr-id-8ba6acb88bf889d41560ccc2c16f5e884af68b9c/>
+<csr-id-819e1ccce5c503329bf6ed5dd9078553a48997c5/>
+<csr-id-d202f9792ba0aea107213ad33ce5e7da06145ef1/>
+<csr-id-2740810b2aa40517f7492f7c67dca7a08b017600/>
+<csr-id-aaac92bad68634923c554f4f2e8bc28769a47e84/>
+<csr-id-c4e363d94ce1715f3ecfe6fd6ee56b93c670bfb2/>
+<csr-id-0337435cd44105749cb219cc75d61da6895d5d8a/>
+<csr-id-d1ebc0ff0be566c749651321394ffb955633286c/>
+<csr-id-cc30a2e20b697ca318bd3b54e5b94f6935eaadd2/>
+<csr-id-6279fd8f5df3ca9c9013635c36041e89df902428/>
+<csr-id-09805e59adba84d83184ef02f27abbb054359c45/>
+<csr-id-fad9d3b0ca3f588f65faf6ec46caf51a7ca1c239/>
+<csr-id-fdc0141fbcabf68ed5d715314d483469e7a7ef14/>
+<csr-id-d6accb8f6194bac7f982ee93409821436dd8beed/>
+<csr-id-fc34337ee4ba708f63e3d2f164660edd5ffe5614/>
+<csr-id-f31ef51a61cf8e1343e4ab956d8be29271976e59/>
+<csr-id-850e115e33e5da9fe6266718e4cf04c23e554d2b/>
+<csr-id-87dcf06eacc4fef9ed5bdec99fbb589c3d81666f/>
+<csr-id-b35a1d6732022a41b846d6a8bcee8ecae940d260/>
+<csr-id-495ecef8c8fcda27b08833df9fcfca503fa65002/>
+<csr-id-da78e9fa4d68d772323c7a2927b8004b8ac5d1a8/>
+<csr-id-7754a160c9fff6fb3796982cb2cc284c033d1008/>
+<csr-id-152cdd848a41109819d890560d26270bd08c12ae/>
+<csr-id-6e669ced2aca094b246c2c0eb805b362924112b1/>
+<csr-id-129fd38e003d2ab23bad2ceb84f59bb74b4ae45b/>
+<csr-id-e92f440d9b980c80c31c04752a8fe0c21fa36585/>
+<csr-id-69b12104a9f9579773553825f63c321e7d1a6899/>
+<csr-id-e86e55cae788506a2280816009b8620bad091477/>
+<csr-id-5894c8163afa9f9d9bed592e7e41912c77cf993d/>
+<csr-id-26314e743e2c4f38eb6c5824bf51209099000f9f/>
+<csr-id-0d655411ab9c81808f683c0ad26a1eb927cdde46/>
+<csr-id-05b442d5893ef46ddaf52306aef5807776bc1d05/>
+<csr-id-89343654018fb1a2fb3f6955f5f0e1c3eb4fe0bd/>
+<csr-id-d0b69af41390df40f5a11d44e08d1b67167a969a/>
+<csr-id-464394af22714fee650ca3e310336584666f921a/>
+<csr-id-f83dff672bc5a739f1a4b76333e25d40523fbe2c/>
+<csr-id-5c284e1c418d93bca7da4a29c4f8feaf5800c1ce/>
+<csr-id-15daf311ea79a95baf5b28760c88fbbff63a450b/>
+<csr-id-2485343caa621bed4cca0df329abda7e61df813d/>
+<csr-id-ef63790422db56158e2e1a6d651e329e14cd7ec0/>
+<csr-id-f1fe6bac018c2268d10233ec1635f0273f1192dc/>
+<csr-id-bbab1f2e38f4445179e7385a9507098d6ff15cbf/>
+<csr-id-f7740ad149d78b4642670ff35deb6163ab56be22/>
+<csr-id-137ba8caf3b9bad5bb7d8e4a9fb236e9988476f2/>
+<csr-id-76827ff6659d33b7b9430e4971a7189fa0d23798/>
+<csr-id-5b5ad43bfa06f5c525a7e00b537381cefe6b7aa4/>
+<csr-id-a2550d11811de9f9ee51652975363d0f24b8d032/>
+<csr-id-331ecf87a76189b10672770377d36877dbd7f53a/>
+<csr-id-1dc168497ee180fa3728be290c65535ba16117e2/>
+<csr-id-f1b99af5dcca4e169463a8932fcf217f9cace8c6/>
+<csr-id-5bc4141fa584a247d507660bcbe46551789ad04a/>
+<csr-id-c9c3ad011fdb4ae693ddeef436f7a14de35ad7b0/>
+<csr-id-544be6d2a27423865d09f355785310368c4c42ed/>
 
 The initial release of the crate that is shared among all google-api crates. This allows
 trait-implementations to be re-used as they are not unique to their respective crate.
@@ -398,6 +603,40 @@ you need.
 
 ### Documentation
 
+<csr-id-4f98fc175ea274d3854929c05637c337f1a6aaa7/>
+<csr-id-12743f543d6021322915bfdd9b4d5ef6b88f72de/>
+<csr-id-6f5c1599168524c0df0b47713ea4eb1a00d049f5/>
+<csr-id-944e04bd12f6415e3818f444d2604fc103ec162b/>
+<csr-id-fbec9bdbba375037ec3ac5886bb86390622194fd/>
+<csr-id-b64722cca85a0396cc1389da694e7abd2338ff2e/>
+<csr-id-47f9ca8b209e0f2453dad6d8c121e60e138f511c/>
+<csr-id-683cbbdd753611c6f09e5111bb1aa3c29e6b909d/>
+<csr-id-92b1ef7476d0adb9168c94b8d9bb1097ad682fbc/>
+<csr-id-6d3bbcea5713a7a868ba7e8def00ed18fda83b64/>
+<csr-id-24e053718a6960466d4da69ba4113fc341646b69/>
+<csr-id-c004840d5bbb5b5196a68b67f709008d055d496a/>
+<csr-id-c65a8a6bdf9296721f21f86266f744d656f00ee9/>
+<csr-id-334061a5e20846cf4f21847c1950f58ca4f9c87e/>
+<csr-id-49c4a4101e73b516b67f66779072efe13a624ba6/>
+<csr-id-74bb79d6b4b73b0031ee233cf9a1667f7fdb8070/>
+<csr-id-c1d09e6d576b6f6bb1245af6e0b9b166c5f69b2f/>
+<csr-id-aadf37004ee609d940674f6f30ae4c942ba522c8/>
+<csr-id-2f293f5e1bc14b8189d38424ef24d829fedd8743/>
+<csr-id-bec5cd5e5c12a38168e0a117adccccd6e3407e9f/>
+<csr-id-6800edb4dd9b3655da231ef483780144c2b52884/>
+<csr-id-4cf365d0263b66ee538eb5e31144469a3018d856/>
+<csr-id-206ccadbb3849c27247d3670c3bf4591636b66d0/>
+<csr-id-9bcb3f8ba900e313bea4fd4203177851e6e86f9a/>
+<csr-id-ac35432b3f200a02a1272b3e295dcf6029e8b441/>
+<csr-id-4b12da4a12927f363f9ce2e208a1c92f05bbda2f/>
+<csr-id-182d0c6facbc80cf30c072abd930aa15a1898123/>
+<csr-id-a7f93a93b62a908f470cc0de1164551786d1b96a/>
+<csr-id-0ff1e07e534e33d0815676270c90109a0195ff82/>
+<csr-id-42ae75c1a1a2bfa148a6c52884c88ac71bcf93c0/>
+<csr-id-4e8872b37af5bbefcbec6db8f9192d0fbf180eeb/>
+<csr-id-bfa20a18c8138ddd7c76a2fcdeb43d40bc884b3d/>
+<csr-id-74aa7bba2d9e5e5375d15ee2500e385d4b33415b/>
+
  - <csr-id-a2f5625fe36c5c257d2dc2a4483e5685f8848518/> add lang attribute to docs index
    Use the W3 standard "lang" attribute on the "html" tag to provide context for browsers and screen
    readers.
@@ -435,110 +674,164 @@ you need.
    [skip ci]
  - <csr-id-bd27046cc8cd5ccf515355a5d810dace168a7db3/> update STRUCT_FLAG and UPLOAD flags
    * adjust documentation to resemble actual upload flag semantics. It was
-     still using the one previously used in docopt.
-   * Make -m <mime-type> optional, defaulting to 'application/octet-stream'
-   
-   Should have been fixed alongside of #81
- - <csr-id-4f98fc175ea274d3854929c05637c337f1a6aaa7/> visual gap between cursor and kv
-   Previously, the space was barely visible, confusing even myself :).
-   Now it's clear, using 4 spaces, that there is a cursor invocation
-   followed by a key-value pair.
- - <csr-id-12743f543d6021322915bfdd9b4d5ef6b88f72de/> add link to general documentation
-   [skip ci]
- - <csr-id-6f5c1599168524c0df0b47713ea4eb1a00d049f5/> request values are moved, not borrowed
-   [skip ci]
- - <csr-id-944e04bd12f6415e3818f444d2604fc103ec162b/> filled README.md
-   All possible documentation was added in a quality sufficient for
-   a first release. After all, everything there is is documented.
- - <csr-id-fbec9bdbba375037ec3ac5886bb86390622194fd/> integrate different program types
-   * put program type inforamtion into shared.yaml to allow accessing it
+   still using the one previously used in docopt.
+* Make -m <mime-type> optional, defaulting to 'application/octet-stream'
+* put program type inforamtion into shared.yaml to allow accessing it
      from the index.html.mako template.
- - <csr-id-b64722cca85a0396cc1389da694e7abd2338ff2e/> random values + cursor information
-   * Instead of writing pod-types, we generate a random value of the
+* Instead of writing pod-types, we generate a random value of the
      required type.
-   * Fully document how cursors can be set, which is all that's usually
+* Fully document how cursors can be set, which is all that's usually
      demonstrated in more complex dynamic structure documentation
- - <csr-id-47f9ca8b209e0f2453dad6d8c121e60e138f511c/> absolute top-level cursor + details
-   * just for show, use absolute cursors in the top-level structure
-   * indicate you are setting an array or hashmap in the details
- - <csr-id-683cbbdd753611c6f09e5111bb1aa3c29e6b909d/> relative cursor positioning
-   It would still be nice though to show absolute positioning as well.
- - <csr-id-92b1ef7476d0adb9168c94b8d9bb1097ad682fbc/> dynamic absolute cursor position example
-   We build all required -r flags using absolute cursor positions only.
-   The next step should be to use relative ones, and of course be more
-   verbose about how this should be interpreted (sequential).
- - <csr-id-6d3bbcea5713a7a868ba7e8def00ed18fda83b64/> upload and output flag
-   We are already there, except for documenting the request value type,
-   which definitely deserves a separate issue.
- - <csr-id-24e053718a6960466d4da69ba4113fc341646b69/> optional paramters
-   Added documentation for flags setting all kinds of optional parameters.
- - <csr-id-c004840d5bbb5b5196a68b67f709008d055d496a/> inforamtion about setting structs
-   For now we just have a 'dum' example, but once we are there, we shall
-   make the example and documentation based on the actual request value.
-   
-   This requires some additional work, which fortunately has to be done
-   in python only.
- - <csr-id-c65a8a6bdf9296721f21f86266f744d656f00ee9/> add required scalar arguments
- - <csr-id-334061a5e20846cf4f21847c1950f58ca4f9c87e/> name default scope in API docs
- - <csr-id-49c4a4101e73b516b67f66779072efe13a624ba6/> added CLI scope documentation
-   In addition to that, they can now be set as well.
-   Unified generation of the 'default' scope.
- - <csr-id-74bb79d6b4b73b0031ee233cf9a1667f7fdb8070/> update to include CLI targets
- - <csr-id-c1d09e6d576b6f6bb1245af6e0b9b166c5f69b2f/> minor phrasing changes
-   Also removed superfluous 'extern' for tests
- - <csr-id-aadf37004ee609d940674f6f30ae4c942ba522c8/> deal with 'virtual' methods resource
-   We assure to know about it, instead of writing nonsense about that
-   'methods' resources which does not actually exist.
-   
-   I am relatively sure to have found all the spots.
- - <csr-id-2f293f5e1bc14b8189d38424ef24d829fedd8743/> method features and general info
-   * add method listing for various categories, like 'downloads' and
+* just for show, use absolute cursors in the top-level structure
+* indicate you are setting an array or hashmap in the details
+* add method listing for various categories, like 'downloads' and
      'uploads'
-   * add general information on how to do downloads and uploads using
+* add general information on how to do downloads and uploads using
      various protocols
- - <csr-id-bec5cd5e5c12a38168e0a117adccccd6e3407e9f/> add build instructions
-   These should help people to get started on their own.
- - <csr-id-6800edb4dd9b3655da231ef483780144c2b52884/> initial version
-   It's still rather simple, but a basis for further improvements
- - <csr-id-4cf365d0263b66ee538eb5e31144469a3018d856/> result handling and remaining todos
-   Basically there is no todo left, which puts us in a good position for
-   implementing more features, and get some feedback in the meanwhile.
- - <csr-id-206ccadbb3849c27247d3670c3bf4591636b66d0/> bigger font for doc-index
- - <csr-id-9bcb3f8ba900e313bea4fd4203177851e6e86f9a/> for additional parameters
-   Based on the parameters suitable for the entire API. One could also
-   make them available in the builder ... .
- - <csr-id-ac35432b3f200a02a1272b3e295dcf6029e8b441/> cross linking of resources/activities
-   This makes it so much easier to get to the example call you are
-   interested in.
-   It's getting there, slowly ;)
- - <csr-id-4b12da4a12927f363f9ce2e208a1c92f05bbda2f/> docs for terms.upload methods
-   Also fs::File is now used with prefix, to prevent clashes.
- - <csr-id-182d0c6facbc80cf30c072abd930aa15a1898123/> scope docs for method builders
- - <csr-id-a7f93a93b62a908f470cc0de1164551786d1b96a/> fixed spacing
-   Also, the `do()` implementation was moved into it's own def, even
-   though it's still quite empty.
- - <csr-id-0ff1e07e534e33d0815676270c90109a0195ff82/> improved spacing
- - <csr-id-42ae75c1a1a2bfa148a6c52884c88ac71bcf93c0/> added info about settable parts
-   It's not as good as the parts info on the website, but it's something !
-   At least people don't have to read the text, but find this information
-   in all the spots that are relevant to this.
- - <csr-id-4e8872b37af5bbefcbec6db8f9192d0fbf180eeb/> more information, nicer visuals
- - <csr-id-bfa20a18c8138ddd7c76a2fcdeb43d40bc884b3d/> method builder call example
-   With nearly fully randomized examples to show how it can be done.
-   It's quite nice to see actual calls, using everything required to get
-   a call. The only thing the user has to manage is to fill in actual
-   values.
-   
-   But, it also shows that our builder pattern doesn't work yet due to ...
-   you guessed it ... lifetime issues :D
- - <csr-id-74aa7bba2d9e5e5375d15ee2500e385d4b33415b/> library overview as far as possible
-   Everything we have, feature wise, is now documented in a first version
-   at least.
-   
-   We shall keep this uptodate with what we are implementing, which also
-   helps figuring out a good api.
 
 ### New Features
+
+<csr-id-96415d17ca383ba0653fb4df23df1ebe27d57f55/>
+<csr-id-75b80de3c644a1487358561810c7c56bad8cca1d/>
+<csr-id-894b5b5ec7bf7cb027ba31bf83c40f27e0ab51bd/>
+<csr-id-656fcae2b481ac90254bf5e3081d2bbd659d5232/>
+<csr-id-db4624b46728379393372be40b1ce731fe8f28b4/>
+<csr-id-b39bc3a9cd165db8f9ea3fa536697ca80d36628e/>
+<csr-id-988d37f0dfaf8a1725bf92364e965c1f32e6802f/>
+<csr-id-36513f101e0c3299513fe1bf542c7fc7c492e771/>
+<csr-id-c248301951cc1266136e2ab7b6c6f5cc54d86164/>
+<csr-id-a3289420337c7f607f4393fcf0832167267cc473/>
+<csr-id-e42f6fbedb0a2e609c6d1363a5c0eaa5b7967863/>
+<csr-id-b830c1c6decea4d5b3a16712b31daaa544cc837b/>
+<csr-id-c14ef9afc86a17b5bc3952882f98fc7bf7a2ced8/>
+<csr-id-03f35bd4f547da5843fab755ca678c01800aabed/>
+<csr-id-159c65916f0fb4d0136a8cc622919daf60a7ecfd/>
+<csr-id-f5f12c559448f73a08a812f4ac40bfc6dafcbabb/>
+<csr-id-15b78cd1ff148a20006e92fd9210e93f01d9f366/>
+<csr-id-1dd1fcf4b80e9554bac430326fa668b18cd9c678/>
+<csr-id-6119bfb7627c7e238a5641b0781bfca3689e8a36/>
+<csr-id-9eed4056e53d71f2b8165fd4099fda6fc0d0798a/>
+<csr-id-36a7cb239a2717b54500ed41a346a382b092f76a/>
+<csr-id-6ae6ee88a05d8d8c76f69c4bff2c37684b3d81ad/>
+<csr-id-3f49f50ac21fb921b61c1170c633214782f39cc7/>
+<csr-id-c3a9f1e8e594172ac783f0b9c76e093a534674ee/>
+<csr-id-e34e24e04943e6cce8564295587bbf426c58077f/>
+<csr-id-d6919f1eb65c7e29527360739555fce4a254d9e8/>
+<csr-id-8afc76a7fe50ba8171f1e2045d989162c9864395/>
+<csr-id-f71c2862851f98c00fb893fa3b940a912b893845/>
+<csr-id-7dc9972445593f592f369759b9839a3dedf8d12c/>
+<csr-id-be228f19940d38e484809116c1bd84bb8edf5ee8/>
+<csr-id-4548644cb1498f4c7769d8e98cc7ddf8c0e4f47b/>
+<csr-id-5799d44fceb537f8f82ae4919682c9189a172792/>
+<csr-id-ca8e8c06220f858424c8c1b799b1f00bd89e9bb2/>
+<csr-id-310c81f19cbfb8e1fc7d7f3766492c002a340761/>
+<csr-id-3cef120c58d304e120ba5e86a1717f1c47452452/>
+<csr-id-c78ea5381aeeb7c97ce4fc35e0c9da40a7022423/>
+<csr-id-39253d988af3d7795b2167edb3a54b8988dda00c/>
+<csr-id-f527c8202b961d3dcb4c30a13e3c28a650fb144c/>
+<csr-id-390354bd08b429fb438d60c54e2a36756e086c3c/>
+<csr-id-d1c97912cbebf8df3f2817b04b15a78d952b092a/>
+<csr-id-cefd606b538ed86d7b659f83b64ee2b14f71fc3b/>
+<csr-id-be7d8214c16287fb245918c38561544245a0aa1d/>
+<csr-id-29ee94b4c04f72d2676a98dda6632a06c5b8ba54/>
+<csr-id-065753cc3a56227c2e87fbcc8b36121dc3bb1ab6/>
+<csr-id-42a76e465549beadd3080c36f68922d8e44fba54/>
+<csr-id-d26cf7740614134e97f1b6add19c3b91242fc994/>
+<csr-id-8ad316bda3fd5eaa7e9a993ff1a9120e71022365/>
+<csr-id-57e0f0658379db524f1a964232a3fa39111be626/>
+<csr-id-ffef7dda57c8f3f14d86712107416eaffe4c1bfc/>
+<csr-id-9ea85273cd18798c7f0c523a45de1f25c0648c92/>
+<csr-id-307d3f487c6b35f42be643505a4e65c6ce04e6ec/>
+<csr-id-0823dec75cc89b8e0a87a41ab2dcd1d5a405a24e/>
+<csr-id-8bb2166da0a11db45a68e53518e94119b6d5a3b3/>
+<csr-id-bb75c5b69871ec88c888618d0c3292741c9cffff/>
+<csr-id-55978ff9a2fe332c5ed46476af4f921a72999e5c/>
+<csr-id-9f719dd9287ee112fa6c3ebb6be64e9793da8a81/>
+<csr-id-d3bb130be0b25f984c75ab125d2b344929865213/>
+<csr-id-265b448297493afe11c38ac751376c67907e84da/>
+<csr-id-3a1543033949b8f25e2e3cd888c9f43029b4de3d/>
+<csr-id-508d14eafbca167f9801a2ca7ff9a1ae922be734/>
+<csr-id-02d7a06fdff10d54c93d00fa18e0330e1f536162/>
+<csr-id-4a27ac7e1d14207645915637c4817a17f10916b9/>
+<csr-id-cb5a0a35bc36cbf234e2ac5d2cec0b2c14ac1d2f/>
+<csr-id-9d401f5486b447ea0fc43cb0d4bb84fac3329357/>
+<csr-id-224af64068c60649266aff7cc06abd001053015b/>
+<csr-id-b127df17b02a4823e74a5125961bdfa23f77f7a0/>
+<csr-id-8db346b8b01f003fed24d202822c398fa0994443/>
+<csr-id-71c827b3067131a150bfd4a3503a61b836ec39b5/>
+<csr-id-fc589cb965848332dd944a790cafd7d4745d9fc7/>
+<csr-id-3ea5e194859749e05632edcfd35cc21db8cf53ff/>
+<csr-id-b0a1f518e957c96a0f5b5b2297a738cb42032e87/>
+<csr-id-7cfb5afd394041019899ca4cdcf10c9187204409/>
+<csr-id-d2bf24ca859b945e1f5ee64dc5ccdf7357d01184/>
+<csr-id-1fee21de24eee4fd62151595ef7915987f7a39db/>
+<csr-id-54eb784a550a619b3773e44fc2ddd0b2a58ffcd2/>
+<csr-id-64219e7e7eed42f7491a2aba80f5e8fd7567385e/>
+<csr-id-d758f410f68b84cb635a6a0633bb09b147939397/>
+<csr-id-60d953a3428d11591954e7488bc46078d4765b1f/>
+<csr-id-354370705dd317b9839cf9a6ad34e22b9efe12dc/>
+<csr-id-33e85ddd29db5a75ce49718d850652c36ad7ce25/>
+<csr-id-79cbf3ee3fccdbfadcb1176ebc319f8bbabb8b68/>
+<csr-id-60adacf8d47eb43a0f82642a69c5216e79285dbc/>
+<csr-id-eef1471357e7a16f7501575bcca1d17cddf05515/>
+<csr-id-2c79f6e3cfbf7044a061eef1ddfb6fadac19401d/>
+<csr-id-9a58b0badd0fea4220cccb953f6deb00c8edbaaa/>
+<csr-id-7f33cf22a5c22e3cc50dcc199604af78ba8e13fa/>
+<csr-id-dd0772f1d7e1330229bb36040686f91e088befd2/>
+<csr-id-c0a247605890be6553fa4709074b4c4ca4a199a9/>
+<csr-id-9a17ab9e4e98d8797a9912d3d5094c0e2bf9716f/>
+<csr-id-664d8225d2d5275148395828af02c0bc54b7ee24/>
+<csr-id-b8956103d9460c73956dbc28ca2f1684ba8b853c/>
+<csr-id-f27fda8f34e084e1532f4e6528b93e156f062503/>
+<csr-id-ac8c41530d082203f93d81851682d02ed5c98d9a/>
+<csr-id-712fed578a377c27bd6153b098ee4b3244b0355e/>
+<csr-id-2d036b6623a6f21e7d5706b382e2bc1e28dac87c/>
+<csr-id-bb76832b2f317501d398f5ea9fe8ea6b12dacf7b/>
+<csr-id-e1b7a63f0660682a1680d9651cd5c3e784b12030/>
+<csr-id-aabed3858143bcd28d4b95e3831c408d3120719b/>
+<csr-id-da300e035ebc92728c5566071c26505a38b409f6/>
+<csr-id-7c6f7d5e97344e7df0f397c65209795e5b8515bc/>
+<csr-id-6c4166094358fd236490239d12235a80b738f34f/>
+<csr-id-432faa275f89bb1c3ab00b60ff07225eec5a4489/>
+<csr-id-678b6929ca7bffb4e4495272330aac02a082dbcd/>
+<csr-id-5b2d8a77a3cf17a1c5989e856b1ae2dc77613264/>
+<csr-id-de0c7a4ae049b6f7fbc256d64bc363ebd8de2101/>
+<csr-id-66f3ae14e5f088828d6c9d772643889366934fac/>
+<csr-id-020300af15022124cfa0d3e1722d45ff371f924d/>
+<csr-id-48d40d45c5ee2b8dce689eb0a0457e0364246899/>
+<csr-id-693b5c8f6a556941fcbfaf6b58f0d0dd00053a66/>
+<csr-id-582aca32494bf938889b04c60c5d3cec81872f77/>
+<csr-id-942cbe18f1f237fe8efacde93fd121879924d619/>
+<csr-id-01db89057deca47d86355e35c86b4fb88c218db0/>
+<csr-id-e96260bacc959aee2d3baa1353d48087637f3df9/>
+<csr-id-615a12465415cfa155271ce2fb94be9faa7405db/>
+<csr-id-f1d95822f784bce84927c2a9d4134d5477495217/>
+<csr-id-e164cf73667a6b64908a1dd41c5adf91191a5237/>
+<csr-id-c1eeee0591f96e2865db1ed13900ba7b59475ac9/>
+<csr-id-ba98bee62fa2e067e9bc18f6f52db8be1da35161/>
+<csr-id-d8edf1dcd46c6f7ae27e6f61b8aa1dea071a44a0/>
+<csr-id-a5e675e7a958327938a31ec38ddebfaf58af9f42/>
+<csr-id-475163ec29e5d20e74141de76f38b88a51bfbd06/>
+<csr-id-fc15a7030f81658663ff416a86880bfde01f23f0/>
+<csr-id-3670e4f6c98d1b04a618fa9c14d5470a7a6765b7/>
+<csr-id-4e5f2c05d93dd2f4cbf7472a8911fbd7e0463d9d/>
+<csr-id-e3b6aee6d631c589cb277b999583aa460631c34d/>
+<csr-id-2298601165f5b65f76c86f4542139965c2486e58/>
+<csr-id-be938255bd14202cc77c6bc543c6e92060a7ccb0/>
+<csr-id-2d77857aaf9b6a7e1a5dc7a3f77349a3662f8c7c/>
+<csr-id-087a0762ac936f40bc4cec6f2281db34d9cab95b/>
+<csr-id-30041e9c7da099c4843cd987ff34349394d8613d/>
+<csr-id-20410adb786a1f35e870b38fc3b5b3140b626708/>
+<csr-id-c0bfeabbc39cd7449f59c8e1fd1fe9e5abba315a/>
+<csr-id-0812068c905463c10352ac194f44c9a317352647/>
+<csr-id-0c2f149b1e168497a376ce48105fa4d4089612e6/>
+<csr-id-f13c2960ab8b3441a32bde892a8ee53f8497b987/>
+<csr-id-1980f76c3240b44c306158df30793ca20ffc9461/>
+<csr-id-eebcf549295fe5b0521092bd0c79d83c416d351d/>
+<csr-id-aaf432fb545b47a64692dda0296414edbf3017b6/>
+<csr-id-24a727fdea7c2ae47dd23b7ff571cd717ec4d870/>
+<csr-id-67b052c5f376c85ceb2f3e94e676e4906df9fd10/>
+<csr-id-dda847607fc88ab6bb6d9646d52cd9795f7af0b3/>
 
  - <csr-id-c5ff239961df59cae23a7dd609d69b629f31e7fa/> Support custom connectors
    Switch the constraints on Hub types to use public traits based on
@@ -578,681 +871,319 @@ you need.
    resources.
  - <csr-id-0e6605d7a4ee59e16d52fd93e037b5608fd5f61f/> added back-link to crates.io
    * url is created per-API and features a nice crates image coming
-     from githubusercontent.
- - <csr-id-96415d17ca383ba0653fb4df23df1ebe27d57f55/> did you mean for struct values
-   * functionality is cursor-aware, and fixes the actual string the user
+   from githubusercontent.
+* functionality is cursor-aware, and fixes the actual string the user
      passed in. That way, it is made very clear how the suggested value
      is to be used.
-   * it's a known weakness of the implementation that it operates on a
+* it's a known weakness of the implementation that it operates on a
      flattened list of field names, and thus may make nonsensical
      suggestions.
-   * added punctuation to all errors
- - <csr-id-75b80de3c644a1487358561810c7c56bad8cca1d/> `-u <mode> <file>` parsing
-   * As `possible_values()` applies to all arguments, we cannot use it
+* added punctuation to all errors
+* As `possible_values()` applies to all arguments, we cannot use it
      anymore but have to check the UploadProtocol type ourselves.
      Besides that, switching to the latest `clap` simplified our lives
      a little.
-   * ajusted docs to not enforce using `-r` all the time
- - <csr-id-894b5b5ec7bf7cb027ba31bf83c40f27e0ab51bd/> adjust to serde usage in `yup-oauth`
-   * More detailed error type for JsonTokenStorage
-   * removed all traces of rustc_serialize
-   * use pretty-printers everywhere to allow writing human-readable json
+* ajusted docs to not enforce using `-r` all the time
+* More detailed error type for JsonTokenStorage
+* removed all traces of rustc_serialize
+* use pretty-printers everywhere to allow writing human-readable json
      files for secretes and for tokens
- - <csr-id-656fcae2b481ac90254bf5e3081d2bbd659d5232/> implement -u as good as possible
-   We can't have the `-u <mode> <file> <mime>` style yet, but
-   https://github.com/kbknapp/clap-rs/issues/88 might help with that
-   at some point.
-   
-   Related to #92 and #81
- - <csr-id-db4624b46728379393372be40b1ce731fe8f28b4/> parse structure and build App
-   We are currently setting everything up at runtime, and manage to get
-   nearly all information into it, except for the more complex
-   `-u (simple|resumable) <file> <mime>` flag.
- - <csr-id-b39bc3a9cd165db8f9ea3fa536697ca80d36628e/> initial version of command generation
-   It compiles and works, even though there are many things we want to
-   improve.
-   
-   One big question is how to define multi-arguments, like -u foo bar baz.
- - <csr-id-988d37f0dfaf8a1725bf92364e965c1f32e6802f/> setup infrastructure
-   This allows us to setup clap and see if it compiles, which is the prime
-   goal of the current workflow step.
-   
-   Related to #81
- - <csr-id-36513f101e0c3299513fe1bf542c7fc7c492e771/> simple linux deployment script
-   It's made for a linux machine, not for docker
- - <csr-id-c248301951cc1266136e2ab7b6c6f5cc54d86164/> simple osx deploy script
-   * added simple script to build tar archive with all debug/release
+* added simple script to build tar archive with all debug/release
      binaries.
-   * slightly improved docker script, even though it would need additional
+* slightly improved docker script, even though it would need additional
      work. For now, I use the cloud VM anyway
- - <csr-id-a3289420337c7f607f4393fcf0832167267cc473/> improved error handling
-   We are now able to decode detailed errors and pass them on. This allows
-   the CLI to provide more useful error responses.
-   Additionally, the CLI will only print debug responses in --debug mode.
- - <csr-id-e42f6fbedb0a2e609c6d1363a5c0eaa5b7967863/> per-API-credentials with default
-   That way, we can provide better service, as CLIs that consume a lot of
-   quota can easily have their own app credentials, and with it, their
-   own quota.
-   
-   The fallback will be a project that allows to use all possible
-   google APIs.
-   
-   The user can always put in his own application secret to use his own
-   quota or even paid services.
- - <csr-id-b830c1c6decea4d5b3a16712b31daaa544cc837b/> hashmap handling
-   * with native support for type conversion and error handling
-   * improved hash-map key-value parsing to at least state that it knows
+* with native support for type conversion and error handling
+* improved hash-map key-value parsing to at least state that it knows
      it's dealing with a hashmap. Error text is still not what it should
      be because we don't know at runtime (initially) what type we handle.
- - <csr-id-c14ef9afc86a17b5bc3952882f98fc7bf7a2ced8/> repeated required args
-   * Seem to work for docopt, mkdocs and code itself
-   * mkdocs now show type of required params
-   * some code which deals with converting elements to their
+* Seem to work for docopt, mkdocs and code itself
+* mkdocs now show type of required params
+* some code which deals with converting elements to their
      target types is totally untested right now.
-   
-   Related to #77
- - <csr-id-03f35bd4f547da5843fab755ca678c01800aabed/> --debug-auth flag
-   * Allow to see all authentication related communication, similar to
+* Allow to see all authentication related communication, similar to
      --debug flag otherwise.
-   * fixed broken generator when handling request value parsing.
- - <csr-id-159c65916f0fb4d0136a8cc622919daf60a7ecfd/> --debug flag to output traffix
-   * If `--debug` is set, we will output all server communication to
+* fixed broken generator when handling request value parsing.
+* If `--debug` is set, we will output all server communication to
      stderr. That way, we can compare our requests to what is expected by
      ush based on official docs.
-   * `discovery` now doesn't use the API key anymore - this is specified
+* `discovery` now doesn't use the API key anymore - this is specified
       using a custom override.
-   
-   Nice, we are totally ready to test and fix all API features.
-   
-   Related to #70
- - <csr-id-f5f12c559448f73a08a812f4ac40bfc6dafcbabb/> added first versions of all CLI
-   That way, changes can be tracked.
-   Also, we make it official.
-   
-   Future checkins will only be made if major changes were done,
-   similar to how the APIs are handled.
-   
-   Related to #64
- - <csr-id-15b78cd1ff148a20006e92fd9210e93f01d9f366/> struct value parsing
-   This works already for simple request values, but doens't generate
-   compiling code for structures with Parts in them.
-   Nonetheless, it's a big step towards finishing the overall issue.
-   
-   Related to #64
- - <csr-id-1dd1fcf4b80e9554bac430326fa668b18cd9c678/> field cursor complete and untested
-   Tests just need to be run, and of course, the impementation might need
-   fixing.
-   
-   Related to #64
- - <csr-id-6119bfb7627c7e238a5641b0781bfca3689e8a36/> make respective uppload_call
-   Now we actually provide the information required to upload data in a
-   simple or resumable fashion.
- - <csr-id-9eed4056e53d71f2b8165fd4099fda6fc0d0798a/> upload flag parsing
-   We handle errors gracefully with costum types and minimal amount of
-   code. Unfortunately, Mime type parsing is very 'flexible', allowing
-   nonesense types to be passed easily.
-   
-   Related to #62
- - <csr-id-36a7cb239a2717b54500ed41a346a382b092f76a/> global optional parameters+DL tracking
-   * set globally shared parameters (which includes 'alt')
-   * track if 'alt' is set to 'media' at runtime to do the right thing when
+* set globally shared parameters (which includes 'alt')
+* track if 'alt' is set to 'media' at runtime to do the right thing when
      outputting the result. There is still an issue to be fixed though
-   
-   Related to #61
- - <csr-id-6ae6ee88a05d8d8c76f69c4bff2c37684b3d81ad/> parse method parameters and set them
-   It's implemented in a working fashion, except that the default value
-   is not currently set to something sensible, causing duplicate errors in
-   case the key-value syntax is wrong.
-   
-   Related to #61
- - <csr-id-3f49f50ac21fb921b61c1170c633214782f39cc7/> handle output json encoding and ostreams
-   * support for encoding response schemas to json
-   * support for simple downloads (without alt=media)
- - <csr-id-c3a9f1e8e594172ac783f0b9c76e093a534674ee/> interpret output arguments
-   For now we don't properly handle errors when opening files, but the
-   code is there.
-   Will panic in next commit.
-   
-   Related to #63
- - <csr-id-e34e24e04943e6cce8564295587bbf426c58077f/> required arg parsing + first doit() call
-   We are parsing required scalar values and handle parse-errors correctly,
-   to the point were we make a simple, non-upload doit() call.
-   
-   It shows that we seem to build invalid calls, for now,but that's nothing
-   we can't fix once the time is ripe.
-   
-   Next goals will be related to finalizing the argument parsing code.
- - <csr-id-d6919f1eb65c7e29527360739555fce4a254d9e8/> infrastructure for call and dry-run
-   Now we are able to cleanly handle our arguments on a per-method basis.
-   The generated code won't clutter our design as we put the details into
-   their own methods.
- - <csr-id-8afc76a7fe50ba8171f1e2045d989162c9864395/> Implementation of JsonTokenStorage
-   It's also used by the code, replacing the previous standing,
-   MemoryStorage.
- - <csr-id-f71c2862851f98c00fb893fa3b940a912b893845/> init hub + refactor for dry-run mode
-   The hub is just using preset types - we will have to implement our own
-   storage and auth-delegate, as well as a Hub delegate at some point.
-   
-   Dry run mode allows us to check for errors and use a call builder
-   using the very same code.
- - <csr-id-7dc9972445593f592f369759b9839a3dedf8d12c/> Display + Error traits for Error struct
-   * improved documentation about error handling, it's less verbose yet
+* support for encoding response schemas to json
+* support for simple downloads (without alt=media)
+* improved documentation about error handling, it's less verbose yet
      explains what you can do.
- - <csr-id-be228f19940d38e484809116c1bd84bb8edf5ee8/> engine checks resource and method args
-   We are now at a spot where we can actually start parsing arguments.
-   
-   * ArgumentError -> ClIError - seems more fitting
- - <csr-id-4548644cb1498f4c7769d8e98cc7ddf8c0e4f47b/> write default and read app-secret
-   * if there is no secret file in json format, we write a default one
+* ArgumentError -> ClIError - seems more fitting
+* if there is no secret file in json format, we write a default one
      that we will then read in a second iteration of the loop.
      That way, the user has an example of how such a file must look like.
-   
-   Next step is to cleanup the error type and implement the Error trait.
- - <csr-id-5799d44fceb537f8f82ae4919682c9189a172792/> create config directory, if possible
-   * Only supports one level of directory
-   * full error handling, and uses memory efficiently
- - <csr-id-ca8e8c06220f858424c8c1b799b1f00bd89e9bb2/> infrastructure
-   * allow usage of cmn.rs for common types (like Error types)
-   * instantiate an engine and handle errors, in an initial quick and dirty
+* Only supports one level of directory
+* full error handling, and uses memory efficiently
+* allow usage of cmn.rs for common types (like Error types)
+* instantiate an engine and handle errors, in an initial quick and dirty
      way.
-   
-    Fixes #52
- - <csr-id-310c81f19cbfb8e1fc7d7f3766492c002a340761/> generate complete docopts grammar
-   Grammar is laid out per method, providing general purpose arguments
-   only as needed/supported.
-   
-   All details will be contained in the markdown documentation.
-   
-   Related to #45
- - <csr-id-3cef120c58d304e120ba5e86a1717f1c47452452/> per-method-markdown-files
-   That way, all information can be placed within a single markdown file
-   per method call. This will keep loading times low while maximizing
-   usability.
-   
-   That way, it's comparable to the API documentation, which is most
-   detailed on a per-method basis as well.
- - <csr-id-c78ea5381aeeb7c97ce4fc35e0c9da40a7022423/> cli postprocessing support
-   That way, a single huge markdown file containing documentation for
-   commands and methods can be split up into multiple files for
-   individual inclusion in mkdocs.
-   
-   It's done by a post-processor which is loaded by mako-render, providing
-   access to the entire context. Said processor may also drop results
-   altogether and thus prevent files to be written that have been split up
-   by it.
- - <csr-id-39253d988af3d7795b2167edb3a54b8988dda00c/> docopt subcommands
-   Setup command/subcommand pattern.
-   Next will be the infrastucture for documenting these, using mkdocs
-   and markdown.
- - <csr-id-f527c8202b961d3dcb4c30a13e3c28a650fb144c/> bin renaming + docopt infrastructure
-   * allow to rename executables, for now just brute-force using a boolean
+* allow to rename executables, for now just brute-force using a boolean
      flag. If we have more binaries at some point, we might want to be more
      elaborate.
-   * everything related to docopts functionality is now in the docopts
+* everything related to docopts functionality is now in the docopts
      module.
    
      Related to #45
- - <csr-id-390354bd08b429fb438d60c54e2a36756e086c3c/> basic usage of docopts
-   For now we just show it works within our generator.
-   Next step is to actually generate docopts grammar.
- - <csr-id-d1c97912cbebf8df3f2817b04b15a78d952b092a/> mkdocs generator works now
-   It can be selected for each type of program we want to build, and makes
-   sense for everything that is not a library.
-   
-   We also tried to unify names and folders a bit more, even though there
-   certainly is more work to be done to be fully non-redundant.
- - <csr-id-cefd606b538ed86d7b659f83b64ee2b14f71fc3b/> cli depends on API, generically
-   This allows us to build efficiently. CLI programs can now have their
-   own cmn.rs implementation, which we can test standalone with
-   `cargo test`.
-   
-   The primary makefile currently just explicitly pulls in the type-*.yaml,
-   one day we could possibly put it into a loop.
- - <csr-id-be7d8214c16287fb245918c38561544245a0aa1d/> api generation works once again
-   With the new structure, it should be easy to add CLI programs with
-   proper dependencies accordingly.
- - <csr-id-29ee94b4c04f72d2676a98dda6632a06c5b8ba54/> Resumable upload implemented
-   With all bells and whisles. For now, we don't have a good return value
-   to indicate that the operation was cancelled, which needs fixing.
- - <csr-id-065753cc3a56227c2e87fbcc8b36121dc3bb1ab6/> implement query_transfer_status()
-   The delegate logic is implemented and seems sound.
-   It's somewhat funny that after all this back and forth, all we get
-   is a valid start position for the upload.
- - <csr-id-42a76e465549beadd3080c36f68922d8e44fba54/> ContentRange header (parse and format)
-   Now we are able to send the transfer-update requests and implement the
-   actual chunk logic.
- - <csr-id-d26cf7740614134e97f1b6add19c3b91242fc994/> use of oauth2::Scheme
-   That way, we improved our API, reduced code bloat, and are very clear
-   about the what we do for Authorization.
- - <csr-id-8ad316bda3fd5eaa7e9a993ff1a9120e71022365/> crate version +<revision>
-   That way, crate names reveal exact inforamtion about the contained
-   API revision.
-   
-   * crate version: code gen version
-   * +<revision> (build-metadata): exact version of API schema
- - <csr-id-57e0f0658379db524f1a964232a3fa39111be626/> check upload size against max-size
-
- - <csr-id-ffef7dda57c8f3f14d86712107416eaffe4c1bfc/> make actual `store_upload_url()` call
-   We also assure to call only as often as we have to, keeping some state
-   between the loops accordingly.
- - <csr-id-9ea85273cd18798c7f0c523a45de1f25c0648c92/> improved delegate calls
-   The delegate will be asked for an upload URL, that he may store during
-   yet another call.
- - <csr-id-307d3f487c6b35f42be643505a4e65c6ce04e6ec/> resumable-upload infrastructure
-   Layout the `ResumableUploadHelper` and implement the entire logic
-   with the mbuild renerator.
-   
-   All that's left to be done is to implement the 'chunked upload' method.
-   
-   The borrow checker helped me to prevent a bug as well.
- - <csr-id-0823dec75cc89b8e0a87a41ab2dcd1d5a405a24e/> don't crash if json decode fails.
-   Instead, tell the delegate about it and return the error.
- - <csr-id-8bb2166da0a11db45a68e53518e94119b6d5a3b3/> mark unused types with marker trait
-   For some reason, some google APIs define types they never use. We now
-   mark them, just because we can, to show our superiority ;) ;) ;) :D .
- - <csr-id-bb75c5b69871ec88c888618d0c3292741c9cffff/> support for 'variant' schema
-   Documentation links, at one spot, have been updated as well.
-   The variant schema is represented natively as enum, it all looks
-   very good.
-   
-   Json has been taken care of as well ... .
- - <csr-id-55978ff9a2fe332c5ed46476af4f921a72999e5c/> Option<_> in schema only if needed
-   This means that only part fields will be optional.
- - <csr-id-9f719dd9287ee112fa6c3ebb6be64e9793da8a81/> added field aliases, were needed
-   This makes sure our fields can properly be decoded.
- - <csr-id-d3bb130be0b25f984c75ab125d2b344929865213/> use serge instead of serialize
-   However, for some reason, the `Serialize/Deserialize` macros don't work
-   for me, even though they work just fine in the respective tests of
-   the serge crate. What am I possibly doing wrong ?
- - <csr-id-265b448297493afe11c38ac751376c67907e84da/> simplify delegate calls
-   Now we use the DefaultDelegate as standin in case there is user-delgate.
-   That way, we save plenty of complexity as no additional
-   `if let Some(ref mut dlg) = delegate` is necesary.
- - <csr-id-3a1543033949b8f25e2e3cd888c9f43029b4de3d/> prevent duplicate schema types
-   These could clash with types we import from Cmn. When that happens,
-   just a single list must be adjusted for a fix, see
-   `unique_type_name`
- - <csr-id-508d14eafbca167f9801a2ca7ff9a1ae922be734/> begin()/finished() calls
-   During `begin()`, the delegate receives additional information about the
-   current call, which can be useful for performance tracking, among
-   other things.
- - <csr-id-02d7a06fdff10d54c93d00fa18e0330e1f536162/> alt 'media' handling to allow dls
-   This also includes documentation to state which methods actually support
-   media download, and how to achieve that.
-   
-   Added TODO to not forget we should tell the user how to achieve these
-   kinds of things.
- - <csr-id-4a27ac7e1d14207645915637c4817a17f10916b9/> crates with 'google-' prefix
-
- - <csr-id-cb5a0a35bc36cbf234e2ac5d2cec0b2c14ac1d2f/> allow to set user-agent
-
- - <csr-id-9d401f5486b447ea0fc43cb0d4bb84fac3329357/> optimizations and simplification; seek
-   * MultiPartReader is using match to handle state, reducing unnecessary
+* crate version: code gen version
+* +<revision> (build-metadata): exact version of API schema
+* MultiPartReader is using match to handle state, reducing unnecessary
      calls to 0 in that regard.
-   * Fixed seek() calls on readers, assuring they are reset to start each
+* Fixed seek() calls on readers, assuring they are reset to start each
      time the loop is done.
-   * both media-parameters now use `ReadSeek` streams.
-   * Use `seek()` to figure out size, simplifying the interface.
- - <csr-id-224af64068c60649266aff7cc06abd001053015b/> optimized memory allocation and options
-   * reserve_exact(X) where possible (params, multi-part-reader)
-   * `if let` used whereever possible to prevent duplicate checks
-   
-   This increases the possible performance, and makes for more readable,
-   concise code.
- - <csr-id-b127df17b02a4823e74a5125961bdfa23f77f7a0/> multibytereader single byte test
-   It shows that we actually don't handle our state correctly.
-   The first test which reads to string obviously uses a big-enough buffer.
- - <csr-id-8db346b8b01f003fed24d202822c398fa0994443/> MultiPartReader is working.
-   Something that is missing is a single-byte read test
- - <csr-id-71c827b3067131a150bfd4a3503a61b836ec39b5/> initial part writing
-   We are a state-machine, and handle parts of it correctly.
-   However, we don't yet write the boundary at all, and could improve
-   our use of match.
- - <csr-id-fc589cb965848332dd944a790cafd7d4745d9fc7/> multi-part mime-type and add_parts()
-   Next we will implement the actual Read method
- - <csr-id-3ea5e194859749e05632edcfd35cc21db8cf53ff/> handle 'alt' param
-   It's conditionally set to json, if we expect a response value.
- - <csr-id-b0a1f518e957c96a0f5b5b2297a738cb42032e87/> more multipart infrastructure
-   * outer frame of `MultiPartReader` to allow using it in `doit()`
-   * restructured `doit()` to get content-types right
-   
-   There is more work to do, as it currently doesn't compile, nor
-   do we deal with our streams correctly.
-   
-   But we are on a good way.
- - <csr-id-7cfb5afd394041019899ca4cdcf10c9187204409/> improve body infrastructure
-   This will support choosing custom readers at runtime, depending on
-   whether we have a resumable or simple media upload.
- - <csr-id-d2bf24ca859b945e1f5ee64dc5ccdf7357d01184/> simplify URL_ENCODE handling
-   More maintainable template code, with less redundancy.
- - <csr-id-1fee21de24eee4fd62151595ef7915987f7a39db/> uri-template handling complete
-   We now handle url-encoding for the parameters that would require it,
-   and can deal with repeated params that will match '/param*'.
- - <csr-id-54eb784a550a619b3773e44fc2ddd0b2a58ffcd2/> uri-template generation works
-   This doesn't mean it's correctly implemented, but we are on our way.
-   It does compile, at least
- - <csr-id-64219e7e7eed42f7491a2aba80f5e8fd7567385e/> repeated types in examples
-   Made sure usage examples know how to use repeated types.
- - <csr-id-d758f410f68b84cb635a6a0633bb09b147939397/> repeatable parameters working
-   The code dealing with them currently assumes they are "/" separated.
- - <csr-id-60d953a3428d11591954e7488bc46078d4765b1f/> intermed. support for 'methods'
-   These 'methods' have no resources, and need slightly special handling.
-   This version at least makes the generator work, even though
-   it produces duplicates.
-   
-   However, as it is so ugly, I'd rather consider to change it
-   substantially ... this feature should just come naturally.
- - <csr-id-354370705dd317b9839cf9a6ad34e22b9efe12dc/> partial implementation of url expr
-   URL expressions allow to substitute values within the URL with
-   parameters. However, this is not only a simple key-value replacement,
-   but supports expressions that need a parser.
-   
-   This one will have to be implemented next.
- - <csr-id-33e85ddd29db5a75ce49718d850652c36ad7ce25/> set upload media type
-   Related to #17
- - <csr-id-79cbf3ee3fccdbfadcb1176ebc319f8bbabb8b68/> add more obvious crate and api version
-
- - <csr-id-60adacf8d47eb43a0f82642a69c5216e79285dbc/> pre-request delegate call.
-   This one is likely to change the further we advance in the upload-media
-   implementation.
- - <csr-id-eef1471357e7a16f7501575bcca1d17cddf05515/> json decode and delegation
-   Now json errors are handled and delegated with the option to retry,
-   and all other values are just decoded according to plan.
-   
-   For now, I brutally unwrap json values assuming this will work, because
-   it really should work.
- - <csr-id-2c79f6e3cfbf7044a061eef1ddfb6fadac19401d/> authentication with and without scopes
-   It's quite rough around the edges, but has a slight chance to work.
-   Will still to handle return values accordingly.
- - <csr-id-9a58b0badd0fea4220cccb953f6deb00c8edbaaa/> attempt to send json-encoded request
-   This doesn't work yet, as I am unable to unwrap the client properly.
-   It's a refcell that contains a BorrowMut to a hyper::Client, and
-   lets just, it's complicated.
- - <csr-id-7f33cf22a5c22e3cc50dcc199604af78ba8e13fa/> add cargo.toml dependency information
-
- - <csr-id-dd0772f1d7e1330229bb36040686f91e088befd2/> docs and tests of youtube3 on travis
-   This might already bring it close to 7 minutes runtime, which seems
-   like providing us with a buffer big enough for when it is
-   feature-complete.
- - <csr-id-c0a247605890be6553fa4709074b4c4ca4a199a9/> update-json using discovery API
-   Instead of depending on the google go client API repository, I now
-   use the original data source, namely the discovery API.
- - <csr-id-9a17ab9e4e98d8797a9912d3d5094c0e2bf9716f/> full usage example on landing page
-   Related to #4
- - <csr-id-664d8225d2d5275148395828af02c0bc54b7ee24/> oauth22 -> oauth2_v2
-   Related to #3
- - <csr-id-b8956103d9460c73956dbc28ca2f1684ba8b853c/> improved library names
-   Related to #3
- - <csr-id-f27fda8f34e084e1532f4e6528b93e156f062503/> new github-pages target
-   For import of all docs to the github
- - <csr-id-ac8c41530d082203f93d81851682d02ed5c98d9a/> now we pre-generate nested schemas
-   Into a complete, global list of schemas, with additional meta-data.
-   
-   However, it's currently not complete, as $refs are missing.
-   There is some resemblance to to_rust_type(...), which worries me
-   slightly
- - <csr-id-712fed578a377c27bd6153b098ee4b3244b0355e/> part 1 to implement 'any' type
-   It is a Json object, with a schema as defined elsewhere. It's quite
-   cool to see this (nearly) working already. However, it will require
-   us to transitively assign the required markers which is based
-   on information we don't currently have.
-   
-   Maybe implementing this could also help to simplify name-clash checks
-   or make them better at least ?
- - <csr-id-2d036b6623a6f21e7d5706b382e2bc1e28dac87c/> build all apis, were possible
-   Now there is a blacklist feature, allowing to list apis we can't yet
-   handle for whichever reason.
- - <csr-id-bb76832b2f317501d398f5ea9fe8ea6b12dacf7b/> new Scope enum type
-   For use in all places where scopes are desired. It will also be made
-   available for adding scopes by the user.
- - <csr-id-e1b7a63f0660682a1680d9651cd5c3e784b12030/> scope as property ...
-   ... however, it will become an enumeration, as I don't like people
-   putting in strings all by themselves. This also means we have to
-   generate good enums ourselves.
- - <csr-id-aabed3858143bcd28d4b95e3831c408d3120719b/> query string setup
-   It works for uploads as well as for others.
-   
-   Next up is to setup the head and authentication. It will be as simple
-   as calling and handling `GetToken`, even though I think that there
-   needs to be better support for the scope that is asked for ... .
- - <csr-id-da300e035ebc92728c5566071c26505a38b409f6/> generic result type
-   ... and we actually add additional fields to our fields list.
- - <csr-id-7c6f7d5e97344e7df0f397c65209795e5b8515bc/> additional fields and Result type
-   Now query params are handled completely, including clash check.
-   Additionally, there is a new result type which encapsulates everything.
-   
-   It must be typed to the actual result type though, which can be a
-   request result
- - <csr-id-6c4166094358fd236490239d12235a80b738f34f/> put all fields onto a list
-   Also handle the case when the 'part' field is generated from the
-   request. Additional params still need work
- - <csr-id-432faa275f89bb1c3ab00b60ff07225eec5a4489/> spike to see how delegate can be work
-   To avoid an additional type parameter, we will use dynamic dispatch
-   for the delegate.
-   
-   Having function overrides at some point seems like an excercise better
-   left for version 1.1 ;)
- - <csr-id-678b6929ca7bffb4e4495272330aac02a082dbcd/> first attempt to get it to work
-   With a big but ! The most simple thing to do it was to just add
-   additional type parameters to the respective method.
-   
-   Now the type cannot be inferred, which means type-hints must be added.
-   This should be easy enough, but ... has to be done somehow.
- - <csr-id-5b2d8a77a3cf17a1c5989e856b1ae2dc77613264/> media-upload doit() methods
-   It's just a first step, and even though the generation works well,
-   I am still missing the right Rust code. Will have to simplify ...
- - <csr-id-de0c7a4ae049b6f7fbc256d64bc363ebd8de2101/> `param()` to set any parameter
-   That way, things like drive.files.insert alt=media has a chance to work.
-   We should actually check for this to support various 'alt' values
- - <csr-id-66f3ae14e5f088828d6c9d772643889366934fac/> added gogole drive API
-   Just to have another, different set of api information to deal with,
-   and not accidentally hard-code things to work with youtube only.
-   
-   Prepared dealing with media uploads, and it turns out to be best to
-   adjust the 'doit()' to take the respective type parameter.
-   
-   We also have to think about downloads, like the ones for google drive,
-   which requires custom query parameters.
- - <csr-id-020300af15022124cfa0d3e1722d45ff371f924d/> ground work for upload media
-   This might mean we need additional type parameters, but I will see how
-   it's going to work out.
-   
-   In theory, we could define a new trait for Seek+Read, but this would
-   mean that we couldn't contain owned streams.
-   
-   For max flexibility, it's better to have additional type parameters
-   and use BorrowMut to allow ownership, and borrow.
- - <csr-id-48d40d45c5ee2b8dce689eb0a0457e0364246899/> request type handling part 1
-   Now we will generate proper resoure methods builder calls to instaniate
-   the more or less valid method builders.
-   
-   However, it doesn't compile yet, and the 'to_parts()' method on
-   resources is still missing.
- - <csr-id-693b5c8f6a556941fcbfaf6b58f0d0dd00053a66/> build insert/update ... methods
-   It's just the first version which defaults everything.
-   Required parameter lists still have to be built.
-   
-   It's not going to be a problem at all.
- - <csr-id-582aca32494bf938889b04c60c5d3cec81872f77/> properties and setters for mbuilder
-   This includes descriptions, of course, and generally seems to look
-   quite neat. For now, we brutally consume all input to own it,
-   but in future we might be able to put in Borrow to support them all.
- - <csr-id-942cbe18f1f237fe8efacde93fd121879924d619/> infrastructure for method builders
-   Now comes the actual work of setting them up.
-   Additionally, the docs were decluttered to show comments only
-   were necessary. Now the code path to getting the hub is as concise as
-   possible.
- - <csr-id-01db89057deca47d86355e35c86b4fb88c218db0/> Partial MethodBuilder impl
-   Including documentation at least on the method builder part. The
-   great thing is that fully working examples are now included on
-   every type !
-   
-   Now more involved part starts ... namely setting up the individual call
-   method signatures.
- - <csr-id-e96260bacc959aee2d3baa1353d48087637f3df9/> defs are now more readable
-   This works with a new `indent` and `unindent` filters respectively.
-   There are a few things to consider, but I have understood how it works
-   and can handle it.
-   There is some overhead just to give me nicer visuals ... might choose
-   a different route, like annotations.
- - <csr-id-615a12465415cfa155271ce2fb94be9faa7405db/> generate hub implementation and docs
-   This includes docs for the library usage.
-   It's totally great to be able to paste example code right were it
-   belongs, and also put the same elsewhere to compose more complex docs.
- - <csr-id-f1d95822f784bce84927c2a9d4134d5477495217/> def for DO NOT EDIT comments
-   A note like that is now added to all files we generated, commented out
-   depending on the file type.
-   
-   Quite neat, except that for filtering, I always have to use blocks.
- - <csr-id-e164cf73667a6b64908a1dd41c5adf91191a5237/> Traits now show up as part of lib
-   Previously, they were in an extra, oddly named crate.
-   Now we just make it a part of our generated codebase.
-   
-   That way, traits, and common code, shows up as part of the library.
-   Fair enough.
-   
-   This also means that the types ar not reusable.
-   Maybe a mixed-mode can be used if that is desired.
- - <csr-id-c1eeee0591f96e2865db1ed13900ba7b59475ac9/> add marker traits to schema types
-   Based on their involvement in activities.
-   It nearly works perfectly.
- - <csr-id-ba98bee62fa2e067e9bc18f6f52db8be1da35161/> LUTs and context to make better docs
-   Now a context is passed to utility functions, which contains the state
-   these may be interested in. This keeps it clean from global state.
-   
-   With the lookup tables, it is possible to figure out relations between
-   types and document them accordingly.
- - <csr-id-d8edf1dcd46c6f7ae27e6f61b8aa1dea071a44a0/> first generated result ...
-   ... just to keep track on how it changes over time.
- - <csr-id-a5e675e7a958327938a31ec38ddebfaf58af9f42/> generating valid rust from schemas
-   It's very nice, even though there is some more work to be done here.
-   It's just the beginning ... .
- - <csr-id-475163ec29e5d20e74141de76f38b88a51bfbd06/> now sets up entire project structure
-   That way, we have a common library to pull in from the main repository,
-   and a space for testing new code (in a partial implementation).
-   
-   Next there will be generated object structures.
- - <csr-id-fc15a7030f81658663ff416a86880bfde01f23f0/> improved license information
-   ... and readme, and looks of author listing.
-   Slowly getting into the flow, possibilities seem thrilling.
- - <csr-id-3670e4f6c98d1b04a618fa9c14d5470a7a6765b7/> LICENSE + README.md
-   Readme is very initial, but the architecture is set to evolve it to
-   something no less than beatiful.
- - <csr-id-4e5f2c05d93dd2f4cbf7472a8911fbd7e0463d9d/> mako-render generates output dirs
-   That way, the makefile doesn't need to know that much anymore, and
-   gets simpler/less verbose.
-   
-   \# Also
-   * Added filters for rust doc string
-   * fixed .PHONY
- - <csr-id-e3b6aee6d631c589cb277b999583aa460631c34d/> apis target - make all apis
- - <csr-id-2298601165f5b65f76c86f4542139965c2486e58/> can now use custom libraries in pycode
-   Namespaces can exclusively be used during rendering, which is fine if
-   you remind yourself of the newline rules.
-   However, I also need some utiltiies that convert input data. These
-   are now within their own libraries, which can be used from python blocks
-   like the ordinary python functions they are.
-   
-   Quite neat.
-   In future, most of the functionality will be in separate namespaces,
-   the top-level will just assemble the main library file, usnig the
-   provided %defs. That way, the main file is kept clean.
- - <csr-id-be938255bd14202cc77c6bc543c6e92060a7ccb0/> cargo.toml template
-   It's quite final, and super easy to change and to read.
-   
-   It seems we want to use namespaces/shared implementations soon to allow
-   using defs. In our case, we transform the version in a particular way,
-   which is easy enough, yet I'd like to use it to make the system more
-   powerful.
- - <csr-id-2d77857aaf9b6a7e1a5dc7a3f77349a3662f8c7c/> generic source/output mappings
-   This includes proper handling of dependencies.
-   The code is concise, pythonic and quite 'cody', but does the job just
-   fine.
- - <csr-id-087a0762ac936f40bc4cec6f2281db34d9cab95b/> multiple input-outputs per call
-   That way, we read the data files only once, but produce all the outputs
-   we need. Together with a powerful makefile, we have a multi-invocation
-   with proper depedency tracking.
-   Everything will be regenerated though, even though just a single input
-   template file changed.
-   
-   The alternative would be to have one dependency and invocation per
-   input dependency, but that will read the entire json each time.
-   
-   Let's see what's faster/more useful during development.
- - <csr-id-30041e9c7da099c4843cd987ff34349394d8613d/> api deps generation works
-   It's very pleasant to use, and worth the slightly greater effort.
- - <csr-id-20410adb786a1f35e870b38fc3b5b3140b626708/> mako autosetup and improved executable
-   Now we can write mako templates, with a similar feature set as
-   pyratemp. Except that its syntax is nicer, allows to do everything
-   and that there is syntax highlight support.
-   
-   Let's see how it fares
- - <csr-id-c0bfeabbc39cd7449f59c8e1fd1fe9e5abba315a/> successfully generating make deps
-   After minor modifications to pyratemp, it certainly does the job.
-   
-   What it **does NOT** do:
-   
-   * multiple outputs per template/command invocation
-   * NICE embedding of code (like GSL can)
-   
-   It will do the job nonetheless, but mako might be worth a look
- - <csr-id-0812068c905463c10352ac194f44c9a317352647/> my first gsl program ...
-   And it crashes on linux and on osx.
-   What am I doing wrong ?
- - <csr-id-0c2f149b1e168497a376ce48105fa4d4089612e6/> unified make based build system
-   Added all prerequisite programs in binary for easier use.
-   Make is now implemented top-level, and is not expected to do too much
-   work actually. It will, however, keep track of all required
-   gsl invocation and make sure calls are efficient by not having
-   to rebuild everything every time. That's what make does, anyway ;)
- - <csr-id-f13c2960ab8b3441a32bde892a8ee53f8497b987/> added authenticator arg
-   That will allow interaction between client and authentication attempts.
-   It also shows how cumbersome it is to deal with all these
-   generics ... but hey, you gotta do what you gotta do.
-   
-   If boxes of pointers would be used, it would be easier to handle, but
-   enforces a certain memory model. That, of course, is not desired.
- - <csr-id-1980f76c3240b44c306158df30793ca20ffc9461/> makefile for handling json-to-xml
-   That way, it will remain clearly documented how to do this, and allow
-   for efficient calling of gsl as well, at some point.
-   
-   Of course it will be a little more difficult for us to know all
-   dependencies, but gsl could generate these as well for us, I suppose.
- - <csr-id-eebcf549295fe5b0521092bd0c79d83c416d351d/> add conversion tool and youtube api
-   The json file needs to be converted to valid XML, which should be
-   done by a soon-to-be-modified xml2json tool.
- - <csr-id-aaf432fb545b47a64692dda0296414edbf3017b6/> first primitive types and api
-   Now it should be possible to implement first version of actual
-   insert handling, with everything there is about it.
-   
-   That should eventually help to generalize it, as I am definitely
-   not going to hand-implemented these protocols ... .
-   
-   The great thing is, that if done right, one will be able to truly be
-   first and make an impact !
- - <csr-id-24a727fdea7c2ae47dd23b7ff571cd717ec4d870/> improved module layout
-   As there will be plenty of types, it will be better to split it up.
-   Also learned something about self::<submodule> :).
-   
-   Insert and and update should be hand-implemented just to see how it's
-   working. Then there should be some investment to auto-generate this
-   with `gsl`. Once the latter works ... I could auto-generate all apis,
-   or adjust the go generator to create rust instead.
-   
-   Depends on what will be faster ... .
- - <csr-id-67b052c5f376c85ceb2f3e94e676e4906df9fd10/> figure out ownership model
-   There is a central `YouTube` type which helps constructing various
-   sub-builders, which in turn provide individual functions.
-   
-   Architecturally, it's very similar to the go implementation, but
-   more efficient memory wise.
- - <csr-id-dda847607fc88ab6bb6d9646d52cd9795f7af0b3/> initial commit
-   Base project with everything it will need to grow:
-   * CI
-   * documentation
-   * basic cargo
+* both media-parameters now use `ReadSeek` streams.
+* Use `seek()` to figure out size, simplifying the interface.
+* reserve_exact(X) where possible (params, multi-part-reader)
+* `if let` used whereever possible to prevent duplicate checks
+* outer frame of `MultiPartReader` to allow using it in `doit()`
+* restructured `doit()` to get content-types right
+* Added filters for rust doc string
+* fixed .PHONY
+* multiple outputs per template/command invocation
+* NICE embedding of code (like GSL can)
+* CI
+* documentation
+* basic cargo
 
 ### Bug Fixes
+
+<csr-id-1323d0dccbb2ed7570e59b9b125f7b4a97ef7575/>
+<csr-id-99789de208609f0b8ca39852492fe0bbc54689ba/>
+<csr-id-082e51e16e9deb01e9c82ea7c8ac9be5bee80c79/>
+<csr-id-b68b2a6bf5786327afad1d95bceffa1111400e0a/>
+<csr-id-5e28a06dc0dfafd414765738fff35d019a903cab/>
+<csr-id-f3d0ef45d26baaafa3b9120bebe371bce424309c/>
+<csr-id-0ba9535a1150750b80e862c8fc197819f0f25954/>
+<csr-id-0f14aa966e5e878612111709568b13e7a2c70345/>
+<csr-id-292dd2f34f04a2376c3d44990111d4a0fc2c400e/>
+<csr-id-b6f5fc6eb3e6be21d22fb667b541f13ee3881df1/>
+<csr-id-dc367c34751e04036e56a4d984d6b7f8f92cef4d/>
+<csr-id-e9fe17ee3b5df32de65ed4017c65748eb8388a29/>
+<csr-id-3921b6a5a071ec0dc9d803b0ae809a348c34f87f/>
+<csr-id-5ca021727511b8265da1abadc48eb241ca24e3c5/>
+<csr-id-bed46ba2414167fcf6563ac1766f3239765f4800/>
+<csr-id-cb6679cb2b45022162a7e6a1b5de39b1fbbcf870/>
+<csr-id-065cfdd22f974afe9d8071e0227929464c1df796/>
+<csr-id-9e8a047ebfddd7a94226b8d559b03325abf7ab54/>
+<csr-id-33f281360a0a5dfa93cd7e6f4f345689e86bcc3f/>
+<csr-id-4bb7a33e9370f520b985f96aa8229b659320ff1d/>
+<csr-id-a2c6b58d5b8525110a5386e93c2de4f6851b95c6/>
+<csr-id-ef9e7f1bae2bff1629530fde14ca19ad424fc653/>
+<csr-id-b54acb7c96c842228a7ec65ff6b6edaf2b19b0bd/>
+<csr-id-78c7d46f9ddb7b102fd59135cac5d1033f090b0a/>
+<csr-id-8179f3bf89991d83f6cb5689618f8ee90b3f9a5b/>
+<csr-id-9a2d2b576c84536a7a93deedcba68544bf4a10eb/>
+<csr-id-0bd7f2004843b4e9dcd8af366e7ffc6632fb9e41/>
+<csr-id-53c27da2e786e12a29037addde15d571c3b53b39/>
+<csr-id-8dab8c01249a9f54e43aebe8a009f60935279de8/>
+<csr-id-8ab4fd0bd4b64eb76c77adc82aff99df17a1070c/>
+<csr-id-be894becc38296a62760a0724ea1310081e713de/>
+<csr-id-e129a7d3ae878a9ee78ea21fe1c0aa8b5671a5e0/>
+<csr-id-0f61fa4c95c25c0e9f30cc10b6aa3b005d26e3ca/>
+<csr-id-615ac64ec1d86c1c00ff05a4d2f6065c866330a7/>
+<csr-id-d0491a4950f657c55dfbf6a16a16a64c72b9077c/>
+<csr-id-27fdd8ee0c19dda409b6ca5a804edf23b8555ff3/>
+<csr-id-a566b702738c4b470988645f2867966d1d288370/>
+<csr-id-62db3ae87c1ad71082566a2e195a1e5d2cb7219f/>
+<csr-id-a9e0be6583fd92b9a171091b70e81bdba4ad4aa2/>
+<csr-id-2ad8d887cda32214dc520af5a9621366f4522fdf/>
+<csr-id-5483e328320412c39798ba15f26d02b90dd7591d/>
+<csr-id-b0a41c4e788fd95f9ace6823c2e52d18f33195c9/>
+<csr-id-d9ed001b46cc6e510ea2267fa205abd036be10b6/>
+<csr-id-bcf90cbcc8f625b787596fb95eda4355e35b403b/>
+<csr-id-2cc48072344715c428c204e98ab991c8133cf4c2/>
+<csr-id-2ca05292971d50adb267305492a8c703b929e99f/>
+<csr-id-ee84fefb4a46bf816fd6fcedebaa1428d12969a5/>
+<csr-id-9e64d1bd10f0cd68c8519954bda14ce784805a7a/>
+<csr-id-be117767a11962e330568d1dd98035e7b142b910/>
+<csr-id-3efa4f2b12219412cdabf8535e03974b94f71af5/>
+<csr-id-3fe2732a01371ededca2c35fe7499a4bbe63c318/>
+<csr-id-9274938f9f69ecab2e8cb975467860f41466ad1d/>
+<csr-id-b27c990db8a8701e2814e77136a34689be56c623/>
+<csr-id-d2a4e2ff8b16cb848869cc07b6c5a9107fb0a929/>
+<csr-id-89432cc64600ba0711e412c6cf6b1e06e2f11102/>
+<csr-id-c346645fc96abf9831ce723bb56e26f95e3c5b45/>
+<csr-id-bf6a2ba60c364e7c30de198d335e481c0b3206f0/>
+<csr-id-153324ebccf8a7846d9669f16c8f3ea52f0ec810/>
+<csr-id-94c821e09d2b75756dd3dfa2d5f508b079413cf1/>
+<csr-id-2f200217f942aa0317186811dbbe95d675a17ab0/>
+<csr-id-fac50418a7156b1b2fa958008691dbb2f6cbb756/>
+<csr-id-d46c083975201a6a4804fde9d4cec6ae0fc29479/>
+<csr-id-4115d50ca795ec2a2958f5f75b7681cb9f84720b/>
+<csr-id-d0ce221ba39db621b969b8c1faad358c775502a5/>
+<csr-id-b039b382446f450a58c12d2d881dbcd00b96928a/>
+<csr-id-7a38f7e4d5dea97b5bd2cbe6b10e4619b3b45b12/>
+<csr-id-63e23dd48f7fb80268eb3bc95380b77b233de62a/>
+<csr-id-5320a48e68c0ee4457455c5caa5c01f322fc6c7e/>
+<csr-id-bac4e1a82fa331370c20a7c4843989f11974600c/>
+<csr-id-feaa3a06ed53ae039750e2d420817116b1140984/>
+<csr-id-02a41296628eb0cbc0c8b7b2e86b06678e8db084/>
+<csr-id-1aff3135d97435632599bf39cf5e8c5de9d773a8/>
+<csr-id-8ac8d3b1cb59249d492a657fa8cd39fbe3fd99a7/>
+<csr-id-9a8ae4b7d66ec1b6a74316fceeccbf04a2f77469/>
+<csr-id-57808cf92adf7ff4dd65664a4a4ed3a361b60c6e/>
+<csr-id-de85fb43e53723d1d38d0b6e8746acc962035233/>
+<csr-id-c2dd9c7a020e0367bc87b20fa8054c85f48b71c1/>
+<csr-id-4e275eaaddfd7a86ed42d04df24113015c6ea099/>
+<csr-id-607ba745d140e5d2567a715c6ddaa775d2cf0d99/>
+<csr-id-b6a48bdcd5fb215e94a00a69d11ce0ac007c2df3/>
+<csr-id-2f3b2d24ce2367356698b902becabb40b8636ab6/>
+<csr-id-0bb30da78244abcf09c7d04571515e6584ccb4a3/>
+<csr-id-be7ccb085cb5ea908fb75d0ae7cb6c91ded33bd4/>
+<csr-id-6befdbc6fa730fc4a5513d2cad9e1784c580e516/>
+<csr-id-f8689be4515d5693004da17bb2244a385ac1e794/>
+<csr-id-845a568b25f387c58a17752852aed63e7305c7b1/>
+<csr-id-6d84ef906e6b9ff344fd7acac3140bdad3d48e78/>
+<csr-id-e523ddb6ec9f1e9e8bcc51fbec02e364dbddaa72/>
+<csr-id-797f289886d899a7e1b21216ee46218d179e38bf/>
+<csr-id-a4b73cc1c4e3919cf8bf2f782d598d0840c4922f/>
+<csr-id-e730281003b4a4caad0d48c2712e5d1433848bd7/>
+<csr-id-d8fdf9df9f41719f6acb9bf3750aa8069cfab675/>
+<csr-id-9ea3fea7750bce93c531f99b13c747c78a806b59/>
+<csr-id-4cf0720ef1e025737416ad5fe07eff2389c86ad8/>
+<csr-id-fa278a99c769e99727176f4faae081cc2d219342/>
+<csr-id-bf22bef77ae62d06209c70d273ecccef29a4268a/>
+<csr-id-bf37e515d2b5affec6296c34fbfa68fa89f7d4b9/>
+<csr-id-4b87d909f21daff696dd81da463fae3b14e59725/>
+<csr-id-306852d5147d7083ff011f990c5feedcf3e338bb/>
+<csr-id-830529c40b6ab01381fe36f27753047a2b03244f/>
+<csr-id-fa011315c31815cf283ecff18e245553378f3cb9/>
+<csr-id-76841da09801f23abef4955d76430ce1191c0b77/>
+<csr-id-e45eb053d52db016342bd568d10bc368495dad86/>
+<csr-id-5b4f18d341cbd8f87d3e3792b1dfa803f7849015/>
+<csr-id-51ddcf74a6d1cf204156c6a018ced2f2d85c9352/>
+<csr-id-acd42dfccc87f49cf5c9bf51a206da8bed9c02c2/>
+<csr-id-3e0a24db0d8d25fec9457364d49106c22aee3c23/>
+<csr-id-75e73d56d95dc4126ef39f0ae60d901a32af9954/>
+<csr-id-6d3dc77635724602a89026477bfc0f8f785968ba/>
+<csr-id-b9a469c0a4e655da54940dc2876559f573c88c08/>
+<csr-id-2e74d9141313da1cc6a26149650ee59c43047f06/>
+<csr-id-6db733274d65f10a213612561a5771bf4b7b8316/>
+<csr-id-34d0a7aad3b139c71b4d0dd7ca4e10c1336ebb8f/>
+<csr-id-a399488c2799e1acca0961f80a6c116a3330190c/>
+<csr-id-191e822c5a93771e32e85bc5c00ef450c6719fb6/>
+<csr-id-6f2149b7d49ee693cc616b92f9de79f220ce6e2d/>
+<csr-id-9dbdcc465f45c13faa85e5489073e7b7f5e18133/>
+<csr-id-dd1d191966aa41ec66c5a4baba5ebd43771c3a05/>
+<csr-id-3403bd1c5cec379cd2ad98040cca0ec6a4eef4a3/>
+<csr-id-99f8b65f75822d54f32100655d0b5678f43a8478/>
+<csr-id-91861dcb71b371e8ec5511ddedee0ae45cee9af0/>
+<csr-id-919ae4d8ae85f35f54c69c8c222ba43ba304e263/>
+<csr-id-a2ca1cb28ec1ce9f5f381f55ea78aa59a56ea915/>
+<csr-id-c7fb7c409343f19e26f1c3d488718decec7990b0/>
+<csr-id-e953535473429b01293d679e23337b74645e0c18/>
+<csr-id-d1c5bf1e4ab2a91c30d2bcbd1e08a1a02c73ad41/>
+<csr-id-e5b013e97c56040dba266a43a8308448a32645eb/>
+<csr-id-fca1b24cd186b090f75e35f362c8bbb2754e3e4d/>
+<csr-id-ea161897f5fe25e024292755c753f2410211bea1/>
+<csr-id-6ad0c2ef79a634d4cb631a36eb92b2cf82b59121/>
+<csr-id-04f4c95688f2cef0866ce07da68ae9d710596c7c/>
+<csr-id-3bc930ae47c2544de4825ecec5346f53626a75e2/>
+<csr-id-cd1ff18ba94966088a779b26347dc683f1f0c2d3/>
+<csr-id-556906ca60a90fc6eb34917d42813daf9792fbcb/>
+<csr-id-3a9aa519496be9da6283b847f38d9a2deaf682aa/>
+<csr-id-030c40d2699196e29d1c8606d042403df52a7534/>
+<csr-id-4bf280079ed5cf33c4ed2617c3aa62151ec0dcd0/>
+<csr-id-98f4bbab4774fb166936c60cbe8eee2302f35052/>
+<csr-id-80161f72be1aa7f7551603c90752793c84eedb6d/>
+<csr-id-0152138e0c019575caa3e40f87f19382d92a63ac/>
+<csr-id-5ff22851faec165258e5c3ff9c6eed58df3efee3/>
+<csr-id-8d9f175f917ec19e4752c5c3806f6f5624e066e2/>
+<csr-id-10dfeeb1aa5a1de2919e9753444e8e63855d1285/>
+<csr-id-97da926e28d7ad7ed90d12b7ff48477bcf67ee68/>
+<csr-id-ff385e5cacb43d173912243fc033578b0c0b0f63/>
+<csr-id-cfb8faefb8545114ddadea59871214b35e515d5a/>
+<csr-id-b9a81a900ec054b102ce045cf25a4348c297f260/>
+<csr-id-b6ebb1ec371c833ef7386264ed9522b880586316/>
+<csr-id-a05426e79b8c0773dbb219b327539431e4d1fdfc/>
+<csr-id-6b2301351f6792fb37b7dfec6c1f0592fdc6b9cc/>
+<csr-id-e53e23a893ce6d59777b8b53f94770d5c3c86b9c/>
+<csr-id-29d9e45c9fc8bbdbed23d3d5a9be20f8023bb22d/>
+<csr-id-b90a1916889b2d1cc6c595c3cd121739223db345/>
+<csr-id-863a98c0d7932475dc207d204ec91c26ddec326c/>
+<csr-id-63997910decf909a8242a8a7f16f6a4c276e1d67/>
+<csr-id-79879daf1b2a52593d2bc9b51ba244bfaddcf1f0/>
+<csr-id-91f69ffd6ed85790d8b6d1c8b5b63d7f4c7e6259/>
+<csr-id-1349c786b7e986511e4c2ca058d45bebb7f458dd/>
+<csr-id-814c9c9ffab64a7607f4056fbad4203ea8f19991/>
+<csr-id-876772cf2296c4b7c80c2f828e245c903da67802/>
+<csr-id-31efbf4fb0033b9f1fdfae0054ece1717ec05b79/>
+<csr-id-4c657ac9d132257a392bfbf2ed861142b6baf36a/>
+<csr-id-a87fbdf0a86cfa410c79671aee931e3bf95fab11/>
+<csr-id-51d05d6db01edb4f78159c3c07d77d0aceb85b89/>
+<csr-id-5fd7cb511407de7176dc07c1443ef07075c063a4/>
+<csr-id-8006bb8ca910b14ece8dee6230d476a361c7c163/>
+<csr-id-b43eb0e301c068500777fe580c1bd1017d0819b1/>
+<csr-id-6167dc07fc63cec22a8d2b01fe69f05f03ac3f9a/>
+<csr-id-c8061ebe2fbe97274c68b7af6e5a8d08c0245139/>
+<csr-id-4b9dbb28ff474661855f53143862b621e650f157/>
+<csr-id-97b2649094cc225d0cfc42857140f0d245e11352/>
+<csr-id-7758f99ff2e19c3518eddcfca2e1adeee12e0659/>
+<csr-id-4f794ef5ff7b5a068a568056d2bfd7372ec9b57c/>
+<csr-id-7e243936f226f6e26d2b551765b62cddc866776b/>
+<csr-id-00de2b187d74fd78f049a13d1517fc91d218da71/>
+<csr-id-e3ab233a6cee8482c1c98b1e2c759e7a17cceab9/>
+<csr-id-de40a8bd1ee8759287cd2a489cc5d995c296a07e/>
+<csr-id-614539a925c5e64508fa28506b1c6db3ccd96882/>
+<csr-id-32145e645ea29ff43c451530906356564e12f817/>
+<csr-id-538120f7d1425e026220211857658a775c958577/>
+<csr-id-dfcd554faa36cbcdf18ab985c2aed744dd45dc6d/>
+<csr-id-da57505567a58b59f320016d92b50f1ea248067c/>
+<csr-id-9b308bb6ddebe979abca6f46da131c822f95c639/>
+<csr-id-54540e695a9b246ca3d412ab62e843e4dd7974d0/>
+<csr-id-50fa189a715332a7ce49fc7a9c95e5a1ef22b81f/>
+<csr-id-a268be27d2123a77259fa1d7d1f831c7e72c4459/>
+<csr-id-5d563c88a8e3ccb33ebe381b47beb6ecfd4444fc/>
+<csr-id-559cb8fe458e18fec05d0ca3cd2847fb981f2da0/>
+<csr-id-bfc392291666a40cf3fbe4db3dfeda69d23018fa/>
+<csr-id-efe56ad25081b632f1e65fd8292e9c4d535659bc/>
+<csr-id-cf258bf4e5148723940cc757ec032b5aff814f1e/>
+<csr-id-d99ba9c5b3c5f73ad148679a866698c811eec495/>
+<csr-id-df9f0299bf5db0b7affdd90b4dfb331c74f543f2/>
+<csr-id-c7e169dff3712ff5f73497d2d9cba3303a83277a/>
+<csr-id-7816cc81455c1c7a48e84289e176baf25e8480e2/>
+<csr-id-1e332ddb91540c19586e6d85869c8e54c47552b0/>
+<csr-id-92d8fa76d0f419738e2efa7df3deebb974c1e0cf/>
+<csr-id-ff5cbb3bf410276fbe5af8cc966ac363e448970c/>
+<csr-id-2531011fc579df4edc38b15de459c135975fa077/>
+<csr-id-35bd1c3e9c8a6ab52068e279d8f925eea8af055d/>
+<csr-id-3b7e63f28675ea2646c88dfa16c62c063e076b96/>
+<csr-id-6d2b0fc2649bc5203c07c29dd020b50550d15746/>
+<csr-id-28878e0618cbb5632a1353ceb2048a913e9355d2/>
+<csr-id-1423e46210d95d823ff9bee9896cf407b0e9f0cc/>
+<csr-id-baea071a6f1c52410c0ca79cf24ab325f6efa586/>
+<csr-id-6fad7600a03f2f6a3964f309fc8e277b34f8aa60/>
+<csr-id-0d9f6363eb271f95624559b06cfd07ab6b5bc9b5/>
+<csr-id-4bdee961d19fc6fc6cb3cf322dfb85d2769bbcee/>
+<csr-id-fad0a7177aa296aa777b45d0001effa36332d24e/>
+<csr-id-a3206abc92d7bc9d829a1e2e00dbd299c379f2ab/>
+<csr-id-9cbb2adc5a65bece45e524a71f2d66160f7aa133/>
+<csr-id-f2dda421e64e9164557d5b3b94604bcb2be49254/>
+<csr-id-70ea612f19fbe7e1ef0a01b0d399fb357a46c390/>
+<csr-id-452b658c27e265c6a2df90ea56502db338957154/>
+<csr-id-8746f5e0e20297ce58203da01638fafad155132c/>
+<csr-id-8dc5e2a53dbe4d620e97089e2af9e3a94a82a4a4/>
+<csr-id-f4030f02841521220fa52856fa733b828a59ab6b/>
+<csr-id-bb04b60dc405d74765161bc75e35b4de72c5dcc4/>
+<csr-id-ddb48a4303a7a0653898e9eea69b3d358a14fa0c/>
+<csr-id-49c2ffb8e0f02698657aba46a7b34981258c6e35/>
+<csr-id-317554aff398a823beae63fa09a6014ee1508f4b/>
+<csr-id-11b6fe212ff33c1b2378997411cb11524d73a81c/>
+<csr-id-c3d399e91a6fea7a09316f018865815214a14be8/>
+<csr-id-179c64c5e74c7a783a3dc4ef68e900440e587c83/>
+<csr-id-e06738a7bd49538d402f8c995710cf231d47221d/>
+<csr-id-f2ca8c3fb79e482ca39d3aeb40be9b8c7f9c58d8/>
+<csr-id-e081017cb3631df007937fe4bce09c554e8c58c0/>
+<csr-id-e83b063f0527d7e5253f14a22c90fd3b4197584a/>
+<csr-id-e0724fb56f4a49fc5da4d6b5ea75dd1029ee9a44/>
+<csr-id-143aa6fd8638b3541d71954c6e3493bc961813dd/>
+<csr-id-d4869cfefc58db4580e98e8dd1ae040c81083ba9/>
 
  - <csr-id-499416c01101c162da133613d5c855912b17eb3e/> teach remove_json_null_values arrays
    change `remove_json_null_values()` to properly remove nulls from and recurse in to arrays
@@ -1283,964 +1214,137 @@ you need.
    Summary of changes:
    
    - Converted from using span + br tags for formatting to using tables
-   - Added Bootstrap stylesheet
-   - Refactored a lot of the logic which was being done in the html ${...}
+- Added Bootstrap stylesheet
+- Refactored a lot of the logic which was being done in the html ${...}
      tags out into a block which gets run at the start of each api version.
      (hopefully this will make the template easier to maintain in the long
      run)
-   
-   Possible issue:
-   
-   I swapped from looping over each key in `tc.keys()` to assuming the keys
-   will only ever be ["api", "cli"]. This hard codes the keys instead of
-   getting them dynamically, but makes it easier to format as a table and
-   lets you pull a lot of the logic out of the template and into a single
-   block before each table row.
-   
-   If the types of application in `tc.keys()` ever changes then this
-   template will need to be updated accordingly!
- - <csr-id-1323d0dccbb2ed7570e59b9b125f7b4a97ef7575/> use new serde map implementation
-   No fun, this one.
- - <csr-id-99789de208609f0b8ca39852492fe0bbc54689ba/> build better data
-   Really just what is needed right now to make it work.
-   
-   [skip ci]
- - <csr-id-082e51e16e9deb01e9c82ea7c8ac9be5bee80c79/> make cli publishing work
-   It really needs allow-dirty.
-   Let's hope that won't publish too much.
- - <csr-id-b68b2a6bf5786327afad1d95bceffa1111400e0a/> try to depend on major version of api
-   Previously that didn't work due to a bug in carg,
-   but should work now.
- - <csr-id-5e28a06dc0dfafd414765738fff35d019a903cab/> cli + api use a single base version
-   That way we get rid of the duplication at least.
-   Probably it would be enough to just refer to version 1 of the
-   library respectively, and let semver do the rest.
- - <csr-id-f3d0ef45d26baaafa3b9120bebe371bce424309c/> correct link to license on github
-   [skip ci]
- - <csr-id-0ba9535a1150750b80e862c8fc197819f0f25954/> handle discovery urls with $
-   Some google discovery URLs contain `$discovery` or other variants,
-   causing the calls to wget to interpret `$d` as an environment variable
-   instead of a literal. An example is:
-   `https://logging.googleapis.com/$discovery/rest?version=v2`.
-   
-   To fix this, the `$` has been escaped so that wget fetches the URL as
-   expected.
- - <csr-id-0f14aa966e5e878612111709568b13e7a2c70345/> Add an unused field to empty API types.
-   Null structs (struct Foo;) cause the following error when trying to
-   deserialize an empty JSON object `{}` into them:
-   
-   `JsonDecodeError("{}\n", Syntax(InvalidType(Map), 1, 1))` (also known as
-   `invalid type: map at line 1 column 1: {}`). The optional struct member
-   prevents this error.
- - <csr-id-292dd2f34f04a2376c3d44990111d4a0fc2c400e/> URL-encoding '/' in URLs is not accepted by Google APIs.
- - <csr-id-b6f5fc6eb3e6be21d22fb667b541f13ee3881df1/> use redirect flow
-   The interactive flow requires to paste a code back into the
-   command-line, which does only work when it's cat'ed, but not
-   if it is pasted.
-   
-   This should let it handle everything internally, which is
-   way more user-friendly.
- - <csr-id-dc367c34751e04036e56a4d984d6b7f8f92cef4d/> relative path for custom target dir
-   Using a shared target-dir is important to keep
-   disk-space usage in check and speed up builds.
- - <csr-id-e9fe17ee3b5df32de65ed4017c65748eb8388a29/> don't fail by default on non-nightly
- - <csr-id-3921b6a5a071ec0dc9d803b0ae809a348c34f87f/> use working version of serde-codegen
-   This update fixes the build on stable, and allows builds
-   on nightly as usual.
-   
-   The trick is to use the latest version of serde-codegen,
-   which keeps the syntex version internal, preventing clashes
-   between libraries that might have different requirements.
- - <csr-id-5ca021727511b8265da1abadc48eb241ca24e3c5/> as learned from yup-oauth
-   That way, there is no redudancny anymore.
- - <csr-id-bed46ba2414167fcf6563ac1766f3239765f4800/> work with latest serde
-   `cargo test` will work now.
-   We now use the latest serde once again, which should
-   make everything better.
- - <csr-id-cb6679cb2b45022162a7e6a1b5de39b1fbbcf870/> remove cargo/config
-   It seems due to a so far possibly unfiled bug, cargo fails to
-   get it's CWDs right.
-   
-   Last verified with cargo 0.11.0-nightly (42bce5c 2016-05-17).
-   
-   To reproduce, just put the deleted file back and run a build command,
-   such as
-   
-   ```bash
-   make drive3-cli-cargo ARGS=build --no-default-features --features=nightly
-   ```
- - <csr-id-065cfdd22f974afe9d8071e0227929464c1df796/> use hyper Bearer header style
-   Considering we kind-of hardcoded this authentication type anyway,
-   we now use the Auth-types provided by hyper 0.8.
-   
-   The incentive here was the compiler telling us that there the
-   yup-oauth::Scheme type doesn't implement the hyper::authorization::Scheme
-   anymore, even though that clearly was the case. Also it couldn't be
-   reproduced in yup-oauth itself.
-   
-   This will need some work to get correct again, so this is just a crude
-   patch to make it work again.
- - <csr-id-9e8a047ebfddd7a94226b8d559b03325abf7ab54/> compatibility with serde 0.6
-   0.7 has a weird assertion error that might have happened
-   if files get too large.
- - <csr-id-33f281360a0a5dfa93cd7e6f4f345689e86bcc3f/> choose serde-version which works
-   Everything newer than the ones we see here will cause
-   the error described in #148.
- - <csr-id-4bb7a33e9370f520b985f96aa8229b659320ff1d/> use venv-python to run any utility
-   Previously the yaml version generation could fail if your system-python
-   didn't have yaml installed. Now the virtual env is used, which is
-   guaranteed to support yaml.
- - <csr-id-a2c6b58d5b8525110a5386e93c2de4f6851b95c6/> use latest oauth2 lib
-   It enables using std::time::Duration natively
- - <csr-id-ef9e7f1bae2bff1629530fde14ca19ad424fc653/> use new discoveryRestUrl field for json download
- - <csr-id-b54acb7c96c842228a7ec65ff6b6edaf2b19b0bd/> use std::Thread::sleep
-   However, in sibling libraries, we still use time::Duration, which
-   now is a part of std::time::Duration.
-   These should be adjusted, to make the usage of
-   sleep(Duration::from_millis(d.num_milliseconds() as u64)) into sleep(d)
- - <csr-id-78c7d46f9ddb7b102fd59135cac5d1033f090b0a/> improve handling of error code if stable is tested
- - <csr-id-8179f3bf89991d83f6cb5689618f8ee90b3f9a5b/> get cmn compiling on nightly rust
-
- - <csr-id-9a2d2b576c84536a7a93deedcba68544bf4a10eb/> assure license can be generated
- - <csr-id-0bd7f2004843b4e9dcd8af366e7ffc6632fb9e41/> use PYTHONPATH for mako invocation
-   That way, it will find its resources.
- - <csr-id-53c27da2e786e12a29037addde15d571c3b53b39/> improve version and library name handling
-   We can now deal with versions having the 'alpha' or 'beta' suffix.
-   It's rather hard-coded, but solves the problem for now.
-   
-   Related to #126
- - <csr-id-8dab8c01249a9f54e43aebe8a009f60935279de8/> update to latest serde/rust
- - <csr-id-8ab4fd0bd4b64eb76c77adc82aff99df17a1070c/> update to serde 0.5.0
-   Serde move all json code into a separate crate that we are now using
-   as well.
- - <csr-id-be894becc38296a62760a0724ea1310081e713de/> use clap 1.0.3
-   * `SubCommand::new(...)` was renamed to `SubCommand::with_name(...)`
+* `SubCommand::new(...)` was renamed to `SubCommand::with_name(...)`
      which actually is now consistent with everything else
      (e.g. `Arg::with_name(...)`)
- - <csr-id-e129a7d3ae878a9ee78ea21fe1c0aa8b5671a5e0/> compatibility with hyper 0.6.4
-   * Signature of `client::Response` changed and now requires a
+* Signature of `client::Response` changed and now requires a
      `hyper::Url` as well.
-   
-    Closes #123
- - <csr-id-0f61fa4c95c25c0e9f30cc10b6aa3b005d26e3ca/> adjust linux script to target dir
-   Previously it attempted to find build-artifacts in
-   the 'gen' directory, now these are all found in
-   'target', provided cargo 0.3.0 is used.
-   
-   [skip ci]
- - <csr-id-615ac64ec1d86c1c00ff05a4d2f6065c866330a7/> flush output stream on CLI output
-   For some reason, this is now a requirement - previously this didn't
-   seem to be necessary.
-   
-   Don't know what changed there ... and it's odd it doesn't flush
-   when the process is going down or the handle is destroyed.
- - <csr-id-d0491a4950f657c55dfbf6a16a16a64c72b9077c/> work with hyper v0.6.0
-   Currently the latter actually fails to link on OSX, and requires a local
-   override with [this fix](https://goo.gl/OTExmN).
- - <csr-id-27fdd8ee0c19dda409b6ca5a804edf23b8555ff3/> type-inference fails on empty vec
-   Previously this wasn't the case, as the type could be inferred by the
-   type of the parent-vector to extend.
-   
-   Apparently this feature was removed, probably for good reason.
- - <csr-id-a566b702738c4b470988645f2867966d1d288370/> make statement shell compatible
-   The previous one actually required bash, instead of sh
- - <csr-id-62db3ae87c1ad71082566a2e195a1e5d2cb7219f/> add type annotation
-   It seems to be required when building with an older rustc version.
-   This did work in nightly, and just seems to be some sort of limiation
-   in stable.
- - <csr-id-a9e0be6583fd92b9a171091b70e81bdba4ad4aa2/> work on stable
-   CLI was slightly adjusted to not use unstable features.
-   Fortunately, there is no serde magic happening, which allows
-   us to keep it simple without using a build script.
- - <csr-id-2ad8d887cda32214dc520af5a9621366f4522fdf/> minor fixes
-   * Mime crate must be used in the same version hyper uses
-   * made attempted move a borrow
- - <csr-id-5483e328320412c39798ba15f26d02b90dd7591d/> expanded header implementation
-   Now it compiles to the point where `Mime` appears as duplicate type,
-   for some reason.
- - <csr-id-b0a41c4e788fd95f9ace6823c2e52d18f33195c9/> first big step towards syntex
-   Even though there is a bug that caues {} to be used in stead of
-   (),
-   when exanding macros, which causes syntax errors that we have to
-   workaround, it's not a real issue.
-   
-   What's happening additionally is missing hyper macros, which
-   now have to be expanded manually. Shouldn't be a problem,
-   pretty-printing when compiling is made for just that ;).
-   
-   No, it's sad that `include!()` works so badly, it makes
-   using serde so difficult ... it's no fun i must say.
-   
-   Just for stable ... I am not sure if it is worth it."
- - <csr-id-d9ed001b46cc6e510ea2267fa205abd036be10b6/> clean was depending on unknown targets
-   There are no per-program-type docs clean, just made it depend on
-   docs-all-clean.
-   
-   Also added the `docs-api|cli` target to the generated per-program-type
-   make help. It was just missing, even though it existed.
- - <csr-id-bcf90cbcc8f625b787596fb95eda4355e35b403b/> fix clean target for docs/cli
-   clean-all-docs and clean-all-cli aren't valid targets. The current mako
-   template causes `make clean` to abend reporting that it can't make these
-   targets.
- - <csr-id-2cc48072344715c428c204e98ab991c8133cf4c2/> URL substitution handling
-   Previously we would remove the wrong parameters when attempting to
-   remove only those parameters that have been used in the URL
-   substitution.
-   
-   The code we have now is more idiomatic and appears to be removing the
-   correct parameters.
- - <csr-id-2ca05292971d50adb267305492a8c703b929e99f/> dc630d01e 2015-05-09
-   * Vec::add was removed ... which forces me to write 4 lines instead of
+* Mime crate must be used in the same version hyper uses
+* made attempted move a borrow
+* Vec::add was removed ... which forces me to write 4 lines instead of
      one very readable one :(.
      Not everything is to the better here, even though I can imagine they
      did it to prevent people from thinking this is a cheap operation.
-   
-   [skip ci]
- - <csr-id-ee84fefb4a46bf816fd6fcedebaa1428d12969a5/> deal with rustc lifetime issue
-   Related to #109
- - <csr-id-9e64d1bd10f0cd68c8519954bda14ce784805a7a/> limit tar.gz to executable
-   Previously it could re-pack tar-files and mess everything up.
-   
-   [skip ci]
- - <csr-id-be117767a11962e330568d1dd98035e7b142b910/> osx-tar files without directory
-   Previously, they contained the parent directory, which wasn't intended
-   and was different from the plain-layout dictated by the linux version
-   of the script.
-   
-   [skip ci]
- - <csr-id-3efa4f2b12219412cdabf8535e03974b94f71af5/> filter null values of requrest structs
-   Some servers, like youtube, reject null values possibly thanks to
-   the reliance on parts. Now we are filtering them (in a very inefficient,
-   but working way), which seems to be fine with the servers.
-   
-   Effectively, we seem to be able now to upload videos ... .
-   
-   More testing required !
- - <csr-id-3fe2732a01371ededca2c35fe7499a4bbe63c318/> upgrade to hyper v0.4.0
-   It was basically just a find-and-replace to adapt to the changed names
-   of Error and Result types.
- - <csr-id-9274938f9f69ecab2e8cb975467860f41466ad1d/> completed list of parameter names
-   Previously the 'did-you-mean' functionality only knew the global
-   paramters, but not the method-local ones.
- - <csr-id-b27c990db8a8701e2814e77136a34689be56c623/> simplified call to form_urlencode
-   It now supports more generic inputs, as suggested in a lenghty
-   dialog on a corresponding github issue.
-   
-   Required to build with >=0.2.33
- - <csr-id-d2a4e2ff8b16cb848869cc07b6c5a9107fb0a929/> added latest reference CLI code
-   Just to have something to link to
- - <csr-id-89432cc64600ba0711e412c6cf6b1e06e2f11102/> gate usage of `upload_media_params`
-   Previously the local stack variable would be used even though it
-   wasn't initialized as there were no upload flags. Now this only
-   happens if there are media params.
-   
-   [skip ci]
- - <csr-id-c346645fc96abf9831ce723bb56e26f95e3c5b45/> let delegate forget uploaded urls
-   When uploading using the resumable protocol, we are now telling the
-   delegate to forget the previously stored URL after successful upload.
-   Previously it would have tried to return such a URL and thus made
-   the system retry uploading a file that was already uploaded.
- - <csr-id-bf6a2ba60c364e7c30de198d335e481c0b3206f0/> handle repeated required strings
-   In a single case we wouldn't properly pass on string arguments that
-   were repeated. Now we handle them with a nice one-liner.
- - <csr-id-153324ebccf8a7846d9669f16c8f3ea52f0ec810/> 'about()' text for main commands
-   It shows up in the help, and makes it easier to navigate the command
-   tree without bringing up the html documentation.
- - <csr-id-94c821e09d2b75756dd3dfa2d5f508b079413cf1/> adjust `JsonTokenStorage` to yup-oauth
-   Signature of `set()` changed to return a `Result<(), _>` instead of
-   an `Option<_>`.
-   
-   Related to https://github.com/Byron/yup-oauth2/issues/5
-   [skip ci]
- - <csr-id-2f200217f942aa0317186811dbbe95d675a17ab0/> unified error handling
-   * Use `Result` everywhere, instead of Option or tuples
-   * Properly handle error occurring after the dry-run. We do it in an
+* Use `Result` everywhere, instead of Option or tuples
+* Properly handle error occurring after the dry-run. We do it in an
      extensible way, in case we need to do more than handle invalid output
      files at some point. Output files that could not be opened will now
      result in a nice error message with all the information we have.
- - <csr-id-fac50418a7156b1b2fa958008691dbb2f6cbb756/> escape subcommand descriptions
-   Otherwise, we could have had invalid rust strings.
-   
-   [skip ci]
- - <csr-id-d46c083975201a6a4804fde9d4cec6ae0fc29479/> remove unused std_misc feature
-   Hopefully this will not trigger errors elsewhere, but we will
-   just find out I guess ;)
- - <csr-id-4115d50ca795ec2a2958f5f75b7681cb9f84720b/> adjust to latest hyper header macros
- - <csr-id-d0ce221ba39db621b969b8c1faad358c775502a5/> re-introduce UploadProtocol,fix CallType
-   * CallType now represents either Upload or Standard calls, whereas
+* CallType now represents either Upload or Standard calls, whereas
      the Upload variant is represented by the UploadProtocol enum.
      That way it's clear what happens, and we don't mix orthogonal concepts
      in one enumeration just for convenience.
-   
-   All tested APIs seem to build, verified
-   
-   * upload
-   * download
-   * request structures
-   * parameters
-   * scopes
-   * config-dir
-   * debug[-auth]
- - <csr-id-b039b382446f450a58c12d2d881dbcd00b96928a/> update docs and fix calltype handling
-   * mkdoc docs grammar is now hierarchical, making the command structure
+* upload
+* download
+* request structures
+* parameters
+* scopes
+* config-dir
+* debug[-auth]
+* mkdoc docs grammar is now hierarchical, making the command structure
      more obvious and easier to understand. It's a nice addition to the
      auto-generated, hierachical usage of clap.
-   * UploadProtocol enum is now CallType, to ease handling the different
+* UploadProtocol enum is now CallType, to ease handling the different
      ways the Call has to be executed. It looks quite clean, even though
      combining upload protocols and the calltype is a bit hacky.
- - <csr-id-7a38f7e4d5dea97b5bd2cbe6b10e4619b3b45b12/> various fixes and improvements
-   * `--version` now includes the API revision we embody
+* `--version` now includes the API revision we embody
      (using crate_version())
-   * Allow multiple scopes to be specified, instead of just one. Previously
+* Allow multiple scopes to be specified, instead of just one. Previously
      this was problemantic due to argument parsing of docopt being greedy.
      However, this also means we have to specify the `-r` flag for each
      invocation. See https://github.com/kbknapp/clap-rs/issues/89 .
-   * Adapted to new signature of `Arg::possible_values()` and used the
+* Adapted to new signature of `Arg::possible_values()` and used the
      previously orphaned `UploadProtocol` enum.
-   * Deduplicated code a little by adding the new `opt_values()` generator
+* Deduplicated code a little by adding the new `opt_values()` generator
      function.
-   
-    Related to #81
- - <csr-id-63e23dd48f7fb80268eb3bc95380b77b233de62a/> print usage if command is missing
-   Also, fixed config-dir substitution in flag's help message
- - <csr-id-5320a48e68c0ee4457455c5caa5c01f322fc6c7e/> tweaks to make youtube3 work
-   Mainly minor cleanup, and handling of generator branches that
-   didn't show up in smaller APIs that were used during the first steps.
-   
-   related to #81
- - <csr-id-bac4e1a82fa331370c20a7c4843989f11974600c/> adjust option usage to changed API
-   Discovery API now builds and seems to work even ! More testing
-   will have to be done though to be sure.
- - <csr-id-feaa3a06ed53ae039750e2d420817116b1140984/> handle apis without media upload
-   We are annotating the type of the optional protocols if that shall be
-   required.
- - <csr-id-02a41296628eb0cbc0c8b7b2e86b06678e8db084/> call `iter()` directly
-   As IntoIter is only implemented for slices up a sice of 32.
-   DFAReporting though will reach 55, at least.
-   
-   Also added dfareporting-cli code to show how stackoverflow issues can be
-   circumvented efficiently.
- - <csr-id-1aff3135d97435632599bf39cf5e8c5de9d773a8/> commit before un-using UploadProtocol
-   We will try to wait for https://github.com/kbknapp/clap-rs/issues/87
-   to allow us to use the enumeration instead of strings, as well as
-   an iterator, which will look more idiomatic in the end.
- - <csr-id-8ac8d3b1cb59249d492a657fa8cd39fbe3fd99a7/> generate command data structure
-   We do this in the hopes to circumvent a stack overflow.
-   This means we will setup the parser entirely at runtime, which actually
-   saves a little bit of code.
- - <csr-id-9a8ae4b7d66ec1b6a74316fceeccbf04a2f77469/> upload some code to help debugging
-   We get a stack-overflow when trying to run the dfa-reporting program,
-   and right now I don't know how to workaround it.
-   
-   This could be preventing us from using clap.
- - <csr-id-57808cf92adf7ff4dd65664a4a4ed3a361b60c6e/> make it work with latest hyper
-   This is known to work with the master of hyper. It's probably OK
-   to keep it, preparing for the next release and under the assupmtion
-   that I will not be releasing binaries for a while.
- - <csr-id-de85fb43e53723d1d38d0b6e8746acc962035233/> exclude cloudsearch from build
-   It doesn't have a single method, and thus is useless
- - <csr-id-c2dd9c7a020e0367bc87b20fa8054c85f48b71c1/> code updated to v0.1.6, latest CLI
-   * also includes publishing tag files
- - <csr-id-4e275eaaddfd7a86ed42d04df24113015c6ea099/> CLI + API release preps
- - <csr-id-607ba745d140e5d2567a715c6ddaa775d2cf0d99/> update changed `url` crate imports
- - <csr-id-b6a48bdcd5fb215e94a00a69d11ce0ac007c2df3/> request value cursor handling and docs
-   * now the cursor will only be set permanently if the -r flag is used in
+* also includes publishing tag files
+* now the cursor will only be set permanently if the -r flag is used in
      'cursor' mode. In 'cursor=value' mode, the cursor change doesn't
      persist among the flags. That way, one can easily distinguish
      between setting the cursor, and setting a field. However,
      '...sublevel.level=value' will still work as it did previously, yet
      the cursor change will not persist.
-   * Documentation was adjusted to represent the new cursor style.
- - <csr-id-2f3b2d24ce2367356698b902becabb40b8636ab6/> simple and resumable upload works
-   * fixed boundary syntax of multi-part message. Was --BOUNDARY, now is
+* Documentation was adjusted to represent the new cursor style.
+* fixed boundary syntax of multi-part message. Was --BOUNDARY, now is
      --BOUNDARY--
-   * Fixed ContentRange parsing and serialization. We actually managed
+* Fixed ContentRange parsing and serialization. We actually managed
      to break it last time we tried to update it to match the Go
      implementation.
-   * fixed uploadType header parameter. It's based on chosen protocol and
+* fixed uploadType header parameter. It's based on chosen protocol and
      whether or not the method supports multipart operation for the given
      protocol.
-   
-   Related to #76
- - <csr-id-0bb30da78244abcf09c7d04571515e6584ccb4a3/> use only one request structure
-   This works as we can just put all request-structure parsing to the top
-   of the function.
-   That way, we don't put the request struture twice.
- - <csr-id-be7ccb085cb5ea908fb75d0ae7cb6c91ded33bd4/> set request value to call
-   Previously, even though the request was passed by reference, it was
-   copied and thus our changes never arrived in the call.
-   
-   Now the API makes this clear by taking ownership, and the CLI code
-   sets the Request value lateron, explicitly.
-   
-   Related to #76
- - <csr-id-6befdbc6fa730fc4a5513d2cad9e1784c580e516/> verified download works
-   * implement custom scopes - previously they could be set, but were
+* implement custom scopes - previously they could be set, but were
      ignored during the API call
-   * api-overrides are not yaml files for convenience. Existing ones were
+* api-overrides are not yaml files for convenience. Existing ones were
      updated as needed.
- - <csr-id-f8689be4515d5693004da17bb2244a385ac1e794/> update all code to latest version
-   * add new APIs
-   * remove old ones
-   * add latest json files
- - <csr-id-845a568b25f387c58a17752852aed63e7305c7b1/> response value json decoding
-   * updated all json API descriptions
-   * enabled 'pretty' printing of response structures. However, currently
+* add new APIs
+* remove old ones
+* add latest json files
+* updated all json API descriptions
+* enabled 'pretty' printing of response structures. However, currently
      there is no way to get rid of all the NULL fields without external
      filtering
-   * all structure fields are now optional - there seems to be no way
+* all structure fields are now optional - there seems to be no way
      around it.
- - <csr-id-6d84ef906e6b9ff344fd7acac3140bdad3d48e78/> implement deletion of tokens
-   Previously this case was entirely uncovered.
-   Interesting note: when a token is revoked, existing auth-tokens will
-   still work. However, you may not refresh them in case permissions
-   have been revoked. It's good as there is only one code-path to deal
-   with (and we verified it to be working), and bad for the user as
-   malicious software can keep using an account for certain time until
-   the token expires.
- - <csr-id-e523ddb6ec9f1e9e8bcc51fbec02e364dbddaa72/> adapt to changed yup-oauth2 API
-   The latter changed a lot, to the better, and we handle the new
-   return types accordingly.
-   
-   Related to #74
- - <csr-id-797f289886d899a7e1b21216ee46218d179e38bf/> resolve generator issues
-   * exclude dataflow API - it doesn't have a single method as long as
+* exclude dataflow API - it doesn't have a single method as long as
      it's in B4. See https://github.com/Byron/google-apis-rs/issues/78
-   * assure ARRAY branch can be hit
- - <csr-id-a4b73cc1c4e3919cf8bf2f782d598d0840c4922f/> update make target
-   Also, generate CLI. Probably there is not enough time to build it.
- - <csr-id-e730281003b4a4caad0d48c2712e5d1433848bd7/> README info + fix author email
-   Please note that docker build script is still in debug mode, this
-   issue will remind me about it: #72
- - <csr-id-d8fdf9df9f41719f6acb9bf3750aa8069cfab675/> scopes were used illegally
-   Which caused a compile error. This was fixed by assuring the code
-   uses the same function to determine whether or not scopes are present
-   per method.
-   
-   [skip ci]
- - <csr-id-9ea3fea7750bce93c531f99b13c747c78a806b59/> (abf0548b5 2015-04-15) (built 2015-04-15)
- - <csr-id-4cf0720ef1e025737416ad5fe07eff2389c86ad8/> latest version of all APIs
-   Now CLI and API and the same level
- - <csr-id-fa278a99c769e99727176f4faae081cc2d219342/> request value parsing compiles and inits
-   Therefore, you can now actually make the call and the program will not
-   crash due to uninitialized Options.
- - <csr-id-bf22bef77ae62d06209c70d273ecccef29a4268a/> struct access compiles ...
-   ... but currently wouldn't run as we don't initialize the optional sub-
-   structures at all.
- - <csr-id-bf37e515d2b5affec6296c34fbfa68fa89f7d4b9/> corrected cursor handling in mkdocs
-   The trick was to use an actual list of cursor tokens that is consumed
-   on use. That way, we don't loose track of were we are in the
-   structure.
-   
-   Related to #64
- - <csr-id-4b87d909f21daff696dd81da463fae3b14e59725/> NULL default values instead of randoms
-   Instead of generating nonesense random values, we just map defaults
-   that represent the respective NULL value of a given type.
- - <csr-id-306852d5147d7083ff011f990c5feedcf3e338bb/> alt-media handling in CLI+API-docs
-   * API-docs now adjust depending on where 'alt' is set (either as global
+* assure ARRAY branch can be hit
+* API-docs now adjust depending on where 'alt' is set (either as global
      parameter, or as method-parameter)
-   * CLI: download tracking now works for 'alt' as method-parameter
-   * CLI: global parameter remapping allows them to be named consistently,
+* CLI: download tracking now works for 'alt' as method-parameter
+* CLI: global parameter remapping allows them to be named consistently,
      but map to the name required by the google API.
- - <csr-id-830529c40b6ab01381fe36f27753047a2b03244f/> optional parameter default handling
-   Now we provide a matching default for each paramter, thus alleviating
-   the previous issue of unncecessary follow-up errors.
- - <csr-id-fa011315c31815cf283ecff18e245553378f3cb9/> add rustc_serialize to test-crate
-   A top-level `cargo test` didn't work anymore thanks to a missing
-   mention of rustc_serialize.
-   
-   [skip ci]
- - <csr-id-76841da09801f23abef4955d76430ce1191c0b77/> optimze argument handling and conversion
-   * Thanks to a generic function, we save a lot of code within main.rs
-   * more effcient signature for ParseError
- - <csr-id-e45eb053d52db016342bd568d10bc368495dad86/> Display for Errors + refactor
-   * refactored errors into a hierarchy
-   * implemented `Display` trait for all error types, including some
+* Thanks to a generic function, we save a lot of code within main.rs
+* more effcient signature for ParseError
+* refactored errors into a hierarchy
+* implemented `Display` trait for all error types, including some
      'hierarchy-aware' printing.
- - <csr-id-5b4f18d341cbd8f87d3e3792b1dfa803f7849015/> improved scope handling; fix CLI
-   * in APIs, scopes will now be per-method, and if no scope is given,
+* in APIs, scopes will now be per-method, and if no scope is given,
      we will assume only the API key has to be set. Previously there was
      a wild mix between globally mentioned scopes and method scopes.
-   * assure CLI generation works so far, for all avaialable APIs
-   
-   Related to #48
- - <csr-id-51ddcf74a6d1cf204156c6a018ced2f2d85c9352/> add commands.yml.mako
-   It was previously hidden thanks to .gitignore.
-   
-   Good I made a fresh clone to see if make really really works.
- - <csr-id-acd42dfccc87f49cf5c9bf51a206da8bed9c02c2/> dependencies are now per-program-type
-   Previously we put cli.py into the common lib folder, which caused the
-   API to be regenerated and rebuilt whenever we changed code that will
-   only affect the CLI, causing terrible turnaround times.
-   
-   Now the dependency is fixed.
- - <csr-id-3e0a24db0d8d25fec9457364d49106c22aee3c23/> 'bytes ...' -> 'bytes=...'
-   * update all APIs to contain said change. It's not worth a republish
+* assure CLI generation works so far, for all avaialable APIs
+* update all APIs to contain said change. It's not worth a republish
      though.
- - <csr-id-75e73d56d95dc4126ef39f0ae60d901a32af9954/> better subtext + rename target
-   * catchier title for dev diary episode 1
-   * fixed target name for clean, which was 'clean-api', but should have
+* catchier title for dev diary episode 1
+* fixed target name for clean, which was 'clean-api', but should have
      been 'clean-all-api'
- - <csr-id-6d3dc77635724602a89026477bfc0f8f785968ba/> one folder per API docs
-   Otherwise, it would overwrite its search index, effectively breaking
-   the search field.
-   
-   We might run into space issues on github, as the generated docs are
-   duplicating each other and use a lot of disk-space.
- - <csr-id-b9a469c0a4e655da54940dc2876559f573c88c08/> use bytes=... when sending as well
-   Previously, `bytes=` was just parsed, but not sent to the server.
-   This change is motivated by a similar change in this commit:
-   http://goo.gl/AvyvLb
- - <csr-id-2e74d9141313da1cc6a26149650ee59c43047f06/> fix dependencies
-   That way, we don't build documentation unless this is truly necessary
- - <csr-id-6db733274d65f10a213612561a5771bf4b7b8316/> add publish state v0.1.5
- - <csr-id-34d0a7aad3b139c71b4d0dd7ca4e10c1336ebb8f/> corrected absolute links
-   This only affected links in readme files, not the relative ones
-   in the actual documentation
- - <csr-id-a399488c2799e1acca0961f80a6c116a3330190c/> v0.1.5
-   * fix documentation link in Cargo.toml
-   * adjust to latest hyper. It's not even out yet, but people
+* fix documentation link in Cargo.toml
+* adjust to latest hyper. It's not even out yet, but people
      can't build the APIs anyway.
- - <csr-id-191e822c5a93771e32e85bc5c00ef450c6719fb6/> adjust to hyper client
-   * deal with hyper client not using a type-parameter anymore
-   * fix incorrect documentation link (use '_' instead of '-')
- - <csr-id-6f2149b7d49ee693cc616b92f9de79f220ce6e2d/> v0.1.4
-   * added crate publish tag files
- - <csr-id-9dbdcc465f45c13faa85e5489073e7b7f5e18133/> adjust invalid make target
-   * `docs` is `docs-all` now. On travis, this should only build one API
- - <csr-id-dd1d191966aa41ec66c5a4baba5ebd43771c3a05/> v0.1.4
-   * macro 'alias' was renamed to 'rename'
-   * fixed `cargo test` on main project
-   
-   The latter pointed me to the serde issue, which would have made
-   everything fail when actually used to communicate with google servers.
- - <csr-id-3403bd1c5cec379cd2ad98040cca0ec6a4eef4a3/> v0.1.3
-   * keywords are no longer than 20 characters, which is a restriction
+* deal with hyper client not using a type-parameter anymore
+* fix incorrect documentation link (use '_' instead of '-')
+* added crate publish tag files
+* `docs` is `docs-all` now. On travis, this should only build one API
+* macro 'alias' was renamed to 'rename'
+* fixed `cargo test` on main project
+* keywords are no longer than 20 characters, which is a restriction
      cargo imposes
-   * don't use 'homepage' link in cargo.toml unless the homepage is
+* don't use 'homepage' link in cargo.toml unless the homepage is
      non-empty
-   * Added all publish-results to mark the respective crate version
-   
-   Related to #46
- - <csr-id-99f8b65f75822d54f32100655d0b5678f43a8478/> version 0.1.3
-   * builds with latest beta/nightly
- - <csr-id-91861dcb71b371e8ec5511ddedee0ae45cee9af0/> rustc (be9bd7c93 2015-04-05)
-   * using std::convert
-   * update to latest hyper (and other dependencies)
-   
-   Related to #46
- - <csr-id-919ae4d8ae85f35f54c69c8c222ba43ba304e263/> github-pages index generation
-   Previously, we forgot to pull in the new type-specific dataset, which
-   caused the index.html.mako file to fail.
- - <csr-id-a2ca1cb28ec1ce9f5f381f55ea78aa59a56ea915/> check-in of latest sources
-   This also includes crate files to remember which
-   crates we have published already.
-   
-   Related to #44
- - <csr-id-c7fb7c409343f19e26f1c3d488718decec7990b0/> set the API version to 0.1.2
- - <csr-id-e953535473429b01293d679e23337b74645e0c18/> incl. `Result` conform to standards
-   Related to #44
- - <csr-id-d1c5bf1e4ab2a91c30d2bcbd1e08a1a02c73ad41/> remove newlines interpreted as test
-   When documenting mandatory arguments of a methods builder, it was
-   possible to document 'parts', which have a long multi-line description
-   with empty lines inbetween. This caused the indentation to be funny
-   and tricked rustdoc into thinking these are indented doc-tests.
-   
-   Now we remove these empty lines, also hoping we dont encounter lines
-   with just whitespace in them. The latter would require a tiny update
-   of our regex.
- - <csr-id-e5b013e97c56040dba266a43a8308448a32645eb/> remove custom Result Enum
-   Instead, we just use a customized `Result` tyoe and thus stick to
-   common Rust conventions.
- - <csr-id-fca1b24cd186b090f75e35f362c8bbb2754e3e4d/> update json files from discovery API
- - <csr-id-ea161897f5fe25e024292755c753f2410211bea1/> typo fixes and misc. improvements
-
- - <csr-id-6ad0c2ef79a634d4cb631a36eb92b2cf82b59121/> whitespace and trait rename
-   * `ResourceMethodsBuilder` -> `MethodsBuilder`. This is now precise
+* Added all publish-results to mark the respective crate version
+* builds with latest beta/nightly
+* using std::convert
+* update to latest hyper (and other dependencies)
+* `ResourceMethodsBuilder` -> `MethodsBuilder`. This is now precise
       enough. Previously it was just to similar to what's now a
       `CallBuilder`
-   * Fixed whitespace issue in `doit()`
- - <csr-id-04f4c95688f2cef0866ce07da68ae9d710596c7c/> upload size now taken properly
-   Previously, it would query the size from the wrong dict and obtain
-   the value 0 all the time. This would have made every upload fail with
-   `UploadSizeLimitExeeded`.
-   Now we obtain the actual size limit, and will ignore it if unset/0
-   for some reason.
-   
-   Patch += 1
- - <csr-id-3bc930ae47c2544de4825ecec5346f53626a75e2/> 0.1.0 release
-   * Added all APIs to source control
-   * upped crate version
- - <csr-id-cd1ff18ba94966088a779b26347dc683f1f0c2d3/> upload() return value handling
-   Now deals with Cancellation and non-OK status codes correctly.
- - <csr-id-556906ca60a90fc6eb34917d42813daf9792fbcb/> re-export types used by delegate
-   Otherwise, delegate implementation might not actually be possible.
- - <csr-id-3a9aa519496be9da6283b847f38d9a2deaf682aa/> better introduction and version handling
-   Make it cristal clear what the crate version means, and what version of
-   the documentation you are looking at. Also do this in the README file.
-   
-   Assure that 'Google' is capitalized.
- - <csr-id-030c40d2699196e29d1c8606d042403df52a7534/> repository/source-code link
-   Previously it pointed to a timestamp file. Unified repository
-   source code link generation, and simplified 'deps.mako'.
-   
-   Related to #38
- - <csr-id-4bf280079ed5cf33c4ed2617c3aa62151ec0dcd0/> simplification and cleanup
-   * renamed `*MethodsBuilder` type to `*Methods` type
-   * renamed `*CallBuilder` type to `*Call` type
-   * greatly simplified `doit()` signature if uploads are involved
-   * pass `auth` to upload helper
- - <csr-id-98f4bbab4774fb166936c60cbe8eee2302f35052/> schema_markers() accessed map incorrectly
- - <csr-id-80161f72be1aa7f7551603c90752793c84eedb6d/> prune unused and ToParts trait
-   * do not emit unused types. Sometimes though, rustc doesn't seem to
+* Fixed whitespace issue in `doit()`
+* Added all APIs to source control
+* upped crate version
+* renamed `*MethodsBuilder` type to `*Methods` type
+* renamed `*CallBuilder` type to `*Call` type
+* greatly simplified `doit()` signature if uploads are involved
+* pass `auth` to upload helper
+* do not emit unused types. Sometimes though, rustc doesn't seem to
      detect that attributses are actually used
-   * ToParts trait is used and implemented only when needed.
-   
-   Linters are back to 'normal'.
- - <csr-id-0152138e0c019575caa3e40f87f19382d92a63ac/> pretty names for methods and resources
-   Previously, it was possible for methods to have '.' which showed up
-   in the documentation. Now these are replaced with ' '.
- - <csr-id-5ff22851faec165258e5c3ff9c6eed58df3efee3/> exclude those with recursive schemas
-   They currently don't compile as Box 'serde' is not supported.
-   See https://github.com/erickt/rust-serde/issues/45.
-   
-   Related to #34.
- - <csr-id-8d9f175f917ec19e4752c5c3806f6f5624e066e2/> make recursive types possible
-   Must be `Option<Box<T>>` now, whereas a simple `Box<T>` worked
-   previously. Anyway, serde can't decode/encode Boxes yet, so
-   plus1 was removed from the list of APIs to build.
-   
-   Related to #34
- - <csr-id-10dfeeb1aa5a1de2919e9753444e8e63855d1285/> MethodBuilder -> CallBuilder
-   Find-and-replace. It seems to build and work correctly, still
- - <csr-id-97da926e28d7ad7ed90d12b7ff48477bcf67ee68/> improved markdown for library overview
-   And names of free methods, which previously contained '.'. These are
-   now spaces.
- - <csr-id-ff385e5cacb43d173912243fc033578b0c0b0f63/> just add latest youtube code
-   It's good to see what actually changed in the json realm.
- - <csr-id-cfb8faefb8545114ddadea59871214b35e515d5a/> Vec/HashMap are Optionals
-   That assures that we can decode partial server responses, and send
-   partial structures as well.
- - <csr-id-b9a81a900ec054b102ce045cf25a4348c297f260/> serde cleanup;JsonError pub fields
- - <csr-id-b6ebb1ec371c833ef7386264ed9522b880586316/> prevent type-clash with `Result`
-   This should have been fixed in previous commit, but wasn't.
-   Actually a change that fixed one API, broke the other, and vice-versa.
-   
-   It's kind of a hack, because it's tailored to fix particular cases only,
-   yet I believe it's contained enough to say 'good enough'.
- - <csr-id-a05426e79b8c0773dbb219b327539431e4d1fdfc/> some links pointed to old doc name
-   With one of the recent changes, the crate name was changed to be
-   different from the library name. However, there were still plenty of
-   places that would refer to the library name instead of the new crate
-   name.
-   
-   That way, links in the README.md as well as index/index.html still
-   pointed to the old location.
- - <csr-id-6b2301351f6792fb37b7dfec6c1f0592fdc6b9cc/> MultiPartReader test case
-   Simple fixes, required as its API changed
- - <csr-id-e53e23a893ce6d59777b8b53f94770d5c3c86b9c/> MultiPartReader now works correctly
-   The state-handling was incorrect, causing it to not handle small reads
-   correctly.
-   However, this is working nicely now.
- - <csr-id-29d9e45c9fc8bbdbed23d3d5a9be20f8023bb22d/> fix lifetime issues
-   Those were totally real, actually, and I am happy the borrow checker
-   exists !
-   
-   Only one weirdness happened with RefCell<BorrowMut<C>>, but it could be
-   fixed by checking actual types using `let foo: () = something_nasty()`.
- - <csr-id-b90a1916889b2d1cc6c595c3cd121739223db345/> repeated params string addition
-   It seems odd that String + &str is required.
-   In any way, previously it would try to add i32 to a string.
- - <csr-id-863a98c0d7932475dc207d204ec91c26ddec326c/> repeated parameters docs improvement
-   Previously, it said it would 'set' the property, which is not the case
-   after all.
- - <csr-id-63997910decf909a8242a8a7f16f6a4c276e1d67/> regenerate .api.deps less often
-   It took too long to do it, so the 'MAKO_LIB_FILES' dependency was
-   removed. It can be re-added if needed.
- - <csr-id-79879daf1b2a52593d2bc9b51ba244bfaddcf1f0/> decent solution for free methods
-   Now I just add a 'virtual' resource, which is called 'methods'.
-   The good thing about this is that it works well standalone, or
-   in conjunction with actual resources.
-   
-   Also the system works with it just with minimal changes
- - <csr-id-91f69ffd6ed85790d8b6d1c8b5b63d7f4c7e6259/> unit-tests work once again
-   Added missing Result cases to make match exhaustive
- - <csr-id-1349c786b7e986511e4c2ca058d45bebb7f458dd/> remove BorrowMut until it's cleared
-   See stackoverflow at http://goo.gl/f27zJkj.
-   
-   Now we can actually call out client and move on with handling the result
- - <csr-id-814c9c9ffab64a7607f4056fbad4203ea8f19991/> user lower-case library names,always
-
- - <csr-id-876772cf2296c4b7c80c2f828e245c903da67802/> force python2.7 in virtualenv
-   force the usage of python2.7 on systems where /usr/bin/python points to python3.x
-   
-   fixes issue #12
- - <csr-id-31efbf4fb0033b9f1fdfae0054ece1717ec05b79/> incorrectly capitalized cargo.toml
-   This caused cargo on a case-sensitive file-system not to find the
-   cargo file, which made it to look upwards in the directory structure
-   to find the correctly named Cargo.toml fo the 'cmn' development
-   project.
- - <csr-id-4c657ac9d132257a392bfbf2ed861142b6baf36a/> explicit subshell for cargo-doc
-   Previously, it was only executing for cargo $(ARGS)
- - <csr-id-a87fbdf0a86cfa410c79671aee931e3bf95fab11/> try using a subshell for cargo cmd
-   Apparently travis doesn't execute cargo in the right sub-directory.
-   Might be a difference in the way make works
-   
-   Related to #8
- - <csr-id-51d05d6db01edb4f78159c3c07d77d0aceb85b89/> fixed dependency to wrong target
-   Which caused the cmn.rs to be missing, and the build to fail.
- - <csr-id-5fd7cb511407de7176dc07c1443ef07075c063a4/> install virtualenv automatically
-   The only dependency we really have is python, and wget.
-   Pip is not needed !
- - <csr-id-8006bb8ca910b14ece8dee6230d476a361c7c163/> fully qualified activity names
-
- - <csr-id-b43eb0e301c068500777fe580c1bd1017d0819b1/> Do not generate docs !
-   Previously, travis would continuously overwrite my combined docs with
-   the ones from the dev-project, and make them useless.
-   
-   This has been driving me nuts ! Good to have it fixed !
- - <csr-id-6167dc07fc63cec22a8d2b01fe69f05f03ac3f9a/> added milestone link
-   It's important to the project, and should thus be listed there
- - <csr-id-c8061ebe2fbe97274c68b7af6e5a8d08c0245139/> use function to make links correctly
-   It will automatically handle rust-doc mode, and use relative or absolute
-   links respectively.
- - <csr-id-4b9dbb28ff474661855f53143862b621e650f157/> assured it handles '0' correctly
-   Previously, it could possibly take a '0' away from the start of a
-   version. Now this is definitely not possible anymore.
- - <csr-id-97b2649094cc225d0cfc42857140f0d245e11352/> make 'regen-apis' work
-   Thanks to changes in mako libraries, it won't work anymore without
-   the template directory set
- - <csr-id-7758f99ff2e19c3518eddcfca2e1adeee12e0659/> typo
- - <csr-id-4f794ef5ff7b5a068a568056d2bfd7372ec9b57c/> fix incorrect nested type names
-   There was a name-duplication which led to un-inmplemented types.
-   
-   The good thing is that this was the last issue that kept all 72
-   APIs from compiling.
- - <csr-id-7e243936f226f6e26d2b551765b62cddc866776b/> finally, we pick up all types
-   HashMap types were missing previously, but now it seems to be picked
-   up quite nicely.
-   Would this mean we do the type-setup correctly, everywhere ?
- - <csr-id-00de2b187d74fd78f049a13d1517fc91d218da71/> transitive, minimal traits for types
-   Previously, I would just assign all useful traits to all types, no
-   matter on how they were actually used.
-   Now it builds all dependnecies and considers them when assigning
-   traits, which is as precise as we need it.
-   
-   This is important to us as the `Json` type is just encodable, but
-   not decodable. Fortunately, we just have to encode it, but in theory
-   this makes it hard to embed any json in a known structure.
- - <csr-id-e3ab233a6cee8482c1c98b1e2c759e7a17cceab9/> no unused types anymore
-   Due to shared global state which was altered, we got wrong results.
-   This is fixed now, thanks to a deepcopy. Amazing, how altering global
-   state is always biting you, even though you are convinced it's safe
-   to do in just this case !
-   General rule: Just don't do it, no matter what !
- - <csr-id-de40a8bd1ee8759287cd2a489cc5d995c296a07e/> improved camelCasing
-   Previously, it was possible to get types like Foo_bar, which is not
-   desireable.
-   Now it is totally impossible to see such blasphemy ;)
- - <csr-id-614539a925c5e64508fa28506b1c6db3ccd96882/> protect from nested-type-clash
-   It was possible for a nested type to be generated with a name that in
-   fact CLASHED with an existing schema type. What are the odds !
-   
-   The clash-check added will just verify against clashes with schema
-   types, which seems to be doing it for now.
- - <csr-id-32145e645ea29ff43c451530906356564e12f817/> nested type names are consistent now
-   At least so it appears.
-   The implementation doesn't look totally clean to me, as it seems
-   similar concerns are in different portions of the code, which was
-   merely tuned to work together.
-   
-   It could break appart if someone - me - wants to change it sometime
- - <csr-id-538120f7d1425e026220211857658a775c958577/> scope -> add_scope
-   This is not only more precisely saying what it does, but also doesn't
-   clash with scope parameters on resources ;) (happened in dfareporting)
- - <csr-id-dfcd554faa36cbcdf18ab985c2aed744dd45dc6d/> improved nested array type handling
-   It needs deduplication though, coming up next
- - <csr-id-da57505567a58b59f320016d92b50f1ea248067c/> prevent struct recursion issue
-   This works by just boxing types which are nested within themselves,
-   breaking the recursion.
- - <csr-id-9b308bb6ddebe979abca6f46da131c822f95c639/> nicer code and identifiers
- - <csr-id-54540e695a9b246ca3d412ab62e843e4dd7974d0/> nested types work for arrays
-   Thanks to removed code which made no sense to me, I put in a bug.
-   Now the code is back, beta than ever, and documented as well :).
- - <csr-id-50fa189a715332a7ce49fc7a9c95e5a1ef22b81f/> now deals with non-objects
-   These are arrays or HashMaps, which are nested types too. This is used
-   to have custom types of standard vectors or hashmaps, which resolve
-   to NewTypes in Rust.
- - <csr-id-a268be27d2123a77259fa1d7d1f831c7e72c4459/> optionals are working once again
-   A bug was introduced which caused nested-types not to be optional
-   in situations were they should.
- - <csr-id-5d563c88a8e3ccb33ebe381b47beb6ecfd4444fc/> nested type resolution and hashes
-   It seems we do it better than the actual Go implementation, which fails
-   to detect that scopes are actually having a string member.
-   
-   However, there still is an issue, as it's as hashmap for us, but just
-   a member for go ... lets see ...
-   https://developers.google.com/discovery/v1/reference/apis#resource
-   shows that we implement it correctly :) !!
- - <csr-id-559cb8fe458e18fec05d0ca3cd2847fb981f2da0/> remove compiler warnings.
-   Also, a build issue was fixed when schemas were no objects.
-   However, I think I will have to check this one anyway
- - <csr-id-bfc392291666a40cf3fbe4db3dfeda69d23018fa/> no compiler warnings
-   This involves disabling the dead-code lint, which is just to ease
-   debugging, currently there is a lot of dead code as 'hub' is never used.
-   
-   Soon, this will change, so the lint will be enabled again.
- - <csr-id-efe56ad25081b632f1e65fd8292e9c4d535659bc/> deepcopy dicts instead
-   It was possible for writes to happen in nested dicts, causing global
-   data to change and confuse the system.
-   Not that I wouldn't be aware of that danger, but apparently I didn't
-   see the recursiveness of the call tree :).
- - <csr-id-cf258bf4e5148723940cc757ec032b5aff814f1e/> fixes to help more projects to build
-   Involving
-   * complete list of reserved words (keywords in Rust)
-   * use namespace for otherwise clashing types in cmn::, io::
- - <csr-id-d99ba9c5b3c5f73ad148679a866698c811eec495/> fix name clashes
-   Scopes could be invalid, previosly, and the hub type could clash
-   with other types provided as Schema.
-   
-   Also, we used reserved identifiers
- - <csr-id-df9f0299bf5db0b7affdd90b4dfb331c74f543f2/> deal with missing auth information
-   Now all APIs can be built successfully, which should help to
-   prevent things from getting hardcoded in any way.
- - <csr-id-c7e169dff3712ff5f73497d2d9cba3303a83277a/> resource-to-category map
-   It allows to obtain category, which we previously dropped
- - <csr-id-7816cc81455c1c7a48e84289e176baf25e8480e2/> do not degenerate during activity_split
-   First step, next one will actually be keeping that data ...
- - <csr-id-1e332ddb91540c19586e6d85869c8e54c47552b0/> asssure candidate is in mapping
-   It seems nearly nothing can be taken for granted ;).
-   It's best to just run against a big set of APIs and fix issues as they
-   arise though.
-   
-   More flexibility means more maintenance, after all.
- - <csr-id-92d8fa76d0f419738e2efa7df3deebb974c1e0cf/> intermediate improvements ...
-   ... it shows that the override I used previously won't work for `admin`.
-   Therefore we have to keep the actual value, instead of degenrating it.
-   
-   Makes sense ... it's interesting how much one tends to hard-code things
-   to work just for a few cases, unless you opt in to see the whole picture
- - <csr-id-ff5cbb3bf410276fbe5af8cc966ac363e448970c/> ignore beta/alpha,assure latest
-   There were a few bugs in the generator program, which caused old
-   versions to be picked up, and alphas/betas
- - <csr-id-2531011fc579df4edc38b15de459c135975fa077/> now with flattened activities
-   That way, we don't have recursive method builders, but instead
-   flatten the hierarchy. In our case, this is easier and means
-   less to type. E.g.
-   
-   `hub.user().message().import(...)` now is
-   `hub.user().message_import(...)`
-   
-   In go it would look like this though
-   `hub.user.messages.import(...)
-   which is neater.
-   
-   We will never have that though, as it will initialize a massive amount
-   of data right on the stack, even though only some of it is ever used
-   ... .
- - <csr-id-35bd1c3e9c8a6ab52068e279d8f925eea8af055d/> first recursive resource support
-   However, this also means we need recursive builders, which is tottally
-   unsupported for now ... .
-   
-   This means we have to generalize rbuild generation ... could be easy.
-   Lets see
- - <csr-id-3b7e63f28675ea2646c88dfa16c62c063e076b96/> make scope gen work with gmail
- - <csr-id-6d2b0fc2649bc5203c07c29dd020b50550d15746/> scopes are sorted Strings now
-   That way, we make retrieved tokens independent of the order scopes
-   were passed in. Additionally, we can pass any scopes, just in case
-   someone uses one token for multiple APIs.
-   Let's keep it flexible.
- - <csr-id-28878e0618cbb5632a1353ceb2048a913e9355d2/> Manual scope parameter ...
-   ... however, it should better be a set, and there must be a way to
-   control certain global names using the configuration :)
- - <csr-id-1423e46210d95d823ff9bee9896cf407b0e9f0cc/> it now works in every which way
-   Custom property annotations have been very useful, to steer very special
-   cases.
-   
-   It's also good that now there is enough infrastructure to deal with
-   any amount of additional type parameters.
- - <csr-id-baea071a6f1c52410c0ca79cf24ab325f6efa586/> added size and mime type support
-   This information must be provided, I just forgot it
- - <csr-id-6fad7600a03f2f6a3964f309fc8e277b34f8aa60/> doit() call with enum type annotation
-   It's syntax I never used before, but ... works !
-   Now lets try to get the BorrowMut back
- - <csr-id-0d9f6363eb271f95624559b06cfd07ab6b5bc9b5/> recursion for nested types
-   Drive has recursive nested types, which were not handled preeviously.
- - <csr-id-4bdee961d19fc6fc6cb3cf322dfb85d2769bbcee/> examples section in mbuilder got lost
- - <csr-id-fad0a7177aa296aa777b45d0001effa36332d24e/> filter request value props by parts
-   Previously, it would just show all parts.
-   It's still not correct though as this isn't necessarily the parts used
-   in the request value, but only the ones in the response value.
-   
-   It's as good as it gets though, that's all the information contained
-   in the json.
- - <csr-id-a3206abc92d7bc9d829a1e2e00dbd299c379f2ab/> method builder examples work now
-   It was easier than expected, but in the end needs quite some custom
-   code and handling. Good to have mako (and python !!!)
- - <csr-id-9cbb2adc5a65bece45e524a71f2d66160f7aa133/> have to handle required/optionals vals
-   Of course, it's ok to do that, but ... of course it doesn't make things
-   easier. However, I want these examples to be representing the real thing
- - <csr-id-f2dda421e64e9164557d5b3b94604bcb2be49254/> remove empty '/// # ' lines
-   They seem to make cargo fail to build valid doctests. Might be worth
-   a ticket !
- - <csr-id-70ea612f19fbe7e1ef0a01b0d399fb357a46c390/> fixed part handling,it compiles now
-   What's missing is docs, which will see some work now.
-   I guess it will be best to hide all the prelude from the user, to allow
-   him to focus on what's important here.
- - <csr-id-452b658c27e265c6a2df90ea56502db338957154/> setters now copy copyables
-   Previously, they would take everything as reference and clone
-   everything unconditionally. Now we do it only as we need to do it,
-   no extra work incurred.
- - <csr-id-8746f5e0e20297ce58203da01638fafad155132c/> using visual markers now
-   Makes everything evaluate faster, and is good enough as well.
-   Besides, you don't have to think about whitespace too much, keeping
-   things simpler is usually better
- - <csr-id-8dc5e2a53dbe4d620e97089e2af9e3a94a82a4a4/> perfected trait recognition.
-   However, they are not listed as traits of the youtube api. What we
-   really want is to list common implementation types as part of ourselves.
-   
-   This doesn't work though as long as we don't have the common impl
-   as part of our sources.
- - <csr-id-f4030f02841521220fa52856fa733b828a59ab6b/> now the map is complete
-   It's quite nice - next up is marker traits !
- - <csr-id-bb04b60dc405d74765161bc75e35b4de72c5dcc4/> dependency handling:dirs with timestamp
-   That way, make will not regenerate unnecessarily
- - <csr-id-ddb48a4303a7a0653898e9eea69b3d358a14fa0c/> make all pods optionals.
-   That way, json conversions will always work, which is probably what
-   we desire (especially when handling server answers).
- - <csr-id-49c2ffb8e0f02698657aba46a7b34981258c6e35/> now docs look good too
- - <csr-id-317554aff398a823beae63fa09a6014ee1508f4b/> unify generated constants
-   like library-name. That way, they are always the same, even if I
-   change my mind.
-   
-   Good coding style is easy, using the current setup.
- - <csr-id-11b6fe212ff33c1b2378997411cb11524d73a81c/> mv youtube-rs to google-apis-rs
- - <csr-id-c3d399e91a6fea7a09316f018865815214a14be8/> handle whitespace and add GENINFO
-   Also, remove obsolete pyra files
- - <csr-id-179c64c5e74c7a783a3dc4ef68e900440e587c83/> is now self-contained
-   A little more than the promised 500 lines of code though ;).
- - <csr-id-e06738a7bd49538d402f8c995710cf231d47221d/> removed gsl, added pyratemp
-   As GSL failed in my first attempt to get the example program going,
-   it might be better to try something else before too much time is spend.
-   
-   Fortunately, pyratemp **seems** to be something usable, and even if not,
-   it might be possible to make it usable as it's just a 'simple'
-   python script that I might be able to understand, if need be.
- - <csr-id-f2ca8c3fb79e482ca39d3aeb40be9b8c7f9c58d8/> fixed dependencies
-   The make deps generator should only care about the shared xml
- - <csr-id-e081017cb3631df007937fe4bce09c554e8c58c0/> forgot to add shared.xml
-   As XML files are ignored, I didn't see that.
- - <csr-id-e83b063f0527d7e5253f14a22c90fd3b4197584a/> works exactly as needed.
-   Producing non-malformed pretty xml
- - <csr-id-e0724fb56f4a49fc5da4d6b5ea75dd1029ee9a44/> xml.tostring works now ...
-   ... but it still generates invalid output due to scopes.
-   Should be an easy fix
- - <csr-id-143aa6fd8638b3541d71954c6e3493bc961813dd/> make it handle top-level keys
-   It can now handle multiple of them.
-   
-   However, conversion fails, as the bloody xml converter can't handle
-   booleans ??? WTF
- - <csr-id-d4869cfefc58db4580e98e8dd1ae040c81083ba9/> make sure we get correct openssl vers.
+* ToParts trait is used and implemented only when needed.
+* complete list of reserved words (keywords in Rust)
+* use namespace for otherwise clashing types in cmn::, io::
 
 ### Other
 
@@ -2453,7 +1557,7 @@ you need.
 
 <csr-read-only-do-not-edit/>
 
- - 2863 commits contributed to the release over the course of 2766 calendar days.
+ - 2864 commits contributed to the release over the course of 2766 calendar days.
  - 642 commits were understood as [conventional](https://www.conventionalcommits.org).
  - 7 unique issues were worked on: [#173](https://github.com/Byron/google-apis-rs/issues/173), [#269](https://github.com/Byron/google-apis-rs/issues/269), [#271](https://github.com/Byron/google-apis-rs/issues/271), [#281](https://github.com/Byron/google-apis-rs/issues/281), [#296](https://github.com/Byron/google-apis-rs/issues/296), [#328](https://github.com/Byron/google-apis-rs/issues/328), [#357](https://github.com/Byron/google-apis-rs/issues/357)
 
@@ -2479,6 +1583,7 @@ you need.
  * **[#357](https://github.com/Byron/google-apis-rs/issues/357)**
     - regenerate all APIs and CLIs ([`7abe6a3`](https://github.com/Byron/google-apis-rs/commit/7abe6a3de2c3de713d9d4754c880897f85a84847))
  * **Uncategorized**
+    - prepare changelog ([`ecb10a2`](https://github.com/Byron/google-apis-rs/commit/ecb10a2ff500a1d10add9be336393a10e51ec050))
     - Merge branch 'common-crate' ([`96b3d72`](https://github.com/Byron/google-apis-rs/commit/96b3d728a3b3d76c64fa0e48198d09b2d3c023bd))
     - prepare google-apis-common for release ([`716c4c2`](https://github.com/Byron/google-apis-rs/commit/716c4c263a278c334feacf57c3eabbed09251a9e))
     - rename `google-api-client` to `google-apis-common` ([`8d7309b`](https://github.com/Byron/google-apis-rs/commit/8d7309b78c3bc909b794d447115328cfb0f41649))
@@ -5335,4 +4440,8 @@ you need.
     - figure out ownership model ([`67b052c`](https://github.com/Byron/google-apis-rs/commit/67b052c5f376c85ceb2f3e94e676e4906df9fd10))
     - initial commit ([`dda8476`](https://github.com/Byron/google-apis-rs/commit/dda847607fc88ab6bb6d9646d52cd9795f7af0b3))
 </details>
+
+<csr-unknown>
+Should have been fixed alongside of #81 visual gap between cursor and kvPreviously, the space was barely visible, confusing even myself :).Now it’s clear, using 4 spaces, that there is a cursor invocationfollowed by a key-value pair. add link to general documentation[skip ci] request values are moved, not borrowed[skip ci] filled README.mdAll possible documentation was added in a quality sufficient fora first release. After all, everything there is is documented. integrate different program types random values + cursor information absolute top-level cursor + details relative cursor positioningIt would still be nice though to show absolute positioning as well. dynamic absolute cursor position exampleWe build all required -r flags using absolute cursor positions only.The next step should be to use relative ones, and of course be moreverbose about how this should be interpreted (sequential). upload and output flagWe are already there, except for documenting the request value type,which definitely deserves a separate issue. optional paramtersAdded documentation for flags setting all kinds of optional parameters. inforamtion about setting structsFor now we just have a ‘dum’ example, but once we are there, we shallmake the example and documentation based on the actual request value.This requires some additional work, which fortunately has to be donein python only. add required scalar arguments name default scope in API docs added CLI scope documentationIn addition to that, they can now be set as well.Unified generation of the ‘default’ scope. update to include CLI targets minor phrasing changesAlso removed superfluous ‘extern’ for tests deal with ‘virtual’ methods resourceWe assure to know about it, instead of writing nonsense about that‘methods’ resources which does not actually exist.I am relatively sure to have found all the spots. method features and general info add build instructionsThese should help people to get started on their own. initial versionIt’s still rather simple, but a basis for further improvements result handling and remaining todosBasically there is no todo left, which puts us in a good position forimplementing more features, and get some feedback in the meanwhile. bigger font for doc-index for additional parametersBased on the parameters suitable for the entire API. One could alsomake them available in the builder … . cross linking of resources/activitiesThis makes it so much easier to get to the example call you areinterested in.It’s getting there, slowly ;) docs for terms.upload methodsAlso fs::File is now used with prefix, to prevent clashes. scope docs for method builders fixed spacingAlso, the do() implementation was moved into it’s own def, eventhough it’s still quite empty. improved spacing added info about settable partsIt’s not as good as the parts info on the website, but it’s something !At least people don’t have to read the text, but find this informationin all the spots that are relevant to this. more information, nicer visuals method builder call exampleWith nearly fully randomized examples to show how it can be done.It’s quite nice to see actual calls, using everything required to geta call. The only thing the user has to manage is to fill in actualvalues.But, it also shows that our builder pattern doesn’t work yet due to …you guessed it … lifetime issues :D library overview as far as possibleEverything we have, feature wise, is now documented in a first versionat least.We shall keep this uptodate with what we are implementing, which alsohelps figuring out a good api. did you mean for struct values -u <mode> <file> parsing adjust to serde usage in yup-oauth implement -u as good as possibleWe can’t have the -u <mode> <file> <mime> style yet, buthttps://github.com/kbknapp/clap-rs/issues/88 might help with thatat some point.Related to #92 and #81 parse structure and build AppWe are currently setting everything up at runtime, and manage to getnearly all information into it, except for the more complex-u (simple|resumable) <file> <mime> flag. initial version of command generationIt compiles and works, even though there are many things we want toimprove.One big question is how to define multi-arguments, like -u foo bar baz. setup infrastructureThis allows us to setup clap and see if it compiles, which is the primegoal of the current workflow step.Related to #81 simple linux deployment scriptIt’s made for a linux machine, not for docker simple osx deploy script improved error handlingWe are now able to decode detailed errors and pass them on. This allowsthe CLI to provide more useful error responses.Additionally, the CLI will only print debug responses in –debug mode. per-API-credentials with defaultThat way, we can provide better service, as CLIs that consume a lot ofquota can easily have their own app credentials, and with it, theirown quota.The fallback will be a project that allows to use all possiblegoogle APIs.The user can always put in his own application secret to use his ownquota or even paid services. hashmap handling repeated required argsRelated to #77 –debug-auth flag –debug flag to output traffixNice, we are totally ready to test and fix all API features.Related to #70 added first versions of all CLIThat way, changes can be tracked.Also, we make it official.Future checkins will only be made if major changes were done,similar to how the APIs are handled.Related to #64 struct value parsingThis works already for simple request values, but doens’t generatecompiling code for structures with Parts in them.Nonetheless, it’s a big step towards finishing the overall issue.Related to #64 field cursor complete and untestedTests just need to be run, and of course, the impementation might needfixing.Related to #64 make respective uppload_callNow we actually provide the information required to upload data in asimple or resumable fashion. upload flag parsingWe handle errors gracefully with costum types and minimal amount ofcode. Unfortunately, Mime type parsing is very ‘flexible’, allowingnonesense types to be passed easily.Related to #62 global optional parameters+DL trackingRelated to #61 parse method parameters and set themIt’s implemented in a working fashion, except that the default valueis not currently set to something sensible, causing duplicate errors incase the key-value syntax is wrong.Related to #61 handle output json encoding and ostreams interpret output argumentsFor now we don’t properly handle errors when opening files, but thecode is there.Will panic in next commit.Related to #63 required arg parsing + first doit() callWe are parsing required scalar values and handle parse-errors correctly,to the point were we make a simple, non-upload doit() call.It shows that we seem to build invalid calls, for now,but that’s nothingwe can’t fix once the time is ripe.Next goals will be related to finalizing the argument parsing code. infrastructure for call and dry-runNow we are able to cleanly handle our arguments on a per-method basis.The generated code won’t clutter our design as we put the details intotheir own methods. Implementation of JsonTokenStorageIt’s also used by the code, replacing the previous standing,MemoryStorage. init hub + refactor for dry-run modeThe hub is just using preset types - we will have to implement our ownstorage and auth-delegate, as well as a Hub delegate at some point.Dry run mode allows us to check for errors and use a call builderusing the very same code. Display + Error traits for Error struct engine checks resource and method argsWe are now at a spot where we can actually start parsing arguments. write default and read app-secretNext step is to cleanup the error type and implement the Error trait. create config directory, if possible infrastructureFixes #52 generate complete docopts grammarGrammar is laid out per method, providing general purpose argumentsonly as needed/supported.All details will be contained in the markdown documentation.Related to #45 per-method-markdown-filesThat way, all information can be placed within a single markdown fileper method call. This will keep loading times low while maximizingusability.That way, it’s comparable to the API documentation, which is mostdetailed on a per-method basis as well. cli postprocessing supportThat way, a single huge markdown file containing documentation forcommands and methods can be split up into multiple files forindividual inclusion in mkdocs.It’s done by a post-processor which is loaded by mako-render, providingaccess to the entire context. Said processor may also drop resultsaltogether and thus prevent files to be written that have been split upby it. docopt subcommandsSetup command/subcommand pattern.Next will be the infrastucture for documenting these, using mkdocsand markdown. bin renaming + docopt infrastructure basic usage of docoptsFor now we just show it works within our generator.Next step is to actually generate docopts grammar. mkdocs generator works nowIt can be selected for each type of program we want to build, and makessense for everything that is not a library.We also tried to unify names and folders a bit more, even though therecertainly is more work to be done to be fully non-redundant. cli depends on API, genericallyThis allows us to build efficiently. CLI programs can now have theirown cmn.rs implementation, which we can test standalone withcargo test.The primary makefile currently just explicitly pulls in the type-*.yaml,one day we could possibly put it into a loop. api generation works once againWith the new structure, it should be easy to add CLI programs withproper dependencies accordingly. Resumable upload implementedWith all bells and whisles. For now, we don’t have a good return valueto indicate that the operation was cancelled, which needs fixing. implement query_transfer_status()The delegate logic is implemented and seems sound.It’s somewhat funny that after all this back and forth, all we getis a valid start position for the upload. ContentRange header (parse and format)Now we are able to send the transfer-update requests and implement theactual chunk logic. use of oauth2::SchemeThat way, we improved our API, reduced code bloat, and are very clearabout the what we do for Authorization. crate version +<revision>That way, crate names reveal exact inforamtion about the containedAPI revision. check upload size against max-size make actual store_upload_url() callWe also assure to call only as often as we have to, keeping some statebetween the loops accordingly. improved delegate callsThe delegate will be asked for an upload URL, that he may store duringyet another call. resumable-upload infrastructureLayout the ResumableUploadHelper and implement the entire logicwith the mbuild renerator.All that’s left to be done is to implement the ‘chunked upload’ method.The borrow checker helped me to prevent a bug as well. don’t crash if json decode fails.Instead, tell the delegate about it and return the error. mark unused types with marker traitFor some reason, some google APIs define types they never use. We nowmark them, just because we can, to show our superiority ;) ;) ;) :D . support for ‘variant’ schemaDocumentation links, at one spot, have been updated as well.The variant schema is represented natively as enum, it all looksvery good.Json has been taken care of as well … . Option<_> in schema only if neededThis means that only part fields will be optional. added field aliases, were neededThis makes sure our fields can properly be decoded. use serge instead of serializeHowever, for some reason, the Serialize/Deserialize macros don’t workfor me, even though they work just fine in the respective tests ofthe serge crate. What am I possibly doing wrong ? simplify delegate callsNow we use the DefaultDelegate as standin in case there is user-delgate.That way, we save plenty of complexity as no additionalif let Some(ref mut dlg) = delegate is necesary. prevent duplicate schema typesThese could clash with types we import from Cmn. When that happens,just a single list must be adjusted for a fix, seeunique_type_name begin()/finished() callsDuring begin(), the delegate receives additional information about thecurrent call, which can be useful for performance tracking, amongother things. alt ‘media’ handling to allow dlsThis also includes documentation to state which methods actually supportmedia download, and how to achieve that.Added TODO to not forget we should tell the user how to achieve thesekinds of things. crates with ‘google-’ prefix allow to set user-agent optimizations and simplification; seek optimized memory allocation and optionsThis increases the possible performance, and makes for more readable,concise code. multibytereader single byte testIt shows that we actually don’t handle our state correctly.The first test which reads to string obviously uses a big-enough buffer. MultiPartReader is working.Something that is missing is a single-byte read test initial part writingWe are a state-machine, and handle parts of it correctly.However, we don’t yet write the boundary at all, and could improveour use of match. multi-part mime-type and add_parts()Next we will implement the actual Read method handle ‘alt’ paramIt’s conditionally set to json, if we expect a response value. more multipart infrastructureThere is more work to do, as it currently doesn’t compile, nordo we deal with our streams correctly.But we are on a good way. improve body infrastructureThis will support choosing custom readers at runtime, depending onwhether we have a resumable or simple media upload. simplify URL_ENCODE handlingMore maintainable template code, with less redundancy. uri-template handling completeWe now handle url-encoding for the parameters that would require it,and can deal with repeated params that will match ‘/param*’. uri-template generation worksThis doesn’t mean it’s correctly implemented, but we are on our way.It does compile, at least repeated types in examplesMade sure usage examples know how to use repeated types. repeatable parameters workingThe code dealing with them currently assumes they are “/” separated. intermed. support for ‘methods’These ‘methods’ have no resources, and need slightly special handling.This version at least makes the generator work, even thoughit produces duplicates.However, as it is so ugly, I’d rather consider to change itsubstantially … this feature should just come naturally. partial implementation of url exprURL expressions allow to substitute values within the URL withparameters. However, this is not only a simple key-value replacement,but supports expressions that need a parser.This one will have to be implemented next. set upload media typeRelated to #17 add more obvious crate and api version pre-request delegate call.This one is likely to change the further we advance in the upload-mediaimplementation. json decode and delegationNow json errors are handled and delegated with the option to retry,and all other values are just decoded according to plan.For now, I brutally unwrap json values assuming this will work, becauseit really should work. authentication with and without scopesIt’s quite rough around the edges, but has a slight chance to work.Will still to handle return values accordingly. attempt to send json-encoded requestThis doesn’t work yet, as I am unable to unwrap the client properly.It’s a refcell that contains a BorrowMut to a hyper::Client, andlets just, it’s complicated. add cargo.toml dependency information docs and tests of youtube3 on travisThis might already bring it close to 7 minutes runtime, which seemslike providing us with a buffer big enough for when it isfeature-complete. update-json using discovery APIInstead of depending on the google go client API repository, I nowuse the original data source, namely the discovery API. full usage example on landing pageRelated to #4 oauth22 -> oauth2_v2Related to #3 improved library namesRelated to #3 new github-pages targetFor import of all docs to the github now we pre-generate nested schemasInto a complete, global list of schemas, with additional meta-data.However, it’s currently not complete, as $refs are missing.There is some resemblance to to_rust_type(…), which worries meslightly part 1 to implement ‘any’ typeIt is a Json object, with a schema as defined elsewhere. It’s quitecool to see this (nearly) working already. However, it will requireus to transitively assign the required markers which is basedon information we don’t currently have.Maybe implementing this could also help to simplify name-clash checksor make them better at least ? build all apis, were possibleNow there is a blacklist feature, allowing to list apis we can’t yethandle for whichever reason. new Scope enum typeFor use in all places where scopes are desired. It will also be madeavailable for adding scopes by the user. scope as property …… however, it will become an enumeration, as I don’t like peopleputting in strings all by themselves. This also means we have togenerate good enums ourselves. query string setupIt works for uploads as well as for others.Next up is to setup the head and authentication. It will be as simpleas calling and handling GetToken, even though I think that thereneeds to be better support for the scope that is asked for … . generic result type… and we actually add additional fields to our fields list. additional fields and Result typeNow query params are handled completely, including clash check.Additionally, there is a new result type which encapsulates everything.It must be typed to the actual result type though, which can be arequest result put all fields onto a listAlso handle the case when the ‘part’ field is generated from therequest. Additional params still need work spike to see how delegate can be workTo avoid an additional type parameter, we will use dynamic dispatchfor the delegate.Having function overrides at some point seems like an excercise betterleft for version 1.1 ;) first attempt to get it to workWith a big but ! The most simple thing to do it was to just addadditional type parameters to the respective method.Now the type cannot be inferred, which means type-hints must be added.This should be easy enough, but … has to be done somehow. media-upload doit() methodsIt’s just a first step, and even though the generation works well,I am still missing the right Rust code. Will have to simplify … param() to set any parameterThat way, things like drive.files.insert alt=media has a chance to work.We should actually check for this to support various ‘alt’ values added gogole drive APIJust to have another, different set of api information to deal with,and not accidentally hard-code things to work with youtube only.Prepared dealing with media uploads, and it turns out to be best toadjust the ‘doit()’ to take the respective type parameter.We also have to think about downloads, like the ones for google drive,which requires custom query parameters. ground work for upload mediaThis might mean we need additional type parameters, but I will see howit’s going to work out.In theory, we could define a new trait for Seek+Read, but this wouldmean that we couldn’t contain owned streams.For max flexibility, it’s better to have additional type parametersand use BorrowMut to allow ownership, and borrow. request type handling part 1Now we will generate proper resoure methods builder calls to instaniatethe more or less valid method builders.However, it doesn’t compile yet, and the ‘to_parts()’ method onresources is still missing. build insert/update … methodsIt’s just the first version which defaults everything.Required parameter lists still have to be built.It’s not going to be a problem at all. properties and setters for mbuilderThis includes descriptions, of course, and generally seems to lookquite neat. For now, we brutally consume all input to own it,but in future we might be able to put in Borrow to support them all. infrastructure for method buildersNow comes the actual work of setting them up.Additionally, the docs were decluttered to show comments onlywere necessary. Now the code path to getting the hub is as concise aspossible. Partial MethodBuilder implIncluding documentation at least on the method builder part. Thegreat thing is that fully working examples are now included onevery type !Now more involved part starts … namely setting up the individual callmethod signatures. defs are now more readableThis works with a new indent and unindent filters respectively.There are a few things to consider, but I have understood how it worksand can handle it.There is some overhead just to give me nicer visuals … might choosea different route, like annotations. generate hub implementation and docsThis includes docs for the library usage.It’s totally great to be able to paste example code right were itbelongs, and also put the same elsewhere to compose more complex docs. def for DO NOT EDIT commentsA note like that is now added to all files we generated, commented outdepending on the file type.Quite neat, except that for filtering, I always have to use blocks. Traits now show up as part of libPreviously, they were in an extra, oddly named crate.Now we just make it a part of our generated codebase.That way, traits, and common code, shows up as part of the library.Fair enough.This also means that the types ar not reusable.Maybe a mixed-mode can be used if that is desired. add marker traits to schema typesBased on their involvement in activities.It nearly works perfectly. LUTs and context to make better docsNow a context is passed to utility functions, which contains the statethese may be interested in. This keeps it clean from global state.With the lookup tables, it is possible to figure out relations betweentypes and document them accordingly. first generated result …… just to keep track on how it changes over time. generating valid rust from schemasIt’s very nice, even though there is some more work to be done here.It’s just the beginning … . now sets up entire project structureThat way, we have a common library to pull in from the main repository,and a space for testing new code (in a partial implementation).Next there will be generated object structures. improved license information… and readme, and looks of author listing.Slowly getting into the flow, possibilities seem thrilling. LICENSE + README.mdReadme is very initial, but the architecture is set to evolve it tosomething no less than beatiful. mako-render generates output dirsThat way, the makefile doesn’t need to know that much anymore, andgets simpler/less verbose.# Also apis target - make all apis can now use custom libraries in pycodeNamespaces can exclusively be used during rendering, which is fine ifyou remind yourself of the newline rules.However, I also need some utiltiies that convert input data. Theseare now within their own libraries, which can be used from python blockslike the ordinary python functions they are.Quite neat.In future, most of the functionality will be in separate namespaces,the top-level will just assemble the main library file, usnig theprovided %defs. That way, the main file is kept clean. cargo.toml templateIt’s quite final, and super easy to change and to read.It seems we want to use namespaces/shared implementations soon to allowusing defs. In our case, we transform the version in a particular way,which is easy enough, yet I’d like to use it to make the system morepowerful. generic source/output mappingsThis includes proper handling of dependencies.The code is concise, pythonic and quite ‘cody’, but does the job justfine. multiple input-outputs per callThat way, we read the data files only once, but produce all the outputswe need. Together with a powerful makefile, we have a multi-invocationwith proper depedency tracking.Everything will be regenerated though, even though just a single inputtemplate file changed.The alternative would be to have one dependency and invocation perinput dependency, but that will read the entire json each time.Let’s see what’s faster/more useful during development. api deps generation worksIt’s very pleasant to use, and worth the slightly greater effort. mako autosetup and improved executableNow we can write mako templates, with a similar feature set aspyratemp. Except that its syntax is nicer, allows to do everythingand that there is syntax highlight support.Let’s see how it fares successfully generating make depsAfter minor modifications to pyratemp, it certainly does the job.What it does NOT do:It will do the job nonetheless, but mako might be worth a look my first gsl program …And it crashes on linux and on osx.What am I doing wrong ? unified make based build systemAdded all prerequisite programs in binary for easier use.Make is now implemented top-level, and is not expected to do too muchwork actually. It will, however, keep track of all requiredgsl invocation and make sure calls are efficient by not havingto rebuild everything every time. That’s what make does, anyway ;) added authenticator argThat will allow interaction between client and authentication attempts.It also shows how cumbersome it is to deal with all thesegenerics … but hey, you gotta do what you gotta do.If boxes of pointers would be used, it would be easier to handle, butenforces a certain memory model. That, of course, is not desired. makefile for handling json-to-xmlThat way, it will remain clearly documented how to do this, and allowfor efficient calling of gsl as well, at some point.Of course it will be a little more difficult for us to know alldependencies, but gsl could generate these as well for us, I suppose. add conversion tool and youtube apiThe json file needs to be converted to valid XML, which should bedone by a soon-to-be-modified xml2json tool. first primitive types and apiNow it should be possible to implement first version of actualinsert handling, with everything there is about it.That should eventually help to generalize it, as I am definitelynot going to hand-implemented these protocols … .The great thing is, that if done right, one will be able to truly befirst and make an impact ! improved module layoutAs there will be plenty of types, it will be better to split it up.Also learned something about self::<submodule> :).Insert and and update should be hand-implemented just to see how it’sworking. Then there should be some investment to auto-generate thiswith gsl. Once the latter works … I could auto-generate all apis,or adjust the go generator to create rust instead.Depends on what will be faster … . figure out ownership modelThere is a central YouTube type which helps constructing varioussub-builders, which in turn provide individual functions.Architecturally, it’s very similar to the go implementation, butmore efficient memory wise. initial commitBase project with everything it will need to grow:Possible issue:I swapped from looping over each key in tc.keys() to assuming the keyswill only ever be [“api”, “cli”]. This hard codes the keys instead ofgetting them dynamically, but makes it easier to format as a table andlets you pull a lot of the logic out of the template and into a singleblock before each table row.If the types of application in tc.keys() ever changes then thistemplate will need to be updated accordingly! use new serde map implementationNo fun, this one. build better dataReally just what is needed right now to make it work.[skip ci] make cli publishing workIt really needs allow-dirty.Let’s hope that won’t publish too much. try to depend on major version of apiPreviously that didn’t work due to a bug in carg,but should work now. cli + api use a single base versionThat way we get rid of the duplication at least.Probably it would be enough to just refer to version 1 of thelibrary respectively, and let semver do the rest. correct link to license on github[skip ci] handle discovery urls with $Some google discovery URLs contain $discovery or other variants,causing the calls to wget to interpret $d as an environment variableinstead of a literal. An example is:https://logging.googleapis.com/$discovery/rest?version=v2.To fix this, the $ has been escaped so that wget fetches the URL asexpected. Add an unused field to empty API types.Null structs (struct Foo;) cause the following error when trying todeserialize an empty JSON object {} into them:JsonDecodeError("{}\n", Syntax(InvalidType(Map), 1, 1)) (also known asinvalid type: map at line 1 column 1: {}). The optional struct memberprevents this error. URL-encoding ‘/’ in URLs is not accepted by Google APIs. use redirect flowThe interactive flow requires to paste a code back into thecommand-line, which does only work when it’s cat’ed, but notif it is pasted.This should let it handle everything internally, which isway more user-friendly. relative path for custom target dirUsing a shared target-dir is important to keepdisk-space usage in check and speed up builds. don’t fail by default on non-nightly use working version of serde-codegenThis update fixes the build on stable, and allows buildson nightly as usual.The trick is to use the latest version of serde-codegen,which keeps the syntex version internal, preventing clashesbetween libraries that might have different requirements. as learned from yup-oauthThat way, there is no redudancny anymore. work with latest serdecargo test will work now.We now use the latest serde once again, which shouldmake everything better. remove cargo/configIt seems due to a so far possibly unfiled bug, cargo fails toget it’s CWDs right.Last verified with cargo 0.11.0-nightly (42bce5c 2016-05-17).To reproduce, just put the deleted file back and run a build command,such asbashmake drive3-cli-cargo ARGS=build --no-default-features --features=nightly
+ use hyper Bearer header styleConsidering we kind-of hardcoded this authentication type anyway,we now use the Auth-types provided by hyper 0.8.The incentive here was the compiler telling us that there theyup-oauth::Scheme type doesn’t implement the hyper::authorization::Schemeanymore, even though that clearly was the case. Also it couldn’t bereproduced in yup-oauth itself.This will need some work to get correct again, so this is just a crudepatch to make it work again. compatibility with serde 0.60.7 has a weird assertion error that might have happenedif files get too large. choose serde-version which worksEverything newer than the ones we see here will causethe error described in #148. use venv-python to run any utilityPreviously the yaml version generation could fail if your system-pythondidn’t have yaml installed. Now the virtual env is used, which isguaranteed to support yaml. use latest oauth2 libIt enables using std::time::Duration natively use new discoveryRestUrl field for json download use std::Thread::sleepHowever, in sibling libraries, we still use time::Duration, whichnow is a part of std::time::Duration.These should be adjusted, to make the usage ofsleep(Duration::from_millis(d.num_milliseconds() as u64)) into sleep(d) improve handling of error code if stable is tested get cmn compiling on nightly rust assure license can be generated use PYTHONPATH for mako invocationThat way, it will find its resources. improve version and library name handlingWe can now deal with versions having the ‘alpha’ or ‘beta’ suffix.It’s rather hard-coded, but solves the problem for now.Related to #126 update to latest serde/rust update to serde 0.5.0Serde move all json code into a separate crate that we are now usingas well. use clap 1.0.3 compatibility with hyper 0.6.4Closes #123 adjust linux script to target dirPreviously it attempted to find build-artifacts inthe ‘gen’ directory, now these are all found in‘target’, provided cargo 0.3.0 is used.[skip ci] flush output stream on CLI outputFor some reason, this is now a requirement - previously this didn’tseem to be necessary.Don’t know what changed there … and it’s odd it doesn’t flushwhen the process is going down or the handle is destroyed. work with hyper v0.6.0Currently the latter actually fails to link on OSX, and requires a localoverride with https://goo.gl/OTExmNthis fix. type-inference fails on empty vecPreviously this wasn’t the case, as the type could be inferred by thetype of the parent-vector to extend.Apparently this feature was removed, probably for good reason. make statement shell compatibleThe previous one actually required bash, instead of sh add type annotationIt seems to be required when building with an older rustc version.This did work in nightly, and just seems to be some sort of limiationin stable. work on stableCLI was slightly adjusted to not use unstable features.Fortunately, there is no serde magic happening, which allowsus to keep it simple without using a build script. minor fixes expanded header implementationNow it compiles to the point where Mime appears as duplicate type,for some reason. first big step towards syntexEven though there is a bug that caues {} to be used in stead of(),when exanding macros, which causes syntax errors that we have toworkaround, it’s not a real issue.What’s happening additionally is missing hyper macros, whichnow have to be expanded manually. Shouldn’t be a problem,pretty-printing when compiling is made for just that ;).No, it’s sad that include!() works so badly, it makesusing serde so difficult … it’s no fun i must say.Just for stable … I am not sure if it is worth it.“ clean was depending on unknown targetsThere are no per-program-type docs clean, just made it depend ondocs-all-clean.Also added the docs-api|cli target to the generated per-program-typemake help. It was just missing, even though it existed. fix clean target for docs/cliclean-all-docs and clean-all-cli aren’t valid targets. The current makotemplate causes make clean to abend reporting that it can’t make thesetargets. URL substitution handlingPreviously we would remove the wrong parameters when attempting toremove only those parameters that have been used in the URLsubstitution.The code we have now is more idiomatic and appears to be removing thecorrect parameters. dc630d01e 2015-05-09[skip ci] deal with rustc lifetime issueRelated to #109 limit tar.gz to executablePreviously it could re-pack tar-files and mess everything up.[skip ci] osx-tar files without directoryPreviously, they contained the parent directory, which wasn’t intendedand was different from the plain-layout dictated by the linux versionof the script.[skip ci] filter null values of requrest structsSome servers, like youtube, reject null values possibly thanks tothe reliance on parts. Now we are filtering them (in a very inefficient,but working way), which seems to be fine with the servers.Effectively, we seem to be able now to upload videos … .More testing required ! upgrade to hyper v0.4.0It was basically just a find-and-replace to adapt to the changed namesof Error and Result types. completed list of parameter namesPreviously the ‘did-you-mean’ functionality only knew the globalparamters, but not the method-local ones. simplified call to form_urlencodeIt now supports more generic inputs, as suggested in a lenghtydialog on a corresponding github issue.Required to build with >=0.2.33 added latest reference CLI codeJust to have something to link to gate usage of upload_media_paramsPreviously the local stack variable would be used even though itwasn’t initialized as there were no upload flags. Now this onlyhappens if there are media params.[skip ci] let delegate forget uploaded urlsWhen uploading using the resumable protocol, we are now telling thedelegate to forget the previously stored URL after successful upload.Previously it would have tried to return such a URL and thus madethe system retry uploading a file that was already uploaded. handle repeated required stringsIn a single case we wouldn’t properly pass on string arguments thatwere repeated. Now we handle them with a nice one-liner. ‘about()’ text for main commandsIt shows up in the help, and makes it easier to navigate the commandtree without bringing up the html documentation. adjust JsonTokenStorage to yup-oauthSignature of set() changed to return a Result<(), _> instead ofan Option<_>.Related to https://github.com/Byron/yup-oauth2/issues/5[skip ci] unified error handling escape subcommand descriptionsOtherwise, we could have had invalid rust strings.[skip ci] remove unused std_misc featureHopefully this will not trigger errors elsewhere, but we willjust find out I guess ;) adjust to latest hyper header macros re-introduce UploadProtocol,fix CallTypeAll tested APIs seem to build, verified update docs and fix calltype handling various fixes and improvementsRelated to #81 print usage if command is missingAlso, fixed config-dir substitution in flag’s help message tweaks to make youtube3 workMainly minor cleanup, and handling of generator branches thatdidn’t show up in smaller APIs that were used during the first steps.related to #81 adjust option usage to changed APIDiscovery API now builds and seems to work even ! More testingwill have to be done though to be sure. handle apis without media uploadWe are annotating the type of the optional protocols if that shall berequired. call iter() directlyAs IntoIter is only implemented for slices up a sice of 32.DFAReporting though will reach 55, at least.Also added dfareporting-cli code to show how stackoverflow issues can becircumvented efficiently. commit before un-using UploadProtocolWe will try to wait for https://github.com/kbknapp/clap-rs/issues/87to allow us to use the enumeration instead of strings, as well asan iterator, which will look more idiomatic in the end. generate command data structureWe do this in the hopes to circumvent a stack overflow.This means we will setup the parser entirely at runtime, which actuallysaves a little bit of code. upload some code to help debuggingWe get a stack-overflow when trying to run the dfa-reporting program,and right now I don’t know how to workaround it.This could be preventing us from using clap. make it work with latest hyperThis is known to work with the master of hyper. It’s probably OKto keep it, preparing for the next release and under the assupmtionthat I will not be releasing binaries for a while. exclude cloudsearch from buildIt doesn’t have a single method, and thus is useless code updated to v0.1.6, latest CLI CLI + API release preps update changed url crate imports request value cursor handling and docs simple and resumable upload worksRelated to #76 use only one request structureThis works as we can just put all request-structure parsing to the topof the function.That way, we don’t put the request struture twice. set request value to callPreviously, even though the request was passed by reference, it wascopied and thus our changes never arrived in the call.Now the API makes this clear by taking ownership, and the CLI codesets the Request value lateron, explicitly.Related to #76 verified download works update all code to latest version response value json decoding implement deletion of tokensPreviously this case was entirely uncovered.Interesting note: when a token is revoked, existing auth-tokens willstill work. However, you may not refresh them in case permissionshave been revoked. It’s good as there is only one code-path to dealwith (and we verified it to be working), and bad for the user asmalicious software can keep using an account for certain time untilthe token expires. adapt to changed yup-oauth2 APIThe latter changed a lot, to the better, and we handle the newreturn types accordingly.Related to #74 resolve generator issues update make targetAlso, generate CLI. Probably there is not enough time to build it. README info + fix author emailPlease note that docker build script is still in debug mode, thisissue will remind me about it: #72 scopes were used illegallyWhich caused a compile error. This was fixed by assuring the codeuses the same function to determine whether or not scopes are presentper method.[skip ci] (abf0548b5 2015-04-15) (built 2015-04-15) latest version of all APIsNow CLI and API and the same level request value parsing compiles and initsTherefore, you can now actually make the call and the program will notcrash due to uninitialized Options. struct access compiles …… but currently wouldn’t run as we don’t initialize the optional sub-structures at all. corrected cursor handling in mkdocsThe trick was to use an actual list of cursor tokens that is consumedon use. That way, we don’t loose track of were we are in thestructure.Related to #64 NULL default values instead of randomsInstead of generating nonesense random values, we just map defaultsthat represent the respective NULL value of a given type. alt-media handling in CLI+API-docs optional parameter default handlingNow we provide a matching default for each paramter, thus alleviatingthe previous issue of unncecessary follow-up errors. add rustc_serialize to test-crateA top-level cargo test didn’t work anymore thanks to a missingmention of rustc_serialize.[skip ci] optimze argument handling and conversion Display for Errors + refactor improved scope handling; fix CLIRelated to #48 add commands.yml.makoIt was previously hidden thanks to .gitignore.Good I made a fresh clone to see if make really really works. dependencies are now per-program-typePreviously we put cli.py into the common lib folder, which caused theAPI to be regenerated and rebuilt whenever we changed code that willonly affect the CLI, causing terrible turnaround times.Now the dependency is fixed. ‘bytes …’ -> ‘bytes=…’ better subtext + rename target one folder per API docsOtherwise, it would overwrite its search index, effectively breakingthe search field.We might run into space issues on github, as the generated docs areduplicating each other and use a lot of disk-space. use bytes=… when sending as wellPreviously, bytes= was just parsed, but not sent to the server.This change is motivated by a similar change in this commit:http://goo.gl/AvyvLb fix dependenciesThat way, we don’t build documentation unless this is truly necessary add publish state v0.1.5 corrected absolute linksThis only affected links in readme files, not the relative onesin the actual documentation v0.1.5 adjust to hyper client v0.1.4 adjust invalid make target v0.1.4The latter pointed me to the serde issue, which would have madeeverything fail when actually used to communicate with google servers. v0.1.3Related to #46 version 0.1.3 rustc (be9bd7c93 2015-04-05)Related to #46 github-pages index generationPreviously, we forgot to pull in the new type-specific dataset, whichcaused the index.html.mako file to fail. check-in of latest sourcesThis also includes crate files to remember whichcrates we have published already.Related to #44 set the API version to 0.1.2 incl. Result conform to standardsRelated to #44 remove newlines interpreted as testWhen documenting mandatory arguments of a methods builder, it waspossible to document ‘parts’, which have a long multi-line descriptionwith empty lines inbetween. This caused the indentation to be funnyand tricked rustdoc into thinking these are indented doc-tests.Now we remove these empty lines, also hoping we dont encounter lineswith just whitespace in them. The latter would require a tiny updateof our regex. remove custom Result EnumInstead, we just use a customized Result tyoe and thus stick tocommon Rust conventions. update json files from discovery API typo fixes and misc. improvements whitespace and trait rename upload size now taken properlyPreviously, it would query the size from the wrong dict and obtainthe value 0 all the time. This would have made every upload fail withUploadSizeLimitExeeded.Now we obtain the actual size limit, and will ignore it if unset/0for some reason.Patch += 1 0.1.0 release upload() return value handlingNow deals with Cancellation and non-OK status codes correctly. re-export types used by delegateOtherwise, delegate implementation might not actually be possible. better introduction and version handlingMake it cristal clear what the crate version means, and what version ofthe documentation you are looking at. Also do this in the README file.Assure that ‘Google’ is capitalized. repository/source-code linkPreviously it pointed to a timestamp file. Unified repositorysource code link generation, and simplified ‘deps.mako’.Related to #38 simplification and cleanup schema_markers() accessed map incorrectly prune unused and ToParts traitLinters are back to ‘normal’. pretty names for methods and resourcesPreviously, it was possible for methods to have ‘.’ which showed upin the documentation. Now these are replaced with ’ ’. exclude those with recursive schemasThey currently don’t compile as Box ‘serde’ is not supported.See https://github.com/erickt/rust-serde/issues/45.Related to #34. make recursive types possibleMust be Option<Box<T>> now, whereas a simple Box<T> workedpreviously. Anyway, serde can’t decode/encode Boxes yet, soplus1 was removed from the list of APIs to build.Related to #34 MethodBuilder -> CallBuilderFind-and-replace. It seems to build and work correctly, still improved markdown for library overviewAnd names of free methods, which previously contained ‘.’. These arenow spaces. just add latest youtube codeIt’s good to see what actually changed in the json realm. Vec/HashMap are OptionalsThat assures that we can decode partial server responses, and sendpartial structures as well. serde cleanup;JsonError pub fields prevent type-clash with ResultThis should have been fixed in previous commit, but wasn’t.Actually a change that fixed one API, broke the other, and vice-versa.It’s kind of a hack, because it’s tailored to fix particular cases only,yet I believe it’s contained enough to say ‘good enough’. some links pointed to old doc nameWith one of the recent changes, the crate name was changed to bedifferent from the library name. However, there were still plenty ofplaces that would refer to the library name instead of the new cratename.That way, links in the README.md as well as index/index.html stillpointed to the old location. MultiPartReader test caseSimple fixes, required as its API changed MultiPartReader now works correctlyThe state-handling was incorrect, causing it to not handle small readscorrectly.However, this is working nicely now. fix lifetime issuesThose were totally real, actually, and I am happy the borrow checkerexists !Only one weirdness happened with RefCell<BorrowMut<C>>, but it could befixed by checking actual types using let foo: () = something_nasty(). repeated params string additionIt seems odd that String + &str is required.In any way, previously it would try to add i32 to a string. repeated parameters docs improvementPreviously, it said it would ‘set’ the property, which is not the caseafter all. regenerate .api.deps less oftenIt took too long to do it, so the ‘MAKO_LIB_FILES’ dependency wasremoved. It can be re-added if needed. decent solution for free methodsNow I just add a ‘virtual’ resource, which is called ‘methods’.The good thing about this is that it works well standalone, orin conjunction with actual resources.Also the system works with it just with minimal changes unit-tests work once againAdded missing Result cases to make match exhaustive remove BorrowMut until it’s clearedSee stackoverflow at http://goo.gl/f27zJkj.Now we can actually call out client and move on with handling the result user lower-case library names,always force python2.7 in virtualenvforce the usage of python2.7 on systems where /usr/bin/python points to python3.xfixes issue #12 incorrectly capitalized cargo.tomlThis caused cargo on a case-sensitive file-system not to find thecargo file, which made it to look upwards in the directory structureto find the correctly named Cargo.toml fo the ‘cmn’ developmentproject. explicit subshell for cargo-docPreviously, it was only executing for cargo $(ARGS) try using a subshell for cargo cmdApparently travis doesn’t execute cargo in the right sub-directory.Might be a difference in the way make worksRelated to #8 fixed dependency to wrong targetWhich caused the cmn.rs to be missing, and the build to fail. install virtualenv automaticallyThe only dependency we really have is python, and wget.Pip is not needed ! fully qualified activity names Do not generate docs !Previously, travis would continuously overwrite my combined docs withthe ones from the dev-project, and make them useless.This has been driving me nuts ! Good to have it fixed ! added milestone linkIt’s important to the project, and should thus be listed there use function to make links correctlyIt will automatically handle rust-doc mode, and use relative or absolutelinks respectively. assured it handles ‘0’ correctlyPreviously, it could possibly take a ‘0’ away from the start of aversion. Now this is definitely not possible anymore. make ‘regen-apis’ workThanks to changes in mako libraries, it won’t work anymore withoutthe template directory set typo fix incorrect nested type namesThere was a name-duplication which led to un-inmplemented types.The good thing is that this was the last issue that kept all 72APIs from compiling. finally, we pick up all typesHashMap types were missing previously, but now it seems to be pickedup quite nicely.Would this mean we do the type-setup correctly, everywhere ? transitive, minimal traits for typesPreviously, I would just assign all useful traits to all types, nomatter on how they were actually used.Now it builds all dependnecies and considers them when assigningtraits, which is as precise as we need it.This is important to us as the Json type is just encodable, butnot decodable. Fortunately, we just have to encode it, but in theorythis makes it hard to embed any json in a known structure. no unused types anymoreDue to shared global state which was altered, we got wrong results.This is fixed now, thanks to a deepcopy. Amazing, how altering globalstate is always biting you, even though you are convinced it’s safeto do in just this case !General rule: Just don’t do it, no matter what ! improved camelCasingPreviously, it was possible to get types like Foo_bar, which is notdesireable.Now it is totally impossible to see such blasphemy ;) protect from nested-type-clashIt was possible for a nested type to be generated with a name that infact CLASHED with an existing schema type. What are the odds !The clash-check added will just verify against clashes with schematypes, which seems to be doing it for now. nested type names are consistent nowAt least so it appears.The implementation doesn’t look totally clean to me, as it seemssimilar concerns are in different portions of the code, which wasmerely tuned to work together.It could break appart if someone - me - wants to change it sometime scope -> add_scopeThis is not only more precisely saying what it does, but also doesn’tclash with scope parameters on resources ;) (happened in dfareporting) improved nested array type handlingIt needs deduplication though, coming up next prevent struct recursion issueThis works by just boxing types which are nested within themselves,breaking the recursion. nicer code and identifiers nested types work for arraysThanks to removed code which made no sense to me, I put in a bug.Now the code is back, beta than ever, and documented as well :). now deals with non-objectsThese are arrays or HashMaps, which are nested types too. This is usedto have custom types of standard vectors or hashmaps, which resolveto NewTypes in Rust. optionals are working once againA bug was introduced which caused nested-types not to be optionalin situations were they should. nested type resolution and hashesIt seems we do it better than the actual Go implementation, which failsto detect that scopes are actually having a string member.However, there still is an issue, as it’s as hashmap for us, but justa member for go … lets see …https://developers.google.com/discovery/v1/reference/apis#resourceshows that we implement it correctly :) !! remove compiler warnings.Also, a build issue was fixed when schemas were no objects.However, I think I will have to check this one anyway no compiler warningsThis involves disabling the dead-code lint, which is just to easedebugging, currently there is a lot of dead code as ‘hub’ is never used.Soon, this will change, so the lint will be enabled again. deepcopy dicts insteadIt was possible for writes to happen in nested dicts, causing globaldata to change and confuse the system.Not that I wouldn’t be aware of that danger, but apparently I didn’tsee the recursiveness of the call tree :). fixes to help more projects to buildInvolving fix name clashesScopes could be invalid, previosly, and the hub type could clashwith other types provided as Schema.Also, we used reserved identifiers deal with missing auth informationNow all APIs can be built successfully, which should help toprevent things from getting hardcoded in any way. resource-to-category mapIt allows to obtain category, which we previously dropped do not degenerate during activity_splitFirst step, next one will actually be keeping that data … asssure candidate is in mappingIt seems nearly nothing can be taken for granted ;).It’s best to just run against a big set of APIs and fix issues as theyarise though.More flexibility means more maintenance, after all. intermediate improvements …… it shows that the override I used previously won’t work for admin.Therefore we have to keep the actual value, instead of degenrating it.Makes sense … it’s interesting how much one tends to hard-code thingsto work just for a few cases, unless you opt in to see the whole picture ignore beta/alpha,assure latestThere were a few bugs in the generator program, which caused oldversions to be picked up, and alphas/betas now with flattened activitiesThat way, we don’t have recursive method builders, but insteadflatten the hierarchy. In our case, this is easier and meansless to type. E.g.hub.user().message().import(...) now ishub.user().message_import(...)In go it would look like this though`hub.user.messages.import(…)which is neater.We will never have that though, as it will initialize a massive amountof data right on the stack, even though only some of it is ever used… . first recursive resource supportHowever, this also means we need recursive builders, which is tottallyunsupported for now … .This means we have to generalize rbuild generation … could be easy.Lets see make scope gen work with gmail scopes are sorted Strings nowThat way, we make retrieved tokens independent of the order scopeswere passed in. Additionally, we can pass any scopes, just in casesomeone uses one token for multiple APIs.Let’s keep it flexible. Manual scope parameter …… however, it should better be a set, and there must be a way tocontrol certain global names using the configuration :) it now works in every which wayCustom property annotations have been very useful, to steer very specialcases.It’s also good that now there is enough infrastructure to deal withany amount of additional type parameters. added size and mime type supportThis information must be provided, I just forgot it doit() call with enum type annotationIt’s syntax I never used before, but … works !Now lets try to get the BorrowMut back recursion for nested typesDrive has recursive nested types, which were not handled preeviously. examples section in mbuilder got lost filter request value props by partsPreviously, it would just show all parts.It’s still not correct though as this isn’t necessarily the parts usedin the request value, but only the ones in the response value.It’s as good as it gets though, that’s all the information containedin the json. method builder examples work nowIt was easier than expected, but in the end needs quite some customcode and handling. Good to have mako (and python !!!) have to handle required/optionals valsOf course, it’s ok to do that, but … of course it doesn’t make thingseasier. However, I want these examples to be representing the real thing remove empty ’/// # ’ linesThey seem to make cargo fail to build valid doctests. Might be wortha ticket ! fixed part handling,it compiles nowWhat’s missing is docs, which will see some work now.I guess it will be best to hide all the prelude from the user, to allowhim to focus on what’s important here. setters now copy copyablesPreviously, they would take everything as reference and cloneeverything unconditionally. Now we do it only as we need to do it,no extra work incurred. using visual markers nowMakes everything evaluate faster, and is good enough as well.Besides, you don’t have to think about whitespace too much, keepingthings simpler is usually better perfected trait recognition.However, they are not listed as traits of the youtube api. What wereally want is to list common implementation types as part of ourselves.This doesn’t work though as long as we don’t have the common implas part of our sources. now the map is completeIt’s quite nice - next up is marker traits ! dependency handling:dirs with timestampThat way, make will not regenerate unnecessarily make all pods optionals.That way, json conversions will always work, which is probably whatwe desire (especially when handling server answers). now docs look good too unify generated constantslike library-name. That way, they are always the same, even if Ichange my mind.Good coding style is easy, using the current setup. mv youtube-rs to google-apis-rs handle whitespace and add GENINFOAlso, remove obsolete pyra files is now self-containedA little more than the promised 500 lines of code though ;). removed gsl, added pyratempAs GSL failed in my first attempt to get the example program going,it might be better to try something else before too much time is spend.Fortunately, pyratemp seems to be something usable, and even if not,it might be possible to make it usable as it’s just a ‘simple’python script that I might be able to understand, if need be. fixed dependenciesThe make deps generator should only care about the shared xml forgot to add shared.xmlAs XML files are ignored, I didn’t see that. works exactly as needed.Producing non-malformed pretty xml xml.tostring works now …… but it still generates invalid output due to scopes.Should be an easy fix make it handle top-level keysIt can now handle multiple of them.However, conversion fails, as the bloody xml converter can’t handlebooleans ??? WTF make sure we get correct openssl vers.<csr-unknown/>
 
