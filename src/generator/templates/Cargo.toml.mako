@@ -33,9 +33,6 @@ hyper-rustls = "0.23.0"
 mime = "^ 0.2.0"
 serde = { version = "^ 1.0", features = ["derive"] }
 serde_json = "^ 1.0"
-## TODO: Make yup-oauth2 optional
-## yup-oauth2 = { version = "^ 7.0", optional = true }
-yup-oauth2 = "^ 7.0"
 itertools = "^ 0.10"
 % if 'is_executable' not in cargo:
 google-api-client = { path = "../../google-api-client" }

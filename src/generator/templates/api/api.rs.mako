@@ -32,7 +32,7 @@ use tokio::io::{AsyncRead, AsyncWrite};
 use tower_service;
 use serde::{Serialize, Deserialize};
 
-use crate::{client, client::GetToken};
+use crate::{client, client::GetToken, client::oauth2};
 
 // ##############
 // UTILITIES ###
