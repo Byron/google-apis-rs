@@ -1,7 +1,9 @@
 use std::error;
 use std::error::Error as StdError;
 use std::fmt::{self, Display};
+use std::future::Future;
 use std::io::{self, Cursor, Read, Seek, SeekFrom, Write};
+use std::pin::Pin;
 use std::str::FromStr;
 use std::thread::sleep;
 use std::time::Duration;
@@ -105,12 +107,13 @@ pub trait Delegate: Send {
         None
     }
 
+    // TODO: Remove oauth2::Error
     /// Called whenever the Authenticator didn't yield a token. The delegate
     /// may attempt to provide one, or just take it as a general information about the
     /// impending failure.
     /// The given Error provides information about why the token couldn't be acquired in the
     /// first place
-    fn token(&mut self, err: &oauth2::Error) -> Option<oauth2::AccessToken> {
+    fn token(&mut self, err: &oauth2::Error) -> Option<String> {
         let _ = err;
         None
     }
@@ -227,6 +230,7 @@ pub enum Error {
     /// Neither through the authenticator, nor through the Delegate.
     MissingAPIKey,
 
+    // TODO: Remove oauth2::Error
     /// We required a Token, but didn't get one from the Authenticator
     MissingToken(oauth2::Error),
 
@@ -272,6 +276,7 @@ impl Display for Error {
                 writeln!(f, "Bad Request: {}", message)?;
                 Ok(())
             }
+            // TODO: Remove oauth2::Error
             Error::MissingToken(ref err) => {
                 writeln!(f, "Token retrieval failed with error: {}", err)
             }
@@ -784,4 +789,76 @@ pub async fn get_body_as_string(res_body: &mut hyper::Body) -> String {
     let res_body_buf = hyper::body::to_bytes(res_body).await.unwrap();
     let res_body_string = String::from_utf8_lossy(&res_body_buf);
     res_body_string.to_string()
+}
+
+// TODO: Simplify this to Option<String>
+type TokenResult = std::result::Result<Option<String>, oauth2::Error>;
+
+pub trait GetToken: GetTokenClone {
+    /// Called whenever there is the need for an oauth token after
+    /// the official authenticator implementation didn't provide one, for some reason.
+    /// If this method returns None as well, the underlying operation will fail
+    fn get_token<'a>(&'a self, _scopes: &'a [&str]) -> Pin<Box<dyn Future<Output=TokenResult> + 'a>> {
+        Box::pin(async move { Ok(None) })
+    }
+}
+
+pub trait GetTokenClone {
+    fn clone_box(&self) -> Box<dyn GetToken>;
+}
+
+impl<T> GetTokenClone for T
+where
+    T: 'static + GetToken + Clone,
+{
+    fn clone_box(&self) -> Box<dyn GetToken> {
+        Box::new(self.clone())
+    }
+}
+
+impl Clone for Box<dyn GetToken> {
+    fn clone(&self) -> Box<dyn GetToken> {
+        self.clone_box()
+    }
+}
+
+impl GetToken for String {
+    fn get_token<'a>(&'a self, _scopes: &'a [&str]) -> Pin<Box<dyn Future<Output=TokenResult> + 'a>> {
+        Box::pin(async move { Ok(Some(self.clone())) })
+    }
+}
+
+/// In the event that the API endpoint does not require an oauth2 token, `NoToken` should be provided to the hub to avoid specifying an
+/// authenticator.
+#[derive(Default, Clone)]
+pub struct NoToken;
+
+impl GetToken for NoToken {}
+
+// TODO: Make this optional
+// #[cfg(feature = "yup-oauth2")]
+mod yup_oauth2_impl {
+    use core::future::Future;
+    use core::pin::Pin;
+
+    use super::{GetToken, TokenResult};
+
+    use tower_service::Service;
+    use yup_oauth2::authenticator::Authenticator;
+    use tokio::io::{AsyncRead, AsyncWrite};
+    use http::Uri;
+    use hyper::client::connect::Connection;
+
+
+    impl<S> GetToken for Authenticator<S> where
+        S: Service<Uri> + Clone + Send + Sync + 'static,
+        S::Response: Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+        S::Future: Send + Unpin + 'static,
+        S::Error: Into<Box<dyn std::error::Error + Send + Sync>> {
+        fn get_token<'a>(&'a self, scopes: &'a [&str]) -> Pin<Box<dyn Future<Output=TokenResult> + 'a>> {
+            Box::pin(async move {
+                self.token(scopes).await.map(|t| Some(t.as_str().to_owned()))
+            })
+        }
+    }
 }

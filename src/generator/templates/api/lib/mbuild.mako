@@ -706,10 +706,21 @@ else {
 
         loop {
             % if default_scope:
-            let token = match ${auth_call}.token(&self.${api.properties.scopes}.keys().collect::<Vec<_>>()[..]).await {
-                Ok(token) => token.clone(),
+            let token = match ${auth_call}.get_token(&self.${api.properties.scopes}.keys().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                // TODO: remove Ok / Err branches
+                Ok(Some(token)) => token.clone(),
+                Ok(None) => {
+                    let err = oauth2::Error::OtherError(anyhow::Error::msg("unknown error occurred while generating oauth2 token"));
+                    match dlg.token(&err) {
+                        Some(token) => token,
+                        None => {
+                            ${delegate_finish}(false);
+                            return Err(client::Error::MissingToken(err))
+                        }
+                    }
+                }
                 Err(err) => {
-                    match  dlg.token(&err) {
+                    match dlg.token(&err) {
                         Some(token) => token,
                         None => {
                             ${delegate_finish}(false);

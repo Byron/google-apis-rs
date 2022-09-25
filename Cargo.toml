@@ -19,6 +19,7 @@ path = "src/rust/lib.rs"
 
 [dependencies]
 clap = "2"
+http = "^0.2"
 hyper = "0.14"
 mime = "0.2"
 rustc-serialize = "*"

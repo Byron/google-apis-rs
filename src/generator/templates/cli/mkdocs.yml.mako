@@ -14,11 +14,12 @@ repo_url: ${util.github_source_root_url()}
 docs_dir: ${mkdocs.docs_dir}
 site_dir: ${mkdocs.site_dir}
 
-pages:
-- ['index.md', 'Home']
+nav:
+- Home: 'index.md'
 % for resource in sorted(c.rta_map.keys()):
+- '${pretty(resource)}':
 % for method in sorted(c.rta_map[resource]):
-- ['${subcommand_md_filename(resource, method)}', '${pretty(resource)}', '${pretty(method)}']
+    - '${pretty(method)}': '${subcommand_md_filename(resource, method)}'
 % endfor # each method
 % endfor # each resource
 

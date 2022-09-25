@@ -26,12 +26,16 @@ path = "src/main.rs"
 % endif
 
 [dependencies]
+## TODO: temporary, remove when yup-oauth2 is optional
+anyhow = "^ 1.0"
 hyper-rustls = "0.23.0"
 ## Must match the one hyper uses, otherwise there are duplicate similarly named `Mime` structs
 mime = "^ 0.2.0"
 serde = "^ 1.0"
 serde_json = "^ 1.0"
 serde_derive = "^ 1.0"
+## TODO: Make yup-oauth2 optional
+## yup-oauth2 = { version = "^ 7.0", optional = true }
 yup-oauth2 = "^ 7.0"
 itertools = "^ 0.10"
 % for dep in cargo.get('dependencies', list()):
@@ -41,7 +45,7 @@ ${dep}
 <%
   api_name = util.library_name()
   crate_name_we_depend_on = None
-  
+
   if make.depends_on_suffix is not None:
     crate_name_we_depend_on = library_to_crate_name(api_name, suffix=make.depends_on_suffix)
 %>\
@@ -53,3 +57,7 @@ ${dep}
 path = "../${api_name}"
 version = "${util.crate_version()}"
 % endif
+
+## TODO: Make yup-oauth2 optional
+# [features]
+# default = ["yup-oauth2"]
