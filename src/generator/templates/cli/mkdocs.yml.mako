@@ -14,7 +14,7 @@ repo_url: ${util.github_source_root_url()}
 docs_dir: ${mkdocs.docs_dir}
 site_dir: ${mkdocs.site_dir}
 
-pages:
+nav:
 - ['index.md', 'Home']
 % for resource in sorted(c.rta_map.keys()):
 % for method in sorted(c.rta_map[resource]):
