@@ -31,13 +31,15 @@ anyhow = "^ 1.0"
 hyper-rustls = "0.23.0"
 ## Must match the one hyper uses, otherwise there are duplicate similarly named `Mime` structs
 mime = "^ 0.2.0"
-serde = "^ 1.0"
+serde = { version = "^ 1.0", features = ["derive"] }
 serde_json = "^ 1.0"
-serde_derive = "^ 1.0"
 ## TODO: Make yup-oauth2 optional
 ## yup-oauth2 = { version = "^ 7.0", optional = true }
 yup-oauth2 = "^ 7.0"
 itertools = "^ 0.10"
+% if 'is_executable' not in cargo:
+google-api-client = { path = "../../google-api-client" }
+% endif
 % for dep in cargo.get('dependencies', list()):
 ${dep}
 % endfor
@@ -49,7 +51,6 @@ ${dep}
   if make.depends_on_suffix is not None:
     crate_name_we_depend_on = library_to_crate_name(api_name, suffix=make.depends_on_suffix)
 %>\
-
 
 % if make.depends_on_suffix is not None:
 

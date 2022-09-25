@@ -30,6 +30,8 @@ use http::Uri;
 use hyper::client::connect;
 use tokio::io::{AsyncRead, AsyncWrite};
 use tower_service;
+use serde::{Serialize, Deserialize};
+
 use crate::{client, client::GetToken};
 
 // ##############
