@@ -795,7 +795,7 @@ pub async fn get_body_as_string(res_body: &mut hyper::Body) -> String {
 type TokenResult = std::result::Result<Option<String>, oauth2::Error>;
 
 pub trait GetToken: GetTokenClone {
-    /// Called whenever there is the need for your applications API key after
+    /// Called whenever there is the need for an oauth token after
     /// the official authenticator implementation didn't provide one, for some reason.
     /// If this method returns None as well, the underlying operation will fail
     fn get_token<'a>(&'a self, _scopes: &'a [&str]) -> Pin<Box<dyn Future<Output=TokenResult> + 'a>> {
@@ -828,7 +828,12 @@ impl GetToken for String {
     }
 }
 
-impl GetToken for () {}
+/// In the event that the API endpoint does not require an oauth2 token, `NoToken` should be provided to the hub to avoid specifying an
+/// authenticator.
+#[derive(Default, Clone)]
+pub struct NoToken;
+
+impl GetToken for NoToken {}
 
 // TODO: Make this optional
 // #[cfg(feature = "yup-oauth2")]
