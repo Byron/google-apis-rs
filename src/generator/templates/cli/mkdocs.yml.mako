@@ -17,8 +17,9 @@ site_dir: ${mkdocs.site_dir}
 nav:
 - Home: 'index.md'
 % for resource in sorted(c.rta_map.keys()):
+- '${pretty(resource)}':
 % for method in sorted(c.rta_map[resource]):
-- '${subcommand_md_filename(resource, method)}': '${pretty(resource)}', '${pretty(method)}'
+    - '${pretty(method)}': '${subcommand_md_filename(resource, method)}'
 % endfor # each method
 % endfor # each resource
 
