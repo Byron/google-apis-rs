@@ -23,7 +23,7 @@ use serde_json as json;
 use tokio::io::{AsyncRead, AsyncWrite};
 use tower_service;
 
-use yup_oauth2 as oauth2;
+pub use yup_oauth2 as oauth2;
 
 const LINE_ENDING: &str = "\r\n";
 
