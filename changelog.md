@@ -1,5 +1,11 @@
 <a name="api-v2.0.0:cli-v2.0.0"></a>
 
+## api/cli-vNEXT (YYYY-MM-DD)
+
+- New `GetToken` trait for custom ways of specifying a token. The latter can now be a String or be
+  `NoToken` as well.
+- Upgrade `mkdocs` to a more recent version that doesn't break in more recent python interpreters.
+
 ## api/cli-v3.0.0 (2022-3-8)
 
 - Support for yup-oauth 0.6
