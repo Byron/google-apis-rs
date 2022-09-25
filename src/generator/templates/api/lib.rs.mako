@@ -43,7 +43,7 @@ ${lib.docs(c)}
 // Re-export the hyper and hyper_rustls crate, they are required to build the hub
 pub use hyper;
 pub use hyper_rustls;
-pub extern crate google_api_client as client;
+pub extern crate google_apis_common as client;
 
 pub mod api;
 

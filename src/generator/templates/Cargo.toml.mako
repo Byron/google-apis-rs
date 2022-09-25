@@ -35,7 +35,7 @@ serde = { version = "^ 1.0", features = ["derive"] }
 serde_json = "^ 1.0"
 itertools = "^ 0.10"
 % if 'is_executable' not in cargo:
-google-api-client = { path = "../../google-api-client" }
+google-apis-common = { path = "../../google-apis-common", version = "4.0" }
 % endif
 % for dep in cargo.get('dependencies', list()):
 ${dep}

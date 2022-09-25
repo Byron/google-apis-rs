@@ -22,7 +22,7 @@ extern crate strsim;
 
 // just pull it in the check if it compiles
 mod cli;
-use google_api_client as api;
+use google_apis_common as api;
 
 /// This module is for testing only, its code is used in mako templates
 #[cfg(test)]
