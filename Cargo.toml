@@ -1,0 +1,6 @@
+[workspace]
+
+members = [
+    "google-apis-common",
+    "google-clis-common"
+]
