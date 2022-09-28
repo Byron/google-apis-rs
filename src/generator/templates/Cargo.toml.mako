@@ -34,7 +34,9 @@ mime = "^ 0.2.0"
 serde = { version = "^ 1.0", features = ["derive"] }
 serde_json = "^ 1.0"
 itertools = "^ 0.10"
-% if 'is_executable' not in cargo:
+% if cargo.get('is_executable', False):
+google-clis-common = { path = "../../google-clis-common", version = "4.0" }
+% else:
 google-apis-common = { path = "../../google-apis-common", version = "4.0" }
 % endif
 % for dep in cargo.get('dependencies', list()):

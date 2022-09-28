@@ -14,8 +14,6 @@
 </%block>
 #![allow(unused_variables, unused_imports, dead_code, unused_mut)]
 
-extern crate tokio;
-
 #[macro_use]
 extern crate clap;
 
@@ -25,7 +23,7 @@ use clap::{App, SubCommand, Arg};
 
 use ${to_extern_crate_name(library_to_crate_name(library_name(name, version), make.depends_on_suffix))}::{api, Error, oauth2};
 
-mod client;
+use google_clis_common as client;
 
 ${engine.new(c)}\
 

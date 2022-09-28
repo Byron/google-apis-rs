@@ -861,3 +861,87 @@ mod yup_oauth2_impl {
         }
     }
 }
+
+#[cfg(test)]
+mod test_api {
+    use super::*;
+    use hyper;
+    use std::default::Default;
+    use std::io::Read;
+    use std::str::FromStr;
+
+    use serde_json as json;
+    use serde::{Serialize, Deserialize};
+
+    const EXPECTED: &'static str = "\r\n--MDuXWGyeE33QFXGchb2VFWc4Z7945d\r\n\
+Content-Length: 50\r\n\
+Content-Type: application/json\r\n\
+\r\n\
+foo\r\n\
+--MDuXWGyeE33QFXGchb2VFWc4Z7945d\r\n\
+Content-Length: 25\r\n\
+Content-Type: application/plain\r\n\
+\r\n\
+bar\r\n\
+--MDuXWGyeE33QFXGchb2VFWc4Z7945d--";
+
+    const EXPECTED_LEN: usize = 223;
+
+    #[test]
+    fn serde() {
+        #[derive(Default, Serialize, Deserialize)]
+        struct Foo {
+            opt: Option<String>,
+            req: u32,
+            opt_vec: Option<Vec<String>>,
+            vec: Vec<String>,
+        }
+
+        let f: Foo = Default::default();
+        json::to_string(&f).unwrap(); // should work
+
+        let j = "{\"opt\":null,\"req\":0,\"vec\":[]}";
+        let f: Foo = json::from_str(j).unwrap();
+
+        // This fails, unless 'vec' is optional
+        // let j = "{\"opt\":null,\"req\":0}";
+        // let f: Foo = json::from_str(j).unwrap();
+
+        #[derive(Default, Serialize, Deserialize)]
+        struct Bar {
+            #[serde(rename = "snooSnoo")]
+            snoo_snoo: String,
+        }
+        json::to_string(&<Bar as Default>::default()).unwrap();
+
+        let j = "{\"snooSnoo\":\"foo\"}";
+        let b: Bar = json::from_str(&j).unwrap();
+        assert_eq!(b.snoo_snoo, "foo");
+
+        // We can't have unknown fields with structs.
+        // #[derive(Default, Serialize, Deserialize)]
+        // struct BarOpt {
+        //     #[serde(rename="snooSnoo")]
+        //     snoo_snoo: Option<String>
+        // }
+        // let j = "{\"snooSnoo\":\"foo\",\"foo\":\"bar\"}";
+        // let b: BarOpt = json::from_str(&j).unwrap();
+    }
+
+    #[test]
+    fn byte_range_from_str() {
+        assert_eq!(
+            <Chunk as FromStr>::from_str("2-42"),
+            Ok(Chunk { first: 2, last: 42 })
+        )
+    }
+
+    #[test]
+    fn dyn_delegate_is_send() {
+        fn with_send(x: impl Send) {}
+
+        let mut dd = DefaultDelegate::default();
+        let dlg: &mut dyn Delegate = &mut dd;
+        with_send(dlg);
+    }
+}
