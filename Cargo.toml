@@ -2,5 +2,7 @@
 
 members = [
     "google-apis-common",
-    "google-clis-common"
+    "google-clis-common",
+    "src/rust/preproc"
 ]
+exclude = ["gen"]
