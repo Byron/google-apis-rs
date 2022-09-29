@@ -614,6 +614,8 @@ api:
     - v1
     vmmigration:
     - v1
+    walletobjects:
+    - v1
     webfonts:
     - v1
     webmasters:
