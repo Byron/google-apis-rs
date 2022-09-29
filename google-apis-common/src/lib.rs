@@ -793,7 +793,7 @@ pub async fn get_body_as_string(res_body: &mut hyper::Body) -> String {
 // TODO: Simplify this to Option<String>
 type TokenResult = std::result::Result<Option<String>, oauth2::Error>;
 
-pub trait GetToken: GetTokenClone {
+pub trait GetToken: GetTokenClone + Send {
     /// Called whenever there is the need for an oauth token after
     /// the official authenticator implementation didn't provide one, for some reason.
     /// If this method returns None as well, the underlying operation will fail
@@ -927,5 +927,14 @@ mod test_api {
         let mut dd = DefaultDelegate::default();
         let dlg: &mut dyn Delegate = &mut dd;
         with_send(dlg);
+    }
+    
+    #[test]
+    fn dyn_get_token_is_send() {
+        fn with_send(_x: impl Send) {}
+
+        let mut gt = String::new();
+        let dgt: &mut dyn GetToken = &mut dd;
+        with_send(dgt);
     }
 }
