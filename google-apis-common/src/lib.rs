@@ -934,7 +934,7 @@ mod test_api {
         fn with_send(_x: impl Send) {}
 
         let mut gt = String::new();
-        let dgt: &mut dyn GetToken = &mut dd;
+        let dgt: &mut dyn GetToken = &mut gt;
         with_send(dgt);
     }
 }
