@@ -865,27 +865,11 @@ mod yup_oauth2_impl {
 #[cfg(test)]
 mod test_api {
     use super::*;
-    use hyper;
     use std::default::Default;
-    use std::io::Read;
     use std::str::FromStr;
 
     use serde_json as json;
     use serde::{Serialize, Deserialize};
-
-    const EXPECTED: &'static str = "\r\n--MDuXWGyeE33QFXGchb2VFWc4Z7945d\r\n\
-Content-Length: 50\r\n\
-Content-Type: application/json\r\n\
-\r\n\
-foo\r\n\
---MDuXWGyeE33QFXGchb2VFWc4Z7945d\r\n\
-Content-Length: 25\r\n\
-Content-Type: application/plain\r\n\
-\r\n\
-bar\r\n\
---MDuXWGyeE33QFXGchb2VFWc4Z7945d--";
-
-    const EXPECTED_LEN: usize = 223;
 
     #[test]
     fn serde() {
@@ -901,7 +885,7 @@ bar\r\n\
         json::to_string(&f).unwrap(); // should work
 
         let j = "{\"opt\":null,\"req\":0,\"vec\":[]}";
-        let f: Foo = json::from_str(j).unwrap();
+        let _f: Foo = json::from_str(j).unwrap();
 
         // This fails, unless 'vec' is optional
         // let j = "{\"opt\":null,\"req\":0}";
@@ -938,7 +922,7 @@ bar\r\n\
 
     #[test]
     fn dyn_delegate_is_send() {
-        fn with_send(x: impl Send) {}
+        fn with_send(_x: impl Send) {}
 
         let mut dd = DefaultDelegate::default();
         let dlg: &mut dyn Delegate = &mut dd;
