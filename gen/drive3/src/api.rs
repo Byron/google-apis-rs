@@ -13,7 +13,9 @@ use http::Uri;
 use hyper::client::connect;
 use tokio::io::{AsyncRead, AsyncWrite};
 use tower_service;
-use crate::client;
+use serde::{Serialize, Deserialize};
+
+use crate::{client, client::GetToken, client::oauth2};
 
 // ##############
 // UTILITIES ###
@@ -146,7 +148,7 @@ impl Default for Scope {
 #[derive(Clone)]
 pub struct DriveHub<S> {
     pub client: hyper::Client<S, hyper::body::Body>,
-    pub auth: oauth2::authenticator::Authenticator<S>,
+    pub auth: Box<dyn client::GetToken>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
@@ -156,11 +158,11 @@ impl<'a, S> client::Hub for DriveHub<S> {}
 
 impl<'a, S> DriveHub<S> {
 
-    pub fn new(client: hyper::Client<S, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<S>) -> DriveHub<S> {
+    pub fn new<A: 'static + client::GetToken>(client: hyper::Client<S, hyper::body::Body>, auth: A) -> DriveHub<S> {
         DriveHub {
             client,
-            auth: authenticator,
-            _user_agent: "google-api-rust-client/4.0.1".to_string(),
+            auth: Box::new(auth),
+            _user_agent: "google-api-rust-client/4.0.2".to_string(),
             _base_url: "https://www.googleapis.com/drive/v3/".to_string(),
             _root_url: "https://www.googleapis.com/".to_string(),
         }
@@ -198,7 +200,7 @@ impl<'a, S> DriveHub<S> {
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/4.0.1`.
+    /// It defaults to `google-api-rust-client/4.0.2`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -3287,10 +3289,21 @@ where
 
 
         loop {
-            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
-                Ok(token) => token.clone(),
+            let token = match self.hub.auth.get_token(&self._scopes.keys().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                // TODO: remove Ok / Err branches
+                Ok(Some(token)) => token.clone(),
+                Ok(None) => {
+                    let err = oauth2::Error::OtherError(anyhow::Error::msg("unknown error occurred while generating oauth2 token"));
+                    match dlg.token(&err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(client::Error::MissingToken(err))
+                        }
+                    }
+                }
                 Err(err) => {
-                    match  dlg.token(&err) {
+                    match dlg.token(&err) {
                         Some(token) => token,
                         None => {
                             dlg.finished(false);
@@ -3528,10 +3541,21 @@ where
 
 
         loop {
-            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
-                Ok(token) => token.clone(),
+            let token = match self.hub.auth.get_token(&self._scopes.keys().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                // TODO: remove Ok / Err branches
+                Ok(Some(token)) => token.clone(),
+                Ok(None) => {
+                    let err = oauth2::Error::OtherError(anyhow::Error::msg("unknown error occurred while generating oauth2 token"));
+                    match dlg.token(&err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(client::Error::MissingToken(err))
+                        }
+                    }
+                }
                 Err(err) => {
-                    match  dlg.token(&err) {
+                    match dlg.token(&err) {
                         Some(token) => token,
                         None => {
                             dlg.finished(false);
@@ -3839,10 +3863,21 @@ where
 
 
         loop {
-            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
-                Ok(token) => token.clone(),
+            let token = match self.hub.auth.get_token(&self._scopes.keys().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                // TODO: remove Ok / Err branches
+                Ok(Some(token)) => token.clone(),
+                Ok(None) => {
+                    let err = oauth2::Error::OtherError(anyhow::Error::msg("unknown error occurred while generating oauth2 token"));
+                    match dlg.token(&err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(client::Error::MissingToken(err))
+                        }
+                    }
+                }
                 Err(err) => {
-                    match  dlg.token(&err) {
+                    match dlg.token(&err) {
                         Some(token) => token,
                         None => {
                             dlg.finished(false);
@@ -4234,10 +4269,21 @@ where
 
 
         loop {
-            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
-                Ok(token) => token.clone(),
+            let token = match self.hub.auth.get_token(&self._scopes.keys().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                // TODO: remove Ok / Err branches
+                Ok(Some(token)) => token.clone(),
+                Ok(None) => {
+                    let err = oauth2::Error::OtherError(anyhow::Error::msg("unknown error occurred while generating oauth2 token"));
+                    match dlg.token(&err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(client::Error::MissingToken(err))
+                        }
+                    }
+                }
                 Err(err) => {
-                    match  dlg.token(&err) {
+                    match dlg.token(&err) {
                         Some(token) => token,
                         None => {
                             dlg.finished(false);
@@ -4578,10 +4624,21 @@ where
 
 
         loop {
-            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
-                Ok(token) => token.clone(),
+            let token = match self.hub.auth.get_token(&self._scopes.keys().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                // TODO: remove Ok / Err branches
+                Ok(Some(token)) => token.clone(),
+                Ok(None) => {
+                    let err = oauth2::Error::OtherError(anyhow::Error::msg("unknown error occurred while generating oauth2 token"));
+                    match dlg.token(&err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(client::Error::MissingToken(err))
+                        }
+                    }
+                }
                 Err(err) => {
-                    match  dlg.token(&err) {
+                    match dlg.token(&err) {
                         Some(token) => token,
                         None => {
                             dlg.finished(false);
@@ -4842,10 +4899,21 @@ where
 
 
         loop {
-            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
-                Ok(token) => token.clone(),
+            let token = match self.hub.auth.get_token(&self._scopes.keys().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                // TODO: remove Ok / Err branches
+                Ok(Some(token)) => token.clone(),
+                Ok(None) => {
+                    let err = oauth2::Error::OtherError(anyhow::Error::msg("unknown error occurred while generating oauth2 token"));
+                    match dlg.token(&err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(client::Error::MissingToken(err))
+                        }
+                    }
+                }
                 Err(err) => {
-                    match  dlg.token(&err) {
+                    match dlg.token(&err) {
                         Some(token) => token,
                         None => {
                             dlg.finished(false);
@@ -5109,10 +5177,21 @@ where
 
 
         loop {
-            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
-                Ok(token) => token.clone(),
+            let token = match self.hub.auth.get_token(&self._scopes.keys().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                // TODO: remove Ok / Err branches
+                Ok(Some(token)) => token.clone(),
+                Ok(None) => {
+                    let err = oauth2::Error::OtherError(anyhow::Error::msg("unknown error occurred while generating oauth2 token"));
+                    match dlg.token(&err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(client::Error::MissingToken(err))
+                        }
+                    }
+                }
                 Err(err) => {
-                    match  dlg.token(&err) {
+                    match dlg.token(&err) {
                         Some(token) => token,
                         None => {
                             dlg.finished(false);
@@ -5370,10 +5449,21 @@ where
 
 
         loop {
-            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
-                Ok(token) => token.clone(),
+            let token = match self.hub.auth.get_token(&self._scopes.keys().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                // TODO: remove Ok / Err branches
+                Ok(Some(token)) => token.clone(),
+                Ok(None) => {
+                    let err = oauth2::Error::OtherError(anyhow::Error::msg("unknown error occurred while generating oauth2 token"));
+                    match dlg.token(&err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(client::Error::MissingToken(err))
+                        }
+                    }
+                }
                 Err(err) => {
-                    match  dlg.token(&err) {
+                    match dlg.token(&err) {
                         Some(token) => token,
                         None => {
                             dlg.finished(false);
@@ -5661,10 +5751,21 @@ where
 
 
         loop {
-            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
-                Ok(token) => token.clone(),
+            let token = match self.hub.auth.get_token(&self._scopes.keys().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                // TODO: remove Ok / Err branches
+                Ok(Some(token)) => token.clone(),
+                Ok(None) => {
+                    let err = oauth2::Error::OtherError(anyhow::Error::msg("unknown error occurred while generating oauth2 token"));
+                    match dlg.token(&err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(client::Error::MissingToken(err))
+                        }
+                    }
+                }
                 Err(err) => {
-                    match  dlg.token(&err) {
+                    match dlg.token(&err) {
                         Some(token) => token,
                         None => {
                             dlg.finished(false);
@@ -5963,10 +6064,21 @@ where
 
 
         loop {
-            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
-                Ok(token) => token.clone(),
+            let token = match self.hub.auth.get_token(&self._scopes.keys().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                // TODO: remove Ok / Err branches
+                Ok(Some(token)) => token.clone(),
+                Ok(None) => {
+                    let err = oauth2::Error::OtherError(anyhow::Error::msg("unknown error occurred while generating oauth2 token"));
+                    match dlg.token(&err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(client::Error::MissingToken(err))
+                        }
+                    }
+                }
                 Err(err) => {
-                    match  dlg.token(&err) {
+                    match dlg.token(&err) {
                         Some(token) => token,
                         None => {
                             dlg.finished(false);
@@ -6236,10 +6348,21 @@ where
 
 
         loop {
-            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
-                Ok(token) => token.clone(),
+            let token = match self.hub.auth.get_token(&self._scopes.keys().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                // TODO: remove Ok / Err branches
+                Ok(Some(token)) => token.clone(),
+                Ok(None) => {
+                    let err = oauth2::Error::OtherError(anyhow::Error::msg("unknown error occurred while generating oauth2 token"));
+                    match dlg.token(&err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(client::Error::MissingToken(err))
+                        }
+                    }
+                }
                 Err(err) => {
-                    match  dlg.token(&err) {
+                    match dlg.token(&err) {
                         Some(token) => token,
                         None => {
                             dlg.finished(false);
@@ -6501,10 +6624,21 @@ where
 
 
         loop {
-            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
-                Ok(token) => token.clone(),
+            let token = match self.hub.auth.get_token(&self._scopes.keys().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                // TODO: remove Ok / Err branches
+                Ok(Some(token)) => token.clone(),
+                Ok(None) => {
+                    let err = oauth2::Error::OtherError(anyhow::Error::msg("unknown error occurred while generating oauth2 token"));
+                    match dlg.token(&err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(client::Error::MissingToken(err))
+                        }
+                    }
+                }
                 Err(err) => {
-                    match  dlg.token(&err) {
+                    match dlg.token(&err) {
                         Some(token) => token,
                         None => {
                             dlg.finished(false);
@@ -6750,10 +6884,21 @@ where
 
 
         loop {
-            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
-                Ok(token) => token.clone(),
+            let token = match self.hub.auth.get_token(&self._scopes.keys().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                // TODO: remove Ok / Err branches
+                Ok(Some(token)) => token.clone(),
+                Ok(None) => {
+                    let err = oauth2::Error::OtherError(anyhow::Error::msg("unknown error occurred while generating oauth2 token"));
+                    match dlg.token(&err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(client::Error::MissingToken(err))
+                        }
+                    }
+                }
                 Err(err) => {
-                    match  dlg.token(&err) {
+                    match dlg.token(&err) {
                         Some(token) => token,
                         None => {
                             dlg.finished(false);
@@ -7011,10 +7156,21 @@ where
 
 
         loop {
-            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
-                Ok(token) => token.clone(),
+            let token = match self.hub.auth.get_token(&self._scopes.keys().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                // TODO: remove Ok / Err branches
+                Ok(Some(token)) => token.clone(),
+                Ok(None) => {
+                    let err = oauth2::Error::OtherError(anyhow::Error::msg("unknown error occurred while generating oauth2 token"));
+                    match dlg.token(&err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(client::Error::MissingToken(err))
+                        }
+                    }
+                }
                 Err(err) => {
-                    match  dlg.token(&err) {
+                    match dlg.token(&err) {
                         Some(token) => token,
                         None => {
                             dlg.finished(false);
@@ -7262,10 +7418,21 @@ where
 
 
         loop {
-            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
-                Ok(token) => token.clone(),
+            let token = match self.hub.auth.get_token(&self._scopes.keys().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                // TODO: remove Ok / Err branches
+                Ok(Some(token)) => token.clone(),
+                Ok(None) => {
+                    let err = oauth2::Error::OtherError(anyhow::Error::msg("unknown error occurred while generating oauth2 token"));
+                    match dlg.token(&err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(client::Error::MissingToken(err))
+                        }
+                    }
+                }
                 Err(err) => {
-                    match  dlg.token(&err) {
+                    match dlg.token(&err) {
                         Some(token) => token,
                         None => {
                             dlg.finished(false);
@@ -7534,10 +7701,21 @@ where
 
 
         loop {
-            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
-                Ok(token) => token.clone(),
+            let token = match self.hub.auth.get_token(&self._scopes.keys().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                // TODO: remove Ok / Err branches
+                Ok(Some(token)) => token.clone(),
+                Ok(None) => {
+                    let err = oauth2::Error::OtherError(anyhow::Error::msg("unknown error occurred while generating oauth2 token"));
+                    match dlg.token(&err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(client::Error::MissingToken(err))
+                        }
+                    }
+                }
                 Err(err) => {
-                    match  dlg.token(&err) {
+                    match dlg.token(&err) {
                         Some(token) => token,
                         None => {
                             dlg.finished(false);
@@ -7811,10 +7989,21 @@ where
 
 
         loop {
-            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
-                Ok(token) => token.clone(),
+            let token = match self.hub.auth.get_token(&self._scopes.keys().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                // TODO: remove Ok / Err branches
+                Ok(Some(token)) => token.clone(),
+                Ok(None) => {
+                    let err = oauth2::Error::OtherError(anyhow::Error::msg("unknown error occurred while generating oauth2 token"));
+                    match dlg.token(&err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(client::Error::MissingToken(err))
+                        }
+                    }
+                }
                 Err(err) => {
-                    match  dlg.token(&err) {
+                    match dlg.token(&err) {
                         Some(token) => token,
                         None => {
                             dlg.finished(false);
@@ -8137,10 +8326,21 @@ where
 
 
         loop {
-            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
-                Ok(token) => token.clone(),
+            let token = match self.hub.auth.get_token(&self._scopes.keys().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                // TODO: remove Ok / Err branches
+                Ok(Some(token)) => token.clone(),
+                Ok(None) => {
+                    let err = oauth2::Error::OtherError(anyhow::Error::msg("unknown error occurred while generating oauth2 token"));
+                    match dlg.token(&err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(client::Error::MissingToken(err))
+                        }
+                    }
+                }
                 Err(err) => {
-                    match  dlg.token(&err) {
+                    match dlg.token(&err) {
                         Some(token) => token,
                         None => {
                             dlg.finished(false);
@@ -8500,10 +8700,21 @@ where
         let mut upload_url: Option<String> = None;
 
         loop {
-            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
-                Ok(token) => token.clone(),
+            let token = match self.hub.auth.get_token(&self._scopes.keys().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                // TODO: remove Ok / Err branches
+                Ok(Some(token)) => token.clone(),
+                Ok(None) => {
+                    let err = oauth2::Error::OtherError(anyhow::Error::msg("unknown error occurred while generating oauth2 token"));
+                    match dlg.token(&err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(client::Error::MissingToken(err))
+                        }
+                    }
+                }
                 Err(err) => {
-                    match  dlg.token(&err) {
+                    match dlg.token(&err) {
                         Some(token) => token,
                         None => {
                             dlg.finished(false);
@@ -8927,10 +9138,21 @@ where
 
 
         loop {
-            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
-                Ok(token) => token.clone(),
+            let token = match self.hub.auth.get_token(&self._scopes.keys().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                // TODO: remove Ok / Err branches
+                Ok(Some(token)) => token.clone(),
+                Ok(None) => {
+                    let err = oauth2::Error::OtherError(anyhow::Error::msg("unknown error occurred while generating oauth2 token"));
+                    match dlg.token(&err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(client::Error::MissingToken(err))
+                        }
+                    }
+                }
                 Err(err) => {
-                    match  dlg.token(&err) {
+                    match dlg.token(&err) {
                         Some(token) => token,
                         None => {
                             dlg.finished(false);
@@ -9173,10 +9395,21 @@ where
 
 
         loop {
-            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
-                Ok(token) => token.clone(),
+            let token = match self.hub.auth.get_token(&self._scopes.keys().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                // TODO: remove Ok / Err branches
+                Ok(Some(token)) => token.clone(),
+                Ok(None) => {
+                    let err = oauth2::Error::OtherError(anyhow::Error::msg("unknown error occurred while generating oauth2 token"));
+                    match dlg.token(&err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(client::Error::MissingToken(err))
+                        }
+                    }
+                }
                 Err(err) => {
-                    match  dlg.token(&err) {
+                    match dlg.token(&err) {
                         Some(token) => token,
                         None => {
                             dlg.finished(false);
@@ -9418,10 +9651,21 @@ where
 
 
         loop {
-            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
-                Ok(token) => token.clone(),
+            let token = match self.hub.auth.get_token(&self._scopes.keys().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                // TODO: remove Ok / Err branches
+                Ok(Some(token)) => token.clone(),
+                Ok(None) => {
+                    let err = oauth2::Error::OtherError(anyhow::Error::msg("unknown error occurred while generating oauth2 token"));
+                    match dlg.token(&err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(client::Error::MissingToken(err))
+                        }
+                    }
+                }
                 Err(err) => {
-                    match  dlg.token(&err) {
+                    match dlg.token(&err) {
                         Some(token) => token,
                         None => {
                             dlg.finished(false);
@@ -9664,10 +9908,21 @@ where
 
 
         loop {
-            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
-                Ok(token) => token.clone(),
+            let token = match self.hub.auth.get_token(&self._scopes.keys().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                // TODO: remove Ok / Err branches
+                Ok(Some(token)) => token.clone(),
+                Ok(None) => {
+                    let err = oauth2::Error::OtherError(anyhow::Error::msg("unknown error occurred while generating oauth2 token"));
+                    match dlg.token(&err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(client::Error::MissingToken(err))
+                        }
+                    }
+                }
                 Err(err) => {
-                    match  dlg.token(&err) {
+                    match dlg.token(&err) {
                         Some(token) => token,
                         None => {
                             dlg.finished(false);
@@ -9970,10 +10225,21 @@ where
 
 
         loop {
-            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
-                Ok(token) => token.clone(),
+            let token = match self.hub.auth.get_token(&self._scopes.keys().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                // TODO: remove Ok / Err branches
+                Ok(Some(token)) => token.clone(),
+                Ok(None) => {
+                    let err = oauth2::Error::OtherError(anyhow::Error::msg("unknown error occurred while generating oauth2 token"));
+                    match dlg.token(&err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(client::Error::MissingToken(err))
+                        }
+                    }
+                }
                 Err(err) => {
-                    match  dlg.token(&err) {
+                    match dlg.token(&err) {
                         Some(token) => token,
                         None => {
                             dlg.finished(false);
@@ -10299,10 +10565,21 @@ where
 
 
         loop {
-            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
-                Ok(token) => token.clone(),
+            let token = match self.hub.auth.get_token(&self._scopes.keys().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                // TODO: remove Ok / Err branches
+                Ok(Some(token)) => token.clone(),
+                Ok(None) => {
+                    let err = oauth2::Error::OtherError(anyhow::Error::msg("unknown error occurred while generating oauth2 token"));
+                    match dlg.token(&err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(client::Error::MissingToken(err))
+                        }
+                    }
+                }
                 Err(err) => {
-                    match  dlg.token(&err) {
+                    match dlg.token(&err) {
                         Some(token) => token,
                         None => {
                             dlg.finished(false);
@@ -10704,10 +10981,21 @@ where
 
 
         loop {
-            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
-                Ok(token) => token.clone(),
+            let token = match self.hub.auth.get_token(&self._scopes.keys().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                // TODO: remove Ok / Err branches
+                Ok(Some(token)) => token.clone(),
+                Ok(None) => {
+                    let err = oauth2::Error::OtherError(anyhow::Error::msg("unknown error occurred while generating oauth2 token"));
+                    match dlg.token(&err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(client::Error::MissingToken(err))
+                        }
+                    }
+                }
                 Err(err) => {
-                    match  dlg.token(&err) {
+                    match dlg.token(&err) {
                         Some(token) => token,
                         None => {
                             dlg.finished(false);
@@ -10892,10 +11180,21 @@ where
         let mut upload_url: Option<String> = None;
 
         loop {
-            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
-                Ok(token) => token.clone(),
+            let token = match self.hub.auth.get_token(&self._scopes.keys().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                // TODO: remove Ok / Err branches
+                Ok(Some(token)) => token.clone(),
+                Ok(None) => {
+                    let err = oauth2::Error::OtherError(anyhow::Error::msg("unknown error occurred while generating oauth2 token"));
+                    match dlg.token(&err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(client::Error::MissingToken(err))
+                        }
+                    }
+                }
                 Err(err) => {
-                    match  dlg.token(&err) {
+                    match dlg.token(&err) {
                         Some(token) => token,
                         None => {
                             dlg.finished(false);
@@ -11381,10 +11680,21 @@ where
 
 
         loop {
-            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
-                Ok(token) => token.clone(),
+            let token = match self.hub.auth.get_token(&self._scopes.keys().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                // TODO: remove Ok / Err branches
+                Ok(Some(token)) => token.clone(),
+                Ok(None) => {
+                    let err = oauth2::Error::OtherError(anyhow::Error::msg("unknown error occurred while generating oauth2 token"));
+                    match dlg.token(&err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(client::Error::MissingToken(err))
+                        }
+                    }
+                }
                 Err(err) => {
-                    match  dlg.token(&err) {
+                    match dlg.token(&err) {
                         Some(token) => token,
                         None => {
                             dlg.finished(false);
@@ -11733,10 +12043,21 @@ where
 
 
         loop {
-            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
-                Ok(token) => token.clone(),
+            let token = match self.hub.auth.get_token(&self._scopes.keys().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                // TODO: remove Ok / Err branches
+                Ok(Some(token)) => token.clone(),
+                Ok(None) => {
+                    let err = oauth2::Error::OtherError(anyhow::Error::msg("unknown error occurred while generating oauth2 token"));
+                    match dlg.token(&err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(client::Error::MissingToken(err))
+                        }
+                    }
+                }
                 Err(err) => {
-                    match  dlg.token(&err) {
+                    match dlg.token(&err) {
                         Some(token) => token,
                         None => {
                             dlg.finished(false);
@@ -12071,10 +12392,21 @@ where
 
 
         loop {
-            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
-                Ok(token) => token.clone(),
+            let token = match self.hub.auth.get_token(&self._scopes.keys().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                // TODO: remove Ok / Err branches
+                Ok(Some(token)) => token.clone(),
+                Ok(None) => {
+                    let err = oauth2::Error::OtherError(anyhow::Error::msg("unknown error occurred while generating oauth2 token"));
+                    match dlg.token(&err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(client::Error::MissingToken(err))
+                        }
+                    }
+                }
                 Err(err) => {
-                    match  dlg.token(&err) {
+                    match dlg.token(&err) {
                         Some(token) => token,
                         None => {
                             dlg.finished(false);
@@ -12363,10 +12695,21 @@ where
 
 
         loop {
-            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
-                Ok(token) => token.clone(),
+            let token = match self.hub.auth.get_token(&self._scopes.keys().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                // TODO: remove Ok / Err branches
+                Ok(Some(token)) => token.clone(),
+                Ok(None) => {
+                    let err = oauth2::Error::OtherError(anyhow::Error::msg("unknown error occurred while generating oauth2 token"));
+                    match dlg.token(&err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(client::Error::MissingToken(err))
+                        }
+                    }
+                }
                 Err(err) => {
-                    match  dlg.token(&err) {
+                    match dlg.token(&err) {
                         Some(token) => token,
                         None => {
                             dlg.finished(false);
@@ -12678,10 +13021,21 @@ where
 
 
         loop {
-            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
-                Ok(token) => token.clone(),
+            let token = match self.hub.auth.get_token(&self._scopes.keys().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                // TODO: remove Ok / Err branches
+                Ok(Some(token)) => token.clone(),
+                Ok(None) => {
+                    let err = oauth2::Error::OtherError(anyhow::Error::msg("unknown error occurred while generating oauth2 token"));
+                    match dlg.token(&err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(client::Error::MissingToken(err))
+                        }
+                    }
+                }
                 Err(err) => {
-                    match  dlg.token(&err) {
+                    match dlg.token(&err) {
                         Some(token) => token,
                         None => {
                             dlg.finished(false);
@@ -13019,10 +13373,21 @@ where
 
 
         loop {
-            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
-                Ok(token) => token.clone(),
+            let token = match self.hub.auth.get_token(&self._scopes.keys().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                // TODO: remove Ok / Err branches
+                Ok(Some(token)) => token.clone(),
+                Ok(None) => {
+                    let err = oauth2::Error::OtherError(anyhow::Error::msg("unknown error occurred while generating oauth2 token"));
+                    match dlg.token(&err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(client::Error::MissingToken(err))
+                        }
+                    }
+                }
                 Err(err) => {
-                    match  dlg.token(&err) {
+                    match dlg.token(&err) {
                         Some(token) => token,
                         None => {
                             dlg.finished(false);
@@ -13350,10 +13715,21 @@ where
 
 
         loop {
-            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
-                Ok(token) => token.clone(),
+            let token = match self.hub.auth.get_token(&self._scopes.keys().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                // TODO: remove Ok / Err branches
+                Ok(Some(token)) => token.clone(),
+                Ok(None) => {
+                    let err = oauth2::Error::OtherError(anyhow::Error::msg("unknown error occurred while generating oauth2 token"));
+                    match dlg.token(&err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(client::Error::MissingToken(err))
+                        }
+                    }
+                }
                 Err(err) => {
-                    match  dlg.token(&err) {
+                    match dlg.token(&err) {
                         Some(token) => token,
                         None => {
                             dlg.finished(false);
@@ -13629,10 +14005,21 @@ where
 
 
         loop {
-            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
-                Ok(token) => token.clone(),
+            let token = match self.hub.auth.get_token(&self._scopes.keys().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                // TODO: remove Ok / Err branches
+                Ok(Some(token)) => token.clone(),
+                Ok(None) => {
+                    let err = oauth2::Error::OtherError(anyhow::Error::msg("unknown error occurred while generating oauth2 token"));
+                    match dlg.token(&err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(client::Error::MissingToken(err))
+                        }
+                    }
+                }
                 Err(err) => {
-                    match  dlg.token(&err) {
+                    match dlg.token(&err) {
                         Some(token) => token,
                         None => {
                             dlg.finished(false);
@@ -13902,10 +14289,21 @@ where
 
 
         loop {
-            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
-                Ok(token) => token.clone(),
+            let token = match self.hub.auth.get_token(&self._scopes.keys().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                // TODO: remove Ok / Err branches
+                Ok(Some(token)) => token.clone(),
+                Ok(None) => {
+                    let err = oauth2::Error::OtherError(anyhow::Error::msg("unknown error occurred while generating oauth2 token"));
+                    match dlg.token(&err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(client::Error::MissingToken(err))
+                        }
+                    }
+                }
                 Err(err) => {
-                    match  dlg.token(&err) {
+                    match dlg.token(&err) {
                         Some(token) => token,
                         None => {
                             dlg.finished(false);
@@ -14200,10 +14598,21 @@ where
 
 
         loop {
-            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
-                Ok(token) => token.clone(),
+            let token = match self.hub.auth.get_token(&self._scopes.keys().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                // TODO: remove Ok / Err branches
+                Ok(Some(token)) => token.clone(),
+                Ok(None) => {
+                    let err = oauth2::Error::OtherError(anyhow::Error::msg("unknown error occurred while generating oauth2 token"));
+                    match dlg.token(&err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(client::Error::MissingToken(err))
+                        }
+                    }
+                }
                 Err(err) => {
-                    match  dlg.token(&err) {
+                    match dlg.token(&err) {
                         Some(token) => token,
                         None => {
                             dlg.finished(false);
@@ -14507,10 +14916,21 @@ where
 
 
         loop {
-            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
-                Ok(token) => token.clone(),
+            let token = match self.hub.auth.get_token(&self._scopes.keys().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                // TODO: remove Ok / Err branches
+                Ok(Some(token)) => token.clone(),
+                Ok(None) => {
+                    let err = oauth2::Error::OtherError(anyhow::Error::msg("unknown error occurred while generating oauth2 token"));
+                    match dlg.token(&err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(client::Error::MissingToken(err))
+                        }
+                    }
+                }
                 Err(err) => {
-                    match  dlg.token(&err) {
+                    match dlg.token(&err) {
                         Some(token) => token,
                         None => {
                             dlg.finished(false);
@@ -14794,10 +15214,21 @@ where
 
 
         loop {
-            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
-                Ok(token) => token.clone(),
+            let token = match self.hub.auth.get_token(&self._scopes.keys().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                // TODO: remove Ok / Err branches
+                Ok(Some(token)) => token.clone(),
+                Ok(None) => {
+                    let err = oauth2::Error::OtherError(anyhow::Error::msg("unknown error occurred while generating oauth2 token"));
+                    match dlg.token(&err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(client::Error::MissingToken(err))
+                        }
+                    }
+                }
                 Err(err) => {
-                    match  dlg.token(&err) {
+                    match dlg.token(&err) {
                         Some(token) => token,
                         None => {
                             dlg.finished(false);
@@ -15076,10 +15507,21 @@ where
 
 
         loop {
-            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
-                Ok(token) => token.clone(),
+            let token = match self.hub.auth.get_token(&self._scopes.keys().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                // TODO: remove Ok / Err branches
+                Ok(Some(token)) => token.clone(),
+                Ok(None) => {
+                    let err = oauth2::Error::OtherError(anyhow::Error::msg("unknown error occurred while generating oauth2 token"));
+                    match dlg.token(&err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(client::Error::MissingToken(err))
+                        }
+                    }
+                }
                 Err(err) => {
-                    match  dlg.token(&err) {
+                    match dlg.token(&err) {
                         Some(token) => token,
                         None => {
                             dlg.finished(false);
@@ -15357,10 +15799,21 @@ where
 
 
         loop {
-            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
-                Ok(token) => token.clone(),
+            let token = match self.hub.auth.get_token(&self._scopes.keys().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                // TODO: remove Ok / Err branches
+                Ok(Some(token)) => token.clone(),
+                Ok(None) => {
+                    let err = oauth2::Error::OtherError(anyhow::Error::msg("unknown error occurred while generating oauth2 token"));
+                    match dlg.token(&err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(client::Error::MissingToken(err))
+                        }
+                    }
+                }
                 Err(err) => {
-                    match  dlg.token(&err) {
+                    match dlg.token(&err) {
                         Some(token) => token,
                         None => {
                             dlg.finished(false);
@@ -15645,10 +16098,21 @@ where
 
 
         loop {
-            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
-                Ok(token) => token.clone(),
+            let token = match self.hub.auth.get_token(&self._scopes.keys().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                // TODO: remove Ok / Err branches
+                Ok(Some(token)) => token.clone(),
+                Ok(None) => {
+                    let err = oauth2::Error::OtherError(anyhow::Error::msg("unknown error occurred while generating oauth2 token"));
+                    match dlg.token(&err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(client::Error::MissingToken(err))
+                        }
+                    }
+                }
                 Err(err) => {
-                    match  dlg.token(&err) {
+                    match dlg.token(&err) {
                         Some(token) => token,
                         None => {
                             dlg.finished(false);
@@ -15918,10 +16382,21 @@ where
 
 
         loop {
-            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
-                Ok(token) => token.clone(),
+            let token = match self.hub.auth.get_token(&self._scopes.keys().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                // TODO: remove Ok / Err branches
+                Ok(Some(token)) => token.clone(),
+                Ok(None) => {
+                    let err = oauth2::Error::OtherError(anyhow::Error::msg("unknown error occurred while generating oauth2 token"));
+                    match dlg.token(&err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(client::Error::MissingToken(err))
+                        }
+                    }
+                }
                 Err(err) => {
-                    match  dlg.token(&err) {
+                    match dlg.token(&err) {
                         Some(token) => token,
                         None => {
                             dlg.finished(false);
@@ -16183,10 +16658,21 @@ where
 
 
         loop {
-            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
-                Ok(token) => token.clone(),
+            let token = match self.hub.auth.get_token(&self._scopes.keys().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                // TODO: remove Ok / Err branches
+                Ok(Some(token)) => token.clone(),
+                Ok(None) => {
+                    let err = oauth2::Error::OtherError(anyhow::Error::msg("unknown error occurred while generating oauth2 token"));
+                    match dlg.token(&err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(client::Error::MissingToken(err))
+                        }
+                    }
+                }
                 Err(err) => {
-                    match  dlg.token(&err) {
+                    match dlg.token(&err) {
                         Some(token) => token,
                         None => {
                             dlg.finished(false);
@@ -16432,10 +16918,21 @@ where
 
 
         loop {
-            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
-                Ok(token) => token.clone(),
+            let token = match self.hub.auth.get_token(&self._scopes.keys().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                // TODO: remove Ok / Err branches
+                Ok(Some(token)) => token.clone(),
+                Ok(None) => {
+                    let err = oauth2::Error::OtherError(anyhow::Error::msg("unknown error occurred while generating oauth2 token"));
+                    match dlg.token(&err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(client::Error::MissingToken(err))
+                        }
+                    }
+                }
                 Err(err) => {
-                    match  dlg.token(&err) {
+                    match dlg.token(&err) {
                         Some(token) => token,
                         None => {
                             dlg.finished(false);
@@ -16690,10 +17187,21 @@ where
 
 
         loop {
-            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
-                Ok(token) => token.clone(),
+            let token = match self.hub.auth.get_token(&self._scopes.keys().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                // TODO: remove Ok / Err branches
+                Ok(Some(token)) => token.clone(),
+                Ok(None) => {
+                    let err = oauth2::Error::OtherError(anyhow::Error::msg("unknown error occurred while generating oauth2 token"));
+                    match dlg.token(&err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(client::Error::MissingToken(err))
+                        }
+                    }
+                }
                 Err(err) => {
-                    match  dlg.token(&err) {
+                    match dlg.token(&err) {
                         Some(token) => token,
                         None => {
                             dlg.finished(false);
@@ -16985,10 +17493,21 @@ where
 
 
         loop {
-            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
-                Ok(token) => token.clone(),
+            let token = match self.hub.auth.get_token(&self._scopes.keys().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                // TODO: remove Ok / Err branches
+                Ok(Some(token)) => token.clone(),
+                Ok(None) => {
+                    let err = oauth2::Error::OtherError(anyhow::Error::msg("unknown error occurred while generating oauth2 token"));
+                    match dlg.token(&err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(client::Error::MissingToken(err))
+                        }
+                    }
+                }
                 Err(err) => {
-                    match  dlg.token(&err) {
+                    match dlg.token(&err) {
                         Some(token) => token,
                         None => {
                             dlg.finished(false);
