@@ -105,12 +105,9 @@
 		print('Could not open JSON file at {}'.format(api_json))
 		print(e)
 %>\
-${api_common}: $(RUST_SRC)/${make.id}/client.rs $(lastword $(MAKEFILE_LIST)) ${gen_root_stamp}
-	@ echo "// COPY OF '$<'"  > $@
-	@ echo "// DO NOT EDIT"  >> $@
-	@cat $< >> $@
+${api_common}: ${gen_root_stamp}
 
-${gen_root_stamp}: $(MAKO_RENDER) ${' '.join(i[0] for i in sds)} ${api_json_inputs} $(MAKO_STANDARD_DEPENDENCIES) ${depends_on_target}
+${gen_root_stamp}: $(MAKO_RENDER) ${' '.join(i[0] for i in sds)} ${api_json_inputs} $(MAKO_STANDARD_DEPENDENCIES)
 	@echo Generating ${api_target}
 	$(MAKO) -io ${' '.join("%s=%s" % (s, d) for s, d in sds)} ${post_processor_arg} --data-files ${api_json_inputs}
 	@touch $@

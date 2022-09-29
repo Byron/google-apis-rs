@@ -1,16 +1,15 @@
-use clap::{App, SubCommand};
 use mime::Mime;
-use crate::oauth2::{ApplicationSecret, ConsoleApplicationSecret};
+use yup_oauth2::{ApplicationSecret, ConsoleApplicationSecret};
 use serde_json as json;
 use serde_json::value::Value;
+use clap::arg_enum;
 
 use std::env;
-use std::error::Error as StdError;
 use std::fmt;
 use std::fs;
 use std::io;
-use std::io::{stdout, Read, Write};
-use std::path::{Path, PathBuf};
+use std::io::{stdout, Write};
+use std::path::Path;
 use std::str::FromStr;
 use std::string::ToString;
 
@@ -230,7 +229,7 @@ impl FieldCursor {
             }
         };
 
-        for (cid, c) in value.chars().enumerate() {
+        for c in value.chars() {
             if c == FIELD_SEP {
                 if last_c != FIELD_SEP {
                     push_field(&mut output, &mut field);
@@ -370,7 +369,7 @@ pub fn calltype_from_str(
 ) -> CallType {
     CallType::Upload(match UploadProtocol::from_str(name) {
         Ok(up) => up,
-        Err(msg) => {
+        Err(_msg) => {
             err.issues.push(CLIError::InvalidUploadProtocol(
                 name.to_string(),
                 valid_protocols,
@@ -743,4 +742,49 @@ pub fn application_secret_from_directory(
         }
     }
     unreachable!();
+}
+
+
+#[cfg(test)]
+mod test_cli {
+    use super::*;
+
+    use std::default::Default;
+
+    #[test]
+    fn cursor() {
+        let mut c: FieldCursor = Default::default();
+
+        assert_eq!(c.to_string(), "");
+        assert_eq!(c.num_fields(), 0);
+        assert!(c.set("").is_err());
+        assert!(c.set(".").is_ok());
+        assert!(c.set("..").is_err());
+        assert_eq!(c.num_fields(), 0);
+
+        assert!(c.set("foo").is_ok());
+        assert_eq!(c.to_string(), "foo");
+        assert_eq!(c.num_fields(), 1);
+        assert!(c.set("..").is_ok());
+        assert_eq!(c.num_fields(), 0);
+        assert_eq!(c.to_string(), "");
+
+        assert!(c.set("foo.").is_err());
+
+        assert!(c.set("foo.bar").is_ok());
+        assert_eq!(c.num_fields(), 2);
+        assert_eq!(c.to_string(), "foo.bar");
+        assert!(c.set("sub.level").is_ok());
+        assert_eq!(c.num_fields(), 4);
+        assert_eq!(c.to_string(), "foo.bar.sub.level");
+        assert!(c.set("...other").is_ok());
+        assert_eq!(c.to_string(), "foo.bar.other");
+        assert_eq!(c.num_fields(), 3);
+        assert!(c.set(".one.two.three...beer").is_ok());
+        assert_eq!(c.num_fields(), 2);
+        assert_eq!(c.to_string(), "one.beer");
+        assert!(c.set("one.two.three...").is_ok());
+        assert_eq!(c.num_fields(), 3);
+        assert_eq!(c.to_string(), "one.beer.one");
+    }
 }

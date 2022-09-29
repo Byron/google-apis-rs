@@ -1,35 +1,8 @@
-# DO NOT PUBLISH
-# This library is just to try out the code that should ultimately go into the code generator !
-[package]
+[workspace]
 
-name = "client"
-version = "0.0.1"
-authors = ["Sebastian Thiel <byronimo@gmail.com>"]
-description = "A library to facilitate interacting with your youtube account"
-repository = "https://github.com/Byron/google-apis-rs"
-license = "MIT/Apache-2.0"
-keywords = ["youtube", "google", "protocol", "not-for-use"]
-edition = "2018"
-publish = false
-
-[lib]
-# The common client code, used by all generated implementations
-name = "client"
-path = "src/rust/lib.rs"
-
-[dependencies]
-google-apis-common = { version = "4.0", path = "google-apis-common" }
-clap = "2"
-http = "^0.2"
-hyper = "0.14"
-mime = "0.2"
-rustc-serialize = "*"
-yup-oauth2 = "^ 7.0"
-serde = "1"
-serde_json = "1"
-serde_derive = "1"
-strsim = "*"
-tokio = "^ 1.0"
-hyper-rustls = "^0.22"
-itertools = "^ 0.10"
-tower-service = "^0.3"
+members = [
+    "google-apis-common",
+    "google-clis-common",
+    "src/rust/preproc"
+]
+exclude = ["gen"]
