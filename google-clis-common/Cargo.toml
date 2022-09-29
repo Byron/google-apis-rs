@@ -7,10 +7,13 @@ authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 repository = "https://github.com/Byron/google-apis-rs"
 homepage = "https://github.com/Byron/google-apis-rs/google-clis-common"
 documentation = "https://docs.rs/google-clis-common"
-description = "Shared functionality among the google-api crates."
+description = "Shared functionality among the google-api CLI crates."
 license = "MIT"
 keywords = ["google", "web", "api", "cli", "common"]
 edition = "2021"
+
+[lib]
+doctest = false
 
 [dependencies]
 mime = "0.2"
