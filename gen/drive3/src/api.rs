@@ -3,6 +3,7 @@ use std::cell::RefCell;
 use std::default::Default;
 use std::collections::BTreeMap;
 use std::error::Error as StdError;
+use std::sync::Arc;
 use serde_json as json;
 use std::io;
 use std::fs;
@@ -148,7 +149,7 @@ impl Default for Scope {
 #[derive(Clone)]
 pub struct DriveHub<S> {
     pub client: hyper::Client<S, hyper::body::Body>,
-    pub auth: Box<dyn client::GetToken>,
+    pub auth: Arc<Box<dyn client::GetToken + Send + Sync>>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
@@ -158,10 +159,10 @@ impl<'a, S> client::Hub for DriveHub<S> {}
 
 impl<'a, S> DriveHub<S> {
 
-    pub fn new<A: 'static + client::GetToken>(client: hyper::Client<S, hyper::body::Body>, auth: A) -> DriveHub<S> {
+    pub fn new<A: 'static + client::GetToken + Send + Sync>(client: hyper::Client<S, hyper::body::Body>, auth: A) -> DriveHub<S> {
         DriveHub {
             client,
-            auth: Box::new(auth),
+            auth: Arc::new(Box::new(auth)),
             _user_agent: "google-api-rust-client/4.0.2".to_string(),
             _base_url: "https://www.googleapis.com/drive/v3/".to_string(),
             _root_url: "https://www.googleapis.com/".to_string(),
