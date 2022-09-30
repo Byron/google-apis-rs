@@ -752,32 +752,14 @@ where
 
 // TODO(ST): Allow sharing common code between program types
 pub fn remove_json_null_values(value: &mut json::value::Value) {
-    match *value {
-        json::value::Value::Object(ref mut map) => {
-            let mut for_removal = Vec::new();
-
-            for (key, mut value) in map.iter_mut() {
-                if value.is_null() {
-                    for_removal.push(key.clone());
-                } else {
-                    remove_json_null_values(&mut value);
-                }
-            }
-
-            for key in &for_removal {
-                map.remove(key);
-            }
+    match value {
+        json::value::Value::Object(map) => {
+            map.retain(|_, value| !value.is_null());
+            map.values_mut().for_each(remove_json_null_values);
         }
-        json::value::Value::Array(ref mut arr) => {
-            let mut i = 0;
-            while i < arr.len() {
-                if arr[i].is_null() {
-                    arr.remove(i);
-                } else {
-                    remove_json_null_values(&mut arr[i]);
-                    i += 1;
-                }
-            }
+        json::value::Value::Array(arr) => {
+            arr.retain(|value| !value.is_null());
+            arr.iter_mut().for_each(remove_json_null_values);
         }
         _ => {}
     }
