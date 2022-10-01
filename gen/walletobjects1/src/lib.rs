@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/generator/templates/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Walletobjects* crate version *4.0.2+20220928*, where *20220928* is the exact revision of the *walletobjects:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v4.0.2*.
+//! This documentation was generated from *Walletobjects* crate version *4.0.4+20220928*, where *20220928* is the exact revision of the *walletobjects:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v4.0.4*.
 //! 
 //! Everything else about the *Walletobjects* *v1* API can be found at the
 //! [official documentation site](https://developers.google.com/pay/passes).

@@ -17579,7 +17579,7 @@ async fn main() {
     
     let mut app = App::new("walletobjects1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("4.0.2+20220928")
+           .version("4.0.4+20220928")
            .about("API for issuers to save and manage Google Wallet Objects.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_walletobjects1_cli")
            .arg(Arg::with_name("url")
