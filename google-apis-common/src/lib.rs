@@ -5,7 +5,6 @@ use std::future::Future;
 use std::io::{self, Cursor, Read, Seek, SeekFrom, Write};
 use std::pin::Pin;
 use std::str::FromStr;
-use std::thread::sleep;
 use std::time::Duration;
 
 use itertools::Itertools;
@@ -21,6 +20,7 @@ use mime::{Attr, Mime, SubLevel, TopLevel, Value};
 use serde_json as json;
 
 use tokio::io::{AsyncRead, AsyncWrite};
+use tokio::time::sleep;
 use tower_service;
 
 pub use yup_oauth2 as oauth2;
@@ -597,7 +597,6 @@ where
     pub media_type: Mime,
     pub content_length: u64,
 }
-
 impl<'a, A, S> ResumableUploadHelper<'a, A, S>
 where
     S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
@@ -639,7 +638,7 @@ where
                         }
                         None | Some(_) => {
                             if let Retry::After(d) = self.delegate.http_failure(&r, None) {
-                                sleep(d);
+                                sleep(d).await;
                                 continue;
                             }
                             return Err(Ok(r));
@@ -649,7 +648,7 @@ where
                 }
                 Err(err) => {
                     if let Retry::After(d) = self.delegate.http_error(&err) {
-                        sleep(d);
+                        sleep(d).await;
                         continue;
                     }
                     return Err(Err(err));
@@ -732,7 +731,7 @@ where
                             &reconstructed_result,
                             json::from_str(&res_body_string).ok(),
                         ) {
-                            sleep(d);
+                            sleep(d).await;
                             continue;
                         }
                     }
@@ -740,7 +739,7 @@ where
                 }
                 Err(err) => {
                     if let Retry::After(d) = self.delegate.http_error(&err) {
-                        sleep(d);
+                        sleep(d).await;
                         continue;
                     }
                     return Some(Err(err));
@@ -752,32 +751,14 @@ where
 
 // TODO(ST): Allow sharing common code between program types
 pub fn remove_json_null_values(value: &mut json::value::Value) {
-    match *value {
-        json::value::Value::Object(ref mut map) => {
-            let mut for_removal = Vec::new();
-
-            for (key, mut value) in map.iter_mut() {
-                if value.is_null() {
-                    for_removal.push(key.clone());
-                } else {
-                    remove_json_null_values(&mut value);
-                }
-            }
-
-            for key in &for_removal {
-                map.remove(key);
-            }
+    match value {
+        json::value::Value::Object(map) => {
+            map.retain(|_, value| !value.is_null());
+            map.values_mut().for_each(remove_json_null_values);
         }
-        json::value::Value::Array(ref mut arr) => {
-            let mut i = 0;
-            while i < arr.len() {
-                if arr[i].is_null() {
-                    arr.remove(i);
-                } else {
-                    remove_json_null_values(&mut arr[i]);
-                    i += 1;
-                }
-            }
+        json::value::Value::Array(arr) => {
+            arr.retain(|value| !value.is_null());
+            arr.iter_mut().for_each(remove_json_null_values);
         }
         _ => {}
     }
