@@ -134,7 +134,7 @@ impl${mb_tparams} ${CALL_BUILDER_MARKERT_TRAIT} for ${ThisType} {}
 
 impl${mb_tparams} ${ThisType}
 where
-    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
     S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
     S::Future: Send + Unpin + 'static,
     S::Error: Into<Box<dyn StdError + Send + Sync>>,
@@ -809,7 +809,7 @@ else {
 ;
 
                 client.request(request.unwrap()).await
-                
+
 </%block>\
                 % if resumable_media_param:
             }
