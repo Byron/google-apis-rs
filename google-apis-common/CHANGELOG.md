@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## Unreleased
+## 4.0.1 (2022-10-02)
 
 `+Send` trait bound for `GetToken`.
 
@@ -13,8 +13,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 <csr-read-only-do-not-edit/>
 
- - 9 commits contributed to the release over the course of 2 calendar days.
- - 5 days passed between releases.
+ - 10 commits contributed to the release over the course of 3 calendar days.
+ - 6 days passed between releases.
  - 0 commits were understood as [conventional](https://www.conventionalcommits.org).
  - 0 issues like '(#ID)' where seen in commit messages
 
@@ -25,6 +25,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 <details><summary>view details</summary>
 
  * **Uncategorized**
+    - prepare release of google-apis-common ([`dc0686e`](https://github.com/Byron/google-apis-rs/commit/dc0686ea0b4cf6984992930ba531407a3e9e2666))
     - Merge branch 'patch-2' ([`fe1e972`](https://github.com/Byron/google-apis-rs/commit/fe1e97299f5cb025d6e4d18a1864356bcb6f5244))
     - Replace std::thread::sleep with tokio::thread::sleep ([`811ed3d`](https://github.com/Byron/google-apis-rs/commit/811ed3d016c7465e95628b91c0828837aeef2f88))
     - Make remove_json_null_values O(n) instead of O(n^2) ([`276324a`](https://github.com/Byron/google-apis-rs/commit/276324ae09f4fa60c65518991cf89ce6bd7900ac))
@@ -1599,7 +1600,4 @@ you need.
     - prepare google-apis-common for release ([`716c4c2`](https://github.com/Byron/google-apis-rs/commit/716c4c263a278c334feacf57c3eabbed09251a9e))
     - rename `google-api-client` to `google-apis-common` ([`8d7309b`](https://github.com/Byron/google-apis-rs/commit/8d7309b78c3bc909b794d447115328cfb0f41649))
 </details>
-
-<csr-unknown>
-Added Bootstrap stylesheetRefactored a lot of the logic which was being done in the html ${…}tags out into a block which gets run at the start of each api version.(hopefully this will make the template easier to maintain in the longrun)<csr-unknown/>
 
