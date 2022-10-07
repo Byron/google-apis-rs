@@ -33,6 +33,17 @@ TYPE_MAP = {'boolean' : 'bool',
             'string'  : 'String',
             'object'  : 'HashMap'}
 
+# TODO: Provide support for these as well
+#  Default to using string type for now
+UNSUPPORTED_TYPES = {
+    "google-duration",
+    "byte",
+    "google-datetime",
+    "date-time",
+    "google-fieldmask",
+    "date",
+}
+
 RESERVED_WORDS = set(('abstract', 'alignof', 'as', 'become', 'box', 'break', 'const', 'continue', 'crate', 'do',
                       'else', 'enum', 'extern', 'false', 'final', 'fn', 'for', 'if', 'impl', 'in', 'let', 'loop',
                       'macro', 'match', 'mod', 'move', 'mut', 'offsetof', 'override', 'priv', 'pub', 'pure', 'ref',
@@ -372,28 +383,29 @@ def to_rust_type(
     if TREF in t:
         # simple, non-recursive fix for some recursive types. This only works on the first depth level
         # which is fine for now. 'allow_optionals' implicitly restricts type boxing for simple types - it
-        # usually is on on the first call, and off when recursion is involved.
+        # is usually on the first call, and off when recursion is involved.
         tn = t[TREF]
         if not _is_recursive and tn == schema_name:
             tn = 'Option<Box<%s>>' % tn
         return wrap_type(tn)
     try:
-        rust_type = TYPE_MAP[t['type']]
+        # TODO: add support for all types and remove this check
+        #  rust_type = TYPE_MAP[t.get("format", t["type"])]
+        # prefer format if present - provides support for i64
+        if "format" in t and t["format"] in TYPE_MAP:
+            rust_type = TYPE_MAP[t["format"]]
+        else:
+            rust_type = TYPE_MAP[t["type"]]
         if t['type'] == 'array':
-            return wrap_type("%s<%s>" % (rust_type, (nested_type(t))))
+            return wrap_type("%s<%s>" % (rust_type, nested_type(t)))
         elif t['type'] == 'object':
             if is_map_prop(t):
                 return wrap_type("%s<String, %s>" % (rust_type, nested_type(t)))
-            else:
-                return wrap_type(nested_type(t))
-        elif rust_type == USE_FORMAT:
-            rust_type = TYPE_MAP[t['format']]
+            return wrap_type(nested_type(t))
 
         if t.get('repeated', False):
-            rust_type = 'Vec<%s>' % rust_type
-        else:
-            rust_type = wrap_type(rust_type)
-        return rust_type
+            return 'Vec<%s>' % rust_type
+        return wrap_type(rust_type)
     except KeyError as err:
         raise AssertionError("%s: Property type '%s' unknown - add new type mapping: %s" % (str(err), t['type'], str(t)))
     except AttributeError as err:
