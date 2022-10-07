@@ -888,34 +888,33 @@ pub mod types {
         fn try_from(value: IntermediateDuration<'a>) -> Result<Self, Self::Error> {
             let abs_duration = 315576000000i64;
             // TODO: Test strings like -.s, -0.0s
-            if !value.0.ends_with('s') {
-                todo!();
-            }
-            let (seconds, nanoseconds) = if let Some((seconds, nanos)) = value.0.split_once('.') {
+            let value = match value.0.strip_suffix('s') {
+                None => todo!("Missing 's' suffix case not handled"),
+                Some(v) => v
+            };
+
+            let (seconds, nanoseconds) = if let Some((seconds, nanos)) = value.split_once('.') {
+                let is_neg = seconds.starts_with("-");
                 let seconds = i64::from_str(seconds)?;
-                let nano_len = nanos.len() - 1;
                 // up . 000_000_000
-                let nano_digits = nanos.chars().filter(|c| c.is_digit(10)).count() as u32;
-                if nano_digits > 9 {
-                    todo!()
+                let nano_magnitude = nanos.chars().filter(|c| c.is_digit(10)).count() as u32;
+                if nano_magnitude > 9 {
+                    // catches numbers larger than 999_999_999
+                    todo!("Numeric overflow case not handled")
                 }
-                // 2 digits: 120_000_000
-                // 9 digits: 123_456_789
-                // pad to 9 digits
-                let nanos = i32::from_str(&nanos[..nanos.len() - 1])? * 10_i32.pow(9 - nano_digits);
+
+                // u32::from_str prevents negative nanos (eg '0.-12s) -> lossless conversion to i32
+                // 10_u32.pow(...) scales number to appropriate # of nanoseconds
+                let mut nanos = (u32::from_str(&nanos).expect("negative nanos not handled") * 10_u32.pow(9 - nano_magnitude)) as i32;
+                if is_neg {
+                    nanos = -nanos;
+                }
                 (seconds, nanos)
             } else {
-                // TODO: handle negative number
-                (i64::from_str(&value.0[..value.0.len().saturating_sub(1)])?, 0)
+                (i64::from_str(value), 0)
             };
-            if (seconds > 0 && nanoseconds < 0) || (seconds < 0 && nanoseconds > 0) {
-                todo!();
-            }
 
             if seconds >= abs_duration || seconds <= -abs_duration {
-                todo!();
-            }
-            if nanoseconds >= 1_000_000_000 || nanoseconds <= -1_000_000_000 {
                 todo!();
             }
 
