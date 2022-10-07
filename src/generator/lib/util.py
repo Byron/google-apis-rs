@@ -12,36 +12,40 @@ seed(1337)
 re_linestart = re.compile('^', flags=re.MULTILINE)
 re_spaces_after_newline = re.compile('^ {4}', flags=re.MULTILINE)
 re_first_4_spaces = re.compile('^ {1,4}', flags=re.MULTILINE)
-re_desc_parts = re.compile(r"((the part (names|properties) that you can include in the parameter value are)|(supported values are ))(.*?)\.", flags=re.IGNORECASE|re.MULTILINE)
+re_desc_parts = re.compile(
+    r"((the part (names|properties) that you can include in the parameter value are)|(supported values are ))(.*?)\.",
+    flags=re.IGNORECASE | re.MULTILINE)
 
 re_find_replacements = re.compile(r"\{[/\+]?\w+\*?\}")
 
-HTTP_METHODS = set(("OPTIONS", "GET", "POST", "PUT", "DELETE", "HEAD", "TRACE", "CONNECT", "PATCH" ))
-
+HTTP_METHODS = set(("OPTIONS", "GET", "POST", "PUT", "DELETE", "HEAD", "TRACE", "CONNECT", "PATCH"))
+CHRONO_DATETIME = 'client::chrono::DateTime<client::chrono::offset::FixedOffset>'
 USE_FORMAT = 'use_format_field'
-TYPE_MAP = {'boolean' : 'bool',
-            'integer' : USE_FORMAT,
-            'number'  : USE_FORMAT,
-            'uint32'  : 'u32',
-            'double'  : 'f64',
-            'float'   : 'f32',
-            'int32'   : 'i32',
-            'any'     : 'String', # TODO: Figure out how to handle it. It's 'interface' in Go ...
-            'int64'   : 'i64',
-            'uint64'  : 'u64',
-            'array'   : 'Vec',
-            'string'  : 'String',
-            'object'  : 'HashMap'}
-
-# TODO: Provide support for these as well
-#  Default to using string type for now
-UNSUPPORTED_TYPES = {
-    "google-duration",
-    "byte",
-    "google-datetime",
-    "date-time",
-    "google-fieldmask",
-    "date",
+TYPE_MAP = {
+    'boolean': 'bool',
+    'integer': USE_FORMAT,
+    'number': USE_FORMAT,
+    'uint32': 'u32',
+    'double': 'f64',
+    'float': 'f32',
+    'int32': 'i32',
+    'any': 'String',  # TODO: Figure out how to handle it. It's 'interface' in Go ...
+    'int64': 'i64',
+    'uint64': 'u64',
+    'array': 'Vec',
+    'string': 'String',
+    'object': 'HashMap',
+    # should be correct
+    'google-datetime': CHRONO_DATETIME,
+    # assumption
+    'date-time': CHRONO_DATETIME,
+    'date': CHRONO_DATETIME,
+    # custom impl
+    'google-duration': 'client::types::Duration',
+    # guessing bytes is universally url-safe b64
+    "byte": "Vec<u8>",
+    # TODO: Provide support for these as well
+    "google-fieldmask": 'String'
 }
 
 RESERVED_WORDS = set(('abstract', 'alignof', 'as', 'become', 'box', 'break', 'const', 'continue', 'crate', 'do',
@@ -50,17 +54,21 @@ RESERVED_WORDS = set(('abstract', 'alignof', 'as', 'become', 'box', 'break', 'co
                       'return', 'sizeof', 'static', 'self', 'struct', 'super', 'true', 'trait', 'type', 'typeof',
                       'unsafe', 'unsized', 'use', 'virtual', 'where', 'while', 'yield'))
 
-words = [w.strip(',') for w in "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.".split(' ')]
-RUST_TYPE_RND_MAP = {'bool': lambda: str(bool(randint(0, 1))).lower(),
-                     'u32' : lambda: randint(0, 100),
-                     'u64' : lambda: randint(0, 100),
-                     'f64' : lambda: random(),
-                     'f32' : lambda: random(),
-                     'i32' : lambda: randint(-101, -1),
-                     'i64' : lambda: randint(-101, -1),
-                     'String': lambda: '"%s"' % choice(words),
-                     '&str': lambda: '"%s"' % choice(words),
-                     '&Vec<String>': lambda: '&vec!["%s".into()]' % choice(words), # why a reference to Vec? Because it works. Should be slice, but who knows how typing works here.
+words = [w.strip(',') for w in
+         "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.".split(
+             ' ')]
+RUST_TYPE_RND_MAP = {
+    'bool': lambda: str(bool(randint(0, 1))).lower(),
+    'u32': lambda: randint(0, 100),
+    'u64': lambda: randint(0, 100),
+    'f64': lambda: random(),
+    'f32': lambda: random(),
+    'i32': lambda: randint(-101, -1),
+    'i64': lambda: randint(-101, -1),
+    'String': lambda: '"%s"' % choice(words),
+    '&str': lambda: '"%s"' % choice(words),
+    '&Vec<String>': lambda: '&vec!["%s".into()]' % choice(words),
+    # why a reference to Vec? Because it works. Should be slice, but who knows how typing works here.
 }
 TREF = '$ref'
 IO_RESPONSE = 'response'
@@ -92,7 +100,7 @@ TO_PARTS_MARKER = 'client::ToParts'
 UNUSED_TYPE_MARKER = 'client::UnusedType'
 
 PROTOCOL_TYPE_INFO = {
-    'simple' : {
+    'simple': {
         'arg_name': 'stream',
         'description': """Upload media all at once.
 If the upload fails for whichever reason, all progress is lost.""",
@@ -100,7 +108,7 @@ If the upload fails for whichever reason, all progress is lost.""",
         'suffix': '',
         'example_value': 'fs::File::open("file.ext").unwrap(), "application/octet-stream".parse().unwrap()'
     },
-    'resumable' : {
+    'resumable': {
         'arg_name': 'resumeable_stream',
         'description': """Upload media in a resumable fashion.
 Even if the upload fails or is interrupted, it can be resumed for a
@@ -127,14 +135,17 @@ data_unit_multipliers = {
 
 HUB_TYPE_PARAMETERS = ('S',)
 
+
 def items(p):
     if isinstance(p, dict):
         return p.items()
     else:
         return p._items()
 
+
 def custom_sorted(p: List[Mapping[str, Any]]) -> List[Mapping[str, Any]]:
-    return sorted(p, key = lambda p: p['name'])
+    return sorted(p, key=lambda p: p['name'])
+
 
 # ==============================================================================
 ## @name Filters
@@ -145,18 +156,22 @@ def custom_sorted(p: List[Mapping[str, Any]]) -> List[Mapping[str, Any]]:
 def rust_module_doc_comment(s):
     return re_linestart.sub('//! ', s)
 
+
 # rust doc comment filter
 def rust_doc_comment(s):
     return re_linestart.sub('/// ', s)
+
 
 # returns true if there is an indication for something that is interpreted as doc comment by rustdoc
 def has_markdown_codeblock_with_indentation(s):
     return re_spaces_after_newline.search(s) != None
 
+
 def preprocess(s):
     p = subprocess.Popen([os.environ['PREPROC']], close_fds=True, stdin=subprocess.PIPE, stdout=subprocess.PIPE)
     res = p.communicate(s.encode('utf-8'))
     return res[0].decode('utf-8')
+
 
 # runs the preprocessor in case there is evidence for code blocks using indentation
 def rust_doc_sanitize(s):
@@ -165,35 +180,44 @@ def rust_doc_sanitize(s):
     else:
         return s
 
+
 # rust comment filter
 def rust_comment(s):
     return re_linestart.sub('// ', s)
+
 
 # hash-based comment filter
 def hash_comment(s):
     return re_linestart.sub('# ', s)
 
+
 # hides lines in rust examples, if not already hidden, or empty.
 def hide_rust_doc_test(s):
     return re.sub('^[^#\n]', lambda m: '# ' + m.group(), s, flags=re.MULTILINE)
+
 
 # remove the first indentation (must be spaces !)
 def unindent(s):
     return re_first_4_spaces.sub('', s)
 
+
 # don't do anything with the passed in string
 def pass_through(s):
     return s
+
 
 # tabs: 1 tabs is 4 spaces
 def unindent_first_by(tabs):
     def unindent_inner(s):
         return re_linestart.sub(' ' * tabs * SPACES_PER_TAB, s)
+
     return unindent_inner
+
 
 # filter to remove empty lines from a string
 def remove_empty_lines(s):
     return re.sub("^\n", '', s, flags=re.MULTILINE)
+
 
 # Prepend prefix  to each line but the first
 def prefix_all_but_first_with(prefix):
@@ -204,11 +228,12 @@ def prefix_all_but_first_with(prefix):
             f = s
             p = None
         else:
-            f = s[:i+1]
-            p = s[i+1:]
+            f = s[:i + 1]
+            p = s[i + 1:]
         if p is None:
             return f
         return f + re_linestart.sub(prefix, p)
+
     return indent_inner
 
 
@@ -219,17 +244,21 @@ def indent_all_but_first_by(indent, indent_in_tabs=True):
     spaces = ' ' * indent
     return prefix_all_but_first_with(spaces)
 
+
 # add 4 spaces to the beginning of a line.
 # useful if you have defs embedded in an unindent block - they need to counteract.
 # It's a bit itchy, but logical
 def indent(s):
     return re_linestart.sub(' ' * SPACES_PER_TAB, s)
 
+
 # indent by given amount of spaces
 def indent_by(n):
     def indent_inner(s):
         return re_linestart.sub(' ' * n, s)
+
     return indent_inner
+
 
 # return s, with trailing newline
 def trailing_newline(s):
@@ -237,29 +266,36 @@ def trailing_newline(s):
         return s + '\n'
     return s
 
+
 # a rust test that doesn't run though
 def rust_doc_test_norun(s):
     return "```test_harness,no_run\n%s```" % trailing_newline(s)
+
 
 # a rust code block in (github) markdown
 def markdown_rust_block(s):
     return "```Rust\n%s```" % trailing_newline(s)
 
+
 # wraps s into an invisible doc test function.
 def rust_test_fn_invisible(s):
     return "# async fn dox() {\n%s# }" % trailing_newline(s)
+
 
 # markdown comments
 def markdown_comment(s):
     return "<!---\n%s-->" % trailing_newline(s)
 
+
 # escape each string in l with "s" and return the new list
 def estr(l):
     return ['"%s"' % i for i in l]
 
+
 # escape all '"' with '\"'
 def escape_rust_string(s):
     return s.replace('"', '\\"')
+
 
 ## -- End Filters -- @}
 
@@ -276,27 +312,33 @@ def put_and(l):
         return l[0]
     return ', '.join(l[:-1]) + ' and ' + l[-1]
 
+
 # ['foo', ...] with e == '*' -> ['*foo*', ...]
 def enclose_in(e, l):
     return ['%s%s%s' % (e, s, e) for s in l]
 
+
 def md_italic(l):
     return enclose_in('*', l)
 
+
 def singular(s):
     if s.endswith('ies'):
-        return s[:-3]+'y'
+        return s[:-3] + 'y'
     if s[-1] == 's':
         return s[:-1]
     return s
+
 
 def split_camelcase_s(s):
     s1 = re.sub('(.)([A-Z][a-z]+)', r'\1 \2', s)
     return re.sub('([a-z0-9])([A-Z])', r'\1 \2', s1).lower()
 
+
 def camel_to_under(s):
     s1 = re.sub('(.)([A-Z][a-z]+)', r'\1_\2', s)
     return re.sub('([a-z0-9])([A-Z])', r'\1_\2', s1).lower()
+
 
 # there are property descriptions from which parts can be extracted. Regex is based on youtube ... it's sufficiently
 # easy enough to add more cases ...
@@ -313,6 +355,7 @@ def extract_parts(desc):
         res.append(part)
     return res
 
+
 ## -- End Natural Language Utilities -- @}
 
 
@@ -324,6 +367,7 @@ def extract_parts(desc):
 def capitalize(s):
     return s[:1].upper() + s[1:]
 
+
 # Return transformed string that could make a good type name
 def canonical_type_name(s):
     # can't use s.capitalize() as it will lower-case the remainder of the string
@@ -332,9 +376,11 @@ def canonical_type_name(s):
     s = ''.join(capitalize(t) for t in s.split('-'))
     return capitalize(s)
 
+
 def nested_type_name(sn, pn):
     suffix = canonical_type_name(pn)
     return sn + suffix
+
 
 # Make properties which are reserved keywords usable
 def mangle_ident(n):
@@ -343,8 +389,10 @@ def mangle_ident(n):
         return n + '_'
     return n
 
+
 def is_map_prop(p):
     return 'additionalProperties' in p
+
 
 def _assure_unique_type_name(schemas, tn):
     if tn in schemas:
@@ -352,24 +400,25 @@ def _assure_unique_type_name(schemas, tn):
         assert tn not in schemas
     return tn
 
+
 # map a json type to an rust type
 # t = type dict
 # NOTE: In case you don't understand how this algorithm really works ... me neither - THE AUTHOR
 def to_rust_type(
-    schemas,
-    schema_name, 
-    property_name, 
-    t, 
-    allow_optionals=True, 
-    _is_recursive=False
-):
+        schemas,
+        schema_name,
+        property_name,
+        t,
+        allow_optionals=True,
+        _is_recursive=False
+) -> str:
     def nested_type(nt):
         if 'items' in nt:
             nt = nt['items']
         elif 'additionalProperties' in nt:
             nt = nt['additionalProperties']
         else:
-            assert(is_nested_type_property(nt))
+            assert (is_nested_type_property(nt))
             # It's a nested type - we take it literally like $ref, but generate a name for the type ourselves
             return _assure_unique_type_name(schemas, nested_type_name(schema_name, property_name))
         return to_rust_type(schemas, schema_name, property_name, nt, allow_optionals=False, _is_recursive=True)
@@ -407,17 +456,21 @@ def to_rust_type(
             return 'Vec<%s>' % rust_type
         return wrap_type(rust_type)
     except KeyError as err:
-        raise AssertionError("%s: Property type '%s' unknown - add new type mapping: %s" % (str(err), t['type'], str(t)))
+        raise AssertionError(
+            "%s: Property type '%s' unknown - add new type mapping: %s" % (str(err), t['type'], str(t)))
     except AttributeError as err:
         raise AssertionError("%s: unknown dict layout: %s" % (str(err), t))
+
 
 # return True if this property is actually a nested type
 def is_nested_type_property(t):
     return 'type' in t and t['type'] == 'object' and 'properties' in t or ('items' in t and 'properties' in t['items'])
 
+
 # Return True if the schema is nested
 def is_nested_type(s):
     return len(s.parents) > 0
+
 
 # convert a rust-type to something that would be taken as input of a function
 # even though our storage type is different
@@ -432,15 +485,16 @@ def activity_input_type(schemas, p):
         return n
     return '&%s' % n
 
+
 def is_pod_property(p):
-    return 'format' in p or p.get('type','') == 'boolean'
+    return 'format' in p or p.get('type', '') == 'boolean'
 
 
 def _traverse_schema_ids(s, c):
     ids = [s.id]
     used_by = s.used_by + s.parents
 
-    seen = set() # protect against loops, just to be sure ...
+    seen = set()  # protect against loops, just to be sure ...
     while used_by:
         id = used_by.pop()
         if id in seen:
@@ -453,6 +507,7 @@ def _traverse_schema_ids(s, c):
         used_by.extend(oid.parents)
     # end gather usages
     return ids
+
 
 # Return sorted type names of all markers applicable to the given schema
 # This list is transitive. Thus, if the schema is used as child of someone with a trait, it
@@ -496,6 +551,7 @@ def schema_markers(s, c, transitive=True):
 
     return sorted(res)
 
+
 ## -- End Rust TypeSystem -- @}
 
 # NOTE: unfortunately, it turned out that sometimes fields are missing. The only way to handle this is to
@@ -503,6 +559,7 @@ def schema_markers(s, c, transitive=True):
 # non-transitive markers that we get here !
 def is_schema_with_optionals(schema_markers):
     return True
+
 
 # -------------------------
 ## @name Activity Utilities
@@ -517,17 +574,21 @@ def activity_split(fqan: str) -> Tuple[str, str, str]:
     # end
     return t[0], t[1], '.'.join(mt)
 
+
 # Shorthand to get a type from parameters of activities
 def activity_rust_type(schemas, p, allow_optionals=True):
     return to_rust_type(schemas, None, p.name, p, allow_optionals=allow_optionals)
+
 
 # the inverse of activity-split, but needs to know the 'name' of the API
 def to_fqan(name, resource, method):
     return '%s.%s.%s' % (name, resource, method)
 
+
 # videos -> Video
 def activity_name_to_type_name(an):
     return canonical_type_name(an)[:-1]
+
 
 # return a list of parameter structures of all params of the given method dict
 # apply a prune filter to restrict the set of returned parameters.
@@ -555,6 +616,7 @@ def _method_params(m, required=None, location=None):
     # end for each parameter
     return sorted(res, key=lambda p: (p.priority, p.name), reverse=True)
 
+
 def _method_io(type_name, c, m, marker=None):
     s = c.schemas.get(m.get(type_name, dict()).get(TREF))
     if s is None:
@@ -563,14 +625,17 @@ def _method_io(type_name, c, m, marker=None):
         return None
     return s
 
+
 # return the given method's request or response schema (dict), or None.
 # optionally return only schemas with the given marker trait
 def method_request(c, m, marker=None):
     return _method_io('request', c, m, marker)
 
+
 # As method request, but returns response instead
 def method_response(c, m, marker=None):
     return _method_io('response', c, m, marker)
+
 
 # return string like 'n.clone()', but depending on the type name of tn (e.g. &str -> n.to_string())
 def rust_copy_value_s(n, tn, p):
@@ -583,22 +648,27 @@ def rust_copy_value_s(n, tn, p):
         nc = n
     return nc
 
+
 # convert a schema into a property (for use with rust type generation).
 # n = name of the property
 def schema_to_required_property(s, n):
     return type(s)({'name': n, TREF: s.id, 'priority': REQUEST_PRIORITY, 'is_query_param': False})
 
+
 def is_required_property(p):
     return p.get('required', False) or p.get('priority', 0) > 0
 
+
 def is_repeated_property(p):
     return p.get('repeated', False)
+
 
 def setter_fn_name(p):
     fn_name = p.name
     if is_repeated_property(p):
         fn_name = 'add_' + fn_name
     return fn_name
+
 
 # _method_params(...), request_value|None -> (required_properties, optional_properties, part_prop|None)
 def organize_params(params, request_value):
@@ -617,6 +687,7 @@ def organize_params(params, request_value):
     # end for each property
     return required_props, optional_props, part_prop
 
+
 # returns method parameters based on whether we can make uploads, and which protocols are supported
 # or empty list if there is no media upload
 def method_media_params(m):
@@ -631,22 +702,24 @@ def method_media_params(m):
     res = list()
     for pn, proto in mu.protocols.items():
         # the pi (proto-info) dict can be shown to the user
-        pi = {'multipart': proto.multipart and 'yes' or 'no', 'maxSize': mu.get('maxSize', '0kb'), 'validMimeTypes': mu.accept}
+        pi = {'multipart': proto.multipart and 'yes' or 'no', 'maxSize': mu.get('maxSize', '0kb'),
+              'validMimeTypes': mu.accept}
         try:
             ti = type(m)(PROTOCOL_TYPE_INFO[pn])
         except KeyError:
             raise AssertionError("media upload protocol '%s' is not implemented" % pn)
         p = type(m)({'name': 'media_%s',
-             'info': pi,
-             'protocol': pn,
-             'path': proto.path,
-             'type': ti,
-             'description': ti.description,
-             'max_size': size_to_bytes(mu.get('maxSize', '0kb'))})
+                     'info': pi,
+                     'protocol': pn,
+                     'path': proto.path,
+                     'type': ti,
+                     'description': ti.description,
+                     'max_size': size_to_bytes(mu.get('maxSize', '0kb'))})
         res.append(p)
     # end for each proto
 
     return res
+
 
 # Build all parameters used in a given method !
 # schemas, context, method(dict), 'request'|'response', request_prop_name -> (params, request_value|None)
@@ -656,18 +729,18 @@ def build_all_params(c, m):
     if request_value:
         params.insert(0, schema_to_required_property(request_value, REQUEST_VALUE_PROPERTY_NAME))
     # add the delegate. It's a type parameter, which has to remain in sync with the type-parameters we actually build.
-    dp = type(m)({ 'name': DELEGATE_PROPERTY_NAME,
-           TREF: "&'a mut dyn %s" % DELEGATE_TYPE,
-          'input_type': "&'a mut dyn %s" % DELEGATE_TYPE,
-          'clone_value': '{}',
-          'skip_example' : True,
-          'priority': 0,
-          'is_query_param': False,
-          'description':
-"""The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
-while executing the actual API request.
-
-It should be used to handle progress information, and to implement a certain level of resilience."""})
+    dp = type(m)({'name': DELEGATE_PROPERTY_NAME,
+                  TREF: "&'a mut dyn %s" % DELEGATE_TYPE,
+                  'input_type': "&'a mut dyn %s" % DELEGATE_TYPE,
+                  'clone_value': '{}',
+                  'skip_example': True,
+                  'priority': 0,
+                  'is_query_param': False,
+                  'description':
+                      """The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+                      while executing the actual API request.
+                      
+                      It should be used to handle progress information, and to implement a certain level of resilience."""})
     params.append(dp)
     return params, request_value
 
@@ -683,18 +756,20 @@ class Context:
     rtc_map: Dict[str, Any]
     schemas: Dict[str, Any]
 
+
 # return a newly build context from the given data
 def new_context(schemas: Dict[str, Dict[str, Any]], resources: Dict[str, Any]) -> Context:
     # Returns (A, B) where
     # A: { SchemaTypeName -> { fqan -> ['request'|'response', ...]}
     # B: { fqan -> activity_method_data }
     # fqan = fully qualified activity name
-    def build_activity_mappings(resources: Dict[str, Any], res = None, fqan = None) -> Tuple[Dict[str, Any], Dict[str, Any]]:
+    def build_activity_mappings(resources: Dict[str, Any], res=None, fqan=None) -> Tuple[
+        Dict[str, Any], Dict[str, Any]]:
         if res is None:
             res = dict()
         if fqan is None:
             fqan = dict()
-        for k,a in resources.items():
+        for k, a in resources.items():
             if 'resources' in a:
                 build_activity_mappings(a["resources"], res, fqan)
             if 'methods' not in a:
@@ -731,6 +806,7 @@ def new_context(schemas: Dict[str, Dict[str, Any]], resources: Dict[str, Any]) -
             # end for each method
         # end for each activity
         return res, fqan
+
     # end utility
 
     # A dict of {s.id -> schema} , with all schemas having the 'parents' key set with [s.id, ...] of all parents
@@ -739,12 +815,14 @@ def new_context(schemas: Dict[str, Dict[str, Any]], resources: Dict[str, Any]) -
         # 'type' in t and t.type == 'object' and 'properties' in t or ('items' in t and 'properties' in t.items)
         PARENT = 'parents'
         USED_BY = 'used_by'
-        def assure_list(s, k):
+
+        def assure_list(s: Dict[str, Any], k: str):
             if k not in s:
                 s[k] = list()
             return s[k]
+
         # end
-        def link_used(s, rs):
+        def link_used(s: Dict[str, Any], rs):
             if TREF in s:
                 l = assure_list(all_schemas[s[TREF]], USED_BY)
                 if rs["id"] not in l:
@@ -756,6 +834,7 @@ def new_context(schemas: Dict[str, Dict[str, Any]], resources: Dict[str, Any]) -
             return l
 
         all_schemas = deepcopy(schemas)
+
         def recurse_properties(prefix: str, rs: Any, s: Any, parent_ids: List[str]):
             assure_list(s, USED_BY)
             assure_list(s, PARENT).extend(parent_ids)
@@ -783,18 +862,20 @@ def new_context(schemas: Dict[str, Dict[str, Any]], resources: Dict[str, Any]) -
                     recurse_properties(ns.id, ns, ns, append_unique(parent_ids, rs["id"]))
                 elif is_map_prop(p):
                     recurse_properties(nested_type_name(prefix, pn), rs,
-                                                        p["additionalProperties"], append_unique(parent_ids, rs["id"]))
+                                       p["additionalProperties"], append_unique(parent_ids, rs["id"]))
                 elif 'items' in p:
                     recurse_properties(nested_type_name(prefix, pn), rs,
-                                                        p["items"], append_unique(parent_ids, rs["id"]))
+                                       p["items"], append_unique(parent_ids, rs["id"]))
                 # end handle prop itself
             # end for each property
+
         # end utility
         for s in all_schemas.values():
             recurse_properties(s["id"], s, s, [])
         # end for each schema
 
         return all_schemas
+
     # end utility
 
     all_schemas = schemas and build_schema_map() or dict()
@@ -816,8 +897,10 @@ def new_context(schemas: Dict[str, Dict[str, Any]], resources: Dict[str, Any]) -
     fqan_map.update(_fqan_map)
     return Context(sta_map, fqan_map, rta_map, rtc_map, all_schemas)
 
+
 def _is_special_version(v):
     return v.endswith('alpha') or v.endswith('beta')
+
 
 def to_api_version(v):
     m = re.search(r"_?v(\d(\.\d)*)_?", v)
@@ -840,8 +923,10 @@ def to_api_version(v):
         version = version + '_' + remainder
     return version
 
+
 def normalize_library_name(name):
     return name.lower()
+
 
 # build a full library name (non-canonical)
 def library_name(name, version):
@@ -853,38 +938,49 @@ def library_name(name, version):
             version = 'v' + version
     return normalize_library_name(name) + version
 
+
 def target_directory_name(name, version, suffix):
     return library_name(name, version) + suffix
+
 
 # return crate name for given result of `library_name()`
 def library_to_crate_name(name, suffix=''):
     return 'google-' + name + suffix
 
+
 # return version like 0.1.0+2014031421
 def crate_version(build_version, revision):
     return '%s+%s' % (build_version, isinstance(revision, str) and revision or '00000000')
+
 
 # return a crate name for us in extern crate statements
 def to_extern_crate_name(crate_name):
     return crate_name.replace('-', '_')
 
+
 def docs_rs_url(base_url, crate_name, version):
     return base_url + '/' + crate_name + '/' + version
+
 
 def crate_name(name, version, make):
     return library_to_crate_name(library_name(name, version), make.target_suffix)
 
+
 def gen_crate_dir(name, version, ti):
     return to_extern_crate_name(library_to_crate_name(library_name(name, version), ti.target_suffix))
+
 
 def crates_io_url(name, version):
     return "https://crates.io/crates/%s" % library_to_crate_name(library_name(name, version))
 
+
 def program_name(name, version):
     return library_name(name, version).replace('_', '-')
 
+
 def api_json_path(api_base, name, version):
     return api_base + '/' + name + '/' + version + '/' + name + '-api.json'
+
 
 def api_index(DOC_ROOT, name, version, ti, cargo, revision, check_exists=True):
     crate_dir = gen_crate_dir(name, version, ti)
@@ -898,20 +994,25 @@ def api_index(DOC_ROOT, name, version, ti, cargo, revision, check_exists=True):
             return index_file_path
         return None
 
+
 # return type name of a resource method builder, from a resource name
 def rb_type(r):
     return "%sMethods" % singular(canonical_type_name(r))
 
+
 def _to_type_params_s(p):
     return '<%s>' % ', '.join(p)
+
 
 # return type parameters of a the hub, ready for use in Rust code
 def hub_type_params_s():
     return _to_type_params_s(HUB_TYPE_PARAMETERS)
 
+
 # Returns True if this API has particular authentication scopes to choose from
 def supports_scopes(auth):
     return bool(auth) and bool(auth.oauth2)
+
 
 # Returns th desired scope for the given method. It will use read-only scopes for read-only methods
 # May be None no scope-based authentication is required
@@ -928,28 +1029,34 @@ def method_default_scope(m):
     # end try to find read-only default scope
     return default_scope
 
-_rb_type_params = ("'a", ) + HUB_TYPE_PARAMETERS
+
+_rb_type_params = ("'a",) + HUB_TYPE_PARAMETERS
 
 
 # type parameters for a resource builder - keeps hub as borrow
 def rb_type_params_s(resource, c):
     return _to_type_params_s(_rb_type_params)
 
+
 # type bounds for resource and method builder
 def struct_type_bounds_s():
     return ', '.join(tp + ": 'a" for tp in HUB_TYPE_PARAMETERS)
+
 
 # type params for the given method builder, as string suitable for Rust code
 def mb_type_params_s(m):
     return _to_type_params_s(_rb_type_params)
 
+
 # as rb_additional_type_params, but for an individual method, as seen from a resource builder !
 def mb_additional_type_params(m):
     return []
 
+
 # return type name for a method on the given resource
 def mb_type(r, m):
     return "%s%sCall" % (singular(canonical_type_name(r)), dot_sep_to_canonical_type_name(m))
+
 
 # canonicalName = util.canonical_name()
 def hub_type(schemas, canonicalName):
@@ -958,8 +1065,9 @@ def hub_type(schemas, canonicalName):
         name += 'Hub'
     return name
 
+
 # return e + d[n] + e + ' ' or ''
-def get_word(d, n, e = ''):
+def get_word(d, n, e=''):
     if n in d:
         v = e + d[n] + e
         if not v.endswith(' '):
@@ -968,28 +1076,34 @@ def get_word(d, n, e = ''):
     else:
         return ''
 
+
 # n = 'FooBar' -> _foo_bar
 def property(n):
     return '_' + mangle_ident(n)
 
+
 def upload_action_fn(upload_action_term, suffix):
     return upload_action_term + suffix
+
 
 # n = 'foo.bar.Baz' -> 'FooBarBaz'
 def dot_sep_to_canonical_type_name(n):
     return ''.join(canonical_type_name(singular(t)) for t in n.split('.'))
 
+
 def find_fattest_resource(c):
     fr = None
     if c.schemas:
         for candidate in sorted(c.schemas.values(),
-                            key=lambda s: (len(c.sta_map.get(s.id, [])), len(s.get('properties', []))), reverse=True):
+                                key=lambda s: (len(c.sta_map.get(s.id, [])), len(s.get('properties', []))),
+                                reverse=True):
             if candidate.id in c.sta_map:
                 fr = candidate
                 break
         # end for each candidate to check
     # end if there are schemas
     return fr
+
 
 # Extract valid parts from the description of the parts prop contained within the given parameter list
 # can be an empty list.
@@ -1003,6 +1117,7 @@ def parts_from_params(params):
     if part_prop:
         return part_prop, extract_parts(part_prop.get('description', ''))
     return part_prop, list()
+
 
 # Convert a scope url to a nice enum variant identifier, ready for use in code
 # name = name of the api, without version, non-normalized (!)
@@ -1027,12 +1142,14 @@ def scope_url_to_variant(name, url, fully_qualified=True):
         return fqvn(FULL)
     return fqvn(dot_sep_to_canonical_type_name(repl(base)))
 
+
 def method_name_to_variant(name):
     name = name.upper()
     fmt = 'hyper::Method.from_str("%s")'
     if name in HTTP_METHODS:
         fmt = 'hyper::Method::%s'
     return fmt % name
+
 
 # given a rust type-name (no optional, as from to_rust_type), you will get a suitable random default value
 # as string suitable to be passed as reference (or copy, where applicable)
@@ -1041,6 +1158,7 @@ def rnd_arg_val_for_type(tn):
         return str(RUST_TYPE_RND_MAP[tn]())
     except KeyError:
         return '&Default::default()'
+
 
 # Converts a size to the respective integer
 # size string like 1MB or 2TB, or 35.5KB

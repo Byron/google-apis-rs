@@ -17,6 +17,9 @@ ${struct} {
     % if pn != mangle_ident(pn):
     #[serde(rename="${pn}")]
     % endif
+    % if p.get("format", None) == "byte":
+    #[serde(serialize_with = "client::types::to_urlsafe_base64", deserialize_with = "client::types::from_urlsafe_base64")]
+    % endif
     pub ${mangle_ident(pn)}: ${to_rust_type(schemas, s.id, pn, p, allow_optionals=allow_optionals)},
 % endfor
 }

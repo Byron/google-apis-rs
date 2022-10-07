@@ -24,6 +24,7 @@ use tokio::time::sleep;
 use tower_service;
 
 pub use yup_oauth2 as oauth2;
+pub use chrono;
 
 const LINE_ENDING: &str = "\r\n";
 
@@ -854,8 +855,15 @@ pub mod types {
         pub nanoseconds: i32,
     }
 
+    impl From<Duration> for chrono::Duration {
+        fn from(duration: Duration) -> chrono::Duration {
+            chrono::Duration::seconds(duration.seconds) + chrono::Duration::nanoseconds(duration.nanoseconds as i64)
+        }
+    }
+
     #[derive(Deserialize)]
     struct IntermediateDuration<'a>(&'a str);
+
 
     impl serde::Serialize for Duration {
         fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
@@ -917,24 +925,24 @@ pub mod types {
 
 
     // #[serde(serialize_with = "path")]
-    fn to_urlsafe_base64<S>(x: &str, s: S) -> Result<S::Ok, S::Error>
+    pub fn to_urlsafe_base64<S>(x: Option<&str>, s: S) -> Result<S::Ok, S::Error>
     where
         S: Serializer,
     {
-        s.serialize_str(&base64::encode_config(x, base64::URL_SAFE))
+        match x {
+            None => s.serialize_none(),
+            Some(x) => s.serialize_some(&base64::encode_config(x, base64::URL_SAFE))
+        }
     }
     // #[serde(deserialize_with = "path")]
-    fn from_urlsafe_base64<'de, D>(deserializer: D) -> Result<Vec<u8>, D::Error>
+    pub fn from_urlsafe_base64<'de, D>(deserializer: D) -> Result<Option<Vec<u8>>, D::Error>
     where
         D: Deserializer<'de>,
     {
-        let s: &str = Deserialize::deserialize(deserializer)?;
-        Ok(base64::decode_config(s, base64::URL_SAFE).unwrap())
+        let s: Option<&str> = Deserialize::deserialize(deserializer)?;
+        // TODO: Map error
+        Ok(s.map(|s| base64::decode_config(s, base64::URL_SAFE).unwrap()))
     }
-    // TODO:
-    // "google-datetime",
-    // "date-time",
-    // "date",
 
     // TODO: https://developers.google.com/protocol-buffers/docs/reference/csharp/class/google/protobuf/well-known-types/field-mask
     // "google-fieldmask",
