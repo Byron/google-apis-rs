@@ -17,7 +17,8 @@ doctest = false
 
 [dependencies]
 mime = "^ 0.2.0"
-serde = "^ 1.0"
+serde = { version = "^ 1.0", features = ["derive"] }
+base64 = "0.13.0"
 serde_json = "^ 1.0"
 ## TODO: Make yup-oauth2 optional
 ## yup-oauth2 = { version = "^ 7.0", optional = true }

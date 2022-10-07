@@ -843,6 +843,103 @@ mod yup_oauth2_impl {
     }
 }
 
+pub mod types {
+    use std::str::FromStr;
+    use serde::{Deserialize, Deserializer, Serializer};
+    // https://github.com/protocolbuffers/protobuf-go/blob/6875c3d7242d1a3db910ce8a504f124cb840c23a/types/known/durationpb/duration.pb.go#L148
+    #[derive(Deserialize)]
+    #[serde(try_from = "IntermediateDuration")]
+    pub struct Duration {
+        pub seconds: i64,
+        pub nanoseconds: i32,
+    }
+
+    #[derive(Deserialize)]
+    struct IntermediateDuration<'a>(&'a str);
+
+    impl serde::Serialize for Duration {
+        fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+            where
+                S: serde::Serializer,
+        {
+            if self.nanoseconds != 0 {
+                if self.seconds == 0 && self.nanoseconds.is_negative() {
+                    serializer.serialize_str(&format!("-0.{}s", self.nanoseconds.abs()))
+                } else {
+                    serializer.serialize_str(&format!("{}.{}s", self.seconds, self.nanoseconds.abs()))
+                }
+            } else {
+                serializer.serialize_str(&format!("{}s", self.seconds))
+            }
+        }
+    }
+
+    impl <'a> TryFrom<IntermediateDuration<'a>> for Duration {
+        type Error = std::num::ParseIntError;
+
+        fn try_from(value: IntermediateDuration<'a>) -> Result<Self, Self::Error> {
+            let abs_duration = 315576000000i64;
+            // TODO: Test strings like -.s, -0.0s
+            if !value.0.ends_with('s') {
+                todo!();
+            }
+            let (seconds, nanoseconds) = if let Some((seconds, nanos)) = value.0.split_once('.') {
+                let seconds = i64::from_str(seconds)?;
+                let nano_len = nanos.len() - 1;
+                // up . 000_000_000
+                let nano_digits = nanos.chars().filter(|c| c.is_digit(10)).count() as u32;
+                if nano_digits > 9 {
+                    todo!()
+                }
+                // 2 digits: 120_000_000
+                // 9 digits: 123_456_789
+                // pad to 9 digits
+                let nanos = i32::from_str(&nanos[..nanos.len() - 1])? * 10_i32.pow(9 - nano_digits);
+                (seconds, nanos)
+            } else {
+                // TODO: handle negative number
+                (i64::from_str(&value.0[..value.0.len().saturating_sub(1)])?, 0)
+            };
+            if (seconds > 0 && nanoseconds < 0) || (seconds < 0 && nanoseconds > 0) {
+                todo!();
+            }
+
+            if seconds >= abs_duration || seconds <= -abs_duration {
+                todo!();
+            }
+            if nanoseconds >= 1_000_000_000 || nanoseconds <= -1_000_000_000 {
+                todo!();
+            }
+
+            Ok(Duration { seconds, nanoseconds })
+        }
+    }
+
+
+    // #[serde(serialize_with = "path")]
+    fn to_urlsafe_base64<S>(x: &str, s: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        s.serialize_str(&base64::encode_config(x, base64::URL_SAFE))
+    }
+    // #[serde(deserialize_with = "path")]
+    fn from_urlsafe_base64<'de, D>(deserializer: D) -> Result<Vec<u8>, D::Error>
+    where
+        D: Deserializer<'de>,
+    {
+        let s: &str = Deserialize::deserialize(deserializer)?;
+        Ok(base64::decode_config(s, base64::URL_SAFE).unwrap())
+    }
+    // TODO:
+    // "google-datetime",
+    // "date-time",
+    // "date",
+
+    // TODO: https://developers.google.com/protocol-buffers/docs/reference/csharp/class/google/protobuf/well-known-types/field-mask
+    // "google-fieldmask",
+}
+
 #[cfg(test)]
 mod test_api {
     use super::*;
