@@ -415,7 +415,7 @@ impl<'a> Read for MultiPartReader<'a> {
             (n, true, _) if n > 0 => {
                 let (headers, reader) = self.raw_parts.remove(0);
                 let mut c = Cursor::new(Vec::<u8>::new());
-                // TODO: The first line ending should be omitted for the first part,
+                //TODO: The first line ending should be omitted for the first part,
                 // fortunately Google's API serves don't seem to mind.
                 (write!(
                     &mut c,
@@ -845,6 +845,7 @@ mod yup_oauth2_impl {
 }
 
 pub mod types {
+    use std::fmt::Formatter;
     use std::str::FromStr;
     use serde::{Deserialize, Deserializer, Serializer};
     // https://github.com/protocolbuffers/protobuf-go/blob/6875c3d7242d1a3db910ce8a504f124cb840c23a/types/known/durationpb/duration.pb.go#L148
@@ -882,43 +883,75 @@ pub mod types {
         }
     }
 
+    #[derive(Debug)]
+    enum ParseDurationError {
+        MissingSecondSuffix,
+        NanosTooSmall,
+        ParseIntError(std::num::ParseIntError),
+        SecondOverflow { seconds: i64, max_seconds: i64 },
+        SecondUnderflow { seconds: i64, min_seconds: i64 }
+    }
+
+    impl From<std::num::ParseIntError> for ParseDurationError {
+        fn from(pie: std::num::ParseIntError) -> Self {
+            ParseDurationError::ParseIntError(pie)
+        }
+    }
+
+    impl std::fmt::Display for ParseDurationError {
+        fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+            match self {
+                ParseDurationError::MissingSecondSuffix => write!(f, "'s' suffix was not present"),
+                ParseDurationError::NanosTooSmall => write!(f, "more than 9 digits of second precision required"),
+                ParseDurationError::ParseIntError(pie) => write!(f, "{}", pie),
+                ParseDurationError::SecondOverflow { seconds, max_seconds } => write!(f, "seconds overflow (got {}, maximum seconds possible {})", seconds, max_seconds),
+                ParseDurationError::SecondUnderflow { seconds, min_seconds } => write!(f, "seconds underflow (got {}, minimum seconds possible {})", seconds, min_seconds)
+            }
+        }
+    }
+
+    impl std::error::Error for ParseDurationError {}
+
     impl <'a> TryFrom<IntermediateDuration<'a>> for Duration {
-        type Error = std::num::ParseIntError;
+        type Error = ParseDurationError;
 
         fn try_from(value: IntermediateDuration<'a>) -> Result<Self, Self::Error> {
             let abs_duration = 315576000000i64;
             // TODO: Test strings like -.s, -0.0s
             let value = match value.0.strip_suffix('s') {
-                None => todo!("Missing 's' suffix case not handled"),
+                None => return Err(ParseDurationError::MissingSecondSuffix),
                 Some(v) => v
             };
 
             let (seconds, nanoseconds) = if let Some((seconds, nanos)) = value.split_once('.') {
                 let is_neg = seconds.starts_with("-");
                 let seconds = i64::from_str(seconds)?;
-                // up . 000_000_000
                 let nano_magnitude = nanos.chars().filter(|c| c.is_digit(10)).count() as u32;
                 if nano_magnitude > 9 {
-                    // catches numbers larger than 999_999_999
-                    todo!("Numeric overflow case not handled")
+                    // not enough precision to model the remaining digits
+                    return Err(ParseDurationError::NanosTooSmall);
                 }
 
                 // u32::from_str prevents negative nanos (eg '0.-12s) -> lossless conversion to i32
                 // 10_u32.pow(...) scales number to appropriate # of nanoseconds
-                let mut nanos = (u32::from_str(&nanos).expect("negative nanos not handled") * 10_u32.pow(9 - nano_magnitude)) as i32;
+                let nanos = u32::from_str(nanos)? as i32;
+
+                let mut nanos = nanos * 10_i32.pow(9 - nano_magnitude);
                 if is_neg {
                     nanos = -nanos;
                 }
                 (seconds, nanos)
             } else {
-                (i64::from_str(value), 0)
+                (i64::from_str(value)?, 0)
             };
 
-            if seconds >= abs_duration || seconds <= -abs_duration {
-                todo!();
+            if seconds >= abs_duration {
+                Err(ParseDurationError::SecondOverflow { seconds, max_seconds: abs_duration })
+            } else if seconds <= -abs_duration {
+                Err(ParseDurationError::SecondUnderflow { seconds, min_seconds: -abs_duration })
+            } else {
+                Ok(Duration { seconds, nanoseconds})
             }
-
-            Ok(Duration { seconds, nanoseconds })
         }
     }
 
