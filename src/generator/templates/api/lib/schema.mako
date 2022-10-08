@@ -18,9 +18,9 @@ ${struct} {
     #[serde(rename="${pn}")]
     % endif
     % if p.get("format", None) == "byte":
-    #[serde(serialize_with = "client::types::to_urlsafe_base64", deserialize_with = "client::types::from_urlsafe_base64")]
+    #[serde(with = "client::serde::urlsafe_base64")]
     % elif p.get("format", None) == "google-duration":
-    #[serde(serialize_with = "client::types::to_duration_str", deserialize_with = "client::types::from_duration_str")]
+    #[serde(with = "client::serde::duration")]
     % endif
     pub ${mangle_ident(pn)}: ${to_rust_type(schemas, s.id, pn, p, allow_optionals=allow_optionals)},
 % endfor
