@@ -17,10 +17,12 @@ ${struct} {
     % if pn != mangle_ident(pn):
     #[serde(rename="${pn}")]
     % endif
-    % if p.get("format", None) == "byte":
+    % if p.get("format") == "byte":
     #[serde(with = "client::serde::urlsafe_base64")]
-    % elif p.get("format", None) == "google-duration":
+    % elif p.get("format") == "google-duration":
     #[serde(with = "client::serde::duration")]
+    % elif p.get("format") == "google-fieldmask":
+    #[serde(with = "client::serde::field_mask")]
     % endif
     pub ${mangle_ident(pn)}: ${to_rust_type(schemas, s.id, pn, p, allow_optionals=allow_optionals)},
 % endfor

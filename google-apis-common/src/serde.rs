@@ -155,12 +155,68 @@ pub mod urlsafe_base64 {
     }
 }
 
-// TODO: https://developers.google.com/protocol-buffers/docs/reference/csharp/class/google/protobuf/well-known-types/field-mask
-// "google-fieldmask"
+pub mod field_mask {
+    /// Implementation based on `https://chromium.googlesource.com/infra/luci/luci-go/+/23ea7a05c6a5/common/proto/fieldmasks.go#184`
+    use serde::{Deserialize, Deserializer, Serializer};
+    use crate::FieldMask;
+
+    fn snakecase(source: &str) -> String {
+        let mut dest = String::with_capacity(source.len() + 5);
+        for c in source.chars() {
+            if c.is_ascii_uppercase() {
+                dest.push('_');
+                dest.push(c.to_ascii_lowercase());
+            } else {
+                dest.push(c);
+            }
+        }
+        dest
+    }
+
+    fn parse_field_mask(s: &str) -> FieldMask {
+        let mut in_quotes = false;
+        let mut prev_ind = 0;
+        let mut paths = Vec::new();
+        for (i, c) in s.chars().enumerate() {
+            if c ==  '`' {
+                in_quotes = !in_quotes;
+            } else if in_quotes {
+                continue;
+            } else if c == ',' {
+                paths.push(snakecase(&s[prev_ind..i]));
+                prev_ind = i + 1;
+            }
+        }
+        paths.push(snakecase(&s[prev_ind..]));
+        FieldMask(paths)
+    }
+
+    pub fn serialize<S>(x: &Option<FieldMask>, s: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        match x {
+            None => s.serialize_none(),
+            Some(fieldmask) => {
+                s.serialize_some(fieldmask.to_string().as_str())
+            }
+        }
+    }
+
+    pub fn deserialize<'de, D>(deserializer: D) -> Result<Option<FieldMask>, D::Error>
+    where
+        D: Deserializer<'de>,
+    {
+        let s: Option<&str> = Deserialize::deserialize(deserializer)?;
+        Ok(s.map(parse_field_mask))
+    }
+}
+
 #[cfg(test)]
 mod test {
-    use super::{duration, urlsafe_base64};
+    use super::{duration, urlsafe_base64, field_mask};
     use serde::{Deserialize, Serialize};
+    use crate::FieldMask;
 
     #[derive(Serialize, Deserialize, Debug, PartialEq)]
     struct DurationWrapper {
@@ -172,6 +228,12 @@ mod test {
     struct Base64Wrapper {
         #[serde(with = "urlsafe_base64")]
         bytes: Option<Vec<u8>>,
+    }
+
+    #[derive(Serialize, Deserialize, Debug, PartialEq)]
+    struct FieldMaskWrapper {
+        #[serde(with = "field_mask")]
+        fields: Option<FieldMask>,
     }
 
     #[test]
@@ -244,8 +306,19 @@ mod test {
         );
     }
 
-    #[test]
+   #[test]
     fn urlsafe_base64_de_failure_cases() {
         assert!(serde_json::from_str::<Base64Wrapper>(r#"{"bytes": "aGVsbG8gd29ybG+Q"}"#).is_err());
+    }
+
+    #[test]
+    fn field_mask_roundtrip() {
+        let wrapper = FieldMaskWrapper {
+            fields: Some(FieldMask(vec!["user.display_name".to_string(), "photo".to_string()]))
+        };
+        let json_repr = &serde_json::to_string(&wrapper);
+        assert!(json_repr.is_ok(), "serialization should succeed");
+        assert_eq!(wrapper, serde_json::from_str(r#"{"fields": "user.displayName,photo"}"#).unwrap());
+        assert_eq!(wrapper, serde_json::from_str(json_repr.as_ref().unwrap()).unwrap(), "round trip should succeed");
     }
 }

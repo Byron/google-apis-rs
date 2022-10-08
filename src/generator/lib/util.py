@@ -49,8 +49,7 @@ TYPE_MAP = {
     'google-duration': f"{CHRONO_PATH}::Duration",
     # guessing bytes is universally url-safe b64
     "byte": "Vec<u8>",
-    # TODO: Provide support for these as well
-    "google-fieldmask": 'String'
+    "google-fieldmask": "client::FieldMask"
 }
 
 RESERVED_WORDS = set(('abstract', 'alignof', 'as', 'become', 'box', 'break', 'const', 'continue', 'crate', 'do',
@@ -80,15 +79,17 @@ RUST_TYPE_RND_MAP = {
     '&str': lambda: '"%s"' % choice(words),
     '&Vec<String>': lambda: '&vec!["%s".into()]' % choice(words),
     "Vec<u8>": lambda: f"vec![0, 1, 2, 3]",
+    # why a reference to Vec? Because it works. Should be slice, but who knows how typing works here.
     "&Vec<u8>": lambda: f"&vec![0, 1, 2, 3]",
     # TODO: styling this
     f"{CHRONO_PATH}::Duration": lambda: f"chrono::Duration::seconds({randint(0, 9999999)})",
     CHRONO_DATE: chrono_date,
     CHRONO_DATETIME: lambda: f"chrono::Utc::now()",
+    "FieldMask": lambda: f"FieldMask(vec![{choice(words)}])",
     f"&{CHRONO_PATH}::Duration": lambda: f"&chrono::Duration::seconds({randint(0, 9999999)})",
     f"&{CHRONO_DATE}": lambda: f"&{chrono_date()}",
     f"&{CHRONO_DATETIME}": lambda: f"&chrono::Utc::now()",
-    # why a reference to Vec? Because it works. Should be slice, but who knows how typing works here.
+    f"&FieldMask": lambda: f"&FieldMask(vec![{choice(words)}])",
 }
 TREF = '$ref'
 IO_RESPONSE = 'response'
