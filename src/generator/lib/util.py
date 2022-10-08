@@ -455,13 +455,9 @@ def to_rust_type(
             tn = 'Option<Box<%s>>' % tn
         return wrap_type(tn)
     try:
-        # TODO: add support for all types and remove this check
-        #  rust_type = TYPE_MAP[t.get("format", t["type"])]
-        # prefer format if present - provides support for i64
-        if "format" in t and t["format"] in TYPE_MAP:
-            rust_type = TYPE_MAP[t["format"]]
-        else:
-            rust_type = TYPE_MAP[t["type"]]
+        # prefer format if present
+        rust_type = TYPE_MAP[t.get("format", t["type"])]
+
         if t['type'] == 'array':
             return wrap_type("%s<%s>" % (rust_type, nested_type(t)))
         elif t['type'] == 'object':
