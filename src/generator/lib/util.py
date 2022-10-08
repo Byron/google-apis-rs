@@ -20,7 +20,7 @@ re_find_replacements = re.compile(r"\{[/\+]?\w+\*?\}")
 
 HTTP_METHODS = set(("OPTIONS", "GET", "POST", "PUT", "DELETE", "HEAD", "TRACE", "CONNECT", "PATCH"))
 CHRONO_PATH = "client::chrono"
-CHRONO_DATETIME = f"{CHRONO_PATH}::DateTime<{CHRONO_PATH}::offset::FixedOffset>"
+CHRONO_DATETIME = f"{CHRONO_PATH}::NaiveDateTime"
 CHRONO_DATE = f"{CHRONO_PATH}::NaiveDate"
 USE_FORMAT = 'use_format_field'
 TYPE_MAP = {
@@ -38,7 +38,7 @@ TYPE_MAP = {
     'string': 'String',
     'object': 'HashMap',
     # https://developers.google.com/protocol-buffers/docs/reference/java/com/google/protobuf/Timestamp
-    # In JSON format, the Timestamp type is encoded as a string in the [RFC 3339]
+    # In JSON format, the Timestamp type is encoded as a string in the [RFC 3339] format
     'google-datetime': CHRONO_DATETIME,
     # RFC 3339 date-time value
     'date-time': CHRONO_DATETIME,
@@ -62,6 +62,12 @@ RESERVED_WORDS = set(('abstract', 'alignof', 'as', 'become', 'box', 'break', 'co
 words = [w.strip(',') for w in
          "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.".split(
              ' ')]
+
+
+def chrono_date():
+    return f"{CHRONO_DATE}::from_ymd({randint(1, 9999)}, {randint(1, 12)}, {randint(1, 31)})"
+
+
 RUST_TYPE_RND_MAP = {
     'bool': lambda: str(bool(randint(0, 1))).lower(),
     'u32': lambda: randint(0, 100),
@@ -73,6 +79,15 @@ RUST_TYPE_RND_MAP = {
     'String': lambda: '"%s"' % choice(words),
     '&str': lambda: '"%s"' % choice(words),
     '&Vec<String>': lambda: '&vec!["%s".into()]' % choice(words),
+    "Vec<u8>": lambda: f"vec![0, 1, 2, 3]",
+    "&Vec<u8>": lambda: f"&vec![0, 1, 2, 3]",
+    # TODO: styling this
+    f"{CHRONO_PATH}::Duration": lambda: f"{CHRONO_PATH}::Duration::seconds({randint(0, 9999999)})",
+    CHRONO_DATE: chrono_date,
+    CHRONO_DATETIME: lambda: f"{chrono_date()}.with_hms({randint(0, 23)}, {randint(0, 59)}, {randint(0, 59)})",
+    f"&{CHRONO_PATH}::Duration": lambda: f"&{CHRONO_PATH}::Duration::seconds({randint(0, 9999999)})",
+    f"&{CHRONO_DATE}": lambda: f"&{chrono_date()}",
+    f"&{CHRONO_DATETIME}": lambda: f"&{chrono_date()}.with_hms({randint(0, 23)}, {randint(0, 59)}, {randint(0, 59)})"
     # why a reference to Vec? Because it works. Should be slice, but who knows how typing works here.
 }
 TREF = '$ref'
