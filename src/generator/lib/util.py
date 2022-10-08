@@ -41,7 +41,7 @@ TYPE_MAP = {
     'date-time': CHRONO_DATETIME,
     'date': CHRONO_DATETIME,
     # custom impl
-    'google-duration': 'client::types::Duration',
+    'google-duration': 'client::chrono::Duration',
     # guessing bytes is universally url-safe b64
     "byte": "Vec<u8>",
     # TODO: Provide support for these as well
