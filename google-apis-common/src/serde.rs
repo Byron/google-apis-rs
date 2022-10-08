@@ -1,7 +1,10 @@
 pub mod duration {
     use std::fmt::Formatter;
     use std::str::FromStr;
+
     use serde::{Deserialize, Deserializer, Serializer};
+
+    use chrono::Duration;
 
     #[derive(Debug)]
     enum ParseDurationError {
@@ -9,7 +12,7 @@ pub mod duration {
         NanosTooSmall,
         ParseIntError(std::num::ParseIntError),
         SecondOverflow { seconds: i64, max_seconds: i64 },
-        SecondUnderflow { seconds: i64, min_seconds: i64 }
+        SecondUnderflow { seconds: i64, min_seconds: i64 },
     }
 
     impl From<std::num::ParseIntError> for ParseDurationError {
@@ -22,22 +25,38 @@ pub mod duration {
         fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
             match self {
                 ParseDurationError::MissingSecondSuffix => write!(f, "'s' suffix was not present"),
-                ParseDurationError::NanosTooSmall => write!(f, "more than 9 digits of second precision required"),
+                ParseDurationError::NanosTooSmall => {
+                    write!(f, "more than 9 digits of second precision required")
+                }
                 ParseDurationError::ParseIntError(pie) => write!(f, "{:?}", pie),
-                ParseDurationError::SecondOverflow { seconds, max_seconds } => write!(f, "seconds overflow (got {}, maximum seconds possible {})", seconds, max_seconds),
-                ParseDurationError::SecondUnderflow { seconds, min_seconds } => write!(f, "seconds underflow (got {}, minimum seconds possible {})", seconds, min_seconds)
+                ParseDurationError::SecondOverflow {
+                    seconds,
+                    max_seconds,
+                } => write!(
+                    f,
+                    "seconds overflow (got {}, maximum seconds possible {})",
+                    seconds, max_seconds
+                ),
+                ParseDurationError::SecondUnderflow {
+                    seconds,
+                    min_seconds,
+                } => write!(
+                    f,
+                    "seconds underflow (got {}, minimum seconds possible {})",
+                    seconds, min_seconds
+                ),
             }
         }
     }
 
     impl std::error::Error for ParseDurationError {}
 
-    fn parse_duration(s: &str) -> Result<chrono::Duration, ParseDurationError> {
+    fn parse_duration(s: &str) -> Result<Duration, ParseDurationError> {
         let abs_duration = 315576000000i64;
         // TODO: Test strings like -.s, -0.0s
         let value = match s.strip_suffix('s') {
             None => return Err(ParseDurationError::MissingSecondSuffix),
-            Some(v) => v
+            Some(v) => v,
         };
 
         let (seconds, nanoseconds) = if let Some((seconds, nanos)) = value.split_once('.') {
@@ -63,25 +82,32 @@ pub mod duration {
         };
 
         if seconds >= abs_duration {
-            Err(ParseDurationError::SecondOverflow { seconds, max_seconds: abs_duration })
+            Err(ParseDurationError::SecondOverflow {
+                seconds,
+                max_seconds: abs_duration,
+            })
         } else if seconds <= -abs_duration {
-            Err(ParseDurationError::SecondUnderflow { seconds, min_seconds: -abs_duration })
+            Err(ParseDurationError::SecondUnderflow {
+                seconds,
+                min_seconds: -abs_duration,
+            })
         } else {
-            Ok(chrono::Duration::seconds(seconds) + chrono::Duration::nanoseconds(nanoseconds.into()))
+            Ok(Duration::seconds(seconds) + Duration::nanoseconds(nanoseconds.into()))
         }
     }
 
-    pub fn serialize<S>(x: &Option<chrono::Duration>, s: S) -> Result<S::Ok, S::Error>
-        where
-            S: Serializer,
+    pub fn serialize<S>(x: &Option<Duration>, s: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
     {
         match x {
             None => s.serialize_none(),
             Some(x) => {
                 let seconds = x.num_seconds();
-                let nanoseconds = (*x - chrono::Duration::seconds(seconds))
+                let nanoseconds = (*x - Duration::seconds(seconds))
                     .num_nanoseconds()
-                    .expect("number of nanoseconds is less than or equal to 1 billion") as i32;
+                    .expect("number of nanoseconds is less than or equal to 1 billion")
+                    as i32;
                 // might be left with -1 + non-zero nanos
                 if nanoseconds != 0 {
                     if seconds == 0 && nanoseconds.is_negative() {
@@ -96,16 +122,13 @@ pub mod duration {
         }
     }
 
-    pub fn deserialize<'de, D>(deserializer: D) -> Result<Option<chrono::Duration>, D::Error>
-        where
-            D: Deserializer<'de>,
+    pub fn deserialize<'de, D>(deserializer: D) -> Result<Option<Duration>, D::Error>
+    where
+        D: Deserializer<'de>,
     {
         let s: Option<&str> = Deserialize::deserialize(deserializer)?;
-        match s.map(|s| parse_duration(s)) {
-            None => Ok(None),
-            Some(Ok(d)) => Ok(Some(d)),
-            Some(Err(e)) => Err(serde::de::Error::custom(e)),
-        }
+        s.map(|s| parse_duration(s).map_err(serde::de::Error::custom))
+            .transpose()
     }
 }
 
@@ -118,7 +141,7 @@ pub mod urlsafe_base64 {
     {
         match x {
             None => s.serialize_none(),
-            Some(x) => s.serialize_some(&base64::encode_config(x, base64::URL_SAFE))
+            Some(x) => s.serialize_some(&base64::encode_config(x, base64::URL_SAFE)),
         }
     }
 
@@ -127,14 +150,10 @@ pub mod urlsafe_base64 {
         D: Deserializer<'de>,
     {
         let s: Option<&str> = Deserialize::deserialize(deserializer)?;
-        // TODO: Map error
-        match s.map(|s| base64::decode_config(s, base64::URL_SAFE)) {
-            None => Ok(None),
-            Some(Ok(d)) => Ok(Some(d)),
-            Some(Err(e)) => Err(serde::de::Error::custom(e)),
-        }
+        s.map(|s| base64::decode_config(s, base64::URL_SAFE).map_err(serde::de::Error::custom))
+            .transpose()
     }
-
-    // TODO: https://developers.google.com/protocol-buffers/docs/reference/csharp/class/google/protobuf/well-known-types/field-mask
-    // "google-fieldmask"
 }
+
+// TODO: https://developers.google.com/protocol-buffers/docs/reference/csharp/class/google/protobuf/well-known-types/field-mask
+// "google-fieldmask"
