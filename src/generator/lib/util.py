@@ -86,10 +86,6 @@ RUST_TYPE_RND_MAP = {
     CHRONO_DATE: chrono_date,
     CHRONO_DATETIME: lambda: f"chrono::Utc::now()",
     "FieldMask": lambda: f"FieldMask(vec![{choice(words)}])",
-    f"&{CHRONO_PATH}::Duration": lambda: f"&chrono::Duration::seconds({randint(0, 9999999)})",
-    f"&{CHRONO_DATE}": lambda: f"&{chrono_date()}",
-    f"&{CHRONO_DATETIME}": lambda: f"&chrono::Utc::now()",
-    f"&FieldMask": lambda: f"&FieldMask(vec![{choice(words)}])",
 }
 TREF = '$ref'
 IO_RESPONSE = 'response'
