@@ -37,18 +37,19 @@ TYPE_MAP = {
     'array': 'Vec',
     'string': 'String',
     'object': 'HashMap',
-    # https://developers.google.com/protocol-buffers/docs/reference/java/com/google/protobuf/Timestamp
+    # https://github.com/protocolbuffers/protobuf/blob/ec1a70913e5793a7d0a7b5fbf7e0e4f75409dd41/src/google/protobuf/timestamp.proto
     # In JSON format, the Timestamp type is encoded as a string in the [RFC 3339] format
     'google-datetime': CHRONO_DATETIME,
-    # RFC 3339 date-time value
+    # Per .json files: RFC 3339 timestamp
     'date-time': CHRONO_DATETIME,
-    # A date in RFC 3339 format with only the date part
+    # Per .json files: A date in RFC 3339 format with only the date part
     # e.g. "2013-01-15"
     'date': CHRONO_DATE,
-    # custom serde impl - {seconds}.{nanoseconds}s
+    # https://github.com/protocolbuffers/protobuf/blob/ec1a70913e5793a7d0a7b5fbf7e0e4f75409dd41/src/google/protobuf/duration.proto
     'google-duration': f"{CHRONO_PATH}::Duration",
     # guessing bytes is universally url-safe b64
     "byte": "Vec<u8>",
+    # https://github.com/protocolbuffers/protobuf/blob/ec1a70913e5793a7d0a7b5fbf7e0e4f75409dd41/src/google/protobuf/field_mask.proto
     "google-fieldmask": "client::FieldMask"
 }
 
