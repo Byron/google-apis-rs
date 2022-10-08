@@ -127,8 +127,9 @@ pub mod duration {
         D: Deserializer<'de>,
     {
         let s: Option<&str> = Deserialize::deserialize(deserializer)?;
-        s.map(|s| parse_duration(s).map_err(serde::de::Error::custom))
+        s.map(parse_duration)
             .transpose()
+            .map_err(serde::de::Error::custom)
     }
 }
 
@@ -150,8 +151,9 @@ pub mod urlsafe_base64 {
         D: Deserializer<'de>,
     {
         let s: Option<&str> = Deserialize::deserialize(deserializer)?;
-        s.map(|s| base64::decode_config(s, base64::URL_SAFE).map_err(serde::de::Error::custom))
+        s.map(|s| base64::decode_config(s, base64::URL_SAFE))
             .transpose()
+            .map_err(serde::de::Error::custom)
     }
 }
 
@@ -210,28 +212,63 @@ pub mod field_mask {
     }
 }
 
+pub mod str_like {
+    /// Implementation based on `https://chromium.googlesource.com/infra/luci/luci-go/+/23ea7a05c6a5/common/proto/fieldmasks.go#184`
+    use serde::{Deserialize, Deserializer, Serializer};
+    use std::str::FromStr;
+
+    pub fn serialize<S, T>(x: &Option<T>, s: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+        T: std::fmt::Display,
+    {
+        match x {
+            None => s.serialize_none(),
+            Some(num) => s.serialize_some(num.to_string().as_str()),
+        }
+    }
+
+    pub fn deserialize<'de, D, T>(deserializer: D) -> Result<Option<T>, D::Error>
+    where
+        D: Deserializer<'de>,
+        T: FromStr,
+        <T as FromStr>::Err: std::fmt::Display,
+    {
+        let s: Option<&str> = Deserialize::deserialize(deserializer)?;
+        s.map(T::from_str)
+            .transpose()
+            .map_err(serde::de::Error::custom)
+    }
+}
+
 #[cfg(test)]
 mod test {
-    use super::{duration, field_mask, urlsafe_base64};
+    use super::{duration, field_mask, str_like, urlsafe_base64};
     use crate::FieldMask;
     use serde::{Deserialize, Serialize};
 
     #[derive(Serialize, Deserialize, Debug, PartialEq)]
     struct DurationWrapper {
-        #[serde(with = "duration")]
+        #[serde(default, with = "duration")]
         duration: Option<chrono::Duration>,
     }
 
     #[derive(Serialize, Deserialize, Debug, PartialEq)]
     struct Base64Wrapper {
-        #[serde(with = "urlsafe_base64")]
+        #[serde(default, with = "urlsafe_base64")]
         bytes: Option<Vec<u8>>,
     }
 
     #[derive(Serialize, Deserialize, Debug, PartialEq)]
     struct FieldMaskWrapper {
-        #[serde(with = "field_mask")]
+        #[serde(default, with = "field_mask")]
         fields: Option<FieldMask>,
+    }
+
+    #[derive(Serialize, Deserialize, Debug, PartialEq)]
+    struct I64Wrapper {
+        #[serde(default, with = "str_like")]
+        num: Option<i64>,
     }
 
     #[test]
@@ -337,5 +374,32 @@ mod test {
             serde_json::from_str(json_repr.as_ref().unwrap()).unwrap(),
             "round trip should succeed"
         );
+    }
+
+    #[test]
+    fn num_roundtrip() {
+        let wrapper = I64Wrapper {
+            num: Some(i64::MAX),
+        };
+
+        let json_repr = &serde_json::to_string(&wrapper);
+        assert!(json_repr.is_ok(), "serialization should succeed");
+        assert_eq!(
+            wrapper,
+            serde_json::from_str(&format!("{{\"num\": \"{}\"}}", i64::MAX)).unwrap()
+        );
+        assert_eq!(
+            wrapper,
+            serde_json::from_str(json_repr.as_ref().unwrap()).unwrap(),
+            "round trip should succeed"
+        );
+    }
+
+    #[test]
+    fn test_empty_wrapper() {
+        assert_eq!(DurationWrapper { duration: None }, serde_json::from_str("{}").unwrap());
+        assert_eq!(Base64Wrapper { bytes: None }, serde_json::from_str("{}").unwrap());
+        assert_eq!(FieldMaskWrapper { fields: None }, serde_json::from_str("{}").unwrap());
+        assert_eq!(I64Wrapper { num: None }, serde_json::from_str("{}").unwrap());
     }
 }

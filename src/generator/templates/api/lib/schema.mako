@@ -18,11 +18,13 @@ ${struct} {
     #[serde(rename="${pn}")]
     % endif
     % if p.get("format") == "byte":
-    #[serde(with = "client::serde::urlsafe_base64")]
+    #[serde(default, with = "client::serde::urlsafe_base64")]
     % elif p.get("format") == "google-duration":
-    #[serde(with = "client::serde::duration")]
+    #[serde(default, with = "client::serde::duration")]
     % elif p.get("format") == "google-fieldmask":
-    #[serde(with = "client::serde::field_mask")]
+    #[serde(default, with = "client::serde::field_mask")]
+    % elif p.get("format") in {"uint64", "int64"}:
+    #[serde(default, with = "client::serde::str_like")]
     % endif
     pub ${mangle_ident(pn)}: ${to_rust_type(schemas, s.id, pn, p, allow_optionals=allow_optionals)},
 % endfor
