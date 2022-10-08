@@ -6,6 +6,8 @@ pub mod duration {
 
     use chrono::Duration;
 
+    const MAX_SECONDS: i64 = 315576000000i64;
+
     #[derive(Debug)]
     enum ParseDurationError {
         MissingSecondSuffix,
@@ -52,7 +54,6 @@ pub mod duration {
     impl std::error::Error for ParseDurationError {}
 
     fn parse_duration(s: &str) -> Result<Duration, ParseDurationError> {
-        let abs_duration = 315576000000i64;
         // TODO: Test strings like -.s, -0.0s
         let value = match s.strip_suffix('s') {
             None => return Err(ParseDurationError::MissingSecondSuffix),
@@ -81,15 +82,15 @@ pub mod duration {
             (i64::from_str(value)?, 0)
         };
 
-        if seconds >= abs_duration {
+        if seconds >= MAX_SECONDS {
             Err(ParseDurationError::SecondOverflow {
                 seconds,
-                max_seconds: abs_duration,
+                max_seconds: MAX_SECONDS,
             })
-        } else if seconds <= -abs_duration {
+        } else if seconds <= -MAX_SECONDS {
             Err(ParseDurationError::SecondUnderflow {
                 seconds,
-                min_seconds: -abs_duration,
+                min_seconds: -MAX_SECONDS,
             })
         } else {
             Ok(Duration::seconds(seconds) + Duration::nanoseconds(nanoseconds.into()))
@@ -106,14 +107,13 @@ pub mod duration {
                 let seconds = x.num_seconds();
                 let nanoseconds = (*x - Duration::seconds(seconds))
                     .num_nanoseconds()
-                    .expect("number of nanoseconds is less than or equal to 1 billion")
+                    .expect("absolute number of nanoseconds is less than 1 billion")
                     as i32;
-                // might be left with -1 + non-zero nanos
                 if nanoseconds != 0 {
                     if seconds == 0 && nanoseconds.is_negative() {
-                        s.serialize_str(&format!("-0.{}s", nanoseconds.abs()))
+                        s.serialize_str(&format!("-0.{:0>9}s", nanoseconds.abs()))
                     } else {
-                        s.serialize_str(&format!("{}.{}s", seconds, nanoseconds.abs()))
+                        s.serialize_str(&format!("{}.{:0>9}s", seconds, nanoseconds.abs()))
                     }
                 } else {
                     s.serialize_str(&format!("{}s", seconds))
@@ -157,3 +157,95 @@ pub mod urlsafe_base64 {
 
 // TODO: https://developers.google.com/protocol-buffers/docs/reference/csharp/class/google/protobuf/well-known-types/field-mask
 // "google-fieldmask"
+#[cfg(test)]
+mod test {
+    use super::{duration, urlsafe_base64};
+    use serde::{Deserialize, Serialize};
+
+    #[derive(Serialize, Deserialize, Debug, PartialEq)]
+    struct DurationWrapper {
+        #[serde(with = "duration")]
+        duration: Option<chrono::Duration>,
+    }
+
+    #[derive(Serialize, Deserialize)]
+    struct Base64Wrapper {
+        #[serde(with = "urlsafe_base64")]
+        bytes: Option<Vec<u8>>,
+    }
+
+    #[test]
+    fn test_duration_de_success_cases() {
+        let durations = [
+            ("-0.2s", -200_000_000),
+            ("0.000000001s", 1),
+            ("999.999999999s", 999_999_999_999),
+            ("129s", 129_000_000_000),
+            ("0.123456789s", 123_456_789),
+        ];
+        for (repr, nanos) in durations.into_iter() {
+            let wrapper: DurationWrapper =
+                serde_json::from_str(&format!("{{\"duration\": \"{}\"}}", repr)).unwrap();
+            assert_eq!(
+                Some(nanos),
+                wrapper.duration.unwrap().num_nanoseconds(),
+                "parsed \"{}\" expecting Duration with {}ns",
+                repr,
+                nanos
+            );
+        }
+    }
+
+    #[test]
+    fn test_duration_de_failure_cases() {
+        let durations = ["1.-3s", "1.1111111111s", "1.2"];
+        for repr in durations.into_iter() {
+            assert!(
+                serde_json::from_str::<DurationWrapper>(&format!("{{\"duration\": \"{}\"}}", repr))
+                    .is_err(),
+                "parsed \"{}\" expecting err",
+                repr
+            );
+        }
+    }
+
+    #[test]
+    fn test_duration_ser_success_cases() {
+        let durations = [
+            -200_000_000,
+            1,
+            999_999_999_999,
+            129_000_000_000,
+            123_456_789,
+        ];
+
+        for nanos in durations.into_iter() {
+            let wrapper = DurationWrapper {
+                duration: Some(chrono::Duration::nanoseconds(nanos)),
+            };
+            let s = serde_json::to_string(&wrapper);
+            assert!(s.is_ok(), "Could not serialize {}ns", nanos);
+            let s = s.unwrap();
+            assert_eq!(
+                wrapper,
+                serde_json::from_str(&s).unwrap(),
+                "round trip should return same duration"
+            );
+        }
+    }
+
+    #[test]
+    fn urlsafe_base64_de_success_cases() {
+        let wrapper: Base64Wrapper =
+            serde_json::from_str(r#"{"bytes": "aGVsbG8gd29ybGQ="}"#).unwrap();
+        assert_eq!(
+            Some(b"hello world".as_slice()),
+            wrapper.bytes.as_ref().map(Vec::as_slice)
+        );
+    }
+
+    #[test]
+    fn urlsafe_base64_de_failure_cases() {
+        assert!(serde_json::from_str::<Base64Wrapper>(r#"{"bytes": "aGVsbG8gd29ybG+Q"}"#).is_err());
+    }
+}
