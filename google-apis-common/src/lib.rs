@@ -918,7 +918,7 @@ pub mod types {
 
     impl std::error::Error for ParseDurationError {}
 
-    pub fn to_duration_str<S>(x: Option<&chrono::Duration>, s: S) -> Result<S::Ok, S::Error>
+    pub fn to_duration_str<S>(x: &Option<chrono::Duration>, s: S) -> Result<S::Ok, S::Error>
     where
         S: Serializer,
     {
@@ -952,7 +952,7 @@ pub mod types {
         Ok(s.map(|s| parse_duration_from_str(s).unwrap()))
     }
 
-    pub fn to_urlsafe_base64<S>(x: Option<&[u8]>, s: S) -> Result<S::Ok, S::Error>
+    pub fn to_urlsafe_base64<S>(x: &Option<Vec<u8>>, s: S) -> Result<S::Ok, S::Error>
     where
         S: Serializer,
     {
