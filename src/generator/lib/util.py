@@ -19,7 +19,9 @@ re_desc_parts = re.compile(
 re_find_replacements = re.compile(r"\{[/\+]?\w+\*?\}")
 
 HTTP_METHODS = set(("OPTIONS", "GET", "POST", "PUT", "DELETE", "HEAD", "TRACE", "CONNECT", "PATCH"))
-CHRONO_DATETIME = 'client::chrono::DateTime<client::chrono::offset::FixedOffset>'
+CHRONO_PATH = "client::chrono"
+CHRONO_DATETIME = f"{CHRONO_PATH}::DateTime<{CHRONO_PATH}::offset::FixedOffset>"
+CHRONO_DATE = f"{CHRONO_PATH}::NaiveDate"
 USE_FORMAT = 'use_format_field'
 TYPE_MAP = {
     'boolean': 'bool',
@@ -35,13 +37,16 @@ TYPE_MAP = {
     'array': 'Vec',
     'string': 'String',
     'object': 'HashMap',
-    # should be correct
+    # https://developers.google.com/protocol-buffers/docs/reference/java/com/google/protobuf/Timestamp
+    # In JSON format, the Timestamp type is encoded as a string in the [RFC 3339]
     'google-datetime': CHRONO_DATETIME,
-    # assumption
+    # RFC 3339 date-time value
     'date-time': CHRONO_DATETIME,
-    'date': CHRONO_DATETIME,
-    # custom impl
-    'google-duration': 'client::chrono::Duration',
+    # A date in RFC 3339 format with only the date part
+    # e.g. "2013-01-15"
+    'date': CHRONO_DATE,
+    # custom serde impl - {seconds}.{nanoseconds}s
+    'google-duration': f"{CHRONO_PATH}::Duration",
     # guessing bytes is universally url-safe b64
     "byte": "Vec<u8>",
     # TODO: Provide support for these as well
