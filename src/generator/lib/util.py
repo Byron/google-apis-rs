@@ -65,7 +65,7 @@ words = [w.strip(',') for w in
 
 
 def chrono_date():
-    return f"{CHRONO_DATE}::from_ymd({randint(1, 9999)}, {randint(1, 12)}, {randint(1, 31)})"
+    return f"chrono::NaiveDate::from_ymd({randint(1, 9999)}, {randint(1, 12)}, {randint(1, 31)})"
 
 
 RUST_TYPE_RND_MAP = {
@@ -82,12 +82,12 @@ RUST_TYPE_RND_MAP = {
     "Vec<u8>": lambda: f"vec![0, 1, 2, 3]",
     "&Vec<u8>": lambda: f"&vec![0, 1, 2, 3]",
     # TODO: styling this
-    f"{CHRONO_PATH}::Duration": lambda: f"{CHRONO_PATH}::Duration::seconds({randint(0, 9999999)})",
+    f"{CHRONO_PATH}::Duration": lambda: f"chrono::Duration::seconds({randint(0, 9999999)})",
     CHRONO_DATE: chrono_date,
-    CHRONO_DATETIME: lambda: f"{CHRONO_PATH}::Utc::now()",
-    f"&{CHRONO_PATH}::Duration": lambda: f"&{CHRONO_PATH}::Duration::seconds({randint(0, 9999999)})",
+    CHRONO_DATETIME: lambda: f"chrono::Utc::now()",
+    f"&{CHRONO_PATH}::Duration": lambda: f"&chrono::Duration::seconds({randint(0, 9999999)})",
     f"&{CHRONO_DATE}": lambda: f"&{chrono_date()}",
-    f"&{CHRONO_DATETIME}": lambda: f"&{CHRONO_PATH}::Utc::now()",
+    f"&{CHRONO_DATETIME}": lambda: f"&chrono::Utc::now()",
     # why a reference to Vec? Because it works. Should be slice, but who knows how typing works here.
 }
 TREF = '$ref'
