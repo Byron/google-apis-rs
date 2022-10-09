@@ -1,4 +1,4 @@
-from typing import Optional, List
+from typing import Optional, List, Tuple
 from copy import deepcopy
 
 
@@ -8,6 +8,13 @@ class RustType:
         self.members = members
 
     def serde_replace_inner_ty(self, from_to):
+        """Create a type which can be used by serde_with::serde_as to (de)serialize this type.
+        Substitutions described by from_to are used for types which require special (de)serialization support.
+        Returns true if the type changes (and thus, requires special (de)serialization).
+
+        :param from_to:
+        :return:
+        """
         if self.members is None:
             return False
 
@@ -19,11 +26,13 @@ class RustType:
             else:
                 # serde_as fails to compile if type definition includes
                 # types without custom serialization
-                if not member.serde_replace_inner_ty(from_to):
+                if member.serde_replace_inner_ty(from_to):
+                    changed = True
+                else:
                     self.members[i] = Base("_")
         return changed
 
-    def serde_as(self) -> "RustType":
+    def serde_as(self) -> Tuple["RustType", bool]:
         copied = deepcopy(self)
         from_to = {
             Vec(Base("u8")): Base("::client::serde::urlsafe_base64::Wrapper"),
