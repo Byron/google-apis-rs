@@ -1,5 +1,5 @@
-pub mod serde;
 pub mod field_mask;
+pub mod serde;
 
 use std::error;
 use std::error::Error as StdError;
@@ -28,6 +28,7 @@ use tower_service;
 
 pub use chrono;
 pub use field_mask::FieldMask;
+pub use serde_with;
 pub use yup_oauth2 as oauth2;
 
 const LINE_ENDING: &str = "\r\n";

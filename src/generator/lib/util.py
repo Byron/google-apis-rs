@@ -6,6 +6,7 @@ from dataclasses import dataclass
 from random import (randint, random, choice, seed)
 from typing import Any, Dict, List, Mapping, Tuple
 from copy import deepcopy
+from .rust_type import Base, Box, HashMap, Vec, Option, RustType
 
 seed(1337)
 
@@ -51,6 +52,36 @@ TYPE_MAP = {
     "byte": "Vec<u8>",
     # https://github.com/protocolbuffers/protobuf/blob/ec1a70913e5793a7d0a7b5fbf7e0e4f75409dd41/src/google/protobuf/field_mask.proto
     "google-fieldmask": "client::FieldMask"
+}
+
+RUST_TYPE_MAP = {
+    'boolean': Base("bool"),
+    'integer': USE_FORMAT,
+    'number': USE_FORMAT,
+    'uint32': Base("u32"),
+    'double': Base("f64"),
+    'float': Base("f32"),
+    'int32': Base("i32"),
+    'any': Base("String"),  # TODO: Figure out how to handle it. It's 'interface' in Go ...
+    'int64': Base("i64"),
+    'uint64': Base("u64"),
+    'array': Vec(None),
+    'string': Base("String"),
+    'object': HashMap(None, None),
+    # https://github.com/protocolbuffers/protobuf/blob/ec1a70913e5793a7d0a7b5fbf7e0e4f75409dd41/src/google/protobuf/timestamp.proto
+    # In JSON format, the Timestamp type is encoded as a string in the [RFC 3339] format
+    'google-datetime': Base(CHRONO_DATETIME),
+    # Per .json files: RFC 3339 timestamp
+    'date-time': Base(CHRONO_DATETIME),
+    # Per .json files: A date in RFC 3339 format with only the date part
+    # e.g. "2013-01-15"
+    'date': Base(CHRONO_DATE),
+    # https://github.com/protocolbuffers/protobuf/blob/ec1a70913e5793a7d0a7b5fbf7e0e4f75409dd41/src/google/protobuf/duration.proto
+    'google-duration': Base(f"{CHRONO_PATH}::Duration"),
+    # guessing bytes is universally url-safe b64
+    "byte": Vec(Base("u8")),
+    # https://github.com/protocolbuffers/protobuf/blob/ec1a70913e5793a7d0a7b5fbf7e0e4f75409dd41/src/google/protobuf/field_mask.proto
+    "google-fieldmask": Base("client::FieldMask")
 }
 
 RESERVED_WORDS = set(('abstract', 'alignof', 'as', 'become', 'box', 'break', 'const', 'continue', 'crate', 'do',
@@ -430,21 +461,43 @@ def to_rust_type(
         allow_optionals=True,
         _is_recursive=False
 ) -> str:
-    def nested_type(nt):
+    return str(to_rust_type_inner(schemas, schema_name, property_name, t, allow_optionals, _is_recursive))
+
+
+def to_serde_type(
+        schemas,
+        schema_name,
+        property_name,
+        t,
+        allow_optionals=True,
+        _is_recursive=False
+) -> Tuple[RustType, bool]:
+    return to_rust_type_inner(schemas, schema_name, property_name, t, allow_optionals, _is_recursive).serde_as()
+
+
+def to_rust_type_inner(
+        schemas,
+        schema_name,
+        property_name,
+        t,
+        allow_optionals=True,
+        _is_recursive=False
+) -> RustType:
+    def nested_type(nt) -> RustType:
         if 'items' in nt:
             nt = nt['items']
         elif 'additionalProperties' in nt:
             nt = nt['additionalProperties']
         else:
-            assert (is_nested_type_property(nt))
+            assert is_nested_type_property(nt)
             # It's a nested type - we take it literally like $ref, but generate a name for the type ourselves
-            return _assure_unique_type_name(schemas, nested_type_name(schema_name, property_name))
-        return to_rust_type(schemas, schema_name, property_name, nt, allow_optionals=False, _is_recursive=True)
+            return Base(_assure_unique_type_name(schemas, nested_type_name(schema_name, property_name)))
+        return to_rust_type_inner(schemas, schema_name, property_name, nt, allow_optionals=False, _is_recursive=True)
 
-    def wrap_type(tn):
+    def wrap_type(rt) -> RustType:
         if allow_optionals:
-            tn = "Option<%s>" % tn
-        return tn
+            return Option(rt)
+        return rt
 
     # unconditionally handle $ref types, which should point to another schema.
     if TREF in t:
@@ -452,22 +505,21 @@ def to_rust_type(
         # which is fine for now. 'allow_optionals' implicitly restricts type boxing for simple types - it
         # is usually on the first call, and off when recursion is involved.
         tn = t[TREF]
+        rt = Base(tn)
         if not _is_recursive and tn == schema_name:
-            tn = 'Option<Box<%s>>' % tn
-        return wrap_type(tn)
+            rt = Option(Box(rt))
+        return wrap_type(rt)
     try:
         # prefer format if present
-        rust_type = TYPE_MAP[t.get("format", t["type"])]
-
-        if t['type'] == 'array':
-            return wrap_type("%s<%s>" % (rust_type, nested_type(t)))
-        elif t['type'] == 'object':
+        rust_type = RUST_TYPE_MAP[t.get("format", t["type"])]
+        if rust_type == Vec(None):
+            return wrap_type(Vec(nested_type(t)))
+        if rust_type == HashMap(None, None):
             if is_map_prop(t):
-                return wrap_type("%s<String, %s>" % (rust_type, nested_type(t)))
+                return wrap_type(HashMap(Base("String"), nested_type(t)))
             return wrap_type(nested_type(t))
-
         if t.get('repeated', False):
-            return 'Vec<%s>' % rust_type
+            return Vec(rust_type)
         return wrap_type(rust_type)
     except KeyError as err:
         raise AssertionError(

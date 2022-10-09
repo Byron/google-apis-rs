@@ -1,8 +1,8 @@
 pub mod duration {
+    use serde::{Deserialize, Deserializer};
+    use serde_with::{DeserializeAs, SerializeAs};
     use std::fmt::Formatter;
     use std::str::FromStr;
-
-    use serde::{Deserialize, Deserializer, Serializer};
 
     use chrono::Duration;
 
@@ -53,7 +53,7 @@ pub mod duration {
 
     impl std::error::Error for ParseDurationError {}
 
-    fn parse_duration(s: &str) -> Result<Duration, ParseDurationError> {
+    fn duration_from_str(s: &str) -> Result<Duration, ParseDurationError> {
         // TODO: Test strings like -.s, -0.0s
         let value = match s.strip_suffix('s') {
             None => return Err(ParseDurationError::MissingSecondSuffix),
@@ -97,115 +97,95 @@ pub mod duration {
         }
     }
 
-    pub fn serialize<S>(x: &Option<Duration>, s: S) -> Result<S::Ok, S::Error>
-    where
-        S: Serializer,
-    {
-        match x {
-            None => s.serialize_none(),
-            Some(x) => {
-                let seconds = x.num_seconds();
-                let nanoseconds = (*x - Duration::seconds(seconds))
-                    .num_nanoseconds()
-                    .expect("absolute number of nanoseconds is less than 1 billion")
-                    as i32;
-                if nanoseconds != 0 {
-                    if seconds == 0 && nanoseconds.is_negative() {
-                        s.serialize_str(&format!("-0.{:0>9}s", nanoseconds.abs()))
-                    } else {
-                        s.serialize_str(&format!("{}.{:0>9}s", seconds, nanoseconds.abs()))
-                    }
-                } else {
-                    s.serialize_str(&format!("{}s", seconds))
-                }
+    fn duration_to_string(duration: &Duration) -> String {
+        let seconds = duration.num_seconds();
+        let nanoseconds = (*duration - Duration::seconds(seconds))
+            .num_nanoseconds()
+            .expect("absolute number of nanoseconds is less than 1 billion")
+            as i32;
+        if nanoseconds != 0 {
+            if seconds == 0 && nanoseconds.is_negative() {
+                format!("-0.{:0>9}s", nanoseconds.abs())
+            } else {
+                format!("{}.{:0>9}s", seconds, nanoseconds.abs())
             }
+        } else {
+            format!("{}s", seconds)
         }
     }
 
-    pub fn deserialize<'de, D>(deserializer: D) -> Result<Option<Duration>, D::Error>
-    where
-        D: Deserializer<'de>,
-    {
-        let s: Option<&str> = Deserialize::deserialize(deserializer)?;
-        s.map(parse_duration)
-            .transpose()
-            .map_err(serde::de::Error::custom)
+    pub struct Wrapper;
+
+    impl SerializeAs<Duration> for Wrapper {
+        fn serialize_as<S>(value: &Duration, s: S) -> Result<S::Ok, S::Error>
+        where
+            S: serde::Serializer,
+        {
+            s.serialize_str(&duration_to_string(value))
+        }
+    }
+
+    impl<'de> DeserializeAs<'de, Duration> for Wrapper {
+        fn deserialize_as<D>(deserializer: D) -> Result<Duration, D::Error>
+        where
+            D: Deserializer<'de>,
+        {
+            let s = Deserialize::deserialize(deserializer)?;
+            duration_from_str(s).map_err(serde::de::Error::custom)
+        }
     }
 }
 
 pub mod urlsafe_base64 {
     use serde::{Deserialize, Deserializer, Serializer};
+    use serde_with::{DeserializeAs, SerializeAs};
 
-    pub fn serialize<S>(x: &Option<Vec<u8>>, s: S) -> Result<S::Ok, S::Error>
-    where
-        S: Serializer,
-    {
-        match x {
-            None => s.serialize_none(),
-            Some(x) => s.serialize_some(&base64::encode_config(x, base64::URL_SAFE)),
+    pub struct Wrapper;
+
+    impl SerializeAs<Vec<u8>> for Wrapper {
+        fn serialize_as<S>(value: &Vec<u8>, s: S) -> Result<S::Ok, S::Error>
+        where
+            S: Serializer,
+        {
+            s.serialize_str(&base64::encode_config(value, base64::URL_SAFE))
         }
     }
 
-    pub fn deserialize<'de, D>(deserializer: D) -> Result<Option<Vec<u8>>, D::Error>
-    where
-        D: Deserializer<'de>,
-    {
-        let s: Option<&str> = Deserialize::deserialize(deserializer)?;
-        s.map(|s| base64::decode_config(s, base64::URL_SAFE))
-            .transpose()
-            .map_err(serde::de::Error::custom)
-    }
-}
-
-pub mod str_like {
-    /// Implementation based on `https://chromium.googlesource.com/infra/luci/luci-go/+/23ea7a05c6a5/common/proto/fieldmasks.go#184`
-    use serde::{Deserialize, Deserializer, Serializer};
-    use std::str::FromStr;
-
-    pub fn serialize<S, T>(x: &Option<T>, s: S) -> Result<S::Ok, S::Error>
-    where
-        S: Serializer,
-        T: std::fmt::Display,
-    {
-        match x {
-            None => s.serialize_none(),
-            Some(num) => s.serialize_some(num.to_string().as_str()),
+    impl<'de> DeserializeAs<'de, Vec<u8>> for Wrapper {
+        fn deserialize_as<D>(deserializer: D) -> Result<Vec<u8>, D::Error>
+        where
+            D: Deserializer<'de>,
+        {
+            let s: &str = Deserialize::deserialize(deserializer)?;
+            base64::decode_config(s, base64::URL_SAFE).map_err(serde::de::Error::custom)
         }
-    }
-
-    pub fn deserialize<'de, D, T>(deserializer: D) -> Result<Option<T>, D::Error>
-    where
-        D: Deserializer<'de>,
-        T: FromStr,
-        <T as FromStr>::Err: std::fmt::Display,
-    {
-        let s: Option<&str> = Deserialize::deserialize(deserializer)?;
-        s.map(T::from_str)
-            .transpose()
-            .map_err(serde::de::Error::custom)
     }
 }
 
 #[cfg(test)]
 mod test {
-    use super::{duration, str_like, urlsafe_base64};
+    use super::{duration, urlsafe_base64};
     use serde::{Deserialize, Serialize};
+    use serde_with::{serde_as, DisplayFromStr};
 
+    #[serde_as]
     #[derive(Serialize, Deserialize, Debug, PartialEq)]
     struct DurationWrapper {
-        #[serde(default, with = "duration")]
+        #[serde_as(as = "Option<duration::Wrapper>")]
         duration: Option<chrono::Duration>,
     }
 
+    #[serde_as]
     #[derive(Serialize, Deserialize, Debug, PartialEq)]
     struct Base64Wrapper {
-        #[serde(default, with = "urlsafe_base64")]
+        #[serde_as(as = "Option<urlsafe_base64::Wrapper>")]
         bytes: Option<Vec<u8>>,
     }
 
+    #[serde_as]
     #[derive(Serialize, Deserialize, Debug, PartialEq)]
     struct I64Wrapper {
-        #[serde(default, with = "str_like")]
+        #[serde_as(as = "Option<DisplayFromStr>")]
         num: Option<i64>,
     }
 

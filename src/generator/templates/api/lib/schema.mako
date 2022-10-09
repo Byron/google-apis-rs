@@ -1,5 +1,5 @@
 <%!
-    from generator.lib.util import (schema_markers, rust_doc_comment, mangle_ident, to_rust_type, put_and,
+    from generator.lib.util import (schema_markers, rust_doc_comment, mangle_ident, to_serde_type, to_rust_type, put_and,
                       IO_TYPES, activity_split, enclose_in, REQUEST_MARKER_TRAIT, mb_type, indent_all_but_first_by,
                       NESTED_TYPE_SUFFIX, RESPONSE_MARKER_TRAIT, split_camelcase_s, METHODS_RESOURCE,
                       PART_MARKER_TRAIT, canonical_type_name, TO_PARTS_MARKER, UNUSED_TYPE_MARKER, is_schema_with_optionals,
@@ -17,14 +17,14 @@ ${struct} {
     % if pn != mangle_ident(pn):
     #[serde(rename="${pn}")]
     % endif
-    % if p.get("format") == "byte":
-    #[serde(default, with = "client::serde::urlsafe_base64")]
-    % elif p.get("format") == "google-duration":
-    #[serde(default, with = "client::serde::duration")]
-    % elif p.get("format") in {"uint64", "int64"}:
-    #[serde(default, with = "client::serde::str_like")]
+    <%
+        rust_ty = to_rust_type(schemas, s.id, pn, p, allow_optionals=allow_optionals)
+        serde_ty, use_custom_serde = to_serde_type(schemas, s.id, pn, p, allow_optionals=allow_optionals)
+    %>
+    % if use_custom_serde:
+    #[serde_as(as = "${serde_ty}")]
     % endif
-    pub ${mangle_ident(pn)}: ${to_rust_type(schemas, s.id, pn, p, allow_optionals=allow_optionals)},
+    pub ${mangle_ident(pn)}: ${rust_ty},
 % endfor
 }
 % elif 'additionalProperties' in s:
@@ -83,7 +83,8 @@ ${struct} { _never_set: Option<bool> }
 <%block filter="rust_doc_sanitize, rust_doc_comment">\
 ${doc(s, c)}\
 </%block>
-#[derive(${', '.join(traits)})]
+    #[serde_with::serde_as(crate = "::client::serde_with")]
+    #[derive(${', '.join(traits)})]
 % if s.type == 'object':
 ${_new_object(s, s.get('properties'), c, allow_optionals)}\
 % elif s.type == 'array':
