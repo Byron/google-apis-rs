@@ -97,7 +97,7 @@ pub mod duration {
         }
     }
 
-    fn duration_to_string(duration: &Duration) -> String {
+    pub fn to_string(duration: &Duration) -> String {
         let seconds = duration.num_seconds();
         let nanoseconds = (*duration - Duration::seconds(seconds))
             .num_nanoseconds()
@@ -121,7 +121,7 @@ pub mod duration {
         where
             S: serde::Serializer,
         {
-            s.serialize_str(&duration_to_string(value))
+            s.serialize_str(&to_string(value))
         }
     }
 
@@ -142,12 +142,16 @@ pub mod urlsafe_base64 {
 
     pub struct Wrapper;
 
+    pub fn to_string(bytes: &Vec<u8>) -> String {
+        base64::encode_config(bytes, base64::URL_SAFE)
+    }
+
     impl SerializeAs<Vec<u8>> for Wrapper {
         fn serialize_as<S>(value: &Vec<u8>, s: S) -> Result<S::Ok, S::Error>
         where
             S: Serializer,
         {
-            s.serialize_str(&base64::encode_config(value, base64::URL_SAFE))
+            s.serialize_str(&to_string(value))
         }
     }
 
@@ -160,6 +164,10 @@ pub mod urlsafe_base64 {
             base64::decode_config(s, base64::URL_SAFE).map_err(serde::de::Error::custom)
         }
     }
+}
+
+pub fn datetime_to_string(datetime: &chrono::DateTime<chrono::offset::Utc>) -> String {
+    datetime.to_rfc3339_opts(chrono::SecondsFormat::Millis, true)
 }
 
 #[cfg(test)]

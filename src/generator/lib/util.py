@@ -1241,5 +1241,15 @@ def size_to_bytes(size):
     # end handle errors gracefully
 
 
+def string_impl(p):
+    return {
+        "google-duration": "::client::serde::duration::to_string",
+        "byte": "::client::serde::urlsafe_base64::to_string",
+        "google-datetime": "::client::serde::datetime_to_string",
+        "date-time": "::client::serde::datetime_to_string",
+        "google-fieldmask": "(|x: &client::FieldMask| x.to_string())"
+    }.get(p.get("format"), "(|x: &dyn std::fmt::Display| x.to_string())")
+
+
 if __name__ == '__main__':
     raise AssertionError('For import only')
