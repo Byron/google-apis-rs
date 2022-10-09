@@ -157,61 +157,6 @@ pub mod urlsafe_base64 {
     }
 }
 
-pub mod field_mask {
-    use crate::FieldMask;
-    /// Implementation based on `https://chromium.googlesource.com/infra/luci/luci-go/+/23ea7a05c6a5/common/proto/fieldmasks.go#184`
-    use serde::{Deserialize, Deserializer, Serializer};
-
-    fn snakecase(source: &str) -> String {
-        let mut dest = String::with_capacity(source.len() + 5);
-        for c in source.chars() {
-            if c.is_ascii_uppercase() {
-                dest.push('_');
-                dest.push(c.to_ascii_lowercase());
-            } else {
-                dest.push(c);
-            }
-        }
-        dest
-    }
-
-    fn parse_field_mask(s: &str) -> FieldMask {
-        let mut in_quotes = false;
-        let mut prev_ind = 0;
-        let mut paths = Vec::new();
-        for (i, c) in s.chars().enumerate() {
-            if c == '`' {
-                in_quotes = !in_quotes;
-            } else if in_quotes {
-                continue;
-            } else if c == ',' {
-                paths.push(snakecase(&s[prev_ind..i]));
-                prev_ind = i + 1;
-            }
-        }
-        paths.push(snakecase(&s[prev_ind..]));
-        FieldMask(paths)
-    }
-
-    pub fn serialize<S>(x: &Option<FieldMask>, s: S) -> Result<S::Ok, S::Error>
-    where
-        S: Serializer,
-    {
-        match x {
-            None => s.serialize_none(),
-            Some(fieldmask) => s.serialize_some(fieldmask.to_string().as_str()),
-        }
-    }
-
-    pub fn deserialize<'de, D>(deserializer: D) -> Result<Option<FieldMask>, D::Error>
-    where
-        D: Deserializer<'de>,
-    {
-        let s: Option<&str> = Deserialize::deserialize(deserializer)?;
-        Ok(s.map(parse_field_mask))
-    }
-}
-
 pub mod str_like {
     /// Implementation based on `https://chromium.googlesource.com/infra/luci/luci-go/+/23ea7a05c6a5/common/proto/fieldmasks.go#184`
     use serde::{Deserialize, Deserializer, Serializer};
@@ -243,8 +188,7 @@ pub mod str_like {
 
 #[cfg(test)]
 mod test {
-    use super::{duration, field_mask, str_like, urlsafe_base64};
-    use crate::FieldMask;
+    use super::{duration, str_like, urlsafe_base64};
     use serde::{Deserialize, Serialize};
 
     #[derive(Serialize, Deserialize, Debug, PartialEq)]
@@ -257,12 +201,6 @@ mod test {
     struct Base64Wrapper {
         #[serde(default, with = "urlsafe_base64")]
         bytes: Option<Vec<u8>>,
-    }
-
-    #[derive(Serialize, Deserialize, Debug, PartialEq)]
-    struct FieldMaskWrapper {
-        #[serde(default, with = "field_mask")]
-        fields: Option<FieldMask>,
     }
 
     #[derive(Serialize, Deserialize, Debug, PartialEq)]
@@ -356,27 +294,6 @@ mod test {
     }
 
     #[test]
-    fn field_mask_roundtrip() {
-        let wrapper = FieldMaskWrapper {
-            fields: Some(FieldMask(vec![
-                "user.display_name".to_string(),
-                "photo".to_string(),
-            ])),
-        };
-        let json_repr = &serde_json::to_string(&wrapper);
-        assert!(json_repr.is_ok(), "serialization should succeed");
-        assert_eq!(
-            wrapper,
-            serde_json::from_str(r#"{"fields": "user.displayName,photo"}"#).unwrap()
-        );
-        assert_eq!(
-            wrapper,
-            serde_json::from_str(json_repr.as_ref().unwrap()).unwrap(),
-            "round trip should succeed"
-        );
-    }
-
-    #[test]
     fn num_roundtrip() {
         let wrapper = I64Wrapper {
             num: Some(i64::MAX),
@@ -397,9 +314,17 @@ mod test {
 
     #[test]
     fn test_empty_wrapper() {
-        assert_eq!(DurationWrapper { duration: None }, serde_json::from_str("{}").unwrap());
-        assert_eq!(Base64Wrapper { bytes: None }, serde_json::from_str("{}").unwrap());
-        assert_eq!(FieldMaskWrapper { fields: None }, serde_json::from_str("{}").unwrap());
-        assert_eq!(I64Wrapper { num: None }, serde_json::from_str("{}").unwrap());
+        assert_eq!(
+            DurationWrapper { duration: None },
+            serde_json::from_str("{}").unwrap()
+        );
+        assert_eq!(
+            Base64Wrapper { bytes: None },
+            serde_json::from_str("{}").unwrap()
+        );
+        assert_eq!(
+            I64Wrapper { num: None },
+            serde_json::from_str("{}").unwrap()
+        );
     }
 }

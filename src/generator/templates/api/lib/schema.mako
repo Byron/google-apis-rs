@@ -21,8 +21,6 @@ ${struct} {
     #[serde(default, with = "client::serde::urlsafe_base64")]
     % elif p.get("format") == "google-duration":
     #[serde(default, with = "client::serde::duration")]
-    % elif p.get("format") == "google-fieldmask":
-    #[serde(default, with = "client::serde::field_mask")]
     % elif p.get("format") in {"uint64", "int64"}:
     #[serde(default, with = "client::serde::str_like")]
     % endif

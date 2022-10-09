@@ -1,4 +1,5 @@
 pub mod serde;
+pub mod field_mask;
 
 use std::error;
 use std::error::Error as StdError;
@@ -25,8 +26,9 @@ use tokio::io::{AsyncRead, AsyncWrite};
 use tokio::time::sleep;
 use tower_service;
 
-pub use yup_oauth2 as oauth2;
 pub use chrono;
+pub use field_mask::FieldMask;
+pub use yup_oauth2 as oauth2;
 
 const LINE_ENDING: &str = "\r\n";
 
@@ -843,37 +845,6 @@ mod yup_oauth2_impl {
                 self.token(scopes).await.map(|t| Some(t.as_str().to_owned()))
             })
         }
-    }
-}
-
-fn titlecase(source: &str, dest: &mut String) {
-    let mut underscore = false;
-    for c in source.chars() {
-        if c == '_' {
-            underscore = true;
-        } else if underscore {
-            dest.push(c.to_ascii_uppercase());
-            underscore = false;
-        } else {
-            dest.push(c);
-        }
-    }
-}
-
-
-/// A `FieldMask` as defined in `https://github.com/protocolbuffers/protobuf/blob/ec1a70913e5793a7d0a7b5fbf7e0e4f75409dd41/src/google/protobuf/field_mask.proto#L180`
-#[derive(Debug, PartialEq, Default)]
-pub struct FieldMask(Vec<String>);
-
-impl FieldMask {
-    pub fn to_string(&self) -> String {
-        let mut repr = String::new();
-        for path in &self.0 {
-            titlecase(path, &mut repr);
-            repr.push(',');
-        }
-        repr.pop();
-        repr
     }
 }
 
