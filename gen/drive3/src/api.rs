@@ -14,7 +14,7 @@ use tokio::time::sleep;
 use tower_service;
 use serde::{Serialize, Deserialize};
 
-use crate::{client, client::GetToken, client::oauth2};
+use crate::{client, client::GetToken, client::oauth2, client::serde_with};
 
 // ##############
 // UTILITIES ###
@@ -90,7 +90,7 @@ impl Default for Scope {
 /// use drive3::{Result, Error};
 /// # async fn dox() {
 /// use std::default::Default;
-/// use drive3::{DriveHub, oauth2, hyper, hyper_rustls};
+/// use drive3::{DriveHub, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// // Get an ApplicationSecret instance by some means. It contains the `client_id` and 
 /// // `client_secret`, among other things.
@@ -161,7 +161,7 @@ impl<'a, S> DriveHub<S> {
         DriveHub {
             client,
             auth: Box::new(auth),
-            _user_agent: "google-api-rust-client/4.0.4".to_string(),
+            _user_agent: "google-api-rust-client/5.0.0".to_string(),
             _base_url: "https://www.googleapis.com/drive/v3/".to_string(),
             _root_url: "https://www.googleapis.com/".to_string(),
         }
@@ -199,7 +199,7 @@ impl<'a, S> DriveHub<S> {
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/4.0.4`.
+    /// It defaults to `google-api-rust-client/5.0.0`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -236,44 +236,60 @@ impl<'a, S> DriveHub<S> {
 /// 
 /// * [get about](AboutGetCall) (response)
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct About {
     /// Whether the user has installed the requesting app.
     #[serde(rename="appInstalled")]
+    
     pub app_installed: Option<bool>,
     /// Whether the user can create shared drives.
     #[serde(rename="canCreateDrives")]
+    
     pub can_create_drives: Option<bool>,
     /// Deprecated - use canCreateDrives instead.
     #[serde(rename="canCreateTeamDrives")]
+    
     pub can_create_team_drives: Option<bool>,
     /// A list of themes that are supported for shared drives.
     #[serde(rename="driveThemes")]
+    
     pub drive_themes: Option<Vec<AboutDriveThemes>>,
     /// A map of source MIME type to possible targets for all supported exports.
     #[serde(rename="exportFormats")]
+    
     pub export_formats: Option<HashMap<String, Vec<String>>>,
     /// The currently supported folder colors as RGB hex strings.
     #[serde(rename="folderColorPalette")]
+    
     pub folder_color_palette: Option<Vec<String>>,
     /// A map of source MIME type to possible targets for all supported imports.
     #[serde(rename="importFormats")]
+    
     pub import_formats: Option<HashMap<String, Vec<String>>>,
     /// Identifies what kind of resource this is. Value: the fixed string "drive#about".
+    
     pub kind: Option<String>,
     /// A map of maximum import sizes by MIME type, in bytes.
     #[serde(rename="maxImportSizes")]
-    pub max_import_sizes: Option<HashMap<String, String>>,
+    
+    #[serde_as(as = "Option<HashMap<_, ::client::serde_with::DisplayFromStr>>")]
+    pub max_import_sizes: Option<HashMap<String, i64>>,
     /// The maximum upload size in bytes.
     #[serde(rename="maxUploadSize")]
-    pub max_upload_size: Option<String>,
+    
+    #[serde_as(as = "Option<::client::serde_with::DisplayFromStr>")]
+    pub max_upload_size: Option<i64>,
     /// The user's storage quota limits and usage. All fields are measured in bytes.
     #[serde(rename="storageQuota")]
+    
     pub storage_quota: Option<AboutStorageQuota>,
     /// Deprecated - use driveThemes instead.
     #[serde(rename="teamDriveThemes")]
+    
     pub team_drive_themes: Option<Vec<AboutTeamDriveThemes>>,
     /// The authenticated user.
+    
     pub user: Option<User>,
 }
 
@@ -291,35 +307,47 @@ impl client::ResponseResult for About {}
 /// * [list changes](ChangeListCall) (none)
 /// * [watch changes](ChangeWatchCall) (none)
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Change {
     /// The type of the change. Possible values are file and drive.
     #[serde(rename="changeType")]
+    
     pub change_type: Option<String>,
     /// The updated state of the shared drive. Present if the changeType is drive, the user is still a member of the shared drive, and the shared drive has not been deleted.
+    
     pub drive: Option<Drive>,
     /// The ID of the shared drive associated with this change.
     #[serde(rename="driveId")]
+    
     pub drive_id: Option<String>,
     /// The updated state of the file. Present if the type is file and the file has not been removed from this list of changes.
+    
     pub file: Option<File>,
     /// The ID of the file which has changed.
     #[serde(rename="fileId")]
+    
     pub file_id: Option<String>,
     /// Identifies what kind of resource this is. Value: the fixed string "drive#change".
+    
     pub kind: Option<String>,
     /// Whether the file or shared drive has been removed from this list of changes, for example by deletion or loss of access.
+    
     pub removed: Option<bool>,
     /// Deprecated - use drive instead.
     #[serde(rename="teamDrive")]
+    
     pub team_drive: Option<TeamDrive>,
     /// Deprecated - use driveId instead.
     #[serde(rename="teamDriveId")]
+    
     pub team_drive_id: Option<String>,
     /// The time of this change (RFC 3339 date-time).
-    pub time: Option<String>,
+    
+    pub time: Option<client::chrono::DateTime<client::chrono::offset::Utc>>,
     /// Deprecated - use changeType instead.
     #[serde(rename="type")]
+    
     pub type_: Option<String>,
 }
 
@@ -335,17 +363,22 @@ impl client::Resource for Change {}
 /// 
 /// * [list changes](ChangeListCall) (response)
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ChangeList {
     /// The list of changes. If nextPageToken is populated, then this list may be incomplete and an additional page of results should be fetched.
+    
     pub changes: Option<Vec<Change>>,
     /// Identifies what kind of resource this is. Value: the fixed string "drive#changeList".
+    
     pub kind: Option<String>,
     /// The starting page token for future changes. This will be present only if the end of the current changes list has been reached.
     #[serde(rename="newStartPageToken")]
+    
     pub new_start_page_token: Option<String>,
     /// The page token for the next page of changes. This will be absent if the end of the changes list has been reached. If the token is rejected for any reason, it should be discarded, and pagination should be restarted from the first page of results.
     #[serde(rename="nextPageToken")]
+    
     pub next_page_token: Option<String>,
 }
 
@@ -363,30 +396,42 @@ impl client::ResponseResult for ChangeList {}
 /// * [stop channels](ChannelStopCall) (request)
 /// * [watch files](FileWatchCall) (request|response)
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Channel {
     /// The address where notifications are delivered for this channel.
+    
     pub address: Option<String>,
     /// Date and time of notification channel expiration, expressed as a Unix timestamp, in milliseconds. Optional.
-    pub expiration: Option<String>,
+    
+    #[serde_as(as = "Option<::client::serde_with::DisplayFromStr>")]
+    pub expiration: Option<i64>,
     /// A UUID or similar unique string that identifies this channel.
+    
     pub id: Option<String>,
     /// Identifies this as a notification channel used to watch for changes to a resource, which is "api#channel".
+    
     pub kind: Option<String>,
     /// Additional parameters controlling delivery channel behavior. Optional.
+    
     pub params: Option<HashMap<String, String>>,
     /// A Boolean value to indicate whether payload is wanted. Optional.
+    
     pub payload: Option<bool>,
     /// An opaque ID that identifies the resource being watched on this channel. Stable across different API versions.
     #[serde(rename="resourceId")]
+    
     pub resource_id: Option<String>,
     /// A version-specific identifier for the watched resource.
     #[serde(rename="resourceUri")]
+    
     pub resource_uri: Option<String>,
     /// An arbitrary string delivered to the target address with each notification delivered over this channel. Optional.
+    
     pub token: Option<String>,
     /// The type of delivery mechanism used for this channel. Valid values are "web_hook" (or "webhook"). Both values refer to a channel where Http requests are used to deliver messages.
     #[serde(rename="type")]
+    
     pub type_: Option<String>,
 }
 
@@ -408,35 +453,48 @@ impl client::ResponseResult for Channel {}
 /// * [list comments](CommentListCall) (none)
 /// * [update comments](CommentUpdateCall) (request|response)
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Comment {
     /// A region of the document represented as a JSON string. For details on defining anchor properties, refer to  Add comments and replies.
+    
     pub anchor: Option<String>,
     /// The author of the comment. The author's email address and permission ID will not be populated.
+    
     pub author: Option<User>,
     /// The plain text content of the comment. This field is used for setting the content, while htmlContent should be displayed.
+    
     pub content: Option<String>,
     /// The time at which the comment was created (RFC 3339 date-time).
     #[serde(rename="createdTime")]
-    pub created_time: Option<String>,
+    
+    pub created_time: Option<client::chrono::DateTime<client::chrono::offset::Utc>>,
     /// Whether the comment has been deleted. A deleted comment has no content.
+    
     pub deleted: Option<bool>,
     /// The content of the comment with HTML formatting.
     #[serde(rename="htmlContent")]
+    
     pub html_content: Option<String>,
     /// The ID of the comment.
+    
     pub id: Option<String>,
     /// Identifies what kind of resource this is. Value: the fixed string "drive#comment".
+    
     pub kind: Option<String>,
     /// The last time the comment or any of its replies was modified (RFC 3339 date-time).
     #[serde(rename="modifiedTime")]
-    pub modified_time: Option<String>,
+    
+    pub modified_time: Option<client::chrono::DateTime<client::chrono::offset::Utc>>,
     /// The file content to which the comment refers, typically within the anchor region. For a text file, for example, this would be the text at the location of the comment.
     #[serde(rename="quotedFileContent")]
+    
     pub quoted_file_content: Option<CommentQuotedFileContent>,
     /// The full list of replies to the comment in chronological order.
+    
     pub replies: Option<Vec<Reply>>,
     /// Whether the comment has been resolved by one of its replies.
+    
     pub resolved: Option<bool>,
 }
 
@@ -454,14 +512,18 @@ impl client::ResponseResult for Comment {}
 /// 
 /// * [list comments](CommentListCall) (response)
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct CommentList {
     /// The list of comments. If nextPageToken is populated, then this list may be incomplete and an additional page of results should be fetched.
+    
     pub comments: Option<Vec<Comment>>,
     /// Identifies what kind of resource this is. Value: the fixed string "drive#commentList".
+    
     pub kind: Option<String>,
     /// The page token for the next page of comments. This will be absent if the end of the comments list has been reached. If the token is rejected for any reason, it should be discarded, and pagination should be restarted from the first page of results.
     #[serde(rename="nextPageToken")]
+    
     pub next_page_token: Option<String>,
 }
 
@@ -472,21 +534,27 @@ impl client::ResponseResult for CommentList {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ContentRestriction {
     /// Whether the content of the file is read-only. If a file is read-only, a new revision of the file may not be added, comments may not be added or modified, and the title of the file may not be modified.
     #[serde(rename="readOnly")]
+    
     pub read_only: Option<bool>,
     /// Reason for why the content of the file is restricted. This is only mutable on requests that also set readOnly=true.
+    
     pub reason: Option<String>,
     /// The user who set the content restriction. Only populated if readOnly is true.
     #[serde(rename="restrictingUser")]
+    
     pub restricting_user: Option<User>,
     /// The time at which the content restriction was set (formatted RFC 3339 timestamp). Only populated if readOnly is true.
     #[serde(rename="restrictionTime")]
-    pub restriction_time: Option<String>,
+    
+    pub restriction_time: Option<client::chrono::DateTime<client::chrono::offset::Utc>>,
     /// The type of the content restriction. Currently the only possible value is globalContentRestriction.
     #[serde(rename="type")]
+    
     pub type_: Option<String>,
 }
 
@@ -508,37 +576,50 @@ impl client::Part for ContentRestriction {}
 /// * [unhide drives](DriveUnhideCall) (response)
 /// * [update drives](DriveUpdateCall) (request|response)
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Drive {
     /// An image file and cropping parameters from which a background image for this shared drive is set. This is a write only field; it can only be set on drive.drives.update requests that don't set themeId. When specified, all fields of the backgroundImageFile must be set.
     #[serde(rename="backgroundImageFile")]
+    
     pub background_image_file: Option<DriveBackgroundImageFile>,
     /// A short-lived link to this shared drive's background image.
     #[serde(rename="backgroundImageLink")]
+    
     pub background_image_link: Option<String>,
     /// Capabilities the current user has on this shared drive.
+    
     pub capabilities: Option<DriveCapabilities>,
     /// The color of this shared drive as an RGB hex string. It can only be set on a drive.drives.update request that does not set themeId.
     #[serde(rename="colorRgb")]
+    
     pub color_rgb: Option<String>,
     /// The time at which the shared drive was created (RFC 3339 date-time).
     #[serde(rename="createdTime")]
-    pub created_time: Option<String>,
+    
+    pub created_time: Option<client::chrono::DateTime<client::chrono::offset::Utc>>,
     /// Whether the shared drive is hidden from default view.
+    
     pub hidden: Option<bool>,
     /// The ID of this shared drive which is also the ID of the top level folder of this shared drive.
+    
     pub id: Option<String>,
     /// Identifies what kind of resource this is. Value: the fixed string "drive#drive".
+    
     pub kind: Option<String>,
     /// The name of this shared drive.
+    
     pub name: Option<String>,
     /// The organizational unit of this shared drive. This field is only populated on drives.list responses when the useDomainAdminAccess parameter is set to true.
     #[serde(rename="orgUnitId")]
+    
     pub org_unit_id: Option<String>,
     /// A set of restrictions that apply to this shared drive or items inside this shared drive.
+    
     pub restrictions: Option<DriveRestrictions>,
     /// The ID of the theme from which the background image and color will be set. The set of possible driveThemes can be retrieved from a drive.about.get response. When not specified on a drive.drives.create request, a random theme is chosen from which the background image and color are set. This is a write-only field; it can only be set on requests that don't set colorRgb or backgroundImageFile.
     #[serde(rename="themeId")]
+    
     pub theme_id: Option<String>,
 }
 
@@ -556,14 +637,18 @@ impl client::ResponseResult for Drive {}
 /// 
 /// * [list drives](DriveListCall) (response)
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct DriveList {
     /// The list of shared drives. If nextPageToken is populated, then this list may be incomplete and an additional page of results should be fetched.
+    
     pub drives: Option<Vec<Drive>>,
     /// Identifies what kind of resource this is. Value: the fixed string "drive#driveList".
+    
     pub kind: Option<String>,
     /// The page token for the next page of shared drives. This will be absent if the end of the list has been reached. If the token is rejected for any reason, it should be discarded, and pagination should be restarted from the first page of results.
     #[serde(rename="nextPageToken")]
+    
     pub next_page_token: Option<String>,
 }
 
@@ -588,177 +673,241 @@ impl client::ResponseResult for DriveList {}
 /// * [update files](FileUpdateCall) (request|response)
 /// * [watch files](FileWatchCall) (none)
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct File {
     /// A collection of arbitrary key-value pairs which are private to the requesting app.
     /// Entries with null values are cleared in update and copy requests. These properties can only be retrieved using an authenticated request. An authenticated request uses an access token obtained with a OAuth 2 client ID. You cannot use an API key to retrieve private properties.
     #[serde(rename="appProperties")]
+    
     pub app_properties: Option<HashMap<String, String>>,
     /// Capabilities the current user has on this file. Each capability corresponds to a fine-grained action that a user may take.
+    
     pub capabilities: Option<FileCapabilities>,
     /// Additional information about the content of the file. These fields are never populated in responses.
     #[serde(rename="contentHints")]
+    
     pub content_hints: Option<FileContentHints>,
     /// Restrictions for accessing the content of the file. Only populated if such a restriction exists.
     #[serde(rename="contentRestrictions")]
+    
     pub content_restrictions: Option<Vec<ContentRestriction>>,
     /// Whether the options to copy, print, or download this file, should be disabled for readers and commenters.
     #[serde(rename="copyRequiresWriterPermission")]
+    
     pub copy_requires_writer_permission: Option<bool>,
     /// The time at which the file was created (RFC 3339 date-time).
     #[serde(rename="createdTime")]
-    pub created_time: Option<String>,
+    
+    pub created_time: Option<client::chrono::DateTime<client::chrono::offset::Utc>>,
     /// A short description of the file.
+    
     pub description: Option<String>,
     /// ID of the shared drive the file resides in. Only populated for items in shared drives.
     #[serde(rename="driveId")]
+    
     pub drive_id: Option<String>,
     /// Whether the file has been explicitly trashed, as opposed to recursively trashed from a parent folder.
     #[serde(rename="explicitlyTrashed")]
+    
     pub explicitly_trashed: Option<bool>,
     /// Links for exporting Docs Editors files to specific formats.
     #[serde(rename="exportLinks")]
+    
     pub export_links: Option<HashMap<String, String>>,
     /// The final component of fullFileExtension. This is only available for files with binary content in Google Drive.
     #[serde(rename="fileExtension")]
+    
     pub file_extension: Option<String>,
     /// The color for a folder or shortcut to a folder as an RGB hex string. The supported colors are published in the folderColorPalette field of the About resource.
     /// If an unsupported color is specified, the closest color in the palette will be used instead.
     #[serde(rename="folderColorRgb")]
+    
     pub folder_color_rgb: Option<String>,
     /// The full file extension extracted from the name field. May contain multiple concatenated extensions, such as "tar.gz". This is only available for files with binary content in Google Drive.
     /// This is automatically updated when the name field changes, however it is not cleared if the new name does not contain a valid extension.
     #[serde(rename="fullFileExtension")]
+    
     pub full_file_extension: Option<String>,
     /// Whether there are permissions directly on this file. This field is only populated for items in shared drives.
     #[serde(rename="hasAugmentedPermissions")]
+    
     pub has_augmented_permissions: Option<bool>,
     /// Whether this file has a thumbnail. This does not indicate whether the requesting app has access to the thumbnail. To check access, look for the presence of the thumbnailLink field.
     #[serde(rename="hasThumbnail")]
+    
     pub has_thumbnail: Option<bool>,
     /// The ID of the file's head revision. This is currently only available for files with binary content in Google Drive.
     #[serde(rename="headRevisionId")]
+    
     pub head_revision_id: Option<String>,
     /// A static, unauthenticated link to the file's icon.
     #[serde(rename="iconLink")]
+    
     pub icon_link: Option<String>,
     /// The ID of the file.
+    
     pub id: Option<String>,
     /// Additional metadata about image media, if available.
     #[serde(rename="imageMediaMetadata")]
+    
     pub image_media_metadata: Option<FileImageMediaMetadata>,
     /// Whether the file was created or opened by the requesting app.
     #[serde(rename="isAppAuthorized")]
+    
     pub is_app_authorized: Option<bool>,
     /// Identifies what kind of resource this is. Value: the fixed string "drive#file".
+    
     pub kind: Option<String>,
     /// The last user to modify the file.
     #[serde(rename="lastModifyingUser")]
+    
     pub last_modifying_user: Option<User>,
     /// Contains details about the link URLs that clients are using to refer to this item.
     #[serde(rename="linkShareMetadata")]
+    
     pub link_share_metadata: Option<FileLinkShareMetadata>,
     /// The MD5 checksum for the content of the file. This is only applicable to files with binary content in Google Drive.
     #[serde(rename="md5Checksum")]
+    
     pub md5_checksum: Option<String>,
     /// The MIME type of the file.
     /// Google Drive will attempt to automatically detect an appropriate value from uploaded content if no value is provided. The value cannot be changed unless a new revision is uploaded.
     /// If a file is created with a Google Doc MIME type, the uploaded content will be imported if possible. The supported import formats are published in the About resource.
     #[serde(rename="mimeType")]
+    
     pub mime_type: Option<String>,
     /// Whether the file has been modified by this user.
     #[serde(rename="modifiedByMe")]
+    
     pub modified_by_me: Option<bool>,
     /// The last time the file was modified by the user (RFC 3339 date-time).
     #[serde(rename="modifiedByMeTime")]
-    pub modified_by_me_time: Option<String>,
+    
+    pub modified_by_me_time: Option<client::chrono::DateTime<client::chrono::offset::Utc>>,
     /// The last time the file was modified by anyone (RFC 3339 date-time).
     /// Note that setting modifiedTime will also update modifiedByMeTime for the user.
     #[serde(rename="modifiedTime")]
-    pub modified_time: Option<String>,
+    
+    pub modified_time: Option<client::chrono::DateTime<client::chrono::offset::Utc>>,
     /// The name of the file. This is not necessarily unique within a folder. Note that for immutable items such as the top level folders of shared drives, My Drive root folder, and Application Data folder the name is constant.
+    
     pub name: Option<String>,
     /// The original filename of the uploaded content if available, or else the original value of the name field. This is only available for files with binary content in Google Drive.
     #[serde(rename="originalFilename")]
+    
     pub original_filename: Option<String>,
     /// Whether the user owns the file. Not populated for items in shared drives.
     #[serde(rename="ownedByMe")]
+    
     pub owned_by_me: Option<bool>,
     /// The owner of this file. Only certain legacy files may have more than one owner. This field isn't populated for items in shared drives.
+    
     pub owners: Option<Vec<User>>,
     /// The IDs of the parent folders which contain the file.
     /// If not specified as part of a create request, the file will be placed directly in the user's My Drive folder. If not specified as part of a copy request, the file will inherit any discoverable parents of the source file. Update requests must use the addParents and removeParents parameters to modify the parents list.
+    
     pub parents: Option<Vec<String>>,
     /// List of permission IDs for users with access to this file.
     #[serde(rename="permissionIds")]
+    
     pub permission_ids: Option<Vec<String>>,
     /// The full list of permissions for the file. This is only available if the requesting user can share the file. Not populated for items in shared drives.
+    
     pub permissions: Option<Vec<Permission>>,
     /// A collection of arbitrary key-value pairs which are visible to all apps.
     /// Entries with null values are cleared in update and copy requests.
+    
     pub properties: Option<HashMap<String, String>>,
     /// The number of storage quota bytes used by the file. This includes the head revision as well as previous revisions with keepForever enabled.
     #[serde(rename="quotaBytesUsed")]
-    pub quota_bytes_used: Option<String>,
+    
+    #[serde_as(as = "Option<::client::serde_with::DisplayFromStr>")]
+    pub quota_bytes_used: Option<i64>,
     /// A key needed to access the item via a shared link.
     #[serde(rename="resourceKey")]
+    
     pub resource_key: Option<String>,
     /// Whether the file has been shared. Not populated for items in shared drives.
+    
     pub shared: Option<bool>,
     /// The time at which the file was shared with the user, if applicable (RFC 3339 date-time).
     #[serde(rename="sharedWithMeTime")]
-    pub shared_with_me_time: Option<String>,
+    
+    pub shared_with_me_time: Option<client::chrono::DateTime<client::chrono::offset::Utc>>,
     /// The user who shared the file with the requesting user, if applicable.
     #[serde(rename="sharingUser")]
+    
     pub sharing_user: Option<User>,
     /// Shortcut file details. Only populated for shortcut files, which have the mimeType field set to application/vnd.google-apps.shortcut.
     #[serde(rename="shortcutDetails")]
+    
     pub shortcut_details: Option<FileShortcutDetails>,
     /// The size of the file's content in bytes. This is applicable to binary files in Google Drive and Google Docs files.
-    pub size: Option<String>,
+    
+    #[serde_as(as = "Option<::client::serde_with::DisplayFromStr>")]
+    pub size: Option<i64>,
     /// The list of spaces which contain the file. The currently supported values are 'drive', 'appDataFolder' and 'photos'.
+    
     pub spaces: Option<Vec<String>>,
     /// Whether the user has starred the file.
+    
     pub starred: Option<bool>,
     /// Deprecated - use driveId instead.
     #[serde(rename="teamDriveId")]
+    
     pub team_drive_id: Option<String>,
     /// A short-lived link to the file's thumbnail, if available. Typically lasts on the order of hours. Only populated when the requesting app can access the file's content. If the file isn't shared publicly, the URL returned in Files.thumbnailLink must be fetched using a credentialed request.
     #[serde(rename="thumbnailLink")]
+    
     pub thumbnail_link: Option<String>,
     /// The thumbnail version for use in thumbnail cache invalidation.
     #[serde(rename="thumbnailVersion")]
-    pub thumbnail_version: Option<String>,
+    
+    #[serde_as(as = "Option<::client::serde_with::DisplayFromStr>")]
+    pub thumbnail_version: Option<i64>,
     /// Whether the file has been trashed, either explicitly or from a trashed parent folder. Only the owner may trash a file. The trashed item is excluded from all files.list responses returned for any user who does not own the file. However, all users with access to the file can see the trashed item metadata in an API response. All users with access can copy, download, export, and share the file.
+    
     pub trashed: Option<bool>,
     /// The time that the item was trashed (RFC 3339 date-time). Only populated for items in shared drives.
     #[serde(rename="trashedTime")]
-    pub trashed_time: Option<String>,
+    
+    pub trashed_time: Option<client::chrono::DateTime<client::chrono::offset::Utc>>,
     /// If the file has been explicitly trashed, the user who trashed it. Only populated for items in shared drives.
     #[serde(rename="trashingUser")]
+    
     pub trashing_user: Option<User>,
     /// A monotonically increasing version number for the file. This reflects every change made to the file on the server, even those not visible to the user.
-    pub version: Option<String>,
+    
+    #[serde_as(as = "Option<::client::serde_with::DisplayFromStr>")]
+    pub version: Option<i64>,
     /// Additional metadata about video media. This may not be available immediately upon upload.
     #[serde(rename="videoMediaMetadata")]
+    
     pub video_media_metadata: Option<FileVideoMediaMetadata>,
     /// Whether the file has been viewed by this user.
     #[serde(rename="viewedByMe")]
+    
     pub viewed_by_me: Option<bool>,
     /// The last time the file was viewed by the user (RFC 3339 date-time).
     #[serde(rename="viewedByMeTime")]
-    pub viewed_by_me_time: Option<String>,
+    
+    pub viewed_by_me_time: Option<client::chrono::DateTime<client::chrono::offset::Utc>>,
     /// Deprecated - use copyRequiresWriterPermission instead.
     #[serde(rename="viewersCanCopyContent")]
+    
     pub viewers_can_copy_content: Option<bool>,
     /// A link for downloading the content of the file in a browser. This is only available for files with binary content in Google Drive.
     #[serde(rename="webContentLink")]
+    
     pub web_content_link: Option<String>,
     /// A link for opening the file in a relevant Google editor or viewer in a browser.
     #[serde(rename="webViewLink")]
+    
     pub web_view_link: Option<String>,
     /// Whether users with only writer permission can modify the file's permissions. Not populated for items in shared drives.
     #[serde(rename="writersCanShare")]
+    
     pub writers_can_share: Option<bool>,
 }
 
@@ -776,17 +925,22 @@ impl client::ResponseResult for File {}
 /// 
 /// * [list files](FileListCall) (response)
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct FileList {
     /// The list of files. If nextPageToken is populated, then this list may be incomplete and an additional page of results should be fetched.
+    
     pub files: Option<Vec<File>>,
     /// Whether the search process was incomplete. If true, then some search results may be missing, since all documents were not searched. This may occur when searching multiple drives with the "allDrives" corpora, but all corpora could not be searched. When this happens, it is suggested that clients narrow their query by choosing a different corpus such as "user" or "drive".
     #[serde(rename="incompleteSearch")]
+    
     pub incomplete_search: Option<bool>,
     /// Identifies what kind of resource this is. Value: the fixed string "drive#fileList".
+    
     pub kind: Option<String>,
     /// The page token for the next page of files. This will be absent if the end of the files list has been reached. If the token is rejected for any reason, it should be discarded, and pagination should be restarted from the first page of results.
     #[serde(rename="nextPageToken")]
+    
     pub next_page_token: Option<String>,
 }
 
@@ -802,13 +956,17 @@ impl client::ResponseResult for FileList {}
 /// 
 /// * [generate ids files](FileGenerateIdCall) (response)
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GeneratedIds {
     /// The IDs generated for the requesting user in the specified space.
+    
     pub ids: Option<Vec<String>>,
     /// Identifies what kind of resource this is. Value: the fixed string "drive#generatedIds".
+    
     pub kind: Option<String>,
     /// The type of file that can be created with these IDs.
+    
     pub space: Option<String>,
 }
 
@@ -828,12 +986,15 @@ impl client::ResponseResult for GeneratedIds {}
 /// * [list permissions](PermissionListCall) (none)
 /// * [update permissions](PermissionUpdateCall) (request|response)
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Permission {
     /// Whether the permission allows the file to be discovered through search. This is only applicable for permissions of type domain or anyone.
     #[serde(rename="allowFileDiscovery")]
+    
     pub allow_file_discovery: Option<bool>,
     /// Whether the account associated with this permission has been deleted. This field only pertains to user and group permissions.
+    
     pub deleted: Option<bool>,
     /// The "pretty" name of the value of the permission. The following is a list of examples for each type of permission:  
     /// - user - User's full name, as defined for their Google account, such as "Joe Smith." 
@@ -841,30 +1002,39 @@ pub struct Permission {
     /// - domain - String domain name, such as "thecompany.com." 
     /// - anyone - No displayName is present.
     #[serde(rename="displayName")]
+    
     pub display_name: Option<String>,
     /// The domain to which this permission refers.
+    
     pub domain: Option<String>,
     /// The email address of the user or group to which this permission refers.
     #[serde(rename="emailAddress")]
+    
     pub email_address: Option<String>,
     /// The time at which this permission will expire (RFC 3339 date-time). Expiration times have the following restrictions:  
     /// - They can only be set on user and group permissions 
     /// - The time must be in the future 
     /// - The time cannot be more than a year in the future
     #[serde(rename="expirationTime")]
-    pub expiration_time: Option<String>,
+    
+    pub expiration_time: Option<client::chrono::DateTime<client::chrono::offset::Utc>>,
     /// The ID of this permission. This is a unique identifier for the grantee, and is published in User resources as permissionId. IDs should be treated as opaque values.
+    
     pub id: Option<String>,
     /// Identifies what kind of resource this is. Value: the fixed string "drive#permission".
+    
     pub kind: Option<String>,
     /// Whether the account associated with this permission is a pending owner. Only populated for user type permissions for files that are not in a shared drive.
     #[serde(rename="pendingOwner")]
+    
     pub pending_owner: Option<bool>,
     /// Details of whether the permissions on this shared drive item are inherited or directly on this item. This is an output-only field which is present only for shared drive items.
     #[serde(rename="permissionDetails")]
+    
     pub permission_details: Option<Vec<PermissionPermissionDetails>>,
     /// A link to the user's profile photo, if available.
     #[serde(rename="photoLink")]
+    
     pub photo_link: Option<String>,
     /// The role granted by this permission. While new values may be supported in the future, the following are currently allowed:  
     /// - owner 
@@ -873,9 +1043,11 @@ pub struct Permission {
     /// - writer 
     /// - commenter 
     /// - reader
+    
     pub role: Option<String>,
     /// Deprecated - use permissionDetails instead.
     #[serde(rename="teamDrivePermissionDetails")]
+    
     pub team_drive_permission_details: Option<Vec<PermissionTeamDrivePermissionDetails>>,
     /// The type of the grantee. Valid values are:  
     /// - user 
@@ -883,8 +1055,10 @@ pub struct Permission {
     /// - domain 
     /// - anyone  When creating a permission, if type is user or group, you must provide an emailAddress for the user or group. When type is domain, you must provide a domain. There isn't extra information required for a anyone type.
     #[serde(rename="type")]
+    
     pub type_: Option<String>,
     /// Indicates the view for this permission. Only populated for permissions that belong to a view. published is the only supported value.
+    
     pub view: Option<String>,
 }
 
@@ -902,14 +1076,18 @@ impl client::ResponseResult for Permission {}
 /// 
 /// * [list permissions](PermissionListCall) (response)
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PermissionList {
     /// Identifies what kind of resource this is. Value: the fixed string "drive#permissionList".
+    
     pub kind: Option<String>,
     /// The page token for the next page of permissions. This field will be absent if the end of the permissions list has been reached. If the token is rejected for any reason, it should be discarded, and pagination should be restarted from the first page of results.
     #[serde(rename="nextPageToken")]
+    
     pub next_page_token: Option<String>,
     /// The list of permissions. If nextPageToken is populated, then this list may be incomplete and an additional page of results should be fetched.
+    
     pub permissions: Option<Vec<Permission>>,
 }
 
@@ -927,31 +1105,41 @@ impl client::ResponseResult for PermissionList {}
 /// * [get replies](ReplyGetCall) (response)
 /// * [update replies](ReplyUpdateCall) (request|response)
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Reply {
     /// The action the reply performed to the parent comment. Valid values are:  
     /// - resolve 
     /// - reopen
+    
     pub action: Option<String>,
     /// The author of the reply. The author's email address and permission ID will not be populated.
+    
     pub author: Option<User>,
     /// The plain text content of the reply. This field is used for setting the content, while htmlContent should be displayed. This is required on creates if no action is specified.
+    
     pub content: Option<String>,
     /// The time at which the reply was created (RFC 3339 date-time).
     #[serde(rename="createdTime")]
-    pub created_time: Option<String>,
+    
+    pub created_time: Option<client::chrono::DateTime<client::chrono::offset::Utc>>,
     /// Whether the reply has been deleted. A deleted reply has no content.
+    
     pub deleted: Option<bool>,
     /// The content of the reply with HTML formatting.
     #[serde(rename="htmlContent")]
+    
     pub html_content: Option<String>,
     /// The ID of the reply.
+    
     pub id: Option<String>,
     /// Identifies what kind of resource this is. Value: the fixed string "drive#reply".
+    
     pub kind: Option<String>,
     /// The last time the reply was modified (RFC 3339 date-time).
     #[serde(rename="modifiedTime")]
-    pub modified_time: Option<String>,
+    
+    pub modified_time: Option<client::chrono::DateTime<client::chrono::offset::Utc>>,
 }
 
 impl client::RequestValue for Reply {}
@@ -967,14 +1155,18 @@ impl client::ResponseResult for Reply {}
 /// 
 /// * [list replies](ReplyListCall) (response)
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ReplyList {
     /// Identifies what kind of resource this is. Value: the fixed string "drive#replyList".
+    
     pub kind: Option<String>,
     /// The page token for the next page of replies. This will be absent if the end of the replies list has been reached. If the token is rejected for any reason, it should be discarded, and pagination should be restarted from the first page of results.
     #[serde(rename="nextPageToken")]
+    
     pub next_page_token: Option<String>,
     /// The list of replies. If nextPageToken is populated, then this list may be incomplete and an additional page of results should be fetched.
+    
     pub replies: Option<Vec<Reply>>,
 }
 
@@ -993,47 +1185,63 @@ impl client::ResponseResult for ReplyList {}
 /// * [list revisions](RevisionListCall) (none)
 /// * [update revisions](RevisionUpdateCall) (request|response)
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Revision {
     /// Links for exporting Docs Editors files to specific formats.
     #[serde(rename="exportLinks")]
+    
     pub export_links: Option<HashMap<String, String>>,
     /// The ID of the revision.
+    
     pub id: Option<String>,
     /// Whether to keep this revision forever, even if it is no longer the head revision. If not set, the revision will be automatically purged 30 days after newer content is uploaded. This can be set on a maximum of 200 revisions for a file.
     /// This field is only applicable to files with binary content in Drive.
     #[serde(rename="keepForever")]
+    
     pub keep_forever: Option<bool>,
     /// Identifies what kind of resource this is. Value: the fixed string "drive#revision".
+    
     pub kind: Option<String>,
     /// The last user to modify this revision.
     #[serde(rename="lastModifyingUser")]
+    
     pub last_modifying_user: Option<User>,
     /// The MD5 checksum of the revision's content. This is only applicable to files with binary content in Drive.
     #[serde(rename="md5Checksum")]
+    
     pub md5_checksum: Option<String>,
     /// The MIME type of the revision.
     #[serde(rename="mimeType")]
+    
     pub mime_type: Option<String>,
     /// The last time the revision was modified (RFC 3339 date-time).
     #[serde(rename="modifiedTime")]
-    pub modified_time: Option<String>,
+    
+    pub modified_time: Option<client::chrono::DateTime<client::chrono::offset::Utc>>,
     /// The original filename used to create this revision. This is only applicable to files with binary content in Drive.
     #[serde(rename="originalFilename")]
+    
     pub original_filename: Option<String>,
     /// Whether subsequent revisions will be automatically republished. This is only applicable to Docs Editors files.
     #[serde(rename="publishAuto")]
+    
     pub publish_auto: Option<bool>,
     /// Whether this revision is published. This is only applicable to Docs Editors files.
+    
     pub published: Option<bool>,
     /// A link to the published revision. This is only populated for Google Sites files.
     #[serde(rename="publishedLink")]
+    
     pub published_link: Option<String>,
     /// Whether this revision is published outside the domain. This is only applicable to Docs Editors files.
     #[serde(rename="publishedOutsideDomain")]
+    
     pub published_outside_domain: Option<bool>,
     /// The size of the revision's content in bytes. This is only applicable to files with binary content in Drive.
-    pub size: Option<String>,
+    
+    #[serde_as(as = "Option<::client::serde_with::DisplayFromStr>")]
+    pub size: Option<i64>,
 }
 
 impl client::RequestValue for Revision {}
@@ -1050,14 +1258,18 @@ impl client::ResponseResult for Revision {}
 /// 
 /// * [list revisions](RevisionListCall) (response)
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct RevisionList {
     /// Identifies what kind of resource this is. Value: the fixed string "drive#revisionList".
+    
     pub kind: Option<String>,
     /// The page token for the next page of revisions. This will be absent if the end of the revisions list has been reached. If the token is rejected for any reason, it should be discarded, and pagination should be restarted from the first page of results.
     #[serde(rename="nextPageToken")]
+    
     pub next_page_token: Option<String>,
     /// The list of revisions. If nextPageToken is populated, then this list may be incomplete and an additional page of results should be fetched.
+    
     pub revisions: Option<Vec<Revision>>,
 }
 
@@ -1073,12 +1285,15 @@ impl client::ResponseResult for RevisionList {}
 /// 
 /// * [get start page token changes](ChangeGetStartPageTokenCall) (response)
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct StartPageToken {
     /// Identifies what kind of resource this is. Value: the fixed string "drive#startPageToken".
+    
     pub kind: Option<String>,
     /// The starting page token for listing changes.
     #[serde(rename="startPageToken")]
+    
     pub start_page_token: Option<String>,
 }
 
@@ -1096,35 +1311,47 @@ impl client::ResponseResult for StartPageToken {}
 /// * [get teamdrives](TeamdriveGetCall) (response)
 /// * [update teamdrives](TeamdriveUpdateCall) (request|response)
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct TeamDrive {
     /// An image file and cropping parameters from which a background image for this Team Drive is set. This is a write only field; it can only be set on drive.teamdrives.update requests that don't set themeId. When specified, all fields of the backgroundImageFile must be set.
     #[serde(rename="backgroundImageFile")]
+    
     pub background_image_file: Option<TeamDriveBackgroundImageFile>,
     /// A short-lived link to this Team Drive's background image.
     #[serde(rename="backgroundImageLink")]
+    
     pub background_image_link: Option<String>,
     /// Capabilities the current user has on this Team Drive.
+    
     pub capabilities: Option<TeamDriveCapabilities>,
     /// The color of this Team Drive as an RGB hex string. It can only be set on a drive.teamdrives.update request that does not set themeId.
     #[serde(rename="colorRgb")]
+    
     pub color_rgb: Option<String>,
     /// The time at which the Team Drive was created (RFC 3339 date-time).
     #[serde(rename="createdTime")]
-    pub created_time: Option<String>,
+    
+    pub created_time: Option<client::chrono::DateTime<client::chrono::offset::Utc>>,
     /// The ID of this Team Drive which is also the ID of the top level folder of this Team Drive.
+    
     pub id: Option<String>,
     /// Identifies what kind of resource this is. Value: the fixed string "drive#teamDrive".
+    
     pub kind: Option<String>,
     /// The name of this Team Drive.
+    
     pub name: Option<String>,
     /// The organizational unit of this shared drive. This field is only populated on drives.list responses when the useDomainAdminAccess parameter is set to true.
     #[serde(rename="orgUnitId")]
+    
     pub org_unit_id: Option<String>,
     /// A set of restrictions that apply to this Team Drive or items inside this Team Drive.
+    
     pub restrictions: Option<TeamDriveRestrictions>,
     /// The ID of the theme from which the background image and color will be set. The set of possible teamDriveThemes can be retrieved from a drive.about.get response. When not specified on a drive.teamdrives.create request, a random theme is chosen from which the background image and color are set. This is a write-only field; it can only be set on requests that don't set colorRgb or backgroundImageFile.
     #[serde(rename="themeId")]
+    
     pub theme_id: Option<String>,
 }
 
@@ -1142,15 +1369,19 @@ impl client::ResponseResult for TeamDrive {}
 /// 
 /// * [list teamdrives](TeamdriveListCall) (response)
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct TeamDriveList {
     /// Identifies what kind of resource this is. Value: the fixed string "drive#teamDriveList".
+    
     pub kind: Option<String>,
     /// The page token for the next page of Team Drives. This will be absent if the end of the Team Drives list has been reached. If the token is rejected for any reason, it should be discarded, and pagination should be restarted from the first page of results.
     #[serde(rename="nextPageToken")]
+    
     pub next_page_token: Option<String>,
     /// The list of Team Drives. If nextPageToken is populated, then this list may be incomplete and an additional page of results should be fetched.
     #[serde(rename="teamDrives")]
+    
     pub team_drives: Option<Vec<TeamDrive>>,
 }
 
@@ -1161,23 +1392,30 @@ impl client::ResponseResult for TeamDriveList {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct User {
     /// A plain text displayable name for this user.
     #[serde(rename="displayName")]
+    
     pub display_name: Option<String>,
     /// The email address of the user. This may not be present in certain contexts if the user has not made their email address visible to the requester.
     #[serde(rename="emailAddress")]
+    
     pub email_address: Option<String>,
     /// Identifies what kind of resource this is. Value: the fixed string "drive#user".
+    
     pub kind: Option<String>,
     /// Whether this user is the requesting user.
+    
     pub me: Option<bool>,
     /// The user's ID as visible in Permission resources.
     #[serde(rename="permissionId")]
+    
     pub permission_id: Option<String>,
     /// A link to the user's profile photo, if available.
     #[serde(rename="photoLink")]
+    
     pub photo_link: Option<String>,
 }
 
@@ -1188,15 +1426,19 @@ impl client::Part for User {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AboutDriveThemes {
     /// A link to this theme's background image.
     #[serde(rename="backgroundImageLink")]
+    
     pub background_image_link: Option<String>,
     /// The color of this theme as an RGB hex string.
     #[serde(rename="colorRgb")]
+    
     pub color_rgb: Option<String>,
     /// The ID of the theme.
+    
     pub id: Option<String>,
 }
 
@@ -1208,18 +1450,27 @@ impl client::Part for AboutDriveThemes {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AboutStorageQuota {
     /// The usage limit, if applicable. This will not be present if the user has unlimited storage.
-    pub limit: Option<String>,
+    
+    #[serde_as(as = "Option<::client::serde_with::DisplayFromStr>")]
+    pub limit: Option<i64>,
     /// The total usage across all services.
-    pub usage: Option<String>,
+    
+    #[serde_as(as = "Option<::client::serde_with::DisplayFromStr>")]
+    pub usage: Option<i64>,
     /// The usage by all files in Google Drive.
     #[serde(rename="usageInDrive")]
-    pub usage_in_drive: Option<String>,
+    
+    #[serde_as(as = "Option<::client::serde_with::DisplayFromStr>")]
+    pub usage_in_drive: Option<i64>,
     /// The usage by trashed files in Google Drive.
     #[serde(rename="usageInDriveTrash")]
-    pub usage_in_drive_trash: Option<String>,
+    
+    #[serde_as(as = "Option<::client::serde_with::DisplayFromStr>")]
+    pub usage_in_drive_trash: Option<i64>,
 }
 
 impl client::NestedType for AboutStorageQuota {}
@@ -1230,15 +1481,19 @@ impl client::Part for AboutStorageQuota {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AboutTeamDriveThemes {
     /// Deprecated - use driveThemes/backgroundImageLink instead.
     #[serde(rename="backgroundImageLink")]
+    
     pub background_image_link: Option<String>,
     /// Deprecated - use driveThemes/colorRgb instead.
     #[serde(rename="colorRgb")]
+    
     pub color_rgb: Option<String>,
     /// Deprecated - use driveThemes/id instead.
+    
     pub id: Option<String>,
 }
 
@@ -1250,12 +1505,15 @@ impl client::Part for AboutTeamDriveThemes {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct CommentQuotedFileContent {
     /// The MIME type of the quoted content.
     #[serde(rename="mimeType")]
+    
     pub mime_type: Option<String>,
     /// The quoted content itself. This is interpreted as plain text if set through the API.
+    
     pub value: Option<String>,
 }
 
@@ -1267,17 +1525,22 @@ impl client::Part for CommentQuotedFileContent {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct DriveBackgroundImageFile {
     /// The ID of an image file in Google Drive to use for the background image.
+    
     pub id: Option<String>,
     /// The width of the cropped image in the closed range of 0 to 1. This value represents the width of the cropped image divided by the width of the entire image. The height is computed by applying a width to height aspect ratio of 80 to 9. The resulting image must be at least 1280 pixels wide and 144 pixels high.
+    
     pub width: Option<f32>,
     /// The X coordinate of the upper left corner of the cropping area in the background image. This is a value in the closed range of 0 to 1. This value represents the horizontal distance from the left side of the entire image to the left side of the cropping area divided by the width of the entire image.
     #[serde(rename="xCoordinate")]
+    
     pub x_coordinate: Option<f32>,
     /// The Y coordinate of the upper left corner of the cropping area in the background image. This is a value in the closed range of 0 to 1. This value represents the vertical distance from the top side of the entire image to the top side of the cropping area divided by the height of the entire image.
     #[serde(rename="yCoordinate")]
+    
     pub y_coordinate: Option<f32>,
 }
 
@@ -1289,61 +1552,80 @@ impl client::Part for DriveBackgroundImageFile {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct DriveCapabilities {
     /// Whether the current user can add children to folders in this shared drive.
     #[serde(rename="canAddChildren")]
+    
     pub can_add_children: Option<bool>,
     /// Whether the current user can change the copyRequiresWriterPermission restriction of this shared drive.
     #[serde(rename="canChangeCopyRequiresWriterPermissionRestriction")]
+    
     pub can_change_copy_requires_writer_permission_restriction: Option<bool>,
     /// Whether the current user can change the domainUsersOnly restriction of this shared drive.
     #[serde(rename="canChangeDomainUsersOnlyRestriction")]
+    
     pub can_change_domain_users_only_restriction: Option<bool>,
     /// Whether the current user can change the background of this shared drive.
     #[serde(rename="canChangeDriveBackground")]
+    
     pub can_change_drive_background: Option<bool>,
     /// Whether the current user can change the driveMembersOnly restriction of this shared drive.
     #[serde(rename="canChangeDriveMembersOnlyRestriction")]
+    
     pub can_change_drive_members_only_restriction: Option<bool>,
     /// Whether the current user can comment on files in this shared drive.
     #[serde(rename="canComment")]
+    
     pub can_comment: Option<bool>,
     /// Whether the current user can copy files in this shared drive.
     #[serde(rename="canCopy")]
+    
     pub can_copy: Option<bool>,
     /// Whether the current user can delete children from folders in this shared drive.
     #[serde(rename="canDeleteChildren")]
+    
     pub can_delete_children: Option<bool>,
     /// Whether the current user can delete this shared drive. Attempting to delete the shared drive may still fail if there are untrashed items inside the shared drive.
     #[serde(rename="canDeleteDrive")]
+    
     pub can_delete_drive: Option<bool>,
     /// Whether the current user can download files in this shared drive.
     #[serde(rename="canDownload")]
+    
     pub can_download: Option<bool>,
     /// Whether the current user can edit files in this shared drive
     #[serde(rename="canEdit")]
+    
     pub can_edit: Option<bool>,
     /// Whether the current user can list the children of folders in this shared drive.
     #[serde(rename="canListChildren")]
+    
     pub can_list_children: Option<bool>,
     /// Whether the current user can add members to this shared drive or remove them or change their role.
     #[serde(rename="canManageMembers")]
+    
     pub can_manage_members: Option<bool>,
     /// Whether the current user can read the revisions resource of files in this shared drive.
     #[serde(rename="canReadRevisions")]
+    
     pub can_read_revisions: Option<bool>,
     /// Whether the current user can rename files or folders in this shared drive.
     #[serde(rename="canRename")]
+    
     pub can_rename: Option<bool>,
     /// Whether the current user can rename this shared drive.
     #[serde(rename="canRenameDrive")]
+    
     pub can_rename_drive: Option<bool>,
     /// Whether the current user can share files or folders in this shared drive.
     #[serde(rename="canShare")]
+    
     pub can_share: Option<bool>,
     /// Whether the current user can trash children from folders in this shared drive.
     #[serde(rename="canTrashChildren")]
+    
     pub can_trash_children: Option<bool>,
 }
 
@@ -1355,19 +1637,24 @@ impl client::Part for DriveCapabilities {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct DriveRestrictions {
     /// Whether administrative privileges on this shared drive are required to modify restrictions.
     #[serde(rename="adminManagedRestrictions")]
+    
     pub admin_managed_restrictions: Option<bool>,
     /// Whether the options to copy, print, or download files inside this shared drive, should be disabled for readers and commenters. When this restriction is set to true, it will override the similarly named field to true for any file inside this shared drive.
     #[serde(rename="copyRequiresWriterPermission")]
+    
     pub copy_requires_writer_permission: Option<bool>,
     /// Whether access to this shared drive and items inside this shared drive is restricted to users of the domain to which this shared drive belongs. This restriction may be overridden by other sharing policies controlled outside of this shared drive.
     #[serde(rename="domainUsersOnly")]
+    
     pub domain_users_only: Option<bool>,
     /// Whether access to items inside this shared drive is restricted to its members.
     #[serde(rename="driveMembersOnly")]
+    
     pub drive_members_only: Option<bool>,
 }
 
@@ -1379,115 +1666,152 @@ impl client::Part for DriveRestrictions {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct FileCapabilities {
     /// Whether the current user is the pending owner of the file. Not populated for shared drive files.
     #[serde(rename="canAcceptOwnership")]
+    
     pub can_accept_ownership: Option<bool>,
     /// Whether the current user can add children to this folder. This is always false when the item is not a folder.
     #[serde(rename="canAddChildren")]
+    
     pub can_add_children: Option<bool>,
     /// Whether the current user can add a folder from another drive (different shared drive or My Drive) to this folder. This is false when the item is not a folder. Only populated for items in shared drives.
     #[serde(rename="canAddFolderFromAnotherDrive")]
+    
     pub can_add_folder_from_another_drive: Option<bool>,
     /// Whether the current user can add a parent for the item without removing an existing parent in the same request. Not populated for shared drive files.
     #[serde(rename="canAddMyDriveParent")]
+    
     pub can_add_my_drive_parent: Option<bool>,
     /// Whether the current user can change the copyRequiresWriterPermission restriction of this file.
     #[serde(rename="canChangeCopyRequiresWriterPermission")]
+    
     pub can_change_copy_requires_writer_permission: Option<bool>,
     /// Whether the current user can change the securityUpdateEnabled field on link share metadata.
     #[serde(rename="canChangeSecurityUpdateEnabled")]
+    
     pub can_change_security_update_enabled: Option<bool>,
     /// Deprecated
     #[serde(rename="canChangeViewersCanCopyContent")]
+    
     pub can_change_viewers_can_copy_content: Option<bool>,
     /// Whether the current user can comment on this file.
     #[serde(rename="canComment")]
+    
     pub can_comment: Option<bool>,
     /// Whether the current user can copy this file. For an item in a shared drive, whether the current user can copy non-folder descendants of this item, or this item itself if it is not a folder.
     #[serde(rename="canCopy")]
+    
     pub can_copy: Option<bool>,
     /// Whether the current user can delete this file.
     #[serde(rename="canDelete")]
+    
     pub can_delete: Option<bool>,
     /// Whether the current user can delete children of this folder. This is false when the item is not a folder. Only populated for items in shared drives.
     #[serde(rename="canDeleteChildren")]
+    
     pub can_delete_children: Option<bool>,
     /// Whether the current user can download this file.
     #[serde(rename="canDownload")]
+    
     pub can_download: Option<bool>,
     /// Whether the current user can edit this file. Other factors may limit the type of changes a user can make to a file. For example, see canChangeCopyRequiresWriterPermission or canModifyContent.
     #[serde(rename="canEdit")]
+    
     pub can_edit: Option<bool>,
     /// Whether the current user can list the children of this folder. This is always false when the item is not a folder.
     #[serde(rename="canListChildren")]
+    
     pub can_list_children: Option<bool>,
     /// Whether the current user can modify the content of this file.
     #[serde(rename="canModifyContent")]
+    
     pub can_modify_content: Option<bool>,
     /// Whether the current user can modify restrictions on content of this file.
     #[serde(rename="canModifyContentRestriction")]
+    
     pub can_modify_content_restriction: Option<bool>,
     /// Whether the current user can move children of this folder outside of the shared drive. This is false when the item is not a folder. Only populated for items in shared drives.
     #[serde(rename="canMoveChildrenOutOfDrive")]
+    
     pub can_move_children_out_of_drive: Option<bool>,
     /// Deprecated - use canMoveChildrenOutOfDrive instead.
     #[serde(rename="canMoveChildrenOutOfTeamDrive")]
+    
     pub can_move_children_out_of_team_drive: Option<bool>,
     /// Whether the current user can move children of this folder within this drive. This is false when the item is not a folder. Note that a request to move the child may still fail depending on the current user's access to the child and to the destination folder.
     #[serde(rename="canMoveChildrenWithinDrive")]
+    
     pub can_move_children_within_drive: Option<bool>,
     /// Deprecated - use canMoveChildrenWithinDrive instead.
     #[serde(rename="canMoveChildrenWithinTeamDrive")]
+    
     pub can_move_children_within_team_drive: Option<bool>,
     /// Deprecated - use canMoveItemOutOfDrive instead.
     #[serde(rename="canMoveItemIntoTeamDrive")]
+    
     pub can_move_item_into_team_drive: Option<bool>,
     /// Whether the current user can move this item outside of this drive by changing its parent. Note that a request to change the parent of the item may still fail depending on the new parent that is being added.
     #[serde(rename="canMoveItemOutOfDrive")]
+    
     pub can_move_item_out_of_drive: Option<bool>,
     /// Deprecated - use canMoveItemOutOfDrive instead.
     #[serde(rename="canMoveItemOutOfTeamDrive")]
+    
     pub can_move_item_out_of_team_drive: Option<bool>,
     /// Whether the current user can move this item within this drive. Note that a request to change the parent of the item may still fail depending on the new parent that is being added and the parent that is being removed.
     #[serde(rename="canMoveItemWithinDrive")]
+    
     pub can_move_item_within_drive: Option<bool>,
     /// Deprecated - use canMoveItemWithinDrive instead.
     #[serde(rename="canMoveItemWithinTeamDrive")]
+    
     pub can_move_item_within_team_drive: Option<bool>,
     /// Deprecated - use canMoveItemWithinDrive or canMoveItemOutOfDrive instead.
     #[serde(rename="canMoveTeamDriveItem")]
+    
     pub can_move_team_drive_item: Option<bool>,
     /// Whether the current user can read the shared drive to which this file belongs. Only populated for items in shared drives.
     #[serde(rename="canReadDrive")]
+    
     pub can_read_drive: Option<bool>,
     /// Whether the current user can read the revisions resource of this file. For a shared drive item, whether revisions of non-folder descendants of this item, or this item itself if it is not a folder, can be read.
     #[serde(rename="canReadRevisions")]
+    
     pub can_read_revisions: Option<bool>,
     /// Deprecated - use canReadDrive instead.
     #[serde(rename="canReadTeamDrive")]
+    
     pub can_read_team_drive: Option<bool>,
     /// Whether the current user can remove children from this folder. This is always false when the item is not a folder. For a folder in a shared drive, use canDeleteChildren or canTrashChildren instead.
     #[serde(rename="canRemoveChildren")]
+    
     pub can_remove_children: Option<bool>,
     /// Whether the current user can remove a parent from the item without adding another parent in the same request. Not populated for shared drive files.
     #[serde(rename="canRemoveMyDriveParent")]
+    
     pub can_remove_my_drive_parent: Option<bool>,
     /// Whether the current user can rename this file.
     #[serde(rename="canRename")]
+    
     pub can_rename: Option<bool>,
     /// Whether the current user can modify the sharing settings for this file.
     #[serde(rename="canShare")]
+    
     pub can_share: Option<bool>,
     /// Whether the current user can move this file to trash.
     #[serde(rename="canTrash")]
+    
     pub can_trash: Option<bool>,
     /// Whether the current user can trash children of this folder. This is false when the item is not a folder. Only populated for items in shared drives.
     #[serde(rename="canTrashChildren")]
+    
     pub can_trash_children: Option<bool>,
     /// Whether the current user can restore this file from trash.
     #[serde(rename="canUntrash")]
+    
     pub can_untrash: Option<bool>,
 }
 
@@ -1499,12 +1823,15 @@ impl client::Part for FileCapabilities {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct FileContentHints {
     /// Text to be indexed for the file to improve fullText queries. This is limited to 128KB in length and may contain HTML elements.
     #[serde(rename="indexableText")]
+    
     pub indexable_text: Option<String>,
     /// A thumbnail for the file. This will only be used if Google Drive cannot generate a standard thumbnail.
+    
     pub thumbnail: Option<FileContentHintsThumbnail>,
 }
 
@@ -1516,12 +1843,16 @@ impl client::Part for FileContentHints {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct FileContentHintsThumbnail {
     /// The thumbnail data encoded with URL-safe Base64 (RFC 4648 section 5).
-    pub image: Option<String>,
+    
+    #[serde_as(as = "Option<::client::serde::urlsafe_base64::Wrapper>")]
+    pub image: Option<Vec<u8>>,
     /// The MIME type of the thumbnail.
     #[serde(rename="mimeType")]
+    
     pub mime_type: Option<String>,
 }
 
@@ -1533,62 +1864,84 @@ impl client::Part for FileContentHintsThumbnail {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct FileImageMediaMetadata {
     /// The aperture used to create the photo (f-number).
+    
     pub aperture: Option<f32>,
     /// The make of the camera used to create the photo.
     #[serde(rename="cameraMake")]
+    
     pub camera_make: Option<String>,
     /// The model of the camera used to create the photo.
     #[serde(rename="cameraModel")]
+    
     pub camera_model: Option<String>,
     /// The color space of the photo.
     #[serde(rename="colorSpace")]
+    
     pub color_space: Option<String>,
     /// The exposure bias of the photo (APEX value).
     #[serde(rename="exposureBias")]
+    
     pub exposure_bias: Option<f32>,
     /// The exposure mode used to create the photo.
     #[serde(rename="exposureMode")]
+    
     pub exposure_mode: Option<String>,
     /// The length of the exposure, in seconds.
     #[serde(rename="exposureTime")]
+    
     pub exposure_time: Option<f32>,
     /// Whether a flash was used to create the photo.
     #[serde(rename="flashUsed")]
+    
     pub flash_used: Option<bool>,
     /// The focal length used to create the photo, in millimeters.
     #[serde(rename="focalLength")]
+    
     pub focal_length: Option<f32>,
     /// The height of the image in pixels.
+    
     pub height: Option<i32>,
     /// The ISO speed used to create the photo.
     #[serde(rename="isoSpeed")]
+    
     pub iso_speed: Option<i32>,
     /// The lens used to create the photo.
+    
     pub lens: Option<String>,
     /// Geographic location information stored in the image.
+    
     pub location: Option<FileImageMediaMetadataLocation>,
     /// The smallest f-number of the lens at the focal length used to create the photo (APEX value).
     #[serde(rename="maxApertureValue")]
+    
     pub max_aperture_value: Option<f32>,
     /// The metering mode used to create the photo.
     #[serde(rename="meteringMode")]
+    
     pub metering_mode: Option<String>,
     /// The number of clockwise 90 degree rotations applied from the image's original orientation.
+    
     pub rotation: Option<i32>,
     /// The type of sensor used to create the photo.
+    
     pub sensor: Option<String>,
     /// The distance to the subject of the photo, in meters.
     #[serde(rename="subjectDistance")]
+    
     pub subject_distance: Option<i32>,
     /// The date and time the photo was taken (EXIF DateTime).
+    
     pub time: Option<String>,
     /// The white balance mode used to create the photo.
     #[serde(rename="whiteBalance")]
+    
     pub white_balance: Option<String>,
     /// The width of the image in pixels.
+    
     pub width: Option<i32>,
 }
 
@@ -1600,13 +1953,17 @@ impl client::Part for FileImageMediaMetadata {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct FileImageMediaMetadataLocation {
     /// The altitude stored in the image.
+    
     pub altitude: Option<f64>,
     /// The latitude stored in the image.
+    
     pub latitude: Option<f64>,
     /// The longitude stored in the image.
+    
     pub longitude: Option<f64>,
 }
 
@@ -1618,13 +1975,16 @@ impl client::Part for FileImageMediaMetadataLocation {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct FileLinkShareMetadata {
     /// Whether the file is eligible for security update.
     #[serde(rename="securityUpdateEligible")]
+    
     pub security_update_eligible: Option<bool>,
     /// Whether the security update is enabled for this file.
     #[serde(rename="securityUpdateEnabled")]
+    
     pub security_update_enabled: Option<bool>,
 }
 
@@ -1636,16 +1996,20 @@ impl client::Part for FileLinkShareMetadata {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct FileShortcutDetails {
     /// The ID of the file that this shortcut points to.
     #[serde(rename="targetId")]
+    
     pub target_id: Option<String>,
     /// The MIME type of the file that this shortcut points to. The value of this field is a snapshot of the target's MIME type, captured when the shortcut is created.
     #[serde(rename="targetMimeType")]
+    
     pub target_mime_type: Option<String>,
     /// The ResourceKey for the target file.
     #[serde(rename="targetResourceKey")]
+    
     pub target_resource_key: Option<String>,
 }
 
@@ -1657,14 +2021,19 @@ impl client::Part for FileShortcutDetails {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct FileVideoMediaMetadata {
     /// The duration of the video in milliseconds.
     #[serde(rename="durationMillis")]
-    pub duration_millis: Option<String>,
+    
+    #[serde_as(as = "Option<::client::serde_with::DisplayFromStr>")]
+    pub duration_millis: Option<i64>,
     /// The height of the video in pixels.
+    
     pub height: Option<i32>,
     /// The width of the video in pixels.
+    
     pub width: Option<i32>,
 }
 
@@ -1676,17 +2045,21 @@ impl client::Part for FileVideoMediaMetadata {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PermissionPermissionDetails {
     /// Whether this permission is inherited. This field is always populated. This is an output-only field.
+    
     pub inherited: Option<bool>,
     /// The ID of the item from which this permission is inherited. This is an output-only field.
     #[serde(rename="inheritedFrom")]
+    
     pub inherited_from: Option<String>,
     /// The permission type for this user. While new values may be added in future, the following are currently possible:  
     /// - file 
     /// - member
     #[serde(rename="permissionType")]
+    
     pub permission_type: Option<String>,
     /// The primary role for this user. While new values may be added in the future, the following are currently possible:  
     /// - organizer 
@@ -1694,6 +2067,7 @@ pub struct PermissionPermissionDetails {
     /// - writer 
     /// - commenter 
     /// - reader
+    
     pub role: Option<String>,
 }
 
@@ -1705,17 +2079,22 @@ impl client::Part for PermissionPermissionDetails {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PermissionTeamDrivePermissionDetails {
     /// Deprecated - use permissionDetails/inherited instead.
+    
     pub inherited: Option<bool>,
     /// Deprecated - use permissionDetails/inheritedFrom instead.
     #[serde(rename="inheritedFrom")]
+    
     pub inherited_from: Option<String>,
     /// Deprecated - use permissionDetails/role instead.
+    
     pub role: Option<String>,
     /// Deprecated - use permissionDetails/permissionType instead.
     #[serde(rename="teamDrivePermissionType")]
+    
     pub team_drive_permission_type: Option<String>,
 }
 
@@ -1727,17 +2106,22 @@ impl client::Part for PermissionTeamDrivePermissionDetails {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct TeamDriveBackgroundImageFile {
     /// The ID of an image file in Drive to use for the background image.
+    
     pub id: Option<String>,
     /// The width of the cropped image in the closed range of 0 to 1. This value represents the width of the cropped image divided by the width of the entire image. The height is computed by applying a width to height aspect ratio of 80 to 9. The resulting image must be at least 1280 pixels wide and 144 pixels high.
+    
     pub width: Option<f32>,
     /// The X coordinate of the upper left corner of the cropping area in the background image. This is a value in the closed range of 0 to 1. This value represents the horizontal distance from the left side of the entire image to the left side of the cropping area divided by the width of the entire image.
     #[serde(rename="xCoordinate")]
+    
     pub x_coordinate: Option<f32>,
     /// The Y coordinate of the upper left corner of the cropping area in the background image. This is a value in the closed range of 0 to 1. This value represents the vertical distance from the top side of the entire image to the top side of the cropping area divided by the height of the entire image.
     #[serde(rename="yCoordinate")]
+    
     pub y_coordinate: Option<f32>,
 }
 
@@ -1749,64 +2133,84 @@ impl client::Part for TeamDriveBackgroundImageFile {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct TeamDriveCapabilities {
     /// Whether the current user can add children to folders in this Team Drive.
     #[serde(rename="canAddChildren")]
+    
     pub can_add_children: Option<bool>,
     /// Whether the current user can change the copyRequiresWriterPermission restriction of this Team Drive.
     #[serde(rename="canChangeCopyRequiresWriterPermissionRestriction")]
+    
     pub can_change_copy_requires_writer_permission_restriction: Option<bool>,
     /// Whether the current user can change the domainUsersOnly restriction of this Team Drive.
     #[serde(rename="canChangeDomainUsersOnlyRestriction")]
+    
     pub can_change_domain_users_only_restriction: Option<bool>,
     /// Whether the current user can change the background of this Team Drive.
     #[serde(rename="canChangeTeamDriveBackground")]
+    
     pub can_change_team_drive_background: Option<bool>,
     /// Whether the current user can change the teamMembersOnly restriction of this Team Drive.
     #[serde(rename="canChangeTeamMembersOnlyRestriction")]
+    
     pub can_change_team_members_only_restriction: Option<bool>,
     /// Whether the current user can comment on files in this Team Drive.
     #[serde(rename="canComment")]
+    
     pub can_comment: Option<bool>,
     /// Whether the current user can copy files in this Team Drive.
     #[serde(rename="canCopy")]
+    
     pub can_copy: Option<bool>,
     /// Whether the current user can delete children from folders in this Team Drive.
     #[serde(rename="canDeleteChildren")]
+    
     pub can_delete_children: Option<bool>,
     /// Whether the current user can delete this Team Drive. Attempting to delete the Team Drive may still fail if there are untrashed items inside the Team Drive.
     #[serde(rename="canDeleteTeamDrive")]
+    
     pub can_delete_team_drive: Option<bool>,
     /// Whether the current user can download files in this Team Drive.
     #[serde(rename="canDownload")]
+    
     pub can_download: Option<bool>,
     /// Whether the current user can edit files in this Team Drive
     #[serde(rename="canEdit")]
+    
     pub can_edit: Option<bool>,
     /// Whether the current user can list the children of folders in this Team Drive.
     #[serde(rename="canListChildren")]
+    
     pub can_list_children: Option<bool>,
     /// Whether the current user can add members to this Team Drive or remove them or change their role.
     #[serde(rename="canManageMembers")]
+    
     pub can_manage_members: Option<bool>,
     /// Whether the current user can read the revisions resource of files in this Team Drive.
     #[serde(rename="canReadRevisions")]
+    
     pub can_read_revisions: Option<bool>,
     /// Deprecated - use canDeleteChildren or canTrashChildren instead.
     #[serde(rename="canRemoveChildren")]
+    
     pub can_remove_children: Option<bool>,
     /// Whether the current user can rename files or folders in this Team Drive.
     #[serde(rename="canRename")]
+    
     pub can_rename: Option<bool>,
     /// Whether the current user can rename this Team Drive.
     #[serde(rename="canRenameTeamDrive")]
+    
     pub can_rename_team_drive: Option<bool>,
     /// Whether the current user can share files or folders in this Team Drive.
     #[serde(rename="canShare")]
+    
     pub can_share: Option<bool>,
     /// Whether the current user can trash children from folders in this Team Drive.
     #[serde(rename="canTrashChildren")]
+    
     pub can_trash_children: Option<bool>,
 }
 
@@ -1818,19 +2222,24 @@ impl client::Part for TeamDriveCapabilities {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct TeamDriveRestrictions {
     /// Whether administrative privileges on this Team Drive are required to modify restrictions.
     #[serde(rename="adminManagedRestrictions")]
+    
     pub admin_managed_restrictions: Option<bool>,
     /// Whether the options to copy, print, or download files inside this Team Drive, should be disabled for readers and commenters. When this restriction is set to true, it will override the similarly named field to true for any file inside this Team Drive.
     #[serde(rename="copyRequiresWriterPermission")]
+    
     pub copy_requires_writer_permission: Option<bool>,
     /// Whether access to this Team Drive and items inside this Team Drive is restricted to users of the domain to which this Team Drive belongs. This restriction may be overridden by other sharing policies controlled outside of this Team Drive.
     #[serde(rename="domainUsersOnly")]
+    
     pub domain_users_only: Option<bool>,
     /// Whether access to items inside this Team Drive is restricted to members of this Team Drive.
     #[serde(rename="teamMembersOnly")]
+    
     pub team_members_only: Option<bool>,
 }
 
@@ -1857,7 +2266,7 @@ impl client::Part for TeamDriveRestrictions {}
 /// 
 /// # async fn dox() {
 /// use std::default::Default;
-/// use drive3::{DriveHub, oauth2, hyper, hyper_rustls};
+/// use drive3::{DriveHub, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// let secret: oauth2::ApplicationSecret = Default::default();
 /// let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -1910,7 +2319,7 @@ impl<'a, S> AboutMethods<'a, S> {
 /// 
 /// # async fn dox() {
 /// use std::default::Default;
-/// use drive3::{DriveHub, oauth2, hyper, hyper_rustls};
+/// use drive3::{DriveHub, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// let secret: oauth2::ApplicationSecret = Default::default();
 /// let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -2027,7 +2436,7 @@ impl<'a, S> ChangeMethods<'a, S> {
 /// 
 /// # async fn dox() {
 /// use std::default::Default;
-/// use drive3::{DriveHub, oauth2, hyper, hyper_rustls};
+/// use drive3::{DriveHub, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// let secret: oauth2::ApplicationSecret = Default::default();
 /// let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -2085,7 +2494,7 @@ impl<'a, S> ChannelMethods<'a, S> {
 /// 
 /// # async fn dox() {
 /// use std::default::Default;
-/// use drive3::{DriveHub, oauth2, hyper, hyper_rustls};
+/// use drive3::{DriveHub, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// let secret: oauth2::ApplicationSecret = Default::default();
 /// let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -2226,7 +2635,7 @@ impl<'a, S> CommentMethods<'a, S> {
 /// 
 /// # async fn dox() {
 /// use std::default::Default;
-/// use drive3::{DriveHub, oauth2, hyper, hyper_rustls};
+/// use drive3::{DriveHub, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// let secret: oauth2::ApplicationSecret = Default::default();
 /// let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -2391,7 +2800,7 @@ impl<'a, S> DriveMethods<'a, S> {
 /// 
 /// # async fn dox() {
 /// use std::default::Default;
-/// use drive3::{DriveHub, oauth2, hyper, hyper_rustls};
+/// use drive3::{DriveHub, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// let secret: oauth2::ApplicationSecret = Default::default();
 /// let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -2648,7 +3057,7 @@ impl<'a, S> FileMethods<'a, S> {
 /// 
 /// # async fn dox() {
 /// use std::default::Default;
-/// use drive3::{DriveHub, oauth2, hyper, hyper_rustls};
+/// use drive3::{DriveHub, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// let secret: oauth2::ApplicationSecret = Default::default();
 /// let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -2809,7 +3218,7 @@ impl<'a, S> PermissionMethods<'a, S> {
 /// 
 /// # async fn dox() {
 /// use std::default::Default;
-/// use drive3::{DriveHub, oauth2, hyper, hyper_rustls};
+/// use drive3::{DriveHub, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// let secret: oauth2::ApplicationSecret = Default::default();
 /// let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -2959,7 +3368,7 @@ impl<'a, S> ReplyMethods<'a, S> {
 /// 
 /// # async fn dox() {
 /// use std::default::Default;
-/// use drive3::{DriveHub, oauth2, hyper, hyper_rustls};
+/// use drive3::{DriveHub, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// let secret: oauth2::ApplicationSecret = Default::default();
 /// let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -3079,7 +3488,7 @@ impl<'a, S> RevisionMethods<'a, S> {
 /// 
 /// # async fn dox() {
 /// use std::default::Default;
-/// use drive3::{DriveHub, oauth2, hyper, hyper_rustls};
+/// use drive3::{DriveHub, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// let secret: oauth2::ApplicationSecret = Default::default();
 /// let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -3217,7 +3626,7 @@ impl<'a, S> TeamdriveMethods<'a, S> {
 /// # extern crate google_drive3 as drive3;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use drive3::{DriveHub, oauth2, hyper, hyper_rustls};
+/// # use drive3::{DriveHub, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
 /// # let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -3378,7 +3787,8 @@ where
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.````
     ///
     /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AboutGetCall<'a, S> {
@@ -3449,7 +3859,7 @@ where
 /// # extern crate google_drive3 as drive3;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use drive3::{DriveHub, oauth2, hyper, hyper_rustls};
+/// # use drive3::{DriveHub, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
 /// # let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -3505,17 +3915,17 @@ where
         dlg.begin(client::MethodInfo { id: "drive.changes.getStartPageToken",
                                http_method: hyper::Method::GET });
         let mut params: Vec<(&str, String)> = Vec::with_capacity(6 + self._additional_params.len());
-        if let Some(value) = self._team_drive_id {
-            params.push(("teamDriveId", value.to_string()));
+        if let Some(value) = self._team_drive_id.as_ref() {
+            params.push(("teamDriveId", (|x: &dyn std::fmt::Display| x.to_string())(value)));
         }
-        if let Some(value) = self._supports_team_drives {
-            params.push(("supportsTeamDrives", value.to_string()));
+        if let Some(value) = self._supports_team_drives.as_ref() {
+            params.push(("supportsTeamDrives", (|x: &dyn std::fmt::Display| x.to_string())(value)));
         }
-        if let Some(value) = self._supports_all_drives {
-            params.push(("supportsAllDrives", value.to_string()));
+        if let Some(value) = self._supports_all_drives.as_ref() {
+            params.push(("supportsAllDrives", (|x: &dyn std::fmt::Display| x.to_string())(value)));
         }
-        if let Some(value) = self._drive_id {
-            params.push(("driveId", value.to_string()));
+        if let Some(value) = self._drive_id.as_ref() {
+            params.push(("driveId", (|x: &dyn std::fmt::Display| x.to_string())(value)));
         }
         for &field in ["alt", "teamDriveId", "supportsTeamDrives", "supportsAllDrives", "driveId"].iter() {
             if self._additional_params.contains_key(field) {
@@ -3658,7 +4068,8 @@ where
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.````
     ///
     /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ChangeGetStartPageTokenCall<'a, S> {
@@ -3729,7 +4140,7 @@ where
 /// # extern crate google_drive3 as drive3;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use drive3::{DriveHub, oauth2, hyper, hyper_rustls};
+/// # use drive3::{DriveHub, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
 /// # let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -3802,42 +4213,42 @@ where
         dlg.begin(client::MethodInfo { id: "drive.changes.list",
                                http_method: hyper::Method::GET });
         let mut params: Vec<(&str, String)> = Vec::with_capacity(15 + self._additional_params.len());
-        params.push(("pageToken", self._page_token.to_string()));
-        if let Some(value) = self._team_drive_id {
-            params.push(("teamDriveId", value.to_string()));
+        params.push(("pageToken", (|x: &dyn std::fmt::Display| x.to_string())(&self._page_token)));
+        if let Some(value) = self._team_drive_id.as_ref() {
+            params.push(("teamDriveId", (|x: &dyn std::fmt::Display| x.to_string())(value)));
         }
-        if let Some(value) = self._supports_team_drives {
-            params.push(("supportsTeamDrives", value.to_string()));
+        if let Some(value) = self._supports_team_drives.as_ref() {
+            params.push(("supportsTeamDrives", (|x: &dyn std::fmt::Display| x.to_string())(value)));
         }
-        if let Some(value) = self._supports_all_drives {
-            params.push(("supportsAllDrives", value.to_string()));
+        if let Some(value) = self._supports_all_drives.as_ref() {
+            params.push(("supportsAllDrives", (|x: &dyn std::fmt::Display| x.to_string())(value)));
         }
-        if let Some(value) = self._spaces {
-            params.push(("spaces", value.to_string()));
+        if let Some(value) = self._spaces.as_ref() {
+            params.push(("spaces", (|x: &dyn std::fmt::Display| x.to_string())(value)));
         }
-        if let Some(value) = self._restrict_to_my_drive {
-            params.push(("restrictToMyDrive", value.to_string()));
+        if let Some(value) = self._restrict_to_my_drive.as_ref() {
+            params.push(("restrictToMyDrive", (|x: &dyn std::fmt::Display| x.to_string())(value)));
         }
-        if let Some(value) = self._page_size {
-            params.push(("pageSize", value.to_string()));
+        if let Some(value) = self._page_size.as_ref() {
+            params.push(("pageSize", (|x: &dyn std::fmt::Display| x.to_string())(value)));
         }
-        if let Some(value) = self._include_team_drive_items {
-            params.push(("includeTeamDriveItems", value.to_string()));
+        if let Some(value) = self._include_team_drive_items.as_ref() {
+            params.push(("includeTeamDriveItems", (|x: &dyn std::fmt::Display| x.to_string())(value)));
         }
-        if let Some(value) = self._include_removed {
-            params.push(("includeRemoved", value.to_string()));
+        if let Some(value) = self._include_removed.as_ref() {
+            params.push(("includeRemoved", (|x: &dyn std::fmt::Display| x.to_string())(value)));
         }
-        if let Some(value) = self._include_permissions_for_view {
-            params.push(("includePermissionsForView", value.to_string()));
+        if let Some(value) = self._include_permissions_for_view.as_ref() {
+            params.push(("includePermissionsForView", (|x: &dyn std::fmt::Display| x.to_string())(value)));
         }
-        if let Some(value) = self._include_items_from_all_drives {
-            params.push(("includeItemsFromAllDrives", value.to_string()));
+        if let Some(value) = self._include_items_from_all_drives.as_ref() {
+            params.push(("includeItemsFromAllDrives", (|x: &dyn std::fmt::Display| x.to_string())(value)));
         }
-        if let Some(value) = self._include_corpus_removals {
-            params.push(("includeCorpusRemovals", value.to_string()));
+        if let Some(value) = self._include_corpus_removals.as_ref() {
+            params.push(("includeCorpusRemovals", (|x: &dyn std::fmt::Display| x.to_string())(value)));
         }
-        if let Some(value) = self._drive_id {
-            params.push(("driveId", value.to_string()));
+        if let Some(value) = self._drive_id.as_ref() {
+            params.push(("driveId", (|x: &dyn std::fmt::Display| x.to_string())(value)));
         }
         for &field in ["alt", "pageToken", "teamDriveId", "supportsTeamDrives", "supportsAllDrives", "spaces", "restrictToMyDrive", "pageSize", "includeTeamDriveItems", "includeRemoved", "includePermissionsForView", "includeItemsFromAllDrives", "includeCorpusRemovals", "driveId"].iter() {
             if self._additional_params.contains_key(field) {
@@ -4046,7 +4457,8 @@ where
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.````
     ///
     /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ChangeListCall<'a, S> {
@@ -4118,7 +4530,7 @@ where
 /// use drive3::api::Channel;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use drive3::{DriveHub, oauth2, hyper, hyper_rustls};
+/// # use drive3::{DriveHub, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
 /// # let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -4197,42 +4609,42 @@ where
         dlg.begin(client::MethodInfo { id: "drive.changes.watch",
                                http_method: hyper::Method::POST });
         let mut params: Vec<(&str, String)> = Vec::with_capacity(16 + self._additional_params.len());
-        params.push(("pageToken", self._page_token.to_string()));
-        if let Some(value) = self._team_drive_id {
-            params.push(("teamDriveId", value.to_string()));
+        params.push(("pageToken", (|x: &dyn std::fmt::Display| x.to_string())(&self._page_token)));
+        if let Some(value) = self._team_drive_id.as_ref() {
+            params.push(("teamDriveId", (|x: &dyn std::fmt::Display| x.to_string())(value)));
         }
-        if let Some(value) = self._supports_team_drives {
-            params.push(("supportsTeamDrives", value.to_string()));
+        if let Some(value) = self._supports_team_drives.as_ref() {
+            params.push(("supportsTeamDrives", (|x: &dyn std::fmt::Display| x.to_string())(value)));
         }
-        if let Some(value) = self._supports_all_drives {
-            params.push(("supportsAllDrives", value.to_string()));
+        if let Some(value) = self._supports_all_drives.as_ref() {
+            params.push(("supportsAllDrives", (|x: &dyn std::fmt::Display| x.to_string())(value)));
         }
-        if let Some(value) = self._spaces {
-            params.push(("spaces", value.to_string()));
+        if let Some(value) = self._spaces.as_ref() {
+            params.push(("spaces", (|x: &dyn std::fmt::Display| x.to_string())(value)));
         }
-        if let Some(value) = self._restrict_to_my_drive {
-            params.push(("restrictToMyDrive", value.to_string()));
+        if let Some(value) = self._restrict_to_my_drive.as_ref() {
+            params.push(("restrictToMyDrive", (|x: &dyn std::fmt::Display| x.to_string())(value)));
         }
-        if let Some(value) = self._page_size {
-            params.push(("pageSize", value.to_string()));
+        if let Some(value) = self._page_size.as_ref() {
+            params.push(("pageSize", (|x: &dyn std::fmt::Display| x.to_string())(value)));
         }
-        if let Some(value) = self._include_team_drive_items {
-            params.push(("includeTeamDriveItems", value.to_string()));
+        if let Some(value) = self._include_team_drive_items.as_ref() {
+            params.push(("includeTeamDriveItems", (|x: &dyn std::fmt::Display| x.to_string())(value)));
         }
-        if let Some(value) = self._include_removed {
-            params.push(("includeRemoved", value.to_string()));
+        if let Some(value) = self._include_removed.as_ref() {
+            params.push(("includeRemoved", (|x: &dyn std::fmt::Display| x.to_string())(value)));
         }
-        if let Some(value) = self._include_permissions_for_view {
-            params.push(("includePermissionsForView", value.to_string()));
+        if let Some(value) = self._include_permissions_for_view.as_ref() {
+            params.push(("includePermissionsForView", (|x: &dyn std::fmt::Display| x.to_string())(value)));
         }
-        if let Some(value) = self._include_items_from_all_drives {
-            params.push(("includeItemsFromAllDrives", value.to_string()));
+        if let Some(value) = self._include_items_from_all_drives.as_ref() {
+            params.push(("includeItemsFromAllDrives", (|x: &dyn std::fmt::Display| x.to_string())(value)));
         }
-        if let Some(value) = self._include_corpus_removals {
-            params.push(("includeCorpusRemovals", value.to_string()));
+        if let Some(value) = self._include_corpus_removals.as_ref() {
+            params.push(("includeCorpusRemovals", (|x: &dyn std::fmt::Display| x.to_string())(value)));
         }
-        if let Some(value) = self._drive_id {
-            params.push(("driveId", value.to_string()));
+        if let Some(value) = self._drive_id.as_ref() {
+            params.push(("driveId", (|x: &dyn std::fmt::Display| x.to_string())(value)));
         }
         for &field in ["alt", "pageToken", "teamDriveId", "supportsTeamDrives", "supportsAllDrives", "spaces", "restrictToMyDrive", "pageSize", "includeTeamDriveItems", "includeRemoved", "includePermissionsForView", "includeItemsFromAllDrives", "includeCorpusRemovals", "driveId"].iter() {
             if self._additional_params.contains_key(field) {
@@ -4464,7 +4876,8 @@ where
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.````
     ///
     /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ChangeWatchCall<'a, S> {
@@ -4536,7 +4949,7 @@ where
 /// use drive3::api::Channel;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use drive3::{DriveHub, oauth2, hyper, hyper_rustls};
+/// # use drive3::{DriveHub, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
 /// # let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -4715,7 +5128,8 @@ where
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.````
     ///
     /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ChannelStopCall<'a, S> {
@@ -4787,7 +5201,7 @@ where
 /// use drive3::api::Comment;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use drive3::{DriveHub, oauth2, hyper, hyper_rustls};
+/// # use drive3::{DriveHub, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
 /// # let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -4842,7 +5256,7 @@ where
         dlg.begin(client::MethodInfo { id: "drive.comments.create",
                                http_method: hyper::Method::POST });
         let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
-        params.push(("fileId", self._file_id.to_string()));
+        params.push(("fileId", (|x: &dyn std::fmt::Display| x.to_string())(&self._file_id)));
         for &field in ["alt", "fileId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
@@ -5010,7 +5424,8 @@ where
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.````
     ///
     /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CommentCreateCall<'a, S> {
@@ -5081,7 +5496,7 @@ where
 /// # extern crate google_drive3 as drive3;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use drive3::{DriveHub, oauth2, hyper, hyper_rustls};
+/// # use drive3::{DriveHub, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
 /// # let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -5131,8 +5546,8 @@ where
         dlg.begin(client::MethodInfo { id: "drive.comments.delete",
                                http_method: hyper::Method::DELETE });
         let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
-        params.push(("fileId", self._file_id.to_string()));
-        params.push(("commentId", self._comment_id.to_string()));
+        params.push(("fileId", (|x: &dyn std::fmt::Display| x.to_string())(&self._file_id)));
+        params.push(("commentId", (|x: &dyn std::fmt::Display| x.to_string())(&self._comment_id)));
         for &field in ["fileId", "commentId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
@@ -5276,7 +5691,8 @@ where
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.````
     ///
     /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CommentDeleteCall<'a, S> {
@@ -5347,7 +5763,7 @@ where
 /// # extern crate google_drive3 as drive3;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use drive3::{DriveHub, oauth2, hyper, hyper_rustls};
+/// # use drive3::{DriveHub, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
 /// # let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -5399,10 +5815,10 @@ where
         dlg.begin(client::MethodInfo { id: "drive.comments.get",
                                http_method: hyper::Method::GET });
         let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
-        params.push(("fileId", self._file_id.to_string()));
-        params.push(("commentId", self._comment_id.to_string()));
-        if let Some(value) = self._include_deleted {
-            params.push(("includeDeleted", value.to_string()));
+        params.push(("fileId", (|x: &dyn std::fmt::Display| x.to_string())(&self._file_id)));
+        params.push(("commentId", (|x: &dyn std::fmt::Display| x.to_string())(&self._comment_id)));
+        if let Some(value) = self._include_deleted.as_ref() {
+            params.push(("includeDeleted", (|x: &dyn std::fmt::Display| x.to_string())(value)));
         }
         for &field in ["alt", "fileId", "commentId", "includeDeleted"].iter() {
             if self._additional_params.contains_key(field) {
@@ -5565,7 +5981,8 @@ where
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.````
     ///
     /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CommentGetCall<'a, S> {
@@ -5636,7 +6053,7 @@ where
 /// # extern crate google_drive3 as drive3;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use drive3::{DriveHub, oauth2, hyper, hyper_rustls};
+/// # use drive3::{DriveHub, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
 /// # let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -5693,18 +6110,18 @@ where
         dlg.begin(client::MethodInfo { id: "drive.comments.list",
                                http_method: hyper::Method::GET });
         let mut params: Vec<(&str, String)> = Vec::with_capacity(7 + self._additional_params.len());
-        params.push(("fileId", self._file_id.to_string()));
-        if let Some(value) = self._start_modified_time {
-            params.push(("startModifiedTime", value.to_string()));
+        params.push(("fileId", (|x: &dyn std::fmt::Display| x.to_string())(&self._file_id)));
+        if let Some(value) = self._start_modified_time.as_ref() {
+            params.push(("startModifiedTime", (|x: &dyn std::fmt::Display| x.to_string())(value)));
         }
-        if let Some(value) = self._page_token {
-            params.push(("pageToken", value.to_string()));
+        if let Some(value) = self._page_token.as_ref() {
+            params.push(("pageToken", (|x: &dyn std::fmt::Display| x.to_string())(value)));
         }
-        if let Some(value) = self._page_size {
-            params.push(("pageSize", value.to_string()));
+        if let Some(value) = self._page_size.as_ref() {
+            params.push(("pageSize", (|x: &dyn std::fmt::Display| x.to_string())(value)));
         }
-        if let Some(value) = self._include_deleted {
-            params.push(("includeDeleted", value.to_string()));
+        if let Some(value) = self._include_deleted.as_ref() {
+            params.push(("includeDeleted", (|x: &dyn std::fmt::Display| x.to_string())(value)));
         }
         for &field in ["alt", "fileId", "startModifiedTime", "pageToken", "pageSize", "includeDeleted"].iter() {
             if self._additional_params.contains_key(field) {
@@ -5878,7 +6295,8 @@ where
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.````
     ///
     /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CommentListCall<'a, S> {
@@ -5950,7 +6368,7 @@ where
 /// use drive3::api::Comment;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use drive3::{DriveHub, oauth2, hyper, hyper_rustls};
+/// # use drive3::{DriveHub, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
 /// # let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -6006,8 +6424,8 @@ where
         dlg.begin(client::MethodInfo { id: "drive.comments.update",
                                http_method: hyper::Method::PATCH });
         let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
-        params.push(("fileId", self._file_id.to_string()));
-        params.push(("commentId", self._comment_id.to_string()));
+        params.push(("fileId", (|x: &dyn std::fmt::Display| x.to_string())(&self._file_id)));
+        params.push(("commentId", (|x: &dyn std::fmt::Display| x.to_string())(&self._comment_id)));
         for &field in ["alt", "fileId", "commentId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
@@ -6185,7 +6603,8 @@ where
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.````
     ///
     /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CommentUpdateCall<'a, S> {
@@ -6257,7 +6676,7 @@ where
 /// use drive3::api::Drive;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use drive3::{DriveHub, oauth2, hyper, hyper_rustls};
+/// # use drive3::{DriveHub, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
 /// # let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -6312,7 +6731,7 @@ where
         dlg.begin(client::MethodInfo { id: "drive.drives.create",
                                http_method: hyper::Method::POST });
         let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
-        params.push(("requestId", self._request_id.to_string()));
+        params.push(("requestId", (|x: &dyn std::fmt::Display| x.to_string())(&self._request_id)));
         for &field in ["alt", "requestId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
@@ -6459,7 +6878,8 @@ where
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.````
     ///
     /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> DriveCreateCall<'a, S> {
@@ -6530,7 +6950,7 @@ where
 /// # extern crate google_drive3 as drive3;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use drive3::{DriveHub, oauth2, hyper, hyper_rustls};
+/// # use drive3::{DriveHub, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
 /// # let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -6579,7 +6999,7 @@ where
         dlg.begin(client::MethodInfo { id: "drive.drives.delete",
                                http_method: hyper::Method::DELETE });
         let mut params: Vec<(&str, String)> = Vec::with_capacity(2 + self._additional_params.len());
-        params.push(("driveId", self._drive_id.to_string()));
+        params.push(("driveId", (|x: &dyn std::fmt::Display| x.to_string())(&self._drive_id)));
         for &field in ["driveId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
@@ -6713,7 +7133,8 @@ where
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.````
     ///
     /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> DriveDeleteCall<'a, S> {
@@ -6784,7 +7205,7 @@ where
 /// # extern crate google_drive3 as drive3;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use drive3::{DriveHub, oauth2, hyper, hyper_rustls};
+/// # use drive3::{DriveHub, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
 /// # let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -6835,9 +7256,9 @@ where
         dlg.begin(client::MethodInfo { id: "drive.drives.get",
                                http_method: hyper::Method::GET });
         let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
-        params.push(("driveId", self._drive_id.to_string()));
-        if let Some(value) = self._use_domain_admin_access {
-            params.push(("useDomainAdminAccess", value.to_string()));
+        params.push(("driveId", (|x: &dyn std::fmt::Display| x.to_string())(&self._drive_id)));
+        if let Some(value) = self._use_domain_admin_access.as_ref() {
+            params.push(("useDomainAdminAccess", (|x: &dyn std::fmt::Display| x.to_string())(value)));
         }
         for &field in ["alt", "driveId", "useDomainAdminAccess"].iter() {
             if self._additional_params.contains_key(field) {
@@ -6990,7 +7411,8 @@ where
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.````
     ///
     /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> DriveGetCall<'a, S> {
@@ -7061,7 +7483,7 @@ where
 /// # extern crate google_drive3 as drive3;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use drive3::{DriveHub, oauth2, hyper, hyper_rustls};
+/// # use drive3::{DriveHub, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
 /// # let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -7110,7 +7532,7 @@ where
         dlg.begin(client::MethodInfo { id: "drive.drives.hide",
                                http_method: hyper::Method::POST });
         let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
-        params.push(("driveId", self._drive_id.to_string()));
+        params.push(("driveId", (|x: &dyn std::fmt::Display| x.to_string())(&self._drive_id)));
         for &field in ["alt", "driveId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
@@ -7255,7 +7677,8 @@ where
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.````
     ///
     /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> DriveHideCall<'a, S> {
@@ -7326,7 +7749,7 @@ where
 /// # extern crate google_drive3 as drive3;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use drive3::{DriveHub, oauth2, hyper, hyper_rustls};
+/// # use drive3::{DriveHub, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
 /// # let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -7382,17 +7805,17 @@ where
         dlg.begin(client::MethodInfo { id: "drive.drives.list",
                                http_method: hyper::Method::GET });
         let mut params: Vec<(&str, String)> = Vec::with_capacity(6 + self._additional_params.len());
-        if let Some(value) = self._use_domain_admin_access {
-            params.push(("useDomainAdminAccess", value.to_string()));
+        if let Some(value) = self._use_domain_admin_access.as_ref() {
+            params.push(("useDomainAdminAccess", (|x: &dyn std::fmt::Display| x.to_string())(value)));
         }
-        if let Some(value) = self._q {
-            params.push(("q", value.to_string()));
+        if let Some(value) = self._q.as_ref() {
+            params.push(("q", (|x: &dyn std::fmt::Display| x.to_string())(value)));
         }
-        if let Some(value) = self._page_token {
-            params.push(("pageToken", value.to_string()));
+        if let Some(value) = self._page_token.as_ref() {
+            params.push(("pageToken", (|x: &dyn std::fmt::Display| x.to_string())(value)));
         }
-        if let Some(value) = self._page_size {
-            params.push(("pageSize", value.to_string()));
+        if let Some(value) = self._page_size.as_ref() {
+            params.push(("pageSize", (|x: &dyn std::fmt::Display| x.to_string())(value)));
         }
         for &field in ["alt", "useDomainAdminAccess", "q", "pageToken", "pageSize"].iter() {
             if self._additional_params.contains_key(field) {
@@ -7535,7 +7958,8 @@ where
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.````
     ///
     /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> DriveListCall<'a, S> {
@@ -7606,7 +8030,7 @@ where
 /// # extern crate google_drive3 as drive3;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use drive3::{DriveHub, oauth2, hyper, hyper_rustls};
+/// # use drive3::{DriveHub, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
 /// # let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -7655,7 +8079,7 @@ where
         dlg.begin(client::MethodInfo { id: "drive.drives.unhide",
                                http_method: hyper::Method::POST });
         let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
-        params.push(("driveId", self._drive_id.to_string()));
+        params.push(("driveId", (|x: &dyn std::fmt::Display| x.to_string())(&self._drive_id)));
         for &field in ["alt", "driveId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
@@ -7800,7 +8224,8 @@ where
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.````
     ///
     /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> DriveUnhideCall<'a, S> {
@@ -7872,7 +8297,7 @@ where
 /// use drive3::api::Drive;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use drive3::{DriveHub, oauth2, hyper, hyper_rustls};
+/// # use drive3::{DriveHub, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
 /// # let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -7929,9 +8354,9 @@ where
         dlg.begin(client::MethodInfo { id: "drive.drives.update",
                                http_method: hyper::Method::PATCH });
         let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
-        params.push(("driveId", self._drive_id.to_string()));
-        if let Some(value) = self._use_domain_admin_access {
-            params.push(("useDomainAdminAccess", value.to_string()));
+        params.push(("driveId", (|x: &dyn std::fmt::Display| x.to_string())(&self._drive_id)));
+        if let Some(value) = self._use_domain_admin_access.as_ref() {
+            params.push(("useDomainAdminAccess", (|x: &dyn std::fmt::Display| x.to_string())(value)));
         }
         for &field in ["alt", "driveId", "useDomainAdminAccess"].iter() {
             if self._additional_params.contains_key(field) {
@@ -8107,7 +8532,8 @@ where
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.````
     ///
     /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> DriveUpdateCall<'a, S> {
@@ -8179,7 +8605,7 @@ where
 /// use drive3::api::File;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use drive3::{DriveHub, oauth2, hyper, hyper_rustls};
+/// # use drive3::{DriveHub, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
 /// # let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -8248,27 +8674,27 @@ where
         dlg.begin(client::MethodInfo { id: "drive.files.copy",
                                http_method: hyper::Method::POST });
         let mut params: Vec<(&str, String)> = Vec::with_capacity(11 + self._additional_params.len());
-        params.push(("fileId", self._file_id.to_string()));
-        if let Some(value) = self._supports_team_drives {
-            params.push(("supportsTeamDrives", value.to_string()));
+        params.push(("fileId", (|x: &dyn std::fmt::Display| x.to_string())(&self._file_id)));
+        if let Some(value) = self._supports_team_drives.as_ref() {
+            params.push(("supportsTeamDrives", (|x: &dyn std::fmt::Display| x.to_string())(value)));
         }
-        if let Some(value) = self._supports_all_drives {
-            params.push(("supportsAllDrives", value.to_string()));
+        if let Some(value) = self._supports_all_drives.as_ref() {
+            params.push(("supportsAllDrives", (|x: &dyn std::fmt::Display| x.to_string())(value)));
         }
-        if let Some(value) = self._ocr_language {
-            params.push(("ocrLanguage", value.to_string()));
+        if let Some(value) = self._ocr_language.as_ref() {
+            params.push(("ocrLanguage", (|x: &dyn std::fmt::Display| x.to_string())(value)));
         }
-        if let Some(value) = self._keep_revision_forever {
-            params.push(("keepRevisionForever", value.to_string()));
+        if let Some(value) = self._keep_revision_forever.as_ref() {
+            params.push(("keepRevisionForever", (|x: &dyn std::fmt::Display| x.to_string())(value)));
         }
-        if let Some(value) = self._include_permissions_for_view {
-            params.push(("includePermissionsForView", value.to_string()));
+        if let Some(value) = self._include_permissions_for_view.as_ref() {
+            params.push(("includePermissionsForView", (|x: &dyn std::fmt::Display| x.to_string())(value)));
         }
-        if let Some(value) = self._ignore_default_visibility {
-            params.push(("ignoreDefaultVisibility", value.to_string()));
+        if let Some(value) = self._ignore_default_visibility.as_ref() {
+            params.push(("ignoreDefaultVisibility", (|x: &dyn std::fmt::Display| x.to_string())(value)));
         }
-        if let Some(value) = self._enforce_single_parent {
-            params.push(("enforceSingleParent", value.to_string()));
+        if let Some(value) = self._enforce_single_parent.as_ref() {
+            params.push(("enforceSingleParent", (|x: &dyn std::fmt::Display| x.to_string())(value)));
         }
         for &field in ["alt", "fileId", "supportsTeamDrives", "supportsAllDrives", "ocrLanguage", "keepRevisionForever", "includePermissionsForView", "ignoreDefaultVisibility", "enforceSingleParent"].iter() {
             if self._additional_params.contains_key(field) {
@@ -8486,7 +8912,8 @@ where
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.````
     ///
     /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> FileCopyCall<'a, S> {
@@ -8559,7 +8986,7 @@ where
 /// use std::fs;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use drive3::{DriveHub, oauth2, hyper, hyper_rustls};
+/// # use drive3::{DriveHub, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
 /// # let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -8630,29 +9057,29 @@ where
         dlg.begin(client::MethodInfo { id: "drive.files.create",
                                http_method: hyper::Method::POST });
         let mut params: Vec<(&str, String)> = Vec::with_capacity(11 + self._additional_params.len());
-        if let Some(value) = self._use_content_as_indexable_text {
-            params.push(("useContentAsIndexableText", value.to_string()));
+        if let Some(value) = self._use_content_as_indexable_text.as_ref() {
+            params.push(("useContentAsIndexableText", (|x: &dyn std::fmt::Display| x.to_string())(value)));
         }
-        if let Some(value) = self._supports_team_drives {
-            params.push(("supportsTeamDrives", value.to_string()));
+        if let Some(value) = self._supports_team_drives.as_ref() {
+            params.push(("supportsTeamDrives", (|x: &dyn std::fmt::Display| x.to_string())(value)));
         }
-        if let Some(value) = self._supports_all_drives {
-            params.push(("supportsAllDrives", value.to_string()));
+        if let Some(value) = self._supports_all_drives.as_ref() {
+            params.push(("supportsAllDrives", (|x: &dyn std::fmt::Display| x.to_string())(value)));
         }
-        if let Some(value) = self._ocr_language {
-            params.push(("ocrLanguage", value.to_string()));
+        if let Some(value) = self._ocr_language.as_ref() {
+            params.push(("ocrLanguage", (|x: &dyn std::fmt::Display| x.to_string())(value)));
         }
-        if let Some(value) = self._keep_revision_forever {
-            params.push(("keepRevisionForever", value.to_string()));
+        if let Some(value) = self._keep_revision_forever.as_ref() {
+            params.push(("keepRevisionForever", (|x: &dyn std::fmt::Display| x.to_string())(value)));
         }
-        if let Some(value) = self._include_permissions_for_view {
-            params.push(("includePermissionsForView", value.to_string()));
+        if let Some(value) = self._include_permissions_for_view.as_ref() {
+            params.push(("includePermissionsForView", (|x: &dyn std::fmt::Display| x.to_string())(value)));
         }
-        if let Some(value) = self._ignore_default_visibility {
-            params.push(("ignoreDefaultVisibility", value.to_string()));
+        if let Some(value) = self._ignore_default_visibility.as_ref() {
+            params.push(("ignoreDefaultVisibility", (|x: &dyn std::fmt::Display| x.to_string())(value)));
         }
-        if let Some(value) = self._enforce_single_parent {
-            params.push(("enforceSingleParent", value.to_string()));
+        if let Some(value) = self._enforce_single_parent.as_ref() {
+            params.push(("enforceSingleParent", (|x: &dyn std::fmt::Display| x.to_string())(value)));
         }
         for &field in ["alt", "useContentAsIndexableText", "supportsTeamDrives", "supportsAllDrives", "ocrLanguage", "keepRevisionForever", "includePermissionsForView", "ignoreDefaultVisibility", "enforceSingleParent"].iter() {
             if self._additional_params.contains_key(field) {
@@ -8958,7 +9385,8 @@ where
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.````
     ///
     /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> FileCreateCall<'a, S> {
@@ -9029,7 +9457,7 @@ where
 /// # extern crate google_drive3 as drive3;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use drive3::{DriveHub, oauth2, hyper, hyper_rustls};
+/// # use drive3::{DriveHub, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
 /// # let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -9084,15 +9512,15 @@ where
         dlg.begin(client::MethodInfo { id: "drive.files.delete",
                                http_method: hyper::Method::DELETE });
         let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
-        params.push(("fileId", self._file_id.to_string()));
-        if let Some(value) = self._supports_team_drives {
-            params.push(("supportsTeamDrives", value.to_string()));
+        params.push(("fileId", (|x: &dyn std::fmt::Display| x.to_string())(&self._file_id)));
+        if let Some(value) = self._supports_team_drives.as_ref() {
+            params.push(("supportsTeamDrives", (|x: &dyn std::fmt::Display| x.to_string())(value)));
         }
-        if let Some(value) = self._supports_all_drives {
-            params.push(("supportsAllDrives", value.to_string()));
+        if let Some(value) = self._supports_all_drives.as_ref() {
+            params.push(("supportsAllDrives", (|x: &dyn std::fmt::Display| x.to_string())(value)));
         }
-        if let Some(value) = self._enforce_single_parent {
-            params.push(("enforceSingleParent", value.to_string()));
+        if let Some(value) = self._enforce_single_parent.as_ref() {
+            params.push(("enforceSingleParent", (|x: &dyn std::fmt::Display| x.to_string())(value)));
         }
         for &field in ["fileId", "supportsTeamDrives", "supportsAllDrives", "enforceSingleParent"].iter() {
             if self._additional_params.contains_key(field) {
@@ -9248,7 +9676,8 @@ where
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.````
     ///
     /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> FileDeleteCall<'a, S> {
@@ -9319,7 +9748,7 @@ where
 /// # extern crate google_drive3 as drive3;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use drive3::{DriveHub, oauth2, hyper, hyper_rustls};
+/// # use drive3::{DriveHub, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
 /// # let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -9369,8 +9798,8 @@ where
         dlg.begin(client::MethodInfo { id: "drive.files.emptyTrash",
                                http_method: hyper::Method::DELETE });
         let mut params: Vec<(&str, String)> = Vec::with_capacity(2 + self._additional_params.len());
-        if let Some(value) = self._enforce_single_parent {
-            params.push(("enforceSingleParent", value.to_string()));
+        if let Some(value) = self._enforce_single_parent.as_ref() {
+            params.push(("enforceSingleParent", (|x: &dyn std::fmt::Display| x.to_string())(value)));
         }
         for &field in ["enforceSingleParent"].iter() {
             if self._additional_params.contains_key(field) {
@@ -9481,7 +9910,8 @@ where
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.````
     ///
     /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> FileEmptyTrashCall<'a, S> {
@@ -9555,7 +9985,7 @@ where
 /// # extern crate google_drive3 as drive3;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use drive3::{DriveHub, oauth2, hyper, hyper_rustls};
+/// # use drive3::{DriveHub, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
 /// # let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -9605,8 +10035,8 @@ where
         dlg.begin(client::MethodInfo { id: "drive.files.export",
                                http_method: hyper::Method::GET });
         let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
-        params.push(("fileId", self._file_id.to_string()));
-        params.push(("mimeType", self._mime_type.to_string()));
+        params.push(("fileId", (|x: &dyn std::fmt::Display| x.to_string())(&self._file_id)));
+        params.push(("mimeType", (|x: &dyn std::fmt::Display| x.to_string())(&self._mime_type)));
         for &field in ["fileId", "mimeType"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
@@ -9750,7 +10180,8 @@ where
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.````
     ///
     /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> FileExportCall<'a, S> {
@@ -9821,7 +10252,7 @@ where
 /// # extern crate google_drive3 as drive3;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use drive3::{DriveHub, oauth2, hyper, hyper_rustls};
+/// # use drive3::{DriveHub, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
 /// # let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -9875,14 +10306,14 @@ where
         dlg.begin(client::MethodInfo { id: "drive.files.generateIds",
                                http_method: hyper::Method::GET });
         let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
-        if let Some(value) = self._type_ {
-            params.push(("type", value.to_string()));
+        if let Some(value) = self._type_.as_ref() {
+            params.push(("type", (|x: &dyn std::fmt::Display| x.to_string())(value)));
         }
-        if let Some(value) = self._space {
-            params.push(("space", value.to_string()));
+        if let Some(value) = self._space.as_ref() {
+            params.push(("space", (|x: &dyn std::fmt::Display| x.to_string())(value)));
         }
-        if let Some(value) = self._count {
-            params.push(("count", value.to_string()));
+        if let Some(value) = self._count.as_ref() {
+            params.push(("count", (|x: &dyn std::fmt::Display| x.to_string())(value)));
         }
         for &field in ["alt", "type", "space", "count"].iter() {
             if self._additional_params.contains_key(field) {
@@ -10018,7 +10449,8 @@ where
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.````
     ///
     /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> FileGenerateIdCall<'a, S> {
@@ -10094,7 +10526,7 @@ where
 /// # extern crate google_drive3 as drive3;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use drive3::{DriveHub, oauth2, hyper, hyper_rustls};
+/// # use drive3::{DriveHub, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
 /// # let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -10151,18 +10583,18 @@ where
         dlg.begin(client::MethodInfo { id: "drive.files.get",
                                http_method: hyper::Method::GET });
         let mut params: Vec<(&str, String)> = Vec::with_capacity(6 + self._additional_params.len());
-        params.push(("fileId", self._file_id.to_string()));
-        if let Some(value) = self._supports_team_drives {
-            params.push(("supportsTeamDrives", value.to_string()));
+        params.push(("fileId", (|x: &dyn std::fmt::Display| x.to_string())(&self._file_id)));
+        if let Some(value) = self._supports_team_drives.as_ref() {
+            params.push(("supportsTeamDrives", (|x: &dyn std::fmt::Display| x.to_string())(value)));
         }
-        if let Some(value) = self._supports_all_drives {
-            params.push(("supportsAllDrives", value.to_string()));
+        if let Some(value) = self._supports_all_drives.as_ref() {
+            params.push(("supportsAllDrives", (|x: &dyn std::fmt::Display| x.to_string())(value)));
         }
-        if let Some(value) = self._include_permissions_for_view {
-            params.push(("includePermissionsForView", value.to_string()));
+        if let Some(value) = self._include_permissions_for_view.as_ref() {
+            params.push(("includePermissionsForView", (|x: &dyn std::fmt::Display| x.to_string())(value)));
         }
-        if let Some(value) = self._acknowledge_abuse {
-            params.push(("acknowledgeAbuse", value.to_string()));
+        if let Some(value) = self._acknowledge_abuse.as_ref() {
+            params.push(("acknowledgeAbuse", (|x: &dyn std::fmt::Display| x.to_string())(value)));
         }
         for &field in ["fileId", "supportsTeamDrives", "supportsAllDrives", "includePermissionsForView", "acknowledgeAbuse"].iter() {
             if self._additional_params.contains_key(field) {
@@ -10352,7 +10784,8 @@ where
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.````
     ///
     /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> FileGetCall<'a, S> {
@@ -10423,7 +10856,7 @@ where
 /// # extern crate google_drive3 as drive3;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use drive3::{DriveHub, oauth2, hyper, hyper_rustls};
+/// # use drive3::{DriveHub, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
 /// # let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -10499,47 +10932,47 @@ where
         dlg.begin(client::MethodInfo { id: "drive.files.list",
                                http_method: hyper::Method::GET });
         let mut params: Vec<(&str, String)> = Vec::with_capacity(16 + self._additional_params.len());
-        if let Some(value) = self._team_drive_id {
-            params.push(("teamDriveId", value.to_string()));
+        if let Some(value) = self._team_drive_id.as_ref() {
+            params.push(("teamDriveId", (|x: &dyn std::fmt::Display| x.to_string())(value)));
         }
-        if let Some(value) = self._supports_team_drives {
-            params.push(("supportsTeamDrives", value.to_string()));
+        if let Some(value) = self._supports_team_drives.as_ref() {
+            params.push(("supportsTeamDrives", (|x: &dyn std::fmt::Display| x.to_string())(value)));
         }
-        if let Some(value) = self._supports_all_drives {
-            params.push(("supportsAllDrives", value.to_string()));
+        if let Some(value) = self._supports_all_drives.as_ref() {
+            params.push(("supportsAllDrives", (|x: &dyn std::fmt::Display| x.to_string())(value)));
         }
-        if let Some(value) = self._spaces {
-            params.push(("spaces", value.to_string()));
+        if let Some(value) = self._spaces.as_ref() {
+            params.push(("spaces", (|x: &dyn std::fmt::Display| x.to_string())(value)));
         }
-        if let Some(value) = self._q {
-            params.push(("q", value.to_string()));
+        if let Some(value) = self._q.as_ref() {
+            params.push(("q", (|x: &dyn std::fmt::Display| x.to_string())(value)));
         }
-        if let Some(value) = self._page_token {
-            params.push(("pageToken", value.to_string()));
+        if let Some(value) = self._page_token.as_ref() {
+            params.push(("pageToken", (|x: &dyn std::fmt::Display| x.to_string())(value)));
         }
-        if let Some(value) = self._page_size {
-            params.push(("pageSize", value.to_string()));
+        if let Some(value) = self._page_size.as_ref() {
+            params.push(("pageSize", (|x: &dyn std::fmt::Display| x.to_string())(value)));
         }
-        if let Some(value) = self._order_by {
-            params.push(("orderBy", value.to_string()));
+        if let Some(value) = self._order_by.as_ref() {
+            params.push(("orderBy", (|x: &dyn std::fmt::Display| x.to_string())(value)));
         }
-        if let Some(value) = self._include_team_drive_items {
-            params.push(("includeTeamDriveItems", value.to_string()));
+        if let Some(value) = self._include_team_drive_items.as_ref() {
+            params.push(("includeTeamDriveItems", (|x: &dyn std::fmt::Display| x.to_string())(value)));
         }
-        if let Some(value) = self._include_permissions_for_view {
-            params.push(("includePermissionsForView", value.to_string()));
+        if let Some(value) = self._include_permissions_for_view.as_ref() {
+            params.push(("includePermissionsForView", (|x: &dyn std::fmt::Display| x.to_string())(value)));
         }
-        if let Some(value) = self._include_items_from_all_drives {
-            params.push(("includeItemsFromAllDrives", value.to_string()));
+        if let Some(value) = self._include_items_from_all_drives.as_ref() {
+            params.push(("includeItemsFromAllDrives", (|x: &dyn std::fmt::Display| x.to_string())(value)));
         }
-        if let Some(value) = self._drive_id {
-            params.push(("driveId", value.to_string()));
+        if let Some(value) = self._drive_id.as_ref() {
+            params.push(("driveId", (|x: &dyn std::fmt::Display| x.to_string())(value)));
         }
-        if let Some(value) = self._corpus {
-            params.push(("corpus", value.to_string()));
+        if let Some(value) = self._corpus.as_ref() {
+            params.push(("corpus", (|x: &dyn std::fmt::Display| x.to_string())(value)));
         }
-        if let Some(value) = self._corpora {
-            params.push(("corpora", value.to_string()));
+        if let Some(value) = self._corpora.as_ref() {
+            params.push(("corpora", (|x: &dyn std::fmt::Display| x.to_string())(value)));
         }
         for &field in ["alt", "teamDriveId", "supportsTeamDrives", "supportsAllDrives", "spaces", "q", "pageToken", "pageSize", "orderBy", "includeTeamDriveItems", "includePermissionsForView", "includeItemsFromAllDrives", "driveId", "corpus", "corpora"].iter() {
             if self._additional_params.contains_key(field) {
@@ -10752,7 +11185,8 @@ where
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.````
     ///
     /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> FileListCall<'a, S> {
@@ -10825,7 +11259,7 @@ where
 /// use std::fs;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use drive3::{DriveHub, oauth2, hyper, hyper_rustls};
+/// # use drive3::{DriveHub, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
 /// # let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -10897,33 +11331,33 @@ where
         dlg.begin(client::MethodInfo { id: "drive.files.update",
                                http_method: hyper::Method::PATCH });
         let mut params: Vec<(&str, String)> = Vec::with_capacity(13 + self._additional_params.len());
-        params.push(("fileId", self._file_id.to_string()));
-        if let Some(value) = self._use_content_as_indexable_text {
-            params.push(("useContentAsIndexableText", value.to_string()));
+        params.push(("fileId", (|x: &dyn std::fmt::Display| x.to_string())(&self._file_id)));
+        if let Some(value) = self._use_content_as_indexable_text.as_ref() {
+            params.push(("useContentAsIndexableText", (|x: &dyn std::fmt::Display| x.to_string())(value)));
         }
-        if let Some(value) = self._supports_team_drives {
-            params.push(("supportsTeamDrives", value.to_string()));
+        if let Some(value) = self._supports_team_drives.as_ref() {
+            params.push(("supportsTeamDrives", (|x: &dyn std::fmt::Display| x.to_string())(value)));
         }
-        if let Some(value) = self._supports_all_drives {
-            params.push(("supportsAllDrives", value.to_string()));
+        if let Some(value) = self._supports_all_drives.as_ref() {
+            params.push(("supportsAllDrives", (|x: &dyn std::fmt::Display| x.to_string())(value)));
         }
-        if let Some(value) = self._remove_parents {
-            params.push(("removeParents", value.to_string()));
+        if let Some(value) = self._remove_parents.as_ref() {
+            params.push(("removeParents", (|x: &dyn std::fmt::Display| x.to_string())(value)));
         }
-        if let Some(value) = self._ocr_language {
-            params.push(("ocrLanguage", value.to_string()));
+        if let Some(value) = self._ocr_language.as_ref() {
+            params.push(("ocrLanguage", (|x: &dyn std::fmt::Display| x.to_string())(value)));
         }
-        if let Some(value) = self._keep_revision_forever {
-            params.push(("keepRevisionForever", value.to_string()));
+        if let Some(value) = self._keep_revision_forever.as_ref() {
+            params.push(("keepRevisionForever", (|x: &dyn std::fmt::Display| x.to_string())(value)));
         }
-        if let Some(value) = self._include_permissions_for_view {
-            params.push(("includePermissionsForView", value.to_string()));
+        if let Some(value) = self._include_permissions_for_view.as_ref() {
+            params.push(("includePermissionsForView", (|x: &dyn std::fmt::Display| x.to_string())(value)));
         }
-        if let Some(value) = self._enforce_single_parent {
-            params.push(("enforceSingleParent", value.to_string()));
+        if let Some(value) = self._enforce_single_parent.as_ref() {
+            params.push(("enforceSingleParent", (|x: &dyn std::fmt::Display| x.to_string())(value)));
         }
-        if let Some(value) = self._add_parents {
-            params.push(("addParents", value.to_string()));
+        if let Some(value) = self._add_parents.as_ref() {
+            params.push(("addParents", (|x: &dyn std::fmt::Display| x.to_string())(value)));
         }
         for &field in ["alt", "fileId", "useContentAsIndexableText", "supportsTeamDrives", "supportsAllDrives", "removeParents", "ocrLanguage", "keepRevisionForever", "includePermissionsForView", "enforceSingleParent", "addParents"].iter() {
             if self._additional_params.contains_key(field) {
@@ -11085,33 +11519,33 @@ where
         dlg.begin(client::MethodInfo { id: "drive.files.update",
                                http_method: hyper::Method::PATCH });
         let mut params: Vec<(&str, String)> = Vec::with_capacity(13 + self._additional_params.len());
-        params.push(("fileId", self._file_id.to_string()));
-        if let Some(value) = self._use_content_as_indexable_text {
-            params.push(("useContentAsIndexableText", value.to_string()));
+        params.push(("fileId", (|x: &dyn std::fmt::Display| x.to_string())(&self._file_id)));
+        if let Some(value) = self._use_content_as_indexable_text.as_ref() {
+            params.push(("useContentAsIndexableText", (|x: &dyn std::fmt::Display| x.to_string())(value)));
         }
-        if let Some(value) = self._supports_team_drives {
-            params.push(("supportsTeamDrives", value.to_string()));
+        if let Some(value) = self._supports_team_drives.as_ref() {
+            params.push(("supportsTeamDrives", (|x: &dyn std::fmt::Display| x.to_string())(value)));
         }
-        if let Some(value) = self._supports_all_drives {
-            params.push(("supportsAllDrives", value.to_string()));
+        if let Some(value) = self._supports_all_drives.as_ref() {
+            params.push(("supportsAllDrives", (|x: &dyn std::fmt::Display| x.to_string())(value)));
         }
-        if let Some(value) = self._remove_parents {
-            params.push(("removeParents", value.to_string()));
+        if let Some(value) = self._remove_parents.as_ref() {
+            params.push(("removeParents", (|x: &dyn std::fmt::Display| x.to_string())(value)));
         }
-        if let Some(value) = self._ocr_language {
-            params.push(("ocrLanguage", value.to_string()));
+        if let Some(value) = self._ocr_language.as_ref() {
+            params.push(("ocrLanguage", (|x: &dyn std::fmt::Display| x.to_string())(value)));
         }
-        if let Some(value) = self._keep_revision_forever {
-            params.push(("keepRevisionForever", value.to_string()));
+        if let Some(value) = self._keep_revision_forever.as_ref() {
+            params.push(("keepRevisionForever", (|x: &dyn std::fmt::Display| x.to_string())(value)));
         }
-        if let Some(value) = self._include_permissions_for_view {
-            params.push(("includePermissionsForView", value.to_string()));
+        if let Some(value) = self._include_permissions_for_view.as_ref() {
+            params.push(("includePermissionsForView", (|x: &dyn std::fmt::Display| x.to_string())(value)));
         }
-        if let Some(value) = self._enforce_single_parent {
-            params.push(("enforceSingleParent", value.to_string()));
+        if let Some(value) = self._enforce_single_parent.as_ref() {
+            params.push(("enforceSingleParent", (|x: &dyn std::fmt::Display| x.to_string())(value)));
         }
-        if let Some(value) = self._add_parents {
-            params.push(("addParents", value.to_string()));
+        if let Some(value) = self._add_parents.as_ref() {
+            params.push(("addParents", (|x: &dyn std::fmt::Display| x.to_string())(value)));
         }
         for &field in ["alt", "fileId", "useContentAsIndexableText", "supportsTeamDrives", "supportsAllDrives", "removeParents", "ocrLanguage", "keepRevisionForever", "includePermissionsForView", "enforceSingleParent", "addParents"].iter() {
             if self._additional_params.contains_key(field) {
@@ -11455,7 +11889,8 @@ where
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.````
     ///
     /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> FileUpdateCall<'a, S> {
@@ -11532,7 +11967,7 @@ where
 /// use drive3::api::Channel;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use drive3::{DriveHub, oauth2, hyper, hyper_rustls};
+/// # use drive3::{DriveHub, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
 /// # let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -11595,18 +12030,18 @@ where
         dlg.begin(client::MethodInfo { id: "drive.files.watch",
                                http_method: hyper::Method::POST });
         let mut params: Vec<(&str, String)> = Vec::with_capacity(7 + self._additional_params.len());
-        params.push(("fileId", self._file_id.to_string()));
-        if let Some(value) = self._supports_team_drives {
-            params.push(("supportsTeamDrives", value.to_string()));
+        params.push(("fileId", (|x: &dyn std::fmt::Display| x.to_string())(&self._file_id)));
+        if let Some(value) = self._supports_team_drives.as_ref() {
+            params.push(("supportsTeamDrives", (|x: &dyn std::fmt::Display| x.to_string())(value)));
         }
-        if let Some(value) = self._supports_all_drives {
-            params.push(("supportsAllDrives", value.to_string()));
+        if let Some(value) = self._supports_all_drives.as_ref() {
+            params.push(("supportsAllDrives", (|x: &dyn std::fmt::Display| x.to_string())(value)));
         }
-        if let Some(value) = self._include_permissions_for_view {
-            params.push(("includePermissionsForView", value.to_string()));
+        if let Some(value) = self._include_permissions_for_view.as_ref() {
+            params.push(("includePermissionsForView", (|x: &dyn std::fmt::Display| x.to_string())(value)));
         }
-        if let Some(value) = self._acknowledge_abuse {
-            params.push(("acknowledgeAbuse", value.to_string()));
+        if let Some(value) = self._acknowledge_abuse.as_ref() {
+            params.push(("acknowledgeAbuse", (|x: &dyn std::fmt::Display| x.to_string())(value)));
         }
         for &field in ["fileId", "supportsTeamDrives", "supportsAllDrives", "includePermissionsForView", "acknowledgeAbuse"].iter() {
             if self._additional_params.contains_key(field) {
@@ -11819,7 +12254,8 @@ where
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.````
     ///
     /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> FileWatchCall<'a, S> {
@@ -11891,7 +12327,7 @@ where
 /// use drive3::api::Permission;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use drive3::{DriveHub, oauth2, hyper, hyper_rustls};
+/// # use drive3::{DriveHub, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
 /// # let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -11962,30 +12398,30 @@ where
         dlg.begin(client::MethodInfo { id: "drive.permissions.create",
                                http_method: hyper::Method::POST });
         let mut params: Vec<(&str, String)> = Vec::with_capacity(12 + self._additional_params.len());
-        params.push(("fileId", self._file_id.to_string()));
-        if let Some(value) = self._use_domain_admin_access {
-            params.push(("useDomainAdminAccess", value.to_string()));
+        params.push(("fileId", (|x: &dyn std::fmt::Display| x.to_string())(&self._file_id)));
+        if let Some(value) = self._use_domain_admin_access.as_ref() {
+            params.push(("useDomainAdminAccess", (|x: &dyn std::fmt::Display| x.to_string())(value)));
         }
-        if let Some(value) = self._transfer_ownership {
-            params.push(("transferOwnership", value.to_string()));
+        if let Some(value) = self._transfer_ownership.as_ref() {
+            params.push(("transferOwnership", (|x: &dyn std::fmt::Display| x.to_string())(value)));
         }
-        if let Some(value) = self._supports_team_drives {
-            params.push(("supportsTeamDrives", value.to_string()));
+        if let Some(value) = self._supports_team_drives.as_ref() {
+            params.push(("supportsTeamDrives", (|x: &dyn std::fmt::Display| x.to_string())(value)));
         }
-        if let Some(value) = self._supports_all_drives {
-            params.push(("supportsAllDrives", value.to_string()));
+        if let Some(value) = self._supports_all_drives.as_ref() {
+            params.push(("supportsAllDrives", (|x: &dyn std::fmt::Display| x.to_string())(value)));
         }
-        if let Some(value) = self._send_notification_email {
-            params.push(("sendNotificationEmail", value.to_string()));
+        if let Some(value) = self._send_notification_email.as_ref() {
+            params.push(("sendNotificationEmail", (|x: &dyn std::fmt::Display| x.to_string())(value)));
         }
-        if let Some(value) = self._move_to_new_owners_root {
-            params.push(("moveToNewOwnersRoot", value.to_string()));
+        if let Some(value) = self._move_to_new_owners_root.as_ref() {
+            params.push(("moveToNewOwnersRoot", (|x: &dyn std::fmt::Display| x.to_string())(value)));
         }
-        if let Some(value) = self._enforce_single_parent {
-            params.push(("enforceSingleParent", value.to_string()));
+        if let Some(value) = self._enforce_single_parent.as_ref() {
+            params.push(("enforceSingleParent", (|x: &dyn std::fmt::Display| x.to_string())(value)));
         }
-        if let Some(value) = self._email_message {
-            params.push(("emailMessage", value.to_string()));
+        if let Some(value) = self._email_message.as_ref() {
+            params.push(("emailMessage", (|x: &dyn std::fmt::Display| x.to_string())(value)));
         }
         for &field in ["alt", "fileId", "useDomainAdminAccess", "transferOwnership", "supportsTeamDrives", "supportsAllDrives", "sendNotificationEmail", "moveToNewOwnersRoot", "enforceSingleParent", "emailMessage"].iter() {
             if self._additional_params.contains_key(field) {
@@ -12210,7 +12646,8 @@ where
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.````
     ///
     /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PermissionCreateCall<'a, S> {
@@ -12281,7 +12718,7 @@ where
 /// # extern crate google_drive3 as drive3;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use drive3::{DriveHub, oauth2, hyper, hyper_rustls};
+/// # use drive3::{DriveHub, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
 /// # let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -12337,16 +12774,16 @@ where
         dlg.begin(client::MethodInfo { id: "drive.permissions.delete",
                                http_method: hyper::Method::DELETE });
         let mut params: Vec<(&str, String)> = Vec::with_capacity(6 + self._additional_params.len());
-        params.push(("fileId", self._file_id.to_string()));
-        params.push(("permissionId", self._permission_id.to_string()));
-        if let Some(value) = self._use_domain_admin_access {
-            params.push(("useDomainAdminAccess", value.to_string()));
+        params.push(("fileId", (|x: &dyn std::fmt::Display| x.to_string())(&self._file_id)));
+        params.push(("permissionId", (|x: &dyn std::fmt::Display| x.to_string())(&self._permission_id)));
+        if let Some(value) = self._use_domain_admin_access.as_ref() {
+            params.push(("useDomainAdminAccess", (|x: &dyn std::fmt::Display| x.to_string())(value)));
         }
-        if let Some(value) = self._supports_team_drives {
-            params.push(("supportsTeamDrives", value.to_string()));
+        if let Some(value) = self._supports_team_drives.as_ref() {
+            params.push(("supportsTeamDrives", (|x: &dyn std::fmt::Display| x.to_string())(value)));
         }
-        if let Some(value) = self._supports_all_drives {
-            params.push(("supportsAllDrives", value.to_string()));
+        if let Some(value) = self._supports_all_drives.as_ref() {
+            params.push(("supportsAllDrives", (|x: &dyn std::fmt::Display| x.to_string())(value)));
         }
         for &field in ["fileId", "permissionId", "useDomainAdminAccess", "supportsTeamDrives", "supportsAllDrives"].iter() {
             if self._additional_params.contains_key(field) {
@@ -12512,7 +12949,8 @@ where
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.````
     ///
     /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PermissionDeleteCall<'a, S> {
@@ -12583,7 +13021,7 @@ where
 /// # extern crate google_drive3 as drive3;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use drive3::{DriveHub, oauth2, hyper, hyper_rustls};
+/// # use drive3::{DriveHub, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
 /// # let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -12639,16 +13077,16 @@ where
         dlg.begin(client::MethodInfo { id: "drive.permissions.get",
                                http_method: hyper::Method::GET });
         let mut params: Vec<(&str, String)> = Vec::with_capacity(7 + self._additional_params.len());
-        params.push(("fileId", self._file_id.to_string()));
-        params.push(("permissionId", self._permission_id.to_string()));
-        if let Some(value) = self._use_domain_admin_access {
-            params.push(("useDomainAdminAccess", value.to_string()));
+        params.push(("fileId", (|x: &dyn std::fmt::Display| x.to_string())(&self._file_id)));
+        params.push(("permissionId", (|x: &dyn std::fmt::Display| x.to_string())(&self._permission_id)));
+        if let Some(value) = self._use_domain_admin_access.as_ref() {
+            params.push(("useDomainAdminAccess", (|x: &dyn std::fmt::Display| x.to_string())(value)));
         }
-        if let Some(value) = self._supports_team_drives {
-            params.push(("supportsTeamDrives", value.to_string()));
+        if let Some(value) = self._supports_team_drives.as_ref() {
+            params.push(("supportsTeamDrives", (|x: &dyn std::fmt::Display| x.to_string())(value)));
         }
-        if let Some(value) = self._supports_all_drives {
-            params.push(("supportsAllDrives", value.to_string()));
+        if let Some(value) = self._supports_all_drives.as_ref() {
+            params.push(("supportsAllDrives", (|x: &dyn std::fmt::Display| x.to_string())(value)));
         }
         for &field in ["alt", "fileId", "permissionId", "useDomainAdminAccess", "supportsTeamDrives", "supportsAllDrives"].iter() {
             if self._additional_params.contains_key(field) {
@@ -12825,7 +13263,8 @@ where
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.````
     ///
     /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PermissionGetCall<'a, S> {
@@ -12896,7 +13335,7 @@ where
 /// # extern crate google_drive3 as drive3;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use drive3::{DriveHub, oauth2, hyper, hyper_rustls};
+/// # use drive3::{DriveHub, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
 /// # let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -12957,24 +13396,24 @@ where
         dlg.begin(client::MethodInfo { id: "drive.permissions.list",
                                http_method: hyper::Method::GET });
         let mut params: Vec<(&str, String)> = Vec::with_capacity(9 + self._additional_params.len());
-        params.push(("fileId", self._file_id.to_string()));
-        if let Some(value) = self._use_domain_admin_access {
-            params.push(("useDomainAdminAccess", value.to_string()));
+        params.push(("fileId", (|x: &dyn std::fmt::Display| x.to_string())(&self._file_id)));
+        if let Some(value) = self._use_domain_admin_access.as_ref() {
+            params.push(("useDomainAdminAccess", (|x: &dyn std::fmt::Display| x.to_string())(value)));
         }
-        if let Some(value) = self._supports_team_drives {
-            params.push(("supportsTeamDrives", value.to_string()));
+        if let Some(value) = self._supports_team_drives.as_ref() {
+            params.push(("supportsTeamDrives", (|x: &dyn std::fmt::Display| x.to_string())(value)));
         }
-        if let Some(value) = self._supports_all_drives {
-            params.push(("supportsAllDrives", value.to_string()));
+        if let Some(value) = self._supports_all_drives.as_ref() {
+            params.push(("supportsAllDrives", (|x: &dyn std::fmt::Display| x.to_string())(value)));
         }
-        if let Some(value) = self._page_token {
-            params.push(("pageToken", value.to_string()));
+        if let Some(value) = self._page_token.as_ref() {
+            params.push(("pageToken", (|x: &dyn std::fmt::Display| x.to_string())(value)));
         }
-        if let Some(value) = self._page_size {
-            params.push(("pageSize", value.to_string()));
+        if let Some(value) = self._page_size.as_ref() {
+            params.push(("pageSize", (|x: &dyn std::fmt::Display| x.to_string())(value)));
         }
-        if let Some(value) = self._include_permissions_for_view {
-            params.push(("includePermissionsForView", value.to_string()));
+        if let Some(value) = self._include_permissions_for_view.as_ref() {
+            params.push(("includePermissionsForView", (|x: &dyn std::fmt::Display| x.to_string())(value)));
         }
         for &field in ["alt", "fileId", "useDomainAdminAccess", "supportsTeamDrives", "supportsAllDrives", "pageToken", "pageSize", "includePermissionsForView"].iter() {
             if self._additional_params.contains_key(field) {
@@ -13162,7 +13601,8 @@ where
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.````
     ///
     /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PermissionListCall<'a, S> {
@@ -13234,7 +13674,7 @@ where
 /// use drive3::api::Permission;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use drive3::{DriveHub, oauth2, hyper, hyper_rustls};
+/// # use drive3::{DriveHub, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
 /// # let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -13300,22 +13740,22 @@ where
         dlg.begin(client::MethodInfo { id: "drive.permissions.update",
                                http_method: hyper::Method::PATCH });
         let mut params: Vec<(&str, String)> = Vec::with_capacity(10 + self._additional_params.len());
-        params.push(("fileId", self._file_id.to_string()));
-        params.push(("permissionId", self._permission_id.to_string()));
-        if let Some(value) = self._use_domain_admin_access {
-            params.push(("useDomainAdminAccess", value.to_string()));
+        params.push(("fileId", (|x: &dyn std::fmt::Display| x.to_string())(&self._file_id)));
+        params.push(("permissionId", (|x: &dyn std::fmt::Display| x.to_string())(&self._permission_id)));
+        if let Some(value) = self._use_domain_admin_access.as_ref() {
+            params.push(("useDomainAdminAccess", (|x: &dyn std::fmt::Display| x.to_string())(value)));
         }
-        if let Some(value) = self._transfer_ownership {
-            params.push(("transferOwnership", value.to_string()));
+        if let Some(value) = self._transfer_ownership.as_ref() {
+            params.push(("transferOwnership", (|x: &dyn std::fmt::Display| x.to_string())(value)));
         }
-        if let Some(value) = self._supports_team_drives {
-            params.push(("supportsTeamDrives", value.to_string()));
+        if let Some(value) = self._supports_team_drives.as_ref() {
+            params.push(("supportsTeamDrives", (|x: &dyn std::fmt::Display| x.to_string())(value)));
         }
-        if let Some(value) = self._supports_all_drives {
-            params.push(("supportsAllDrives", value.to_string()));
+        if let Some(value) = self._supports_all_drives.as_ref() {
+            params.push(("supportsAllDrives", (|x: &dyn std::fmt::Display| x.to_string())(value)));
         }
-        if let Some(value) = self._remove_expiration {
-            params.push(("removeExpiration", value.to_string()));
+        if let Some(value) = self._remove_expiration.as_ref() {
+            params.push(("removeExpiration", (|x: &dyn std::fmt::Display| x.to_string())(value)));
         }
         for &field in ["alt", "fileId", "permissionId", "useDomainAdminAccess", "transferOwnership", "supportsTeamDrives", "supportsAllDrives", "removeExpiration"].iter() {
             if self._additional_params.contains_key(field) {
@@ -13529,7 +13969,8 @@ where
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.````
     ///
     /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PermissionUpdateCall<'a, S> {
@@ -13601,7 +14042,7 @@ where
 /// use drive3::api::Reply;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use drive3::{DriveHub, oauth2, hyper, hyper_rustls};
+/// # use drive3::{DriveHub, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
 /// # let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -13657,8 +14098,8 @@ where
         dlg.begin(client::MethodInfo { id: "drive.replies.create",
                                http_method: hyper::Method::POST });
         let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
-        params.push(("fileId", self._file_id.to_string()));
-        params.push(("commentId", self._comment_id.to_string()));
+        params.push(("fileId", (|x: &dyn std::fmt::Display| x.to_string())(&self._file_id)));
+        params.push(("commentId", (|x: &dyn std::fmt::Display| x.to_string())(&self._comment_id)));
         for &field in ["alt", "fileId", "commentId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
@@ -13836,7 +14277,8 @@ where
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.````
     ///
     /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ReplyCreateCall<'a, S> {
@@ -13907,7 +14349,7 @@ where
 /// # extern crate google_drive3 as drive3;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use drive3::{DriveHub, oauth2, hyper, hyper_rustls};
+/// # use drive3::{DriveHub, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
 /// # let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -13958,9 +14400,9 @@ where
         dlg.begin(client::MethodInfo { id: "drive.replies.delete",
                                http_method: hyper::Method::DELETE });
         let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
-        params.push(("fileId", self._file_id.to_string()));
-        params.push(("commentId", self._comment_id.to_string()));
-        params.push(("replyId", self._reply_id.to_string()));
+        params.push(("fileId", (|x: &dyn std::fmt::Display| x.to_string())(&self._file_id)));
+        params.push(("commentId", (|x: &dyn std::fmt::Display| x.to_string())(&self._comment_id)));
+        params.push(("replyId", (|x: &dyn std::fmt::Display| x.to_string())(&self._reply_id)));
         for &field in ["fileId", "commentId", "replyId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
@@ -14114,7 +14556,8 @@ where
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.````
     ///
     /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ReplyDeleteCall<'a, S> {
@@ -14185,7 +14628,7 @@ where
 /// # extern crate google_drive3 as drive3;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use drive3::{DriveHub, oauth2, hyper, hyper_rustls};
+/// # use drive3::{DriveHub, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
 /// # let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -14238,11 +14681,11 @@ where
         dlg.begin(client::MethodInfo { id: "drive.replies.get",
                                http_method: hyper::Method::GET });
         let mut params: Vec<(&str, String)> = Vec::with_capacity(6 + self._additional_params.len());
-        params.push(("fileId", self._file_id.to_string()));
-        params.push(("commentId", self._comment_id.to_string()));
-        params.push(("replyId", self._reply_id.to_string()));
-        if let Some(value) = self._include_deleted {
-            params.push(("includeDeleted", value.to_string()));
+        params.push(("fileId", (|x: &dyn std::fmt::Display| x.to_string())(&self._file_id)));
+        params.push(("commentId", (|x: &dyn std::fmt::Display| x.to_string())(&self._comment_id)));
+        params.push(("replyId", (|x: &dyn std::fmt::Display| x.to_string())(&self._reply_id)));
+        if let Some(value) = self._include_deleted.as_ref() {
+            params.push(("includeDeleted", (|x: &dyn std::fmt::Display| x.to_string())(value)));
         }
         for &field in ["alt", "fileId", "commentId", "replyId", "includeDeleted"].iter() {
             if self._additional_params.contains_key(field) {
@@ -14415,7 +14858,8 @@ where
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.````
     ///
     /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ReplyGetCall<'a, S> {
@@ -14486,7 +14930,7 @@ where
 /// # extern crate google_drive3 as drive3;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use drive3::{DriveHub, oauth2, hyper, hyper_rustls};
+/// # use drive3::{DriveHub, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
 /// # let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -14542,16 +14986,16 @@ where
         dlg.begin(client::MethodInfo { id: "drive.replies.list",
                                http_method: hyper::Method::GET });
         let mut params: Vec<(&str, String)> = Vec::with_capacity(7 + self._additional_params.len());
-        params.push(("fileId", self._file_id.to_string()));
-        params.push(("commentId", self._comment_id.to_string()));
-        if let Some(value) = self._page_token {
-            params.push(("pageToken", value.to_string()));
+        params.push(("fileId", (|x: &dyn std::fmt::Display| x.to_string())(&self._file_id)));
+        params.push(("commentId", (|x: &dyn std::fmt::Display| x.to_string())(&self._comment_id)));
+        if let Some(value) = self._page_token.as_ref() {
+            params.push(("pageToken", (|x: &dyn std::fmt::Display| x.to_string())(value)));
         }
-        if let Some(value) = self._page_size {
-            params.push(("pageSize", value.to_string()));
+        if let Some(value) = self._page_size.as_ref() {
+            params.push(("pageSize", (|x: &dyn std::fmt::Display| x.to_string())(value)));
         }
-        if let Some(value) = self._include_deleted {
-            params.push(("includeDeleted", value.to_string()));
+        if let Some(value) = self._include_deleted.as_ref() {
+            params.push(("includeDeleted", (|x: &dyn std::fmt::Display| x.to_string())(value)));
         }
         for &field in ["alt", "fileId", "commentId", "pageToken", "pageSize", "includeDeleted"].iter() {
             if self._additional_params.contains_key(field) {
@@ -14728,7 +15172,8 @@ where
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.````
     ///
     /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ReplyListCall<'a, S> {
@@ -14800,7 +15245,7 @@ where
 /// use drive3::api::Reply;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use drive3::{DriveHub, oauth2, hyper, hyper_rustls};
+/// # use drive3::{DriveHub, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
 /// # let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -14857,9 +15302,9 @@ where
         dlg.begin(client::MethodInfo { id: "drive.replies.update",
                                http_method: hyper::Method::PATCH });
         let mut params: Vec<(&str, String)> = Vec::with_capacity(6 + self._additional_params.len());
-        params.push(("fileId", self._file_id.to_string()));
-        params.push(("commentId", self._comment_id.to_string()));
-        params.push(("replyId", self._reply_id.to_string()));
+        params.push(("fileId", (|x: &dyn std::fmt::Display| x.to_string())(&self._file_id)));
+        params.push(("commentId", (|x: &dyn std::fmt::Display| x.to_string())(&self._comment_id)));
+        params.push(("replyId", (|x: &dyn std::fmt::Display| x.to_string())(&self._reply_id)));
         for &field in ["alt", "fileId", "commentId", "replyId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
@@ -15047,7 +15492,8 @@ where
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.````
     ///
     /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ReplyUpdateCall<'a, S> {
@@ -15118,7 +15564,7 @@ where
 /// # extern crate google_drive3 as drive3;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use drive3::{DriveHub, oauth2, hyper, hyper_rustls};
+/// # use drive3::{DriveHub, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
 /// # let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -15168,8 +15614,8 @@ where
         dlg.begin(client::MethodInfo { id: "drive.revisions.delete",
                                http_method: hyper::Method::DELETE });
         let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
-        params.push(("fileId", self._file_id.to_string()));
-        params.push(("revisionId", self._revision_id.to_string()));
+        params.push(("fileId", (|x: &dyn std::fmt::Display| x.to_string())(&self._file_id)));
+        params.push(("revisionId", (|x: &dyn std::fmt::Display| x.to_string())(&self._revision_id)));
         for &field in ["fileId", "revisionId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
@@ -15313,7 +15759,8 @@ where
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.````
     ///
     /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> RevisionDeleteCall<'a, S> {
@@ -15389,7 +15836,7 @@ where
 /// # extern crate google_drive3 as drive3;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use drive3::{DriveHub, oauth2, hyper, hyper_rustls};
+/// # use drive3::{DriveHub, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
 /// # let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -15441,10 +15888,10 @@ where
         dlg.begin(client::MethodInfo { id: "drive.revisions.get",
                                http_method: hyper::Method::GET });
         let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
-        params.push(("fileId", self._file_id.to_string()));
-        params.push(("revisionId", self._revision_id.to_string()));
-        if let Some(value) = self._acknowledge_abuse {
-            params.push(("acknowledgeAbuse", value.to_string()));
+        params.push(("fileId", (|x: &dyn std::fmt::Display| x.to_string())(&self._file_id)));
+        params.push(("revisionId", (|x: &dyn std::fmt::Display| x.to_string())(&self._revision_id)));
+        if let Some(value) = self._acknowledge_abuse.as_ref() {
+            params.push(("acknowledgeAbuse", (|x: &dyn std::fmt::Display| x.to_string())(value)));
         }
         for &field in ["fileId", "revisionId", "acknowledgeAbuse"].iter() {
             if self._additional_params.contains_key(field) {
@@ -15623,7 +16070,8 @@ where
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.````
     ///
     /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> RevisionGetCall<'a, S> {
@@ -15694,7 +16142,7 @@ where
 /// # extern crate google_drive3 as drive3;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use drive3::{DriveHub, oauth2, hyper, hyper_rustls};
+/// # use drive3::{DriveHub, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
 /// # let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -15747,12 +16195,12 @@ where
         dlg.begin(client::MethodInfo { id: "drive.revisions.list",
                                http_method: hyper::Method::GET });
         let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
-        params.push(("fileId", self._file_id.to_string()));
-        if let Some(value) = self._page_token {
-            params.push(("pageToken", value.to_string()));
+        params.push(("fileId", (|x: &dyn std::fmt::Display| x.to_string())(&self._file_id)));
+        if let Some(value) = self._page_token.as_ref() {
+            params.push(("pageToken", (|x: &dyn std::fmt::Display| x.to_string())(value)));
         }
-        if let Some(value) = self._page_size {
-            params.push(("pageSize", value.to_string()));
+        if let Some(value) = self._page_size.as_ref() {
+            params.push(("pageSize", (|x: &dyn std::fmt::Display| x.to_string())(value)));
         }
         for &field in ["alt", "fileId", "pageToken", "pageSize"].iter() {
             if self._additional_params.contains_key(field) {
@@ -15912,7 +16360,8 @@ where
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.````
     ///
     /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> RevisionListCall<'a, S> {
@@ -15984,7 +16433,7 @@ where
 /// use drive3::api::Revision;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use drive3::{DriveHub, oauth2, hyper, hyper_rustls};
+/// # use drive3::{DriveHub, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
 /// # let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -16040,8 +16489,8 @@ where
         dlg.begin(client::MethodInfo { id: "drive.revisions.update",
                                http_method: hyper::Method::PATCH });
         let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
-        params.push(("fileId", self._file_id.to_string()));
-        params.push(("revisionId", self._revision_id.to_string()));
+        params.push(("fileId", (|x: &dyn std::fmt::Display| x.to_string())(&self._file_id)));
+        params.push(("revisionId", (|x: &dyn std::fmt::Display| x.to_string())(&self._revision_id)));
         for &field in ["alt", "fileId", "revisionId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
@@ -16219,7 +16668,8 @@ where
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.````
     ///
     /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> RevisionUpdateCall<'a, S> {
@@ -16291,7 +16741,7 @@ where
 /// use drive3::api::TeamDrive;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use drive3::{DriveHub, oauth2, hyper, hyper_rustls};
+/// # use drive3::{DriveHub, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
 /// # let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -16346,7 +16796,7 @@ where
         dlg.begin(client::MethodInfo { id: "drive.teamdrives.create",
                                http_method: hyper::Method::POST });
         let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
-        params.push(("requestId", self._request_id.to_string()));
+        params.push(("requestId", (|x: &dyn std::fmt::Display| x.to_string())(&self._request_id)));
         for &field in ["alt", "requestId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
@@ -16493,7 +16943,8 @@ where
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.````
     ///
     /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TeamdriveCreateCall<'a, S> {
@@ -16564,7 +17015,7 @@ where
 /// # extern crate google_drive3 as drive3;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use drive3::{DriveHub, oauth2, hyper, hyper_rustls};
+/// # use drive3::{DriveHub, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
 /// # let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -16613,7 +17064,7 @@ where
         dlg.begin(client::MethodInfo { id: "drive.teamdrives.delete",
                                http_method: hyper::Method::DELETE });
         let mut params: Vec<(&str, String)> = Vec::with_capacity(2 + self._additional_params.len());
-        params.push(("teamDriveId", self._team_drive_id.to_string()));
+        params.push(("teamDriveId", (|x: &dyn std::fmt::Display| x.to_string())(&self._team_drive_id)));
         for &field in ["teamDriveId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
@@ -16747,7 +17198,8 @@ where
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.````
     ///
     /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TeamdriveDeleteCall<'a, S> {
@@ -16818,7 +17270,7 @@ where
 /// # extern crate google_drive3 as drive3;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use drive3::{DriveHub, oauth2, hyper, hyper_rustls};
+/// # use drive3::{DriveHub, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
 /// # let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -16869,9 +17321,9 @@ where
         dlg.begin(client::MethodInfo { id: "drive.teamdrives.get",
                                http_method: hyper::Method::GET });
         let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
-        params.push(("teamDriveId", self._team_drive_id.to_string()));
-        if let Some(value) = self._use_domain_admin_access {
-            params.push(("useDomainAdminAccess", value.to_string()));
+        params.push(("teamDriveId", (|x: &dyn std::fmt::Display| x.to_string())(&self._team_drive_id)));
+        if let Some(value) = self._use_domain_admin_access.as_ref() {
+            params.push(("useDomainAdminAccess", (|x: &dyn std::fmt::Display| x.to_string())(value)));
         }
         for &field in ["alt", "teamDriveId", "useDomainAdminAccess"].iter() {
             if self._additional_params.contains_key(field) {
@@ -17024,7 +17476,8 @@ where
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.````
     ///
     /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TeamdriveGetCall<'a, S> {
@@ -17095,7 +17548,7 @@ where
 /// # extern crate google_drive3 as drive3;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use drive3::{DriveHub, oauth2, hyper, hyper_rustls};
+/// # use drive3::{DriveHub, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
 /// # let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -17151,17 +17604,17 @@ where
         dlg.begin(client::MethodInfo { id: "drive.teamdrives.list",
                                http_method: hyper::Method::GET });
         let mut params: Vec<(&str, String)> = Vec::with_capacity(6 + self._additional_params.len());
-        if let Some(value) = self._use_domain_admin_access {
-            params.push(("useDomainAdminAccess", value.to_string()));
+        if let Some(value) = self._use_domain_admin_access.as_ref() {
+            params.push(("useDomainAdminAccess", (|x: &dyn std::fmt::Display| x.to_string())(value)));
         }
-        if let Some(value) = self._q {
-            params.push(("q", value.to_string()));
+        if let Some(value) = self._q.as_ref() {
+            params.push(("q", (|x: &dyn std::fmt::Display| x.to_string())(value)));
         }
-        if let Some(value) = self._page_token {
-            params.push(("pageToken", value.to_string()));
+        if let Some(value) = self._page_token.as_ref() {
+            params.push(("pageToken", (|x: &dyn std::fmt::Display| x.to_string())(value)));
         }
-        if let Some(value) = self._page_size {
-            params.push(("pageSize", value.to_string()));
+        if let Some(value) = self._page_size.as_ref() {
+            params.push(("pageSize", (|x: &dyn std::fmt::Display| x.to_string())(value)));
         }
         for &field in ["alt", "useDomainAdminAccess", "q", "pageToken", "pageSize"].iter() {
             if self._additional_params.contains_key(field) {
@@ -17304,7 +17757,8 @@ where
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.````
     ///
     /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TeamdriveListCall<'a, S> {
@@ -17376,7 +17830,7 @@ where
 /// use drive3::api::TeamDrive;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use drive3::{DriveHub, oauth2, hyper, hyper_rustls};
+/// # use drive3::{DriveHub, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
 /// # let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -17433,9 +17887,9 @@ where
         dlg.begin(client::MethodInfo { id: "drive.teamdrives.update",
                                http_method: hyper::Method::PATCH });
         let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
-        params.push(("teamDriveId", self._team_drive_id.to_string()));
-        if let Some(value) = self._use_domain_admin_access {
-            params.push(("useDomainAdminAccess", value.to_string()));
+        params.push(("teamDriveId", (|x: &dyn std::fmt::Display| x.to_string())(&self._team_drive_id)));
+        if let Some(value) = self._use_domain_admin_access.as_ref() {
+            params.push(("useDomainAdminAccess", (|x: &dyn std::fmt::Display| x.to_string())(value)));
         }
         for &field in ["alt", "teamDriveId", "useDomainAdminAccess"].iter() {
             if self._additional_params.contains_key(field) {
@@ -17611,7 +18065,8 @@ where
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.````
     ///
     /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TeamdriveUpdateCall<'a, S> {
