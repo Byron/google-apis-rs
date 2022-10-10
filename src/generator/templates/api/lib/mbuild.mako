@@ -11,7 +11,7 @@
                       DELEGATE_PROPERTY_NAME, struct_type_bounds_s, scope_url_to_variant,
                       re_find_replacements, ADD_PARAM_FN, ADD_PARAM_MEDIA_EXAMPLE, upload_action_fn, METHODS_RESOURCE,
                       method_name_to_variant, size_to_bytes, method_default_scope,
-                      is_repeated_property, setter_fn_name, ADD_SCOPE_FN, rust_doc_sanitize, items)
+                      is_repeated_property, setter_fn_name, ADD_SCOPE_FN, rust_doc_sanitize, items, string_impl)
 
     def get_parts(part_prop):
         if not part_prop:
@@ -534,6 +534,7 @@ match result {
         % for p in field_params:
 <%
     pname = 'self.' + property(p.name)    # property identifier
+    to_string_impl = string_impl(p)
 %>\
         ## parts can also be derived from the request, but we do that only if it's not set
         % if p.name == 'part' and request_value:
@@ -556,15 +557,15 @@ match result {
         % if p.get('repeated', False):
         if ${pname}.len() > 0 {
             for f in ${pname}.iter() {
-                params.push(("${p.name}", f.to_string()));
+                params.push(("${p.name}", ${to_string_impl}(f)));
             }
         }
         % elif not is_required_property(p):
-        if let Some(value) = ${pname} {
-            params.push(("${p.name}", value.to_string()));
+        if let Some(value) = ${pname}.as_ref() {
+            params.push(("${p.name}", ${to_string_impl}(value)));
         }
         % else:
-        params.push(("${p.name}", ${pname}.to_string()));
+        params.push(("${p.name}", ${to_string_impl}(&${pname})));
         % endif
         % endfor
         ## Additional params - may not overlap with optional params

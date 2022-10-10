@@ -243,7 +243,7 @@ Arguments will always be copied or cloned into the builder, to make them indepen
 ###############################################################################################
 <%def name="test_hub(hub_type, comments=True)">\
 use std::default::Default;
-use ${util.library_name()}::{${hub_type}, oauth2, hyper, hyper_rustls};
+use ${util.library_name()}::{${hub_type}, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 
 % if comments:
 // Get an ApplicationSecret instance by some means. It contains the `client_id` and 

@@ -1,3 +1,6 @@
+pub mod field_mask;
+pub mod serde;
+
 use std::error;
 use std::error::Error as StdError;
 use std::fmt::{self, Display};
@@ -23,6 +26,9 @@ use tokio::io::{AsyncRead, AsyncWrite};
 use tokio::time::sleep;
 use tower_service;
 
+pub use chrono;
+pub use field_mask::FieldMask;
+pub use serde_with;
 pub use yup_oauth2 as oauth2;
 
 const LINE_ENDING: &str = "\r\n";
@@ -414,7 +420,7 @@ impl<'a> Read for MultiPartReader<'a> {
             (n, true, _) if n > 0 => {
                 let (headers, reader) = self.raw_parts.remove(0);
                 let mut c = Cursor::new(Vec::<u8>::new());
-                // TODO: The first line ending should be omitted for the first part,
+                //TODO: The first line ending should be omitted for the first part,
                 // fortunately Google's API serves don't seem to mind.
                 (write!(
                     &mut c,
@@ -850,7 +856,7 @@ mod test_api {
     use std::str::FromStr;
 
     use serde_json as json;
-    use serde::{Serialize, Deserialize};
+    use ::serde::{Serialize, Deserialize};
 
     #[test]
     fn serde() {
