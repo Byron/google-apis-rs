@@ -37,7 +37,7 @@ itertools = "^ 0.10"
 % if cargo.get('is_executable', False):
 google-clis-common = { path = "../../google-clis-common", version = "4.0" }
 % else:
-google-apis-common = { path = "../../google-apis-common", version = "4.0" }
+google-apis-common = { path = "../../google-apis-common", version = "5.0" }
 % endif
 % for dep in cargo.get('dependencies', list()):
 ${dep}
