@@ -5,6 +5,47 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 5.0.0 (2022-10-10)
+
+### New Features
+
+ - <csr-id-3625188eb5dac9f6dfe8e672a65e75dcb0810081/> apis-common for the 5.0 line of google crates.
+   It aids with better type decoding support.
+
+### Commit Statistics
+
+<csr-read-only-do-not-edit/>
+
+ - 16 commits contributed to the release over the course of 2 calendar days.
+ - 8 days passed between releases.
+ - 1 commit was understood as [conventional](https://www.conventionalcommits.org).
+ - 0 issues like '(#ID)' where seen in commit messages
+
+### Commit Details
+
+<csr-read-only-do-not-edit/>
+
+<details><summary>view details</summary>
+
+ * **Uncategorized**
+    - apis-common for the 5.0 line of google crates. ([`3625188`](https://github.com/Byron/google-apis-rs/commit/3625188eb5dac9f6dfe8e672a65e75dcb0810081))
+    - Use correct string impls for http headers ([`1c04f66`](https://github.com/Byron/google-apis-rs/commit/1c04f662d17fd131c9342bb4ccccb728e03b9376))
+    - Support serde for arbitrary field types ([`f6cced9`](https://github.com/Byron/google-apis-rs/commit/f6cced960594d680c2335c5740c331b99e46bdcc))
+    - Fix cargo check w.r.t. FieldMask ([`8cc2707`](https://github.com/Byron/google-apis-rs/commit/8cc27075638e005448defd31fbf8ec3e445dd7b0))
+    - Add #[serde(default)] for Option parsing ([`ddac761`](https://github.com/Byron/google-apis-rs/commit/ddac761e06dd2bd6c544bfafc8f058871aa3ec04))
+    - Add base64 round trip test ([`8809ec4`](https://github.com/Byron/google-apis-rs/commit/8809ec4807385e2c90fa2093885e67567f21a94f))
+    - Add FieldMask and serde impl ([`afb96bd`](https://github.com/Byron/google-apis-rs/commit/afb96bd264c91372b9900360d9d060ea38c7a31e))
+    - Add serde test cases ([`928c602`](https://github.com/Byron/google-apis-rs/commit/928c6027e65aed1fb71269571fecdf20e5b0a57c))
+    - serde cleanup ([`7662741`](https://github.com/Byron/google-apis-rs/commit/76627413a34ff335a74750ba3f2cbc8999d4c6f3))
+    - refactor serde functionality into separate module ([`5398dc6`](https://github.com/Byron/google-apis-rs/commit/5398dc6f7945ee08071c8131ed3fb02163342a60))
+    - Fix type signatures ([`477be5d`](https://github.com/Byron/google-apis-rs/commit/477be5d76c1f33a1df6796684b4a29b59bd0ccfd))
+    - Use chrono::Duration directly with serde attributes ([`05df68d`](https://github.com/Byron/google-apis-rs/commit/05df68de324561773b9867f143bf7dbb4381f603))
+    - Add proper error handling for parsing Duration ([`444b610`](https://github.com/Byron/google-apis-rs/commit/444b610ddc62af31c9c95e6865b8e58452afb10f))
+    - Clean up duration parsing code ([`fc78001`](https://github.com/Byron/google-apis-rs/commit/fc780014d4e94b7a01c5237feb21999c86474cc1))
+    - Use appropriate types for date-time, duration, bytes ([`29aa8df`](https://github.com/Byron/google-apis-rs/commit/29aa8df15b0ee08b7dea83f9a25cd9d6c2304b99))
+    - Add support for duration and base64 serde ([`66c535e`](https://github.com/Byron/google-apis-rs/commit/66c535e4d67b2ebcb726eaad4cb6daf24c650ecc))
+</details>
+
 ## 4.0.1 (2022-10-02)
 
 `+Send` trait bound for `GetToken`.
@@ -13,7 +54,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 <csr-read-only-do-not-edit/>
 
- - 10 commits contributed to the release over the course of 3 calendar days.
+ - 11 commits contributed to the release over the course of 3 calendar days.
  - 6 days passed between releases.
  - 0 commits were understood as [conventional](https://www.conventionalcommits.org).
  - 0 issues like '(#ID)' where seen in commit messages
@@ -25,6 +66,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 <details><summary>view details</summary>
 
  * **Uncategorized**
+    - Release google-apis-common v4.0.1 ([`93c8601`](https://github.com/Byron/google-apis-rs/commit/93c8601fdca62f92f164957d9e86220f4f1b10f7))
     - prepare release of google-apis-common ([`dc0686e`](https://github.com/Byron/google-apis-rs/commit/dc0686ea0b4cf6984992930ba531407a3e9e2666))
     - Merge branch 'patch-2' ([`fe1e972`](https://github.com/Byron/google-apis-rs/commit/fe1e97299f5cb025d6e4d18a1864356bcb6f5244))
     - Replace std::thread::sleep with tokio::thread::sleep ([`811ed3d`](https://github.com/Byron/google-apis-rs/commit/811ed3d016c7465e95628b91c0828837aeef2f88))
