@@ -83,8 +83,8 @@ ${struct} { _never_set: Option<bool> }
 <%block filter="rust_doc_sanitize, rust_doc_comment">\
 ${doc(s, c)}\
 </%block>
-    #[serde_with::serde_as(crate = "::client::serde_with")]
-    #[derive(${', '.join(traits)})]
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(${', '.join(traits)})]
 % if s.type == 'object':
 ${_new_object(s, s.get('properties'), c, allow_optionals)}\
 % elif s.type == 'array':
