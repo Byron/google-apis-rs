@@ -670,15 +670,8 @@ else {
         }
         ## Remove all used parameters
         {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(${len(replacements)});
-            for param_name in [${', '.join(reversed(['"%s"' % r[1] for r in replacements]))}].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
+            let to_remove = [${', '.join(reversed(['"%s"' % r[1] for r in replacements]))}];
+            params.retain(|(n, _)| !to_remove.contains(n));
         }
         % endif
 
