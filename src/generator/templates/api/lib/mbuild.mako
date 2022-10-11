@@ -582,17 +582,15 @@ match result {
         % if supports_download:
         let (json_field_missing, enable_resource_parsing) = {
             let mut enable = true;
-            let mut field_present = true;
+            let mut field_missing = true;
             for &(name, ref value) in params.iter() {
                 if name == "alt" {
-                    field_present = false;
-                    if <String as AsRef<str>>::as_ref(&value) != "json" {
-                        enable = false;
-                    }
+                    field_missing = false;
+                    enable = value == "json";
                     break;
                 }
             }
-            (field_present, enable)
+            (field_missing, enable)
         };
         if json_field_missing {
             params.push(("alt", "json".to_string()));
