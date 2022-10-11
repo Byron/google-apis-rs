@@ -126,7 +126,7 @@ pub struct ${ThisType}
     ${api.properties.params}: HashMap<String, String>,
     % if method_default_scope(m):
 ## We need the scopes sorted, to not unnecessarily query new tokens
-    ${api.properties.scopes}: BTreeMap<String, ()>
+    ${api.properties.scopes}: BTreeSet<String>
     % endif
 }
 
@@ -188,9 +188,8 @@ ${self._setter_fn(resource, method, m, p, part_prop, ThisType, c)}\
     pub fn ${ADD_SCOPE_FN}<T, St>(mut self, scope: T) -> ${ThisType}
                                                         where T: Into<Option<St>>,
                                                               St: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self.${api.properties.scopes}.insert(scope.as_ref().to_string(), ()),
-          None => None,
+        if let Some(scope) = scope.into() {
+          self.${api.properties.scopes}.insert(scope.as_ref().to_string());
         };
         self
     }
@@ -637,8 +636,8 @@ else {
         }
         % endif
         % else:
-        if self.${api.properties.scopes}.len() == 0 {
-            self.${api.properties.scopes}.insert(${scope_url_to_variant(name, default_scope, fully_qualified=True)}.as_ref().to_string(), ());
+        if self.${api.properties.scopes}.is_empty() {
+            self.${api.properties.scopes}.insert(${scope_url_to_variant(name, default_scope, fully_qualified=True)}.as_ref().to_string());
         }
         % endif
 
@@ -707,7 +706,7 @@ else {
 
         loop {
             % if default_scope:
-            let token = match ${auth_call}.get_token(&self.${api.properties.scopes}.keys().map(String::as_str).collect::<Vec<_>>()[..]).await {
+            let token = match ${auth_call}.get_token(&self.${api.properties.scopes}.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
                 // TODO: remove Ok / Err branches
                 Ok(Some(token)) => token.clone(),
                 Ok(None) => {
