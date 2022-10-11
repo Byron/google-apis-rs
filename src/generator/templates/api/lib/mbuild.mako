@@ -556,15 +556,15 @@ match result {
         % if p.get('repeated', False):
         if ${pname}.len() > 0 {
             for f in ${pname}.iter() {
-                params.push(("${p.name}", ${to_string_impl}(f)));
+                params.push(("${p.name}", ${to_string_impl("f")}));
             }
         }
         % elif not is_required_property(p):
         if let Some(value) = ${pname}.as_ref() {
-            params.push(("${p.name}", ${to_string_impl}(value)));
+            params.push(("${p.name}", ${to_string_impl("value")}));
         }
         % else:
-        params.push(("${p.name}", ${to_string_impl}(&${pname})));
+        params.push(("${p.name}", ${to_string_impl(pname)}));
         % endif
         % endfor
         ## Additional params - may not overlap with optional params
