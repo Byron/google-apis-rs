@@ -1242,13 +1242,14 @@ def size_to_bytes(size):
 
 
 def string_impl(p):
+    """Returns a function which will convert instances of p to a string"""
     return {
-        "google-duration": "::client::serde::duration::to_string",
-        "byte": "::client::serde::urlsafe_base64::to_string",
-        "google-datetime": "::client::serde::datetime_to_string",
-        "date-time": "::client::serde::datetime_to_string",
-        "google-fieldmask": "(|x: &client::FieldMask| x.to_string())"
-    }.get(p.get("format"), "(|x: &dyn std::fmt::Display| x.to_string())")
+        "google-duration": lambda x: f"::client::serde::duration::to_string(&{x})",
+        "byte": lambda x: f"::client::serde::urlsafe_base64::to_string(&{x})",
+        "google-datetime": lambda x: f"::client::serde::datetime_to_string(&{x})",
+        "date-time": lambda x: f"::client::serde::datetime_to_string(&{x})",
+        "google-fieldmask": lambda x: f"{x}.to_string()"
+    }.get(p.get("format"), lambda x: f"{x}.to_string()")
 
 
 if __name__ == '__main__':
