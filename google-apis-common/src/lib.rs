@@ -1,12 +1,11 @@
+pub mod auth;
 pub mod field_mask;
 pub mod serde;
 
 use std::error;
 use std::error::Error as StdError;
 use std::fmt::{self, Display};
-use std::future::Future;
 use std::io::{self, Cursor, Read, Seek, SeekFrom, Write};
-use std::pin::Pin;
 use std::str::FromStr;
 use std::time::Duration;
 
@@ -26,6 +25,7 @@ use tokio::io::{AsyncRead, AsyncWrite};
 use tokio::time::sleep;
 use tower_service;
 
+pub use auth::{GetToken, NoToken};
 pub use chrono;
 pub use field_mask::FieldMask;
 pub use serde_with;
@@ -119,8 +119,7 @@ pub trait Delegate: Send {
     /// impending failure.
     /// The given Error provides information about why the token couldn't be acquired in the
     /// first place
-    fn token(&mut self, err: &oauth2::Error) -> Option<String> {
-        let _ = err;
+    fn token(&mut self) -> Option<String> {
         None
     }
 
@@ -236,9 +235,8 @@ pub enum Error {
     /// Neither through the authenticator, nor through the Delegate.
     MissingAPIKey,
 
-    // TODO: Remove oauth2::Error
     /// We required a Token, but didn't get one from the Authenticator
-    MissingToken(oauth2::Error),
+    MissingToken,
 
     /// The delgate instructed to cancel the operation
     Cancelled,
@@ -268,24 +266,17 @@ impl Display for Error {
                 resource_size, max_size
             ),
             Error::MissingAPIKey => {
-                (writeln!(
+                writeln!(
                     f,
                     "The application's API key was not found in the configuration"
-                ))
-                .ok();
+                )?;
                 writeln!(
                     f,
                     "It is used as there are no Scopes defined for this method."
                 )
             }
-            Error::BadRequest(ref message) => {
-                writeln!(f, "Bad Request: {}", message)?;
-                Ok(())
-            }
-            // TODO: Remove oauth2::Error
-            Error::MissingToken(ref err) => {
-                writeln!(f, "Token retrieval failed with error: {}", err)
-            }
+            Error::BadRequest(ref message) => writeln!(f, "Bad Request: {}", message),
+            Error::MissingToken => writeln!(f, "Token retrieval failed"),
             Error::Cancelled => writeln!(f, "Operation cancelled by delegate"),
             Error::FieldClash(field) => writeln!(
                 f,
@@ -777,86 +768,14 @@ pub async fn get_body_as_string(res_body: &mut hyper::Body) -> String {
     res_body_string.to_string()
 }
 
-// TODO: Simplify this to Option<String>
-type TokenResult = std::result::Result<Option<String>, oauth2::Error>;
-
-pub trait GetToken: GetTokenClone + Send + Sync {
-    /// Called whenever there is the need for an oauth token after
-    /// the official authenticator implementation didn't provide one, for some reason.
-    /// If this method returns None as well, the underlying operation will fail
-    fn get_token<'a>(&'a self, _scopes: &'a [&str]) -> Pin<Box<dyn Future<Output=TokenResult> + Send + 'a>> {
-        Box::pin(async move { Ok(None) })
-    }
-}
-
-pub trait GetTokenClone {
-    fn clone_box(&self) -> Box<dyn GetToken>;
-}
-
-impl<T> GetTokenClone for T
-where
-    T: 'static + GetToken + Clone,
-{
-    fn clone_box(&self) -> Box<dyn GetToken> {
-        Box::new(self.clone())
-    }
-}
-
-impl Clone for Box<dyn GetToken> {
-    fn clone(&self) -> Box<dyn GetToken> {
-        self.clone_box()
-    }
-}
-
-impl GetToken for String {
-    fn get_token<'a>(&'a self, _scopes: &'a [&str]) -> Pin<Box<dyn Future<Output=TokenResult> + Send + 'a>> {
-        Box::pin(async move { Ok(Some(self.clone())) })
-    }
-}
-
-/// In the event that the API endpoint does not require an oauth2 token, `NoToken` should be provided to the hub to avoid specifying an
-/// authenticator.
-#[derive(Default, Clone)]
-pub struct NoToken;
-
-impl GetToken for NoToken {}
-
-// TODO: Make this optional
-// #[cfg(feature = "yup-oauth2")]
-mod yup_oauth2_impl {
-    use core::future::Future;
-    use core::pin::Pin;
-
-    use super::{GetToken, TokenResult};
-
-    use tower_service::Service;
-    use yup_oauth2::authenticator::Authenticator;
-    use tokio::io::{AsyncRead, AsyncWrite};
-    use http::Uri;
-    use hyper::client::connect::Connection;
-
-
-    impl<S> GetToken for Authenticator<S> where
-        S: Service<Uri> + Clone + Send + Sync + 'static,
-        S::Response: Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
-        S::Future: Send + Unpin + 'static,
-        S::Error: Into<Box<dyn std::error::Error + Send + Sync>> {
-        fn get_token<'a>(&'a self, scopes: &'a [&str]) -> Pin<Box<dyn Future<Output=TokenResult> + Send + 'a>> {
-            Box::pin(async move {
-                self.token(scopes).await.map(|t| Some(t.as_str().to_owned()))
-            })
-        }
-    }
-}
-
 #[cfg(test)]
 mod test_api {
     use super::*;
     use std::default::Default;
     use std::str::FromStr;
 
+    use ::serde::{Deserialize, Serialize};
     use serde_json as json;
-    use ::serde::{Serialize, Deserialize};
 
     #[test]
     fn serde() {
@@ -914,14 +833,5 @@ mod test_api {
         let mut dd = DefaultDelegate::default();
         let dlg: &mut dyn Delegate = &mut dd;
         with_send(dlg);
-    }
-    
-    #[test]
-    fn dyn_get_token_is_send() {
-        fn with_send(_x: impl Send) {}
-
-        let mut gt = String::new();
-        let dgt: &mut dyn GetToken = &mut gt;
-        with_send(dgt);
     }
 }
