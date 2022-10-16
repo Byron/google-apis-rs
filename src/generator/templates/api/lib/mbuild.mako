@@ -174,7 +174,7 @@ ${self._setter_fn(resource, method, m, p, part_prop, ThisType, c)}\
     % if method_default_scope(m):
     /// Identifies the authorization scope for the method you are building.
     ///
-    /// Use this method to actively specify which scope should be used, instead the of the default [`Scope`] variant
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
     /// [`${scope_url_to_variant(name, method_default_scope(m), fully_qualified=True)}`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
