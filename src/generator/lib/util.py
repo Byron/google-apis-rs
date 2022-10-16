@@ -24,35 +24,6 @@ CHRONO_PATH = "client::chrono"
 CHRONO_DATETIME = f"{CHRONO_PATH}::DateTime<{CHRONO_PATH}::offset::Utc>"
 CHRONO_DATE = f"{CHRONO_PATH}::NaiveDate"
 USE_FORMAT = 'use_format_field'
-TYPE_MAP = {
-    'boolean': 'bool',
-    'integer': USE_FORMAT,
-    'number': USE_FORMAT,
-    'uint32': 'u32',
-    'double': 'f64',
-    'float': 'f32',
-    'int32': 'i32',
-    'any': 'String',  # TODO: Figure out how to handle it. It's 'interface' in Go ...
-    'int64': 'i64',
-    'uint64': 'u64',
-    'array': 'Vec',
-    'string': 'String',
-    'object': 'HashMap',
-    # https://github.com/protocolbuffers/protobuf/blob/ec1a70913e5793a7d0a7b5fbf7e0e4f75409dd41/src/google/protobuf/timestamp.proto
-    # In JSON format, the Timestamp type is encoded as a string in the [RFC 3339] format
-    'google-datetime': CHRONO_DATETIME,
-    # Per .json files: RFC 3339 timestamp
-    'date-time': CHRONO_DATETIME,
-    # Per .json files: A date in RFC 3339 format with only the date part
-    # e.g. "2013-01-15"
-    'date': CHRONO_DATE,
-    # https://github.com/protocolbuffers/protobuf/blob/ec1a70913e5793a7d0a7b5fbf7e0e4f75409dd41/src/google/protobuf/duration.proto
-    'google-duration': f"{CHRONO_PATH}::Duration",
-    # guessing bytes is universally url-safe b64
-    "byte": "Vec<u8>",
-    # https://github.com/protocolbuffers/protobuf/blob/ec1a70913e5793a7d0a7b5fbf7e0e4f75409dd41/src/google/protobuf/field_mask.proto
-    "google-fieldmask": "client::FieldMask"
-}
 
 RUST_TYPE_MAP = {
     'boolean': Base("bool"),
@@ -128,7 +99,10 @@ DEL_METHOD = 'delete'
 METHODS_RESOURCE = 'methods'
 
 ADD_PARAM_FN = 'param'
-ADD_SCOPE_FN = 'add_scope'
+ADD_SCOPE_FN = "add_scope"
+ADD_SCOPES_FN = "add_scopes"
+CLEAR_SCOPES_FN = "clear_scopes"
+
 ADD_PARAM_MEDIA_EXAMPLE = "." + ADD_PARAM_FN + '("alt", "media")'
 
 SPACES_PER_TAB = 4

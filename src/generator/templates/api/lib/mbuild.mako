@@ -11,7 +11,8 @@
                       DELEGATE_PROPERTY_NAME, struct_type_bounds_s, scope_url_to_variant,
                       re_find_replacements, ADD_PARAM_FN, ADD_PARAM_MEDIA_EXAMPLE, upload_action_fn, METHODS_RESOURCE,
                       method_name_to_variant, size_to_bytes, method_default_scope,
-                      is_repeated_property, setter_fn_name, ADD_SCOPE_FN, rust_doc_sanitize, items, string_impl)
+                      is_repeated_property, setter_fn_name, ADD_SCOPE_FN, ADD_SCOPES_FN, rust_doc_sanitize,
+                      CLEAR_SCOPES_FN, items, string_impl)
 
     def get_parts(part_prop):
         if not part_prop:
@@ -79,7 +80,7 @@ ${m.description | rust_doc_sanitize, rust_doc_comment}
 % else:
 /// A builder for the *${method}* method supported by a *${singular(resource)}* resource.
 % endif
-/// It is not used directly, but through a `${rb_type(resource)}` instance.
+/// It is not used directly, but through a [`${rb_type(resource)}`] instance.
 ///
 % if part_desc:
 ${part_desc | rust_doc_sanitize, rust_doc_comment}
@@ -173,24 +174,36 @@ ${self._setter_fn(resource, method, m, p, part_prop, ThisType, c)}\
     % if method_default_scope(m):
     /// Identifies the authorization scope for the method you are building.
     ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `${scope_url_to_variant(name, method_default_scope(m), fully_qualified=True)}`.
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`${scope_url_to_variant(name, method_default_scope(m), fully_qualified=True)}`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `${ADD_PARAM_FN}()`
-    /// function for details).
     ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn ${ADD_SCOPE_FN}<T, St>(mut self, scope: T) -> ${ThisType}
-                                                        where T: Into<Option<St>>,
-                                                              St: AsRef<str> {
-        if let Some(scope) = scope.into() {
-          self.${api.properties.scopes}.insert(scope.as_ref().to_string());
-        };
+    pub fn ${ADD_SCOPE_FN}<St>(mut self, scope: St) -> ${ThisType}
+                                                        where St: AsRef<str> {
+        self.${api.properties.scopes}.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::${ADD_SCOPE_FN}()`] for details.
+    pub fn ${ADD_SCOPES_FN}<I, St>(mut self, scopes: I) -> ${ThisType}
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self.${api.properties.scopes}
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::${ADD_PARAM_FN}()`]
+    /// for details).
+    pub fn ${CLEAR_SCOPES_FN}(mut self) -> ${ThisType} {
+        self.${api.properties.scopes}.clear();
         self
     }
     % endif

@@ -25,7 +25,7 @@
 % else:
 /// A builder providing access to all methods supported on *${singular(resource)}* resources.
 % endif
-/// It is not used directly, but through the `${hub_type_name}` hub.
+/// It is not used directly, but through the [`${hub_type_name}`] hub.
 ///
 /// # Example
 ///
