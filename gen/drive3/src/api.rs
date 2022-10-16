@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 use std::cell::RefCell;
 use std::default::Default;
-use std::collections::BTreeMap;
+use std::collections::BTreeSet;
 use std::error::Error as StdError;
 use serde_json as json;
 use std::io;
@@ -161,7 +161,7 @@ impl<'a, S> DriveHub<S> {
         DriveHub {
             client,
             auth: Box::new(auth),
-            _user_agent: "google-api-rust-client/5.0.0".to_string(),
+            _user_agent: "google-api-rust-client/5.0.1".to_string(),
             _base_url: "https://www.googleapis.com/drive/v3/".to_string(),
             _root_url: "https://www.googleapis.com/".to_string(),
         }
@@ -199,7 +199,7 @@ impl<'a, S> DriveHub<S> {
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/5.0.0`.
+    /// It defaults to `google-api-rust-client/5.0.1`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -2253,7 +2253,7 @@ impl client::Part for TeamDriveRestrictions {}
 // #################
 
 /// A builder providing access to all methods supported on *about* resources.
-/// It is not used directly, but through the `DriveHub` hub.
+/// It is not used directly, but through the [`DriveHub`] hub.
 ///
 /// # Example
 ///
@@ -2306,7 +2306,7 @@ impl<'a, S> AboutMethods<'a, S> {
 
 
 /// A builder providing access to all methods supported on *change* resources.
-/// It is not used directly, but through the `DriveHub` hub.
+/// It is not used directly, but through the [`DriveHub`] hub.
 ///
 /// # Example
 ///
@@ -2423,7 +2423,7 @@ impl<'a, S> ChangeMethods<'a, S> {
 
 
 /// A builder providing access to all methods supported on *channel* resources.
-/// It is not used directly, but through the `DriveHub` hub.
+/// It is not used directly, but through the [`DriveHub`] hub.
 ///
 /// # Example
 ///
@@ -2481,7 +2481,7 @@ impl<'a, S> ChannelMethods<'a, S> {
 
 
 /// A builder providing access to all methods supported on *comment* resources.
-/// It is not used directly, but through the `DriveHub` hub.
+/// It is not used directly, but through the [`DriveHub`] hub.
 ///
 /// # Example
 ///
@@ -2622,7 +2622,7 @@ impl<'a, S> CommentMethods<'a, S> {
 
 
 /// A builder providing access to all methods supported on *drive* resources.
-/// It is not used directly, but through the `DriveHub` hub.
+/// It is not used directly, but through the [`DriveHub`] hub.
 ///
 /// # Example
 ///
@@ -2787,7 +2787,7 @@ impl<'a, S> DriveMethods<'a, S> {
 
 
 /// A builder providing access to all methods supported on *file* resources.
-/// It is not used directly, but through the `DriveHub` hub.
+/// It is not used directly, but through the [`DriveHub`] hub.
 ///
 /// # Example
 ///
@@ -3044,7 +3044,7 @@ impl<'a, S> FileMethods<'a, S> {
 
 
 /// A builder providing access to all methods supported on *permission* resources.
-/// It is not used directly, but through the `DriveHub` hub.
+/// It is not used directly, but through the [`DriveHub`] hub.
 ///
 /// # Example
 ///
@@ -3205,7 +3205,7 @@ impl<'a, S> PermissionMethods<'a, S> {
 
 
 /// A builder providing access to all methods supported on *reply* resources.
-/// It is not used directly, but through the `DriveHub` hub.
+/// It is not used directly, but through the [`DriveHub`] hub.
 ///
 /// # Example
 ///
@@ -3355,7 +3355,7 @@ impl<'a, S> ReplyMethods<'a, S> {
 
 
 /// A builder providing access to all methods supported on *revision* resources.
-/// It is not used directly, but through the `DriveHub` hub.
+/// It is not used directly, but through the [`DriveHub`] hub.
 ///
 /// # Example
 ///
@@ -3475,7 +3475,7 @@ impl<'a, S> RevisionMethods<'a, S> {
 
 
 /// A builder providing access to all methods supported on *teamdrive* resources.
-/// It is not used directly, but through the `DriveHub` hub.
+/// It is not used directly, but through the [`DriveHub`] hub.
 ///
 /// # Example
 ///
@@ -3614,7 +3614,7 @@ impl<'a, S> TeamdriveMethods<'a, S> {
 /// Gets information about the user, the user's Drive, and system capabilities.
 ///
 /// A builder for the *get* method supported by a *about* resource.
-/// It is not used directly, but through a `AboutMethods` instance.
+/// It is not used directly, but through a [`AboutMethods`] instance.
 ///
 /// # Example
 ///
@@ -3647,7 +3647,7 @@ pub struct AboutGetCall<'a, S>
     hub: &'a DriveHub<S>,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
+    _scopes: BTreeSet<String>
 }
 
 impl<'a, S> client::CallBuilder for AboutGetCall<'a, S> {}
@@ -3687,8 +3687,8 @@ where
         params.push(("alt", "json".to_string()));
 
         let mut url = self.hub._base_url.clone() + "about";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::MetadataReadonly.as_ref().to_string(), ());
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::MetadataReadonly.as_ref().to_string());
         }
 
 
@@ -3697,7 +3697,7 @@ where
 
 
         loop {
-            let token = match self.hub.auth.get_token(&self._scopes.keys().map(String::as_str).collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
                 // TODO: remove Ok / Err branches
                 Ok(Some(token)) => token.clone(),
                 Ok(None) => {
@@ -3820,25 +3820,36 @@ where
 
     /// Identifies the authorization scope for the method you are building.
     ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::MetadataReadonly`.
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::MetadataReadonly`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
     ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, St>(mut self, scope: T) -> AboutGetCall<'a, S>
-                                                        where T: Into<Option<St>>,
-                                                              St: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
+    pub fn add_scope<St>(mut self, scope: St) -> AboutGetCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> AboutGetCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> AboutGetCall<'a, S> {
+        self._scopes.clear();
         self
     }
 }
@@ -3847,7 +3858,7 @@ where
 /// Gets the starting pageToken for listing future changes.
 ///
 /// A builder for the *getStartPageToken* method supported by a *change* resource.
-/// It is not used directly, but through a `ChangeMethods` instance.
+/// It is not used directly, but through a [`ChangeMethods`] instance.
 ///
 /// # Example
 ///
@@ -3888,7 +3899,7 @@ pub struct ChangeGetStartPageTokenCall<'a, S>
     _drive_id: Option<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
+    _scopes: BTreeSet<String>
 }
 
 impl<'a, S> client::CallBuilder for ChangeGetStartPageTokenCall<'a, S> {}
@@ -3916,16 +3927,16 @@ where
                                http_method: hyper::Method::GET });
         let mut params: Vec<(&str, String)> = Vec::with_capacity(6 + self._additional_params.len());
         if let Some(value) = self._team_drive_id.as_ref() {
-            params.push(("teamDriveId", (|x: &dyn std::fmt::Display| x.to_string())(value)));
+            params.push(("teamDriveId", value.to_string()));
         }
         if let Some(value) = self._supports_team_drives.as_ref() {
-            params.push(("supportsTeamDrives", (|x: &dyn std::fmt::Display| x.to_string())(value)));
+            params.push(("supportsTeamDrives", value.to_string()));
         }
         if let Some(value) = self._supports_all_drives.as_ref() {
-            params.push(("supportsAllDrives", (|x: &dyn std::fmt::Display| x.to_string())(value)));
+            params.push(("supportsAllDrives", value.to_string()));
         }
         if let Some(value) = self._drive_id.as_ref() {
-            params.push(("driveId", (|x: &dyn std::fmt::Display| x.to_string())(value)));
+            params.push(("driveId", value.to_string()));
         }
         for &field in ["alt", "teamDriveId", "supportsTeamDrives", "supportsAllDrives", "driveId"].iter() {
             if self._additional_params.contains_key(field) {
@@ -3940,8 +3951,8 @@ where
         params.push(("alt", "json".to_string()));
 
         let mut url = self.hub._base_url.clone() + "changes/startPageToken";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::MetadataReadonly.as_ref().to_string(), ());
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::MetadataReadonly.as_ref().to_string());
         }
 
 
@@ -3950,7 +3961,7 @@ where
 
 
         loop {
-            let token = match self.hub.auth.get_token(&self._scopes.keys().map(String::as_str).collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
                 // TODO: remove Ok / Err branches
                 Ok(Some(token)) => token.clone(),
                 Ok(None) => {
@@ -4101,25 +4112,36 @@ where
 
     /// Identifies the authorization scope for the method you are building.
     ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::MetadataReadonly`.
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::MetadataReadonly`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
     ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, St>(mut self, scope: T) -> ChangeGetStartPageTokenCall<'a, S>
-                                                        where T: Into<Option<St>>,
-                                                              St: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
+    pub fn add_scope<St>(mut self, scope: St) -> ChangeGetStartPageTokenCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> ChangeGetStartPageTokenCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> ChangeGetStartPageTokenCall<'a, S> {
+        self._scopes.clear();
         self
     }
 }
@@ -4128,7 +4150,7 @@ where
 /// Lists the changes for a user or shared drive.
 ///
 /// A builder for the *list* method supported by a *change* resource.
-/// It is not used directly, but through a `ChangeMethods` instance.
+/// It is not used directly, but through a [`ChangeMethods`] instance.
 ///
 /// # Example
 ///
@@ -4186,7 +4208,7 @@ pub struct ChangeListCall<'a, S>
     _drive_id: Option<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
+    _scopes: BTreeSet<String>
 }
 
 impl<'a, S> client::CallBuilder for ChangeListCall<'a, S> {}
@@ -4213,42 +4235,42 @@ where
         dlg.begin(client::MethodInfo { id: "drive.changes.list",
                                http_method: hyper::Method::GET });
         let mut params: Vec<(&str, String)> = Vec::with_capacity(15 + self._additional_params.len());
-        params.push(("pageToken", (|x: &dyn std::fmt::Display| x.to_string())(&self._page_token)));
+        params.push(("pageToken", self._page_token.to_string()));
         if let Some(value) = self._team_drive_id.as_ref() {
-            params.push(("teamDriveId", (|x: &dyn std::fmt::Display| x.to_string())(value)));
+            params.push(("teamDriveId", value.to_string()));
         }
         if let Some(value) = self._supports_team_drives.as_ref() {
-            params.push(("supportsTeamDrives", (|x: &dyn std::fmt::Display| x.to_string())(value)));
+            params.push(("supportsTeamDrives", value.to_string()));
         }
         if let Some(value) = self._supports_all_drives.as_ref() {
-            params.push(("supportsAllDrives", (|x: &dyn std::fmt::Display| x.to_string())(value)));
+            params.push(("supportsAllDrives", value.to_string()));
         }
         if let Some(value) = self._spaces.as_ref() {
-            params.push(("spaces", (|x: &dyn std::fmt::Display| x.to_string())(value)));
+            params.push(("spaces", value.to_string()));
         }
         if let Some(value) = self._restrict_to_my_drive.as_ref() {
-            params.push(("restrictToMyDrive", (|x: &dyn std::fmt::Display| x.to_string())(value)));
+            params.push(("restrictToMyDrive", value.to_string()));
         }
         if let Some(value) = self._page_size.as_ref() {
-            params.push(("pageSize", (|x: &dyn std::fmt::Display| x.to_string())(value)));
+            params.push(("pageSize", value.to_string()));
         }
         if let Some(value) = self._include_team_drive_items.as_ref() {
-            params.push(("includeTeamDriveItems", (|x: &dyn std::fmt::Display| x.to_string())(value)));
+            params.push(("includeTeamDriveItems", value.to_string()));
         }
         if let Some(value) = self._include_removed.as_ref() {
-            params.push(("includeRemoved", (|x: &dyn std::fmt::Display| x.to_string())(value)));
+            params.push(("includeRemoved", value.to_string()));
         }
         if let Some(value) = self._include_permissions_for_view.as_ref() {
-            params.push(("includePermissionsForView", (|x: &dyn std::fmt::Display| x.to_string())(value)));
+            params.push(("includePermissionsForView", value.to_string()));
         }
         if let Some(value) = self._include_items_from_all_drives.as_ref() {
-            params.push(("includeItemsFromAllDrives", (|x: &dyn std::fmt::Display| x.to_string())(value)));
+            params.push(("includeItemsFromAllDrives", value.to_string()));
         }
         if let Some(value) = self._include_corpus_removals.as_ref() {
-            params.push(("includeCorpusRemovals", (|x: &dyn std::fmt::Display| x.to_string())(value)));
+            params.push(("includeCorpusRemovals", value.to_string()));
         }
         if let Some(value) = self._drive_id.as_ref() {
-            params.push(("driveId", (|x: &dyn std::fmt::Display| x.to_string())(value)));
+            params.push(("driveId", value.to_string()));
         }
         for &field in ["alt", "pageToken", "teamDriveId", "supportsTeamDrives", "supportsAllDrives", "spaces", "restrictToMyDrive", "pageSize", "includeTeamDriveItems", "includeRemoved", "includePermissionsForView", "includeItemsFromAllDrives", "includeCorpusRemovals", "driveId"].iter() {
             if self._additional_params.contains_key(field) {
@@ -4263,8 +4285,8 @@ where
         params.push(("alt", "json".to_string()));
 
         let mut url = self.hub._base_url.clone() + "changes";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::MetadataReadonly.as_ref().to_string(), ());
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::MetadataReadonly.as_ref().to_string());
         }
 
 
@@ -4273,7 +4295,7 @@ where
 
 
         loop {
-            let token = match self.hub.auth.get_token(&self._scopes.keys().map(String::as_str).collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
                 // TODO: remove Ok / Err branches
                 Ok(Some(token)) => token.clone(),
                 Ok(None) => {
@@ -4490,25 +4512,36 @@ where
 
     /// Identifies the authorization scope for the method you are building.
     ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::MetadataReadonly`.
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::MetadataReadonly`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
     ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, St>(mut self, scope: T) -> ChangeListCall<'a, S>
-                                                        where T: Into<Option<St>>,
-                                                              St: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
+    pub fn add_scope<St>(mut self, scope: St) -> ChangeListCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> ChangeListCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> ChangeListCall<'a, S> {
+        self._scopes.clear();
         self
     }
 }
@@ -4517,7 +4550,7 @@ where
 /// Subscribes to changes for a user.
 ///
 /// A builder for the *watch* method supported by a *change* resource.
-/// It is not used directly, but through a `ChangeMethods` instance.
+/// It is not used directly, but through a [`ChangeMethods`] instance.
 ///
 /// # Example
 ///
@@ -4582,7 +4615,7 @@ pub struct ChangeWatchCall<'a, S>
     _drive_id: Option<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
+    _scopes: BTreeSet<String>
 }
 
 impl<'a, S> client::CallBuilder for ChangeWatchCall<'a, S> {}
@@ -4609,42 +4642,42 @@ where
         dlg.begin(client::MethodInfo { id: "drive.changes.watch",
                                http_method: hyper::Method::POST });
         let mut params: Vec<(&str, String)> = Vec::with_capacity(16 + self._additional_params.len());
-        params.push(("pageToken", (|x: &dyn std::fmt::Display| x.to_string())(&self._page_token)));
+        params.push(("pageToken", self._page_token.to_string()));
         if let Some(value) = self._team_drive_id.as_ref() {
-            params.push(("teamDriveId", (|x: &dyn std::fmt::Display| x.to_string())(value)));
+            params.push(("teamDriveId", value.to_string()));
         }
         if let Some(value) = self._supports_team_drives.as_ref() {
-            params.push(("supportsTeamDrives", (|x: &dyn std::fmt::Display| x.to_string())(value)));
+            params.push(("supportsTeamDrives", value.to_string()));
         }
         if let Some(value) = self._supports_all_drives.as_ref() {
-            params.push(("supportsAllDrives", (|x: &dyn std::fmt::Display| x.to_string())(value)));
+            params.push(("supportsAllDrives", value.to_string()));
         }
         if let Some(value) = self._spaces.as_ref() {
-            params.push(("spaces", (|x: &dyn std::fmt::Display| x.to_string())(value)));
+            params.push(("spaces", value.to_string()));
         }
         if let Some(value) = self._restrict_to_my_drive.as_ref() {
-            params.push(("restrictToMyDrive", (|x: &dyn std::fmt::Display| x.to_string())(value)));
+            params.push(("restrictToMyDrive", value.to_string()));
         }
         if let Some(value) = self._page_size.as_ref() {
-            params.push(("pageSize", (|x: &dyn std::fmt::Display| x.to_string())(value)));
+            params.push(("pageSize", value.to_string()));
         }
         if let Some(value) = self._include_team_drive_items.as_ref() {
-            params.push(("includeTeamDriveItems", (|x: &dyn std::fmt::Display| x.to_string())(value)));
+            params.push(("includeTeamDriveItems", value.to_string()));
         }
         if let Some(value) = self._include_removed.as_ref() {
-            params.push(("includeRemoved", (|x: &dyn std::fmt::Display| x.to_string())(value)));
+            params.push(("includeRemoved", value.to_string()));
         }
         if let Some(value) = self._include_permissions_for_view.as_ref() {
-            params.push(("includePermissionsForView", (|x: &dyn std::fmt::Display| x.to_string())(value)));
+            params.push(("includePermissionsForView", value.to_string()));
         }
         if let Some(value) = self._include_items_from_all_drives.as_ref() {
-            params.push(("includeItemsFromAllDrives", (|x: &dyn std::fmt::Display| x.to_string())(value)));
+            params.push(("includeItemsFromAllDrives", value.to_string()));
         }
         if let Some(value) = self._include_corpus_removals.as_ref() {
-            params.push(("includeCorpusRemovals", (|x: &dyn std::fmt::Display| x.to_string())(value)));
+            params.push(("includeCorpusRemovals", value.to_string()));
         }
         if let Some(value) = self._drive_id.as_ref() {
-            params.push(("driveId", (|x: &dyn std::fmt::Display| x.to_string())(value)));
+            params.push(("driveId", value.to_string()));
         }
         for &field in ["alt", "pageToken", "teamDriveId", "supportsTeamDrives", "supportsAllDrives", "spaces", "restrictToMyDrive", "pageSize", "includeTeamDriveItems", "includeRemoved", "includePermissionsForView", "includeItemsFromAllDrives", "includeCorpusRemovals", "driveId"].iter() {
             if self._additional_params.contains_key(field) {
@@ -4659,8 +4692,8 @@ where
         params.push(("alt", "json".to_string()));
 
         let mut url = self.hub._base_url.clone() + "changes/watch";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::Full.as_ref().to_string());
         }
 
 
@@ -4680,7 +4713,7 @@ where
 
 
         loop {
-            let token = match self.hub.auth.get_token(&self._scopes.keys().map(String::as_str).collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
                 // TODO: remove Ok / Err branches
                 Ok(Some(token)) => token.clone(),
                 Ok(None) => {
@@ -4909,25 +4942,36 @@ where
 
     /// Identifies the authorization scope for the method you are building.
     ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::Full`.
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::Full`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
     ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, St>(mut self, scope: T) -> ChangeWatchCall<'a, S>
-                                                        where T: Into<Option<St>>,
-                                                              St: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
+    pub fn add_scope<St>(mut self, scope: St) -> ChangeWatchCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> ChangeWatchCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> ChangeWatchCall<'a, S> {
+        self._scopes.clear();
         self
     }
 }
@@ -4936,7 +4980,7 @@ where
 /// Stop watching resources through this channel
 ///
 /// A builder for the *stop* method supported by a *channel* resource.
-/// It is not used directly, but through a `ChannelMethods` instance.
+/// It is not used directly, but through a [`ChannelMethods`] instance.
 ///
 /// # Example
 ///
@@ -4976,7 +5020,7 @@ pub struct ChannelStopCall<'a, S>
     _request: Channel,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
+    _scopes: BTreeSet<String>
 }
 
 impl<'a, S> client::CallBuilder for ChannelStopCall<'a, S> {}
@@ -5015,8 +5059,8 @@ where
 
 
         let mut url = self.hub._base_url.clone() + "channels/stop";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::Full.as_ref().to_string());
         }
 
 
@@ -5036,7 +5080,7 @@ where
 
 
         loop {
-            let token = match self.hub.auth.get_token(&self._scopes.keys().map(String::as_str).collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
                 // TODO: remove Ok / Err branches
                 Ok(Some(token)) => token.clone(),
                 Ok(None) => {
@@ -5161,25 +5205,36 @@ where
 
     /// Identifies the authorization scope for the method you are building.
     ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::Full`.
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::Full`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
     ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, St>(mut self, scope: T) -> ChannelStopCall<'a, S>
-                                                        where T: Into<Option<St>>,
-                                                              St: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
+    pub fn add_scope<St>(mut self, scope: St) -> ChannelStopCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> ChannelStopCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> ChannelStopCall<'a, S> {
+        self._scopes.clear();
         self
     }
 }
@@ -5188,7 +5243,7 @@ where
 /// Creates a new comment on a file.
 ///
 /// A builder for the *create* method supported by a *comment* resource.
-/// It is not used directly, but through a `CommentMethods` instance.
+/// It is not used directly, but through a [`CommentMethods`] instance.
 ///
 /// # Example
 ///
@@ -5229,7 +5284,7 @@ pub struct CommentCreateCall<'a, S>
     _file_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
+    _scopes: BTreeSet<String>
 }
 
 impl<'a, S> client::CallBuilder for CommentCreateCall<'a, S> {}
@@ -5256,7 +5311,7 @@ where
         dlg.begin(client::MethodInfo { id: "drive.comments.create",
                                http_method: hyper::Method::POST });
         let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
-        params.push(("fileId", (|x: &dyn std::fmt::Display| x.to_string())(&self._file_id)));
+        params.push(("fileId", self._file_id.to_string()));
         for &field in ["alt", "fileId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
@@ -5270,8 +5325,8 @@ where
         params.push(("alt", "json".to_string()));
 
         let mut url = self.hub._base_url.clone() + "files/{fileId}/comments";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::Full.as_ref().to_string());
         }
 
         for &(find_this, param_name) in [("{fileId}", "fileId")].iter() {
@@ -5285,15 +5340,8 @@ where
             url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
         }
         {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
-            for param_name in ["fileId"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
+            let to_remove = ["fileId"];
+            params.retain(|(n, _)| !to_remove.contains(n));
         }
 
         let url = url::Url::parse_with_params(&url, params).unwrap();
@@ -5312,7 +5360,7 @@ where
 
 
         loop {
-            let token = match self.hub.auth.get_token(&self._scopes.keys().map(String::as_str).collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
                 // TODO: remove Ok / Err branches
                 Ok(Some(token)) => token.clone(),
                 Ok(None) => {
@@ -5457,25 +5505,36 @@ where
 
     /// Identifies the authorization scope for the method you are building.
     ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::Full`.
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::Full`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
     ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, St>(mut self, scope: T) -> CommentCreateCall<'a, S>
-                                                        where T: Into<Option<St>>,
-                                                              St: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
+    pub fn add_scope<St>(mut self, scope: St) -> CommentCreateCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> CommentCreateCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> CommentCreateCall<'a, S> {
+        self._scopes.clear();
         self
     }
 }
@@ -5484,7 +5543,7 @@ where
 /// Deletes a comment.
 ///
 /// A builder for the *delete* method supported by a *comment* resource.
-/// It is not used directly, but through a `CommentMethods` instance.
+/// It is not used directly, but through a [`CommentMethods`] instance.
 ///
 /// # Example
 ///
@@ -5519,7 +5578,7 @@ pub struct CommentDeleteCall<'a, S>
     _comment_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
+    _scopes: BTreeSet<String>
 }
 
 impl<'a, S> client::CallBuilder for CommentDeleteCall<'a, S> {}
@@ -5546,8 +5605,8 @@ where
         dlg.begin(client::MethodInfo { id: "drive.comments.delete",
                                http_method: hyper::Method::DELETE });
         let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
-        params.push(("fileId", (|x: &dyn std::fmt::Display| x.to_string())(&self._file_id)));
-        params.push(("commentId", (|x: &dyn std::fmt::Display| x.to_string())(&self._comment_id)));
+        params.push(("fileId", self._file_id.to_string()));
+        params.push(("commentId", self._comment_id.to_string()));
         for &field in ["fileId", "commentId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
@@ -5560,8 +5619,8 @@ where
 
 
         let mut url = self.hub._base_url.clone() + "files/{fileId}/comments/{commentId}";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::Full.as_ref().to_string());
         }
 
         for &(find_this, param_name) in [("{fileId}", "fileId"), ("{commentId}", "commentId")].iter() {
@@ -5575,15 +5634,8 @@ where
             url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
         }
         {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(2);
-            for param_name in ["commentId", "fileId"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
+            let to_remove = ["commentId", "fileId"];
+            params.retain(|(n, _)| !to_remove.contains(n));
         }
 
         let url = url::Url::parse_with_params(&url, params).unwrap();
@@ -5591,7 +5643,7 @@ where
 
 
         loop {
-            let token = match self.hub.auth.get_token(&self._scopes.keys().map(String::as_str).collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
                 // TODO: remove Ok / Err branches
                 Ok(Some(token)) => token.clone(),
                 Ok(None) => {
@@ -5724,25 +5776,36 @@ where
 
     /// Identifies the authorization scope for the method you are building.
     ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::Full`.
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::Full`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
     ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, St>(mut self, scope: T) -> CommentDeleteCall<'a, S>
-                                                        where T: Into<Option<St>>,
-                                                              St: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
+    pub fn add_scope<St>(mut self, scope: St) -> CommentDeleteCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> CommentDeleteCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> CommentDeleteCall<'a, S> {
+        self._scopes.clear();
         self
     }
 }
@@ -5751,7 +5814,7 @@ where
 /// Gets a comment by ID.
 ///
 /// A builder for the *get* method supported by a *comment* resource.
-/// It is not used directly, but through a `CommentMethods` instance.
+/// It is not used directly, but through a [`CommentMethods`] instance.
 ///
 /// # Example
 ///
@@ -5788,7 +5851,7 @@ pub struct CommentGetCall<'a, S>
     _include_deleted: Option<bool>,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
+    _scopes: BTreeSet<String>
 }
 
 impl<'a, S> client::CallBuilder for CommentGetCall<'a, S> {}
@@ -5815,10 +5878,10 @@ where
         dlg.begin(client::MethodInfo { id: "drive.comments.get",
                                http_method: hyper::Method::GET });
         let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
-        params.push(("fileId", (|x: &dyn std::fmt::Display| x.to_string())(&self._file_id)));
-        params.push(("commentId", (|x: &dyn std::fmt::Display| x.to_string())(&self._comment_id)));
+        params.push(("fileId", self._file_id.to_string()));
+        params.push(("commentId", self._comment_id.to_string()));
         if let Some(value) = self._include_deleted.as_ref() {
-            params.push(("includeDeleted", (|x: &dyn std::fmt::Display| x.to_string())(value)));
+            params.push(("includeDeleted", value.to_string()));
         }
         for &field in ["alt", "fileId", "commentId", "includeDeleted"].iter() {
             if self._additional_params.contains_key(field) {
@@ -5833,8 +5896,8 @@ where
         params.push(("alt", "json".to_string()));
 
         let mut url = self.hub._base_url.clone() + "files/{fileId}/comments/{commentId}";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::Readonly.as_ref().to_string());
         }
 
         for &(find_this, param_name) in [("{fileId}", "fileId"), ("{commentId}", "commentId")].iter() {
@@ -5848,15 +5911,8 @@ where
             url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
         }
         {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(2);
-            for param_name in ["commentId", "fileId"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
+            let to_remove = ["commentId", "fileId"];
+            params.retain(|(n, _)| !to_remove.contains(n));
         }
 
         let url = url::Url::parse_with_params(&url, params).unwrap();
@@ -5864,7 +5920,7 @@ where
 
 
         loop {
-            let token = match self.hub.auth.get_token(&self._scopes.keys().map(String::as_str).collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
                 // TODO: remove Ok / Err branches
                 Ok(Some(token)) => token.clone(),
                 Ok(None) => {
@@ -6014,25 +6070,36 @@ where
 
     /// Identifies the authorization scope for the method you are building.
     ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::Readonly`.
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::Readonly`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
     ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, St>(mut self, scope: T) -> CommentGetCall<'a, S>
-                                                        where T: Into<Option<St>>,
-                                                              St: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
+    pub fn add_scope<St>(mut self, scope: St) -> CommentGetCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> CommentGetCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> CommentGetCall<'a, S> {
+        self._scopes.clear();
         self
     }
 }
@@ -6041,7 +6108,7 @@ where
 /// Lists a file's comments.
 ///
 /// A builder for the *list* method supported by a *comment* resource.
-/// It is not used directly, but through a `CommentMethods` instance.
+/// It is not used directly, but through a [`CommentMethods`] instance.
 ///
 /// # Example
 ///
@@ -6083,7 +6150,7 @@ pub struct CommentListCall<'a, S>
     _include_deleted: Option<bool>,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
+    _scopes: BTreeSet<String>
 }
 
 impl<'a, S> client::CallBuilder for CommentListCall<'a, S> {}
@@ -6110,18 +6177,18 @@ where
         dlg.begin(client::MethodInfo { id: "drive.comments.list",
                                http_method: hyper::Method::GET });
         let mut params: Vec<(&str, String)> = Vec::with_capacity(7 + self._additional_params.len());
-        params.push(("fileId", (|x: &dyn std::fmt::Display| x.to_string())(&self._file_id)));
+        params.push(("fileId", self._file_id.to_string()));
         if let Some(value) = self._start_modified_time.as_ref() {
-            params.push(("startModifiedTime", (|x: &dyn std::fmt::Display| x.to_string())(value)));
+            params.push(("startModifiedTime", value.to_string()));
         }
         if let Some(value) = self._page_token.as_ref() {
-            params.push(("pageToken", (|x: &dyn std::fmt::Display| x.to_string())(value)));
+            params.push(("pageToken", value.to_string()));
         }
         if let Some(value) = self._page_size.as_ref() {
-            params.push(("pageSize", (|x: &dyn std::fmt::Display| x.to_string())(value)));
+            params.push(("pageSize", value.to_string()));
         }
         if let Some(value) = self._include_deleted.as_ref() {
-            params.push(("includeDeleted", (|x: &dyn std::fmt::Display| x.to_string())(value)));
+            params.push(("includeDeleted", value.to_string()));
         }
         for &field in ["alt", "fileId", "startModifiedTime", "pageToken", "pageSize", "includeDeleted"].iter() {
             if self._additional_params.contains_key(field) {
@@ -6136,8 +6203,8 @@ where
         params.push(("alt", "json".to_string()));
 
         let mut url = self.hub._base_url.clone() + "files/{fileId}/comments";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::Readonly.as_ref().to_string());
         }
 
         for &(find_this, param_name) in [("{fileId}", "fileId")].iter() {
@@ -6151,15 +6218,8 @@ where
             url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
         }
         {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
-            for param_name in ["fileId"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
+            let to_remove = ["fileId"];
+            params.retain(|(n, _)| !to_remove.contains(n));
         }
 
         let url = url::Url::parse_with_params(&url, params).unwrap();
@@ -6167,7 +6227,7 @@ where
 
 
         loop {
-            let token = match self.hub.auth.get_token(&self._scopes.keys().map(String::as_str).collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
                 // TODO: remove Ok / Err branches
                 Ok(Some(token)) => token.clone(),
                 Ok(None) => {
@@ -6328,25 +6388,36 @@ where
 
     /// Identifies the authorization scope for the method you are building.
     ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::Readonly`.
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::Readonly`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
     ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, St>(mut self, scope: T) -> CommentListCall<'a, S>
-                                                        where T: Into<Option<St>>,
-                                                              St: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
+    pub fn add_scope<St>(mut self, scope: St) -> CommentListCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> CommentListCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> CommentListCall<'a, S> {
+        self._scopes.clear();
         self
     }
 }
@@ -6355,7 +6426,7 @@ where
 /// Updates a comment with patch semantics.
 ///
 /// A builder for the *update* method supported by a *comment* resource.
-/// It is not used directly, but through a `CommentMethods` instance.
+/// It is not used directly, but through a [`CommentMethods`] instance.
 ///
 /// # Example
 ///
@@ -6397,7 +6468,7 @@ pub struct CommentUpdateCall<'a, S>
     _comment_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
+    _scopes: BTreeSet<String>
 }
 
 impl<'a, S> client::CallBuilder for CommentUpdateCall<'a, S> {}
@@ -6424,8 +6495,8 @@ where
         dlg.begin(client::MethodInfo { id: "drive.comments.update",
                                http_method: hyper::Method::PATCH });
         let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
-        params.push(("fileId", (|x: &dyn std::fmt::Display| x.to_string())(&self._file_id)));
-        params.push(("commentId", (|x: &dyn std::fmt::Display| x.to_string())(&self._comment_id)));
+        params.push(("fileId", self._file_id.to_string()));
+        params.push(("commentId", self._comment_id.to_string()));
         for &field in ["alt", "fileId", "commentId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
@@ -6439,8 +6510,8 @@ where
         params.push(("alt", "json".to_string()));
 
         let mut url = self.hub._base_url.clone() + "files/{fileId}/comments/{commentId}";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::Full.as_ref().to_string());
         }
 
         for &(find_this, param_name) in [("{fileId}", "fileId"), ("{commentId}", "commentId")].iter() {
@@ -6454,15 +6525,8 @@ where
             url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
         }
         {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(2);
-            for param_name in ["commentId", "fileId"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
+            let to_remove = ["commentId", "fileId"];
+            params.retain(|(n, _)| !to_remove.contains(n));
         }
 
         let url = url::Url::parse_with_params(&url, params).unwrap();
@@ -6481,7 +6545,7 @@ where
 
 
         loop {
-            let token = match self.hub.auth.get_token(&self._scopes.keys().map(String::as_str).collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
                 // TODO: remove Ok / Err branches
                 Ok(Some(token)) => token.clone(),
                 Ok(None) => {
@@ -6636,25 +6700,36 @@ where
 
     /// Identifies the authorization scope for the method you are building.
     ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::Full`.
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::Full`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
     ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, St>(mut self, scope: T) -> CommentUpdateCall<'a, S>
-                                                        where T: Into<Option<St>>,
-                                                              St: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
+    pub fn add_scope<St>(mut self, scope: St) -> CommentUpdateCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> CommentUpdateCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> CommentUpdateCall<'a, S> {
+        self._scopes.clear();
         self
     }
 }
@@ -6663,7 +6738,7 @@ where
 /// Creates a new shared drive.
 ///
 /// A builder for the *create* method supported by a *drive* resource.
-/// It is not used directly, but through a `DriveMethods` instance.
+/// It is not used directly, but through a [`DriveMethods`] instance.
 ///
 /// # Example
 ///
@@ -6704,7 +6779,7 @@ pub struct DriveCreateCall<'a, S>
     _request_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
+    _scopes: BTreeSet<String>
 }
 
 impl<'a, S> client::CallBuilder for DriveCreateCall<'a, S> {}
@@ -6731,7 +6806,7 @@ where
         dlg.begin(client::MethodInfo { id: "drive.drives.create",
                                http_method: hyper::Method::POST });
         let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
-        params.push(("requestId", (|x: &dyn std::fmt::Display| x.to_string())(&self._request_id)));
+        params.push(("requestId", self._request_id.to_string()));
         for &field in ["alt", "requestId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
@@ -6745,8 +6820,8 @@ where
         params.push(("alt", "json".to_string()));
 
         let mut url = self.hub._base_url.clone() + "drives";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::Full.as_ref().to_string());
         }
 
 
@@ -6766,7 +6841,7 @@ where
 
 
         loop {
-            let token = match self.hub.auth.get_token(&self._scopes.keys().map(String::as_str).collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
                 // TODO: remove Ok / Err branches
                 Ok(Some(token)) => token.clone(),
                 Ok(None) => {
@@ -6911,25 +6986,36 @@ where
 
     /// Identifies the authorization scope for the method you are building.
     ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::Full`.
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::Full`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
     ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, St>(mut self, scope: T) -> DriveCreateCall<'a, S>
-                                                        where T: Into<Option<St>>,
-                                                              St: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
+    pub fn add_scope<St>(mut self, scope: St) -> DriveCreateCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> DriveCreateCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> DriveCreateCall<'a, S> {
+        self._scopes.clear();
         self
     }
 }
@@ -6938,7 +7024,7 @@ where
 /// Permanently deletes a shared drive for which the user is an organizer. The shared drive cannot contain any untrashed items.
 ///
 /// A builder for the *delete* method supported by a *drive* resource.
-/// It is not used directly, but through a `DriveMethods` instance.
+/// It is not used directly, but through a [`DriveMethods`] instance.
 ///
 /// # Example
 ///
@@ -6972,7 +7058,7 @@ pub struct DriveDeleteCall<'a, S>
     _drive_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
+    _scopes: BTreeSet<String>
 }
 
 impl<'a, S> client::CallBuilder for DriveDeleteCall<'a, S> {}
@@ -6999,7 +7085,7 @@ where
         dlg.begin(client::MethodInfo { id: "drive.drives.delete",
                                http_method: hyper::Method::DELETE });
         let mut params: Vec<(&str, String)> = Vec::with_capacity(2 + self._additional_params.len());
-        params.push(("driveId", (|x: &dyn std::fmt::Display| x.to_string())(&self._drive_id)));
+        params.push(("driveId", self._drive_id.to_string()));
         for &field in ["driveId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
@@ -7012,8 +7098,8 @@ where
 
 
         let mut url = self.hub._base_url.clone() + "drives/{driveId}";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::Full.as_ref().to_string());
         }
 
         for &(find_this, param_name) in [("{driveId}", "driveId")].iter() {
@@ -7027,15 +7113,8 @@ where
             url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
         }
         {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
-            for param_name in ["driveId"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
+            let to_remove = ["driveId"];
+            params.retain(|(n, _)| !to_remove.contains(n));
         }
 
         let url = url::Url::parse_with_params(&url, params).unwrap();
@@ -7043,7 +7122,7 @@ where
 
 
         loop {
-            let token = match self.hub.auth.get_token(&self._scopes.keys().map(String::as_str).collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
                 // TODO: remove Ok / Err branches
                 Ok(Some(token)) => token.clone(),
                 Ok(None) => {
@@ -7166,25 +7245,36 @@ where
 
     /// Identifies the authorization scope for the method you are building.
     ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::Full`.
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::Full`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
     ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, St>(mut self, scope: T) -> DriveDeleteCall<'a, S>
-                                                        where T: Into<Option<St>>,
-                                                              St: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
+    pub fn add_scope<St>(mut self, scope: St) -> DriveDeleteCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> DriveDeleteCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> DriveDeleteCall<'a, S> {
+        self._scopes.clear();
         self
     }
 }
@@ -7193,7 +7283,7 @@ where
 /// Gets a shared drive's metadata by ID.
 ///
 /// A builder for the *get* method supported by a *drive* resource.
-/// It is not used directly, but through a `DriveMethods` instance.
+/// It is not used directly, but through a [`DriveMethods`] instance.
 ///
 /// # Example
 ///
@@ -7229,7 +7319,7 @@ pub struct DriveGetCall<'a, S>
     _use_domain_admin_access: Option<bool>,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
+    _scopes: BTreeSet<String>
 }
 
 impl<'a, S> client::CallBuilder for DriveGetCall<'a, S> {}
@@ -7256,9 +7346,9 @@ where
         dlg.begin(client::MethodInfo { id: "drive.drives.get",
                                http_method: hyper::Method::GET });
         let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
-        params.push(("driveId", (|x: &dyn std::fmt::Display| x.to_string())(&self._drive_id)));
+        params.push(("driveId", self._drive_id.to_string()));
         if let Some(value) = self._use_domain_admin_access.as_ref() {
-            params.push(("useDomainAdminAccess", (|x: &dyn std::fmt::Display| x.to_string())(value)));
+            params.push(("useDomainAdminAccess", value.to_string()));
         }
         for &field in ["alt", "driveId", "useDomainAdminAccess"].iter() {
             if self._additional_params.contains_key(field) {
@@ -7273,8 +7363,8 @@ where
         params.push(("alt", "json".to_string()));
 
         let mut url = self.hub._base_url.clone() + "drives/{driveId}";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::Readonly.as_ref().to_string());
         }
 
         for &(find_this, param_name) in [("{driveId}", "driveId")].iter() {
@@ -7288,15 +7378,8 @@ where
             url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
         }
         {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
-            for param_name in ["driveId"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
+            let to_remove = ["driveId"];
+            params.retain(|(n, _)| !to_remove.contains(n));
         }
 
         let url = url::Url::parse_with_params(&url, params).unwrap();
@@ -7304,7 +7387,7 @@ where
 
 
         loop {
-            let token = match self.hub.auth.get_token(&self._scopes.keys().map(String::as_str).collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
                 // TODO: remove Ok / Err branches
                 Ok(Some(token)) => token.clone(),
                 Ok(None) => {
@@ -7444,25 +7527,36 @@ where
 
     /// Identifies the authorization scope for the method you are building.
     ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::Readonly`.
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::Readonly`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
     ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, St>(mut self, scope: T) -> DriveGetCall<'a, S>
-                                                        where T: Into<Option<St>>,
-                                                              St: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
+    pub fn add_scope<St>(mut self, scope: St) -> DriveGetCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> DriveGetCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> DriveGetCall<'a, S> {
+        self._scopes.clear();
         self
     }
 }
@@ -7471,7 +7565,7 @@ where
 /// Hides a shared drive from the default view.
 ///
 /// A builder for the *hide* method supported by a *drive* resource.
-/// It is not used directly, but through a `DriveMethods` instance.
+/// It is not used directly, but through a [`DriveMethods`] instance.
 ///
 /// # Example
 ///
@@ -7505,7 +7599,7 @@ pub struct DriveHideCall<'a, S>
     _drive_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
+    _scopes: BTreeSet<String>
 }
 
 impl<'a, S> client::CallBuilder for DriveHideCall<'a, S> {}
@@ -7532,7 +7626,7 @@ where
         dlg.begin(client::MethodInfo { id: "drive.drives.hide",
                                http_method: hyper::Method::POST });
         let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
-        params.push(("driveId", (|x: &dyn std::fmt::Display| x.to_string())(&self._drive_id)));
+        params.push(("driveId", self._drive_id.to_string()));
         for &field in ["alt", "driveId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
@@ -7546,8 +7640,8 @@ where
         params.push(("alt", "json".to_string()));
 
         let mut url = self.hub._base_url.clone() + "drives/{driveId}/hide";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::Full.as_ref().to_string());
         }
 
         for &(find_this, param_name) in [("{driveId}", "driveId")].iter() {
@@ -7561,15 +7655,8 @@ where
             url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
         }
         {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
-            for param_name in ["driveId"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
+            let to_remove = ["driveId"];
+            params.retain(|(n, _)| !to_remove.contains(n));
         }
 
         let url = url::Url::parse_with_params(&url, params).unwrap();
@@ -7577,7 +7664,7 @@ where
 
 
         loop {
-            let token = match self.hub.auth.get_token(&self._scopes.keys().map(String::as_str).collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
                 // TODO: remove Ok / Err branches
                 Ok(Some(token)) => token.clone(),
                 Ok(None) => {
@@ -7710,25 +7797,36 @@ where
 
     /// Identifies the authorization scope for the method you are building.
     ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::Full`.
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::Full`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
     ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, St>(mut self, scope: T) -> DriveHideCall<'a, S>
-                                                        where T: Into<Option<St>>,
-                                                              St: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
+    pub fn add_scope<St>(mut self, scope: St) -> DriveHideCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> DriveHideCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> DriveHideCall<'a, S> {
+        self._scopes.clear();
         self
     }
 }
@@ -7737,7 +7835,7 @@ where
 /// Lists the user's shared drives.
 ///
 /// A builder for the *list* method supported by a *drive* resource.
-/// It is not used directly, but through a `DriveMethods` instance.
+/// It is not used directly, but through a [`DriveMethods`] instance.
 ///
 /// # Example
 ///
@@ -7778,7 +7876,7 @@ pub struct DriveListCall<'a, S>
     _page_size: Option<i32>,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
+    _scopes: BTreeSet<String>
 }
 
 impl<'a, S> client::CallBuilder for DriveListCall<'a, S> {}
@@ -7806,16 +7904,16 @@ where
                                http_method: hyper::Method::GET });
         let mut params: Vec<(&str, String)> = Vec::with_capacity(6 + self._additional_params.len());
         if let Some(value) = self._use_domain_admin_access.as_ref() {
-            params.push(("useDomainAdminAccess", (|x: &dyn std::fmt::Display| x.to_string())(value)));
+            params.push(("useDomainAdminAccess", value.to_string()));
         }
         if let Some(value) = self._q.as_ref() {
-            params.push(("q", (|x: &dyn std::fmt::Display| x.to_string())(value)));
+            params.push(("q", value.to_string()));
         }
         if let Some(value) = self._page_token.as_ref() {
-            params.push(("pageToken", (|x: &dyn std::fmt::Display| x.to_string())(value)));
+            params.push(("pageToken", value.to_string()));
         }
         if let Some(value) = self._page_size.as_ref() {
-            params.push(("pageSize", (|x: &dyn std::fmt::Display| x.to_string())(value)));
+            params.push(("pageSize", value.to_string()));
         }
         for &field in ["alt", "useDomainAdminAccess", "q", "pageToken", "pageSize"].iter() {
             if self._additional_params.contains_key(field) {
@@ -7830,8 +7928,8 @@ where
         params.push(("alt", "json".to_string()));
 
         let mut url = self.hub._base_url.clone() + "drives";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::Readonly.as_ref().to_string());
         }
 
 
@@ -7840,7 +7938,7 @@ where
 
 
         loop {
-            let token = match self.hub.auth.get_token(&self._scopes.keys().map(String::as_str).collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
                 // TODO: remove Ok / Err branches
                 Ok(Some(token)) => token.clone(),
                 Ok(None) => {
@@ -7991,25 +8089,36 @@ where
 
     /// Identifies the authorization scope for the method you are building.
     ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::Readonly`.
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::Readonly`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
     ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, St>(mut self, scope: T) -> DriveListCall<'a, S>
-                                                        where T: Into<Option<St>>,
-                                                              St: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
+    pub fn add_scope<St>(mut self, scope: St) -> DriveListCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> DriveListCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> DriveListCall<'a, S> {
+        self._scopes.clear();
         self
     }
 }
@@ -8018,7 +8127,7 @@ where
 /// Restores a shared drive to the default view.
 ///
 /// A builder for the *unhide* method supported by a *drive* resource.
-/// It is not used directly, but through a `DriveMethods` instance.
+/// It is not used directly, but through a [`DriveMethods`] instance.
 ///
 /// # Example
 ///
@@ -8052,7 +8161,7 @@ pub struct DriveUnhideCall<'a, S>
     _drive_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
+    _scopes: BTreeSet<String>
 }
 
 impl<'a, S> client::CallBuilder for DriveUnhideCall<'a, S> {}
@@ -8079,7 +8188,7 @@ where
         dlg.begin(client::MethodInfo { id: "drive.drives.unhide",
                                http_method: hyper::Method::POST });
         let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
-        params.push(("driveId", (|x: &dyn std::fmt::Display| x.to_string())(&self._drive_id)));
+        params.push(("driveId", self._drive_id.to_string()));
         for &field in ["alt", "driveId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
@@ -8093,8 +8202,8 @@ where
         params.push(("alt", "json".to_string()));
 
         let mut url = self.hub._base_url.clone() + "drives/{driveId}/unhide";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::Full.as_ref().to_string());
         }
 
         for &(find_this, param_name) in [("{driveId}", "driveId")].iter() {
@@ -8108,15 +8217,8 @@ where
             url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
         }
         {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
-            for param_name in ["driveId"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
+            let to_remove = ["driveId"];
+            params.retain(|(n, _)| !to_remove.contains(n));
         }
 
         let url = url::Url::parse_with_params(&url, params).unwrap();
@@ -8124,7 +8226,7 @@ where
 
 
         loop {
-            let token = match self.hub.auth.get_token(&self._scopes.keys().map(String::as_str).collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
                 // TODO: remove Ok / Err branches
                 Ok(Some(token)) => token.clone(),
                 Ok(None) => {
@@ -8257,25 +8359,36 @@ where
 
     /// Identifies the authorization scope for the method you are building.
     ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::Full`.
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::Full`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
     ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, St>(mut self, scope: T) -> DriveUnhideCall<'a, S>
-                                                        where T: Into<Option<St>>,
-                                                              St: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
+    pub fn add_scope<St>(mut self, scope: St) -> DriveUnhideCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> DriveUnhideCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> DriveUnhideCall<'a, S> {
+        self._scopes.clear();
         self
     }
 }
@@ -8284,7 +8397,7 @@ where
 /// Updates the metadate for a shared drive.
 ///
 /// A builder for the *update* method supported by a *drive* resource.
-/// It is not used directly, but through a `DriveMethods` instance.
+/// It is not used directly, but through a [`DriveMethods`] instance.
 ///
 /// # Example
 ///
@@ -8327,7 +8440,7 @@ pub struct DriveUpdateCall<'a, S>
     _use_domain_admin_access: Option<bool>,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
+    _scopes: BTreeSet<String>
 }
 
 impl<'a, S> client::CallBuilder for DriveUpdateCall<'a, S> {}
@@ -8354,9 +8467,9 @@ where
         dlg.begin(client::MethodInfo { id: "drive.drives.update",
                                http_method: hyper::Method::PATCH });
         let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
-        params.push(("driveId", (|x: &dyn std::fmt::Display| x.to_string())(&self._drive_id)));
+        params.push(("driveId", self._drive_id.to_string()));
         if let Some(value) = self._use_domain_admin_access.as_ref() {
-            params.push(("useDomainAdminAccess", (|x: &dyn std::fmt::Display| x.to_string())(value)));
+            params.push(("useDomainAdminAccess", value.to_string()));
         }
         for &field in ["alt", "driveId", "useDomainAdminAccess"].iter() {
             if self._additional_params.contains_key(field) {
@@ -8371,8 +8484,8 @@ where
         params.push(("alt", "json".to_string()));
 
         let mut url = self.hub._base_url.clone() + "drives/{driveId}";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::Full.as_ref().to_string());
         }
 
         for &(find_this, param_name) in [("{driveId}", "driveId")].iter() {
@@ -8386,15 +8499,8 @@ where
             url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
         }
         {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
-            for param_name in ["driveId"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
+            let to_remove = ["driveId"];
+            params.retain(|(n, _)| !to_remove.contains(n));
         }
 
         let url = url::Url::parse_with_params(&url, params).unwrap();
@@ -8413,7 +8519,7 @@ where
 
 
         loop {
-            let token = match self.hub.auth.get_token(&self._scopes.keys().map(String::as_str).collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
                 // TODO: remove Ok / Err branches
                 Ok(Some(token)) => token.clone(),
                 Ok(None) => {
@@ -8565,25 +8671,36 @@ where
 
     /// Identifies the authorization scope for the method you are building.
     ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::Full`.
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::Full`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
     ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, St>(mut self, scope: T) -> DriveUpdateCall<'a, S>
-                                                        where T: Into<Option<St>>,
-                                                              St: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
+    pub fn add_scope<St>(mut self, scope: St) -> DriveUpdateCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> DriveUpdateCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> DriveUpdateCall<'a, S> {
+        self._scopes.clear();
         self
     }
 }
@@ -8592,7 +8709,7 @@ where
 /// Creates a copy of a file and applies any requested updates with patch semantics. Folders cannot be copied.
 ///
 /// A builder for the *copy* method supported by a *file* resource.
-/// It is not used directly, but through a `FileMethods` instance.
+/// It is not used directly, but through a [`FileMethods`] instance.
 ///
 /// # Example
 ///
@@ -8647,7 +8764,7 @@ pub struct FileCopyCall<'a, S>
     _enforce_single_parent: Option<bool>,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
+    _scopes: BTreeSet<String>
 }
 
 impl<'a, S> client::CallBuilder for FileCopyCall<'a, S> {}
@@ -8674,27 +8791,27 @@ where
         dlg.begin(client::MethodInfo { id: "drive.files.copy",
                                http_method: hyper::Method::POST });
         let mut params: Vec<(&str, String)> = Vec::with_capacity(11 + self._additional_params.len());
-        params.push(("fileId", (|x: &dyn std::fmt::Display| x.to_string())(&self._file_id)));
+        params.push(("fileId", self._file_id.to_string()));
         if let Some(value) = self._supports_team_drives.as_ref() {
-            params.push(("supportsTeamDrives", (|x: &dyn std::fmt::Display| x.to_string())(value)));
+            params.push(("supportsTeamDrives", value.to_string()));
         }
         if let Some(value) = self._supports_all_drives.as_ref() {
-            params.push(("supportsAllDrives", (|x: &dyn std::fmt::Display| x.to_string())(value)));
+            params.push(("supportsAllDrives", value.to_string()));
         }
         if let Some(value) = self._ocr_language.as_ref() {
-            params.push(("ocrLanguage", (|x: &dyn std::fmt::Display| x.to_string())(value)));
+            params.push(("ocrLanguage", value.to_string()));
         }
         if let Some(value) = self._keep_revision_forever.as_ref() {
-            params.push(("keepRevisionForever", (|x: &dyn std::fmt::Display| x.to_string())(value)));
+            params.push(("keepRevisionForever", value.to_string()));
         }
         if let Some(value) = self._include_permissions_for_view.as_ref() {
-            params.push(("includePermissionsForView", (|x: &dyn std::fmt::Display| x.to_string())(value)));
+            params.push(("includePermissionsForView", value.to_string()));
         }
         if let Some(value) = self._ignore_default_visibility.as_ref() {
-            params.push(("ignoreDefaultVisibility", (|x: &dyn std::fmt::Display| x.to_string())(value)));
+            params.push(("ignoreDefaultVisibility", value.to_string()));
         }
         if let Some(value) = self._enforce_single_parent.as_ref() {
-            params.push(("enforceSingleParent", (|x: &dyn std::fmt::Display| x.to_string())(value)));
+            params.push(("enforceSingleParent", value.to_string()));
         }
         for &field in ["alt", "fileId", "supportsTeamDrives", "supportsAllDrives", "ocrLanguage", "keepRevisionForever", "includePermissionsForView", "ignoreDefaultVisibility", "enforceSingleParent"].iter() {
             if self._additional_params.contains_key(field) {
@@ -8709,8 +8826,8 @@ where
         params.push(("alt", "json".to_string()));
 
         let mut url = self.hub._base_url.clone() + "files/{fileId}/copy";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::Full.as_ref().to_string());
         }
 
         for &(find_this, param_name) in [("{fileId}", "fileId")].iter() {
@@ -8724,15 +8841,8 @@ where
             url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
         }
         {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
-            for param_name in ["fileId"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
+            let to_remove = ["fileId"];
+            params.retain(|(n, _)| !to_remove.contains(n));
         }
 
         let url = url::Url::parse_with_params(&url, params).unwrap();
@@ -8751,7 +8861,7 @@ where
 
 
         loop {
-            let token = match self.hub.auth.get_token(&self._scopes.keys().map(String::as_str).collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
                 // TODO: remove Ok / Err branches
                 Ok(Some(token)) => token.clone(),
                 Ok(None) => {
@@ -8945,25 +9055,36 @@ where
 
     /// Identifies the authorization scope for the method you are building.
     ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::Full`.
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::Full`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
     ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, St>(mut self, scope: T) -> FileCopyCall<'a, S>
-                                                        where T: Into<Option<St>>,
-                                                              St: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
+    pub fn add_scope<St>(mut self, scope: St) -> FileCopyCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> FileCopyCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> FileCopyCall<'a, S> {
+        self._scopes.clear();
         self
     }
 }
@@ -8972,7 +9093,7 @@ where
 /// Creates a new file.
 ///
 /// A builder for the *create* method supported by a *file* resource.
-/// It is not used directly, but through a `FileMethods` instance.
+/// It is not used directly, but through a [`FileMethods`] instance.
 ///
 /// # Example
 ///
@@ -9029,7 +9150,7 @@ pub struct FileCreateCall<'a, S>
     _enforce_single_parent: Option<bool>,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
+    _scopes: BTreeSet<String>
 }
 
 impl<'a, S> client::CallBuilder for FileCreateCall<'a, S> {}
@@ -9058,28 +9179,28 @@ where
                                http_method: hyper::Method::POST });
         let mut params: Vec<(&str, String)> = Vec::with_capacity(11 + self._additional_params.len());
         if let Some(value) = self._use_content_as_indexable_text.as_ref() {
-            params.push(("useContentAsIndexableText", (|x: &dyn std::fmt::Display| x.to_string())(value)));
+            params.push(("useContentAsIndexableText", value.to_string()));
         }
         if let Some(value) = self._supports_team_drives.as_ref() {
-            params.push(("supportsTeamDrives", (|x: &dyn std::fmt::Display| x.to_string())(value)));
+            params.push(("supportsTeamDrives", value.to_string()));
         }
         if let Some(value) = self._supports_all_drives.as_ref() {
-            params.push(("supportsAllDrives", (|x: &dyn std::fmt::Display| x.to_string())(value)));
+            params.push(("supportsAllDrives", value.to_string()));
         }
         if let Some(value) = self._ocr_language.as_ref() {
-            params.push(("ocrLanguage", (|x: &dyn std::fmt::Display| x.to_string())(value)));
+            params.push(("ocrLanguage", value.to_string()));
         }
         if let Some(value) = self._keep_revision_forever.as_ref() {
-            params.push(("keepRevisionForever", (|x: &dyn std::fmt::Display| x.to_string())(value)));
+            params.push(("keepRevisionForever", value.to_string()));
         }
         if let Some(value) = self._include_permissions_for_view.as_ref() {
-            params.push(("includePermissionsForView", (|x: &dyn std::fmt::Display| x.to_string())(value)));
+            params.push(("includePermissionsForView", value.to_string()));
         }
         if let Some(value) = self._ignore_default_visibility.as_ref() {
-            params.push(("ignoreDefaultVisibility", (|x: &dyn std::fmt::Display| x.to_string())(value)));
+            params.push(("ignoreDefaultVisibility", value.to_string()));
         }
         if let Some(value) = self._enforce_single_parent.as_ref() {
-            params.push(("enforceSingleParent", (|x: &dyn std::fmt::Display| x.to_string())(value)));
+            params.push(("enforceSingleParent", value.to_string()));
         }
         for &field in ["alt", "useContentAsIndexableText", "supportsTeamDrives", "supportsAllDrives", "ocrLanguage", "keepRevisionForever", "includePermissionsForView", "ignoreDefaultVisibility", "enforceSingleParent"].iter() {
             if self._additional_params.contains_key(field) {
@@ -9102,8 +9223,8 @@ where
                 unreachable!()
             };
         params.push(("uploadType", upload_type.to_string()));
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::Full.as_ref().to_string());
         }
 
 
@@ -9126,7 +9247,7 @@ where
         let mut upload_url: Option<String> = None;
 
         loop {
-            let token = match self.hub.auth.get_token(&self._scopes.keys().map(String::as_str).collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
                 // TODO: remove Ok / Err branches
                 Ok(Some(token)) => token.clone(),
                 Ok(None) => {
@@ -9418,25 +9539,36 @@ where
 
     /// Identifies the authorization scope for the method you are building.
     ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::Full`.
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::Full`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
     ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, St>(mut self, scope: T) -> FileCreateCall<'a, S>
-                                                        where T: Into<Option<St>>,
-                                                              St: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
+    pub fn add_scope<St>(mut self, scope: St) -> FileCreateCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> FileCreateCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> FileCreateCall<'a, S> {
+        self._scopes.clear();
         self
     }
 }
@@ -9445,7 +9577,7 @@ where
 /// Permanently deletes a file owned by the user without moving it to the trash. If the file belongs to a shared drive the user must be an organizer on the parent. If the target is a folder, all descendants owned by the user are also deleted.
 ///
 /// A builder for the *delete* method supported by a *file* resource.
-/// It is not used directly, but through a `FileMethods` instance.
+/// It is not used directly, but through a [`FileMethods`] instance.
 ///
 /// # Example
 ///
@@ -9485,7 +9617,7 @@ pub struct FileDeleteCall<'a, S>
     _enforce_single_parent: Option<bool>,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
+    _scopes: BTreeSet<String>
 }
 
 impl<'a, S> client::CallBuilder for FileDeleteCall<'a, S> {}
@@ -9512,15 +9644,15 @@ where
         dlg.begin(client::MethodInfo { id: "drive.files.delete",
                                http_method: hyper::Method::DELETE });
         let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
-        params.push(("fileId", (|x: &dyn std::fmt::Display| x.to_string())(&self._file_id)));
+        params.push(("fileId", self._file_id.to_string()));
         if let Some(value) = self._supports_team_drives.as_ref() {
-            params.push(("supportsTeamDrives", (|x: &dyn std::fmt::Display| x.to_string())(value)));
+            params.push(("supportsTeamDrives", value.to_string()));
         }
         if let Some(value) = self._supports_all_drives.as_ref() {
-            params.push(("supportsAllDrives", (|x: &dyn std::fmt::Display| x.to_string())(value)));
+            params.push(("supportsAllDrives", value.to_string()));
         }
         if let Some(value) = self._enforce_single_parent.as_ref() {
-            params.push(("enforceSingleParent", (|x: &dyn std::fmt::Display| x.to_string())(value)));
+            params.push(("enforceSingleParent", value.to_string()));
         }
         for &field in ["fileId", "supportsTeamDrives", "supportsAllDrives", "enforceSingleParent"].iter() {
             if self._additional_params.contains_key(field) {
@@ -9534,8 +9666,8 @@ where
 
 
         let mut url = self.hub._base_url.clone() + "files/{fileId}";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::Full.as_ref().to_string());
         }
 
         for &(find_this, param_name) in [("{fileId}", "fileId")].iter() {
@@ -9549,15 +9681,8 @@ where
             url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
         }
         {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
-            for param_name in ["fileId"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
+            let to_remove = ["fileId"];
+            params.retain(|(n, _)| !to_remove.contains(n));
         }
 
         let url = url::Url::parse_with_params(&url, params).unwrap();
@@ -9565,7 +9690,7 @@ where
 
 
         loop {
-            let token = match self.hub.auth.get_token(&self._scopes.keys().map(String::as_str).collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
                 // TODO: remove Ok / Err branches
                 Ok(Some(token)) => token.clone(),
                 Ok(None) => {
@@ -9709,25 +9834,36 @@ where
 
     /// Identifies the authorization scope for the method you are building.
     ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::Full`.
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::Full`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
     ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, St>(mut self, scope: T) -> FileDeleteCall<'a, S>
-                                                        where T: Into<Option<St>>,
-                                                              St: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
+    pub fn add_scope<St>(mut self, scope: St) -> FileDeleteCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> FileDeleteCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> FileDeleteCall<'a, S> {
+        self._scopes.clear();
         self
     }
 }
@@ -9736,7 +9872,7 @@ where
 /// Permanently deletes all of the user's trashed files.
 ///
 /// A builder for the *emptyTrash* method supported by a *file* resource.
-/// It is not used directly, but through a `FileMethods` instance.
+/// It is not used directly, but through a [`FileMethods`] instance.
 ///
 /// # Example
 ///
@@ -9771,7 +9907,7 @@ pub struct FileEmptyTrashCall<'a, S>
     _enforce_single_parent: Option<bool>,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
+    _scopes: BTreeSet<String>
 }
 
 impl<'a, S> client::CallBuilder for FileEmptyTrashCall<'a, S> {}
@@ -9799,7 +9935,7 @@ where
                                http_method: hyper::Method::DELETE });
         let mut params: Vec<(&str, String)> = Vec::with_capacity(2 + self._additional_params.len());
         if let Some(value) = self._enforce_single_parent.as_ref() {
-            params.push(("enforceSingleParent", (|x: &dyn std::fmt::Display| x.to_string())(value)));
+            params.push(("enforceSingleParent", value.to_string()));
         }
         for &field in ["enforceSingleParent"].iter() {
             if self._additional_params.contains_key(field) {
@@ -9813,8 +9949,8 @@ where
 
 
         let mut url = self.hub._base_url.clone() + "files/trash";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::Full.as_ref().to_string());
         }
 
 
@@ -9823,7 +9959,7 @@ where
 
 
         loop {
-            let token = match self.hub.auth.get_token(&self._scopes.keys().map(String::as_str).collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
                 // TODO: remove Ok / Err branches
                 Ok(Some(token)) => token.clone(),
                 Ok(None) => {
@@ -9943,25 +10079,36 @@ where
 
     /// Identifies the authorization scope for the method you are building.
     ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::Full`.
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::Full`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
     ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, St>(mut self, scope: T) -> FileEmptyTrashCall<'a, S>
-                                                        where T: Into<Option<St>>,
-                                                              St: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
+    pub fn add_scope<St>(mut self, scope: St) -> FileEmptyTrashCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> FileEmptyTrashCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> FileEmptyTrashCall<'a, S> {
+        self._scopes.clear();
         self
     }
 }
@@ -9973,7 +10120,7 @@ where
 /// `.param("alt", "media")`.
 ///
 /// A builder for the *export* method supported by a *file* resource.
-/// It is not used directly, but through a `FileMethods` instance.
+/// It is not used directly, but through a [`FileMethods`] instance.
 ///
 /// # Example
 ///
@@ -10008,7 +10155,7 @@ pub struct FileExportCall<'a, S>
     _mime_type: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
+    _scopes: BTreeSet<String>
 }
 
 impl<'a, S> client::CallBuilder for FileExportCall<'a, S> {}
@@ -10035,8 +10182,8 @@ where
         dlg.begin(client::MethodInfo { id: "drive.files.export",
                                http_method: hyper::Method::GET });
         let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
-        params.push(("fileId", (|x: &dyn std::fmt::Display| x.to_string())(&self._file_id)));
-        params.push(("mimeType", (|x: &dyn std::fmt::Display| x.to_string())(&self._mime_type)));
+        params.push(("fileId", self._file_id.to_string()));
+        params.push(("mimeType", self._mime_type.to_string()));
         for &field in ["fileId", "mimeType"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
@@ -10049,8 +10196,8 @@ where
 
 
         let mut url = self.hub._base_url.clone() + "files/{fileId}/export";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::Readonly.as_ref().to_string());
         }
 
         for &(find_this, param_name) in [("{fileId}", "fileId")].iter() {
@@ -10064,15 +10211,8 @@ where
             url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
         }
         {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
-            for param_name in ["fileId"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
+            let to_remove = ["fileId"];
+            params.retain(|(n, _)| !to_remove.contains(n));
         }
 
         let url = url::Url::parse_with_params(&url, params).unwrap();
@@ -10080,7 +10220,7 @@ where
 
 
         loop {
-            let token = match self.hub.auth.get_token(&self._scopes.keys().map(String::as_str).collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
                 // TODO: remove Ok / Err branches
                 Ok(Some(token)) => token.clone(),
                 Ok(None) => {
@@ -10213,25 +10353,36 @@ where
 
     /// Identifies the authorization scope for the method you are building.
     ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::Readonly`.
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::Readonly`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
     ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, St>(mut self, scope: T) -> FileExportCall<'a, S>
-                                                        where T: Into<Option<St>>,
-                                                              St: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
+    pub fn add_scope<St>(mut self, scope: St) -> FileExportCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> FileExportCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> FileExportCall<'a, S> {
+        self._scopes.clear();
         self
     }
 }
@@ -10240,7 +10391,7 @@ where
 /// Generates a set of file IDs which can be provided in create or copy requests.
 ///
 /// A builder for the *generateIds* method supported by a *file* resource.
-/// It is not used directly, but through a `FileMethods` instance.
+/// It is not used directly, but through a [`FileMethods`] instance.
 ///
 /// # Example
 ///
@@ -10279,7 +10430,7 @@ pub struct FileGenerateIdCall<'a, S>
     _count: Option<i32>,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
+    _scopes: BTreeSet<String>
 }
 
 impl<'a, S> client::CallBuilder for FileGenerateIdCall<'a, S> {}
@@ -10307,13 +10458,13 @@ where
                                http_method: hyper::Method::GET });
         let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
         if let Some(value) = self._type_.as_ref() {
-            params.push(("type", (|x: &dyn std::fmt::Display| x.to_string())(value)));
+            params.push(("type", value.to_string()));
         }
         if let Some(value) = self._space.as_ref() {
-            params.push(("space", (|x: &dyn std::fmt::Display| x.to_string())(value)));
+            params.push(("space", value.to_string()));
         }
         if let Some(value) = self._count.as_ref() {
-            params.push(("count", (|x: &dyn std::fmt::Display| x.to_string())(value)));
+            params.push(("count", value.to_string()));
         }
         for &field in ["alt", "type", "space", "count"].iter() {
             if self._additional_params.contains_key(field) {
@@ -10328,8 +10479,8 @@ where
         params.push(("alt", "json".to_string()));
 
         let mut url = self.hub._base_url.clone() + "files/generateIds";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::Full.as_ref().to_string());
         }
 
 
@@ -10338,7 +10489,7 @@ where
 
 
         loop {
-            let token = match self.hub.auth.get_token(&self._scopes.keys().map(String::as_str).collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
                 // TODO: remove Ok / Err branches
                 Ok(Some(token)) => token.clone(),
                 Ok(None) => {
@@ -10482,25 +10633,36 @@ where
 
     /// Identifies the authorization scope for the method you are building.
     ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::Full`.
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::Full`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
     ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, St>(mut self, scope: T) -> FileGenerateIdCall<'a, S>
-                                                        where T: Into<Option<St>>,
-                                                              St: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
+    pub fn add_scope<St>(mut self, scope: St) -> FileGenerateIdCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> FileGenerateIdCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> FileGenerateIdCall<'a, S> {
+        self._scopes.clear();
         self
     }
 }
@@ -10514,7 +10676,7 @@ where
 /// but not the `File` structure that you would usually get. The latter will be a default value.
 ///
 /// A builder for the *get* method supported by a *file* resource.
-/// It is not used directly, but through a `FileMethods` instance.
+/// It is not used directly, but through a [`FileMethods`] instance.
 ///
 /// # Example
 ///
@@ -10556,7 +10718,7 @@ pub struct FileGetCall<'a, S>
     _acknowledge_abuse: Option<bool>,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
+    _scopes: BTreeSet<String>
 }
 
 impl<'a, S> client::CallBuilder for FileGetCall<'a, S> {}
@@ -10583,18 +10745,18 @@ where
         dlg.begin(client::MethodInfo { id: "drive.files.get",
                                http_method: hyper::Method::GET });
         let mut params: Vec<(&str, String)> = Vec::with_capacity(6 + self._additional_params.len());
-        params.push(("fileId", (|x: &dyn std::fmt::Display| x.to_string())(&self._file_id)));
+        params.push(("fileId", self._file_id.to_string()));
         if let Some(value) = self._supports_team_drives.as_ref() {
-            params.push(("supportsTeamDrives", (|x: &dyn std::fmt::Display| x.to_string())(value)));
+            params.push(("supportsTeamDrives", value.to_string()));
         }
         if let Some(value) = self._supports_all_drives.as_ref() {
-            params.push(("supportsAllDrives", (|x: &dyn std::fmt::Display| x.to_string())(value)));
+            params.push(("supportsAllDrives", value.to_string()));
         }
         if let Some(value) = self._include_permissions_for_view.as_ref() {
-            params.push(("includePermissionsForView", (|x: &dyn std::fmt::Display| x.to_string())(value)));
+            params.push(("includePermissionsForView", value.to_string()));
         }
         if let Some(value) = self._acknowledge_abuse.as_ref() {
-            params.push(("acknowledgeAbuse", (|x: &dyn std::fmt::Display| x.to_string())(value)));
+            params.push(("acknowledgeAbuse", value.to_string()));
         }
         for &field in ["fileId", "supportsTeamDrives", "supportsAllDrives", "includePermissionsForView", "acknowledgeAbuse"].iter() {
             if self._additional_params.contains_key(field) {
@@ -10608,25 +10770,23 @@ where
 
         let (json_field_missing, enable_resource_parsing) = {
             let mut enable = true;
-            let mut field_present = true;
+            let mut field_missing = true;
             for &(name, ref value) in params.iter() {
                 if name == "alt" {
-                    field_present = false;
-                    if <String as AsRef<str>>::as_ref(&value) != "json" {
-                        enable = false;
-                    }
+                    field_missing = false;
+                    enable = value == "json";
                     break;
                 }
             }
-            (field_present, enable)
+            (field_missing, enable)
         };
         if json_field_missing {
             params.push(("alt", "json".to_string()));
         }
 
         let mut url = self.hub._base_url.clone() + "files/{fileId}";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::MetadataReadonly.as_ref().to_string(), ());
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::MetadataReadonly.as_ref().to_string());
         }
 
         for &(find_this, param_name) in [("{fileId}", "fileId")].iter() {
@@ -10640,15 +10800,8 @@ where
             url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
         }
         {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
-            for param_name in ["fileId"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
+            let to_remove = ["fileId"];
+            params.retain(|(n, _)| !to_remove.contains(n));
         }
 
         let url = url::Url::parse_with_params(&url, params).unwrap();
@@ -10656,7 +10809,7 @@ where
 
 
         loop {
-            let token = match self.hub.auth.get_token(&self._scopes.keys().map(String::as_str).collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
                 // TODO: remove Ok / Err branches
                 Ok(Some(token)) => token.clone(),
                 Ok(None) => {
@@ -10817,25 +10970,36 @@ where
 
     /// Identifies the authorization scope for the method you are building.
     ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::MetadataReadonly`.
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::MetadataReadonly`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
     ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, St>(mut self, scope: T) -> FileGetCall<'a, S>
-                                                        where T: Into<Option<St>>,
-                                                              St: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
+    pub fn add_scope<St>(mut self, scope: St) -> FileGetCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> FileGetCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> FileGetCall<'a, S> {
+        self._scopes.clear();
         self
     }
 }
@@ -10844,7 +11008,7 @@ where
 /// Lists or searches files.
 ///
 /// A builder for the *list* method supported by a *file* resource.
-/// It is not used directly, but through a `FileMethods` instance.
+/// It is not used directly, but through a [`FileMethods`] instance.
 ///
 /// # Example
 ///
@@ -10905,7 +11069,7 @@ pub struct FileListCall<'a, S>
     _corpora: Option<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
+    _scopes: BTreeSet<String>
 }
 
 impl<'a, S> client::CallBuilder for FileListCall<'a, S> {}
@@ -10933,46 +11097,46 @@ where
                                http_method: hyper::Method::GET });
         let mut params: Vec<(&str, String)> = Vec::with_capacity(16 + self._additional_params.len());
         if let Some(value) = self._team_drive_id.as_ref() {
-            params.push(("teamDriveId", (|x: &dyn std::fmt::Display| x.to_string())(value)));
+            params.push(("teamDriveId", value.to_string()));
         }
         if let Some(value) = self._supports_team_drives.as_ref() {
-            params.push(("supportsTeamDrives", (|x: &dyn std::fmt::Display| x.to_string())(value)));
+            params.push(("supportsTeamDrives", value.to_string()));
         }
         if let Some(value) = self._supports_all_drives.as_ref() {
-            params.push(("supportsAllDrives", (|x: &dyn std::fmt::Display| x.to_string())(value)));
+            params.push(("supportsAllDrives", value.to_string()));
         }
         if let Some(value) = self._spaces.as_ref() {
-            params.push(("spaces", (|x: &dyn std::fmt::Display| x.to_string())(value)));
+            params.push(("spaces", value.to_string()));
         }
         if let Some(value) = self._q.as_ref() {
-            params.push(("q", (|x: &dyn std::fmt::Display| x.to_string())(value)));
+            params.push(("q", value.to_string()));
         }
         if let Some(value) = self._page_token.as_ref() {
-            params.push(("pageToken", (|x: &dyn std::fmt::Display| x.to_string())(value)));
+            params.push(("pageToken", value.to_string()));
         }
         if let Some(value) = self._page_size.as_ref() {
-            params.push(("pageSize", (|x: &dyn std::fmt::Display| x.to_string())(value)));
+            params.push(("pageSize", value.to_string()));
         }
         if let Some(value) = self._order_by.as_ref() {
-            params.push(("orderBy", (|x: &dyn std::fmt::Display| x.to_string())(value)));
+            params.push(("orderBy", value.to_string()));
         }
         if let Some(value) = self._include_team_drive_items.as_ref() {
-            params.push(("includeTeamDriveItems", (|x: &dyn std::fmt::Display| x.to_string())(value)));
+            params.push(("includeTeamDriveItems", value.to_string()));
         }
         if let Some(value) = self._include_permissions_for_view.as_ref() {
-            params.push(("includePermissionsForView", (|x: &dyn std::fmt::Display| x.to_string())(value)));
+            params.push(("includePermissionsForView", value.to_string()));
         }
         if let Some(value) = self._include_items_from_all_drives.as_ref() {
-            params.push(("includeItemsFromAllDrives", (|x: &dyn std::fmt::Display| x.to_string())(value)));
+            params.push(("includeItemsFromAllDrives", value.to_string()));
         }
         if let Some(value) = self._drive_id.as_ref() {
-            params.push(("driveId", (|x: &dyn std::fmt::Display| x.to_string())(value)));
+            params.push(("driveId", value.to_string()));
         }
         if let Some(value) = self._corpus.as_ref() {
-            params.push(("corpus", (|x: &dyn std::fmt::Display| x.to_string())(value)));
+            params.push(("corpus", value.to_string()));
         }
         if let Some(value) = self._corpora.as_ref() {
-            params.push(("corpora", (|x: &dyn std::fmt::Display| x.to_string())(value)));
+            params.push(("corpora", value.to_string()));
         }
         for &field in ["alt", "teamDriveId", "supportsTeamDrives", "supportsAllDrives", "spaces", "q", "pageToken", "pageSize", "orderBy", "includeTeamDriveItems", "includePermissionsForView", "includeItemsFromAllDrives", "driveId", "corpus", "corpora"].iter() {
             if self._additional_params.contains_key(field) {
@@ -10987,8 +11151,8 @@ where
         params.push(("alt", "json".to_string()));
 
         let mut url = self.hub._base_url.clone() + "files";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::MetadataReadonly.as_ref().to_string(), ());
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::MetadataReadonly.as_ref().to_string());
         }
 
 
@@ -10997,7 +11161,7 @@ where
 
 
         loop {
-            let token = match self.hub.auth.get_token(&self._scopes.keys().map(String::as_str).collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
                 // TODO: remove Ok / Err branches
                 Ok(Some(token)) => token.clone(),
                 Ok(None) => {
@@ -11218,25 +11382,36 @@ where
 
     /// Identifies the authorization scope for the method you are building.
     ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::MetadataReadonly`.
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::MetadataReadonly`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
     ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, St>(mut self, scope: T) -> FileListCall<'a, S>
-                                                        where T: Into<Option<St>>,
-                                                              St: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
+    pub fn add_scope<St>(mut self, scope: St) -> FileListCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> FileListCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> FileListCall<'a, S> {
+        self._scopes.clear();
         self
     }
 }
@@ -11245,7 +11420,7 @@ where
 /// Updates a file's metadata and/or content. When calling this method, only populate fields in the request that you want to modify. When updating fields, some fields might change automatically, such as modifiedDate. This method supports patch semantics.
 ///
 /// A builder for the *update* method supported by a *file* resource.
-/// It is not used directly, but through a `FileMethods` instance.
+/// It is not used directly, but through a [`FileMethods`] instance.
 ///
 /// # Example
 ///
@@ -11305,7 +11480,7 @@ pub struct FileUpdateCall<'a, S>
     _add_parents: Option<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
+    _scopes: BTreeSet<String>
 }
 
 impl<'a, S> client::CallBuilder for FileUpdateCall<'a, S> {}
@@ -11331,33 +11506,33 @@ where
         dlg.begin(client::MethodInfo { id: "drive.files.update",
                                http_method: hyper::Method::PATCH });
         let mut params: Vec<(&str, String)> = Vec::with_capacity(13 + self._additional_params.len());
-        params.push(("fileId", (|x: &dyn std::fmt::Display| x.to_string())(&self._file_id)));
+        params.push(("fileId", self._file_id.to_string()));
         if let Some(value) = self._use_content_as_indexable_text.as_ref() {
-            params.push(("useContentAsIndexableText", (|x: &dyn std::fmt::Display| x.to_string())(value)));
+            params.push(("useContentAsIndexableText", value.to_string()));
         }
         if let Some(value) = self._supports_team_drives.as_ref() {
-            params.push(("supportsTeamDrives", (|x: &dyn std::fmt::Display| x.to_string())(value)));
+            params.push(("supportsTeamDrives", value.to_string()));
         }
         if let Some(value) = self._supports_all_drives.as_ref() {
-            params.push(("supportsAllDrives", (|x: &dyn std::fmt::Display| x.to_string())(value)));
+            params.push(("supportsAllDrives", value.to_string()));
         }
         if let Some(value) = self._remove_parents.as_ref() {
-            params.push(("removeParents", (|x: &dyn std::fmt::Display| x.to_string())(value)));
+            params.push(("removeParents", value.to_string()));
         }
         if let Some(value) = self._ocr_language.as_ref() {
-            params.push(("ocrLanguage", (|x: &dyn std::fmt::Display| x.to_string())(value)));
+            params.push(("ocrLanguage", value.to_string()));
         }
         if let Some(value) = self._keep_revision_forever.as_ref() {
-            params.push(("keepRevisionForever", (|x: &dyn std::fmt::Display| x.to_string())(value)));
+            params.push(("keepRevisionForever", value.to_string()));
         }
         if let Some(value) = self._include_permissions_for_view.as_ref() {
-            params.push(("includePermissionsForView", (|x: &dyn std::fmt::Display| x.to_string())(value)));
+            params.push(("includePermissionsForView", value.to_string()));
         }
         if let Some(value) = self._enforce_single_parent.as_ref() {
-            params.push(("enforceSingleParent", (|x: &dyn std::fmt::Display| x.to_string())(value)));
+            params.push(("enforceSingleParent", value.to_string()));
         }
         if let Some(value) = self._add_parents.as_ref() {
-            params.push(("addParents", (|x: &dyn std::fmt::Display| x.to_string())(value)));
+            params.push(("addParents", value.to_string()));
         }
         for &field in ["alt", "fileId", "useContentAsIndexableText", "supportsTeamDrives", "supportsAllDrives", "removeParents", "ocrLanguage", "keepRevisionForever", "includePermissionsForView", "enforceSingleParent", "addParents"].iter() {
             if self._additional_params.contains_key(field) {
@@ -11372,8 +11547,8 @@ where
         params.push(("alt", "json".to_string()));
 
         let mut url = self.hub._base_url.clone() + "files/{fileId}";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::Full.as_ref().to_string());
         }
 
         for &(find_this, param_name) in [("{fileId}", "fileId")].iter() {
@@ -11387,15 +11562,8 @@ where
             url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
         }
         {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
-            for param_name in ["fileId"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
+            let to_remove = ["fileId"];
+            params.retain(|(n, _)| !to_remove.contains(n));
         }
 
         let url = url::Url::parse_with_params(&url, params).unwrap();
@@ -11414,7 +11582,7 @@ where
 
 
         loop {
-            let token = match self.hub.auth.get_token(&self._scopes.keys().map(String::as_str).collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
                 // TODO: remove Ok / Err branches
                 Ok(Some(token)) => token.clone(),
                 Ok(None) => {
@@ -11519,33 +11687,33 @@ where
         dlg.begin(client::MethodInfo { id: "drive.files.update",
                                http_method: hyper::Method::PATCH });
         let mut params: Vec<(&str, String)> = Vec::with_capacity(13 + self._additional_params.len());
-        params.push(("fileId", (|x: &dyn std::fmt::Display| x.to_string())(&self._file_id)));
+        params.push(("fileId", self._file_id.to_string()));
         if let Some(value) = self._use_content_as_indexable_text.as_ref() {
-            params.push(("useContentAsIndexableText", (|x: &dyn std::fmt::Display| x.to_string())(value)));
+            params.push(("useContentAsIndexableText", value.to_string()));
         }
         if let Some(value) = self._supports_team_drives.as_ref() {
-            params.push(("supportsTeamDrives", (|x: &dyn std::fmt::Display| x.to_string())(value)));
+            params.push(("supportsTeamDrives", value.to_string()));
         }
         if let Some(value) = self._supports_all_drives.as_ref() {
-            params.push(("supportsAllDrives", (|x: &dyn std::fmt::Display| x.to_string())(value)));
+            params.push(("supportsAllDrives", value.to_string()));
         }
         if let Some(value) = self._remove_parents.as_ref() {
-            params.push(("removeParents", (|x: &dyn std::fmt::Display| x.to_string())(value)));
+            params.push(("removeParents", value.to_string()));
         }
         if let Some(value) = self._ocr_language.as_ref() {
-            params.push(("ocrLanguage", (|x: &dyn std::fmt::Display| x.to_string())(value)));
+            params.push(("ocrLanguage", value.to_string()));
         }
         if let Some(value) = self._keep_revision_forever.as_ref() {
-            params.push(("keepRevisionForever", (|x: &dyn std::fmt::Display| x.to_string())(value)));
+            params.push(("keepRevisionForever", value.to_string()));
         }
         if let Some(value) = self._include_permissions_for_view.as_ref() {
-            params.push(("includePermissionsForView", (|x: &dyn std::fmt::Display| x.to_string())(value)));
+            params.push(("includePermissionsForView", value.to_string()));
         }
         if let Some(value) = self._enforce_single_parent.as_ref() {
-            params.push(("enforceSingleParent", (|x: &dyn std::fmt::Display| x.to_string())(value)));
+            params.push(("enforceSingleParent", value.to_string()));
         }
         if let Some(value) = self._add_parents.as_ref() {
-            params.push(("addParents", (|x: &dyn std::fmt::Display| x.to_string())(value)));
+            params.push(("addParents", value.to_string()));
         }
         for &field in ["alt", "fileId", "useContentAsIndexableText", "supportsTeamDrives", "supportsAllDrives", "removeParents", "ocrLanguage", "keepRevisionForever", "includePermissionsForView", "enforceSingleParent", "addParents"].iter() {
             if self._additional_params.contains_key(field) {
@@ -11568,8 +11736,8 @@ where
                 unreachable!()
             };
         params.push(("uploadType", upload_type.to_string()));
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::Full.as_ref().to_string());
         }
 
         for &(find_this, param_name) in [("{fileId}", "fileId")].iter() {
@@ -11583,15 +11751,8 @@ where
             url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
         }
         {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
-            for param_name in ["fileId"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
+            let to_remove = ["fileId"];
+            params.retain(|(n, _)| !to_remove.contains(n));
         }
 
         let url = url::Url::parse_with_params(&url, params).unwrap();
@@ -11613,7 +11774,7 @@ where
         let mut upload_url: Option<String> = None;
 
         loop {
-            let token = match self.hub.auth.get_token(&self._scopes.keys().map(String::as_str).collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
                 // TODO: remove Ok / Err branches
                 Ok(Some(token)) => token.clone(),
                 Ok(None) => {
@@ -11922,25 +12083,36 @@ where
 
     /// Identifies the authorization scope for the method you are building.
     ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::Full`.
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::Full`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
     ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, St>(mut self, scope: T) -> FileUpdateCall<'a, S>
-                                                        where T: Into<Option<St>>,
-                                                              St: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
+    pub fn add_scope<St>(mut self, scope: St) -> FileUpdateCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> FileUpdateCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> FileUpdateCall<'a, S> {
+        self._scopes.clear();
         self
     }
 }
@@ -11954,7 +12126,7 @@ where
 /// but not the `Channel` structure that you would usually get. The latter will be a default value.
 ///
 /// A builder for the *watch* method supported by a *file* resource.
-/// It is not used directly, but through a `FileMethods` instance.
+/// It is not used directly, but through a [`FileMethods`] instance.
 ///
 /// # Example
 ///
@@ -12003,7 +12175,7 @@ pub struct FileWatchCall<'a, S>
     _acknowledge_abuse: Option<bool>,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
+    _scopes: BTreeSet<String>
 }
 
 impl<'a, S> client::CallBuilder for FileWatchCall<'a, S> {}
@@ -12030,18 +12202,18 @@ where
         dlg.begin(client::MethodInfo { id: "drive.files.watch",
                                http_method: hyper::Method::POST });
         let mut params: Vec<(&str, String)> = Vec::with_capacity(7 + self._additional_params.len());
-        params.push(("fileId", (|x: &dyn std::fmt::Display| x.to_string())(&self._file_id)));
+        params.push(("fileId", self._file_id.to_string()));
         if let Some(value) = self._supports_team_drives.as_ref() {
-            params.push(("supportsTeamDrives", (|x: &dyn std::fmt::Display| x.to_string())(value)));
+            params.push(("supportsTeamDrives", value.to_string()));
         }
         if let Some(value) = self._supports_all_drives.as_ref() {
-            params.push(("supportsAllDrives", (|x: &dyn std::fmt::Display| x.to_string())(value)));
+            params.push(("supportsAllDrives", value.to_string()));
         }
         if let Some(value) = self._include_permissions_for_view.as_ref() {
-            params.push(("includePermissionsForView", (|x: &dyn std::fmt::Display| x.to_string())(value)));
+            params.push(("includePermissionsForView", value.to_string()));
         }
         if let Some(value) = self._acknowledge_abuse.as_ref() {
-            params.push(("acknowledgeAbuse", (|x: &dyn std::fmt::Display| x.to_string())(value)));
+            params.push(("acknowledgeAbuse", value.to_string()));
         }
         for &field in ["fileId", "supportsTeamDrives", "supportsAllDrives", "includePermissionsForView", "acknowledgeAbuse"].iter() {
             if self._additional_params.contains_key(field) {
@@ -12055,25 +12227,23 @@ where
 
         let (json_field_missing, enable_resource_parsing) = {
             let mut enable = true;
-            let mut field_present = true;
+            let mut field_missing = true;
             for &(name, ref value) in params.iter() {
                 if name == "alt" {
-                    field_present = false;
-                    if <String as AsRef<str>>::as_ref(&value) != "json" {
-                        enable = false;
-                    }
+                    field_missing = false;
+                    enable = value == "json";
                     break;
                 }
             }
-            (field_present, enable)
+            (field_missing, enable)
         };
         if json_field_missing {
             params.push(("alt", "json".to_string()));
         }
 
         let mut url = self.hub._base_url.clone() + "files/{fileId}/watch";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::Full.as_ref().to_string());
         }
 
         for &(find_this, param_name) in [("{fileId}", "fileId")].iter() {
@@ -12087,15 +12257,8 @@ where
             url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
         }
         {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
-            for param_name in ["fileId"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
+            let to_remove = ["fileId"];
+            params.retain(|(n, _)| !to_remove.contains(n));
         }
 
         let url = url::Url::parse_with_params(&url, params).unwrap();
@@ -12114,7 +12277,7 @@ where
 
 
         loop {
-            let token = match self.hub.auth.get_token(&self._scopes.keys().map(String::as_str).collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
                 // TODO: remove Ok / Err branches
                 Ok(Some(token)) => token.clone(),
                 Ok(None) => {
@@ -12287,25 +12450,36 @@ where
 
     /// Identifies the authorization scope for the method you are building.
     ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::Full`.
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::Full`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
     ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, St>(mut self, scope: T) -> FileWatchCall<'a, S>
-                                                        where T: Into<Option<St>>,
-                                                              St: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
+    pub fn add_scope<St>(mut self, scope: St) -> FileWatchCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> FileWatchCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> FileWatchCall<'a, S> {
+        self._scopes.clear();
         self
     }
 }
@@ -12314,7 +12488,7 @@ where
 /// Creates a permission for a file or shared drive.
 ///
 /// A builder for the *create* method supported by a *permission* resource.
-/// It is not used directly, but through a `PermissionMethods` instance.
+/// It is not used directly, but through a [`PermissionMethods`] instance.
 ///
 /// # Example
 ///
@@ -12371,7 +12545,7 @@ pub struct PermissionCreateCall<'a, S>
     _email_message: Option<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
+    _scopes: BTreeSet<String>
 }
 
 impl<'a, S> client::CallBuilder for PermissionCreateCall<'a, S> {}
@@ -12398,30 +12572,30 @@ where
         dlg.begin(client::MethodInfo { id: "drive.permissions.create",
                                http_method: hyper::Method::POST });
         let mut params: Vec<(&str, String)> = Vec::with_capacity(12 + self._additional_params.len());
-        params.push(("fileId", (|x: &dyn std::fmt::Display| x.to_string())(&self._file_id)));
+        params.push(("fileId", self._file_id.to_string()));
         if let Some(value) = self._use_domain_admin_access.as_ref() {
-            params.push(("useDomainAdminAccess", (|x: &dyn std::fmt::Display| x.to_string())(value)));
+            params.push(("useDomainAdminAccess", value.to_string()));
         }
         if let Some(value) = self._transfer_ownership.as_ref() {
-            params.push(("transferOwnership", (|x: &dyn std::fmt::Display| x.to_string())(value)));
+            params.push(("transferOwnership", value.to_string()));
         }
         if let Some(value) = self._supports_team_drives.as_ref() {
-            params.push(("supportsTeamDrives", (|x: &dyn std::fmt::Display| x.to_string())(value)));
+            params.push(("supportsTeamDrives", value.to_string()));
         }
         if let Some(value) = self._supports_all_drives.as_ref() {
-            params.push(("supportsAllDrives", (|x: &dyn std::fmt::Display| x.to_string())(value)));
+            params.push(("supportsAllDrives", value.to_string()));
         }
         if let Some(value) = self._send_notification_email.as_ref() {
-            params.push(("sendNotificationEmail", (|x: &dyn std::fmt::Display| x.to_string())(value)));
+            params.push(("sendNotificationEmail", value.to_string()));
         }
         if let Some(value) = self._move_to_new_owners_root.as_ref() {
-            params.push(("moveToNewOwnersRoot", (|x: &dyn std::fmt::Display| x.to_string())(value)));
+            params.push(("moveToNewOwnersRoot", value.to_string()));
         }
         if let Some(value) = self._enforce_single_parent.as_ref() {
-            params.push(("enforceSingleParent", (|x: &dyn std::fmt::Display| x.to_string())(value)));
+            params.push(("enforceSingleParent", value.to_string()));
         }
         if let Some(value) = self._email_message.as_ref() {
-            params.push(("emailMessage", (|x: &dyn std::fmt::Display| x.to_string())(value)));
+            params.push(("emailMessage", value.to_string()));
         }
         for &field in ["alt", "fileId", "useDomainAdminAccess", "transferOwnership", "supportsTeamDrives", "supportsAllDrives", "sendNotificationEmail", "moveToNewOwnersRoot", "enforceSingleParent", "emailMessage"].iter() {
             if self._additional_params.contains_key(field) {
@@ -12436,8 +12610,8 @@ where
         params.push(("alt", "json".to_string()));
 
         let mut url = self.hub._base_url.clone() + "files/{fileId}/permissions";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::Full.as_ref().to_string());
         }
 
         for &(find_this, param_name) in [("{fileId}", "fileId")].iter() {
@@ -12451,15 +12625,8 @@ where
             url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
         }
         {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
-            for param_name in ["fileId"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
+            let to_remove = ["fileId"];
+            params.retain(|(n, _)| !to_remove.contains(n));
         }
 
         let url = url::Url::parse_with_params(&url, params).unwrap();
@@ -12478,7 +12645,7 @@ where
 
 
         loop {
-            let token = match self.hub.auth.get_token(&self._scopes.keys().map(String::as_str).collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
                 // TODO: remove Ok / Err branches
                 Ok(Some(token)) => token.clone(),
                 Ok(None) => {
@@ -12679,25 +12846,36 @@ where
 
     /// Identifies the authorization scope for the method you are building.
     ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::Full`.
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::Full`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
     ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, St>(mut self, scope: T) -> PermissionCreateCall<'a, S>
-                                                        where T: Into<Option<St>>,
-                                                              St: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
+    pub fn add_scope<St>(mut self, scope: St) -> PermissionCreateCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> PermissionCreateCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> PermissionCreateCall<'a, S> {
+        self._scopes.clear();
         self
     }
 }
@@ -12706,7 +12884,7 @@ where
 /// Deletes a permission.
 ///
 /// A builder for the *delete* method supported by a *permission* resource.
-/// It is not used directly, but through a `PermissionMethods` instance.
+/// It is not used directly, but through a [`PermissionMethods`] instance.
 ///
 /// # Example
 ///
@@ -12747,7 +12925,7 @@ pub struct PermissionDeleteCall<'a, S>
     _supports_all_drives: Option<bool>,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
+    _scopes: BTreeSet<String>
 }
 
 impl<'a, S> client::CallBuilder for PermissionDeleteCall<'a, S> {}
@@ -12774,16 +12952,16 @@ where
         dlg.begin(client::MethodInfo { id: "drive.permissions.delete",
                                http_method: hyper::Method::DELETE });
         let mut params: Vec<(&str, String)> = Vec::with_capacity(6 + self._additional_params.len());
-        params.push(("fileId", (|x: &dyn std::fmt::Display| x.to_string())(&self._file_id)));
-        params.push(("permissionId", (|x: &dyn std::fmt::Display| x.to_string())(&self._permission_id)));
+        params.push(("fileId", self._file_id.to_string()));
+        params.push(("permissionId", self._permission_id.to_string()));
         if let Some(value) = self._use_domain_admin_access.as_ref() {
-            params.push(("useDomainAdminAccess", (|x: &dyn std::fmt::Display| x.to_string())(value)));
+            params.push(("useDomainAdminAccess", value.to_string()));
         }
         if let Some(value) = self._supports_team_drives.as_ref() {
-            params.push(("supportsTeamDrives", (|x: &dyn std::fmt::Display| x.to_string())(value)));
+            params.push(("supportsTeamDrives", value.to_string()));
         }
         if let Some(value) = self._supports_all_drives.as_ref() {
-            params.push(("supportsAllDrives", (|x: &dyn std::fmt::Display| x.to_string())(value)));
+            params.push(("supportsAllDrives", value.to_string()));
         }
         for &field in ["fileId", "permissionId", "useDomainAdminAccess", "supportsTeamDrives", "supportsAllDrives"].iter() {
             if self._additional_params.contains_key(field) {
@@ -12797,8 +12975,8 @@ where
 
 
         let mut url = self.hub._base_url.clone() + "files/{fileId}/permissions/{permissionId}";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::Full.as_ref().to_string());
         }
 
         for &(find_this, param_name) in [("{fileId}", "fileId"), ("{permissionId}", "permissionId")].iter() {
@@ -12812,15 +12990,8 @@ where
             url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
         }
         {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(2);
-            for param_name in ["permissionId", "fileId"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
+            let to_remove = ["permissionId", "fileId"];
+            params.retain(|(n, _)| !to_remove.contains(n));
         }
 
         let url = url::Url::parse_with_params(&url, params).unwrap();
@@ -12828,7 +12999,7 @@ where
 
 
         loop {
-            let token = match self.hub.auth.get_token(&self._scopes.keys().map(String::as_str).collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
                 // TODO: remove Ok / Err branches
                 Ok(Some(token)) => token.clone(),
                 Ok(None) => {
@@ -12982,25 +13153,36 @@ where
 
     /// Identifies the authorization scope for the method you are building.
     ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::Full`.
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::Full`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
     ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, St>(mut self, scope: T) -> PermissionDeleteCall<'a, S>
-                                                        where T: Into<Option<St>>,
-                                                              St: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
+    pub fn add_scope<St>(mut self, scope: St) -> PermissionDeleteCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> PermissionDeleteCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> PermissionDeleteCall<'a, S> {
+        self._scopes.clear();
         self
     }
 }
@@ -13009,7 +13191,7 @@ where
 /// Gets a permission by ID.
 ///
 /// A builder for the *get* method supported by a *permission* resource.
-/// It is not used directly, but through a `PermissionMethods` instance.
+/// It is not used directly, but through a [`PermissionMethods`] instance.
 ///
 /// # Example
 ///
@@ -13050,7 +13232,7 @@ pub struct PermissionGetCall<'a, S>
     _supports_all_drives: Option<bool>,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
+    _scopes: BTreeSet<String>
 }
 
 impl<'a, S> client::CallBuilder for PermissionGetCall<'a, S> {}
@@ -13077,16 +13259,16 @@ where
         dlg.begin(client::MethodInfo { id: "drive.permissions.get",
                                http_method: hyper::Method::GET });
         let mut params: Vec<(&str, String)> = Vec::with_capacity(7 + self._additional_params.len());
-        params.push(("fileId", (|x: &dyn std::fmt::Display| x.to_string())(&self._file_id)));
-        params.push(("permissionId", (|x: &dyn std::fmt::Display| x.to_string())(&self._permission_id)));
+        params.push(("fileId", self._file_id.to_string()));
+        params.push(("permissionId", self._permission_id.to_string()));
         if let Some(value) = self._use_domain_admin_access.as_ref() {
-            params.push(("useDomainAdminAccess", (|x: &dyn std::fmt::Display| x.to_string())(value)));
+            params.push(("useDomainAdminAccess", value.to_string()));
         }
         if let Some(value) = self._supports_team_drives.as_ref() {
-            params.push(("supportsTeamDrives", (|x: &dyn std::fmt::Display| x.to_string())(value)));
+            params.push(("supportsTeamDrives", value.to_string()));
         }
         if let Some(value) = self._supports_all_drives.as_ref() {
-            params.push(("supportsAllDrives", (|x: &dyn std::fmt::Display| x.to_string())(value)));
+            params.push(("supportsAllDrives", value.to_string()));
         }
         for &field in ["alt", "fileId", "permissionId", "useDomainAdminAccess", "supportsTeamDrives", "supportsAllDrives"].iter() {
             if self._additional_params.contains_key(field) {
@@ -13101,8 +13283,8 @@ where
         params.push(("alt", "json".to_string()));
 
         let mut url = self.hub._base_url.clone() + "files/{fileId}/permissions/{permissionId}";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::MetadataReadonly.as_ref().to_string(), ());
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::MetadataReadonly.as_ref().to_string());
         }
 
         for &(find_this, param_name) in [("{fileId}", "fileId"), ("{permissionId}", "permissionId")].iter() {
@@ -13116,15 +13298,8 @@ where
             url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
         }
         {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(2);
-            for param_name in ["permissionId", "fileId"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
+            let to_remove = ["permissionId", "fileId"];
+            params.retain(|(n, _)| !to_remove.contains(n));
         }
 
         let url = url::Url::parse_with_params(&url, params).unwrap();
@@ -13132,7 +13307,7 @@ where
 
 
         loop {
-            let token = match self.hub.auth.get_token(&self._scopes.keys().map(String::as_str).collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
                 // TODO: remove Ok / Err branches
                 Ok(Some(token)) => token.clone(),
                 Ok(None) => {
@@ -13296,25 +13471,36 @@ where
 
     /// Identifies the authorization scope for the method you are building.
     ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::MetadataReadonly`.
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::MetadataReadonly`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
     ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, St>(mut self, scope: T) -> PermissionGetCall<'a, S>
-                                                        where T: Into<Option<St>>,
-                                                              St: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
+    pub fn add_scope<St>(mut self, scope: St) -> PermissionGetCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> PermissionGetCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> PermissionGetCall<'a, S> {
+        self._scopes.clear();
         self
     }
 }
@@ -13323,7 +13509,7 @@ where
 /// Lists a file's or shared drive's permissions.
 ///
 /// A builder for the *list* method supported by a *permission* resource.
-/// It is not used directly, but through a `PermissionMethods` instance.
+/// It is not used directly, but through a [`PermissionMethods`] instance.
 ///
 /// # Example
 ///
@@ -13369,7 +13555,7 @@ pub struct PermissionListCall<'a, S>
     _include_permissions_for_view: Option<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
+    _scopes: BTreeSet<String>
 }
 
 impl<'a, S> client::CallBuilder for PermissionListCall<'a, S> {}
@@ -13396,24 +13582,24 @@ where
         dlg.begin(client::MethodInfo { id: "drive.permissions.list",
                                http_method: hyper::Method::GET });
         let mut params: Vec<(&str, String)> = Vec::with_capacity(9 + self._additional_params.len());
-        params.push(("fileId", (|x: &dyn std::fmt::Display| x.to_string())(&self._file_id)));
+        params.push(("fileId", self._file_id.to_string()));
         if let Some(value) = self._use_domain_admin_access.as_ref() {
-            params.push(("useDomainAdminAccess", (|x: &dyn std::fmt::Display| x.to_string())(value)));
+            params.push(("useDomainAdminAccess", value.to_string()));
         }
         if let Some(value) = self._supports_team_drives.as_ref() {
-            params.push(("supportsTeamDrives", (|x: &dyn std::fmt::Display| x.to_string())(value)));
+            params.push(("supportsTeamDrives", value.to_string()));
         }
         if let Some(value) = self._supports_all_drives.as_ref() {
-            params.push(("supportsAllDrives", (|x: &dyn std::fmt::Display| x.to_string())(value)));
+            params.push(("supportsAllDrives", value.to_string()));
         }
         if let Some(value) = self._page_token.as_ref() {
-            params.push(("pageToken", (|x: &dyn std::fmt::Display| x.to_string())(value)));
+            params.push(("pageToken", value.to_string()));
         }
         if let Some(value) = self._page_size.as_ref() {
-            params.push(("pageSize", (|x: &dyn std::fmt::Display| x.to_string())(value)));
+            params.push(("pageSize", value.to_string()));
         }
         if let Some(value) = self._include_permissions_for_view.as_ref() {
-            params.push(("includePermissionsForView", (|x: &dyn std::fmt::Display| x.to_string())(value)));
+            params.push(("includePermissionsForView", value.to_string()));
         }
         for &field in ["alt", "fileId", "useDomainAdminAccess", "supportsTeamDrives", "supportsAllDrives", "pageToken", "pageSize", "includePermissionsForView"].iter() {
             if self._additional_params.contains_key(field) {
@@ -13428,8 +13614,8 @@ where
         params.push(("alt", "json".to_string()));
 
         let mut url = self.hub._base_url.clone() + "files/{fileId}/permissions";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::MetadataReadonly.as_ref().to_string(), ());
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::MetadataReadonly.as_ref().to_string());
         }
 
         for &(find_this, param_name) in [("{fileId}", "fileId")].iter() {
@@ -13443,15 +13629,8 @@ where
             url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
         }
         {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
-            for param_name in ["fileId"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
+            let to_remove = ["fileId"];
+            params.retain(|(n, _)| !to_remove.contains(n));
         }
 
         let url = url::Url::parse_with_params(&url, params).unwrap();
@@ -13459,7 +13638,7 @@ where
 
 
         loop {
-            let token = match self.hub.auth.get_token(&self._scopes.keys().map(String::as_str).collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
                 // TODO: remove Ok / Err branches
                 Ok(Some(token)) => token.clone(),
                 Ok(None) => {
@@ -13634,25 +13813,36 @@ where
 
     /// Identifies the authorization scope for the method you are building.
     ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::MetadataReadonly`.
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::MetadataReadonly`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
     ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, St>(mut self, scope: T) -> PermissionListCall<'a, S>
-                                                        where T: Into<Option<St>>,
-                                                              St: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
+    pub fn add_scope<St>(mut self, scope: St) -> PermissionListCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> PermissionListCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> PermissionListCall<'a, S> {
+        self._scopes.clear();
         self
     }
 }
@@ -13661,7 +13851,7 @@ where
 /// Updates a permission with patch semantics.
 ///
 /// A builder for the *update* method supported by a *permission* resource.
-/// It is not used directly, but through a `PermissionMethods` instance.
+/// It is not used directly, but through a [`PermissionMethods`] instance.
 ///
 /// # Example
 ///
@@ -13713,7 +13903,7 @@ pub struct PermissionUpdateCall<'a, S>
     _remove_expiration: Option<bool>,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
+    _scopes: BTreeSet<String>
 }
 
 impl<'a, S> client::CallBuilder for PermissionUpdateCall<'a, S> {}
@@ -13740,22 +13930,22 @@ where
         dlg.begin(client::MethodInfo { id: "drive.permissions.update",
                                http_method: hyper::Method::PATCH });
         let mut params: Vec<(&str, String)> = Vec::with_capacity(10 + self._additional_params.len());
-        params.push(("fileId", (|x: &dyn std::fmt::Display| x.to_string())(&self._file_id)));
-        params.push(("permissionId", (|x: &dyn std::fmt::Display| x.to_string())(&self._permission_id)));
+        params.push(("fileId", self._file_id.to_string()));
+        params.push(("permissionId", self._permission_id.to_string()));
         if let Some(value) = self._use_domain_admin_access.as_ref() {
-            params.push(("useDomainAdminAccess", (|x: &dyn std::fmt::Display| x.to_string())(value)));
+            params.push(("useDomainAdminAccess", value.to_string()));
         }
         if let Some(value) = self._transfer_ownership.as_ref() {
-            params.push(("transferOwnership", (|x: &dyn std::fmt::Display| x.to_string())(value)));
+            params.push(("transferOwnership", value.to_string()));
         }
         if let Some(value) = self._supports_team_drives.as_ref() {
-            params.push(("supportsTeamDrives", (|x: &dyn std::fmt::Display| x.to_string())(value)));
+            params.push(("supportsTeamDrives", value.to_string()));
         }
         if let Some(value) = self._supports_all_drives.as_ref() {
-            params.push(("supportsAllDrives", (|x: &dyn std::fmt::Display| x.to_string())(value)));
+            params.push(("supportsAllDrives", value.to_string()));
         }
         if let Some(value) = self._remove_expiration.as_ref() {
-            params.push(("removeExpiration", (|x: &dyn std::fmt::Display| x.to_string())(value)));
+            params.push(("removeExpiration", value.to_string()));
         }
         for &field in ["alt", "fileId", "permissionId", "useDomainAdminAccess", "transferOwnership", "supportsTeamDrives", "supportsAllDrives", "removeExpiration"].iter() {
             if self._additional_params.contains_key(field) {
@@ -13770,8 +13960,8 @@ where
         params.push(("alt", "json".to_string()));
 
         let mut url = self.hub._base_url.clone() + "files/{fileId}/permissions/{permissionId}";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::Full.as_ref().to_string());
         }
 
         for &(find_this, param_name) in [("{fileId}", "fileId"), ("{permissionId}", "permissionId")].iter() {
@@ -13785,15 +13975,8 @@ where
             url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
         }
         {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(2);
-            for param_name in ["permissionId", "fileId"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
+            let to_remove = ["permissionId", "fileId"];
+            params.retain(|(n, _)| !to_remove.contains(n));
         }
 
         let url = url::Url::parse_with_params(&url, params).unwrap();
@@ -13812,7 +13995,7 @@ where
 
 
         loop {
-            let token = match self.hub.auth.get_token(&self._scopes.keys().map(String::as_str).collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
                 // TODO: remove Ok / Err branches
                 Ok(Some(token)) => token.clone(),
                 Ok(None) => {
@@ -14002,25 +14185,36 @@ where
 
     /// Identifies the authorization scope for the method you are building.
     ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::Full`.
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::Full`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
     ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, St>(mut self, scope: T) -> PermissionUpdateCall<'a, S>
-                                                        where T: Into<Option<St>>,
-                                                              St: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
+    pub fn add_scope<St>(mut self, scope: St) -> PermissionUpdateCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> PermissionUpdateCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> PermissionUpdateCall<'a, S> {
+        self._scopes.clear();
         self
     }
 }
@@ -14029,7 +14223,7 @@ where
 /// Creates a new reply to a comment.
 ///
 /// A builder for the *create* method supported by a *reply* resource.
-/// It is not used directly, but through a `ReplyMethods` instance.
+/// It is not used directly, but through a [`ReplyMethods`] instance.
 ///
 /// # Example
 ///
@@ -14071,7 +14265,7 @@ pub struct ReplyCreateCall<'a, S>
     _comment_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
+    _scopes: BTreeSet<String>
 }
 
 impl<'a, S> client::CallBuilder for ReplyCreateCall<'a, S> {}
@@ -14098,8 +14292,8 @@ where
         dlg.begin(client::MethodInfo { id: "drive.replies.create",
                                http_method: hyper::Method::POST });
         let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
-        params.push(("fileId", (|x: &dyn std::fmt::Display| x.to_string())(&self._file_id)));
-        params.push(("commentId", (|x: &dyn std::fmt::Display| x.to_string())(&self._comment_id)));
+        params.push(("fileId", self._file_id.to_string()));
+        params.push(("commentId", self._comment_id.to_string()));
         for &field in ["alt", "fileId", "commentId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
@@ -14113,8 +14307,8 @@ where
         params.push(("alt", "json".to_string()));
 
         let mut url = self.hub._base_url.clone() + "files/{fileId}/comments/{commentId}/replies";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::Full.as_ref().to_string());
         }
 
         for &(find_this, param_name) in [("{fileId}", "fileId"), ("{commentId}", "commentId")].iter() {
@@ -14128,15 +14322,8 @@ where
             url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
         }
         {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(2);
-            for param_name in ["commentId", "fileId"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
+            let to_remove = ["commentId", "fileId"];
+            params.retain(|(n, _)| !to_remove.contains(n));
         }
 
         let url = url::Url::parse_with_params(&url, params).unwrap();
@@ -14155,7 +14342,7 @@ where
 
 
         loop {
-            let token = match self.hub.auth.get_token(&self._scopes.keys().map(String::as_str).collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
                 // TODO: remove Ok / Err branches
                 Ok(Some(token)) => token.clone(),
                 Ok(None) => {
@@ -14310,25 +14497,36 @@ where
 
     /// Identifies the authorization scope for the method you are building.
     ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::Full`.
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::Full`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
     ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, St>(mut self, scope: T) -> ReplyCreateCall<'a, S>
-                                                        where T: Into<Option<St>>,
-                                                              St: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
+    pub fn add_scope<St>(mut self, scope: St) -> ReplyCreateCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> ReplyCreateCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> ReplyCreateCall<'a, S> {
+        self._scopes.clear();
         self
     }
 }
@@ -14337,7 +14535,7 @@ where
 /// Deletes a reply.
 ///
 /// A builder for the *delete* method supported by a *reply* resource.
-/// It is not used directly, but through a `ReplyMethods` instance.
+/// It is not used directly, but through a [`ReplyMethods`] instance.
 ///
 /// # Example
 ///
@@ -14373,7 +14571,7 @@ pub struct ReplyDeleteCall<'a, S>
     _reply_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
+    _scopes: BTreeSet<String>
 }
 
 impl<'a, S> client::CallBuilder for ReplyDeleteCall<'a, S> {}
@@ -14400,9 +14598,9 @@ where
         dlg.begin(client::MethodInfo { id: "drive.replies.delete",
                                http_method: hyper::Method::DELETE });
         let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
-        params.push(("fileId", (|x: &dyn std::fmt::Display| x.to_string())(&self._file_id)));
-        params.push(("commentId", (|x: &dyn std::fmt::Display| x.to_string())(&self._comment_id)));
-        params.push(("replyId", (|x: &dyn std::fmt::Display| x.to_string())(&self._reply_id)));
+        params.push(("fileId", self._file_id.to_string()));
+        params.push(("commentId", self._comment_id.to_string()));
+        params.push(("replyId", self._reply_id.to_string()));
         for &field in ["fileId", "commentId", "replyId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
@@ -14415,8 +14613,8 @@ where
 
 
         let mut url = self.hub._base_url.clone() + "files/{fileId}/comments/{commentId}/replies/{replyId}";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::Full.as_ref().to_string());
         }
 
         for &(find_this, param_name) in [("{fileId}", "fileId"), ("{commentId}", "commentId"), ("{replyId}", "replyId")].iter() {
@@ -14430,15 +14628,8 @@ where
             url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
         }
         {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(3);
-            for param_name in ["replyId", "commentId", "fileId"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
+            let to_remove = ["replyId", "commentId", "fileId"];
+            params.retain(|(n, _)| !to_remove.contains(n));
         }
 
         let url = url::Url::parse_with_params(&url, params).unwrap();
@@ -14446,7 +14637,7 @@ where
 
 
         loop {
-            let token = match self.hub.auth.get_token(&self._scopes.keys().map(String::as_str).collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
                 // TODO: remove Ok / Err branches
                 Ok(Some(token)) => token.clone(),
                 Ok(None) => {
@@ -14589,25 +14780,36 @@ where
 
     /// Identifies the authorization scope for the method you are building.
     ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::Full`.
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::Full`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
     ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, St>(mut self, scope: T) -> ReplyDeleteCall<'a, S>
-                                                        where T: Into<Option<St>>,
-                                                              St: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
+    pub fn add_scope<St>(mut self, scope: St) -> ReplyDeleteCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> ReplyDeleteCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> ReplyDeleteCall<'a, S> {
+        self._scopes.clear();
         self
     }
 }
@@ -14616,7 +14818,7 @@ where
 /// Gets a reply by ID.
 ///
 /// A builder for the *get* method supported by a *reply* resource.
-/// It is not used directly, but through a `ReplyMethods` instance.
+/// It is not used directly, but through a [`ReplyMethods`] instance.
 ///
 /// # Example
 ///
@@ -14654,7 +14856,7 @@ pub struct ReplyGetCall<'a, S>
     _include_deleted: Option<bool>,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
+    _scopes: BTreeSet<String>
 }
 
 impl<'a, S> client::CallBuilder for ReplyGetCall<'a, S> {}
@@ -14681,11 +14883,11 @@ where
         dlg.begin(client::MethodInfo { id: "drive.replies.get",
                                http_method: hyper::Method::GET });
         let mut params: Vec<(&str, String)> = Vec::with_capacity(6 + self._additional_params.len());
-        params.push(("fileId", (|x: &dyn std::fmt::Display| x.to_string())(&self._file_id)));
-        params.push(("commentId", (|x: &dyn std::fmt::Display| x.to_string())(&self._comment_id)));
-        params.push(("replyId", (|x: &dyn std::fmt::Display| x.to_string())(&self._reply_id)));
+        params.push(("fileId", self._file_id.to_string()));
+        params.push(("commentId", self._comment_id.to_string()));
+        params.push(("replyId", self._reply_id.to_string()));
         if let Some(value) = self._include_deleted.as_ref() {
-            params.push(("includeDeleted", (|x: &dyn std::fmt::Display| x.to_string())(value)));
+            params.push(("includeDeleted", value.to_string()));
         }
         for &field in ["alt", "fileId", "commentId", "replyId", "includeDeleted"].iter() {
             if self._additional_params.contains_key(field) {
@@ -14700,8 +14902,8 @@ where
         params.push(("alt", "json".to_string()));
 
         let mut url = self.hub._base_url.clone() + "files/{fileId}/comments/{commentId}/replies/{replyId}";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::Readonly.as_ref().to_string());
         }
 
         for &(find_this, param_name) in [("{fileId}", "fileId"), ("{commentId}", "commentId"), ("{replyId}", "replyId")].iter() {
@@ -14715,15 +14917,8 @@ where
             url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
         }
         {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(3);
-            for param_name in ["replyId", "commentId", "fileId"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
+            let to_remove = ["replyId", "commentId", "fileId"];
+            params.retain(|(n, _)| !to_remove.contains(n));
         }
 
         let url = url::Url::parse_with_params(&url, params).unwrap();
@@ -14731,7 +14926,7 @@ where
 
 
         loop {
-            let token = match self.hub.auth.get_token(&self._scopes.keys().map(String::as_str).collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
                 // TODO: remove Ok / Err branches
                 Ok(Some(token)) => token.clone(),
                 Ok(None) => {
@@ -14891,25 +15086,36 @@ where
 
     /// Identifies the authorization scope for the method you are building.
     ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::Readonly`.
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::Readonly`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
     ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, St>(mut self, scope: T) -> ReplyGetCall<'a, S>
-                                                        where T: Into<Option<St>>,
-                                                              St: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
+    pub fn add_scope<St>(mut self, scope: St) -> ReplyGetCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> ReplyGetCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> ReplyGetCall<'a, S> {
+        self._scopes.clear();
         self
     }
 }
@@ -14918,7 +15124,7 @@ where
 /// Lists a comment's replies.
 ///
 /// A builder for the *list* method supported by a *reply* resource.
-/// It is not used directly, but through a `ReplyMethods` instance.
+/// It is not used directly, but through a [`ReplyMethods`] instance.
 ///
 /// # Example
 ///
@@ -14959,7 +15165,7 @@ pub struct ReplyListCall<'a, S>
     _include_deleted: Option<bool>,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
+    _scopes: BTreeSet<String>
 }
 
 impl<'a, S> client::CallBuilder for ReplyListCall<'a, S> {}
@@ -14986,16 +15192,16 @@ where
         dlg.begin(client::MethodInfo { id: "drive.replies.list",
                                http_method: hyper::Method::GET });
         let mut params: Vec<(&str, String)> = Vec::with_capacity(7 + self._additional_params.len());
-        params.push(("fileId", (|x: &dyn std::fmt::Display| x.to_string())(&self._file_id)));
-        params.push(("commentId", (|x: &dyn std::fmt::Display| x.to_string())(&self._comment_id)));
+        params.push(("fileId", self._file_id.to_string()));
+        params.push(("commentId", self._comment_id.to_string()));
         if let Some(value) = self._page_token.as_ref() {
-            params.push(("pageToken", (|x: &dyn std::fmt::Display| x.to_string())(value)));
+            params.push(("pageToken", value.to_string()));
         }
         if let Some(value) = self._page_size.as_ref() {
-            params.push(("pageSize", (|x: &dyn std::fmt::Display| x.to_string())(value)));
+            params.push(("pageSize", value.to_string()));
         }
         if let Some(value) = self._include_deleted.as_ref() {
-            params.push(("includeDeleted", (|x: &dyn std::fmt::Display| x.to_string())(value)));
+            params.push(("includeDeleted", value.to_string()));
         }
         for &field in ["alt", "fileId", "commentId", "pageToken", "pageSize", "includeDeleted"].iter() {
             if self._additional_params.contains_key(field) {
@@ -15010,8 +15216,8 @@ where
         params.push(("alt", "json".to_string()));
 
         let mut url = self.hub._base_url.clone() + "files/{fileId}/comments/{commentId}/replies";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::Readonly.as_ref().to_string());
         }
 
         for &(find_this, param_name) in [("{fileId}", "fileId"), ("{commentId}", "commentId")].iter() {
@@ -15025,15 +15231,8 @@ where
             url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
         }
         {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(2);
-            for param_name in ["commentId", "fileId"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
+            let to_remove = ["commentId", "fileId"];
+            params.retain(|(n, _)| !to_remove.contains(n));
         }
 
         let url = url::Url::parse_with_params(&url, params).unwrap();
@@ -15041,7 +15240,7 @@ where
 
 
         loop {
-            let token = match self.hub.auth.get_token(&self._scopes.keys().map(String::as_str).collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
                 // TODO: remove Ok / Err branches
                 Ok(Some(token)) => token.clone(),
                 Ok(None) => {
@@ -15205,25 +15404,36 @@ where
 
     /// Identifies the authorization scope for the method you are building.
     ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::Readonly`.
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::Readonly`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
     ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, St>(mut self, scope: T) -> ReplyListCall<'a, S>
-                                                        where T: Into<Option<St>>,
-                                                              St: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
+    pub fn add_scope<St>(mut self, scope: St) -> ReplyListCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> ReplyListCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> ReplyListCall<'a, S> {
+        self._scopes.clear();
         self
     }
 }
@@ -15232,7 +15442,7 @@ where
 /// Updates a reply with patch semantics.
 ///
 /// A builder for the *update* method supported by a *reply* resource.
-/// It is not used directly, but through a `ReplyMethods` instance.
+/// It is not used directly, but through a [`ReplyMethods`] instance.
 ///
 /// # Example
 ///
@@ -15275,7 +15485,7 @@ pub struct ReplyUpdateCall<'a, S>
     _reply_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
+    _scopes: BTreeSet<String>
 }
 
 impl<'a, S> client::CallBuilder for ReplyUpdateCall<'a, S> {}
@@ -15302,9 +15512,9 @@ where
         dlg.begin(client::MethodInfo { id: "drive.replies.update",
                                http_method: hyper::Method::PATCH });
         let mut params: Vec<(&str, String)> = Vec::with_capacity(6 + self._additional_params.len());
-        params.push(("fileId", (|x: &dyn std::fmt::Display| x.to_string())(&self._file_id)));
-        params.push(("commentId", (|x: &dyn std::fmt::Display| x.to_string())(&self._comment_id)));
-        params.push(("replyId", (|x: &dyn std::fmt::Display| x.to_string())(&self._reply_id)));
+        params.push(("fileId", self._file_id.to_string()));
+        params.push(("commentId", self._comment_id.to_string()));
+        params.push(("replyId", self._reply_id.to_string()));
         for &field in ["alt", "fileId", "commentId", "replyId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
@@ -15318,8 +15528,8 @@ where
         params.push(("alt", "json".to_string()));
 
         let mut url = self.hub._base_url.clone() + "files/{fileId}/comments/{commentId}/replies/{replyId}";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::Full.as_ref().to_string());
         }
 
         for &(find_this, param_name) in [("{fileId}", "fileId"), ("{commentId}", "commentId"), ("{replyId}", "replyId")].iter() {
@@ -15333,15 +15543,8 @@ where
             url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
         }
         {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(3);
-            for param_name in ["replyId", "commentId", "fileId"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
+            let to_remove = ["replyId", "commentId", "fileId"];
+            params.retain(|(n, _)| !to_remove.contains(n));
         }
 
         let url = url::Url::parse_with_params(&url, params).unwrap();
@@ -15360,7 +15563,7 @@ where
 
 
         loop {
-            let token = match self.hub.auth.get_token(&self._scopes.keys().map(String::as_str).collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
                 // TODO: remove Ok / Err branches
                 Ok(Some(token)) => token.clone(),
                 Ok(None) => {
@@ -15525,25 +15728,36 @@ where
 
     /// Identifies the authorization scope for the method you are building.
     ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::Full`.
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::Full`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
     ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, St>(mut self, scope: T) -> ReplyUpdateCall<'a, S>
-                                                        where T: Into<Option<St>>,
-                                                              St: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
+    pub fn add_scope<St>(mut self, scope: St) -> ReplyUpdateCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> ReplyUpdateCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> ReplyUpdateCall<'a, S> {
+        self._scopes.clear();
         self
     }
 }
@@ -15552,7 +15766,7 @@ where
 /// Permanently deletes a file version. You can only delete revisions for files with binary content in Google Drive, like images or videos. Revisions for other files, like Google Docs or Sheets, and the last remaining file version can't be deleted.
 ///
 /// A builder for the *delete* method supported by a *revision* resource.
-/// It is not used directly, but through a `RevisionMethods` instance.
+/// It is not used directly, but through a [`RevisionMethods`] instance.
 ///
 /// # Example
 ///
@@ -15587,7 +15801,7 @@ pub struct RevisionDeleteCall<'a, S>
     _revision_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
+    _scopes: BTreeSet<String>
 }
 
 impl<'a, S> client::CallBuilder for RevisionDeleteCall<'a, S> {}
@@ -15614,8 +15828,8 @@ where
         dlg.begin(client::MethodInfo { id: "drive.revisions.delete",
                                http_method: hyper::Method::DELETE });
         let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
-        params.push(("fileId", (|x: &dyn std::fmt::Display| x.to_string())(&self._file_id)));
-        params.push(("revisionId", (|x: &dyn std::fmt::Display| x.to_string())(&self._revision_id)));
+        params.push(("fileId", self._file_id.to_string()));
+        params.push(("revisionId", self._revision_id.to_string()));
         for &field in ["fileId", "revisionId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
@@ -15628,8 +15842,8 @@ where
 
 
         let mut url = self.hub._base_url.clone() + "files/{fileId}/revisions/{revisionId}";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::Full.as_ref().to_string());
         }
 
         for &(find_this, param_name) in [("{fileId}", "fileId"), ("{revisionId}", "revisionId")].iter() {
@@ -15643,15 +15857,8 @@ where
             url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
         }
         {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(2);
-            for param_name in ["revisionId", "fileId"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
+            let to_remove = ["revisionId", "fileId"];
+            params.retain(|(n, _)| !to_remove.contains(n));
         }
 
         let url = url::Url::parse_with_params(&url, params).unwrap();
@@ -15659,7 +15866,7 @@ where
 
 
         loop {
-            let token = match self.hub.auth.get_token(&self._scopes.keys().map(String::as_str).collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
                 // TODO: remove Ok / Err branches
                 Ok(Some(token)) => token.clone(),
                 Ok(None) => {
@@ -15792,25 +15999,36 @@ where
 
     /// Identifies the authorization scope for the method you are building.
     ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::Full`.
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::Full`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
     ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, St>(mut self, scope: T) -> RevisionDeleteCall<'a, S>
-                                                        where T: Into<Option<St>>,
-                                                              St: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
+    pub fn add_scope<St>(mut self, scope: St) -> RevisionDeleteCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> RevisionDeleteCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> RevisionDeleteCall<'a, S> {
+        self._scopes.clear();
         self
     }
 }
@@ -15824,7 +16042,7 @@ where
 /// but not the `Revision` structure that you would usually get. The latter will be a default value.
 ///
 /// A builder for the *get* method supported by a *revision* resource.
-/// It is not used directly, but through a `RevisionMethods` instance.
+/// It is not used directly, but through a [`RevisionMethods`] instance.
 ///
 /// # Example
 ///
@@ -15861,7 +16079,7 @@ pub struct RevisionGetCall<'a, S>
     _acknowledge_abuse: Option<bool>,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
+    _scopes: BTreeSet<String>
 }
 
 impl<'a, S> client::CallBuilder for RevisionGetCall<'a, S> {}
@@ -15888,10 +16106,10 @@ where
         dlg.begin(client::MethodInfo { id: "drive.revisions.get",
                                http_method: hyper::Method::GET });
         let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
-        params.push(("fileId", (|x: &dyn std::fmt::Display| x.to_string())(&self._file_id)));
-        params.push(("revisionId", (|x: &dyn std::fmt::Display| x.to_string())(&self._revision_id)));
+        params.push(("fileId", self._file_id.to_string()));
+        params.push(("revisionId", self._revision_id.to_string()));
         if let Some(value) = self._acknowledge_abuse.as_ref() {
-            params.push(("acknowledgeAbuse", (|x: &dyn std::fmt::Display| x.to_string())(value)));
+            params.push(("acknowledgeAbuse", value.to_string()));
         }
         for &field in ["fileId", "revisionId", "acknowledgeAbuse"].iter() {
             if self._additional_params.contains_key(field) {
@@ -15905,25 +16123,23 @@ where
 
         let (json_field_missing, enable_resource_parsing) = {
             let mut enable = true;
-            let mut field_present = true;
+            let mut field_missing = true;
             for &(name, ref value) in params.iter() {
                 if name == "alt" {
-                    field_present = false;
-                    if <String as AsRef<str>>::as_ref(&value) != "json" {
-                        enable = false;
-                    }
+                    field_missing = false;
+                    enable = value == "json";
                     break;
                 }
             }
-            (field_present, enable)
+            (field_missing, enable)
         };
         if json_field_missing {
             params.push(("alt", "json".to_string()));
         }
 
         let mut url = self.hub._base_url.clone() + "files/{fileId}/revisions/{revisionId}";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::MetadataReadonly.as_ref().to_string(), ());
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::MetadataReadonly.as_ref().to_string());
         }
 
         for &(find_this, param_name) in [("{fileId}", "fileId"), ("{revisionId}", "revisionId")].iter() {
@@ -15937,15 +16153,8 @@ where
             url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
         }
         {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(2);
-            for param_name in ["revisionId", "fileId"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
+            let to_remove = ["revisionId", "fileId"];
+            params.retain(|(n, _)| !to_remove.contains(n));
         }
 
         let url = url::Url::parse_with_params(&url, params).unwrap();
@@ -15953,7 +16162,7 @@ where
 
 
         loop {
-            let token = match self.hub.auth.get_token(&self._scopes.keys().map(String::as_str).collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
                 // TODO: remove Ok / Err branches
                 Ok(Some(token)) => token.clone(),
                 Ok(None) => {
@@ -16103,25 +16312,36 @@ where
 
     /// Identifies the authorization scope for the method you are building.
     ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::MetadataReadonly`.
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::MetadataReadonly`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
     ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, St>(mut self, scope: T) -> RevisionGetCall<'a, S>
-                                                        where T: Into<Option<St>>,
-                                                              St: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
+    pub fn add_scope<St>(mut self, scope: St) -> RevisionGetCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> RevisionGetCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> RevisionGetCall<'a, S> {
+        self._scopes.clear();
         self
     }
 }
@@ -16130,7 +16350,7 @@ where
 /// Lists a file's revisions.
 ///
 /// A builder for the *list* method supported by a *revision* resource.
-/// It is not used directly, but through a `RevisionMethods` instance.
+/// It is not used directly, but through a [`RevisionMethods`] instance.
 ///
 /// # Example
 ///
@@ -16168,7 +16388,7 @@ pub struct RevisionListCall<'a, S>
     _page_size: Option<i32>,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
+    _scopes: BTreeSet<String>
 }
 
 impl<'a, S> client::CallBuilder for RevisionListCall<'a, S> {}
@@ -16195,12 +16415,12 @@ where
         dlg.begin(client::MethodInfo { id: "drive.revisions.list",
                                http_method: hyper::Method::GET });
         let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
-        params.push(("fileId", (|x: &dyn std::fmt::Display| x.to_string())(&self._file_id)));
+        params.push(("fileId", self._file_id.to_string()));
         if let Some(value) = self._page_token.as_ref() {
-            params.push(("pageToken", (|x: &dyn std::fmt::Display| x.to_string())(value)));
+            params.push(("pageToken", value.to_string()));
         }
         if let Some(value) = self._page_size.as_ref() {
-            params.push(("pageSize", (|x: &dyn std::fmt::Display| x.to_string())(value)));
+            params.push(("pageSize", value.to_string()));
         }
         for &field in ["alt", "fileId", "pageToken", "pageSize"].iter() {
             if self._additional_params.contains_key(field) {
@@ -16215,8 +16435,8 @@ where
         params.push(("alt", "json".to_string()));
 
         let mut url = self.hub._base_url.clone() + "files/{fileId}/revisions";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::MetadataReadonly.as_ref().to_string(), ());
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::MetadataReadonly.as_ref().to_string());
         }
 
         for &(find_this, param_name) in [("{fileId}", "fileId")].iter() {
@@ -16230,15 +16450,8 @@ where
             url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
         }
         {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
-            for param_name in ["fileId"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
+            let to_remove = ["fileId"];
+            params.retain(|(n, _)| !to_remove.contains(n));
         }
 
         let url = url::Url::parse_with_params(&url, params).unwrap();
@@ -16246,7 +16459,7 @@ where
 
 
         loop {
-            let token = match self.hub.auth.get_token(&self._scopes.keys().map(String::as_str).collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
                 // TODO: remove Ok / Err branches
                 Ok(Some(token)) => token.clone(),
                 Ok(None) => {
@@ -16393,25 +16606,36 @@ where
 
     /// Identifies the authorization scope for the method you are building.
     ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::MetadataReadonly`.
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::MetadataReadonly`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
     ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, St>(mut self, scope: T) -> RevisionListCall<'a, S>
-                                                        where T: Into<Option<St>>,
-                                                              St: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
+    pub fn add_scope<St>(mut self, scope: St) -> RevisionListCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> RevisionListCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> RevisionListCall<'a, S> {
+        self._scopes.clear();
         self
     }
 }
@@ -16420,7 +16644,7 @@ where
 /// Updates a revision with patch semantics.
 ///
 /// A builder for the *update* method supported by a *revision* resource.
-/// It is not used directly, but through a `RevisionMethods` instance.
+/// It is not used directly, but through a [`RevisionMethods`] instance.
 ///
 /// # Example
 ///
@@ -16462,7 +16686,7 @@ pub struct RevisionUpdateCall<'a, S>
     _revision_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
+    _scopes: BTreeSet<String>
 }
 
 impl<'a, S> client::CallBuilder for RevisionUpdateCall<'a, S> {}
@@ -16489,8 +16713,8 @@ where
         dlg.begin(client::MethodInfo { id: "drive.revisions.update",
                                http_method: hyper::Method::PATCH });
         let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
-        params.push(("fileId", (|x: &dyn std::fmt::Display| x.to_string())(&self._file_id)));
-        params.push(("revisionId", (|x: &dyn std::fmt::Display| x.to_string())(&self._revision_id)));
+        params.push(("fileId", self._file_id.to_string()));
+        params.push(("revisionId", self._revision_id.to_string()));
         for &field in ["alt", "fileId", "revisionId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
@@ -16504,8 +16728,8 @@ where
         params.push(("alt", "json".to_string()));
 
         let mut url = self.hub._base_url.clone() + "files/{fileId}/revisions/{revisionId}";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::Full.as_ref().to_string());
         }
 
         for &(find_this, param_name) in [("{fileId}", "fileId"), ("{revisionId}", "revisionId")].iter() {
@@ -16519,15 +16743,8 @@ where
             url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
         }
         {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(2);
-            for param_name in ["revisionId", "fileId"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
+            let to_remove = ["revisionId", "fileId"];
+            params.retain(|(n, _)| !to_remove.contains(n));
         }
 
         let url = url::Url::parse_with_params(&url, params).unwrap();
@@ -16546,7 +16763,7 @@ where
 
 
         loop {
-            let token = match self.hub.auth.get_token(&self._scopes.keys().map(String::as_str).collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
                 // TODO: remove Ok / Err branches
                 Ok(Some(token)) => token.clone(),
                 Ok(None) => {
@@ -16701,25 +16918,36 @@ where
 
     /// Identifies the authorization scope for the method you are building.
     ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::Full`.
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::Full`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
     ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, St>(mut self, scope: T) -> RevisionUpdateCall<'a, S>
-                                                        where T: Into<Option<St>>,
-                                                              St: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
+    pub fn add_scope<St>(mut self, scope: St) -> RevisionUpdateCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> RevisionUpdateCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> RevisionUpdateCall<'a, S> {
+        self._scopes.clear();
         self
     }
 }
@@ -16728,7 +16956,7 @@ where
 /// Deprecated use drives.create instead.
 ///
 /// A builder for the *create* method supported by a *teamdrive* resource.
-/// It is not used directly, but through a `TeamdriveMethods` instance.
+/// It is not used directly, but through a [`TeamdriveMethods`] instance.
 ///
 /// # Example
 ///
@@ -16769,7 +16997,7 @@ pub struct TeamdriveCreateCall<'a, S>
     _request_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
+    _scopes: BTreeSet<String>
 }
 
 impl<'a, S> client::CallBuilder for TeamdriveCreateCall<'a, S> {}
@@ -16796,7 +17024,7 @@ where
         dlg.begin(client::MethodInfo { id: "drive.teamdrives.create",
                                http_method: hyper::Method::POST });
         let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
-        params.push(("requestId", (|x: &dyn std::fmt::Display| x.to_string())(&self._request_id)));
+        params.push(("requestId", self._request_id.to_string()));
         for &field in ["alt", "requestId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
@@ -16810,8 +17038,8 @@ where
         params.push(("alt", "json".to_string()));
 
         let mut url = self.hub._base_url.clone() + "teamdrives";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::Full.as_ref().to_string());
         }
 
 
@@ -16831,7 +17059,7 @@ where
 
 
         loop {
-            let token = match self.hub.auth.get_token(&self._scopes.keys().map(String::as_str).collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
                 // TODO: remove Ok / Err branches
                 Ok(Some(token)) => token.clone(),
                 Ok(None) => {
@@ -16976,25 +17204,36 @@ where
 
     /// Identifies the authorization scope for the method you are building.
     ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::Full`.
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::Full`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
     ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, St>(mut self, scope: T) -> TeamdriveCreateCall<'a, S>
-                                                        where T: Into<Option<St>>,
-                                                              St: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
+    pub fn add_scope<St>(mut self, scope: St) -> TeamdriveCreateCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> TeamdriveCreateCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> TeamdriveCreateCall<'a, S> {
+        self._scopes.clear();
         self
     }
 }
@@ -17003,7 +17242,7 @@ where
 /// Deprecated use drives.delete instead.
 ///
 /// A builder for the *delete* method supported by a *teamdrive* resource.
-/// It is not used directly, but through a `TeamdriveMethods` instance.
+/// It is not used directly, but through a [`TeamdriveMethods`] instance.
 ///
 /// # Example
 ///
@@ -17037,7 +17276,7 @@ pub struct TeamdriveDeleteCall<'a, S>
     _team_drive_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
+    _scopes: BTreeSet<String>
 }
 
 impl<'a, S> client::CallBuilder for TeamdriveDeleteCall<'a, S> {}
@@ -17064,7 +17303,7 @@ where
         dlg.begin(client::MethodInfo { id: "drive.teamdrives.delete",
                                http_method: hyper::Method::DELETE });
         let mut params: Vec<(&str, String)> = Vec::with_capacity(2 + self._additional_params.len());
-        params.push(("teamDriveId", (|x: &dyn std::fmt::Display| x.to_string())(&self._team_drive_id)));
+        params.push(("teamDriveId", self._team_drive_id.to_string()));
         for &field in ["teamDriveId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
@@ -17077,8 +17316,8 @@ where
 
 
         let mut url = self.hub._base_url.clone() + "teamdrives/{teamDriveId}";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::Full.as_ref().to_string());
         }
 
         for &(find_this, param_name) in [("{teamDriveId}", "teamDriveId")].iter() {
@@ -17092,15 +17331,8 @@ where
             url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
         }
         {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
-            for param_name in ["teamDriveId"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
+            let to_remove = ["teamDriveId"];
+            params.retain(|(n, _)| !to_remove.contains(n));
         }
 
         let url = url::Url::parse_with_params(&url, params).unwrap();
@@ -17108,7 +17340,7 @@ where
 
 
         loop {
-            let token = match self.hub.auth.get_token(&self._scopes.keys().map(String::as_str).collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
                 // TODO: remove Ok / Err branches
                 Ok(Some(token)) => token.clone(),
                 Ok(None) => {
@@ -17231,25 +17463,36 @@ where
 
     /// Identifies the authorization scope for the method you are building.
     ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::Full`.
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::Full`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
     ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, St>(mut self, scope: T) -> TeamdriveDeleteCall<'a, S>
-                                                        where T: Into<Option<St>>,
-                                                              St: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
+    pub fn add_scope<St>(mut self, scope: St) -> TeamdriveDeleteCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> TeamdriveDeleteCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> TeamdriveDeleteCall<'a, S> {
+        self._scopes.clear();
         self
     }
 }
@@ -17258,7 +17501,7 @@ where
 /// Deprecated use drives.get instead.
 ///
 /// A builder for the *get* method supported by a *teamdrive* resource.
-/// It is not used directly, but through a `TeamdriveMethods` instance.
+/// It is not used directly, but through a [`TeamdriveMethods`] instance.
 ///
 /// # Example
 ///
@@ -17294,7 +17537,7 @@ pub struct TeamdriveGetCall<'a, S>
     _use_domain_admin_access: Option<bool>,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
+    _scopes: BTreeSet<String>
 }
 
 impl<'a, S> client::CallBuilder for TeamdriveGetCall<'a, S> {}
@@ -17321,9 +17564,9 @@ where
         dlg.begin(client::MethodInfo { id: "drive.teamdrives.get",
                                http_method: hyper::Method::GET });
         let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
-        params.push(("teamDriveId", (|x: &dyn std::fmt::Display| x.to_string())(&self._team_drive_id)));
+        params.push(("teamDriveId", self._team_drive_id.to_string()));
         if let Some(value) = self._use_domain_admin_access.as_ref() {
-            params.push(("useDomainAdminAccess", (|x: &dyn std::fmt::Display| x.to_string())(value)));
+            params.push(("useDomainAdminAccess", value.to_string()));
         }
         for &field in ["alt", "teamDriveId", "useDomainAdminAccess"].iter() {
             if self._additional_params.contains_key(field) {
@@ -17338,8 +17581,8 @@ where
         params.push(("alt", "json".to_string()));
 
         let mut url = self.hub._base_url.clone() + "teamdrives/{teamDriveId}";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::Readonly.as_ref().to_string());
         }
 
         for &(find_this, param_name) in [("{teamDriveId}", "teamDriveId")].iter() {
@@ -17353,15 +17596,8 @@ where
             url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
         }
         {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
-            for param_name in ["teamDriveId"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
+            let to_remove = ["teamDriveId"];
+            params.retain(|(n, _)| !to_remove.contains(n));
         }
 
         let url = url::Url::parse_with_params(&url, params).unwrap();
@@ -17369,7 +17605,7 @@ where
 
 
         loop {
-            let token = match self.hub.auth.get_token(&self._scopes.keys().map(String::as_str).collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
                 // TODO: remove Ok / Err branches
                 Ok(Some(token)) => token.clone(),
                 Ok(None) => {
@@ -17509,25 +17745,36 @@ where
 
     /// Identifies the authorization scope for the method you are building.
     ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::Readonly`.
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::Readonly`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
     ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, St>(mut self, scope: T) -> TeamdriveGetCall<'a, S>
-                                                        where T: Into<Option<St>>,
-                                                              St: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
+    pub fn add_scope<St>(mut self, scope: St) -> TeamdriveGetCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> TeamdriveGetCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> TeamdriveGetCall<'a, S> {
+        self._scopes.clear();
         self
     }
 }
@@ -17536,7 +17783,7 @@ where
 /// Deprecated use drives.list instead.
 ///
 /// A builder for the *list* method supported by a *teamdrive* resource.
-/// It is not used directly, but through a `TeamdriveMethods` instance.
+/// It is not used directly, but through a [`TeamdriveMethods`] instance.
 ///
 /// # Example
 ///
@@ -17577,7 +17824,7 @@ pub struct TeamdriveListCall<'a, S>
     _page_size: Option<i32>,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
+    _scopes: BTreeSet<String>
 }
 
 impl<'a, S> client::CallBuilder for TeamdriveListCall<'a, S> {}
@@ -17605,16 +17852,16 @@ where
                                http_method: hyper::Method::GET });
         let mut params: Vec<(&str, String)> = Vec::with_capacity(6 + self._additional_params.len());
         if let Some(value) = self._use_domain_admin_access.as_ref() {
-            params.push(("useDomainAdminAccess", (|x: &dyn std::fmt::Display| x.to_string())(value)));
+            params.push(("useDomainAdminAccess", value.to_string()));
         }
         if let Some(value) = self._q.as_ref() {
-            params.push(("q", (|x: &dyn std::fmt::Display| x.to_string())(value)));
+            params.push(("q", value.to_string()));
         }
         if let Some(value) = self._page_token.as_ref() {
-            params.push(("pageToken", (|x: &dyn std::fmt::Display| x.to_string())(value)));
+            params.push(("pageToken", value.to_string()));
         }
         if let Some(value) = self._page_size.as_ref() {
-            params.push(("pageSize", (|x: &dyn std::fmt::Display| x.to_string())(value)));
+            params.push(("pageSize", value.to_string()));
         }
         for &field in ["alt", "useDomainAdminAccess", "q", "pageToken", "pageSize"].iter() {
             if self._additional_params.contains_key(field) {
@@ -17629,8 +17876,8 @@ where
         params.push(("alt", "json".to_string()));
 
         let mut url = self.hub._base_url.clone() + "teamdrives";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::Readonly.as_ref().to_string());
         }
 
 
@@ -17639,7 +17886,7 @@ where
 
 
         loop {
-            let token = match self.hub.auth.get_token(&self._scopes.keys().map(String::as_str).collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
                 // TODO: remove Ok / Err branches
                 Ok(Some(token)) => token.clone(),
                 Ok(None) => {
@@ -17790,25 +18037,36 @@ where
 
     /// Identifies the authorization scope for the method you are building.
     ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::Readonly`.
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::Readonly`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
     ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, St>(mut self, scope: T) -> TeamdriveListCall<'a, S>
-                                                        where T: Into<Option<St>>,
-                                                              St: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
+    pub fn add_scope<St>(mut self, scope: St) -> TeamdriveListCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> TeamdriveListCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> TeamdriveListCall<'a, S> {
+        self._scopes.clear();
         self
     }
 }
@@ -17817,7 +18075,7 @@ where
 /// Deprecated use drives.update instead
 ///
 /// A builder for the *update* method supported by a *teamdrive* resource.
-/// It is not used directly, but through a `TeamdriveMethods` instance.
+/// It is not used directly, but through a [`TeamdriveMethods`] instance.
 ///
 /// # Example
 ///
@@ -17860,7 +18118,7 @@ pub struct TeamdriveUpdateCall<'a, S>
     _use_domain_admin_access: Option<bool>,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
+    _scopes: BTreeSet<String>
 }
 
 impl<'a, S> client::CallBuilder for TeamdriveUpdateCall<'a, S> {}
@@ -17887,9 +18145,9 @@ where
         dlg.begin(client::MethodInfo { id: "drive.teamdrives.update",
                                http_method: hyper::Method::PATCH });
         let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
-        params.push(("teamDriveId", (|x: &dyn std::fmt::Display| x.to_string())(&self._team_drive_id)));
+        params.push(("teamDriveId", self._team_drive_id.to_string()));
         if let Some(value) = self._use_domain_admin_access.as_ref() {
-            params.push(("useDomainAdminAccess", (|x: &dyn std::fmt::Display| x.to_string())(value)));
+            params.push(("useDomainAdminAccess", value.to_string()));
         }
         for &field in ["alt", "teamDriveId", "useDomainAdminAccess"].iter() {
             if self._additional_params.contains_key(field) {
@@ -17904,8 +18162,8 @@ where
         params.push(("alt", "json".to_string()));
 
         let mut url = self.hub._base_url.clone() + "teamdrives/{teamDriveId}";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::Full.as_ref().to_string());
         }
 
         for &(find_this, param_name) in [("{teamDriveId}", "teamDriveId")].iter() {
@@ -17919,15 +18177,8 @@ where
             url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
         }
         {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
-            for param_name in ["teamDriveId"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
+            let to_remove = ["teamDriveId"];
+            params.retain(|(n, _)| !to_remove.contains(n));
         }
 
         let url = url::Url::parse_with_params(&url, params).unwrap();
@@ -17946,7 +18197,7 @@ where
 
 
         loop {
-            let token = match self.hub.auth.get_token(&self._scopes.keys().map(String::as_str).collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
                 // TODO: remove Ok / Err branches
                 Ok(Some(token)) => token.clone(),
                 Ok(None) => {
@@ -18098,25 +18349,36 @@ where
 
     /// Identifies the authorization scope for the method you are building.
     ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::Full`.
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::Full`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
     ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, St>(mut self, scope: T) -> TeamdriveUpdateCall<'a, S>
-                                                        where T: Into<Option<St>>,
-                                                              St: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
+    pub fn add_scope<St>(mut self, scope: St) -> TeamdriveUpdateCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> TeamdriveUpdateCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> TeamdriveUpdateCall<'a, S> {
+        self._scopes.clear();
         self
     }
 }
