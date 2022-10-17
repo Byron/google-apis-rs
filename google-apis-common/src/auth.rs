@@ -74,9 +74,8 @@ use std::pin::Pin;
 type TokenResult = Option<String>;
 
 pub trait GetToken: GetTokenClone + Send + Sync {
-    /// Called whenever there is the need for an oauth token after
-    /// the official authenticator implementation didn't provide one, for some reason.
-    /// If this method returns None as well, the underlying operation will fail
+    /// Called whenever an API call require authentication via an oauth2 token.
+    /// Returns `None` if a token can not be generated for the provided scopes.
     fn get_token<'a>(
         &'a self,
         _scopes: &'a [&str],
