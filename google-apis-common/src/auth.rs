@@ -74,15 +74,19 @@
 use std::future::Future;
 use std::pin::Pin;
 
-type TokenResult = Result<Option<String>, Box<dyn std::error::Error + Send + Sync>>;
+type GetTokenOutput<'a> = Pin<
+    Box<
+        dyn Future<Output = Result<Option<String>, Box<dyn std::error::Error + Send + Sync>>>
+            + Send
+            + 'a,
+    >,
+>;
 
 pub trait GetToken: GetTokenClone + Send + Sync {
-    /// Called whenever an API call require authentication via an oauth2 token.
-    /// Returns `None` if a token can not be generated for the provided scopes.
-    fn get_token<'a>(
-        &'a self,
-        _scopes: &'a [&str],
-    ) -> Pin<Box<dyn Future<Output = TokenResult> + Send + 'a>>;
+    /// Called whenever an API call requires authentication via an oauth2 token.
+    /// Returns `Ok(None)` if a token is not necessary - otherwise, returns an error
+    /// indicating the reason why a token could not be produced.
+    fn get_token<'a>(&'a self, _scopes: &'a [&str]) -> GetTokenOutput<'a>;
 }
 
 pub trait GetTokenClone {
@@ -105,10 +109,7 @@ impl Clone for Box<dyn GetToken> {
 }
 
 impl GetToken for String {
-    fn get_token<'a>(
-        &'a self,
-        _scopes: &'a [&str],
-    ) -> Pin<Box<dyn Future<Output = TokenResult> + Send + 'a>> {
+    fn get_token<'a>(&'a self, _scopes: &'a [&str]) -> GetTokenOutput<'a> {
         Box::pin(async move { Ok(Some(self.clone())) })
     }
 }
@@ -119,20 +120,14 @@ impl GetToken for String {
 pub struct NoToken;
 
 impl GetToken for NoToken {
-    fn get_token<'a>(
-        &'a self,
-        _scopes: &'a [&str],
-    ) -> Pin<Box<dyn Future<Output = TokenResult> + Send + 'a>> {
+    fn get_token<'a>(&'a self, _scopes: &'a [&str]) -> GetTokenOutput<'a> {
         Box::pin(async move { Ok(None) })
     }
 }
 
 #[cfg(feature = "yup-oauth2")]
 mod yup_oauth2_impl {
-    use core::future::Future;
-    use core::pin::Pin;
-
-    use super::{GetToken, TokenResult};
+    use super::{GetToken, GetTokenOutput};
 
     use http::Uri;
     use hyper::client::connect::Connection;
@@ -147,10 +142,7 @@ mod yup_oauth2_impl {
         S::Future: Send + Unpin + 'static,
         S::Error: Into<Box<dyn std::error::Error + Send + Sync>>,
     {
-        fn get_token<'a>(
-            &'a self,
-            scopes: &'a [&str],
-        ) -> Pin<Box<dyn Future<Output = TokenResult> + Send + 'a>> {
+        fn get_token<'a>(&'a self, scopes: &'a [&str]) -> GetTokenOutput<'a> {
             Box::pin(async move {
                 self.token(scopes)
                     .await
