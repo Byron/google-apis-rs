@@ -1,3 +1,73 @@
+//! Authentication for Google API endpoints
+//!
+//! Allows users to provide custom authentication implementations to suite their needs.
+//!
+//! By default, [`GetToken`] is implemented for:
+//! - [`Authenticator`] : An authenticator which supports a variety of authentication methods
+//! - [`String`] : Plain oauth2 token in String format
+//! - [`NoToken`] : No token, used for APIs which do not require a token
+//!
+//! # Usage
+//! [`GetToken`] instances are designed to be used with the Hub constructor provided by the
+//! generated APIs.
+//!
+//! If you intend to use the API libraries on client devices,
+//! [`Authenticator`] supports a variety of client-side authentication methods,
+//! and should be used to provide authentication.
+//!
+//! If you intend to use the API libraries server-side, with server-side client authentication,
+//! use the [`oauth2`] crate and convert the resulting [`AccessToken`] to [`String`].
+//!
+//! If you intend to use APIs which do not require authentication, use [`NoToken`].
+//!
+//! If you have custom authentication requirements, you can implement [`GetToken`] manually.
+//!
+//! # Example
+//! ```rust
+//! use core::future::Future;
+//! use core::pin::Pin;
+//!
+//! use google_apis_common::GetToken;
+//!
+//! use http::Uri;
+//! use hyper::client::connect::Connection;
+//! use tokio::io::{AsyncRead, AsyncWrite};
+//! use tower_service::Service;
+//! use yup_oauth2::authenticator::Authenticator;
+//!
+//! #[derive(Clone)]
+//! struct AuthenticatorWithRetry<S> {
+//!     auth: yup_oauth2::authenticator::Authenticator<S>,
+//!     retries: usize,
+//! }
+//!
+//! impl<S> GetToken for AuthenticatorWithRetry<S>
+//! where
+//!     S: Service<Uri> + Clone + Send + Sync + 'static,
+//!     S::Response: Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+//!     S::Future: Send + Unpin + 'static,
+//!     S::Error: Into<Box<dyn std::error::Error + Send + Sync>>,
+//! {
+//!     fn get_token<'a>(
+//!         &'a self,
+//!         scopes: &'a [&str],
+//!     ) -> Pin<Box<dyn Future<Output = Option<String>> + Send + 'a>> {
+//!         Box::pin(async move {
+//!             let mut auth_token = None;
+//!             for _ in 0..self.retries {
+//!                 if let Ok(token) = self.auth.token(scopes).await {
+//!                     auth_token.insert(token.as_str().to_owned());
+//!                     break;
+//!                 }
+//!             }
+//!             auth_token
+//!         })
+//!     }
+//! }
+//! ```
+//! [`oauth2`]: https://docs.rs/oauth2/latest/oauth2/
+//! [`AccessToken`]: https://docs.rs/oauth2/latest/oauth2/struct.AccessToken.html
+//! [`Authenticator`]: yup_oauth2::authenticator::Authenticator
 use std::future::Future;
 use std::pin::Pin;
 
