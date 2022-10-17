@@ -29,6 +29,7 @@ pub use auth::{GetToken, NoToken};
 pub use chrono;
 pub use field_mask::FieldMask;
 pub use serde_with;
+#[cfg(feature = "yup-oauth2")]
 pub use yup_oauth2 as oauth2;
 
 const LINE_ENDING: &str = "\r\n";

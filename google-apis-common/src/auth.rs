@@ -71,7 +71,6 @@
 use std::future::Future;
 use std::pin::Pin;
 
-// TODO: Simplify this to Option<String>
 type TokenResult = Option<String>;
 
 pub trait GetToken: GetTokenClone + Send + Sync {
@@ -121,8 +120,7 @@ pub struct NoToken;
 
 impl GetToken for NoToken {}
 
-// TODO: Make this optional
-// #[cfg(feature = "yup-oauth2")]
+#[cfg(feature = "yup-oauth2")]
 mod yup_oauth2_impl {
     use core::future::Future;
     use core::pin::Pin;

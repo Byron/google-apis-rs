@@ -49,5 +49,8 @@ pub mod api;
 
 // Re-export the hub type and some basic client structs
 pub use api::${hub_type};
+pub use client::{Result, Error, Delegate, FieldMask};
+
 // Re-export the yup_oauth2 crate, that is required to call some methods of the hub and the client
-pub use client::{Result, Error, Delegate, oauth2, FieldMask};
+#[cfg(feature = "yup-oauth2")]
+pub use client::oauth2;
