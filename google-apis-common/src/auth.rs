@@ -27,17 +27,17 @@
 //! use core::future::Future;
 //! use core::pin::Pin;
 //!
-//! use google_apis_common::GetToken;
+//! use google_apis_common::{GetToken, oauth2};
 //!
 //! use http::Uri;
 //! use hyper::client::connect::Connection;
 //! use tokio::io::{AsyncRead, AsyncWrite};
 //! use tower_service::Service;
-//! use yup_oauth2::authenticator::Authenticator;
+//! use oauth2::authenticator::Authenticator;
 //!
 //! #[derive(Clone)]
 //! struct AuthenticatorWithRetry<S> {
-//!     auth: yup_oauth2::authenticator::Authenticator<S>,
+//!     auth: Authenticator<S>,
 //!     retries: usize,
 //! }
 //!
@@ -51,13 +51,16 @@
 //!     fn get_token<'a>(
 //!         &'a self,
 //!         scopes: &'a [&str],
-//!     ) -> Pin<Box<dyn Future<Output = Option<String>> + Send + 'a>> {
+//!     ) -> Pin<Box<dyn Future<Output = Result<Option<String>, Box<dyn std::error::Error + Send + Sync>>> + Send + 'a>> {
 //!         Box::pin(async move {
-//!             let mut auth_token = None;
+//!             let mut auth_token = Ok(None);
 //!             for _ in 0..self.retries {
-//!                 if let Ok(token) = self.auth.token(scopes).await {
-//!                     auth_token.insert(token.as_str().to_owned());
-//!                     break;
+//!                 match self.auth.token(scopes).await {
+//!                     Ok(token) => {
+//!                         auth_token = Ok(Some(token.as_str().to_owned()));
+//!                         break;
+//!                     },
+//!                     Err(e) => auth_token = Err(e.into()),
 //!                 }
 //!             }
 //!             auth_token
@@ -71,7 +74,7 @@
 use std::future::Future;
 use std::pin::Pin;
 
-type TokenResult = Option<String>;
+type TokenResult = Result<Option<String>, Box<dyn std::error::Error + Send + Sync>>;
 
 pub trait GetToken: GetTokenClone + Send + Sync {
     /// Called whenever an API call require authentication via an oauth2 token.
@@ -79,9 +82,7 @@ pub trait GetToken: GetTokenClone + Send + Sync {
     fn get_token<'a>(
         &'a self,
         _scopes: &'a [&str],
-    ) -> Pin<Box<dyn Future<Output = TokenResult> + Send + 'a>> {
-        Box::pin(async move { None })
-    }
+    ) -> Pin<Box<dyn Future<Output = TokenResult> + Send + 'a>>;
 }
 
 pub trait GetTokenClone {
@@ -108,7 +109,7 @@ impl GetToken for String {
         &'a self,
         _scopes: &'a [&str],
     ) -> Pin<Box<dyn Future<Output = TokenResult> + Send + 'a>> {
-        Box::pin(async move { Some(self.clone()) })
+        Box::pin(async move { Ok(Some(self.clone())) })
     }
 }
 
@@ -117,7 +118,14 @@ impl GetToken for String {
 #[derive(Default, Clone)]
 pub struct NoToken;
 
-impl GetToken for NoToken {}
+impl GetToken for NoToken {
+    fn get_token<'a>(
+        &'a self,
+        _scopes: &'a [&str],
+    ) -> Pin<Box<dyn Future<Output = TokenResult> + Send + 'a>> {
+        Box::pin(async move { Ok(None) })
+    }
+}
 
 #[cfg(feature = "yup-oauth2")]
 mod yup_oauth2_impl {
@@ -143,7 +151,12 @@ mod yup_oauth2_impl {
             &'a self,
             scopes: &'a [&str],
         ) -> Pin<Box<dyn Future<Output = TokenResult> + Send + 'a>> {
-            Box::pin(async move { self.token(scopes).await.ok().map(|t| t.as_str().to_owned()) })
+            Box::pin(async move {
+                self.token(scopes)
+                    .await
+                    .map(|t| Some(t.as_str().to_owned()))
+                    .map_err(|e| e.into())
+            })
         }
     }
 }

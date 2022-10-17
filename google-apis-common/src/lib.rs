@@ -114,14 +114,16 @@ pub trait Delegate: Send {
         None
     }
 
-    // TODO: Remove oauth2::Error
     /// Called whenever the Authenticator didn't yield a token. The delegate
     /// may attempt to provide one, or just take it as a general information about the
     /// impending failure.
     /// The given Error provides information about why the token couldn't be acquired in the
     /// first place
-    fn token(&mut self) -> Option<String> {
-        None
+    fn token(
+        &mut self,
+        e: Box<dyn StdError + Send + Sync>,
+    ) -> std::result::Result<Option<String>, Box<dyn StdError + Send + Sync>> {
+        Err(e)
     }
 
     /// Called during resumable uploads to provide a URL for the impending upload.
@@ -237,7 +239,7 @@ pub enum Error {
     MissingAPIKey,
 
     /// We required a Token, but didn't get one from the Authenticator
-    MissingToken,
+    MissingToken(Box<dyn StdError + Send + Sync>),
 
     /// The delgate instructed to cancel the operation
     Cancelled,
@@ -258,10 +260,10 @@ pub enum Error {
 
 impl Display for Error {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        match *self {
-            Error::Io(ref err) => err.fmt(f),
-            Error::HttpError(ref err) => err.fmt(f),
-            Error::UploadSizeLimitExceeded(ref resource_size, ref max_size) => writeln!(
+        match self {
+            Error::Io(err) => err.fmt(f),
+            Error::HttpError(err) => err.fmt(f),
+            Error::UploadSizeLimitExceeded(resource_size, max_size) => writeln!(
                 f,
                 "The media size {} exceeds the maximum allowed upload size of {}",
                 resource_size, max_size
@@ -276,16 +278,16 @@ impl Display for Error {
                     "It is used as there are no Scopes defined for this method."
                 )
             }
-            Error::BadRequest(ref message) => writeln!(f, "Bad Request: {}", message),
-            Error::MissingToken => writeln!(f, "Token retrieval failed"),
+            Error::BadRequest(message) => writeln!(f, "Bad Request: {}", message),
+            Error::MissingToken(e) => writeln!(f, "Token retrieval failed: {}", e),
             Error::Cancelled => writeln!(f, "Operation cancelled by delegate"),
             Error::FieldClash(field) => writeln!(
                 f,
                 "The custom parameter '{}' is already provided natively by the CallBuilder.",
                 field
             ),
-            Error::JsonDecodeError(ref json_str, ref err) => writeln!(f, "{}: {}", err, json_str),
-            Error::Failure(ref response) => {
+            Error::JsonDecodeError(json_str, err) => writeln!(f, "{}: {}", err, json_str),
+            Error::Failure(response) => {
                 writeln!(f, "Http status indicates failure: {:?}", response)
             }
         }
@@ -577,14 +579,12 @@ impl RangeResponseHeader {
 pub struct ResumableUploadHelper<'a, A: 'a, S>
 where
     S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
-    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Response:
+        hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
     S::Future: Send + Unpin + 'static,
     S::Error: Into<Box<dyn StdError + Send + Sync>>,
 {
-    pub client: &'a hyper::client::Client<
-        S,
-        hyper::body::Body,
-    >,
+    pub client: &'a hyper::client::Client<S, hyper::body::Body>,
     pub delegate: &'a mut dyn Delegate,
     pub start_at: Option<u64>,
     pub auth: &'a A,
@@ -598,7 +598,8 @@ where
 impl<'a, A, S> ResumableUploadHelper<'a, A, S>
 where
     S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
-    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Response:
+        hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
     S::Future: Send + Unpin + 'static,
     S::Error: Into<Box<dyn StdError + Send + Sync>>,
 {
