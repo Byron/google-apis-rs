@@ -54,7 +54,7 @@
 //!     ) -> Pin<Box<dyn Future<Output = Result<Option<String>, Box<dyn std::error::Error + Send + Sync>>> + Send + 'a>> {
 //!         Box::pin(async move {
 //!             let mut auth_token = Ok(None);
-//!             for _ in 0..self.retries {
+//!             for _ in 0..=self.retries {
 //!                 match self.auth.token(scopes).await {
 //!                     Ok(token) => {
 //!                         auth_token = Ok(Some(token.as_str().to_owned()));
