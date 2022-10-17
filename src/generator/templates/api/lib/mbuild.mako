@@ -856,7 +856,8 @@ else {
                                 start_at: if upload_url_from_server { Some(0) } else { None },
                                 auth: &${auth_call},
                                 user_agent: &self.hub._user_agent,
-                                auth_header: format!("Bearer {}", token.expect("resumable upload requires token").as_str()),
+                                // TODO: Check this assumption
+                                auth_header: format!("Bearer {}", token.ok_or_else(|| client::Error::MissingToken("resumable upload requires token".into()))?.as_str()),
                                 url: url_str,
                                 reader: &mut reader,
                                 media_type: reader_mime_type.clone(),
