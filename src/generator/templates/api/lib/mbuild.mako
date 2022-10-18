@@ -689,7 +689,7 @@ else {
         let url = url::Url::parse_with_params(&url, params).unwrap();
 
         % if request_value:
-        let mut json_mime_type: mime::Mime = "application/json".parse().unwrap();
+        let mut json_mime_type = mime::APPLICATION_JSON;
         let mut request_value_reader =
             {
                 let mut value = json::value::to_value(&self.${property(REQUEST_VALUE_PROPERTY_NAME)}).expect("serde to work");

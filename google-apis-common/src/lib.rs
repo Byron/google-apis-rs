@@ -17,7 +17,7 @@ use hyper::header::{HeaderMap, AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, USER
 use hyper::Method;
 use hyper::StatusCode;
 
-use mime::{Attr, Mime, SubLevel, TopLevel, Value};
+use mime::Mime;
 
 use serde_json as json;
 
@@ -358,7 +358,7 @@ impl<'a> MultiPartReader<'a> {
         let mut headers = HeaderMap::new();
         headers.insert(
             CONTENT_TYPE,
-            hyper::header::HeaderValue::from_str(&format!("{}", mime_type)).unwrap(),
+            hyper::header::HeaderValue::from_str(&mime_type.to_string()).unwrap(),
         );
         headers.insert(CONTENT_LENGTH, size.into());
         self.raw_parts.push((headers, reader));
@@ -368,14 +368,8 @@ impl<'a> MultiPartReader<'a> {
     /// Returns the mime-type representing our multi-part message.
     /// Use it with the ContentType header.
     pub fn mime_type(&self) -> Mime {
-        Mime(
-            TopLevel::Multipart,
-            SubLevel::Ext("related".to_string()),
-            vec![(
-                Attr::Ext("boundary".to_string()),
-                Value::Ext(BOUNDARY.to_string()),
-            )],
-        )
+        Mime::from_str(&format!("multipart/related;boundary={}", BOUNDARY))
+            .expect("valid mimetype")
     }
 
     /// Returns true if we are totally used
