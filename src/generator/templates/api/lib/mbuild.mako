@@ -711,24 +711,13 @@ else {
         loop {
             % if default_scope:
             let token = match ${auth_call}.get_token(&self.${api.properties.scopes}.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
-                // TODO: remove Ok / Err branches
-                Ok(Some(token)) => token.clone(),
-                Ok(None) => {
-                    let err = oauth2::Error::OtherError(anyhow::Error::msg("unknown error occurred while generating oauth2 token"));
-                    match dlg.token(&err) {
-                        Some(token) => token,
-                        None => {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
                             ${delegate_finish}(false);
-                            return Err(client::Error::MissingToken(err))
-                        }
-                    }
-                }
-                Err(err) => {
-                    match dlg.token(&err) {
-                        Some(token) => token,
-                        None => {
-                            ${delegate_finish}(false);
-                            return Err(client::Error::MissingToken(err))
+                            return Err(client::Error::MissingToken(e));
                         }
                     }
                 }
@@ -767,11 +756,13 @@ else {
                 let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(${method_name_to_variant(m.httpMethod)}).uri(url.clone().into_string())
-                        .header(USER_AGENT, self.hub._user_agent.clone())\
-                        % if default_scope:
-                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()))\
-                        % endif
-;
+                        .header(USER_AGENT, self.hub._user_agent.clone());
+
+                % if default_scope:
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+                % endif
 
                 % if resumable_media_param:
                 upload_url_from_server = true;
@@ -865,7 +856,8 @@ else {
                                 start_at: if upload_url_from_server { Some(0) } else { None },
                                 auth: &${auth_call},
                                 user_agent: &self.hub._user_agent,
-                                auth_header: format!("Bearer {}", token.as_str()),
+                                // TODO: Check this assumption
+                                auth_header: format!("Bearer {}", token.ok_or_else(|| client::Error::MissingToken("resumable upload requires token".into()))?.as_str()),
                                 url: url_str,
                                 reader: &mut reader,
                                 media_type: reader_mime_type.clone(),

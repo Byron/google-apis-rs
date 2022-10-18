@@ -58,6 +58,8 @@ path = "../${api_name}"
 version = "${util.crate_version()}"
 % endif
 
-## TODO: Make yup-oauth2 optional
-# [features]
-# default = ["yup-oauth2"]
+% if not cargo.get("is_executable", False):
+[features]
+yup-oauth2 = ["google-apis-common/yup-oauth2"]
+default = ["yup-oauth2"]
+% endif

@@ -19,6 +19,7 @@ jobs:
           source ~/.profile
           make test-gen
           make gen-all-cli cargo-api ARGS=test
+          make cargo-api ARGS='check --no-default-features'
           make cargo-api ARGS=doc
           make docs-all
           cargo test
