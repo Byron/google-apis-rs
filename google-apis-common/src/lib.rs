@@ -333,6 +333,13 @@ pub struct MultiPartReader<'a> {
 }
 
 impl<'a> MultiPartReader<'a> {
+    // TODO: This should be an associated constant
+    /// Returns the mime-type representing our multi-part message.
+    /// Use it with the ContentType header.
+    pub fn mime_type() -> Mime {
+        Mime::from_str(&format!("multipart/related;boundary={}", BOUNDARY)).expect("valid mimetype")
+    }
+
     /// Reserve memory for exactly the given amount of parts
     pub fn reserve_exact(&mut self, cap: usize) {
         self.raw_parts.reserve_exact(cap);
@@ -363,13 +370,6 @@ impl<'a> MultiPartReader<'a> {
         headers.insert(CONTENT_LENGTH, size.into());
         self.raw_parts.push((headers, reader));
         self
-    }
-
-    /// Returns the mime-type representing our multi-part message.
-    /// Use it with the ContentType header.
-    pub fn mime_type(&self) -> Mime {
-        Mime::from_str(&format!("multipart/related;boundary={}", BOUNDARY))
-            .expect("valid mimetype")
     }
 
     /// Returns true if we are totally used
@@ -771,6 +771,7 @@ mod test_api {
     use std::str::FromStr;
 
     use ::serde::{Deserialize, Serialize};
+    use mime;
     use serde_json as json;
 
     #[test]
@@ -829,5 +830,17 @@ mod test_api {
         let mut dd = DefaultDelegate::default();
         let dlg: &mut dyn Delegate = &mut dd;
         with_send(dlg);
+    }
+
+    #[test]
+    fn test_mime() {
+        let mime = MultiPartReader::mime_type();
+
+        assert_eq!(mime::MULTIPART, mime.type_());
+        assert_eq!("related", mime.subtype());
+        assert_eq!(
+            Some(BOUNDARY),
+            mime.get_param("boundary").map(|x| x.as_str())
+        );
     }
 }
