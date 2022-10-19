@@ -41,6 +41,12 @@ pub enum Retry {
     After(Duration),
 }
 
+#[derive(PartialEq, Eq)]
+pub enum UploadProtocol {
+    Simple,
+    Resumable,
+}
+
 /// Identifies the Hub. There is only one per library, this trait is supposed
 /// to make intended use more explicit.
 /// The hub allows to access all resource methods more easily.

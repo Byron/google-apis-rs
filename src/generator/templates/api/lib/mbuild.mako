@@ -14,6 +14,11 @@
                       is_repeated_property, setter_fn_name, ADD_SCOPE_FN, ADD_SCOPES_FN, rust_doc_sanitize,
                       CLEAR_SCOPES_FN, items, string_impl)
 
+    PROTOCOL_TYPE_MAP = {
+        "simple": "client::UploadProtocol::Simple",
+        "resumable": "client::UploadProtocol::Resumable"
+    }
+
     def get_parts(part_prop):
         if not part_prop:
             return list()
@@ -450,7 +455,7 @@ match result {
         type_params = '<%s>' % mtype_param
         qualifier = ''
         where = '\n\t\twhere ' + mtype_param + ': client::ReadSeek'
-        add_args = (', mut reader: %s, reader_mime_type: mime::Mime' % mtype_param) + ", protocol: &'static str"
+        add_args = (', mut reader: %s, reader_mime_type: mime::Mime' % mtype_param) + ", protocol: client::UploadProtocol"
         for p in media_params:
             if p.protocol == 'simple':
                 simple_media_param = p
@@ -606,7 +611,6 @@ match result {
         params.push(("alt", "json".into()));
         % endif ## supportsMediaDownload
         % endif ## response schema
-
         % if media_params:
         let (mut url, upload_type) =
             % for mp in media_params:
@@ -615,7 +619,7 @@ match result {
             % else:
 else if \
             % endif
-protocol == "${mp.protocol}" {
+protocol == ${PROTOCOL_TYPE_MAP[mp.protocol]} {
                 (self.hub._root_url.clone() + "${mp.path.lstrip('/')}", "${upload_type_map.get(mp.protocol, mp.protocol)}")
             } \
             % endfor
@@ -757,7 +761,7 @@ else {
 
                 % if resumable_media_param:
                 upload_url_from_server = true;
-                if protocol == "${resumable_media_param.protocol}" {
+                if protocol == ${PROTOCOL_TYPE_MAP[resumable_media_param.protocol]} {
                     req_builder = req_builder.header("X-Upload-Content-Type", format!("{}", reader_mime_type));
                 }
                 % endif
@@ -777,7 +781,7 @@ else {
                     % endif ## not simple_media_param
                 % else:
                     % if simple_media_param:
-                        let request = if protocol == "${simple_media_param.protocol}" {
+                        let request = if protocol == ${PROTOCOL_TYPE_MAP[simple_media_param.protocol]} {
                             ${READER_SEEK | indent_all_but_first_by(4)}
                             let mut bytes = Vec::with_capacity(size as usize);
                             reader.read_to_end(&mut bytes)?;
@@ -833,7 +837,7 @@ else {
                         }
                     }
                     % if resumable_media_param:
-                    if protocol == "${resumable_media_param.protocol}" {
+                    if protocol == ${PROTOCOL_TYPE_MAP[resumable_media_param.protocol]} {
                         ${READER_SEEK | indent_all_but_first_by(6)}
                         let upload_result = {
                             let url_str = &res.headers().get("Location").expect("LOCATION header is part of protocol").to_str().unwrap();
@@ -919,7 +923,7 @@ if enable_resource_parsing \
     % endfor
     pub async fn ${upload_action_fn(api.terms.upload_action, p.type.suffix)}<${mtype_param}>(self, ${p.type.arg_name}: ${mtype_param}, mime_type: mime::Mime) -> ${rtype}
                 where ${mtype_param}: client::ReadSeek {
-        self.${api.terms.action}(${p.type.arg_name}, mime_type, "${p.protocol}").await
+        self.${api.terms.action}(${p.type.arg_name}, mime_type, ${PROTOCOL_TYPE_MAP[p.protocol]}).await
     }
     % endfor
 </%def>
