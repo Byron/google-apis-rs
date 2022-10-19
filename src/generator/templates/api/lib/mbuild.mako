@@ -658,21 +658,18 @@ else {
     replace_assign = 'Some(value)'
     url_replace_arg = 'replace_with.expect("to find substitution value in params")'
     if URL_ENCODE in special_cases:
-        replace_init = ' = String::new()'
-        replace_assign = 'value.to_string()'
+        replace_init = ': Cow<str> = "".into()'
+        replace_assign = 'Cow::from(value.as_ref())'
         url_replace_arg = '&replace_with'
     # end handle url encoding
 %>\
             let mut replace_with${replace_init};
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = ${replace_assign};
-                    break;
-                }
+            if let Some((_, value)) = params.iter().find(|(name, _)| name == &param_name) {
+                replace_with = ${replace_assign};
             }
             % if URL_ENCODE in special_cases:
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string().into();
             }
             % endif
             url = url.replace(find_this, ${url_replace_arg});
