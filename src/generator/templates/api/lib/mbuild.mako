@@ -592,19 +592,14 @@ match result {
 
         % if response_schema:
         % if supports_download:
-        let (json_field_missing, enable_resource_parsing) = {
-            let mut enable = true;
-            let mut field_missing = true;
-            for &(name, ref value) in params.iter() {
-                if name == "alt" {
-                    field_missing = false;
-                    enable = value == "json";
-                    break;
-                }
+        let (alt_field_missing, enable_resource_parsing) = {
+            if let Some((_, value)) = params.iter().find(|(name, _)| name == &"alt") {
+                (false, value == "json")
+            } else {
+                (true, true)
             }
-            (field_missing, enable)
         };
-        if json_field_missing {
+        if alt_field_missing {
             params.push(("alt", "json".into()));
         }
         % else:
