@@ -14,9 +14,11 @@
                       is_repeated_property, setter_fn_name, ADD_SCOPE_FN, ADD_SCOPES_FN, rust_doc_sanitize,
                       CLEAR_SCOPES_FN, items, string_impl)
 
+    SIMPLE = "simple"
+    RESUMABLE = "resumable"
     PROTOCOL_TYPE_MAP = {
-        "simple": "client::UploadProtocol::Simple",
-        "resumable": "client::UploadProtocol::Resumable"
+        SIMPLE: "client::UploadProtocol::Simple",
+        RESUMABLE: "client::UploadProtocol::Resumable"
     }
 
     def get_parts(part_prop):
@@ -457,9 +459,9 @@ match result {
         where = '\n\t\twhere ' + mtype_param + ': client::ReadSeek'
         add_args = (', mut reader: %s, reader_mime_type: mime::Mime' % mtype_param) + ", protocol: client::UploadProtocol"
         for p in media_params:
-            if p.protocol == 'simple':
+            if p.protocol == SIMPLE:
                 simple_media_param = p
-            elif p.protocol == 'resumable':
+            elif p.protocol == RESUMABLE:
                 resumable_media_param = p
     # end handle media params
 
@@ -541,7 +543,7 @@ match result {
     if media_params and 'mediaUpload' in m:
         upload_type_map = dict()
         for mp in media_params:
-            if mp.protocol == 'simple':
+            if mp.protocol == SIMPLE:
                 upload_type_map[mp.protocol] = m.mediaUpload.protocols.simple.multipart and 'multipart' or 'media'
                 break
         # for each media param
