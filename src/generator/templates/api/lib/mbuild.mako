@@ -525,14 +525,13 @@ match result {
         use std::io::{Read, Seek};
         use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
         use client::ToParts;
+        use std::borrow::Cow;
+
         let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = match ${delegate} {
-            Some(d) => d,
-            None => &mut dd
-        };
+        let mut dlg: &mut dyn client::Delegate = ${delegate}.unwrap_or(&mut dd);
         dlg.begin(client::MethodInfo { id: "${m.id}",
                                http_method: ${method_name_to_variant(m.httpMethod)} });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(${len(params) + len(reserved_params)} + ${paddfields}.len());
+        let mut params: Vec<(&str, Cow<str>)> = Vec::with_capacity(${len(params) + len(reserved_params)} + ${paddfields}.len());
 <%
     if media_params and 'mediaUpload' in m:
         upload_type_map = dict()
@@ -540,7 +539,7 @@ match result {
             if mp.protocol == 'simple':
                 upload_type_map[mp.protocol] = m.mediaUpload.protocols.simple.multipart and 'multipart' or 'media'
                 break
-        # for each meadia param
+        # for each media param
     # end build media param map
 %>\
         % for p in field_params:
@@ -569,15 +568,15 @@ match result {
         % if p.get('repeated', False):
         if ${pname}.len() > 0 {
             for f in ${pname}.iter() {
-                params.push(("${p.name}", ${to_string_impl("f")}));
+                params.push(("${p.name}", ${to_string_impl("f")}.into()));
             }
         }
         % elif not is_required_property(p):
         if let Some(value) = ${pname}.as_ref() {
-            params.push(("${p.name}", ${to_string_impl("value")}));
+            params.push(("${p.name}", ${to_string_impl("value")}.into()));
         }
         % else:
-        params.push(("${p.name}", ${to_string_impl(pname)}));
+        params.push(("${p.name}", ${to_string_impl(pname)}.into()));
         % endif
         % endfor
         ## Additional params - may not overlap with optional params
@@ -587,9 +586,9 @@ match result {
                 return Err(client::Error::FieldClash(field));
             }
         }
-        for (name, value) in ${paddfields}.iter() {
-            params.push((&name, value.clone()));
-        }
+
+        params.extend(${paddfields}.iter().map(|(k, v)| (k.as_str(), v.into())));
+
 
         % if response_schema:
         % if supports_download:
@@ -606,10 +605,10 @@ match result {
             (field_missing, enable)
         };
         if json_field_missing {
-            params.push(("alt", "json".to_string()));
+            params.push(("alt", "json".into()));
         }
         % else:
-        params.push(("alt", "json".to_string()));
+        params.push(("alt", "json".into()));
         % endif ## supportsMediaDownload
         % endif ## response schema
 
@@ -628,7 +627,7 @@ protocol == "${mp.protocol}" {
 else {
                 unreachable!()
             };
-        params.push(("uploadType", upload_type.to_string()));
+        params.push(("uploadType", upload_type.into()));
         % else:
         let mut url = self.hub._base_url.clone() + "${m.path}";
         % endif
@@ -637,9 +636,8 @@ else {
         <%
             assert 'key' in parameters, "Expected 'key' parameter if there are no scopes"
         %>
-        let key = dlg.api_key();
-        match key {
-            Some(value) => params.push(("key", value)),
+        match dlg.api_key() {
+            Some(value) => params.push(("key", value.into())),
             None => {
                 ${delegate_finish}(false);
                 return Err(client::Error::MissingAPIKey)
@@ -652,7 +650,7 @@ else {
         }
         % endif
 
-        ## Hanlde URI Tempates
+        ## Handle URI Templates
         % if replacements:
         for &(find_this, param_name) in [${', '.join('("%s", "%s")' % r for r in replacements)}].iter() {
 <%
@@ -754,8 +752,10 @@ else {
             % endif
                 let client = &self.hub.client;
                 dlg.pre_request();
-                let mut req_builder = hyper::Request::builder().method(${method_name_to_variant(m.httpMethod)}).uri(url.clone().into_string())
-                        .header(USER_AGENT, self.hub._user_agent.clone());
+                let mut req_builder = hyper::Request::builder()
+                    .method(${method_name_to_variant(m.httpMethod)})
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
 
                 % if default_scope:
                 if let Some(token) = token.as_ref() {
