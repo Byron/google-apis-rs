@@ -689,7 +689,7 @@ else {
         let url = url::Url::parse_with_params(&url, params).unwrap();
 
         % if request_value:
-        let mut json_mime_type: mime::Mime = "application/json".parse().unwrap();
+        let mut json_mime_type = mime::APPLICATION_JSON;
         let mut request_value_reader =
             {
                 let mut value = json::value::to_value(&self.${property(REQUEST_VALUE_PROPERTY_NAME)}).expect("serde to work");
@@ -747,10 +747,9 @@ else {
                         ${READER_SEEK | indent_all_but_first_by(5)}
                         mp_reader.add_part(&mut request_value_reader, request_size, json_mime_type.clone())
                                  .add_part(&mut reader, size, reader_mime_type.clone());
-                        let mime_type = mp_reader.mime_type();
-                        (&mut mp_reader as &mut (dyn io::Read + Send), (CONTENT_TYPE, mime_type.to_string()))
+                        (&mut mp_reader as &mut (dyn io::Read + Send), client::MultiPartReader::mime_type())
                     },
-                    _ => (&mut request_value_reader as &mut (dyn io::Read + Send), (CONTENT_TYPE, json_mime_type.to_string())),
+                    _ => (&mut request_value_reader as &mut (dyn io::Read + Send), json_mime_type.clone()),
                 };
             % endif
                 let client = &self.hub.client;
@@ -774,15 +773,15 @@ else {
                 % if request_value:
                     % if not simple_media_param:
                         let request = req_builder
-                        .header(CONTENT_TYPE, format!("{}", json_mime_type.to_string()))
+                        .header(CONTENT_TYPE, json_mime_type.to_string())
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()))\
                     % else:
                         let mut body_reader_bytes = vec![];
                         body_reader.read_to_end(&mut body_reader_bytes).unwrap();
                         let request = req_builder
-                        .header(content_type.0, content_type.1.to_string())
-                        .body(hyper::body::Body::from(body_reader_bytes))\
+                            .header(CONTENT_TYPE, content_type.to_string())
+                            .body(hyper::body::Body::from(body_reader_bytes))\
                     % endif ## not simple_media_param
                 % else:
                     % if simple_media_param:
