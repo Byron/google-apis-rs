@@ -1222,8 +1222,9 @@ def string_impl(p):
         "byte": lambda x: f"::client::serde::urlsafe_base64::to_string(&{x})",
         "google-datetime": lambda x: f"::client::serde::datetime_to_string(&{x})",
         "date-time": lambda x: f"::client::serde::datetime_to_string(&{x})",
-        "google-fieldmask": lambda x: f"{x}.to_string()"
-    }.get(p.get("format"), lambda x: f"{x}.to_string()")
+        "google-fieldmask": lambda x: f"{x}.to_string()",
+        "string": lambda x: x
+    }.get(p.get("format", p["type"]), lambda x: f"{x}.to_string()")
 
 
 if __name__ == '__main__':
