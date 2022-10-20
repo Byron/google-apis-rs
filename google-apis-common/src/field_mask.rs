@@ -30,7 +30,7 @@ fn snakecase(source: &str) -> String {
 }
 
 /// A `FieldMask` as defined in `https://github.com/protocolbuffers/protobuf/blob/ec1a70913e5793a7d0a7b5fbf7e0e4f75409dd41/src/google/protobuf/field_mask.proto#L180`
-#[derive(Clone, Debug, Default, PartialEq)]
+#[derive(Clone, Debug, Default, PartialEq, Eq)]
 pub struct FieldMask(Vec<String>);
 
 impl Serialize for FieldMask {

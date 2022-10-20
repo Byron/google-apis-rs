@@ -42,7 +42,7 @@ impl<'a> Params<'a> {
     ) -> String {
         if url_encode {
             let mut replace_with: Cow<str> = self.get(param).unwrap_or("").into();
-            if from.as_bytes()[1] == '+' as u8 {
+            if from.as_bytes()[1] == b'+' {
                 replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET)
                     .to_string()
                     .into();
@@ -66,6 +66,6 @@ impl<'a> Params<'a> {
     }
 
     pub fn parse_with_url(&self, url: &str) -> Url {
-        Url::parse_with_params(&url, &self.params).unwrap()
+        Url::parse_with_params(url, &self.params).unwrap()
     }
 }

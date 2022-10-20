@@ -24,7 +24,7 @@ use serde_json as json;
 
 use tokio::io::{AsyncRead, AsyncWrite};
 use tokio::time::sleep;
-use tower_service;
+
 
 pub use auth::{GetToken, NoToken};
 pub use chrono;
@@ -372,7 +372,7 @@ impl<'a> MultiPartReader<'a> {
         let mut headers = HeaderMap::new();
         headers.insert(
             CONTENT_TYPE,
-            hyper::header::HeaderValue::from_str(&mime_type.to_string()).unwrap(),
+            hyper::header::HeaderValue::from_str(mime_type.as_ref()).unwrap(),
         );
         headers.insert(CONTENT_LENGTH, size.into());
         self.raw_parts.push((headers, reader));
@@ -481,7 +481,7 @@ impl<'a> Read for MultiPartReader<'a> {
 ///
 /// Generated via rustc --pretty expanded -Z unstable-options, and manually
 /// processed to be more readable.
-#[derive(PartialEq, Debug, Clone)]
+#[derive(PartialEq, Eq, Debug, Clone)]
 pub struct XUploadContentType(pub Mime);
 
 impl ::std::ops::Deref for XUploadContentType {
@@ -501,7 +501,7 @@ impl Display for XUploadContentType {
     }
 }
 
-#[derive(Clone, PartialEq, Debug)]
+#[derive(Clone, PartialEq, Eq, Debug)]
 pub struct Chunk {
     pub first: u64,
     pub last: u64,
@@ -537,7 +537,7 @@ impl FromStr for Chunk {
 }
 
 /// Implements the Content-Range header, for serialization only
-#[derive(Clone, PartialEq, Debug)]
+#[derive(Clone, PartialEq, Eq, Debug)]
 pub struct ContentRange {
     pub range: Option<Chunk>,
     pub total_length: u64,
@@ -556,7 +556,7 @@ impl ContentRange {
     }
 }
 
-#[derive(Clone, PartialEq, Debug)]
+#[derive(Clone, PartialEq, Eq, Debug)]
 pub struct RangeResponseHeader(pub Chunk);
 
 impl RangeResponseHeader {
@@ -565,7 +565,7 @@ impl RangeResponseHeader {
             if let Ok(s) = std::str::from_utf8(raw) {
                 const PREFIX: &str = "bytes ";
                 if let Some(stripped) = s.strip_prefix(PREFIX) {
-                    if let Ok(c) = <Chunk as FromStr>::from_str(&stripped) {
+                    if let Ok(c) = <Chunk as FromStr>::from_str(stripped) {
                         return RangeResponseHeader(c);
                     }
                 }
@@ -778,7 +778,7 @@ mod test_api {
     use std::str::FromStr;
 
     use ::serde::{Deserialize, Serialize};
-    use mime;
+    
     use serde_json as json;
 
     #[test]
@@ -809,7 +809,7 @@ mod test_api {
         json::to_string(&<Bar as Default>::default()).unwrap();
 
         let j = "{\"snooSnoo\":\"foo\"}";
-        let b: Bar = json::from_str(&j).unwrap();
+        let b: Bar = json::from_str(j).unwrap();
         assert_eq!(b.snoo_snoo, "foo");
 
         // We can't have unknown fields with structs.
