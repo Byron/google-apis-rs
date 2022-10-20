@@ -535,6 +535,16 @@ match result {
         let mut dlg: &mut dyn client::Delegate = ${delegate}.unwrap_or(&mut dd);
         dlg.begin(client::MethodInfo { id: "${m.id}",
                                http_method: ${method_name_to_variant(m.httpMethod)} });
+
+        ## TODO: Should go into validation function?
+        ## Additional params - may not overlap with optional params
+        for &field in [${', '.join(enclose_in('"', reserved_params + [p.name for p in field_params]))}].iter() {
+            if ${paddfields}.contains_key(field) {
+                ${delegate_finish}(false);
+                return Err(client::Error::FieldClash(field));
+            }
+        }
+
         let mut params = Params::with_capacity(${len(params) + len(reserved_params)} + ${paddfields}.len());
 <%
     if media_params and 'mediaUpload' in m:
@@ -583,13 +593,6 @@ match result {
         params.push("${p.name}", ${to_string_impl(pname)});
         % endif
         % endfor
-        ## Additional params - may not overlap with optional params
-        for &field in [${', '.join(enclose_in('"', reserved_params + [p.name for p in field_params]))}].iter() {
-            if ${paddfields}.contains_key(field) {
-                ${delegate_finish}(false);
-                return Err(client::Error::FieldClash(field));
-            }
-        }
 
         params.extend(${paddfields}.iter());
 
