@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## Unreleased
+## 5.0.0 (2022-10-20)
 
 ### Breaking
 
@@ -15,7 +15,7 @@ Update `mime` dependency to 0.3 (from 0.2).
 
 <csr-read-only-do-not-edit/>
 
- - 4 commits contributed to the release.
+ - 5 commits contributed to the release.
  - 21 days passed between releases.
  - 0 commits were understood as [conventional](https://www.conventionalcommits.org).
  - 0 issues like '(#ID)' were seen in commit messages
@@ -27,6 +27,7 @@ Update `mime` dependency to 0.3 (from 0.2).
 <details><summary>view details</summary>
 
  * **Uncategorized**
+    - update apis-common crate changelog prior to release ([`065bd8d`](https://github.com/Byron/google-apis-rs/commit/065bd8d1b19f1450ff96a49981243843f8dfa2a0))
     - Merge branch 'refactor' ([`d202c95`](https://github.com/Byron/google-apis-rs/commit/d202c95aa4b6ed4c159b4b3e2f754bf176234f5c))
     - Add default impl to InvalidOptionsError ([`b706de7`](https://github.com/Byron/google-apis-rs/commit/b706de7a9569f182d022b097f8eb42677815808a))
     - cargo clippy --fix google-clis-common ([`f4317a2`](https://github.com/Byron/google-apis-rs/commit/f4317a2968238eb0837bb88e65de4cee387d500f))
