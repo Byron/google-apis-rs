@@ -620,6 +620,15 @@ pub struct InvalidOptionsError {
     pub exit_code: i32,
 }
 
+impl Default for InvalidOptionsError {
+    fn default() -> Self {
+        InvalidOptionsError {
+            issues: Vec::new(),
+            exit_code: 1,
+        }
+    }
+}
+
 impl fmt::Display for InvalidOptionsError {
     fn fmt(&self, f: &mut fmt::Formatter) -> Result<(), fmt::Error> {
         for issue in &self.issues {
@@ -638,10 +647,7 @@ impl InvalidOptionsError {
     }
 
     pub fn new() -> InvalidOptionsError {
-        InvalidOptionsError {
-            issues: Vec::new(),
-            exit_code: 1,
-        }
+        Default::default()
     }
 }
 
