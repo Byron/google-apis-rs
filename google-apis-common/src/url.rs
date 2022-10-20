@@ -41,7 +41,7 @@ impl<'a> Params<'a> {
         url_encode: bool,
     ) -> String {
         if url_encode {
-            let mut replace_with: Cow<str> = self.get(param).unwrap_or("").into();
+            let mut replace_with: Cow<str> = self.get(param).unwrap_or_default().into();
             if from.as_bytes()[1] == b'+' {
                 replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET)
                     .to_string()

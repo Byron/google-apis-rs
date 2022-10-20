@@ -50,11 +50,11 @@ pub fn remove_json_null_values(value: &mut Value) {
         Value::Object(ref mut map) => {
             let mut for_removal = Vec::new();
 
-            for (key, mut value) in map.iter_mut() {
+            for (key, value) in map.iter_mut() {
                 if value.is_null() {
                     for_removal.push(key.clone());
                 } else {
-                    remove_json_null_values(&mut value);
+                    remove_json_null_values(value);
                 }
             }
 
@@ -221,9 +221,9 @@ impl FieldCursor {
 
         let push_field = |fs: &mut String, f: &mut String| {
             if !f.is_empty() {
-                fs.push_str(match did_you_mean(&f, possible_values) {
+                fs.push_str(match did_you_mean(f, possible_values) {
                     Some(candidate) => candidate,
-                    None => &f,
+                    None => f,
                 });
                 f.truncate(0);
             }
@@ -264,7 +264,7 @@ impl FieldCursor {
         for field in &self.0[..self.0.len() - 1] {
             let tmp = object;
             object = match *tmp {
-                Value::Object(ref mut mapping) => assure_entry(mapping, &field),
+                Value::Object(ref mut mapping) => assure_entry(mapping, field),
                 _ => panic!("We don't expect non-object Values here ..."),
             };
         }
@@ -276,18 +276,18 @@ impl FieldCursor {
                     |value: &str, jtype: JsonType, err: &mut InvalidOptionsError| -> Value {
                         match jtype {
                             JsonType::Boolean => {
-                                Value::Bool(arg_from_str(value, err, &field, "boolean"))
+                                Value::Bool(arg_from_str(value, err, field, "boolean"))
                             }
                             JsonType::Int => Value::Number(
-                                json::Number::from_f64(arg_from_str(value, err, &field, "int"))
+                                json::Number::from_f64(arg_from_str(value, err, field, "int"))
                                     .expect("valid f64"),
                             ),
                             JsonType::Uint => Value::Number(
-                                json::Number::from_f64(arg_from_str(value, err, &field, "uint"))
+                                json::Number::from_f64(arg_from_str(value, err, field, "uint"))
                                     .expect("valid f64"),
                             ),
                             JsonType::Float => Value::Number(
-                                json::Number::from_f64(arg_from_str(value, err, &field, "float"))
+                                json::Number::from_f64(arg_from_str(value, err, field, "float"))
                                     .expect("valid f64"),
                             ),
                             JsonType::String => Value::String(value.to_owned()),
@@ -315,7 +315,7 @@ impl FieldCursor {
                         let (key, value) = parse_kv_arg(value, err, true);
                         let jval = to_jval(value.unwrap_or(""), type_info.jtype, err);
 
-                        match *assure_entry(mapping, &field) {
+                        match *assure_entry(mapping, field) {
                             Value::Object(ref mut value_map) => {
                                 if value_map.insert(key.to_owned(), jval).is_some() {
                                     err.issues.push(CLIError::Field(FieldError::Duplicate(
@@ -590,7 +590,7 @@ impl fmt::Display for CLIError {
                 arg_name, value, type_name, err_desc
             ),
             CLIError::UnknownParameter(ref param_name, ref possible_values) => {
-                let suffix = match did_you_mean(param_name, &possible_values) {
+                let suffix = match did_you_mean(param_name, possible_values) {
                     Some(v) => format!(" Did you mean '{}' ?", v),
                     None => String::new(),
                 };
