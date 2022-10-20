@@ -14,6 +14,13 @@
                       is_repeated_property, setter_fn_name, ADD_SCOPE_FN, ADD_SCOPES_FN, rust_doc_sanitize,
                       CLEAR_SCOPES_FN, items, string_impl)
 
+    SIMPLE = "simple"
+    RESUMABLE = "resumable"
+    PROTOCOL_TYPE_MAP = {
+        SIMPLE: "client::UploadProtocol::Simple",
+        RESUMABLE: "client::UploadProtocol::Resumable"
+    }
+
     def get_parts(part_prop):
         if not part_prop:
             return list()
@@ -450,11 +457,11 @@ match result {
         type_params = '<%s>' % mtype_param
         qualifier = ''
         where = '\n\t\twhere ' + mtype_param + ': client::ReadSeek'
-        add_args = (', mut reader: %s, reader_mime_type: mime::Mime' % mtype_param) + ", protocol: &'static str"
+        add_args = (', mut reader: %s, reader_mime_type: mime::Mime' % mtype_param) + ", protocol: client::UploadProtocol"
         for p in media_params:
-            if p.protocol == 'simple':
+            if p.protocol == SIMPLE:
                 simple_media_param = p
-            elif p.protocol == 'resumable':
+            elif p.protocol == RESUMABLE:
                 resumable_media_param = p
     # end handle media params
 
@@ -519,28 +526,34 @@ match result {
     /// Perform the operation you have build so far.
     % endif
     ${action_fn} {
-        % if URL_ENCODE in special_cases:
-        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
-        % endif
         use std::io::{Read, Seek};
         use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::ToParts;
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
         let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = match ${delegate} {
-            Some(d) => d,
-            None => &mut dd
-        };
+        let mut dlg: &mut dyn client::Delegate = ${delegate}.unwrap_or(&mut dd);
         dlg.begin(client::MethodInfo { id: "${m.id}",
                                http_method: ${method_name_to_variant(m.httpMethod)} });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(${len(params) + len(reserved_params)} + ${paddfields}.len());
+
+        ## TODO: Should go into validation function?
+        ## Additional params - may not overlap with optional params
+        for &field in [${', '.join(enclose_in('"', reserved_params + [p.name for p in field_params]))}].iter() {
+            if ${paddfields}.contains_key(field) {
+                ${delegate_finish}(false);
+                return Err(client::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(${len(params) + len(reserved_params)} + ${paddfields}.len());
 <%
     if media_params and 'mediaUpload' in m:
         upload_type_map = dict()
         for mp in media_params:
-            if mp.protocol == 'simple':
+            if mp.protocol == SIMPLE:
                 upload_type_map[mp.protocol] = m.mediaUpload.protocols.simple.multipart and 'multipart' or 'media'
                 break
-        # for each meadia param
+        # for each media param
     # end build media param map
 %>\
         % for p in field_params:
@@ -569,50 +582,36 @@ match result {
         % if p.get('repeated', False):
         if ${pname}.len() > 0 {
             for f in ${pname}.iter() {
-                params.push(("${p.name}", ${to_string_impl("f")}));
+                params.push("${p.name}", ${to_string_impl("f")});
             }
         }
         % elif not is_required_property(p):
         if let Some(value) = ${pname}.as_ref() {
-            params.push(("${p.name}", ${to_string_impl("value")}));
+            params.push("${p.name}", ${to_string_impl("value")});
         }
         % else:
-        params.push(("${p.name}", ${to_string_impl(pname)}));
+        params.push("${p.name}", ${to_string_impl(pname)});
         % endif
         % endfor
-        ## Additional params - may not overlap with optional params
-        for &field in [${', '.join(enclose_in('"', reserved_params + [p.name for p in field_params]))}].iter() {
-            if ${paddfields}.contains_key(field) {
-                ${delegate_finish}(false);
-                return Err(client::Error::FieldClash(field));
-            }
-        }
-        for (name, value) in ${paddfields}.iter() {
-            params.push((&name, value.clone()));
-        }
+
+        params.extend(${paddfields}.iter());
 
         % if response_schema:
         % if supports_download:
-        let (json_field_missing, enable_resource_parsing) = {
-            let mut enable = true;
-            let mut field_missing = true;
-            for &(name, ref value) in params.iter() {
-                if name == "alt" {
-                    field_missing = false;
-                    enable = value == "json";
-                    break;
-                }
+        let (alt_field_missing, enable_resource_parsing) = {
+            if let Some(value) = params.get("alt") {
+                (false, value == "json")
+            } else {
+                (true, true)
             }
-            (field_missing, enable)
         };
-        if json_field_missing {
-            params.push(("alt", "json".to_string()));
+        if alt_field_missing {
+            params.push("alt", "json");
         }
         % else:
-        params.push(("alt", "json".to_string()));
+        params.push("alt", "json");
         % endif ## supportsMediaDownload
         % endif ## response schema
-
         % if media_params:
         let (mut url, upload_type) =
             % for mp in media_params:
@@ -621,14 +620,14 @@ match result {
             % else:
 else if \
             % endif
-protocol == "${mp.protocol}" {
+protocol == ${PROTOCOL_TYPE_MAP[mp.protocol]} {
                 (self.hub._root_url.clone() + "${mp.path.lstrip('/')}", "${upload_type_map.get(mp.protocol, mp.protocol)}")
             } \
             % endfor
 else {
                 unreachable!()
             };
-        params.push(("uploadType", upload_type.to_string()));
+        params.push("uploadType", upload_type);
         % else:
         let mut url = self.hub._base_url.clone() + "${m.path}";
         % endif
@@ -637,9 +636,8 @@ else {
         <%
             assert 'key' in parameters, "Expected 'key' parameter if there are no scopes"
         %>
-        let key = dlg.api_key();
-        match key {
-            Some(value) => params.push(("key", value)),
+        match dlg.api_key() {
+            Some(value) => params.push("key", value),
             None => {
                 ${delegate_finish}(false);
                 return Err(client::Error::MissingAPIKey)
@@ -652,41 +650,19 @@ else {
         }
         % endif
 
-        ## Hanlde URI Tempates
+        ## Handle URI Templates
         % if replacements:
         for &(find_this, param_name) in [${', '.join('("%s", "%s")' % r for r in replacements)}].iter() {
-<%
-    replace_init = ': Option<&str> = None'
-    replace_assign = 'Some(value)'
-    url_replace_arg = 'replace_with.expect("to find substitution value in params")'
-    if URL_ENCODE in special_cases:
-        replace_init = ' = String::new()'
-        replace_assign = 'value.to_string()'
-        url_replace_arg = '&replace_with'
-    # end handle url encoding
-%>\
-            let mut replace_with${replace_init};
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = ${replace_assign};
-                    break;
-                }
-            }
-            % if URL_ENCODE in special_cases:
-            if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
-            }
-            % endif
-            url = url.replace(find_this, ${url_replace_arg});
+            url = params.uri_replacement(url, param_name, find_this, ${"true" if URL_ENCODE in special_cases else "false"});
         }
         ## Remove all used parameters
         {
             let to_remove = [${', '.join(reversed(['"%s"' % r[1] for r in replacements]))}];
-            params.retain(|(n, _)| !to_remove.contains(n));
+            params.remove_params(&to_remove);
         }
         % endif
 
-        let url = url::Url::parse_with_params(&url, params).unwrap();
+        let url = params.parse_with_url(&url);
 
         % if request_value:
         let mut json_mime_type = mime::APPLICATION_JSON;
@@ -742,7 +718,7 @@ else {
             % if request_value and simple_media_param:
                 let mut mp_reader: client::MultiPartReader = Default::default();
                 let (mut body_reader, content_type) = match protocol {
-                    "${simple_media_param.protocol}" => {
+                    ${PROTOCOL_TYPE_MAP[simple_media_param.protocol]} => {
                         mp_reader.reserve_exact(2);
                         ${READER_SEEK | indent_all_but_first_by(5)}
                         mp_reader.add_part(&mut request_value_reader, request_size, json_mime_type.clone())
@@ -754,8 +730,10 @@ else {
             % endif
                 let client = &self.hub.client;
                 dlg.pre_request();
-                let mut req_builder = hyper::Request::builder().method(${method_name_to_variant(m.httpMethod)}).uri(url.clone().into_string())
-                        .header(USER_AGENT, self.hub._user_agent.clone());
+                let mut req_builder = hyper::Request::builder()
+                    .method(${method_name_to_variant(m.httpMethod)})
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
 
                 % if default_scope:
                 if let Some(token) = token.as_ref() {
@@ -765,7 +743,7 @@ else {
 
                 % if resumable_media_param:
                 upload_url_from_server = true;
-                if protocol == "${resumable_media_param.protocol}" {
+                if protocol == ${PROTOCOL_TYPE_MAP[resumable_media_param.protocol]} {
                     req_builder = req_builder.header("X-Upload-Content-Type", format!("{}", reader_mime_type));
                 }
                 % endif
@@ -785,7 +763,7 @@ else {
                     % endif ## not simple_media_param
                 % else:
                     % if simple_media_param:
-                        let request = if protocol == "${simple_media_param.protocol}" {
+                        let request = if protocol == ${PROTOCOL_TYPE_MAP[simple_media_param.protocol]} {
                             ${READER_SEEK | indent_all_but_first_by(4)}
                             let mut bytes = Vec::with_capacity(size as usize);
                             reader.read_to_end(&mut bytes)?;
@@ -841,7 +819,7 @@ else {
                         }
                     }
                     % if resumable_media_param:
-                    if protocol == "${resumable_media_param.protocol}" {
+                    if protocol == ${PROTOCOL_TYPE_MAP[resumable_media_param.protocol]} {
                         ${READER_SEEK | indent_all_but_first_by(6)}
                         let upload_result = {
                             let url_str = &res.headers().get("Location").expect("LOCATION header is part of protocol").to_str().unwrap();
@@ -927,7 +905,7 @@ if enable_resource_parsing \
     % endfor
     pub async fn ${upload_action_fn(api.terms.upload_action, p.type.suffix)}<${mtype_param}>(self, ${p.type.arg_name}: ${mtype_param}, mime_type: mime::Mime) -> ${rtype}
                 where ${mtype_param}: client::ReadSeek {
-        self.${api.terms.action}(${p.type.arg_name}, mime_type, "${p.protocol}").await
+        self.${api.terms.action}(${p.type.arg_name}, mime_type, ${PROTOCOL_TYPE_MAP[p.protocol]}).await
     }
     % endfor
 </%def>

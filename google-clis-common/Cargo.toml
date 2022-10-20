@@ -16,7 +16,7 @@ edition = "2021"
 doctest = false
 
 [dependencies]
-mime = "0.2"
+mime = "^ 0.3"
 yup-oauth2 = "^ 7.0"
 serde = "1"
 serde_json = "1"

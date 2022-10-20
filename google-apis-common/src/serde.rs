@@ -61,9 +61,9 @@ pub mod duration {
         };
 
         let (seconds, nanoseconds) = if let Some((seconds, nanos)) = value.split_once('.') {
-            let is_neg = seconds.starts_with("-");
+            let is_neg = seconds.starts_with('-');
             let seconds = i64::from_str(seconds)?;
-            let nano_magnitude = nanos.chars().filter(|c| c.is_digit(10)).count() as u32;
+            let nano_magnitude = nanos.chars().filter(|c| c.is_ascii_digit()).count() as u32;
             if nano_magnitude > 9 {
                 // not enough precision to model the remaining digits
                 return Err(ParseDurationError::NanosTooSmall);
@@ -261,10 +261,7 @@ mod test {
     fn urlsafe_base64_de_success_cases() {
         let wrapper: Base64Wrapper =
             serde_json::from_str(r#"{"bytes": "aGVsbG8gd29ybGQ="}"#).unwrap();
-        assert_eq!(
-            Some(b"hello world".as_slice()),
-            wrapper.bytes.as_ref().map(Vec::as_slice)
-        );
+        assert_eq!(Some(b"hello world".as_slice()), wrapper.bytes.as_deref());
     }
 
     #[test]
