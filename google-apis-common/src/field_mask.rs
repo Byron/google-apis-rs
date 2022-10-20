@@ -1,3 +1,4 @@
+use std::fmt::{Display, Formatter};
 use std::str::FromStr;
 
 use serde::{Deserialize, Deserializer, Serialize, Serializer};
@@ -73,15 +74,15 @@ impl FromStr for FieldMask {
     }
 }
 
-impl FieldMask {
-    pub fn to_string(&self) -> String {
+impl Display for FieldMask {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         let mut repr = String::new();
         for path in &self.0 {
             titlecase(path, &mut repr);
             repr.push(',');
         }
         repr.pop();
-        repr
+        f.write_str(&repr)
     }
 }
 
