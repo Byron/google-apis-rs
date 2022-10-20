@@ -31,5 +31,5 @@ fn main() {
         None,
     )
     .unwrap();
-    io::stdout().write_all(&output.as_bytes()).unwrap();
+    io::stdout().write_all(output.as_bytes()).unwrap();
 }
