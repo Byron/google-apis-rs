@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/generator/templates/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *drive* crate version *5.0.1+20220225*, where *20220225* is the exact revision of the *drive:v3* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.1*.
+//! This documentation was generated from *drive* crate version *5.0.2-beta-1+20220225*, where *20220225* is the exact revision of the *drive:v3* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.2-beta-1*.
 //! 
 //! Everything else about the *drive* *v3* API can be found at the
 //! [official documentation site](https://developers.google.com/drive/).
@@ -251,5 +251,8 @@ pub mod api;
 
 // Re-export the hub type and some basic client structs
 pub use api::DriveHub;
+pub use client::{Result, Error, Delegate, FieldMask};
+
 // Re-export the yup_oauth2 crate, that is required to call some methods of the hub and the client
-pub use client::{Result, Error, Delegate, oauth2, FieldMask};
+#[cfg(feature = "yup-oauth2")]
+pub use client::oauth2;

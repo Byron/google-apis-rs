@@ -14,7 +14,7 @@ use tokio::time::sleep;
 use tower_service;
 use serde::{Serialize, Deserialize};
 
-use crate::{client, client::GetToken, client::oauth2, client::serde_with};
+use crate::{client, client::GetToken, client::serde_with};
 
 // ##############
 // UTILITIES ###
@@ -161,7 +161,7 @@ impl<'a, S> DriveHub<S> {
         DriveHub {
             client,
             auth: Box::new(auth),
-            _user_agent: "google-api-rust-client/5.0.1".to_string(),
+            _user_agent: "google-api-rust-client/5.0.2-beta-1".to_string(),
             _base_url: "https://www.googleapis.com/drive/v3/".to_string(),
             _root_url: "https://www.googleapis.com/".to_string(),
         }
@@ -199,7 +199,7 @@ impl<'a, S> DriveHub<S> {
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/5.0.1`.
+    /// It defaults to `google-api-rust-client/5.0.2-beta-1`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -3665,57 +3665,45 @@ where
     pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, About)> {
         use std::io::{Read, Seek};
         use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::ToParts;
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
         let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
         dlg.begin(client::MethodInfo { id: "drive.about.get",
                                http_method: hyper::Method::GET });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(2 + self._additional_params.len());
+
         for &field in ["alt"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(client::Error::FieldClash(field));
             }
         }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
 
-        params.push(("alt", "json".to_string()));
+        let mut params = Params::with_capacity(2 + self._additional_params.len());
 
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "about";
         if self._scopes.is_empty() {
             self._scopes.insert(Scope::MetadataReadonly.as_ref().to_string());
         }
 
 
-        let url = url::Url::parse_with_params(&url, params).unwrap();
+        let url = params.parse_with_url(&url);
 
 
 
         loop {
             let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
-                // TODO: remove Ok / Err branches
-                Ok(Some(token)) => token.clone(),
-                Ok(None) => {
-                    let err = oauth2::Error::OtherError(anyhow::Error::msg("unknown error occurred while generating oauth2 token"));
-                    match dlg.token(&err) {
-                        Some(token) => token,
-                        None => {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
                             dlg.finished(false);
-                            return Err(client::Error::MissingToken(err))
-                        }
-                    }
-                }
-                Err(err) => {
-                    match dlg.token(&err) {
-                        Some(token) => token,
-                        None => {
-                            dlg.finished(false);
-                            return Err(client::Error::MissingToken(err))
+                            return Err(client::Error::MissingToken(e));
                         }
                     }
                 }
@@ -3723,8 +3711,14 @@ where
             let mut req_result = {
                 let client = &self.hub.client;
                 dlg.pre_request();
-                let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
-                        .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::GET)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
 
 
                         let request = req_builder
@@ -3917,69 +3911,57 @@ where
     pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, StartPageToken)> {
         use std::io::{Read, Seek};
         use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::ToParts;
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
         let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
         dlg.begin(client::MethodInfo { id: "drive.changes.getStartPageToken",
                                http_method: hyper::Method::GET });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(6 + self._additional_params.len());
-        if let Some(value) = self._team_drive_id.as_ref() {
-            params.push(("teamDriveId", value.to_string()));
-        }
-        if let Some(value) = self._supports_team_drives.as_ref() {
-            params.push(("supportsTeamDrives", value.to_string()));
-        }
-        if let Some(value) = self._supports_all_drives.as_ref() {
-            params.push(("supportsAllDrives", value.to_string()));
-        }
-        if let Some(value) = self._drive_id.as_ref() {
-            params.push(("driveId", value.to_string()));
-        }
+
         for &field in ["alt", "teamDriveId", "supportsTeamDrives", "supportsAllDrives", "driveId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(client::Error::FieldClash(field));
             }
         }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
+
+        let mut params = Params::with_capacity(6 + self._additional_params.len());
+        if let Some(value) = self._team_drive_id.as_ref() {
+            params.push("teamDriveId", value);
+        }
+        if let Some(value) = self._supports_team_drives.as_ref() {
+            params.push("supportsTeamDrives", value.to_string());
+        }
+        if let Some(value) = self._supports_all_drives.as_ref() {
+            params.push("supportsAllDrives", value.to_string());
+        }
+        if let Some(value) = self._drive_id.as_ref() {
+            params.push("driveId", value);
         }
 
-        params.push(("alt", "json".to_string()));
+        params.extend(self._additional_params.iter());
 
+        params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "changes/startPageToken";
         if self._scopes.is_empty() {
             self._scopes.insert(Scope::MetadataReadonly.as_ref().to_string());
         }
 
 
-        let url = url::Url::parse_with_params(&url, params).unwrap();
+        let url = params.parse_with_url(&url);
 
 
 
         loop {
             let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
-                // TODO: remove Ok / Err branches
-                Ok(Some(token)) => token.clone(),
-                Ok(None) => {
-                    let err = oauth2::Error::OtherError(anyhow::Error::msg("unknown error occurred while generating oauth2 token"));
-                    match dlg.token(&err) {
-                        Some(token) => token,
-                        None => {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
                             dlg.finished(false);
-                            return Err(client::Error::MissingToken(err))
-                        }
-                    }
-                }
-                Err(err) => {
-                    match dlg.token(&err) {
-                        Some(token) => token,
-                        None => {
-                            dlg.finished(false);
-                            return Err(client::Error::MissingToken(err))
+                            return Err(client::Error::MissingToken(e));
                         }
                     }
                 }
@@ -3987,8 +3969,14 @@ where
             let mut req_result = {
                 let client = &self.hub.client;
                 dlg.pre_request();
-                let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
-                        .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::GET)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
 
 
                         let request = req_builder
@@ -4226,94 +4214,82 @@ where
     pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, ChangeList)> {
         use std::io::{Read, Seek};
         use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::ToParts;
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
         let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
         dlg.begin(client::MethodInfo { id: "drive.changes.list",
                                http_method: hyper::Method::GET });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(15 + self._additional_params.len());
-        params.push(("pageToken", self._page_token.to_string()));
-        if let Some(value) = self._team_drive_id.as_ref() {
-            params.push(("teamDriveId", value.to_string()));
-        }
-        if let Some(value) = self._supports_team_drives.as_ref() {
-            params.push(("supportsTeamDrives", value.to_string()));
-        }
-        if let Some(value) = self._supports_all_drives.as_ref() {
-            params.push(("supportsAllDrives", value.to_string()));
-        }
-        if let Some(value) = self._spaces.as_ref() {
-            params.push(("spaces", value.to_string()));
-        }
-        if let Some(value) = self._restrict_to_my_drive.as_ref() {
-            params.push(("restrictToMyDrive", value.to_string()));
-        }
-        if let Some(value) = self._page_size.as_ref() {
-            params.push(("pageSize", value.to_string()));
-        }
-        if let Some(value) = self._include_team_drive_items.as_ref() {
-            params.push(("includeTeamDriveItems", value.to_string()));
-        }
-        if let Some(value) = self._include_removed.as_ref() {
-            params.push(("includeRemoved", value.to_string()));
-        }
-        if let Some(value) = self._include_permissions_for_view.as_ref() {
-            params.push(("includePermissionsForView", value.to_string()));
-        }
-        if let Some(value) = self._include_items_from_all_drives.as_ref() {
-            params.push(("includeItemsFromAllDrives", value.to_string()));
-        }
-        if let Some(value) = self._include_corpus_removals.as_ref() {
-            params.push(("includeCorpusRemovals", value.to_string()));
-        }
-        if let Some(value) = self._drive_id.as_ref() {
-            params.push(("driveId", value.to_string()));
-        }
+
         for &field in ["alt", "pageToken", "teamDriveId", "supportsTeamDrives", "supportsAllDrives", "spaces", "restrictToMyDrive", "pageSize", "includeTeamDriveItems", "includeRemoved", "includePermissionsForView", "includeItemsFromAllDrives", "includeCorpusRemovals", "driveId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(client::Error::FieldClash(field));
             }
         }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
+
+        let mut params = Params::with_capacity(15 + self._additional_params.len());
+        params.push("pageToken", self._page_token);
+        if let Some(value) = self._team_drive_id.as_ref() {
+            params.push("teamDriveId", value);
+        }
+        if let Some(value) = self._supports_team_drives.as_ref() {
+            params.push("supportsTeamDrives", value.to_string());
+        }
+        if let Some(value) = self._supports_all_drives.as_ref() {
+            params.push("supportsAllDrives", value.to_string());
+        }
+        if let Some(value) = self._spaces.as_ref() {
+            params.push("spaces", value);
+        }
+        if let Some(value) = self._restrict_to_my_drive.as_ref() {
+            params.push("restrictToMyDrive", value.to_string());
+        }
+        if let Some(value) = self._page_size.as_ref() {
+            params.push("pageSize", value.to_string());
+        }
+        if let Some(value) = self._include_team_drive_items.as_ref() {
+            params.push("includeTeamDriveItems", value.to_string());
+        }
+        if let Some(value) = self._include_removed.as_ref() {
+            params.push("includeRemoved", value.to_string());
+        }
+        if let Some(value) = self._include_permissions_for_view.as_ref() {
+            params.push("includePermissionsForView", value);
+        }
+        if let Some(value) = self._include_items_from_all_drives.as_ref() {
+            params.push("includeItemsFromAllDrives", value.to_string());
+        }
+        if let Some(value) = self._include_corpus_removals.as_ref() {
+            params.push("includeCorpusRemovals", value.to_string());
+        }
+        if let Some(value) = self._drive_id.as_ref() {
+            params.push("driveId", value);
         }
 
-        params.push(("alt", "json".to_string()));
+        params.extend(self._additional_params.iter());
 
+        params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "changes";
         if self._scopes.is_empty() {
             self._scopes.insert(Scope::MetadataReadonly.as_ref().to_string());
         }
 
 
-        let url = url::Url::parse_with_params(&url, params).unwrap();
+        let url = params.parse_with_url(&url);
 
 
 
         loop {
             let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
-                // TODO: remove Ok / Err branches
-                Ok(Some(token)) => token.clone(),
-                Ok(None) => {
-                    let err = oauth2::Error::OtherError(anyhow::Error::msg("unknown error occurred while generating oauth2 token"));
-                    match dlg.token(&err) {
-                        Some(token) => token,
-                        None => {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
                             dlg.finished(false);
-                            return Err(client::Error::MissingToken(err))
-                        }
-                    }
-                }
-                Err(err) => {
-                    match dlg.token(&err) {
-                        Some(token) => token,
-                        None => {
-                            dlg.finished(false);
-                            return Err(client::Error::MissingToken(err))
+                            return Err(client::Error::MissingToken(e));
                         }
                     }
                 }
@@ -4321,8 +4297,14 @@ where
             let mut req_result = {
                 let client = &self.hub.client;
                 dlg.pre_request();
-                let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
-                        .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::GET)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
 
 
                         let request = req_builder
@@ -4633,73 +4615,72 @@ where
     pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, Channel)> {
         use std::io::{Read, Seek};
         use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::ToParts;
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
         let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
         dlg.begin(client::MethodInfo { id: "drive.changes.watch",
                                http_method: hyper::Method::POST });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(16 + self._additional_params.len());
-        params.push(("pageToken", self._page_token.to_string()));
-        if let Some(value) = self._team_drive_id.as_ref() {
-            params.push(("teamDriveId", value.to_string()));
-        }
-        if let Some(value) = self._supports_team_drives.as_ref() {
-            params.push(("supportsTeamDrives", value.to_string()));
-        }
-        if let Some(value) = self._supports_all_drives.as_ref() {
-            params.push(("supportsAllDrives", value.to_string()));
-        }
-        if let Some(value) = self._spaces.as_ref() {
-            params.push(("spaces", value.to_string()));
-        }
-        if let Some(value) = self._restrict_to_my_drive.as_ref() {
-            params.push(("restrictToMyDrive", value.to_string()));
-        }
-        if let Some(value) = self._page_size.as_ref() {
-            params.push(("pageSize", value.to_string()));
-        }
-        if let Some(value) = self._include_team_drive_items.as_ref() {
-            params.push(("includeTeamDriveItems", value.to_string()));
-        }
-        if let Some(value) = self._include_removed.as_ref() {
-            params.push(("includeRemoved", value.to_string()));
-        }
-        if let Some(value) = self._include_permissions_for_view.as_ref() {
-            params.push(("includePermissionsForView", value.to_string()));
-        }
-        if let Some(value) = self._include_items_from_all_drives.as_ref() {
-            params.push(("includeItemsFromAllDrives", value.to_string()));
-        }
-        if let Some(value) = self._include_corpus_removals.as_ref() {
-            params.push(("includeCorpusRemovals", value.to_string()));
-        }
-        if let Some(value) = self._drive_id.as_ref() {
-            params.push(("driveId", value.to_string()));
-        }
+
         for &field in ["alt", "pageToken", "teamDriveId", "supportsTeamDrives", "supportsAllDrives", "spaces", "restrictToMyDrive", "pageSize", "includeTeamDriveItems", "includeRemoved", "includePermissionsForView", "includeItemsFromAllDrives", "includeCorpusRemovals", "driveId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(client::Error::FieldClash(field));
             }
         }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
+
+        let mut params = Params::with_capacity(16 + self._additional_params.len());
+        params.push("pageToken", self._page_token);
+        if let Some(value) = self._team_drive_id.as_ref() {
+            params.push("teamDriveId", value);
+        }
+        if let Some(value) = self._supports_team_drives.as_ref() {
+            params.push("supportsTeamDrives", value.to_string());
+        }
+        if let Some(value) = self._supports_all_drives.as_ref() {
+            params.push("supportsAllDrives", value.to_string());
+        }
+        if let Some(value) = self._spaces.as_ref() {
+            params.push("spaces", value);
+        }
+        if let Some(value) = self._restrict_to_my_drive.as_ref() {
+            params.push("restrictToMyDrive", value.to_string());
+        }
+        if let Some(value) = self._page_size.as_ref() {
+            params.push("pageSize", value.to_string());
+        }
+        if let Some(value) = self._include_team_drive_items.as_ref() {
+            params.push("includeTeamDriveItems", value.to_string());
+        }
+        if let Some(value) = self._include_removed.as_ref() {
+            params.push("includeRemoved", value.to_string());
+        }
+        if let Some(value) = self._include_permissions_for_view.as_ref() {
+            params.push("includePermissionsForView", value);
+        }
+        if let Some(value) = self._include_items_from_all_drives.as_ref() {
+            params.push("includeItemsFromAllDrives", value.to_string());
+        }
+        if let Some(value) = self._include_corpus_removals.as_ref() {
+            params.push("includeCorpusRemovals", value.to_string());
+        }
+        if let Some(value) = self._drive_id.as_ref() {
+            params.push("driveId", value);
         }
 
-        params.push(("alt", "json".to_string()));
+        params.extend(self._additional_params.iter());
 
+        params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "changes/watch";
         if self._scopes.is_empty() {
             self._scopes.insert(Scope::Full.as_ref().to_string());
         }
 
 
-        let url = url::Url::parse_with_params(&url, params).unwrap();
+        let url = params.parse_with_url(&url);
 
-        let mut json_mime_type: mime::Mime = "application/json".parse().unwrap();
+        let mut json_mime_type = mime::APPLICATION_JSON;
         let mut request_value_reader =
             {
                 let mut value = json::value::to_value(&self._request).expect("serde to work");
@@ -4714,24 +4695,13 @@ where
 
         loop {
             let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
-                // TODO: remove Ok / Err branches
-                Ok(Some(token)) => token.clone(),
-                Ok(None) => {
-                    let err = oauth2::Error::OtherError(anyhow::Error::msg("unknown error occurred while generating oauth2 token"));
-                    match dlg.token(&err) {
-                        Some(token) => token,
-                        None => {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
                             dlg.finished(false);
-                            return Err(client::Error::MissingToken(err))
-                        }
-                    }
-                }
-                Err(err) => {
-                    match dlg.token(&err) {
-                        Some(token) => token,
-                        None => {
-                            dlg.finished(false);
-                            return Err(client::Error::MissingToken(err))
+                            return Err(client::Error::MissingToken(e));
                         }
                     }
                 }
@@ -4740,12 +4710,18 @@ where
             let mut req_result = {
                 let client = &self.hub.client;
                 dlg.pre_request();
-                let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
-                        .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::POST)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
 
 
                         let request = req_builder
-                        .header(CONTENT_TYPE, format!("{}", json_mime_type.to_string()))
+                        .header(CONTENT_TYPE, json_mime_type.to_string())
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
@@ -5038,25 +5014,24 @@ where
     pub async fn doit(mut self) -> client::Result<hyper::Response<hyper::body::Body>> {
         use std::io::{Read, Seek};
         use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::ToParts;
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
         let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
         dlg.begin(client::MethodInfo { id: "drive.channels.stop",
                                http_method: hyper::Method::POST });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(2 + self._additional_params.len());
+
         for &field in [].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(client::Error::FieldClash(field));
             }
         }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
 
+        let mut params = Params::with_capacity(2 + self._additional_params.len());
+
+        params.extend(self._additional_params.iter());
 
         let mut url = self.hub._base_url.clone() + "channels/stop";
         if self._scopes.is_empty() {
@@ -5064,9 +5039,9 @@ where
         }
 
 
-        let url = url::Url::parse_with_params(&url, params).unwrap();
+        let url = params.parse_with_url(&url);
 
-        let mut json_mime_type: mime::Mime = "application/json".parse().unwrap();
+        let mut json_mime_type = mime::APPLICATION_JSON;
         let mut request_value_reader =
             {
                 let mut value = json::value::to_value(&self._request).expect("serde to work");
@@ -5081,24 +5056,13 @@ where
 
         loop {
             let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
-                // TODO: remove Ok / Err branches
-                Ok(Some(token)) => token.clone(),
-                Ok(None) => {
-                    let err = oauth2::Error::OtherError(anyhow::Error::msg("unknown error occurred while generating oauth2 token"));
-                    match dlg.token(&err) {
-                        Some(token) => token,
-                        None => {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
                             dlg.finished(false);
-                            return Err(client::Error::MissingToken(err))
-                        }
-                    }
-                }
-                Err(err) => {
-                    match dlg.token(&err) {
-                        Some(token) => token,
-                        None => {
-                            dlg.finished(false);
-                            return Err(client::Error::MissingToken(err))
+                            return Err(client::Error::MissingToken(e));
                         }
                     }
                 }
@@ -5107,12 +5071,18 @@ where
             let mut req_result = {
                 let client = &self.hub.client;
                 dlg.pre_request();
-                let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
-                        .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::POST)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
 
 
                         let request = req_builder
-                        .header(CONTENT_TYPE, format!("{}", json_mime_type.to_string()))
+                        .header(CONTENT_TYPE, json_mime_type.to_string())
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
@@ -5302,51 +5272,43 @@ where
     pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, Comment)> {
         use std::io::{Read, Seek};
         use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::ToParts;
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
         let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
         dlg.begin(client::MethodInfo { id: "drive.comments.create",
                                http_method: hyper::Method::POST });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
-        params.push(("fileId", self._file_id.to_string()));
+
         for &field in ["alt", "fileId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(client::Error::FieldClash(field));
             }
         }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
 
-        params.push(("alt", "json".to_string()));
+        let mut params = Params::with_capacity(4 + self._additional_params.len());
+        params.push("fileId", self._file_id);
 
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "files/{fileId}/comments";
         if self._scopes.is_empty() {
             self._scopes.insert(Scope::Full.as_ref().to_string());
         }
 
         for &(find_this, param_name) in [("{fileId}", "fileId")].iter() {
-            let mut replace_with: Option<&str> = None;
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = Some(value);
-                    break;
-                }
-            }
-            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+            url = params.uri_replacement(url, param_name, find_this, false);
         }
         {
             let to_remove = ["fileId"];
-            params.retain(|(n, _)| !to_remove.contains(n));
+            params.remove_params(&to_remove);
         }
 
-        let url = url::Url::parse_with_params(&url, params).unwrap();
+        let url = params.parse_with_url(&url);
 
-        let mut json_mime_type: mime::Mime = "application/json".parse().unwrap();
+        let mut json_mime_type = mime::APPLICATION_JSON;
         let mut request_value_reader =
             {
                 let mut value = json::value::to_value(&self._request).expect("serde to work");
@@ -5361,24 +5323,13 @@ where
 
         loop {
             let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
-                // TODO: remove Ok / Err branches
-                Ok(Some(token)) => token.clone(),
-                Ok(None) => {
-                    let err = oauth2::Error::OtherError(anyhow::Error::msg("unknown error occurred while generating oauth2 token"));
-                    match dlg.token(&err) {
-                        Some(token) => token,
-                        None => {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
                             dlg.finished(false);
-                            return Err(client::Error::MissingToken(err))
-                        }
-                    }
-                }
-                Err(err) => {
-                    match dlg.token(&err) {
-                        Some(token) => token,
-                        None => {
-                            dlg.finished(false);
-                            return Err(client::Error::MissingToken(err))
+                            return Err(client::Error::MissingToken(e));
                         }
                     }
                 }
@@ -5387,12 +5338,18 @@ where
             let mut req_result = {
                 let client = &self.hub.client;
                 dlg.pre_request();
-                let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
-                        .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::POST)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
 
 
                         let request = req_builder
-                        .header(CONTENT_TYPE, format!("{}", json_mime_type.to_string()))
+                        .header(CONTENT_TYPE, json_mime_type.to_string())
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
@@ -5596,27 +5553,26 @@ where
     pub async fn doit(mut self) -> client::Result<hyper::Response<hyper::body::Body>> {
         use std::io::{Read, Seek};
         use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::ToParts;
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
         let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
         dlg.begin(client::MethodInfo { id: "drive.comments.delete",
                                http_method: hyper::Method::DELETE });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
-        params.push(("fileId", self._file_id.to_string()));
-        params.push(("commentId", self._comment_id.to_string()));
+
         for &field in ["fileId", "commentId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(client::Error::FieldClash(field));
             }
         }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
 
+        let mut params = Params::with_capacity(3 + self._additional_params.len());
+        params.push("fileId", self._file_id);
+        params.push("commentId", self._comment_id);
+
+        params.extend(self._additional_params.iter());
 
         let mut url = self.hub._base_url.clone() + "files/{fileId}/comments/{commentId}";
         if self._scopes.is_empty() {
@@ -5624,44 +5580,26 @@ where
         }
 
         for &(find_this, param_name) in [("{fileId}", "fileId"), ("{commentId}", "commentId")].iter() {
-            let mut replace_with: Option<&str> = None;
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = Some(value);
-                    break;
-                }
-            }
-            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+            url = params.uri_replacement(url, param_name, find_this, false);
         }
         {
             let to_remove = ["commentId", "fileId"];
-            params.retain(|(n, _)| !to_remove.contains(n));
+            params.remove_params(&to_remove);
         }
 
-        let url = url::Url::parse_with_params(&url, params).unwrap();
+        let url = params.parse_with_url(&url);
 
 
 
         loop {
             let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
-                // TODO: remove Ok / Err branches
-                Ok(Some(token)) => token.clone(),
-                Ok(None) => {
-                    let err = oauth2::Error::OtherError(anyhow::Error::msg("unknown error occurred while generating oauth2 token"));
-                    match dlg.token(&err) {
-                        Some(token) => token,
-                        None => {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
                             dlg.finished(false);
-                            return Err(client::Error::MissingToken(err))
-                        }
-                    }
-                }
-                Err(err) => {
-                    match dlg.token(&err) {
-                        Some(token) => token,
-                        None => {
-                            dlg.finished(false);
-                            return Err(client::Error::MissingToken(err))
+                            return Err(client::Error::MissingToken(e));
                         }
                     }
                 }
@@ -5669,8 +5607,14 @@ where
             let mut req_result = {
                 let client = &self.hub.client;
                 dlg.pre_request();
-                let mut req_builder = hyper::Request::builder().method(hyper::Method::DELETE).uri(url.clone().into_string())
-                        .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::DELETE)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
 
 
                         let request = req_builder
@@ -5869,76 +5813,57 @@ where
     pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, Comment)> {
         use std::io::{Read, Seek};
         use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::ToParts;
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
         let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
         dlg.begin(client::MethodInfo { id: "drive.comments.get",
                                http_method: hyper::Method::GET });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
-        params.push(("fileId", self._file_id.to_string()));
-        params.push(("commentId", self._comment_id.to_string()));
-        if let Some(value) = self._include_deleted.as_ref() {
-            params.push(("includeDeleted", value.to_string()));
-        }
+
         for &field in ["alt", "fileId", "commentId", "includeDeleted"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(client::Error::FieldClash(field));
             }
         }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
+
+        let mut params = Params::with_capacity(5 + self._additional_params.len());
+        params.push("fileId", self._file_id);
+        params.push("commentId", self._comment_id);
+        if let Some(value) = self._include_deleted.as_ref() {
+            params.push("includeDeleted", value.to_string());
         }
 
-        params.push(("alt", "json".to_string()));
+        params.extend(self._additional_params.iter());
 
+        params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "files/{fileId}/comments/{commentId}";
         if self._scopes.is_empty() {
             self._scopes.insert(Scope::Readonly.as_ref().to_string());
         }
 
         for &(find_this, param_name) in [("{fileId}", "fileId"), ("{commentId}", "commentId")].iter() {
-            let mut replace_with: Option<&str> = None;
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = Some(value);
-                    break;
-                }
-            }
-            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+            url = params.uri_replacement(url, param_name, find_this, false);
         }
         {
             let to_remove = ["commentId", "fileId"];
-            params.retain(|(n, _)| !to_remove.contains(n));
+            params.remove_params(&to_remove);
         }
 
-        let url = url::Url::parse_with_params(&url, params).unwrap();
+        let url = params.parse_with_url(&url);
 
 
 
         loop {
             let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
-                // TODO: remove Ok / Err branches
-                Ok(Some(token)) => token.clone(),
-                Ok(None) => {
-                    let err = oauth2::Error::OtherError(anyhow::Error::msg("unknown error occurred while generating oauth2 token"));
-                    match dlg.token(&err) {
-                        Some(token) => token,
-                        None => {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
                             dlg.finished(false);
-                            return Err(client::Error::MissingToken(err))
-                        }
-                    }
-                }
-                Err(err) => {
-                    match dlg.token(&err) {
-                        Some(token) => token,
-                        None => {
-                            dlg.finished(false);
-                            return Err(client::Error::MissingToken(err))
+                            return Err(client::Error::MissingToken(e));
                         }
                     }
                 }
@@ -5946,8 +5871,14 @@ where
             let mut req_result = {
                 let client = &self.hub.client;
                 dlg.pre_request();
-                let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
-                        .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::GET)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
 
 
                         let request = req_builder
@@ -6168,84 +6099,65 @@ where
     pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, CommentList)> {
         use std::io::{Read, Seek};
         use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::ToParts;
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
         let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
         dlg.begin(client::MethodInfo { id: "drive.comments.list",
                                http_method: hyper::Method::GET });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(7 + self._additional_params.len());
-        params.push(("fileId", self._file_id.to_string()));
-        if let Some(value) = self._start_modified_time.as_ref() {
-            params.push(("startModifiedTime", value.to_string()));
-        }
-        if let Some(value) = self._page_token.as_ref() {
-            params.push(("pageToken", value.to_string()));
-        }
-        if let Some(value) = self._page_size.as_ref() {
-            params.push(("pageSize", value.to_string()));
-        }
-        if let Some(value) = self._include_deleted.as_ref() {
-            params.push(("includeDeleted", value.to_string()));
-        }
+
         for &field in ["alt", "fileId", "startModifiedTime", "pageToken", "pageSize", "includeDeleted"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(client::Error::FieldClash(field));
             }
         }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
+
+        let mut params = Params::with_capacity(7 + self._additional_params.len());
+        params.push("fileId", self._file_id);
+        if let Some(value) = self._start_modified_time.as_ref() {
+            params.push("startModifiedTime", value);
+        }
+        if let Some(value) = self._page_token.as_ref() {
+            params.push("pageToken", value);
+        }
+        if let Some(value) = self._page_size.as_ref() {
+            params.push("pageSize", value.to_string());
+        }
+        if let Some(value) = self._include_deleted.as_ref() {
+            params.push("includeDeleted", value.to_string());
         }
 
-        params.push(("alt", "json".to_string()));
+        params.extend(self._additional_params.iter());
 
+        params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "files/{fileId}/comments";
         if self._scopes.is_empty() {
             self._scopes.insert(Scope::Readonly.as_ref().to_string());
         }
 
         for &(find_this, param_name) in [("{fileId}", "fileId")].iter() {
-            let mut replace_with: Option<&str> = None;
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = Some(value);
-                    break;
-                }
-            }
-            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+            url = params.uri_replacement(url, param_name, find_this, false);
         }
         {
             let to_remove = ["fileId"];
-            params.retain(|(n, _)| !to_remove.contains(n));
+            params.remove_params(&to_remove);
         }
 
-        let url = url::Url::parse_with_params(&url, params).unwrap();
+        let url = params.parse_with_url(&url);
 
 
 
         loop {
             let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
-                // TODO: remove Ok / Err branches
-                Ok(Some(token)) => token.clone(),
-                Ok(None) => {
-                    let err = oauth2::Error::OtherError(anyhow::Error::msg("unknown error occurred while generating oauth2 token"));
-                    match dlg.token(&err) {
-                        Some(token) => token,
-                        None => {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
                             dlg.finished(false);
-                            return Err(client::Error::MissingToken(err))
-                        }
-                    }
-                }
-                Err(err) => {
-                    match dlg.token(&err) {
-                        Some(token) => token,
-                        None => {
-                            dlg.finished(false);
-                            return Err(client::Error::MissingToken(err))
+                            return Err(client::Error::MissingToken(e));
                         }
                     }
                 }
@@ -6253,8 +6165,14 @@ where
             let mut req_result = {
                 let client = &self.hub.client;
                 dlg.pre_request();
-                let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
-                        .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::GET)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
 
 
                         let request = req_builder
@@ -6486,52 +6404,44 @@ where
     pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, Comment)> {
         use std::io::{Read, Seek};
         use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::ToParts;
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
         let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
         dlg.begin(client::MethodInfo { id: "drive.comments.update",
                                http_method: hyper::Method::PATCH });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
-        params.push(("fileId", self._file_id.to_string()));
-        params.push(("commentId", self._comment_id.to_string()));
+
         for &field in ["alt", "fileId", "commentId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(client::Error::FieldClash(field));
             }
         }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
 
-        params.push(("alt", "json".to_string()));
+        let mut params = Params::with_capacity(5 + self._additional_params.len());
+        params.push("fileId", self._file_id);
+        params.push("commentId", self._comment_id);
 
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "files/{fileId}/comments/{commentId}";
         if self._scopes.is_empty() {
             self._scopes.insert(Scope::Full.as_ref().to_string());
         }
 
         for &(find_this, param_name) in [("{fileId}", "fileId"), ("{commentId}", "commentId")].iter() {
-            let mut replace_with: Option<&str> = None;
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = Some(value);
-                    break;
-                }
-            }
-            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+            url = params.uri_replacement(url, param_name, find_this, false);
         }
         {
             let to_remove = ["commentId", "fileId"];
-            params.retain(|(n, _)| !to_remove.contains(n));
+            params.remove_params(&to_remove);
         }
 
-        let url = url::Url::parse_with_params(&url, params).unwrap();
+        let url = params.parse_with_url(&url);
 
-        let mut json_mime_type: mime::Mime = "application/json".parse().unwrap();
+        let mut json_mime_type = mime::APPLICATION_JSON;
         let mut request_value_reader =
             {
                 let mut value = json::value::to_value(&self._request).expect("serde to work");
@@ -6546,24 +6456,13 @@ where
 
         loop {
             let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
-                // TODO: remove Ok / Err branches
-                Ok(Some(token)) => token.clone(),
-                Ok(None) => {
-                    let err = oauth2::Error::OtherError(anyhow::Error::msg("unknown error occurred while generating oauth2 token"));
-                    match dlg.token(&err) {
-                        Some(token) => token,
-                        None => {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
                             dlg.finished(false);
-                            return Err(client::Error::MissingToken(err))
-                        }
-                    }
-                }
-                Err(err) => {
-                    match dlg.token(&err) {
-                        Some(token) => token,
-                        None => {
-                            dlg.finished(false);
-                            return Err(client::Error::MissingToken(err))
+                            return Err(client::Error::MissingToken(e));
                         }
                     }
                 }
@@ -6572,12 +6471,18 @@ where
             let mut req_result = {
                 let client = &self.hub.client;
                 dlg.pre_request();
-                let mut req_builder = hyper::Request::builder().method(hyper::Method::PATCH).uri(url.clone().into_string())
-                        .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::PATCH)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
 
 
                         let request = req_builder
-                        .header(CONTENT_TYPE, format!("{}", json_mime_type.to_string()))
+                        .header(CONTENT_TYPE, json_mime_type.to_string())
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
@@ -6797,37 +6702,36 @@ where
     pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, Drive)> {
         use std::io::{Read, Seek};
         use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::ToParts;
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
         let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
         dlg.begin(client::MethodInfo { id: "drive.drives.create",
                                http_method: hyper::Method::POST });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
-        params.push(("requestId", self._request_id.to_string()));
+
         for &field in ["alt", "requestId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(client::Error::FieldClash(field));
             }
         }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
 
-        params.push(("alt", "json".to_string()));
+        let mut params = Params::with_capacity(4 + self._additional_params.len());
+        params.push("requestId", self._request_id);
 
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "drives";
         if self._scopes.is_empty() {
             self._scopes.insert(Scope::Full.as_ref().to_string());
         }
 
 
-        let url = url::Url::parse_with_params(&url, params).unwrap();
+        let url = params.parse_with_url(&url);
 
-        let mut json_mime_type: mime::Mime = "application/json".parse().unwrap();
+        let mut json_mime_type = mime::APPLICATION_JSON;
         let mut request_value_reader =
             {
                 let mut value = json::value::to_value(&self._request).expect("serde to work");
@@ -6842,24 +6746,13 @@ where
 
         loop {
             let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
-                // TODO: remove Ok / Err branches
-                Ok(Some(token)) => token.clone(),
-                Ok(None) => {
-                    let err = oauth2::Error::OtherError(anyhow::Error::msg("unknown error occurred while generating oauth2 token"));
-                    match dlg.token(&err) {
-                        Some(token) => token,
-                        None => {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
                             dlg.finished(false);
-                            return Err(client::Error::MissingToken(err))
-                        }
-                    }
-                }
-                Err(err) => {
-                    match dlg.token(&err) {
-                        Some(token) => token,
-                        None => {
-                            dlg.finished(false);
-                            return Err(client::Error::MissingToken(err))
+                            return Err(client::Error::MissingToken(e));
                         }
                     }
                 }
@@ -6868,12 +6761,18 @@ where
             let mut req_result = {
                 let client = &self.hub.client;
                 dlg.pre_request();
-                let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
-                        .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::POST)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
 
 
                         let request = req_builder
-                        .header(CONTENT_TYPE, format!("{}", json_mime_type.to_string()))
+                        .header(CONTENT_TYPE, json_mime_type.to_string())
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
@@ -7076,26 +6975,25 @@ where
     pub async fn doit(mut self) -> client::Result<hyper::Response<hyper::body::Body>> {
         use std::io::{Read, Seek};
         use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::ToParts;
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
         let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
         dlg.begin(client::MethodInfo { id: "drive.drives.delete",
                                http_method: hyper::Method::DELETE });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(2 + self._additional_params.len());
-        params.push(("driveId", self._drive_id.to_string()));
+
         for &field in ["driveId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(client::Error::FieldClash(field));
             }
         }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
 
+        let mut params = Params::with_capacity(2 + self._additional_params.len());
+        params.push("driveId", self._drive_id);
+
+        params.extend(self._additional_params.iter());
 
         let mut url = self.hub._base_url.clone() + "drives/{driveId}";
         if self._scopes.is_empty() {
@@ -7103,44 +7001,26 @@ where
         }
 
         for &(find_this, param_name) in [("{driveId}", "driveId")].iter() {
-            let mut replace_with: Option<&str> = None;
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = Some(value);
-                    break;
-                }
-            }
-            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+            url = params.uri_replacement(url, param_name, find_this, false);
         }
         {
             let to_remove = ["driveId"];
-            params.retain(|(n, _)| !to_remove.contains(n));
+            params.remove_params(&to_remove);
         }
 
-        let url = url::Url::parse_with_params(&url, params).unwrap();
+        let url = params.parse_with_url(&url);
 
 
 
         loop {
             let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
-                // TODO: remove Ok / Err branches
-                Ok(Some(token)) => token.clone(),
-                Ok(None) => {
-                    let err = oauth2::Error::OtherError(anyhow::Error::msg("unknown error occurred while generating oauth2 token"));
-                    match dlg.token(&err) {
-                        Some(token) => token,
-                        None => {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
                             dlg.finished(false);
-                            return Err(client::Error::MissingToken(err))
-                        }
-                    }
-                }
-                Err(err) => {
-                    match dlg.token(&err) {
-                        Some(token) => token,
-                        None => {
-                            dlg.finished(false);
-                            return Err(client::Error::MissingToken(err))
+                            return Err(client::Error::MissingToken(e));
                         }
                     }
                 }
@@ -7148,8 +7028,14 @@ where
             let mut req_result = {
                 let client = &self.hub.client;
                 dlg.pre_request();
-                let mut req_builder = hyper::Request::builder().method(hyper::Method::DELETE).uri(url.clone().into_string())
-                        .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::DELETE)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
 
 
                         let request = req_builder
@@ -7337,75 +7223,56 @@ where
     pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, Drive)> {
         use std::io::{Read, Seek};
         use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::ToParts;
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
         let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
         dlg.begin(client::MethodInfo { id: "drive.drives.get",
                                http_method: hyper::Method::GET });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
-        params.push(("driveId", self._drive_id.to_string()));
-        if let Some(value) = self._use_domain_admin_access.as_ref() {
-            params.push(("useDomainAdminAccess", value.to_string()));
-        }
+
         for &field in ["alt", "driveId", "useDomainAdminAccess"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(client::Error::FieldClash(field));
             }
         }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
+
+        let mut params = Params::with_capacity(4 + self._additional_params.len());
+        params.push("driveId", self._drive_id);
+        if let Some(value) = self._use_domain_admin_access.as_ref() {
+            params.push("useDomainAdminAccess", value.to_string());
         }
 
-        params.push(("alt", "json".to_string()));
+        params.extend(self._additional_params.iter());
 
+        params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "drives/{driveId}";
         if self._scopes.is_empty() {
             self._scopes.insert(Scope::Readonly.as_ref().to_string());
         }
 
         for &(find_this, param_name) in [("{driveId}", "driveId")].iter() {
-            let mut replace_with: Option<&str> = None;
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = Some(value);
-                    break;
-                }
-            }
-            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+            url = params.uri_replacement(url, param_name, find_this, false);
         }
         {
             let to_remove = ["driveId"];
-            params.retain(|(n, _)| !to_remove.contains(n));
+            params.remove_params(&to_remove);
         }
 
-        let url = url::Url::parse_with_params(&url, params).unwrap();
+        let url = params.parse_with_url(&url);
 
 
 
         loop {
             let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
-                // TODO: remove Ok / Err branches
-                Ok(Some(token)) => token.clone(),
-                Ok(None) => {
-                    let err = oauth2::Error::OtherError(anyhow::Error::msg("unknown error occurred while generating oauth2 token"));
-                    match dlg.token(&err) {
-                        Some(token) => token,
-                        None => {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
                             dlg.finished(false);
-                            return Err(client::Error::MissingToken(err))
-                        }
-                    }
-                }
-                Err(err) => {
-                    match dlg.token(&err) {
-                        Some(token) => token,
-                        None => {
-                            dlg.finished(false);
-                            return Err(client::Error::MissingToken(err))
+                            return Err(client::Error::MissingToken(e));
                         }
                     }
                 }
@@ -7413,8 +7280,14 @@ where
             let mut req_result = {
                 let client = &self.hub.client;
                 dlg.pre_request();
-                let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
-                        .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::GET)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
 
 
                         let request = req_builder
@@ -7617,72 +7490,53 @@ where
     pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, Drive)> {
         use std::io::{Read, Seek};
         use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::ToParts;
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
         let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
         dlg.begin(client::MethodInfo { id: "drive.drives.hide",
                                http_method: hyper::Method::POST });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
-        params.push(("driveId", self._drive_id.to_string()));
+
         for &field in ["alt", "driveId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(client::Error::FieldClash(field));
             }
         }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
 
-        params.push(("alt", "json".to_string()));
+        let mut params = Params::with_capacity(3 + self._additional_params.len());
+        params.push("driveId", self._drive_id);
 
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "drives/{driveId}/hide";
         if self._scopes.is_empty() {
             self._scopes.insert(Scope::Full.as_ref().to_string());
         }
 
         for &(find_this, param_name) in [("{driveId}", "driveId")].iter() {
-            let mut replace_with: Option<&str> = None;
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = Some(value);
-                    break;
-                }
-            }
-            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+            url = params.uri_replacement(url, param_name, find_this, false);
         }
         {
             let to_remove = ["driveId"];
-            params.retain(|(n, _)| !to_remove.contains(n));
+            params.remove_params(&to_remove);
         }
 
-        let url = url::Url::parse_with_params(&url, params).unwrap();
+        let url = params.parse_with_url(&url);
 
 
 
         loop {
             let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
-                // TODO: remove Ok / Err branches
-                Ok(Some(token)) => token.clone(),
-                Ok(None) => {
-                    let err = oauth2::Error::OtherError(anyhow::Error::msg("unknown error occurred while generating oauth2 token"));
-                    match dlg.token(&err) {
-                        Some(token) => token,
-                        None => {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
                             dlg.finished(false);
-                            return Err(client::Error::MissingToken(err))
-                        }
-                    }
-                }
-                Err(err) => {
-                    match dlg.token(&err) {
-                        Some(token) => token,
-                        None => {
-                            dlg.finished(false);
-                            return Err(client::Error::MissingToken(err))
+                            return Err(client::Error::MissingToken(e));
                         }
                     }
                 }
@@ -7690,8 +7544,14 @@ where
             let mut req_result = {
                 let client = &self.hub.client;
                 dlg.pre_request();
-                let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
-                        .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::POST)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
 
 
                         let request = req_builder
@@ -7894,69 +7754,57 @@ where
     pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, DriveList)> {
         use std::io::{Read, Seek};
         use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::ToParts;
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
         let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
         dlg.begin(client::MethodInfo { id: "drive.drives.list",
                                http_method: hyper::Method::GET });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(6 + self._additional_params.len());
-        if let Some(value) = self._use_domain_admin_access.as_ref() {
-            params.push(("useDomainAdminAccess", value.to_string()));
-        }
-        if let Some(value) = self._q.as_ref() {
-            params.push(("q", value.to_string()));
-        }
-        if let Some(value) = self._page_token.as_ref() {
-            params.push(("pageToken", value.to_string()));
-        }
-        if let Some(value) = self._page_size.as_ref() {
-            params.push(("pageSize", value.to_string()));
-        }
+
         for &field in ["alt", "useDomainAdminAccess", "q", "pageToken", "pageSize"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(client::Error::FieldClash(field));
             }
         }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
+
+        let mut params = Params::with_capacity(6 + self._additional_params.len());
+        if let Some(value) = self._use_domain_admin_access.as_ref() {
+            params.push("useDomainAdminAccess", value.to_string());
+        }
+        if let Some(value) = self._q.as_ref() {
+            params.push("q", value);
+        }
+        if let Some(value) = self._page_token.as_ref() {
+            params.push("pageToken", value);
+        }
+        if let Some(value) = self._page_size.as_ref() {
+            params.push("pageSize", value.to_string());
         }
 
-        params.push(("alt", "json".to_string()));
+        params.extend(self._additional_params.iter());
 
+        params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "drives";
         if self._scopes.is_empty() {
             self._scopes.insert(Scope::Readonly.as_ref().to_string());
         }
 
 
-        let url = url::Url::parse_with_params(&url, params).unwrap();
+        let url = params.parse_with_url(&url);
 
 
 
         loop {
             let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
-                // TODO: remove Ok / Err branches
-                Ok(Some(token)) => token.clone(),
-                Ok(None) => {
-                    let err = oauth2::Error::OtherError(anyhow::Error::msg("unknown error occurred while generating oauth2 token"));
-                    match dlg.token(&err) {
-                        Some(token) => token,
-                        None => {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
                             dlg.finished(false);
-                            return Err(client::Error::MissingToken(err))
-                        }
-                    }
-                }
-                Err(err) => {
-                    match dlg.token(&err) {
-                        Some(token) => token,
-                        None => {
-                            dlg.finished(false);
-                            return Err(client::Error::MissingToken(err))
+                            return Err(client::Error::MissingToken(e));
                         }
                     }
                 }
@@ -7964,8 +7812,14 @@ where
             let mut req_result = {
                 let client = &self.hub.client;
                 dlg.pre_request();
-                let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
-                        .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::GET)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
 
 
                         let request = req_builder
@@ -8179,72 +8033,53 @@ where
     pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, Drive)> {
         use std::io::{Read, Seek};
         use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::ToParts;
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
         let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
         dlg.begin(client::MethodInfo { id: "drive.drives.unhide",
                                http_method: hyper::Method::POST });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
-        params.push(("driveId", self._drive_id.to_string()));
+
         for &field in ["alt", "driveId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(client::Error::FieldClash(field));
             }
         }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
 
-        params.push(("alt", "json".to_string()));
+        let mut params = Params::with_capacity(3 + self._additional_params.len());
+        params.push("driveId", self._drive_id);
 
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "drives/{driveId}/unhide";
         if self._scopes.is_empty() {
             self._scopes.insert(Scope::Full.as_ref().to_string());
         }
 
         for &(find_this, param_name) in [("{driveId}", "driveId")].iter() {
-            let mut replace_with: Option<&str> = None;
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = Some(value);
-                    break;
-                }
-            }
-            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+            url = params.uri_replacement(url, param_name, find_this, false);
         }
         {
             let to_remove = ["driveId"];
-            params.retain(|(n, _)| !to_remove.contains(n));
+            params.remove_params(&to_remove);
         }
 
-        let url = url::Url::parse_with_params(&url, params).unwrap();
+        let url = params.parse_with_url(&url);
 
 
 
         loop {
             let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
-                // TODO: remove Ok / Err branches
-                Ok(Some(token)) => token.clone(),
-                Ok(None) => {
-                    let err = oauth2::Error::OtherError(anyhow::Error::msg("unknown error occurred while generating oauth2 token"));
-                    match dlg.token(&err) {
-                        Some(token) => token,
-                        None => {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
                             dlg.finished(false);
-                            return Err(client::Error::MissingToken(err))
-                        }
-                    }
-                }
-                Err(err) => {
-                    match dlg.token(&err) {
-                        Some(token) => token,
-                        None => {
-                            dlg.finished(false);
-                            return Err(client::Error::MissingToken(err))
+                            return Err(client::Error::MissingToken(e));
                         }
                     }
                 }
@@ -8252,8 +8087,14 @@ where
             let mut req_result = {
                 let client = &self.hub.client;
                 dlg.pre_request();
-                let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
-                        .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::POST)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
 
 
                         let request = req_builder
@@ -8458,54 +8299,46 @@ where
     pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, Drive)> {
         use std::io::{Read, Seek};
         use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::ToParts;
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
         let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
         dlg.begin(client::MethodInfo { id: "drive.drives.update",
                                http_method: hyper::Method::PATCH });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
-        params.push(("driveId", self._drive_id.to_string()));
-        if let Some(value) = self._use_domain_admin_access.as_ref() {
-            params.push(("useDomainAdminAccess", value.to_string()));
-        }
+
         for &field in ["alt", "driveId", "useDomainAdminAccess"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(client::Error::FieldClash(field));
             }
         }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
+
+        let mut params = Params::with_capacity(5 + self._additional_params.len());
+        params.push("driveId", self._drive_id);
+        if let Some(value) = self._use_domain_admin_access.as_ref() {
+            params.push("useDomainAdminAccess", value.to_string());
         }
 
-        params.push(("alt", "json".to_string()));
+        params.extend(self._additional_params.iter());
 
+        params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "drives/{driveId}";
         if self._scopes.is_empty() {
             self._scopes.insert(Scope::Full.as_ref().to_string());
         }
 
         for &(find_this, param_name) in [("{driveId}", "driveId")].iter() {
-            let mut replace_with: Option<&str> = None;
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = Some(value);
-                    break;
-                }
-            }
-            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+            url = params.uri_replacement(url, param_name, find_this, false);
         }
         {
             let to_remove = ["driveId"];
-            params.retain(|(n, _)| !to_remove.contains(n));
+            params.remove_params(&to_remove);
         }
 
-        let url = url::Url::parse_with_params(&url, params).unwrap();
+        let url = params.parse_with_url(&url);
 
-        let mut json_mime_type: mime::Mime = "application/json".parse().unwrap();
+        let mut json_mime_type = mime::APPLICATION_JSON;
         let mut request_value_reader =
             {
                 let mut value = json::value::to_value(&self._request).expect("serde to work");
@@ -8520,24 +8353,13 @@ where
 
         loop {
             let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
-                // TODO: remove Ok / Err branches
-                Ok(Some(token)) => token.clone(),
-                Ok(None) => {
-                    let err = oauth2::Error::OtherError(anyhow::Error::msg("unknown error occurred while generating oauth2 token"));
-                    match dlg.token(&err) {
-                        Some(token) => token,
-                        None => {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
                             dlg.finished(false);
-                            return Err(client::Error::MissingToken(err))
-                        }
-                    }
-                }
-                Err(err) => {
-                    match dlg.token(&err) {
-                        Some(token) => token,
-                        None => {
-                            dlg.finished(false);
-                            return Err(client::Error::MissingToken(err))
+                            return Err(client::Error::MissingToken(e));
                         }
                     }
                 }
@@ -8546,12 +8368,18 @@ where
             let mut req_result = {
                 let client = &self.hub.client;
                 dlg.pre_request();
-                let mut req_builder = hyper::Request::builder().method(hyper::Method::PATCH).uri(url.clone().into_string())
-                        .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::PATCH)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
 
 
                         let request = req_builder
-                        .header(CONTENT_TYPE, format!("{}", json_mime_type.to_string()))
+                        .header(CONTENT_TYPE, json_mime_type.to_string())
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
@@ -8782,72 +8610,64 @@ where
     pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, File)> {
         use std::io::{Read, Seek};
         use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::ToParts;
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
         let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
         dlg.begin(client::MethodInfo { id: "drive.files.copy",
                                http_method: hyper::Method::POST });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(11 + self._additional_params.len());
-        params.push(("fileId", self._file_id.to_string()));
-        if let Some(value) = self._supports_team_drives.as_ref() {
-            params.push(("supportsTeamDrives", value.to_string()));
-        }
-        if let Some(value) = self._supports_all_drives.as_ref() {
-            params.push(("supportsAllDrives", value.to_string()));
-        }
-        if let Some(value) = self._ocr_language.as_ref() {
-            params.push(("ocrLanguage", value.to_string()));
-        }
-        if let Some(value) = self._keep_revision_forever.as_ref() {
-            params.push(("keepRevisionForever", value.to_string()));
-        }
-        if let Some(value) = self._include_permissions_for_view.as_ref() {
-            params.push(("includePermissionsForView", value.to_string()));
-        }
-        if let Some(value) = self._ignore_default_visibility.as_ref() {
-            params.push(("ignoreDefaultVisibility", value.to_string()));
-        }
-        if let Some(value) = self._enforce_single_parent.as_ref() {
-            params.push(("enforceSingleParent", value.to_string()));
-        }
+
         for &field in ["alt", "fileId", "supportsTeamDrives", "supportsAllDrives", "ocrLanguage", "keepRevisionForever", "includePermissionsForView", "ignoreDefaultVisibility", "enforceSingleParent"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(client::Error::FieldClash(field));
             }
         }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
+
+        let mut params = Params::with_capacity(11 + self._additional_params.len());
+        params.push("fileId", self._file_id);
+        if let Some(value) = self._supports_team_drives.as_ref() {
+            params.push("supportsTeamDrives", value.to_string());
+        }
+        if let Some(value) = self._supports_all_drives.as_ref() {
+            params.push("supportsAllDrives", value.to_string());
+        }
+        if let Some(value) = self._ocr_language.as_ref() {
+            params.push("ocrLanguage", value);
+        }
+        if let Some(value) = self._keep_revision_forever.as_ref() {
+            params.push("keepRevisionForever", value.to_string());
+        }
+        if let Some(value) = self._include_permissions_for_view.as_ref() {
+            params.push("includePermissionsForView", value);
+        }
+        if let Some(value) = self._ignore_default_visibility.as_ref() {
+            params.push("ignoreDefaultVisibility", value.to_string());
+        }
+        if let Some(value) = self._enforce_single_parent.as_ref() {
+            params.push("enforceSingleParent", value.to_string());
         }
 
-        params.push(("alt", "json".to_string()));
+        params.extend(self._additional_params.iter());
 
+        params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "files/{fileId}/copy";
         if self._scopes.is_empty() {
             self._scopes.insert(Scope::Full.as_ref().to_string());
         }
 
         for &(find_this, param_name) in [("{fileId}", "fileId")].iter() {
-            let mut replace_with: Option<&str> = None;
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = Some(value);
-                    break;
-                }
-            }
-            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+            url = params.uri_replacement(url, param_name, find_this, false);
         }
         {
             let to_remove = ["fileId"];
-            params.retain(|(n, _)| !to_remove.contains(n));
+            params.remove_params(&to_remove);
         }
 
-        let url = url::Url::parse_with_params(&url, params).unwrap();
+        let url = params.parse_with_url(&url);
 
-        let mut json_mime_type: mime::Mime = "application/json".parse().unwrap();
+        let mut json_mime_type = mime::APPLICATION_JSON;
         let mut request_value_reader =
             {
                 let mut value = json::value::to_value(&self._request).expect("serde to work");
@@ -8862,24 +8682,13 @@ where
 
         loop {
             let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
-                // TODO: remove Ok / Err branches
-                Ok(Some(token)) => token.clone(),
-                Ok(None) => {
-                    let err = oauth2::Error::OtherError(anyhow::Error::msg("unknown error occurred while generating oauth2 token"));
-                    match dlg.token(&err) {
-                        Some(token) => token,
-                        None => {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
                             dlg.finished(false);
-                            return Err(client::Error::MissingToken(err))
-                        }
-                    }
-                }
-                Err(err) => {
-                    match dlg.token(&err) {
-                        Some(token) => token,
-                        None => {
-                            dlg.finished(false);
-                            return Err(client::Error::MissingToken(err))
+                            return Err(client::Error::MissingToken(e));
                         }
                     }
                 }
@@ -8888,12 +8697,18 @@ where
             let mut req_result = {
                 let client = &self.hub.client;
                 dlg.pre_request();
-                let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
-                        .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::POST)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
 
 
                         let request = req_builder
-                        .header(CONTENT_TYPE, format!("{}", json_mime_type.to_string()))
+                        .header(CONTENT_TYPE, json_mime_type.to_string())
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
@@ -9165,72 +8980,71 @@ where
 
 
     /// Perform the operation you have build so far.
-    async fn doit<RS>(mut self, mut reader: RS, reader_mime_type: mime::Mime, protocol: &'static str) -> client::Result<(hyper::Response<hyper::body::Body>, File)>
+    async fn doit<RS>(mut self, mut reader: RS, reader_mime_type: mime::Mime, protocol: client::UploadProtocol) -> client::Result<(hyper::Response<hyper::body::Body>, File)>
 		where RS: client::ReadSeek {
         use std::io::{Read, Seek};
         use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::ToParts;
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
         let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
         dlg.begin(client::MethodInfo { id: "drive.files.create",
                                http_method: hyper::Method::POST });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(11 + self._additional_params.len());
-        if let Some(value) = self._use_content_as_indexable_text.as_ref() {
-            params.push(("useContentAsIndexableText", value.to_string()));
-        }
-        if let Some(value) = self._supports_team_drives.as_ref() {
-            params.push(("supportsTeamDrives", value.to_string()));
-        }
-        if let Some(value) = self._supports_all_drives.as_ref() {
-            params.push(("supportsAllDrives", value.to_string()));
-        }
-        if let Some(value) = self._ocr_language.as_ref() {
-            params.push(("ocrLanguage", value.to_string()));
-        }
-        if let Some(value) = self._keep_revision_forever.as_ref() {
-            params.push(("keepRevisionForever", value.to_string()));
-        }
-        if let Some(value) = self._include_permissions_for_view.as_ref() {
-            params.push(("includePermissionsForView", value.to_string()));
-        }
-        if let Some(value) = self._ignore_default_visibility.as_ref() {
-            params.push(("ignoreDefaultVisibility", value.to_string()));
-        }
-        if let Some(value) = self._enforce_single_parent.as_ref() {
-            params.push(("enforceSingleParent", value.to_string()));
-        }
+
         for &field in ["alt", "useContentAsIndexableText", "supportsTeamDrives", "supportsAllDrives", "ocrLanguage", "keepRevisionForever", "includePermissionsForView", "ignoreDefaultVisibility", "enforceSingleParent"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(client::Error::FieldClash(field));
             }
         }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
+
+        let mut params = Params::with_capacity(11 + self._additional_params.len());
+        if let Some(value) = self._use_content_as_indexable_text.as_ref() {
+            params.push("useContentAsIndexableText", value.to_string());
+        }
+        if let Some(value) = self._supports_team_drives.as_ref() {
+            params.push("supportsTeamDrives", value.to_string());
+        }
+        if let Some(value) = self._supports_all_drives.as_ref() {
+            params.push("supportsAllDrives", value.to_string());
+        }
+        if let Some(value) = self._ocr_language.as_ref() {
+            params.push("ocrLanguage", value);
+        }
+        if let Some(value) = self._keep_revision_forever.as_ref() {
+            params.push("keepRevisionForever", value.to_string());
+        }
+        if let Some(value) = self._include_permissions_for_view.as_ref() {
+            params.push("includePermissionsForView", value);
+        }
+        if let Some(value) = self._ignore_default_visibility.as_ref() {
+            params.push("ignoreDefaultVisibility", value.to_string());
+        }
+        if let Some(value) = self._enforce_single_parent.as_ref() {
+            params.push("enforceSingleParent", value.to_string());
         }
 
-        params.push(("alt", "json".to_string()));
+        params.extend(self._additional_params.iter());
 
+        params.push("alt", "json");
         let (mut url, upload_type) =
-            if protocol == "resumable" {
+            if protocol == client::UploadProtocol::Resumable {
                 (self.hub._root_url.clone() + "resumable/upload/drive/v3/files", "resumable")
-            } else if protocol == "simple" {
+            } else if protocol == client::UploadProtocol::Simple {
                 (self.hub._root_url.clone() + "upload/drive/v3/files", "multipart")
             } else {
                 unreachable!()
             };
-        params.push(("uploadType", upload_type.to_string()));
+        params.push("uploadType", upload_type);
         if self._scopes.is_empty() {
             self._scopes.insert(Scope::Full.as_ref().to_string());
         }
 
 
-        let url = url::Url::parse_with_params(&url, params).unwrap();
+        let url = params.parse_with_url(&url);
 
-        let mut json_mime_type: mime::Mime = "application/json".parse().unwrap();
+        let mut json_mime_type = mime::APPLICATION_JSON;
         let mut request_value_reader =
             {
                 let mut value = json::value::to_value(&self._request).expect("serde to work");
@@ -9248,24 +9062,13 @@ where
 
         loop {
             let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
-                // TODO: remove Ok / Err branches
-                Ok(Some(token)) => token.clone(),
-                Ok(None) => {
-                    let err = oauth2::Error::OtherError(anyhow::Error::msg("unknown error occurred while generating oauth2 token"));
-                    match dlg.token(&err) {
-                        Some(token) => token,
-                        None => {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
                             dlg.finished(false);
-                            return Err(client::Error::MissingToken(err))
-                        }
-                    }
-                }
-                Err(err) => {
-                    match dlg.token(&err) {
-                        Some(token) => token,
-                        None => {
-                            dlg.finished(false);
-                            return Err(client::Error::MissingToken(err))
+                            return Err(client::Error::MissingToken(e));
                         }
                     }
                 }
@@ -9283,7 +9086,7 @@ where
                 } else {
                     let mut mp_reader: client::MultiPartReader = Default::default();
                     let (mut body_reader, content_type) = match protocol {
-                        "simple" => {
+                        client::UploadProtocol::Simple => {
                             mp_reader.reserve_exact(2);
                             let size = reader.seek(io::SeekFrom::End(0)).unwrap();
                         reader.seek(io::SeekFrom::Start(0)).unwrap();
@@ -9292,26 +9095,31 @@ where
                         }
                             mp_reader.add_part(&mut request_value_reader, request_size, json_mime_type.clone())
                                      .add_part(&mut reader, size, reader_mime_type.clone());
-                            let mime_type = mp_reader.mime_type();
-                            (&mut mp_reader as &mut (dyn io::Read + Send), (CONTENT_TYPE, mime_type.to_string()))
+                            (&mut mp_reader as &mut (dyn io::Read + Send), client::MultiPartReader::mime_type())
                         },
-                        _ => (&mut request_value_reader as &mut (dyn io::Read + Send), (CONTENT_TYPE, json_mime_type.to_string())),
+                        _ => (&mut request_value_reader as &mut (dyn io::Read + Send), json_mime_type.clone()),
                     };
                     let client = &self.hub.client;
                     dlg.pre_request();
-                    let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
-                            .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
+                    let mut req_builder = hyper::Request::builder()
+                        .method(hyper::Method::POST)
+                        .uri(url.as_str())
+                        .header(USER_AGENT, self.hub._user_agent.clone());
+    
+                    if let Some(token) = token.as_ref() {
+                        req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                    }
     
                     upload_url_from_server = true;
-                    if protocol == "resumable" {
+                    if protocol == client::UploadProtocol::Resumable {
                         req_builder = req_builder.header("X-Upload-Content-Type", format!("{}", reader_mime_type));
                     }
     
                             let mut body_reader_bytes = vec![];
                             body_reader.read_to_end(&mut body_reader_bytes).unwrap();
                             let request = req_builder
-                            .header(content_type.0, content_type.1.to_string())
-                            .body(hyper::body::Body::from(body_reader_bytes));
+                                .header(CONTENT_TYPE, content_type.to_string())
+                                .body(hyper::body::Body::from(body_reader_bytes));
     
                     client.request(request.unwrap()).await
     
@@ -9348,7 +9156,7 @@ where
                             None => Err(client::Error::Failure(restored_response)),
                         }
                     }
-                    if protocol == "resumable" {
+                    if protocol == client::UploadProtocol::Resumable {
                         let size = reader.seek(io::SeekFrom::End(0)).unwrap();
                         reader.seek(io::SeekFrom::Start(0)).unwrap();
                         if size > 5497558138880 {
@@ -9366,7 +9174,8 @@ where
                                 start_at: if upload_url_from_server { Some(0) } else { None },
                                 auth: &self.hub.auth,
                                 user_agent: &self.hub._user_agent,
-                                auth_header: format!("Bearer {}", token.as_str()),
+                                // TODO: Check this assumption
+                                auth_header: format!("Bearer {}", token.ok_or_else(|| client::Error::MissingToken("resumable upload requires token".into()))?.as_str()),
                                 url: url_str,
                                 reader: &mut reader,
                                 media_type: reader_mime_type.clone(),
@@ -9425,7 +9234,7 @@ where
     /// * *valid mime types*: '*/*'
     pub async fn upload_resumable<RS>(self, resumeable_stream: RS, mime_type: mime::Mime) -> client::Result<(hyper::Response<hyper::body::Body>, File)>
                 where RS: client::ReadSeek {
-        self.doit(resumeable_stream, mime_type, "resumable").await
+        self.doit(resumeable_stream, mime_type, client::UploadProtocol::Resumable).await
     }
     /// Upload media all at once.
     /// If the upload fails for whichever reason, all progress is lost.
@@ -9435,7 +9244,7 @@ where
     /// * *valid mime types*: '*/*'
     pub async fn upload<RS>(self, stream: RS, mime_type: mime::Mime) -> client::Result<(hyper::Response<hyper::body::Body>, File)>
                 where RS: client::ReadSeek {
-        self.doit(stream, mime_type, "simple").await
+        self.doit(stream, mime_type, client::UploadProtocol::Simple).await
     }
 
     ///
@@ -9635,35 +9444,34 @@ where
     pub async fn doit(mut self) -> client::Result<hyper::Response<hyper::body::Body>> {
         use std::io::{Read, Seek};
         use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::ToParts;
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
         let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
         dlg.begin(client::MethodInfo { id: "drive.files.delete",
                                http_method: hyper::Method::DELETE });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
-        params.push(("fileId", self._file_id.to_string()));
-        if let Some(value) = self._supports_team_drives.as_ref() {
-            params.push(("supportsTeamDrives", value.to_string()));
-        }
-        if let Some(value) = self._supports_all_drives.as_ref() {
-            params.push(("supportsAllDrives", value.to_string()));
-        }
-        if let Some(value) = self._enforce_single_parent.as_ref() {
-            params.push(("enforceSingleParent", value.to_string()));
-        }
+
         for &field in ["fileId", "supportsTeamDrives", "supportsAllDrives", "enforceSingleParent"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(client::Error::FieldClash(field));
             }
         }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
+
+        let mut params = Params::with_capacity(5 + self._additional_params.len());
+        params.push("fileId", self._file_id);
+        if let Some(value) = self._supports_team_drives.as_ref() {
+            params.push("supportsTeamDrives", value.to_string());
+        }
+        if let Some(value) = self._supports_all_drives.as_ref() {
+            params.push("supportsAllDrives", value.to_string());
+        }
+        if let Some(value) = self._enforce_single_parent.as_ref() {
+            params.push("enforceSingleParent", value.to_string());
         }
 
+        params.extend(self._additional_params.iter());
 
         let mut url = self.hub._base_url.clone() + "files/{fileId}";
         if self._scopes.is_empty() {
@@ -9671,44 +9479,26 @@ where
         }
 
         for &(find_this, param_name) in [("{fileId}", "fileId")].iter() {
-            let mut replace_with: Option<&str> = None;
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = Some(value);
-                    break;
-                }
-            }
-            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+            url = params.uri_replacement(url, param_name, find_this, false);
         }
         {
             let to_remove = ["fileId"];
-            params.retain(|(n, _)| !to_remove.contains(n));
+            params.remove_params(&to_remove);
         }
 
-        let url = url::Url::parse_with_params(&url, params).unwrap();
+        let url = params.parse_with_url(&url);
 
 
 
         loop {
             let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
-                // TODO: remove Ok / Err branches
-                Ok(Some(token)) => token.clone(),
-                Ok(None) => {
-                    let err = oauth2::Error::OtherError(anyhow::Error::msg("unknown error occurred while generating oauth2 token"));
-                    match dlg.token(&err) {
-                        Some(token) => token,
-                        None => {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
                             dlg.finished(false);
-                            return Err(client::Error::MissingToken(err))
-                        }
-                    }
-                }
-                Err(err) => {
-                    match dlg.token(&err) {
-                        Some(token) => token,
-                        None => {
-                            dlg.finished(false);
-                            return Err(client::Error::MissingToken(err))
+                            return Err(client::Error::MissingToken(e));
                         }
                     }
                 }
@@ -9716,8 +9506,14 @@ where
             let mut req_result = {
                 let client = &self.hub.client;
                 dlg.pre_request();
-                let mut req_builder = hyper::Request::builder().method(hyper::Method::DELETE).uri(url.clone().into_string())
-                        .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::DELETE)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
 
 
                         let request = req_builder
@@ -9925,28 +9721,27 @@ where
     pub async fn doit(mut self) -> client::Result<hyper::Response<hyper::body::Body>> {
         use std::io::{Read, Seek};
         use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::ToParts;
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
         let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
         dlg.begin(client::MethodInfo { id: "drive.files.emptyTrash",
                                http_method: hyper::Method::DELETE });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(2 + self._additional_params.len());
-        if let Some(value) = self._enforce_single_parent.as_ref() {
-            params.push(("enforceSingleParent", value.to_string()));
-        }
+
         for &field in ["enforceSingleParent"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(client::Error::FieldClash(field));
             }
         }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
+
+        let mut params = Params::with_capacity(2 + self._additional_params.len());
+        if let Some(value) = self._enforce_single_parent.as_ref() {
+            params.push("enforceSingleParent", value.to_string());
         }
 
+        params.extend(self._additional_params.iter());
 
         let mut url = self.hub._base_url.clone() + "files/trash";
         if self._scopes.is_empty() {
@@ -9954,30 +9749,19 @@ where
         }
 
 
-        let url = url::Url::parse_with_params(&url, params).unwrap();
+        let url = params.parse_with_url(&url);
 
 
 
         loop {
             let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
-                // TODO: remove Ok / Err branches
-                Ok(Some(token)) => token.clone(),
-                Ok(None) => {
-                    let err = oauth2::Error::OtherError(anyhow::Error::msg("unknown error occurred while generating oauth2 token"));
-                    match dlg.token(&err) {
-                        Some(token) => token,
-                        None => {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
                             dlg.finished(false);
-                            return Err(client::Error::MissingToken(err))
-                        }
-                    }
-                }
-                Err(err) => {
-                    match dlg.token(&err) {
-                        Some(token) => token,
-                        None => {
-                            dlg.finished(false);
-                            return Err(client::Error::MissingToken(err))
+                            return Err(client::Error::MissingToken(e));
                         }
                     }
                 }
@@ -9985,8 +9769,14 @@ where
             let mut req_result = {
                 let client = &self.hub.client;
                 dlg.pre_request();
-                let mut req_builder = hyper::Request::builder().method(hyper::Method::DELETE).uri(url.clone().into_string())
-                        .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::DELETE)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
 
 
                         let request = req_builder
@@ -10173,27 +9963,26 @@ where
     pub async fn doit(mut self) -> client::Result<hyper::Response<hyper::body::Body>> {
         use std::io::{Read, Seek};
         use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::ToParts;
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
         let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
         dlg.begin(client::MethodInfo { id: "drive.files.export",
                                http_method: hyper::Method::GET });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
-        params.push(("fileId", self._file_id.to_string()));
-        params.push(("mimeType", self._mime_type.to_string()));
+
         for &field in ["fileId", "mimeType"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(client::Error::FieldClash(field));
             }
         }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
 
+        let mut params = Params::with_capacity(3 + self._additional_params.len());
+        params.push("fileId", self._file_id);
+        params.push("mimeType", self._mime_type);
+
+        params.extend(self._additional_params.iter());
 
         let mut url = self.hub._base_url.clone() + "files/{fileId}/export";
         if self._scopes.is_empty() {
@@ -10201,44 +9990,26 @@ where
         }
 
         for &(find_this, param_name) in [("{fileId}", "fileId")].iter() {
-            let mut replace_with: Option<&str> = None;
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = Some(value);
-                    break;
-                }
-            }
-            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+            url = params.uri_replacement(url, param_name, find_this, false);
         }
         {
             let to_remove = ["fileId"];
-            params.retain(|(n, _)| !to_remove.contains(n));
+            params.remove_params(&to_remove);
         }
 
-        let url = url::Url::parse_with_params(&url, params).unwrap();
+        let url = params.parse_with_url(&url);
 
 
 
         loop {
             let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
-                // TODO: remove Ok / Err branches
-                Ok(Some(token)) => token.clone(),
-                Ok(None) => {
-                    let err = oauth2::Error::OtherError(anyhow::Error::msg("unknown error occurred while generating oauth2 token"));
-                    match dlg.token(&err) {
-                        Some(token) => token,
-                        None => {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
                             dlg.finished(false);
-                            return Err(client::Error::MissingToken(err))
-                        }
-                    }
-                }
-                Err(err) => {
-                    match dlg.token(&err) {
-                        Some(token) => token,
-                        None => {
-                            dlg.finished(false);
-                            return Err(client::Error::MissingToken(err))
+                            return Err(client::Error::MissingToken(e));
                         }
                     }
                 }
@@ -10246,8 +10017,14 @@ where
             let mut req_result = {
                 let client = &self.hub.client;
                 dlg.pre_request();
-                let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
-                        .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::GET)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
 
 
                         let request = req_builder
@@ -10448,66 +10225,54 @@ where
     pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, GeneratedIds)> {
         use std::io::{Read, Seek};
         use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::ToParts;
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
         let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
         dlg.begin(client::MethodInfo { id: "drive.files.generateIds",
                                http_method: hyper::Method::GET });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
-        if let Some(value) = self._type_.as_ref() {
-            params.push(("type", value.to_string()));
-        }
-        if let Some(value) = self._space.as_ref() {
-            params.push(("space", value.to_string()));
-        }
-        if let Some(value) = self._count.as_ref() {
-            params.push(("count", value.to_string()));
-        }
+
         for &field in ["alt", "type", "space", "count"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(client::Error::FieldClash(field));
             }
         }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
+
+        let mut params = Params::with_capacity(5 + self._additional_params.len());
+        if let Some(value) = self._type_.as_ref() {
+            params.push("type", value);
+        }
+        if let Some(value) = self._space.as_ref() {
+            params.push("space", value);
+        }
+        if let Some(value) = self._count.as_ref() {
+            params.push("count", value.to_string());
         }
 
-        params.push(("alt", "json".to_string()));
+        params.extend(self._additional_params.iter());
 
+        params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "files/generateIds";
         if self._scopes.is_empty() {
             self._scopes.insert(Scope::Full.as_ref().to_string());
         }
 
 
-        let url = url::Url::parse_with_params(&url, params).unwrap();
+        let url = params.parse_with_url(&url);
 
 
 
         loop {
             let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
-                // TODO: remove Ok / Err branches
-                Ok(Some(token)) => token.clone(),
-                Ok(None) => {
-                    let err = oauth2::Error::OtherError(anyhow::Error::msg("unknown error occurred while generating oauth2 token"));
-                    match dlg.token(&err) {
-                        Some(token) => token,
-                        None => {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
                             dlg.finished(false);
-                            return Err(client::Error::MissingToken(err))
-                        }
-                    }
-                }
-                Err(err) => {
-                    match dlg.token(&err) {
-                        Some(token) => token,
-                        None => {
-                            dlg.finished(false);
-                            return Err(client::Error::MissingToken(err))
+                            return Err(client::Error::MissingToken(e));
                         }
                     }
                 }
@@ -10515,8 +10280,14 @@ where
             let mut req_result = {
                 let client = &self.hub.client;
                 dlg.pre_request();
-                let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
-                        .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::GET)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
 
 
                         let request = req_builder
@@ -10736,98 +10507,74 @@ where
     pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, File)> {
         use std::io::{Read, Seek};
         use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::ToParts;
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
         let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
         dlg.begin(client::MethodInfo { id: "drive.files.get",
                                http_method: hyper::Method::GET });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(6 + self._additional_params.len());
-        params.push(("fileId", self._file_id.to_string()));
-        if let Some(value) = self._supports_team_drives.as_ref() {
-            params.push(("supportsTeamDrives", value.to_string()));
-        }
-        if let Some(value) = self._supports_all_drives.as_ref() {
-            params.push(("supportsAllDrives", value.to_string()));
-        }
-        if let Some(value) = self._include_permissions_for_view.as_ref() {
-            params.push(("includePermissionsForView", value.to_string()));
-        }
-        if let Some(value) = self._acknowledge_abuse.as_ref() {
-            params.push(("acknowledgeAbuse", value.to_string()));
-        }
+
         for &field in ["fileId", "supportsTeamDrives", "supportsAllDrives", "includePermissionsForView", "acknowledgeAbuse"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(client::Error::FieldClash(field));
             }
         }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
+
+        let mut params = Params::with_capacity(6 + self._additional_params.len());
+        params.push("fileId", self._file_id);
+        if let Some(value) = self._supports_team_drives.as_ref() {
+            params.push("supportsTeamDrives", value.to_string());
+        }
+        if let Some(value) = self._supports_all_drives.as_ref() {
+            params.push("supportsAllDrives", value.to_string());
+        }
+        if let Some(value) = self._include_permissions_for_view.as_ref() {
+            params.push("includePermissionsForView", value);
+        }
+        if let Some(value) = self._acknowledge_abuse.as_ref() {
+            params.push("acknowledgeAbuse", value.to_string());
         }
 
-        let (json_field_missing, enable_resource_parsing) = {
-            let mut enable = true;
-            let mut field_missing = true;
-            for &(name, ref value) in params.iter() {
-                if name == "alt" {
-                    field_missing = false;
-                    enable = value == "json";
-                    break;
-                }
+        params.extend(self._additional_params.iter());
+
+        let (alt_field_missing, enable_resource_parsing) = {
+            if let Some(value) = params.get("alt") {
+                (false, value == "json")
+            } else {
+                (true, true)
             }
-            (field_missing, enable)
         };
-        if json_field_missing {
-            params.push(("alt", "json".to_string()));
+        if alt_field_missing {
+            params.push("alt", "json");
         }
-
         let mut url = self.hub._base_url.clone() + "files/{fileId}";
         if self._scopes.is_empty() {
             self._scopes.insert(Scope::MetadataReadonly.as_ref().to_string());
         }
 
         for &(find_this, param_name) in [("{fileId}", "fileId")].iter() {
-            let mut replace_with: Option<&str> = None;
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = Some(value);
-                    break;
-                }
-            }
-            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+            url = params.uri_replacement(url, param_name, find_this, false);
         }
         {
             let to_remove = ["fileId"];
-            params.retain(|(n, _)| !to_remove.contains(n));
+            params.remove_params(&to_remove);
         }
 
-        let url = url::Url::parse_with_params(&url, params).unwrap();
+        let url = params.parse_with_url(&url);
 
 
 
         loop {
             let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
-                // TODO: remove Ok / Err branches
-                Ok(Some(token)) => token.clone(),
-                Ok(None) => {
-                    let err = oauth2::Error::OtherError(anyhow::Error::msg("unknown error occurred while generating oauth2 token"));
-                    match dlg.token(&err) {
-                        Some(token) => token,
-                        None => {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
                             dlg.finished(false);
-                            return Err(client::Error::MissingToken(err))
-                        }
-                    }
-                }
-                Err(err) => {
-                    match dlg.token(&err) {
-                        Some(token) => token,
-                        None => {
-                            dlg.finished(false);
-                            return Err(client::Error::MissingToken(err))
+                            return Err(client::Error::MissingToken(e));
                         }
                     }
                 }
@@ -10835,8 +10582,14 @@ where
             let mut req_result = {
                 let client = &self.hub.client;
                 dlg.pre_request();
-                let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
-                        .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::GET)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
 
 
                         let request = req_builder
@@ -11087,99 +10840,87 @@ where
     pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, FileList)> {
         use std::io::{Read, Seek};
         use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::ToParts;
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
         let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
         dlg.begin(client::MethodInfo { id: "drive.files.list",
                                http_method: hyper::Method::GET });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(16 + self._additional_params.len());
-        if let Some(value) = self._team_drive_id.as_ref() {
-            params.push(("teamDriveId", value.to_string()));
-        }
-        if let Some(value) = self._supports_team_drives.as_ref() {
-            params.push(("supportsTeamDrives", value.to_string()));
-        }
-        if let Some(value) = self._supports_all_drives.as_ref() {
-            params.push(("supportsAllDrives", value.to_string()));
-        }
-        if let Some(value) = self._spaces.as_ref() {
-            params.push(("spaces", value.to_string()));
-        }
-        if let Some(value) = self._q.as_ref() {
-            params.push(("q", value.to_string()));
-        }
-        if let Some(value) = self._page_token.as_ref() {
-            params.push(("pageToken", value.to_string()));
-        }
-        if let Some(value) = self._page_size.as_ref() {
-            params.push(("pageSize", value.to_string()));
-        }
-        if let Some(value) = self._order_by.as_ref() {
-            params.push(("orderBy", value.to_string()));
-        }
-        if let Some(value) = self._include_team_drive_items.as_ref() {
-            params.push(("includeTeamDriveItems", value.to_string()));
-        }
-        if let Some(value) = self._include_permissions_for_view.as_ref() {
-            params.push(("includePermissionsForView", value.to_string()));
-        }
-        if let Some(value) = self._include_items_from_all_drives.as_ref() {
-            params.push(("includeItemsFromAllDrives", value.to_string()));
-        }
-        if let Some(value) = self._drive_id.as_ref() {
-            params.push(("driveId", value.to_string()));
-        }
-        if let Some(value) = self._corpus.as_ref() {
-            params.push(("corpus", value.to_string()));
-        }
-        if let Some(value) = self._corpora.as_ref() {
-            params.push(("corpora", value.to_string()));
-        }
+
         for &field in ["alt", "teamDriveId", "supportsTeamDrives", "supportsAllDrives", "spaces", "q", "pageToken", "pageSize", "orderBy", "includeTeamDriveItems", "includePermissionsForView", "includeItemsFromAllDrives", "driveId", "corpus", "corpora"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(client::Error::FieldClash(field));
             }
         }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
+
+        let mut params = Params::with_capacity(16 + self._additional_params.len());
+        if let Some(value) = self._team_drive_id.as_ref() {
+            params.push("teamDriveId", value);
+        }
+        if let Some(value) = self._supports_team_drives.as_ref() {
+            params.push("supportsTeamDrives", value.to_string());
+        }
+        if let Some(value) = self._supports_all_drives.as_ref() {
+            params.push("supportsAllDrives", value.to_string());
+        }
+        if let Some(value) = self._spaces.as_ref() {
+            params.push("spaces", value);
+        }
+        if let Some(value) = self._q.as_ref() {
+            params.push("q", value);
+        }
+        if let Some(value) = self._page_token.as_ref() {
+            params.push("pageToken", value);
+        }
+        if let Some(value) = self._page_size.as_ref() {
+            params.push("pageSize", value.to_string());
+        }
+        if let Some(value) = self._order_by.as_ref() {
+            params.push("orderBy", value);
+        }
+        if let Some(value) = self._include_team_drive_items.as_ref() {
+            params.push("includeTeamDriveItems", value.to_string());
+        }
+        if let Some(value) = self._include_permissions_for_view.as_ref() {
+            params.push("includePermissionsForView", value);
+        }
+        if let Some(value) = self._include_items_from_all_drives.as_ref() {
+            params.push("includeItemsFromAllDrives", value.to_string());
+        }
+        if let Some(value) = self._drive_id.as_ref() {
+            params.push("driveId", value);
+        }
+        if let Some(value) = self._corpus.as_ref() {
+            params.push("corpus", value);
+        }
+        if let Some(value) = self._corpora.as_ref() {
+            params.push("corpora", value);
         }
 
-        params.push(("alt", "json".to_string()));
+        params.extend(self._additional_params.iter());
 
+        params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "files";
         if self._scopes.is_empty() {
             self._scopes.insert(Scope::MetadataReadonly.as_ref().to_string());
         }
 
 
-        let url = url::Url::parse_with_params(&url, params).unwrap();
+        let url = params.parse_with_url(&url);
 
 
 
         loop {
             let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
-                // TODO: remove Ok / Err branches
-                Ok(Some(token)) => token.clone(),
-                Ok(None) => {
-                    let err = oauth2::Error::OtherError(anyhow::Error::msg("unknown error occurred while generating oauth2 token"));
-                    match dlg.token(&err) {
-                        Some(token) => token,
-                        None => {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
                             dlg.finished(false);
-                            return Err(client::Error::MissingToken(err))
-                        }
-                    }
-                }
-                Err(err) => {
-                    match dlg.token(&err) {
-                        Some(token) => token,
-                        None => {
-                            dlg.finished(false);
-                            return Err(client::Error::MissingToken(err))
+                            return Err(client::Error::MissingToken(e));
                         }
                     }
                 }
@@ -11187,8 +10928,14 @@ where
             let mut req_result = {
                 let client = &self.hub.client;
                 dlg.pre_request();
-                let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
-                        .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::GET)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
 
 
                         let request = req_builder
@@ -11497,78 +11244,70 @@ where
     pub async fn doit_without_upload(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, File)> {
         use std::io::{Read, Seek};
         use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::ToParts;
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
         let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
         dlg.begin(client::MethodInfo { id: "drive.files.update",
                                http_method: hyper::Method::PATCH });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(13 + self._additional_params.len());
-        params.push(("fileId", self._file_id.to_string()));
-        if let Some(value) = self._use_content_as_indexable_text.as_ref() {
-            params.push(("useContentAsIndexableText", value.to_string()));
-        }
-        if let Some(value) = self._supports_team_drives.as_ref() {
-            params.push(("supportsTeamDrives", value.to_string()));
-        }
-        if let Some(value) = self._supports_all_drives.as_ref() {
-            params.push(("supportsAllDrives", value.to_string()));
-        }
-        if let Some(value) = self._remove_parents.as_ref() {
-            params.push(("removeParents", value.to_string()));
-        }
-        if let Some(value) = self._ocr_language.as_ref() {
-            params.push(("ocrLanguage", value.to_string()));
-        }
-        if let Some(value) = self._keep_revision_forever.as_ref() {
-            params.push(("keepRevisionForever", value.to_string()));
-        }
-        if let Some(value) = self._include_permissions_for_view.as_ref() {
-            params.push(("includePermissionsForView", value.to_string()));
-        }
-        if let Some(value) = self._enforce_single_parent.as_ref() {
-            params.push(("enforceSingleParent", value.to_string()));
-        }
-        if let Some(value) = self._add_parents.as_ref() {
-            params.push(("addParents", value.to_string()));
-        }
+
         for &field in ["alt", "fileId", "useContentAsIndexableText", "supportsTeamDrives", "supportsAllDrives", "removeParents", "ocrLanguage", "keepRevisionForever", "includePermissionsForView", "enforceSingleParent", "addParents"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(client::Error::FieldClash(field));
             }
         }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
+
+        let mut params = Params::with_capacity(13 + self._additional_params.len());
+        params.push("fileId", self._file_id);
+        if let Some(value) = self._use_content_as_indexable_text.as_ref() {
+            params.push("useContentAsIndexableText", value.to_string());
+        }
+        if let Some(value) = self._supports_team_drives.as_ref() {
+            params.push("supportsTeamDrives", value.to_string());
+        }
+        if let Some(value) = self._supports_all_drives.as_ref() {
+            params.push("supportsAllDrives", value.to_string());
+        }
+        if let Some(value) = self._remove_parents.as_ref() {
+            params.push("removeParents", value);
+        }
+        if let Some(value) = self._ocr_language.as_ref() {
+            params.push("ocrLanguage", value);
+        }
+        if let Some(value) = self._keep_revision_forever.as_ref() {
+            params.push("keepRevisionForever", value.to_string());
+        }
+        if let Some(value) = self._include_permissions_for_view.as_ref() {
+            params.push("includePermissionsForView", value);
+        }
+        if let Some(value) = self._enforce_single_parent.as_ref() {
+            params.push("enforceSingleParent", value.to_string());
+        }
+        if let Some(value) = self._add_parents.as_ref() {
+            params.push("addParents", value);
         }
 
-        params.push(("alt", "json".to_string()));
+        params.extend(self._additional_params.iter());
 
+        params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "files/{fileId}";
         if self._scopes.is_empty() {
             self._scopes.insert(Scope::Full.as_ref().to_string());
         }
 
         for &(find_this, param_name) in [("{fileId}", "fileId")].iter() {
-            let mut replace_with: Option<&str> = None;
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = Some(value);
-                    break;
-                }
-            }
-            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+            url = params.uri_replacement(url, param_name, find_this, false);
         }
         {
             let to_remove = ["fileId"];
-            params.retain(|(n, _)| !to_remove.contains(n));
+            params.remove_params(&to_remove);
         }
 
-        let url = url::Url::parse_with_params(&url, params).unwrap();
+        let url = params.parse_with_url(&url);
 
-        let mut json_mime_type: mime::Mime = "application/json".parse().unwrap();
+        let mut json_mime_type = mime::APPLICATION_JSON;
         let mut request_value_reader =
             {
                 let mut value = json::value::to_value(&self._request).expect("serde to work");
@@ -11583,24 +11322,13 @@ where
 
         loop {
             let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
-                // TODO: remove Ok / Err branches
-                Ok(Some(token)) => token.clone(),
-                Ok(None) => {
-                    let err = oauth2::Error::OtherError(anyhow::Error::msg("unknown error occurred while generating oauth2 token"));
-                    match dlg.token(&err) {
-                        Some(token) => token,
-                        None => {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
                             dlg.finished(false);
-                            return Err(client::Error::MissingToken(err))
-                        }
-                    }
-                }
-                Err(err) => {
-                    match dlg.token(&err) {
-                        Some(token) => token,
-                        None => {
-                            dlg.finished(false);
-                            return Err(client::Error::MissingToken(err))
+                            return Err(client::Error::MissingToken(e));
                         }
                     }
                 }
@@ -11609,12 +11337,18 @@ where
             let mut req_result = {
                 let client = &self.hub.client;
                 dlg.pre_request();
-                let mut req_builder = hyper::Request::builder().method(hyper::Method::PATCH).uri(url.clone().into_string())
-                        .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::PATCH)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
 
 
                         let request = req_builder
-                        .header(CONTENT_TYPE, format!("{}", json_mime_type.to_string()))
+                        .header(CONTENT_TYPE, json_mime_type.to_string())
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
@@ -11674,90 +11408,82 @@ where
 
 
     /// Perform the operation you have build so far.
-    async fn doit<RS>(mut self, mut reader: RS, reader_mime_type: mime::Mime, protocol: &'static str) -> client::Result<(hyper::Response<hyper::body::Body>, File)>
+    async fn doit<RS>(mut self, mut reader: RS, reader_mime_type: mime::Mime, protocol: client::UploadProtocol) -> client::Result<(hyper::Response<hyper::body::Body>, File)>
 		where RS: client::ReadSeek {
         use std::io::{Read, Seek};
         use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::ToParts;
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
         let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
         dlg.begin(client::MethodInfo { id: "drive.files.update",
                                http_method: hyper::Method::PATCH });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(13 + self._additional_params.len());
-        params.push(("fileId", self._file_id.to_string()));
-        if let Some(value) = self._use_content_as_indexable_text.as_ref() {
-            params.push(("useContentAsIndexableText", value.to_string()));
-        }
-        if let Some(value) = self._supports_team_drives.as_ref() {
-            params.push(("supportsTeamDrives", value.to_string()));
-        }
-        if let Some(value) = self._supports_all_drives.as_ref() {
-            params.push(("supportsAllDrives", value.to_string()));
-        }
-        if let Some(value) = self._remove_parents.as_ref() {
-            params.push(("removeParents", value.to_string()));
-        }
-        if let Some(value) = self._ocr_language.as_ref() {
-            params.push(("ocrLanguage", value.to_string()));
-        }
-        if let Some(value) = self._keep_revision_forever.as_ref() {
-            params.push(("keepRevisionForever", value.to_string()));
-        }
-        if let Some(value) = self._include_permissions_for_view.as_ref() {
-            params.push(("includePermissionsForView", value.to_string()));
-        }
-        if let Some(value) = self._enforce_single_parent.as_ref() {
-            params.push(("enforceSingleParent", value.to_string()));
-        }
-        if let Some(value) = self._add_parents.as_ref() {
-            params.push(("addParents", value.to_string()));
-        }
+
         for &field in ["alt", "fileId", "useContentAsIndexableText", "supportsTeamDrives", "supportsAllDrives", "removeParents", "ocrLanguage", "keepRevisionForever", "includePermissionsForView", "enforceSingleParent", "addParents"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(client::Error::FieldClash(field));
             }
         }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
+
+        let mut params = Params::with_capacity(13 + self._additional_params.len());
+        params.push("fileId", self._file_id);
+        if let Some(value) = self._use_content_as_indexable_text.as_ref() {
+            params.push("useContentAsIndexableText", value.to_string());
+        }
+        if let Some(value) = self._supports_team_drives.as_ref() {
+            params.push("supportsTeamDrives", value.to_string());
+        }
+        if let Some(value) = self._supports_all_drives.as_ref() {
+            params.push("supportsAllDrives", value.to_string());
+        }
+        if let Some(value) = self._remove_parents.as_ref() {
+            params.push("removeParents", value);
+        }
+        if let Some(value) = self._ocr_language.as_ref() {
+            params.push("ocrLanguage", value);
+        }
+        if let Some(value) = self._keep_revision_forever.as_ref() {
+            params.push("keepRevisionForever", value.to_string());
+        }
+        if let Some(value) = self._include_permissions_for_view.as_ref() {
+            params.push("includePermissionsForView", value);
+        }
+        if let Some(value) = self._enforce_single_parent.as_ref() {
+            params.push("enforceSingleParent", value.to_string());
+        }
+        if let Some(value) = self._add_parents.as_ref() {
+            params.push("addParents", value);
         }
 
-        params.push(("alt", "json".to_string()));
+        params.extend(self._additional_params.iter());
 
+        params.push("alt", "json");
         let (mut url, upload_type) =
-            if protocol == "resumable" {
+            if protocol == client::UploadProtocol::Resumable {
                 (self.hub._root_url.clone() + "resumable/upload/drive/v3/files/{fileId}", "resumable")
-            } else if protocol == "simple" {
+            } else if protocol == client::UploadProtocol::Simple {
                 (self.hub._root_url.clone() + "upload/drive/v3/files/{fileId}", "multipart")
             } else {
                 unreachable!()
             };
-        params.push(("uploadType", upload_type.to_string()));
+        params.push("uploadType", upload_type);
         if self._scopes.is_empty() {
             self._scopes.insert(Scope::Full.as_ref().to_string());
         }
 
         for &(find_this, param_name) in [("{fileId}", "fileId")].iter() {
-            let mut replace_with: Option<&str> = None;
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = Some(value);
-                    break;
-                }
-            }
-            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+            url = params.uri_replacement(url, param_name, find_this, false);
         }
         {
             let to_remove = ["fileId"];
-            params.retain(|(n, _)| !to_remove.contains(n));
+            params.remove_params(&to_remove);
         }
 
-        let url = url::Url::parse_with_params(&url, params).unwrap();
+        let url = params.parse_with_url(&url);
 
-        let mut json_mime_type: mime::Mime = "application/json".parse().unwrap();
+        let mut json_mime_type = mime::APPLICATION_JSON;
         let mut request_value_reader =
             {
                 let mut value = json::value::to_value(&self._request).expect("serde to work");
@@ -11775,24 +11501,13 @@ where
 
         loop {
             let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
-                // TODO: remove Ok / Err branches
-                Ok(Some(token)) => token.clone(),
-                Ok(None) => {
-                    let err = oauth2::Error::OtherError(anyhow::Error::msg("unknown error occurred while generating oauth2 token"));
-                    match dlg.token(&err) {
-                        Some(token) => token,
-                        None => {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
                             dlg.finished(false);
-                            return Err(client::Error::MissingToken(err))
-                        }
-                    }
-                }
-                Err(err) => {
-                    match dlg.token(&err) {
-                        Some(token) => token,
-                        None => {
-                            dlg.finished(false);
-                            return Err(client::Error::MissingToken(err))
+                            return Err(client::Error::MissingToken(e));
                         }
                     }
                 }
@@ -11810,7 +11525,7 @@ where
                 } else {
                     let mut mp_reader: client::MultiPartReader = Default::default();
                     let (mut body_reader, content_type) = match protocol {
-                        "simple" => {
+                        client::UploadProtocol::Simple => {
                             mp_reader.reserve_exact(2);
                             let size = reader.seek(io::SeekFrom::End(0)).unwrap();
                         reader.seek(io::SeekFrom::Start(0)).unwrap();
@@ -11819,26 +11534,31 @@ where
                         }
                             mp_reader.add_part(&mut request_value_reader, request_size, json_mime_type.clone())
                                      .add_part(&mut reader, size, reader_mime_type.clone());
-                            let mime_type = mp_reader.mime_type();
-                            (&mut mp_reader as &mut (dyn io::Read + Send), (CONTENT_TYPE, mime_type.to_string()))
+                            (&mut mp_reader as &mut (dyn io::Read + Send), client::MultiPartReader::mime_type())
                         },
-                        _ => (&mut request_value_reader as &mut (dyn io::Read + Send), (CONTENT_TYPE, json_mime_type.to_string())),
+                        _ => (&mut request_value_reader as &mut (dyn io::Read + Send), json_mime_type.clone()),
                     };
                     let client = &self.hub.client;
                     dlg.pre_request();
-                    let mut req_builder = hyper::Request::builder().method(hyper::Method::PATCH).uri(url.clone().into_string())
-                            .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
+                    let mut req_builder = hyper::Request::builder()
+                        .method(hyper::Method::PATCH)
+                        .uri(url.as_str())
+                        .header(USER_AGENT, self.hub._user_agent.clone());
+    
+                    if let Some(token) = token.as_ref() {
+                        req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                    }
     
                     upload_url_from_server = true;
-                    if protocol == "resumable" {
+                    if protocol == client::UploadProtocol::Resumable {
                         req_builder = req_builder.header("X-Upload-Content-Type", format!("{}", reader_mime_type));
                     }
     
                             let mut body_reader_bytes = vec![];
                             body_reader.read_to_end(&mut body_reader_bytes).unwrap();
                             let request = req_builder
-                            .header(content_type.0, content_type.1.to_string())
-                            .body(hyper::body::Body::from(body_reader_bytes));
+                                .header(CONTENT_TYPE, content_type.to_string())
+                                .body(hyper::body::Body::from(body_reader_bytes));
     
                     client.request(request.unwrap()).await
     
@@ -11875,7 +11595,7 @@ where
                             None => Err(client::Error::Failure(restored_response)),
                         }
                     }
-                    if protocol == "resumable" {
+                    if protocol == client::UploadProtocol::Resumable {
                         let size = reader.seek(io::SeekFrom::End(0)).unwrap();
                         reader.seek(io::SeekFrom::Start(0)).unwrap();
                         if size > 5497558138880 {
@@ -11893,7 +11613,8 @@ where
                                 start_at: if upload_url_from_server { Some(0) } else { None },
                                 auth: &self.hub.auth,
                                 user_agent: &self.hub._user_agent,
-                                auth_header: format!("Bearer {}", token.as_str()),
+                                // TODO: Check this assumption
+                                auth_header: format!("Bearer {}", token.ok_or_else(|| client::Error::MissingToken("resumable upload requires token".into()))?.as_str()),
                                 url: url_str,
                                 reader: &mut reader,
                                 media_type: reader_mime_type.clone(),
@@ -11952,7 +11673,7 @@ where
     /// * *valid mime types*: '*/*'
     pub async fn upload_resumable<RS>(self, resumeable_stream: RS, mime_type: mime::Mime) -> client::Result<(hyper::Response<hyper::body::Body>, File)>
                 where RS: client::ReadSeek {
-        self.doit(resumeable_stream, mime_type, "resumable").await
+        self.doit(resumeable_stream, mime_type, client::UploadProtocol::Resumable).await
     }
     /// Upload media all at once.
     /// If the upload fails for whichever reason, all progress is lost.
@@ -11962,7 +11683,7 @@ where
     /// * *valid mime types*: '*/*'
     pub async fn upload<RS>(self, stream: RS, mime_type: mime::Mime) -> client::Result<(hyper::Response<hyper::body::Body>, File)>
                 where RS: client::ReadSeek {
-        self.doit(stream, mime_type, "simple").await
+        self.doit(stream, mime_type, client::UploadProtocol::Simple).await
     }
 
     ///
@@ -12193,77 +11914,64 @@ where
     pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, Channel)> {
         use std::io::{Read, Seek};
         use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::ToParts;
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
         let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
         dlg.begin(client::MethodInfo { id: "drive.files.watch",
                                http_method: hyper::Method::POST });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(7 + self._additional_params.len());
-        params.push(("fileId", self._file_id.to_string()));
-        if let Some(value) = self._supports_team_drives.as_ref() {
-            params.push(("supportsTeamDrives", value.to_string()));
-        }
-        if let Some(value) = self._supports_all_drives.as_ref() {
-            params.push(("supportsAllDrives", value.to_string()));
-        }
-        if let Some(value) = self._include_permissions_for_view.as_ref() {
-            params.push(("includePermissionsForView", value.to_string()));
-        }
-        if let Some(value) = self._acknowledge_abuse.as_ref() {
-            params.push(("acknowledgeAbuse", value.to_string()));
-        }
+
         for &field in ["fileId", "supportsTeamDrives", "supportsAllDrives", "includePermissionsForView", "acknowledgeAbuse"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(client::Error::FieldClash(field));
             }
         }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
+
+        let mut params = Params::with_capacity(7 + self._additional_params.len());
+        params.push("fileId", self._file_id);
+        if let Some(value) = self._supports_team_drives.as_ref() {
+            params.push("supportsTeamDrives", value.to_string());
+        }
+        if let Some(value) = self._supports_all_drives.as_ref() {
+            params.push("supportsAllDrives", value.to_string());
+        }
+        if let Some(value) = self._include_permissions_for_view.as_ref() {
+            params.push("includePermissionsForView", value);
+        }
+        if let Some(value) = self._acknowledge_abuse.as_ref() {
+            params.push("acknowledgeAbuse", value.to_string());
         }
 
-        let (json_field_missing, enable_resource_parsing) = {
-            let mut enable = true;
-            let mut field_missing = true;
-            for &(name, ref value) in params.iter() {
-                if name == "alt" {
-                    field_missing = false;
-                    enable = value == "json";
-                    break;
-                }
+        params.extend(self._additional_params.iter());
+
+        let (alt_field_missing, enable_resource_parsing) = {
+            if let Some(value) = params.get("alt") {
+                (false, value == "json")
+            } else {
+                (true, true)
             }
-            (field_missing, enable)
         };
-        if json_field_missing {
-            params.push(("alt", "json".to_string()));
+        if alt_field_missing {
+            params.push("alt", "json");
         }
-
         let mut url = self.hub._base_url.clone() + "files/{fileId}/watch";
         if self._scopes.is_empty() {
             self._scopes.insert(Scope::Full.as_ref().to_string());
         }
 
         for &(find_this, param_name) in [("{fileId}", "fileId")].iter() {
-            let mut replace_with: Option<&str> = None;
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = Some(value);
-                    break;
-                }
-            }
-            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+            url = params.uri_replacement(url, param_name, find_this, false);
         }
         {
             let to_remove = ["fileId"];
-            params.retain(|(n, _)| !to_remove.contains(n));
+            params.remove_params(&to_remove);
         }
 
-        let url = url::Url::parse_with_params(&url, params).unwrap();
+        let url = params.parse_with_url(&url);
 
-        let mut json_mime_type: mime::Mime = "application/json".parse().unwrap();
+        let mut json_mime_type = mime::APPLICATION_JSON;
         let mut request_value_reader =
             {
                 let mut value = json::value::to_value(&self._request).expect("serde to work");
@@ -12278,24 +11986,13 @@ where
 
         loop {
             let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
-                // TODO: remove Ok / Err branches
-                Ok(Some(token)) => token.clone(),
-                Ok(None) => {
-                    let err = oauth2::Error::OtherError(anyhow::Error::msg("unknown error occurred while generating oauth2 token"));
-                    match dlg.token(&err) {
-                        Some(token) => token,
-                        None => {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
                             dlg.finished(false);
-                            return Err(client::Error::MissingToken(err))
-                        }
-                    }
-                }
-                Err(err) => {
-                    match dlg.token(&err) {
-                        Some(token) => token,
-                        None => {
-                            dlg.finished(false);
-                            return Err(client::Error::MissingToken(err))
+                            return Err(client::Error::MissingToken(e));
                         }
                     }
                 }
@@ -12304,12 +12001,18 @@ where
             let mut req_result = {
                 let client = &self.hub.client;
                 dlg.pre_request();
-                let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
-                        .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::POST)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
 
 
                         let request = req_builder
-                        .header(CONTENT_TYPE, format!("{}", json_mime_type.to_string()))
+                        .header(CONTENT_TYPE, json_mime_type.to_string())
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
@@ -12563,75 +12266,67 @@ where
     pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, Permission)> {
         use std::io::{Read, Seek};
         use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::ToParts;
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
         let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
         dlg.begin(client::MethodInfo { id: "drive.permissions.create",
                                http_method: hyper::Method::POST });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(12 + self._additional_params.len());
-        params.push(("fileId", self._file_id.to_string()));
-        if let Some(value) = self._use_domain_admin_access.as_ref() {
-            params.push(("useDomainAdminAccess", value.to_string()));
-        }
-        if let Some(value) = self._transfer_ownership.as_ref() {
-            params.push(("transferOwnership", value.to_string()));
-        }
-        if let Some(value) = self._supports_team_drives.as_ref() {
-            params.push(("supportsTeamDrives", value.to_string()));
-        }
-        if let Some(value) = self._supports_all_drives.as_ref() {
-            params.push(("supportsAllDrives", value.to_string()));
-        }
-        if let Some(value) = self._send_notification_email.as_ref() {
-            params.push(("sendNotificationEmail", value.to_string()));
-        }
-        if let Some(value) = self._move_to_new_owners_root.as_ref() {
-            params.push(("moveToNewOwnersRoot", value.to_string()));
-        }
-        if let Some(value) = self._enforce_single_parent.as_ref() {
-            params.push(("enforceSingleParent", value.to_string()));
-        }
-        if let Some(value) = self._email_message.as_ref() {
-            params.push(("emailMessage", value.to_string()));
-        }
+
         for &field in ["alt", "fileId", "useDomainAdminAccess", "transferOwnership", "supportsTeamDrives", "supportsAllDrives", "sendNotificationEmail", "moveToNewOwnersRoot", "enforceSingleParent", "emailMessage"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(client::Error::FieldClash(field));
             }
         }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
+
+        let mut params = Params::with_capacity(12 + self._additional_params.len());
+        params.push("fileId", self._file_id);
+        if let Some(value) = self._use_domain_admin_access.as_ref() {
+            params.push("useDomainAdminAccess", value.to_string());
+        }
+        if let Some(value) = self._transfer_ownership.as_ref() {
+            params.push("transferOwnership", value.to_string());
+        }
+        if let Some(value) = self._supports_team_drives.as_ref() {
+            params.push("supportsTeamDrives", value.to_string());
+        }
+        if let Some(value) = self._supports_all_drives.as_ref() {
+            params.push("supportsAllDrives", value.to_string());
+        }
+        if let Some(value) = self._send_notification_email.as_ref() {
+            params.push("sendNotificationEmail", value.to_string());
+        }
+        if let Some(value) = self._move_to_new_owners_root.as_ref() {
+            params.push("moveToNewOwnersRoot", value.to_string());
+        }
+        if let Some(value) = self._enforce_single_parent.as_ref() {
+            params.push("enforceSingleParent", value.to_string());
+        }
+        if let Some(value) = self._email_message.as_ref() {
+            params.push("emailMessage", value);
         }
 
-        params.push(("alt", "json".to_string()));
+        params.extend(self._additional_params.iter());
 
+        params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "files/{fileId}/permissions";
         if self._scopes.is_empty() {
             self._scopes.insert(Scope::Full.as_ref().to_string());
         }
 
         for &(find_this, param_name) in [("{fileId}", "fileId")].iter() {
-            let mut replace_with: Option<&str> = None;
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = Some(value);
-                    break;
-                }
-            }
-            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+            url = params.uri_replacement(url, param_name, find_this, false);
         }
         {
             let to_remove = ["fileId"];
-            params.retain(|(n, _)| !to_remove.contains(n));
+            params.remove_params(&to_remove);
         }
 
-        let url = url::Url::parse_with_params(&url, params).unwrap();
+        let url = params.parse_with_url(&url);
 
-        let mut json_mime_type: mime::Mime = "application/json".parse().unwrap();
+        let mut json_mime_type = mime::APPLICATION_JSON;
         let mut request_value_reader =
             {
                 let mut value = json::value::to_value(&self._request).expect("serde to work");
@@ -12646,24 +12341,13 @@ where
 
         loop {
             let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
-                // TODO: remove Ok / Err branches
-                Ok(Some(token)) => token.clone(),
-                Ok(None) => {
-                    let err = oauth2::Error::OtherError(anyhow::Error::msg("unknown error occurred while generating oauth2 token"));
-                    match dlg.token(&err) {
-                        Some(token) => token,
-                        None => {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
                             dlg.finished(false);
-                            return Err(client::Error::MissingToken(err))
-                        }
-                    }
-                }
-                Err(err) => {
-                    match dlg.token(&err) {
-                        Some(token) => token,
-                        None => {
-                            dlg.finished(false);
-                            return Err(client::Error::MissingToken(err))
+                            return Err(client::Error::MissingToken(e));
                         }
                     }
                 }
@@ -12672,12 +12356,18 @@ where
             let mut req_result = {
                 let client = &self.hub.client;
                 dlg.pre_request();
-                let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
-                        .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::POST)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
 
 
                         let request = req_builder
-                        .header(CONTENT_TYPE, format!("{}", json_mime_type.to_string()))
+                        .header(CONTENT_TYPE, json_mime_type.to_string())
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
@@ -12943,36 +12633,35 @@ where
     pub async fn doit(mut self) -> client::Result<hyper::Response<hyper::body::Body>> {
         use std::io::{Read, Seek};
         use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::ToParts;
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
         let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
         dlg.begin(client::MethodInfo { id: "drive.permissions.delete",
                                http_method: hyper::Method::DELETE });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(6 + self._additional_params.len());
-        params.push(("fileId", self._file_id.to_string()));
-        params.push(("permissionId", self._permission_id.to_string()));
-        if let Some(value) = self._use_domain_admin_access.as_ref() {
-            params.push(("useDomainAdminAccess", value.to_string()));
-        }
-        if let Some(value) = self._supports_team_drives.as_ref() {
-            params.push(("supportsTeamDrives", value.to_string()));
-        }
-        if let Some(value) = self._supports_all_drives.as_ref() {
-            params.push(("supportsAllDrives", value.to_string()));
-        }
+
         for &field in ["fileId", "permissionId", "useDomainAdminAccess", "supportsTeamDrives", "supportsAllDrives"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(client::Error::FieldClash(field));
             }
         }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
+
+        let mut params = Params::with_capacity(6 + self._additional_params.len());
+        params.push("fileId", self._file_id);
+        params.push("permissionId", self._permission_id);
+        if let Some(value) = self._use_domain_admin_access.as_ref() {
+            params.push("useDomainAdminAccess", value.to_string());
+        }
+        if let Some(value) = self._supports_team_drives.as_ref() {
+            params.push("supportsTeamDrives", value.to_string());
+        }
+        if let Some(value) = self._supports_all_drives.as_ref() {
+            params.push("supportsAllDrives", value.to_string());
         }
 
+        params.extend(self._additional_params.iter());
 
         let mut url = self.hub._base_url.clone() + "files/{fileId}/permissions/{permissionId}";
         if self._scopes.is_empty() {
@@ -12980,44 +12669,26 @@ where
         }
 
         for &(find_this, param_name) in [("{fileId}", "fileId"), ("{permissionId}", "permissionId")].iter() {
-            let mut replace_with: Option<&str> = None;
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = Some(value);
-                    break;
-                }
-            }
-            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+            url = params.uri_replacement(url, param_name, find_this, false);
         }
         {
             let to_remove = ["permissionId", "fileId"];
-            params.retain(|(n, _)| !to_remove.contains(n));
+            params.remove_params(&to_remove);
         }
 
-        let url = url::Url::parse_with_params(&url, params).unwrap();
+        let url = params.parse_with_url(&url);
 
 
 
         loop {
             let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
-                // TODO: remove Ok / Err branches
-                Ok(Some(token)) => token.clone(),
-                Ok(None) => {
-                    let err = oauth2::Error::OtherError(anyhow::Error::msg("unknown error occurred while generating oauth2 token"));
-                    match dlg.token(&err) {
-                        Some(token) => token,
-                        None => {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
                             dlg.finished(false);
-                            return Err(client::Error::MissingToken(err))
-                        }
-                    }
-                }
-                Err(err) => {
-                    match dlg.token(&err) {
-                        Some(token) => token,
-                        None => {
-                            dlg.finished(false);
-                            return Err(client::Error::MissingToken(err))
+                            return Err(client::Error::MissingToken(e));
                         }
                     }
                 }
@@ -13025,8 +12696,14 @@ where
             let mut req_result = {
                 let client = &self.hub.client;
                 dlg.pre_request();
-                let mut req_builder = hyper::Request::builder().method(hyper::Method::DELETE).uri(url.clone().into_string())
-                        .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::DELETE)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
 
 
                         let request = req_builder
@@ -13250,82 +12927,63 @@ where
     pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, Permission)> {
         use std::io::{Read, Seek};
         use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::ToParts;
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
         let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
         dlg.begin(client::MethodInfo { id: "drive.permissions.get",
                                http_method: hyper::Method::GET });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(7 + self._additional_params.len());
-        params.push(("fileId", self._file_id.to_string()));
-        params.push(("permissionId", self._permission_id.to_string()));
-        if let Some(value) = self._use_domain_admin_access.as_ref() {
-            params.push(("useDomainAdminAccess", value.to_string()));
-        }
-        if let Some(value) = self._supports_team_drives.as_ref() {
-            params.push(("supportsTeamDrives", value.to_string()));
-        }
-        if let Some(value) = self._supports_all_drives.as_ref() {
-            params.push(("supportsAllDrives", value.to_string()));
-        }
+
         for &field in ["alt", "fileId", "permissionId", "useDomainAdminAccess", "supportsTeamDrives", "supportsAllDrives"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(client::Error::FieldClash(field));
             }
         }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
+
+        let mut params = Params::with_capacity(7 + self._additional_params.len());
+        params.push("fileId", self._file_id);
+        params.push("permissionId", self._permission_id);
+        if let Some(value) = self._use_domain_admin_access.as_ref() {
+            params.push("useDomainAdminAccess", value.to_string());
+        }
+        if let Some(value) = self._supports_team_drives.as_ref() {
+            params.push("supportsTeamDrives", value.to_string());
+        }
+        if let Some(value) = self._supports_all_drives.as_ref() {
+            params.push("supportsAllDrives", value.to_string());
         }
 
-        params.push(("alt", "json".to_string()));
+        params.extend(self._additional_params.iter());
 
+        params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "files/{fileId}/permissions/{permissionId}";
         if self._scopes.is_empty() {
             self._scopes.insert(Scope::MetadataReadonly.as_ref().to_string());
         }
 
         for &(find_this, param_name) in [("{fileId}", "fileId"), ("{permissionId}", "permissionId")].iter() {
-            let mut replace_with: Option<&str> = None;
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = Some(value);
-                    break;
-                }
-            }
-            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+            url = params.uri_replacement(url, param_name, find_this, false);
         }
         {
             let to_remove = ["permissionId", "fileId"];
-            params.retain(|(n, _)| !to_remove.contains(n));
+            params.remove_params(&to_remove);
         }
 
-        let url = url::Url::parse_with_params(&url, params).unwrap();
+        let url = params.parse_with_url(&url);
 
 
 
         loop {
             let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
-                // TODO: remove Ok / Err branches
-                Ok(Some(token)) => token.clone(),
-                Ok(None) => {
-                    let err = oauth2::Error::OtherError(anyhow::Error::msg("unknown error occurred while generating oauth2 token"));
-                    match dlg.token(&err) {
-                        Some(token) => token,
-                        None => {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
                             dlg.finished(false);
-                            return Err(client::Error::MissingToken(err))
-                        }
-                    }
-                }
-                Err(err) => {
-                    match dlg.token(&err) {
-                        Some(token) => token,
-                        None => {
-                            dlg.finished(false);
-                            return Err(client::Error::MissingToken(err))
+                            return Err(client::Error::MissingToken(e));
                         }
                     }
                 }
@@ -13333,8 +12991,14 @@ where
             let mut req_result = {
                 let client = &self.hub.client;
                 dlg.pre_request();
-                let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
-                        .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::GET)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
 
 
                         let request = req_builder
@@ -13573,90 +13237,71 @@ where
     pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, PermissionList)> {
         use std::io::{Read, Seek};
         use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::ToParts;
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
         let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
         dlg.begin(client::MethodInfo { id: "drive.permissions.list",
                                http_method: hyper::Method::GET });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(9 + self._additional_params.len());
-        params.push(("fileId", self._file_id.to_string()));
-        if let Some(value) = self._use_domain_admin_access.as_ref() {
-            params.push(("useDomainAdminAccess", value.to_string()));
-        }
-        if let Some(value) = self._supports_team_drives.as_ref() {
-            params.push(("supportsTeamDrives", value.to_string()));
-        }
-        if let Some(value) = self._supports_all_drives.as_ref() {
-            params.push(("supportsAllDrives", value.to_string()));
-        }
-        if let Some(value) = self._page_token.as_ref() {
-            params.push(("pageToken", value.to_string()));
-        }
-        if let Some(value) = self._page_size.as_ref() {
-            params.push(("pageSize", value.to_string()));
-        }
-        if let Some(value) = self._include_permissions_for_view.as_ref() {
-            params.push(("includePermissionsForView", value.to_string()));
-        }
+
         for &field in ["alt", "fileId", "useDomainAdminAccess", "supportsTeamDrives", "supportsAllDrives", "pageToken", "pageSize", "includePermissionsForView"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(client::Error::FieldClash(field));
             }
         }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
+
+        let mut params = Params::with_capacity(9 + self._additional_params.len());
+        params.push("fileId", self._file_id);
+        if let Some(value) = self._use_domain_admin_access.as_ref() {
+            params.push("useDomainAdminAccess", value.to_string());
+        }
+        if let Some(value) = self._supports_team_drives.as_ref() {
+            params.push("supportsTeamDrives", value.to_string());
+        }
+        if let Some(value) = self._supports_all_drives.as_ref() {
+            params.push("supportsAllDrives", value.to_string());
+        }
+        if let Some(value) = self._page_token.as_ref() {
+            params.push("pageToken", value);
+        }
+        if let Some(value) = self._page_size.as_ref() {
+            params.push("pageSize", value.to_string());
+        }
+        if let Some(value) = self._include_permissions_for_view.as_ref() {
+            params.push("includePermissionsForView", value);
         }
 
-        params.push(("alt", "json".to_string()));
+        params.extend(self._additional_params.iter());
 
+        params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "files/{fileId}/permissions";
         if self._scopes.is_empty() {
             self._scopes.insert(Scope::MetadataReadonly.as_ref().to_string());
         }
 
         for &(find_this, param_name) in [("{fileId}", "fileId")].iter() {
-            let mut replace_with: Option<&str> = None;
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = Some(value);
-                    break;
-                }
-            }
-            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+            url = params.uri_replacement(url, param_name, find_this, false);
         }
         {
             let to_remove = ["fileId"];
-            params.retain(|(n, _)| !to_remove.contains(n));
+            params.remove_params(&to_remove);
         }
 
-        let url = url::Url::parse_with_params(&url, params).unwrap();
+        let url = params.parse_with_url(&url);
 
 
 
         loop {
             let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
-                // TODO: remove Ok / Err branches
-                Ok(Some(token)) => token.clone(),
-                Ok(None) => {
-                    let err = oauth2::Error::OtherError(anyhow::Error::msg("unknown error occurred while generating oauth2 token"));
-                    match dlg.token(&err) {
-                        Some(token) => token,
-                        None => {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
                             dlg.finished(false);
-                            return Err(client::Error::MissingToken(err))
-                        }
-                    }
-                }
-                Err(err) => {
-                    match dlg.token(&err) {
-                        Some(token) => token,
-                        None => {
-                            dlg.finished(false);
-                            return Err(client::Error::MissingToken(err))
+                            return Err(client::Error::MissingToken(e));
                         }
                     }
                 }
@@ -13664,8 +13309,14 @@ where
             let mut req_result = {
                 let client = &self.hub.client;
                 dlg.pre_request();
-                let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
-                        .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::GET)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
 
 
                         let request = req_builder
@@ -13921,67 +13572,59 @@ where
     pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, Permission)> {
         use std::io::{Read, Seek};
         use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::ToParts;
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
         let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
         dlg.begin(client::MethodInfo { id: "drive.permissions.update",
                                http_method: hyper::Method::PATCH });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(10 + self._additional_params.len());
-        params.push(("fileId", self._file_id.to_string()));
-        params.push(("permissionId", self._permission_id.to_string()));
-        if let Some(value) = self._use_domain_admin_access.as_ref() {
-            params.push(("useDomainAdminAccess", value.to_string()));
-        }
-        if let Some(value) = self._transfer_ownership.as_ref() {
-            params.push(("transferOwnership", value.to_string()));
-        }
-        if let Some(value) = self._supports_team_drives.as_ref() {
-            params.push(("supportsTeamDrives", value.to_string()));
-        }
-        if let Some(value) = self._supports_all_drives.as_ref() {
-            params.push(("supportsAllDrives", value.to_string()));
-        }
-        if let Some(value) = self._remove_expiration.as_ref() {
-            params.push(("removeExpiration", value.to_string()));
-        }
+
         for &field in ["alt", "fileId", "permissionId", "useDomainAdminAccess", "transferOwnership", "supportsTeamDrives", "supportsAllDrives", "removeExpiration"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(client::Error::FieldClash(field));
             }
         }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
+
+        let mut params = Params::with_capacity(10 + self._additional_params.len());
+        params.push("fileId", self._file_id);
+        params.push("permissionId", self._permission_id);
+        if let Some(value) = self._use_domain_admin_access.as_ref() {
+            params.push("useDomainAdminAccess", value.to_string());
+        }
+        if let Some(value) = self._transfer_ownership.as_ref() {
+            params.push("transferOwnership", value.to_string());
+        }
+        if let Some(value) = self._supports_team_drives.as_ref() {
+            params.push("supportsTeamDrives", value.to_string());
+        }
+        if let Some(value) = self._supports_all_drives.as_ref() {
+            params.push("supportsAllDrives", value.to_string());
+        }
+        if let Some(value) = self._remove_expiration.as_ref() {
+            params.push("removeExpiration", value.to_string());
         }
 
-        params.push(("alt", "json".to_string()));
+        params.extend(self._additional_params.iter());
 
+        params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "files/{fileId}/permissions/{permissionId}";
         if self._scopes.is_empty() {
             self._scopes.insert(Scope::Full.as_ref().to_string());
         }
 
         for &(find_this, param_name) in [("{fileId}", "fileId"), ("{permissionId}", "permissionId")].iter() {
-            let mut replace_with: Option<&str> = None;
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = Some(value);
-                    break;
-                }
-            }
-            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+            url = params.uri_replacement(url, param_name, find_this, false);
         }
         {
             let to_remove = ["permissionId", "fileId"];
-            params.retain(|(n, _)| !to_remove.contains(n));
+            params.remove_params(&to_remove);
         }
 
-        let url = url::Url::parse_with_params(&url, params).unwrap();
+        let url = params.parse_with_url(&url);
 
-        let mut json_mime_type: mime::Mime = "application/json".parse().unwrap();
+        let mut json_mime_type = mime::APPLICATION_JSON;
         let mut request_value_reader =
             {
                 let mut value = json::value::to_value(&self._request).expect("serde to work");
@@ -13996,24 +13639,13 @@ where
 
         loop {
             let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
-                // TODO: remove Ok / Err branches
-                Ok(Some(token)) => token.clone(),
-                Ok(None) => {
-                    let err = oauth2::Error::OtherError(anyhow::Error::msg("unknown error occurred while generating oauth2 token"));
-                    match dlg.token(&err) {
-                        Some(token) => token,
-                        None => {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
                             dlg.finished(false);
-                            return Err(client::Error::MissingToken(err))
-                        }
-                    }
-                }
-                Err(err) => {
-                    match dlg.token(&err) {
-                        Some(token) => token,
-                        None => {
-                            dlg.finished(false);
-                            return Err(client::Error::MissingToken(err))
+                            return Err(client::Error::MissingToken(e));
                         }
                     }
                 }
@@ -14022,12 +13654,18 @@ where
             let mut req_result = {
                 let client = &self.hub.client;
                 dlg.pre_request();
-                let mut req_builder = hyper::Request::builder().method(hyper::Method::PATCH).uri(url.clone().into_string())
-                        .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::PATCH)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
 
 
                         let request = req_builder
-                        .header(CONTENT_TYPE, format!("{}", json_mime_type.to_string()))
+                        .header(CONTENT_TYPE, json_mime_type.to_string())
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
@@ -14283,52 +13921,44 @@ where
     pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, Reply)> {
         use std::io::{Read, Seek};
         use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::ToParts;
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
         let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
         dlg.begin(client::MethodInfo { id: "drive.replies.create",
                                http_method: hyper::Method::POST });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
-        params.push(("fileId", self._file_id.to_string()));
-        params.push(("commentId", self._comment_id.to_string()));
+
         for &field in ["alt", "fileId", "commentId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(client::Error::FieldClash(field));
             }
         }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
 
-        params.push(("alt", "json".to_string()));
+        let mut params = Params::with_capacity(5 + self._additional_params.len());
+        params.push("fileId", self._file_id);
+        params.push("commentId", self._comment_id);
 
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "files/{fileId}/comments/{commentId}/replies";
         if self._scopes.is_empty() {
             self._scopes.insert(Scope::Full.as_ref().to_string());
         }
 
         for &(find_this, param_name) in [("{fileId}", "fileId"), ("{commentId}", "commentId")].iter() {
-            let mut replace_with: Option<&str> = None;
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = Some(value);
-                    break;
-                }
-            }
-            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+            url = params.uri_replacement(url, param_name, find_this, false);
         }
         {
             let to_remove = ["commentId", "fileId"];
-            params.retain(|(n, _)| !to_remove.contains(n));
+            params.remove_params(&to_remove);
         }
 
-        let url = url::Url::parse_with_params(&url, params).unwrap();
+        let url = params.parse_with_url(&url);
 
-        let mut json_mime_type: mime::Mime = "application/json".parse().unwrap();
+        let mut json_mime_type = mime::APPLICATION_JSON;
         let mut request_value_reader =
             {
                 let mut value = json::value::to_value(&self._request).expect("serde to work");
@@ -14343,24 +13973,13 @@ where
 
         loop {
             let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
-                // TODO: remove Ok / Err branches
-                Ok(Some(token)) => token.clone(),
-                Ok(None) => {
-                    let err = oauth2::Error::OtherError(anyhow::Error::msg("unknown error occurred while generating oauth2 token"));
-                    match dlg.token(&err) {
-                        Some(token) => token,
-                        None => {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
                             dlg.finished(false);
-                            return Err(client::Error::MissingToken(err))
-                        }
-                    }
-                }
-                Err(err) => {
-                    match dlg.token(&err) {
-                        Some(token) => token,
-                        None => {
-                            dlg.finished(false);
-                            return Err(client::Error::MissingToken(err))
+                            return Err(client::Error::MissingToken(e));
                         }
                     }
                 }
@@ -14369,12 +13988,18 @@ where
             let mut req_result = {
                 let client = &self.hub.client;
                 dlg.pre_request();
-                let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
-                        .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::POST)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
 
 
                         let request = req_builder
-                        .header(CONTENT_TYPE, format!("{}", json_mime_type.to_string()))
+                        .header(CONTENT_TYPE, json_mime_type.to_string())
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
@@ -14589,28 +14214,27 @@ where
     pub async fn doit(mut self) -> client::Result<hyper::Response<hyper::body::Body>> {
         use std::io::{Read, Seek};
         use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::ToParts;
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
         let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
         dlg.begin(client::MethodInfo { id: "drive.replies.delete",
                                http_method: hyper::Method::DELETE });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
-        params.push(("fileId", self._file_id.to_string()));
-        params.push(("commentId", self._comment_id.to_string()));
-        params.push(("replyId", self._reply_id.to_string()));
+
         for &field in ["fileId", "commentId", "replyId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(client::Error::FieldClash(field));
             }
         }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
 
+        let mut params = Params::with_capacity(4 + self._additional_params.len());
+        params.push("fileId", self._file_id);
+        params.push("commentId", self._comment_id);
+        params.push("replyId", self._reply_id);
+
+        params.extend(self._additional_params.iter());
 
         let mut url = self.hub._base_url.clone() + "files/{fileId}/comments/{commentId}/replies/{replyId}";
         if self._scopes.is_empty() {
@@ -14618,44 +14242,26 @@ where
         }
 
         for &(find_this, param_name) in [("{fileId}", "fileId"), ("{commentId}", "commentId"), ("{replyId}", "replyId")].iter() {
-            let mut replace_with: Option<&str> = None;
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = Some(value);
-                    break;
-                }
-            }
-            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+            url = params.uri_replacement(url, param_name, find_this, false);
         }
         {
             let to_remove = ["replyId", "commentId", "fileId"];
-            params.retain(|(n, _)| !to_remove.contains(n));
+            params.remove_params(&to_remove);
         }
 
-        let url = url::Url::parse_with_params(&url, params).unwrap();
+        let url = params.parse_with_url(&url);
 
 
 
         loop {
             let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
-                // TODO: remove Ok / Err branches
-                Ok(Some(token)) => token.clone(),
-                Ok(None) => {
-                    let err = oauth2::Error::OtherError(anyhow::Error::msg("unknown error occurred while generating oauth2 token"));
-                    match dlg.token(&err) {
-                        Some(token) => token,
-                        None => {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
                             dlg.finished(false);
-                            return Err(client::Error::MissingToken(err))
-                        }
-                    }
-                }
-                Err(err) => {
-                    match dlg.token(&err) {
-                        Some(token) => token,
-                        None => {
-                            dlg.finished(false);
-                            return Err(client::Error::MissingToken(err))
+                            return Err(client::Error::MissingToken(e));
                         }
                     }
                 }
@@ -14663,8 +14269,14 @@ where
             let mut req_result = {
                 let client = &self.hub.client;
                 dlg.pre_request();
-                let mut req_builder = hyper::Request::builder().method(hyper::Method::DELETE).uri(url.clone().into_string())
-                        .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::DELETE)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
 
 
                         let request = req_builder
@@ -14874,77 +14486,58 @@ where
     pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, Reply)> {
         use std::io::{Read, Seek};
         use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::ToParts;
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
         let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
         dlg.begin(client::MethodInfo { id: "drive.replies.get",
                                http_method: hyper::Method::GET });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(6 + self._additional_params.len());
-        params.push(("fileId", self._file_id.to_string()));
-        params.push(("commentId", self._comment_id.to_string()));
-        params.push(("replyId", self._reply_id.to_string()));
-        if let Some(value) = self._include_deleted.as_ref() {
-            params.push(("includeDeleted", value.to_string()));
-        }
+
         for &field in ["alt", "fileId", "commentId", "replyId", "includeDeleted"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(client::Error::FieldClash(field));
             }
         }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
+
+        let mut params = Params::with_capacity(6 + self._additional_params.len());
+        params.push("fileId", self._file_id);
+        params.push("commentId", self._comment_id);
+        params.push("replyId", self._reply_id);
+        if let Some(value) = self._include_deleted.as_ref() {
+            params.push("includeDeleted", value.to_string());
         }
 
-        params.push(("alt", "json".to_string()));
+        params.extend(self._additional_params.iter());
 
+        params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "files/{fileId}/comments/{commentId}/replies/{replyId}";
         if self._scopes.is_empty() {
             self._scopes.insert(Scope::Readonly.as_ref().to_string());
         }
 
         for &(find_this, param_name) in [("{fileId}", "fileId"), ("{commentId}", "commentId"), ("{replyId}", "replyId")].iter() {
-            let mut replace_with: Option<&str> = None;
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = Some(value);
-                    break;
-                }
-            }
-            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+            url = params.uri_replacement(url, param_name, find_this, false);
         }
         {
             let to_remove = ["replyId", "commentId", "fileId"];
-            params.retain(|(n, _)| !to_remove.contains(n));
+            params.remove_params(&to_remove);
         }
 
-        let url = url::Url::parse_with_params(&url, params).unwrap();
+        let url = params.parse_with_url(&url);
 
 
 
         loop {
             let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
-                // TODO: remove Ok / Err branches
-                Ok(Some(token)) => token.clone(),
-                Ok(None) => {
-                    let err = oauth2::Error::OtherError(anyhow::Error::msg("unknown error occurred while generating oauth2 token"));
-                    match dlg.token(&err) {
-                        Some(token) => token,
-                        None => {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
                             dlg.finished(false);
-                            return Err(client::Error::MissingToken(err))
-                        }
-                    }
-                }
-                Err(err) => {
-                    match dlg.token(&err) {
-                        Some(token) => token,
-                        None => {
-                            dlg.finished(false);
-                            return Err(client::Error::MissingToken(err))
+                            return Err(client::Error::MissingToken(e));
                         }
                     }
                 }
@@ -14952,8 +14545,14 @@ where
             let mut req_result = {
                 let client = &self.hub.client;
                 dlg.pre_request();
-                let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
-                        .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::GET)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
 
 
                         let request = req_builder
@@ -15183,82 +14782,63 @@ where
     pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, ReplyList)> {
         use std::io::{Read, Seek};
         use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::ToParts;
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
         let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
         dlg.begin(client::MethodInfo { id: "drive.replies.list",
                                http_method: hyper::Method::GET });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(7 + self._additional_params.len());
-        params.push(("fileId", self._file_id.to_string()));
-        params.push(("commentId", self._comment_id.to_string()));
-        if let Some(value) = self._page_token.as_ref() {
-            params.push(("pageToken", value.to_string()));
-        }
-        if let Some(value) = self._page_size.as_ref() {
-            params.push(("pageSize", value.to_string()));
-        }
-        if let Some(value) = self._include_deleted.as_ref() {
-            params.push(("includeDeleted", value.to_string()));
-        }
+
         for &field in ["alt", "fileId", "commentId", "pageToken", "pageSize", "includeDeleted"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(client::Error::FieldClash(field));
             }
         }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
+
+        let mut params = Params::with_capacity(7 + self._additional_params.len());
+        params.push("fileId", self._file_id);
+        params.push("commentId", self._comment_id);
+        if let Some(value) = self._page_token.as_ref() {
+            params.push("pageToken", value);
+        }
+        if let Some(value) = self._page_size.as_ref() {
+            params.push("pageSize", value.to_string());
+        }
+        if let Some(value) = self._include_deleted.as_ref() {
+            params.push("includeDeleted", value.to_string());
         }
 
-        params.push(("alt", "json".to_string()));
+        params.extend(self._additional_params.iter());
 
+        params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "files/{fileId}/comments/{commentId}/replies";
         if self._scopes.is_empty() {
             self._scopes.insert(Scope::Readonly.as_ref().to_string());
         }
 
         for &(find_this, param_name) in [("{fileId}", "fileId"), ("{commentId}", "commentId")].iter() {
-            let mut replace_with: Option<&str> = None;
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = Some(value);
-                    break;
-                }
-            }
-            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+            url = params.uri_replacement(url, param_name, find_this, false);
         }
         {
             let to_remove = ["commentId", "fileId"];
-            params.retain(|(n, _)| !to_remove.contains(n));
+            params.remove_params(&to_remove);
         }
 
-        let url = url::Url::parse_with_params(&url, params).unwrap();
+        let url = params.parse_with_url(&url);
 
 
 
         loop {
             let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
-                // TODO: remove Ok / Err branches
-                Ok(Some(token)) => token.clone(),
-                Ok(None) => {
-                    let err = oauth2::Error::OtherError(anyhow::Error::msg("unknown error occurred while generating oauth2 token"));
-                    match dlg.token(&err) {
-                        Some(token) => token,
-                        None => {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
                             dlg.finished(false);
-                            return Err(client::Error::MissingToken(err))
-                        }
-                    }
-                }
-                Err(err) => {
-                    match dlg.token(&err) {
-                        Some(token) => token,
-                        None => {
-                            dlg.finished(false);
-                            return Err(client::Error::MissingToken(err))
+                            return Err(client::Error::MissingToken(e));
                         }
                     }
                 }
@@ -15266,8 +14846,14 @@ where
             let mut req_result = {
                 let client = &self.hub.client;
                 dlg.pre_request();
-                let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
-                        .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::GET)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
 
 
                         let request = req_builder
@@ -15503,53 +15089,45 @@ where
     pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, Reply)> {
         use std::io::{Read, Seek};
         use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::ToParts;
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
         let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
         dlg.begin(client::MethodInfo { id: "drive.replies.update",
                                http_method: hyper::Method::PATCH });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(6 + self._additional_params.len());
-        params.push(("fileId", self._file_id.to_string()));
-        params.push(("commentId", self._comment_id.to_string()));
-        params.push(("replyId", self._reply_id.to_string()));
+
         for &field in ["alt", "fileId", "commentId", "replyId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(client::Error::FieldClash(field));
             }
         }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
 
-        params.push(("alt", "json".to_string()));
+        let mut params = Params::with_capacity(6 + self._additional_params.len());
+        params.push("fileId", self._file_id);
+        params.push("commentId", self._comment_id);
+        params.push("replyId", self._reply_id);
 
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "files/{fileId}/comments/{commentId}/replies/{replyId}";
         if self._scopes.is_empty() {
             self._scopes.insert(Scope::Full.as_ref().to_string());
         }
 
         for &(find_this, param_name) in [("{fileId}", "fileId"), ("{commentId}", "commentId"), ("{replyId}", "replyId")].iter() {
-            let mut replace_with: Option<&str> = None;
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = Some(value);
-                    break;
-                }
-            }
-            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+            url = params.uri_replacement(url, param_name, find_this, false);
         }
         {
             let to_remove = ["replyId", "commentId", "fileId"];
-            params.retain(|(n, _)| !to_remove.contains(n));
+            params.remove_params(&to_remove);
         }
 
-        let url = url::Url::parse_with_params(&url, params).unwrap();
+        let url = params.parse_with_url(&url);
 
-        let mut json_mime_type: mime::Mime = "application/json".parse().unwrap();
+        let mut json_mime_type = mime::APPLICATION_JSON;
         let mut request_value_reader =
             {
                 let mut value = json::value::to_value(&self._request).expect("serde to work");
@@ -15564,24 +15142,13 @@ where
 
         loop {
             let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
-                // TODO: remove Ok / Err branches
-                Ok(Some(token)) => token.clone(),
-                Ok(None) => {
-                    let err = oauth2::Error::OtherError(anyhow::Error::msg("unknown error occurred while generating oauth2 token"));
-                    match dlg.token(&err) {
-                        Some(token) => token,
-                        None => {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
                             dlg.finished(false);
-                            return Err(client::Error::MissingToken(err))
-                        }
-                    }
-                }
-                Err(err) => {
-                    match dlg.token(&err) {
-                        Some(token) => token,
-                        None => {
-                            dlg.finished(false);
-                            return Err(client::Error::MissingToken(err))
+                            return Err(client::Error::MissingToken(e));
                         }
                     }
                 }
@@ -15590,12 +15157,18 @@ where
             let mut req_result = {
                 let client = &self.hub.client;
                 dlg.pre_request();
-                let mut req_builder = hyper::Request::builder().method(hyper::Method::PATCH).uri(url.clone().into_string())
-                        .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::PATCH)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
 
 
                         let request = req_builder
-                        .header(CONTENT_TYPE, format!("{}", json_mime_type.to_string()))
+                        .header(CONTENT_TYPE, json_mime_type.to_string())
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
@@ -15819,27 +15392,26 @@ where
     pub async fn doit(mut self) -> client::Result<hyper::Response<hyper::body::Body>> {
         use std::io::{Read, Seek};
         use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::ToParts;
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
         let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
         dlg.begin(client::MethodInfo { id: "drive.revisions.delete",
                                http_method: hyper::Method::DELETE });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
-        params.push(("fileId", self._file_id.to_string()));
-        params.push(("revisionId", self._revision_id.to_string()));
+
         for &field in ["fileId", "revisionId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(client::Error::FieldClash(field));
             }
         }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
 
+        let mut params = Params::with_capacity(3 + self._additional_params.len());
+        params.push("fileId", self._file_id);
+        params.push("revisionId", self._revision_id);
+
+        params.extend(self._additional_params.iter());
 
         let mut url = self.hub._base_url.clone() + "files/{fileId}/revisions/{revisionId}";
         if self._scopes.is_empty() {
@@ -15847,44 +15419,26 @@ where
         }
 
         for &(find_this, param_name) in [("{fileId}", "fileId"), ("{revisionId}", "revisionId")].iter() {
-            let mut replace_with: Option<&str> = None;
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = Some(value);
-                    break;
-                }
-            }
-            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+            url = params.uri_replacement(url, param_name, find_this, false);
         }
         {
             let to_remove = ["revisionId", "fileId"];
-            params.retain(|(n, _)| !to_remove.contains(n));
+            params.remove_params(&to_remove);
         }
 
-        let url = url::Url::parse_with_params(&url, params).unwrap();
+        let url = params.parse_with_url(&url);
 
 
 
         loop {
             let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
-                // TODO: remove Ok / Err branches
-                Ok(Some(token)) => token.clone(),
-                Ok(None) => {
-                    let err = oauth2::Error::OtherError(anyhow::Error::msg("unknown error occurred while generating oauth2 token"));
-                    match dlg.token(&err) {
-                        Some(token) => token,
-                        None => {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
                             dlg.finished(false);
-                            return Err(client::Error::MissingToken(err))
-                        }
-                    }
-                }
-                Err(err) => {
-                    match dlg.token(&err) {
-                        Some(token) => token,
-                        None => {
-                            dlg.finished(false);
-                            return Err(client::Error::MissingToken(err))
+                            return Err(client::Error::MissingToken(e));
                         }
                     }
                 }
@@ -15892,8 +15446,14 @@ where
             let mut req_result = {
                 let client = &self.hub.client;
                 dlg.pre_request();
-                let mut req_builder = hyper::Request::builder().method(hyper::Method::DELETE).uri(url.clone().into_string())
-                        .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::DELETE)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
 
 
                         let request = req_builder
@@ -16097,90 +15657,66 @@ where
     pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, Revision)> {
         use std::io::{Read, Seek};
         use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::ToParts;
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
         let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
         dlg.begin(client::MethodInfo { id: "drive.revisions.get",
                                http_method: hyper::Method::GET });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
-        params.push(("fileId", self._file_id.to_string()));
-        params.push(("revisionId", self._revision_id.to_string()));
-        if let Some(value) = self._acknowledge_abuse.as_ref() {
-            params.push(("acknowledgeAbuse", value.to_string()));
-        }
+
         for &field in ["fileId", "revisionId", "acknowledgeAbuse"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(client::Error::FieldClash(field));
             }
         }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
+
+        let mut params = Params::with_capacity(4 + self._additional_params.len());
+        params.push("fileId", self._file_id);
+        params.push("revisionId", self._revision_id);
+        if let Some(value) = self._acknowledge_abuse.as_ref() {
+            params.push("acknowledgeAbuse", value.to_string());
         }
 
-        let (json_field_missing, enable_resource_parsing) = {
-            let mut enable = true;
-            let mut field_missing = true;
-            for &(name, ref value) in params.iter() {
-                if name == "alt" {
-                    field_missing = false;
-                    enable = value == "json";
-                    break;
-                }
+        params.extend(self._additional_params.iter());
+
+        let (alt_field_missing, enable_resource_parsing) = {
+            if let Some(value) = params.get("alt") {
+                (false, value == "json")
+            } else {
+                (true, true)
             }
-            (field_missing, enable)
         };
-        if json_field_missing {
-            params.push(("alt", "json".to_string()));
+        if alt_field_missing {
+            params.push("alt", "json");
         }
-
         let mut url = self.hub._base_url.clone() + "files/{fileId}/revisions/{revisionId}";
         if self._scopes.is_empty() {
             self._scopes.insert(Scope::MetadataReadonly.as_ref().to_string());
         }
 
         for &(find_this, param_name) in [("{fileId}", "fileId"), ("{revisionId}", "revisionId")].iter() {
-            let mut replace_with: Option<&str> = None;
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = Some(value);
-                    break;
-                }
-            }
-            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+            url = params.uri_replacement(url, param_name, find_this, false);
         }
         {
             let to_remove = ["revisionId", "fileId"];
-            params.retain(|(n, _)| !to_remove.contains(n));
+            params.remove_params(&to_remove);
         }
 
-        let url = url::Url::parse_with_params(&url, params).unwrap();
+        let url = params.parse_with_url(&url);
 
 
 
         loop {
             let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
-                // TODO: remove Ok / Err branches
-                Ok(Some(token)) => token.clone(),
-                Ok(None) => {
-                    let err = oauth2::Error::OtherError(anyhow::Error::msg("unknown error occurred while generating oauth2 token"));
-                    match dlg.token(&err) {
-                        Some(token) => token,
-                        None => {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
                             dlg.finished(false);
-                            return Err(client::Error::MissingToken(err))
-                        }
-                    }
-                }
-                Err(err) => {
-                    match dlg.token(&err) {
-                        Some(token) => token,
-                        None => {
-                            dlg.finished(false);
-                            return Err(client::Error::MissingToken(err))
+                            return Err(client::Error::MissingToken(e));
                         }
                     }
                 }
@@ -16188,8 +15724,14 @@ where
             let mut req_result = {
                 let client = &self.hub.client;
                 dlg.pre_request();
-                let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
-                        .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::GET)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
 
 
                         let request = req_builder
@@ -16406,78 +15948,59 @@ where
     pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, RevisionList)> {
         use std::io::{Read, Seek};
         use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::ToParts;
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
         let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
         dlg.begin(client::MethodInfo { id: "drive.revisions.list",
                                http_method: hyper::Method::GET });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
-        params.push(("fileId", self._file_id.to_string()));
-        if let Some(value) = self._page_token.as_ref() {
-            params.push(("pageToken", value.to_string()));
-        }
-        if let Some(value) = self._page_size.as_ref() {
-            params.push(("pageSize", value.to_string()));
-        }
+
         for &field in ["alt", "fileId", "pageToken", "pageSize"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(client::Error::FieldClash(field));
             }
         }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
+
+        let mut params = Params::with_capacity(5 + self._additional_params.len());
+        params.push("fileId", self._file_id);
+        if let Some(value) = self._page_token.as_ref() {
+            params.push("pageToken", value);
+        }
+        if let Some(value) = self._page_size.as_ref() {
+            params.push("pageSize", value.to_string());
         }
 
-        params.push(("alt", "json".to_string()));
+        params.extend(self._additional_params.iter());
 
+        params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "files/{fileId}/revisions";
         if self._scopes.is_empty() {
             self._scopes.insert(Scope::MetadataReadonly.as_ref().to_string());
         }
 
         for &(find_this, param_name) in [("{fileId}", "fileId")].iter() {
-            let mut replace_with: Option<&str> = None;
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = Some(value);
-                    break;
-                }
-            }
-            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+            url = params.uri_replacement(url, param_name, find_this, false);
         }
         {
             let to_remove = ["fileId"];
-            params.retain(|(n, _)| !to_remove.contains(n));
+            params.remove_params(&to_remove);
         }
 
-        let url = url::Url::parse_with_params(&url, params).unwrap();
+        let url = params.parse_with_url(&url);
 
 
 
         loop {
             let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
-                // TODO: remove Ok / Err branches
-                Ok(Some(token)) => token.clone(),
-                Ok(None) => {
-                    let err = oauth2::Error::OtherError(anyhow::Error::msg("unknown error occurred while generating oauth2 token"));
-                    match dlg.token(&err) {
-                        Some(token) => token,
-                        None => {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
                             dlg.finished(false);
-                            return Err(client::Error::MissingToken(err))
-                        }
-                    }
-                }
-                Err(err) => {
-                    match dlg.token(&err) {
-                        Some(token) => token,
-                        None => {
-                            dlg.finished(false);
-                            return Err(client::Error::MissingToken(err))
+                            return Err(client::Error::MissingToken(e));
                         }
                     }
                 }
@@ -16485,8 +16008,14 @@ where
             let mut req_result = {
                 let client = &self.hub.client;
                 dlg.pre_request();
-                let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
-                        .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::GET)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
 
 
                         let request = req_builder
@@ -16704,52 +16233,44 @@ where
     pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, Revision)> {
         use std::io::{Read, Seek};
         use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::ToParts;
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
         let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
         dlg.begin(client::MethodInfo { id: "drive.revisions.update",
                                http_method: hyper::Method::PATCH });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
-        params.push(("fileId", self._file_id.to_string()));
-        params.push(("revisionId", self._revision_id.to_string()));
+
         for &field in ["alt", "fileId", "revisionId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(client::Error::FieldClash(field));
             }
         }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
 
-        params.push(("alt", "json".to_string()));
+        let mut params = Params::with_capacity(5 + self._additional_params.len());
+        params.push("fileId", self._file_id);
+        params.push("revisionId", self._revision_id);
 
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "files/{fileId}/revisions/{revisionId}";
         if self._scopes.is_empty() {
             self._scopes.insert(Scope::Full.as_ref().to_string());
         }
 
         for &(find_this, param_name) in [("{fileId}", "fileId"), ("{revisionId}", "revisionId")].iter() {
-            let mut replace_with: Option<&str> = None;
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = Some(value);
-                    break;
-                }
-            }
-            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+            url = params.uri_replacement(url, param_name, find_this, false);
         }
         {
             let to_remove = ["revisionId", "fileId"];
-            params.retain(|(n, _)| !to_remove.contains(n));
+            params.remove_params(&to_remove);
         }
 
-        let url = url::Url::parse_with_params(&url, params).unwrap();
+        let url = params.parse_with_url(&url);
 
-        let mut json_mime_type: mime::Mime = "application/json".parse().unwrap();
+        let mut json_mime_type = mime::APPLICATION_JSON;
         let mut request_value_reader =
             {
                 let mut value = json::value::to_value(&self._request).expect("serde to work");
@@ -16764,24 +16285,13 @@ where
 
         loop {
             let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
-                // TODO: remove Ok / Err branches
-                Ok(Some(token)) => token.clone(),
-                Ok(None) => {
-                    let err = oauth2::Error::OtherError(anyhow::Error::msg("unknown error occurred while generating oauth2 token"));
-                    match dlg.token(&err) {
-                        Some(token) => token,
-                        None => {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
                             dlg.finished(false);
-                            return Err(client::Error::MissingToken(err))
-                        }
-                    }
-                }
-                Err(err) => {
-                    match dlg.token(&err) {
-                        Some(token) => token,
-                        None => {
-                            dlg.finished(false);
-                            return Err(client::Error::MissingToken(err))
+                            return Err(client::Error::MissingToken(e));
                         }
                     }
                 }
@@ -16790,12 +16300,18 @@ where
             let mut req_result = {
                 let client = &self.hub.client;
                 dlg.pre_request();
-                let mut req_builder = hyper::Request::builder().method(hyper::Method::PATCH).uri(url.clone().into_string())
-                        .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::PATCH)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
 
 
                         let request = req_builder
-                        .header(CONTENT_TYPE, format!("{}", json_mime_type.to_string()))
+                        .header(CONTENT_TYPE, json_mime_type.to_string())
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
@@ -17015,37 +16531,36 @@ where
     pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, TeamDrive)> {
         use std::io::{Read, Seek};
         use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::ToParts;
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
         let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
         dlg.begin(client::MethodInfo { id: "drive.teamdrives.create",
                                http_method: hyper::Method::POST });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
-        params.push(("requestId", self._request_id.to_string()));
+
         for &field in ["alt", "requestId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(client::Error::FieldClash(field));
             }
         }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
 
-        params.push(("alt", "json".to_string()));
+        let mut params = Params::with_capacity(4 + self._additional_params.len());
+        params.push("requestId", self._request_id);
 
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "teamdrives";
         if self._scopes.is_empty() {
             self._scopes.insert(Scope::Full.as_ref().to_string());
         }
 
 
-        let url = url::Url::parse_with_params(&url, params).unwrap();
+        let url = params.parse_with_url(&url);
 
-        let mut json_mime_type: mime::Mime = "application/json".parse().unwrap();
+        let mut json_mime_type = mime::APPLICATION_JSON;
         let mut request_value_reader =
             {
                 let mut value = json::value::to_value(&self._request).expect("serde to work");
@@ -17060,24 +16575,13 @@ where
 
         loop {
             let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
-                // TODO: remove Ok / Err branches
-                Ok(Some(token)) => token.clone(),
-                Ok(None) => {
-                    let err = oauth2::Error::OtherError(anyhow::Error::msg("unknown error occurred while generating oauth2 token"));
-                    match dlg.token(&err) {
-                        Some(token) => token,
-                        None => {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
                             dlg.finished(false);
-                            return Err(client::Error::MissingToken(err))
-                        }
-                    }
-                }
-                Err(err) => {
-                    match dlg.token(&err) {
-                        Some(token) => token,
-                        None => {
-                            dlg.finished(false);
-                            return Err(client::Error::MissingToken(err))
+                            return Err(client::Error::MissingToken(e));
                         }
                     }
                 }
@@ -17086,12 +16590,18 @@ where
             let mut req_result = {
                 let client = &self.hub.client;
                 dlg.pre_request();
-                let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
-                        .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::POST)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
 
 
                         let request = req_builder
-                        .header(CONTENT_TYPE, format!("{}", json_mime_type.to_string()))
+                        .header(CONTENT_TYPE, json_mime_type.to_string())
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
@@ -17294,26 +16804,25 @@ where
     pub async fn doit(mut self) -> client::Result<hyper::Response<hyper::body::Body>> {
         use std::io::{Read, Seek};
         use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::ToParts;
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
         let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
         dlg.begin(client::MethodInfo { id: "drive.teamdrives.delete",
                                http_method: hyper::Method::DELETE });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(2 + self._additional_params.len());
-        params.push(("teamDriveId", self._team_drive_id.to_string()));
+
         for &field in ["teamDriveId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(client::Error::FieldClash(field));
             }
         }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
 
+        let mut params = Params::with_capacity(2 + self._additional_params.len());
+        params.push("teamDriveId", self._team_drive_id);
+
+        params.extend(self._additional_params.iter());
 
         let mut url = self.hub._base_url.clone() + "teamdrives/{teamDriveId}";
         if self._scopes.is_empty() {
@@ -17321,44 +16830,26 @@ where
         }
 
         for &(find_this, param_name) in [("{teamDriveId}", "teamDriveId")].iter() {
-            let mut replace_with: Option<&str> = None;
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = Some(value);
-                    break;
-                }
-            }
-            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+            url = params.uri_replacement(url, param_name, find_this, false);
         }
         {
             let to_remove = ["teamDriveId"];
-            params.retain(|(n, _)| !to_remove.contains(n));
+            params.remove_params(&to_remove);
         }
 
-        let url = url::Url::parse_with_params(&url, params).unwrap();
+        let url = params.parse_with_url(&url);
 
 
 
         loop {
             let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
-                // TODO: remove Ok / Err branches
-                Ok(Some(token)) => token.clone(),
-                Ok(None) => {
-                    let err = oauth2::Error::OtherError(anyhow::Error::msg("unknown error occurred while generating oauth2 token"));
-                    match dlg.token(&err) {
-                        Some(token) => token,
-                        None => {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
                             dlg.finished(false);
-                            return Err(client::Error::MissingToken(err))
-                        }
-                    }
-                }
-                Err(err) => {
-                    match dlg.token(&err) {
-                        Some(token) => token,
-                        None => {
-                            dlg.finished(false);
-                            return Err(client::Error::MissingToken(err))
+                            return Err(client::Error::MissingToken(e));
                         }
                     }
                 }
@@ -17366,8 +16857,14 @@ where
             let mut req_result = {
                 let client = &self.hub.client;
                 dlg.pre_request();
-                let mut req_builder = hyper::Request::builder().method(hyper::Method::DELETE).uri(url.clone().into_string())
-                        .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::DELETE)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
 
 
                         let request = req_builder
@@ -17555,75 +17052,56 @@ where
     pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, TeamDrive)> {
         use std::io::{Read, Seek};
         use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::ToParts;
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
         let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
         dlg.begin(client::MethodInfo { id: "drive.teamdrives.get",
                                http_method: hyper::Method::GET });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
-        params.push(("teamDriveId", self._team_drive_id.to_string()));
-        if let Some(value) = self._use_domain_admin_access.as_ref() {
-            params.push(("useDomainAdminAccess", value.to_string()));
-        }
+
         for &field in ["alt", "teamDriveId", "useDomainAdminAccess"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(client::Error::FieldClash(field));
             }
         }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
+
+        let mut params = Params::with_capacity(4 + self._additional_params.len());
+        params.push("teamDriveId", self._team_drive_id);
+        if let Some(value) = self._use_domain_admin_access.as_ref() {
+            params.push("useDomainAdminAccess", value.to_string());
         }
 
-        params.push(("alt", "json".to_string()));
+        params.extend(self._additional_params.iter());
 
+        params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "teamdrives/{teamDriveId}";
         if self._scopes.is_empty() {
             self._scopes.insert(Scope::Readonly.as_ref().to_string());
         }
 
         for &(find_this, param_name) in [("{teamDriveId}", "teamDriveId")].iter() {
-            let mut replace_with: Option<&str> = None;
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = Some(value);
-                    break;
-                }
-            }
-            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+            url = params.uri_replacement(url, param_name, find_this, false);
         }
         {
             let to_remove = ["teamDriveId"];
-            params.retain(|(n, _)| !to_remove.contains(n));
+            params.remove_params(&to_remove);
         }
 
-        let url = url::Url::parse_with_params(&url, params).unwrap();
+        let url = params.parse_with_url(&url);
 
 
 
         loop {
             let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
-                // TODO: remove Ok / Err branches
-                Ok(Some(token)) => token.clone(),
-                Ok(None) => {
-                    let err = oauth2::Error::OtherError(anyhow::Error::msg("unknown error occurred while generating oauth2 token"));
-                    match dlg.token(&err) {
-                        Some(token) => token,
-                        None => {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
                             dlg.finished(false);
-                            return Err(client::Error::MissingToken(err))
-                        }
-                    }
-                }
-                Err(err) => {
-                    match dlg.token(&err) {
-                        Some(token) => token,
-                        None => {
-                            dlg.finished(false);
-                            return Err(client::Error::MissingToken(err))
+                            return Err(client::Error::MissingToken(e));
                         }
                     }
                 }
@@ -17631,8 +17109,14 @@ where
             let mut req_result = {
                 let client = &self.hub.client;
                 dlg.pre_request();
-                let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
-                        .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::GET)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
 
 
                         let request = req_builder
@@ -17842,69 +17326,57 @@ where
     pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, TeamDriveList)> {
         use std::io::{Read, Seek};
         use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::ToParts;
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
         let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
         dlg.begin(client::MethodInfo { id: "drive.teamdrives.list",
                                http_method: hyper::Method::GET });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(6 + self._additional_params.len());
-        if let Some(value) = self._use_domain_admin_access.as_ref() {
-            params.push(("useDomainAdminAccess", value.to_string()));
-        }
-        if let Some(value) = self._q.as_ref() {
-            params.push(("q", value.to_string()));
-        }
-        if let Some(value) = self._page_token.as_ref() {
-            params.push(("pageToken", value.to_string()));
-        }
-        if let Some(value) = self._page_size.as_ref() {
-            params.push(("pageSize", value.to_string()));
-        }
+
         for &field in ["alt", "useDomainAdminAccess", "q", "pageToken", "pageSize"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(client::Error::FieldClash(field));
             }
         }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
+
+        let mut params = Params::with_capacity(6 + self._additional_params.len());
+        if let Some(value) = self._use_domain_admin_access.as_ref() {
+            params.push("useDomainAdminAccess", value.to_string());
+        }
+        if let Some(value) = self._q.as_ref() {
+            params.push("q", value);
+        }
+        if let Some(value) = self._page_token.as_ref() {
+            params.push("pageToken", value);
+        }
+        if let Some(value) = self._page_size.as_ref() {
+            params.push("pageSize", value.to_string());
         }
 
-        params.push(("alt", "json".to_string()));
+        params.extend(self._additional_params.iter());
 
+        params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "teamdrives";
         if self._scopes.is_empty() {
             self._scopes.insert(Scope::Readonly.as_ref().to_string());
         }
 
 
-        let url = url::Url::parse_with_params(&url, params).unwrap();
+        let url = params.parse_with_url(&url);
 
 
 
         loop {
             let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
-                // TODO: remove Ok / Err branches
-                Ok(Some(token)) => token.clone(),
-                Ok(None) => {
-                    let err = oauth2::Error::OtherError(anyhow::Error::msg("unknown error occurred while generating oauth2 token"));
-                    match dlg.token(&err) {
-                        Some(token) => token,
-                        None => {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
                             dlg.finished(false);
-                            return Err(client::Error::MissingToken(err))
-                        }
-                    }
-                }
-                Err(err) => {
-                    match dlg.token(&err) {
-                        Some(token) => token,
-                        None => {
-                            dlg.finished(false);
-                            return Err(client::Error::MissingToken(err))
+                            return Err(client::Error::MissingToken(e));
                         }
                     }
                 }
@@ -17912,8 +17384,14 @@ where
             let mut req_result = {
                 let client = &self.hub.client;
                 dlg.pre_request();
-                let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
-                        .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::GET)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
 
 
                         let request = req_builder
@@ -18136,54 +17614,46 @@ where
     pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, TeamDrive)> {
         use std::io::{Read, Seek};
         use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::ToParts;
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
         let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
         dlg.begin(client::MethodInfo { id: "drive.teamdrives.update",
                                http_method: hyper::Method::PATCH });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
-        params.push(("teamDriveId", self._team_drive_id.to_string()));
-        if let Some(value) = self._use_domain_admin_access.as_ref() {
-            params.push(("useDomainAdminAccess", value.to_string()));
-        }
+
         for &field in ["alt", "teamDriveId", "useDomainAdminAccess"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(client::Error::FieldClash(field));
             }
         }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
+
+        let mut params = Params::with_capacity(5 + self._additional_params.len());
+        params.push("teamDriveId", self._team_drive_id);
+        if let Some(value) = self._use_domain_admin_access.as_ref() {
+            params.push("useDomainAdminAccess", value.to_string());
         }
 
-        params.push(("alt", "json".to_string()));
+        params.extend(self._additional_params.iter());
 
+        params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "teamdrives/{teamDriveId}";
         if self._scopes.is_empty() {
             self._scopes.insert(Scope::Full.as_ref().to_string());
         }
 
         for &(find_this, param_name) in [("{teamDriveId}", "teamDriveId")].iter() {
-            let mut replace_with: Option<&str> = None;
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = Some(value);
-                    break;
-                }
-            }
-            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+            url = params.uri_replacement(url, param_name, find_this, false);
         }
         {
             let to_remove = ["teamDriveId"];
-            params.retain(|(n, _)| !to_remove.contains(n));
+            params.remove_params(&to_remove);
         }
 
-        let url = url::Url::parse_with_params(&url, params).unwrap();
+        let url = params.parse_with_url(&url);
 
-        let mut json_mime_type: mime::Mime = "application/json".parse().unwrap();
+        let mut json_mime_type = mime::APPLICATION_JSON;
         let mut request_value_reader =
             {
                 let mut value = json::value::to_value(&self._request).expect("serde to work");
@@ -18198,24 +17668,13 @@ where
 
         loop {
             let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
-                // TODO: remove Ok / Err branches
-                Ok(Some(token)) => token.clone(),
-                Ok(None) => {
-                    let err = oauth2::Error::OtherError(anyhow::Error::msg("unknown error occurred while generating oauth2 token"));
-                    match dlg.token(&err) {
-                        Some(token) => token,
-                        None => {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
                             dlg.finished(false);
-                            return Err(client::Error::MissingToken(err))
-                        }
-                    }
-                }
-                Err(err) => {
-                    match dlg.token(&err) {
-                        Some(token) => token,
-                        None => {
-                            dlg.finished(false);
-                            return Err(client::Error::MissingToken(err))
+                            return Err(client::Error::MissingToken(e));
                         }
                     }
                 }
@@ -18224,12 +17683,18 @@ where
             let mut req_result = {
                 let client = &self.hub.client;
                 dlg.pre_request();
-                let mut req_builder = hyper::Request::builder().method(hyper::Method::PATCH).uri(url.clone().into_string())
-                        .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::PATCH)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
 
 
                         let request = req_builder
-                        .header(CONTENT_TYPE, format!("{}", json_mime_type.to_string()))
+                        .header(CONTENT_TYPE, json_mime_type.to_string())
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
