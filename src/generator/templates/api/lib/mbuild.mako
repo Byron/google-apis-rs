@@ -715,7 +715,7 @@ else {
             % if request_value and simple_media_param:
                 let mut mp_reader: client::MultiPartReader = Default::default();
                 let (mut body_reader, content_type) = match protocol {
-                    "${simple_media_param.protocol}" => {
+                    ${PROTOCOL_TYPE_MAP[simple_media_param.protocol]} => {
                         mp_reader.reserve_exact(2);
                         ${READER_SEEK | indent_all_but_first_by(5)}
                         mp_reader.add_part(&mut request_value_reader, request_size, json_mime_type.clone())
