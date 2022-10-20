@@ -3,12 +3,10 @@ import re
 import subprocess
 
 from dataclasses import dataclass
-from random import (randint, random, choice, seed)
 from typing import Any, Dict, List, Mapping, Tuple
 from copy import deepcopy
 from .rust_type import Base, Box, HashMap, Vec, Option, RustType
-
-seed(1337)
+from .types import RUST_TYPE_MAP, RUST_TYPE_RND_MAP
 
 re_linestart = re.compile('^', flags=re.MULTILINE)
 re_spaces_after_newline = re.compile('^ {4}', flags=re.MULTILINE)
@@ -20,40 +18,7 @@ re_desc_parts = re.compile(
 re_find_replacements = re.compile(r"\{[/\+]?\w+\*?\}")
 
 HTTP_METHODS = set(("OPTIONS", "GET", "POST", "PUT", "DELETE", "HEAD", "TRACE", "CONNECT", "PATCH"))
-CHRONO_PATH = "client::chrono"
-CHRONO_DATETIME = f"{CHRONO_PATH}::DateTime<{CHRONO_PATH}::offset::Utc>"
-CHRONO_DATE = f"{CHRONO_PATH}::NaiveDate"
-USE_FORMAT = 'use_format_field'
 
-RUST_TYPE_MAP = {
-    'boolean': Base("bool"),
-    'integer': USE_FORMAT,
-    'number': USE_FORMAT,
-    'uint32': Base("u32"),
-    'double': Base("f64"),
-    'float': Base("f32"),
-    'int32': Base("i32"),
-    'any': Base("String"),  # TODO: Figure out how to handle it. It's 'interface' in Go ...
-    'int64': Base("i64"),
-    'uint64': Base("u64"),
-    'array': Vec(None),
-    'string': Base("String"),
-    'object': HashMap(None, None),
-    # https://github.com/protocolbuffers/protobuf/blob/ec1a70913e5793a7d0a7b5fbf7e0e4f75409dd41/src/google/protobuf/timestamp.proto
-    # In JSON format, the Timestamp type is encoded as a string in the [RFC 3339] format
-    'google-datetime': Base(CHRONO_DATETIME),
-    # Per .json files: RFC 3339 timestamp
-    'date-time': Base(CHRONO_DATETIME),
-    # Per .json files: A date in RFC 3339 format with only the date part
-    # e.g. "2013-01-15"
-    'date': Base(CHRONO_DATE),
-    # https://github.com/protocolbuffers/protobuf/blob/ec1a70913e5793a7d0a7b5fbf7e0e4f75409dd41/src/google/protobuf/duration.proto
-    'google-duration': Base(f"{CHRONO_PATH}::Duration"),
-    # guessing bytes is universally url-safe b64
-    "byte": Vec(Base("u8")),
-    # https://github.com/protocolbuffers/protobuf/blob/ec1a70913e5793a7d0a7b5fbf7e0e4f75409dd41/src/google/protobuf/field_mask.proto
-    "google-fieldmask": Base("client::FieldMask")
-}
 
 RESERVED_WORDS = set(('abstract', 'alignof', 'as', 'become', 'box', 'break', 'const', 'continue', 'crate', 'do',
                       'else', 'enum', 'extern', 'false', 'final', 'fn', 'for', 'if', 'impl', 'in', 'let', 'loop',
@@ -61,35 +26,8 @@ RESERVED_WORDS = set(('abstract', 'alignof', 'as', 'become', 'box', 'break', 'co
                       'return', 'sizeof', 'static', 'self', 'struct', 'super', 'true', 'trait', 'type', 'typeof',
                       'unsafe', 'unsized', 'use', 'virtual', 'where', 'while', 'yield'))
 
-words = [w.strip(',') for w in
-         "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.".split(
-             ' ')]
 
 
-def chrono_date():
-    return f"chrono::NaiveDate::from_ymd({randint(1, 9999)}, {randint(1, 12)}, {randint(1, 31)})"
-
-
-RUST_TYPE_RND_MAP = {
-    'bool': lambda: str(bool(randint(0, 1))).lower(),
-    'u32': lambda: randint(0, 100),
-    'u64': lambda: randint(0, 100),
-    'f64': lambda: random(),
-    'f32': lambda: random(),
-    'i32': lambda: randint(-101, -1),
-    'i64': lambda: randint(-101, -1),
-    'String': lambda: '"%s"' % choice(words),
-    '&str': lambda: '"%s"' % choice(words),
-    '&Vec<String>': lambda: '&vec!["%s".into()]' % choice(words),
-    "Vec<u8>": lambda: f"vec![0, 1, 2, 3]",
-    # why a reference to Vec? Because it works. Should be slice, but who knows how typing works here.
-    "&Vec<u8>": lambda: f"&vec![0, 1, 2, 3]",
-    # TODO: styling this
-    f"{CHRONO_PATH}::Duration": lambda: f"chrono::Duration::seconds({randint(0, 9999999)})",
-    CHRONO_DATE: chrono_date,
-    CHRONO_DATETIME: lambda: f"chrono::Utc::now()",
-    "FieldMask": lambda: f"FieldMask(vec![{choice(words)}])",
-}
 TREF = '$ref'
 IO_RESPONSE = 'response'
 IO_REQUEST = 'request'
