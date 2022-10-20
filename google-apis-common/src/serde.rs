@@ -261,10 +261,7 @@ mod test {
     fn urlsafe_base64_de_success_cases() {
         let wrapper: Base64Wrapper =
             serde_json::from_str(r#"{"bytes": "aGVsbG8gd29ybGQ="}"#).unwrap();
-        assert_eq!(
-            Some(b"hello world".as_slice()),
-            wrapper.bytes.as_deref()
-        );
+        assert_eq!(Some(b"hello world".as_slice()), wrapper.bytes.as_deref());
     }
 
     #[test]

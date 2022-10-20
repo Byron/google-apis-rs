@@ -25,7 +25,6 @@ use serde_json as json;
 use tokio::io::{AsyncRead, AsyncWrite};
 use tokio::time::sleep;
 
-
 pub use auth::{GetToken, NoToken};
 pub use chrono;
 pub use field_mask::FieldMask;
@@ -778,7 +777,7 @@ mod test_api {
     use std::str::FromStr;
 
     use ::serde::{Deserialize, Serialize};
-    
+
     use serde_json as json;
 
     #[test]
