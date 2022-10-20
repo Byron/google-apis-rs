@@ -5,6 +5,49 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 5.0.1 (2022-10-20)
+
+### Documentation
+
+ - <csr-id-4d30072c9152d105034eb121a89c79410933cc92/> min 1 try + retries in example
+
+### Commit Statistics
+
+<csr-read-only-do-not-edit/>
+
+ - 19 commits contributed to the release over the course of 2 calendar days.
+ - 10 days passed between releases.
+ - 1 commit was understood as [conventional](https://www.conventionalcommits.org).
+ - 0 issues like '(#ID)' were seen in commit messages
+
+### Commit Details
+
+<csr-read-only-do-not-edit/>
+
+<details><summary>view details</summary>
+
+ * **Uncategorized**
+    - Merge branch 'refactor' ([`d202c95`](https://github.com/Byron/google-apis-rs/commit/d202c95aa4b6ed4c159b4b3e2f754bf176234f5c))
+    - cargo fmt ([`4bdd77a`](https://github.com/Byron/google-apis-rs/commit/4bdd77a52ffa57c6cf6649f7973f5f1eee9e9d6e))
+    - impl std::fmt::Display for FieldMask ([`9285942`](https://github.com/Byron/google-apis-rs/commit/9285942f3d06039f85be8d60a19fcff12e5efdf2))
+    - cargo clippy --fix google-clis-common ([`f4317a2`](https://github.com/Byron/google-apis-rs/commit/f4317a2968238eb0837bb88e65de4cee387d500f))
+    - Apply cargo clippy --fix ([`4cca633`](https://github.com/Byron/google-apis-rs/commit/4cca633f9236dc3cc1a799f562931c9f12026c9f))
+    - Add FromStr impl for FieldMask ([`63793b5`](https://github.com/Byron/google-apis-rs/commit/63793b55a69a30aea17d87b29ab8b19d6d43ebdd))
+    - Refactor Params into external struct ([`0ad3b12`](https://github.com/Byron/google-apis-rs/commit/0ad3b1258f55318cbfa9c4fc121291471cb65dca))
+    - Add UploadProtocol enum to remove string types ([`cfa6958`](https://github.com/Byron/google-apis-rs/commit/cfa6958aa09b2e7ae9ad7da551abc011f38ccd79))
+    - Merge pull request #384 from philippeitis/update-mime ([`b20e630`](https://github.com/Byron/google-apis-rs/commit/b20e63072317775e239b2400099ce1705f1c076c))
+    - Make MultiPartReader::mime_type associated fn ([`f6b195d`](https://github.com/Byron/google-apis-rs/commit/f6b195df4f52bc13f711cadb236cba56890080ff))
+    - Update mime ([`616b324`](https://github.com/Byron/google-apis-rs/commit/616b324a7796173534f97302fcdae6bae0381ad2))
+    - Merge branch 'auth-refactor' ([`fb884e1`](https://github.com/Byron/google-apis-rs/commit/fb884e193a191a671602562ae8d82cd9fb6026ac))
+    - Update documentation ([`7a114a6`](https://github.com/Byron/google-apis-rs/commit/7a114a6d1c8808abff3fc2dc9817d4ca89222450))
+    - min 1 try + retries in example ([`4d30072`](https://github.com/Byron/google-apis-rs/commit/4d30072c9152d105034eb121a89c79410933cc92))
+    - Use Result<Option<_>, _> ([`a375b71`](https://github.com/Byron/google-apis-rs/commit/a375b710b1debaef08583bfc3160c120076d0ebe))
+    - More correct GetToken docs ([`1132b54`](https://github.com/Byron/google-apis-rs/commit/1132b542d2590e0bccf588691d95e47148bc059d))
+    - Make yup-oauth2 optional ([`7ca7f1c`](https://github.com/Byron/google-apis-rs/commit/7ca7f1cafda0292e888e8faff296ab1c3c4400bb))
+    - Document auth.rs ([`50dd53a`](https://github.com/Byron/google-apis-rs/commit/50dd53a87716547ae6bf829e1baef5500b218cef))
+    - Return Option<String> from GetToken::get_token instead of Result<...> ([`32110d6`](https://github.com/Byron/google-apis-rs/commit/32110d6970ae9c16d6889fc5c1fe65556fa3d469))
+</details>
+
 ## 5.0.0 (2022-10-10)
 
 ### New Features
@@ -16,10 +59,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 <csr-read-only-do-not-edit/>
 
- - 16 commits contributed to the release over the course of 2 calendar days.
+ - 18 commits contributed to the release over the course of 2 calendar days.
  - 8 days passed between releases.
  - 1 commit was understood as [conventional](https://www.conventionalcommits.org).
- - 0 issues like '(#ID)' where seen in commit messages
+ - 0 issues like '(#ID)' were seen in commit messages
 
 ### Commit Details
 
@@ -28,7 +71,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 <details><summary>view details</summary>
 
  * **Uncategorized**
+    - Release google-apis-common v5.0.0 ([`1855e44`](https://github.com/Byron/google-apis-rs/commit/1855e44a9509f47ada83c49e0b1262fbb4e1eace))
     - apis-common for the 5.0 line of google crates. ([`3625188`](https://github.com/Byron/google-apis-rs/commit/3625188eb5dac9f6dfe8e672a65e75dcb0810081))
+    - Merge branch 'format_types' ([`ed5dab2`](https://github.com/Byron/google-apis-rs/commit/ed5dab2dbd1aa8d126b1253e8020bcf964f0ee34))
     - Use correct string impls for http headers ([`1c04f66`](https://github.com/Byron/google-apis-rs/commit/1c04f662d17fd131c9342bb4ccccb728e03b9376))
     - Support serde for arbitrary field types ([`f6cced9`](https://github.com/Byron/google-apis-rs/commit/f6cced960594d680c2335c5740c331b99e46bdcc))
     - Fix cargo check w.r.t. FieldMask ([`8cc2707`](https://github.com/Byron/google-apis-rs/commit/8cc27075638e005448defd31fbf8ec3e445dd7b0))
@@ -54,10 +99,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 <csr-read-only-do-not-edit/>
 
- - 11 commits contributed to the release over the course of 3 calendar days.
+ - 13 commits contributed to the release over the course of 3 calendar days.
  - 6 days passed between releases.
  - 0 commits were understood as [conventional](https://www.conventionalcommits.org).
- - 0 issues like '(#ID)' where seen in commit messages
+ - 0 issues like '(#ID)' were seen in commit messages
 
 ### Commit Details
 
@@ -69,11 +114,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     - Release google-apis-common v4.0.1 ([`93c8601`](https://github.com/Byron/google-apis-rs/commit/93c8601fdca62f92f164957d9e86220f4f1b10f7))
     - prepare release of google-apis-common ([`dc0686e`](https://github.com/Byron/google-apis-rs/commit/dc0686ea0b4cf6984992930ba531407a3e9e2666))
     - Merge branch 'patch-2' ([`fe1e972`](https://github.com/Byron/google-apis-rs/commit/fe1e97299f5cb025d6e4d18a1864356bcb6f5244))
+    - Merge branch 'patch-1' ([`6548d38`](https://github.com/Byron/google-apis-rs/commit/6548d384837316a6b40c2f02f581c89dc400181a))
     - Replace std::thread::sleep with tokio::thread::sleep ([`811ed3d`](https://github.com/Byron/google-apis-rs/commit/811ed3d016c7465e95628b91c0828837aeef2f88))
     - Make remove_json_null_values O(n) instead of O(n^2) ([`276324a`](https://github.com/Byron/google-apis-rs/commit/276324ae09f4fa60c65518991cf89ce6bd7900ac))
     - Add additional send/sync bounds ([`dad761d`](https://github.com/Byron/google-apis-rs/commit/dad761d3f8278e014cf51271ef0ab45495f5d86a))
     - Update lib.rs ([`5a5d476`](https://github.com/Byron/google-apis-rs/commit/5a5d476317d6491d9c23bc8c9e5740f392bec7c0))
     - Add Send bound to GetToken ([`b10bdda`](https://github.com/Byron/google-apis-rs/commit/b10bddab08e3ae42a23600235e09d35a71e547bd))
+    - Merge branch 'common-cli-crate' ([`4c4d96d`](https://github.com/Byron/google-apis-rs/commit/4c4d96d3c2028497de2b2e86f94f79a9d6b371bb))
     - fix compile warnings ([`3b4fae9`](https://github.com/Byron/google-apis-rs/commit/3b4fae994e82ba48c4cc809a668516f44a367e5e))
     - run only tests that are actually used/implemented ([`a1e6496`](https://github.com/Byron/google-apis-rs/commit/a1e6496ccdeaa8a0d799c53ed3b95fca5b7fc7c9))
     - Move client.rs to common dependency ([`9142859`](https://github.com/Byron/google-apis-rs/commit/9142859612e00fd81a3644f587f6abb9a8d837a9))
@@ -1626,9 +1673,9 @@ you need.
 
 <csr-read-only-do-not-edit/>
 
- - 4 commits contributed to the release.
+ - 5 commits contributed to the release.
  - 0 commits were understood as [conventional](https://www.conventionalcommits.org).
- - 0 issues like '(#ID)' where seen in commit messages
+ - 0 issues like '(#ID)' were seen in commit messages
 
 ### Commit Details
 
@@ -1639,6 +1686,7 @@ you need.
  * **Uncategorized**
     - Release google-apis-common v4.0.0 ([`64705a7`](https://github.com/Byron/google-apis-rs/commit/64705a75b6ece818c1a5c3c55ff686ea155c856b))
     - prepare changelog ([`ecb10a2`](https://github.com/Byron/google-apis-rs/commit/ecb10a2ff500a1d10add9be336393a10e51ec050))
+    - Merge branch 'common-crate' ([`96b3d72`](https://github.com/Byron/google-apis-rs/commit/96b3d728a3b3d76c64fa0e48198d09b2d3c023bd))
     - prepare google-apis-common for release ([`716c4c2`](https://github.com/Byron/google-apis-rs/commit/716c4c263a278c334feacf57c3eabbed09251a9e))
     - rename `google-api-client` to `google-apis-common` ([`8d7309b`](https://github.com/Byron/google-apis-rs/commit/8d7309b78c3bc909b794d447115328cfb0f41649))
 </details>
