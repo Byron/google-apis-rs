@@ -7,6 +7,14 @@ on:
     branches: [main]
 
 jobs:
+  clippy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: Swatinem/rust-cache@v2
+      - name: Run clippy
+        run: |
+          cargo clippy -- -D warnings
   build-and-test:
     runs-on: ubuntu-latest
     env:
