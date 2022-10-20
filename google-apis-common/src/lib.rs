@@ -1,6 +1,7 @@
 pub mod auth;
 pub mod field_mask;
 pub mod serde;
+pub mod url;
 
 use std::error;
 use std::error::Error as StdError;

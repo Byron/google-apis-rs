@@ -526,19 +526,16 @@ match result {
     /// Perform the operation you have build so far.
     % endif
     ${action_fn} {
-        % if URL_ENCODE in special_cases:
-        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
-        % endif
         use std::io::{Read, Seek};
         use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::ToParts;
+        use client::{ToParts, url::Params};
         use std::borrow::Cow;
 
         let mut dd = client::DefaultDelegate;
         let mut dlg: &mut dyn client::Delegate = ${delegate}.unwrap_or(&mut dd);
         dlg.begin(client::MethodInfo { id: "${m.id}",
                                http_method: ${method_name_to_variant(m.httpMethod)} });
-        let mut params: Vec<(&str, Cow<str>)> = Vec::with_capacity(${len(params) + len(reserved_params)} + ${paddfields}.len());
+        let mut params = Params::with_capacity(${len(params) + len(reserved_params)} + ${paddfields}.len());
 <%
     if media_params and 'mediaUpload' in m:
         upload_type_map = dict()
@@ -575,15 +572,15 @@ match result {
         % if p.get('repeated', False):
         if ${pname}.len() > 0 {
             for f in ${pname}.iter() {
-                params.push(("${p.name}", ${to_string_impl("f")}.into()));
+                params.push("${p.name}", ${to_string_impl("f")});
             }
         }
         % elif not is_required_property(p):
         if let Some(value) = ${pname}.as_ref() {
-            params.push(("${p.name}", ${to_string_impl("value")}.into()));
+            params.push("${p.name}", ${to_string_impl("value")});
         }
         % else:
-        params.push(("${p.name}", ${to_string_impl(pname)}.into()));
+        params.push("${p.name}", ${to_string_impl(pname)});
         % endif
         % endfor
         ## Additional params - may not overlap with optional params
@@ -594,23 +591,22 @@ match result {
             }
         }
 
-        params.extend(${paddfields}.iter().map(|(k, v)| (k.as_str(), v.into())));
-
+        params.extend(${paddfields}.iter());
 
         % if response_schema:
         % if supports_download:
         let (alt_field_missing, enable_resource_parsing) = {
-            if let Some((_, value)) = params.iter().find(|(name, _)| name == &"alt") {
+            if let Some(value) = params.get("alt") {
                 (false, value == "json")
             } else {
                 (true, true)
             }
         };
         if alt_field_missing {
-            params.push(("alt", "json".into()));
+            params.push("alt", "json");
         }
         % else:
-        params.push(("alt", "json".into()));
+        params.push("alt", "json");
         % endif ## supportsMediaDownload
         % endif ## response schema
         % if media_params:
@@ -628,7 +624,7 @@ protocol == ${PROTOCOL_TYPE_MAP[mp.protocol]} {
 else {
                 unreachable!()
             };
-        params.push(("uploadType", upload_type.into()));
+        params.push("uploadType", upload_type);
         % else:
         let mut url = self.hub._base_url.clone() + "${m.path}";
         % endif
@@ -638,7 +634,7 @@ else {
             assert 'key' in parameters, "Expected 'key' parameter if there are no scopes"
         %>
         match dlg.api_key() {
-            Some(value) => params.push(("key", value.into())),
+            Some(value) => params.push("key", value),
             None => {
                 ${delegate_finish}(false);
                 return Err(client::Error::MissingAPIKey)
@@ -654,35 +650,16 @@ else {
         ## Handle URI Templates
         % if replacements:
         for &(find_this, param_name) in [${', '.join('("%s", "%s")' % r for r in replacements)}].iter() {
-<%
-    replace_init = ': Option<&str> = None'
-    replace_assign = 'Some(value)'
-    url_replace_arg = 'replace_with.expect("to find substitution value in params")'
-    if URL_ENCODE in special_cases:
-        replace_init = ': Cow<str> = "".into()'
-        replace_assign = 'Cow::from(value.as_ref())'
-        url_replace_arg = '&replace_with'
-    # end handle url encoding
-%>\
-            let mut replace_with${replace_init};
-            if let Some((_, value)) = params.iter().find(|(name, _)| name == &param_name) {
-                replace_with = ${replace_assign};
-            }
-            % if URL_ENCODE in special_cases:
-            if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string().into();
-            }
-            % endif
-            url = url.replace(find_this, ${url_replace_arg});
+            url = params.uri_replacement(url, param_name, find_this, ${"true" if URL_ENCODE in special_cases else "false"});
         }
         ## Remove all used parameters
         {
             let to_remove = [${', '.join(reversed(['"%s"' % r[1] for r in replacements]))}];
-            params.retain(|(n, _)| !to_remove.contains(n));
+            params.remove_params(&to_remove);
         }
         % endif
 
-        let url = url::Url::parse_with_params(&url, params).unwrap();
+        let url = params.parse_with_url(&url);
 
         % if request_value:
         let mut json_mime_type = mime::APPLICATION_JSON;
