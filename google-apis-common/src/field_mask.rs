@@ -1,3 +1,5 @@
+use std::str::FromStr;
+
 use serde::{Deserialize, Deserializer, Serialize, Serializer};
 
 fn titlecase(source: &str, dest: &mut String) {
@@ -46,12 +48,13 @@ impl<'de> Deserialize<'de> for FieldMask {
         D: Deserializer<'de>,
     {
         let s: &str = Deserialize::deserialize(deserializer)?;
-        Ok(FieldMask::from_str(s))
+        Ok(FieldMask::from_str(s).unwrap())
     }
 }
 
-impl FieldMask {
-    fn from_str(s: &str) -> FieldMask {
+impl FromStr for FieldMask {
+    type Err = std::convert::Infallible;
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
         let mut in_quotes = false;
         let mut prev_ind = 0;
         let mut paths = Vec::new();
@@ -66,9 +69,11 @@ impl FieldMask {
             }
         }
         paths.push(snakecase(&s[prev_ind..]));
-        FieldMask(paths)
+        Ok(FieldMask(paths))
     }
+}
 
+impl FieldMask {
     pub fn to_string(&self) -> String {
         let mut repr = String::new();
         for path in &self.0 {
