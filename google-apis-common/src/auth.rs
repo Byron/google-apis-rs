@@ -57,7 +57,7 @@
 //!             for _ in 0..=self.retries {
 //!                 match self.auth.token(scopes).await {
 //!                     Ok(token) => {
-//!                         auth_token = Ok(Some(token.as_str().to_owned()));
+//!                         auth_token = Ok(token.token().map(|t| t.to_owned()));
 //!                         break;
 //!                     },
 //!                     Err(e) => auth_token = Err(e.into()),
@@ -146,7 +146,7 @@ mod yup_oauth2_impl {
             Box::pin(async move {
                 self.token(scopes)
                     .await
-                    .map(|t| Some(t.as_str().to_owned()))
+                    .map(|t| t.token().map(|t| t.to_owned()))
                     .map_err(|e| e.into())
             })
         }
