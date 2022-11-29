@@ -2,6 +2,7 @@ import os
 import re
 import subprocess
 
+import inflect
 from dataclasses import dataclass
 from typing import Any, Dict, List, Mapping, Tuple
 from copy import deepcopy
@@ -93,6 +94,10 @@ data_unit_multipliers = {
     'pb': 1024 ** 5,
     '%': 1,
 }
+
+
+inflection = inflect.engine()
+
 
 HUB_TYPE_PARAMETERS = ('S',)
 
@@ -284,11 +289,15 @@ def md_italic(l):
 
 
 def singular(s):
-    if s.endswith('ies'):
-        return s[:-3] + 'y'
-    if s[-1] == 's':
-        return s[:-1]
-    return s
+    if s.lower().endswith('data'):
+        return s
+
+    single_noun = inflection.singular_noun(s)
+
+    if single_noun is False:
+        return s
+    else:
+        return single_noun
 
 
 def split_camelcase_s(s):
