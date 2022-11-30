@@ -7,3 +7,4 @@ codecov
 ghp-import
 pyright
 types-PyYAML
+inflect
