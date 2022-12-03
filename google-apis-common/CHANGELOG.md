@@ -5,6 +5,43 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 5.0.2 (2022-12-03)
+
+### Bug Fixes
+
+ - <csr-id-a6574486ba7cae72951f9d8c2c555b38d7279306/> remove old time dependency from API.
+   Chrono currently depends on an old version of time with a reported
+   vulnerability: https://rustsec.org/advisories/RUSTSEC-2020-0159
+   
+   While it does not use any vulnerable code, the dependency may show
+   up in code vulnerability scans, etc.
+   
+   This removes the "oldtime" feature from chrono, to remove that.
+   Also removes the "std" feature because it doesn't seem to be in use
+   in this code.
+
+### Commit Statistics
+
+<csr-read-only-do-not-edit/>
+
+ - 4 commits contributed to the release over the course of 3 calendar days.
+ - 44 days passed between releases.
+ - 1 commit was understood as [conventional](https://www.conventionalcommits.org).
+ - 0 issues like '(#ID)' were seen in commit messages
+
+### Commit Details
+
+<csr-read-only-do-not-edit/>
+
+<details><summary>view details</summary>
+
+ * **Uncategorized**
+    - remove old time dependency from API. ([`a657448`](https://github.com/Byron/google-apis-rs/commit/a6574486ba7cae72951f9d8c2c555b38d7279306))
+    - Remove old time dependency from API. ([`80ba514`](https://github.com/Byron/google-apis-rs/commit/80ba5140331fecd75dc46debded09166aca812c4))
+    - Merge branch 'update_yup_oauth' ([`5f601f8`](https://github.com/Byron/google-apis-rs/commit/5f601f89074d9f944aa1bc0db26ae14a0808d265))
+    - Update yup-oauth2 to 8.0.0. ([`c6039c0`](https://github.com/Byron/google-apis-rs/commit/c6039c085db68835757bc5c9c09000ef5b18164a))
+</details>
+
 ## 5.0.1 (2022-10-20)
 
 ### Documentation
@@ -15,7 +52,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 <csr-read-only-do-not-edit/>
 
- - 19 commits contributed to the release over the course of 2 calendar days.
+ - 20 commits contributed to the release over the course of 2 calendar days.
  - 10 days passed between releases.
  - 1 commit was understood as [conventional](https://www.conventionalcommits.org).
  - 0 issues like '(#ID)' were seen in commit messages
@@ -27,6 +64,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 <details><summary>view details</summary>
 
  * **Uncategorized**
+    - Release google-apis-common v5.0.1 ([`ca8ad69`](https://github.com/Byron/google-apis-rs/commit/ca8ad69d91f189355a6303730ac464501c945112))
     - Merge branch 'refactor' ([`d202c95`](https://github.com/Byron/google-apis-rs/commit/d202c95aa4b6ed4c159b4b3e2f754bf176234f5c))
     - cargo fmt ([`4bdd77a`](https://github.com/Byron/google-apis-rs/commit/4bdd77a52ffa57c6cf6649f7973f5f1eee9e9d6e))
     - impl std::fmt::Display for FieldMask ([`9285942`](https://github.com/Byron/google-apis-rs/commit/9285942f3d06039f85be8d60a19fcff12e5efdf2))
