@@ -33,6 +33,7 @@ api:
     - servicenetworking
     - cloudsearch
     - toolresults
+    # redefinition of type (`Feed`)
     - script
     # redefinition of types apparently
     - streetviewpublish
