@@ -30,7 +30,7 @@ RUST_TYPE_MAP = {
     'double': Base("f64"),
     'float': Base("f32"),
     'int32': Base("i32"),
-    'any': Base("String"),  # TODO: Figure out how to handle it. It's 'interface' in Go ...
+    'any': Base("json::Value"),
     'int64': Base("i64"),
     'uint64': Base("u64"),
     'array': Vec(None),
