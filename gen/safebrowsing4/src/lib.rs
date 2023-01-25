@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/generator/templates/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Safebrowsing* crate version *4.0.1+20220305*, where *20220305* is the exact revision of the *safebrowsing:v4* schema built by the [mako](http://www.makotemplates.org/) code generator *v4.0.1*.
+//! This documentation was generated from *Safebrowsing* crate version *5.0.2-beta-1+20230108*, where *20230108* is the exact revision of the *safebrowsing:v4* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.2-beta-1*.
 //! 
 //! Everything else about the *Safebrowsing* *v4* API can be found at the
 //! [official documentation site](https://developers.google.com/safe-browsing/).
@@ -12,11 +12,11 @@
 //! Handle the following *Resources* with ease from the central [hub](Safebrowsing) ... 
 //! 
 //! * encoded full hashes
-//!  * [*get*](api::EncodedFullHasheGetCall)
+//!  * [*get*](api::EncodedFullHashGetCall)
 //! * encoded updates
 //!  * [*get*](api::EncodedUpdateGetCall)
 //! * full hashes
-//!  * [*find*](api::FullHasheFindCall)
+//!  * [*find*](api::FullHashFindCall)
 //! * threat hits
 //!  * [*create*](api::ThreatHitCreateCall)
 //! * threat list updates
@@ -24,7 +24,7 @@
 //! * threat lists
 //!  * [*list*](api::ThreatListListCall)
 //! * threat matches
-//!  * [*find*](api::ThreatMatcheFindCall)
+//!  * [*find*](api::ThreatMatchFindCall)
 //! 
 //! 
 //! 
@@ -90,7 +90,7 @@
 //! use safebrowsing4::{Result, Error};
 //! # async fn dox() {
 //! use std::default::Default;
-//! use safebrowsing4::{Safebrowsing, oauth2, hyper, hyper_rustls};
+//! use safebrowsing4::{Safebrowsing, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 //! 
 //! // Get an ApplicationSecret instance by some means. It contains the `client_id` and 
 //! // `client_secret`, among other things.
@@ -108,9 +108,9 @@
 //! // You can configure optional parameters by calling the respective setters at will, and
 //! // execute the final call using `doit()`.
 //! // Values shown here are possibly random and not representative !
-//! let result = hub.encoded_full_hashes().get("encodedRequest")
-//!              .client_version("voluptua.")
-//!              .client_id("At")
+//! let result = hub.encoded_full_hashes().get(vec![0, 1, 2, 3])
+//!              .client_version("no")
+//!              .client_id("ipsum")
 //!              .doit().await;
 //! 
 //! match result {
@@ -196,22 +196,17 @@
 // This file was generated automatically from 'src/generator/templates/api/lib.rs.mako'
 // DO NOT EDIT !
 
-#[macro_use]
-extern crate serde_derive;
-
 // Re-export the hyper and hyper_rustls crate, they are required to build the hub
-pub extern crate hyper;
-pub extern crate hyper_rustls;
-extern crate serde;
-extern crate serde_json;
-// Re-export the yup_oauth2 crate, that is required to call some methods of the hub and the client
-pub extern crate yup_oauth2 as oauth2;
-extern crate mime;
-extern crate url;
-
+pub use hyper;
+pub use hyper_rustls;
+pub extern crate google_apis_common as client;
+pub use client::chrono;
 pub mod api;
-pub mod client;
 
 // Re-export the hub type and some basic client structs
 pub use api::Safebrowsing;
-pub use client::{Result, Error, Delegate};
+pub use client::{Result, Error, Delegate, FieldMask};
+
+// Re-export the yup_oauth2 crate, that is required to call some methods of the hub and the client
+#[cfg(feature = "yup-oauth2")]
+pub use client::oauth2;

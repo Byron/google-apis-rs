@@ -1,19 +1,20 @@
 use std::collections::HashMap;
 use std::cell::RefCell;
 use std::default::Default;
-use std::collections::BTreeMap;
+use std::collections::BTreeSet;
 use std::error::Error as StdError;
 use serde_json as json;
 use std::io;
 use std::fs;
 use std::mem;
-use std::thread::sleep;
 
-use http::Uri;
 use hyper::client::connect;
 use tokio::io::{AsyncRead, AsyncWrite};
+use tokio::time::sleep;
 use tower_service;
-use crate::client;
+use serde::{Serialize, Deserialize};
+
+use crate::{client, client::GetToken, client::serde_with};
 
 // ##############
 // UTILITIES ###
@@ -40,7 +41,7 @@ use crate::client;
 /// use mybusinessbusinesscalls1::{Result, Error};
 /// # async fn dox() {
 /// use std::default::Default;
-/// use mybusinessbusinesscalls1::{MyBusinessBusinessCalls, oauth2, hyper, hyper_rustls};
+/// use mybusinessbusinesscalls1::{MyBusinessBusinessCalls, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// // Get an ApplicationSecret instance by some means. It contains the `client_id` and 
 /// // `client_secret`, among other things.
@@ -64,7 +65,7 @@ use crate::client;
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.locations().update_businesscallssettings(req, "name")
-///              .update_mask("At")
+///              .update_mask(&Default::default())
 ///              .doit().await;
 /// 
 /// match result {
@@ -89,7 +90,7 @@ use crate::client;
 #[derive(Clone)]
 pub struct MyBusinessBusinessCalls<S> {
     pub client: hyper::Client<S, hyper::body::Body>,
-    pub auth: oauth2::authenticator::Authenticator<S>,
+    pub auth: Box<dyn client::GetToken>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
@@ -99,11 +100,11 @@ impl<'a, S> client::Hub for MyBusinessBusinessCalls<S> {}
 
 impl<'a, S> MyBusinessBusinessCalls<S> {
 
-    pub fn new(client: hyper::Client<S, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<S>) -> MyBusinessBusinessCalls<S> {
+    pub fn new<A: 'static + client::GetToken>(client: hyper::Client<S, hyper::body::Body>, auth: A) -> MyBusinessBusinessCalls<S> {
         MyBusinessBusinessCalls {
             client,
-            auth: authenticator,
-            _user_agent: "google-api-rust-client/4.0.1".to_string(),
+            auth: Box::new(auth),
+            _user_agent: "google-api-rust-client/5.0.2-beta-1".to_string(),
             _base_url: "https://mybusinessbusinesscalls.googleapis.com/".to_string(),
             _root_url: "https://mybusinessbusinesscalls.googleapis.com/".to_string(),
         }
@@ -114,7 +115,7 @@ impl<'a, S> MyBusinessBusinessCalls<S> {
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/4.0.1`.
+    /// It defaults to `google-api-rust-client/5.0.2-beta-1`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -146,25 +147,32 @@ impl<'a, S> MyBusinessBusinessCalls<S> {
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AggregateMetrics {
     /// Total count of answered calls.
     #[serde(rename="answeredCallsCount")]
+    
     pub answered_calls_count: Option<i32>,
     /// End date for this metric.
     #[serde(rename="endDate")]
+    
     pub end_date: Option<Date>,
     /// A list of metrics by hour of day.
     #[serde(rename="hourlyMetrics")]
+    
     pub hourly_metrics: Option<Vec<HourlyMetrics>>,
     /// Total count of missed calls.
     #[serde(rename="missedCallsCount")]
+    
     pub missed_calls_count: Option<i32>,
     /// Date for this metric. If metric is monthly, only year and month are used.
     #[serde(rename="startDate")]
+    
     pub start_date: Option<Date>,
     /// A list of metrics by day of week.
     #[serde(rename="weekdayMetrics")]
+    
     pub weekday_metrics: Option<Vec<WeekDayMetrics>>,
 }
 
@@ -175,15 +183,19 @@ impl client::Part for AggregateMetrics {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct BusinessCallsInsights {
     /// Metric for the time range based on start_date and end_date.
     #[serde(rename="aggregateMetrics")]
+    
     pub aggregate_metrics: Option<AggregateMetrics>,
     /// The metric for which the value applies.
     #[serde(rename="metricType")]
+    
     pub metric_type: Option<String>,
     /// Required. The resource name of the calls insights. Format: locations/{location}/businesscallsinsights
+    
     pub name: Option<String>,
 }
 
@@ -200,15 +212,19 @@ impl client::Part for BusinessCallsInsights {}
 /// * [get businesscallssettings locations](LocationGetBusinesscallssettingCall) (response)
 /// * [update businesscallssettings locations](LocationUpdateBusinesscallssettingCall) (request|response)
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct BusinessCallsSettings {
     /// Required. The state of this location's enrollment in Business calls.
     #[serde(rename="callsState")]
+    
     pub calls_state: Option<String>,
     /// Input only. Time when the end user provided consent to the API user to enable business calls.
     #[serde(rename="consentTime")]
-    pub consent_time: Option<String>,
+    
+    pub consent_time: Option<client::chrono::DateTime<client::chrono::offset::Utc>>,
     /// Required. The resource name of the calls settings. Format: locations/{location}/businesscallssettings
+    
     pub name: Option<String>,
 }
 
@@ -220,13 +236,17 @@ impl client::ResponseResult for BusinessCallsSettings {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Date {
     /// Day of a month. Must be from 1 to 31 and valid for the year and month, or 0 to specify a year by itself or a year and month where the day isn't significant.
+    
     pub day: Option<i32>,
     /// Month of a year. Must be from 1 to 12, or 0 to specify a year without a month and day.
+    
     pub month: Option<i32>,
     /// Year of the date. Must be from 1 to 9999, or 0 to specify a date without a year.
+    
     pub year: Option<i32>,
 }
 
@@ -237,12 +257,15 @@ impl client::Part for Date {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct HourlyMetrics {
     /// Hour of the day. Allowed values are 0-23.
+    
     pub hour: Option<i32>,
     /// Total count of missed calls for this hour.
     #[serde(rename="missedCallsCount")]
+    
     pub missed_calls_count: Option<i32>,
 }
 
@@ -258,13 +281,16 @@ impl client::Part for HourlyMetrics {}
 /// 
 /// * [businesscallsinsights list locations](LocationBusinesscallsinsightListCall) (response)
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ListBusinessCallsInsightsResponse {
     /// A collection of business calls insights for the location.
     #[serde(rename="businessCallsInsights")]
+    
     pub business_calls_insights: Option<Vec<BusinessCallsInsights>>,
     /// A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages. Some of the metric_types (e.g, AGGREGATE_COUNT) returns a single page. For these metrics, the next_page_token will be empty.
     #[serde(rename="nextPageToken")]
+    
     pub next_page_token: Option<String>,
 }
 
@@ -275,12 +301,15 @@ impl client::ResponseResult for ListBusinessCallsInsightsResponse {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct WeekDayMetrics {
     /// Day of the week. Allowed values are Sunday - Saturday.
+    
     pub day: Option<String>,
     /// Total count of missed calls for this hour.
     #[serde(rename="missedCallsCount")]
+    
     pub missed_calls_count: Option<i32>,
 }
 
@@ -293,7 +322,7 @@ impl client::Part for WeekDayMetrics {}
 // #################
 
 /// A builder providing access to all methods supported on *location* resources.
-/// It is not used directly, but through the `MyBusinessBusinessCalls` hub.
+/// It is not used directly, but through the [`MyBusinessBusinessCalls`] hub.
 ///
 /// # Example
 ///
@@ -306,7 +335,7 @@ impl client::Part for WeekDayMetrics {}
 /// 
 /// # async fn dox() {
 /// use std::default::Default;
-/// use mybusinessbusinesscalls1::{MyBusinessBusinessCalls, oauth2, hyper, hyper_rustls};
+/// use mybusinessbusinesscalls1::{MyBusinessBusinessCalls, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// let secret: oauth2::ApplicationSecret = Default::default();
 /// let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -396,7 +425,7 @@ impl<'a, S> LocationMethods<'a, S> {
 /// Returns insights for Business calls for a location.
 ///
 /// A builder for the *businesscallsinsights.list* method supported by a *location* resource.
-/// It is not used directly, but through a `LocationMethods` instance.
+/// It is not used directly, but through a [`LocationMethods`] instance.
 ///
 /// # Example
 ///
@@ -408,7 +437,7 @@ impl<'a, S> LocationMethods<'a, S> {
 /// # extern crate google_mybusinessbusinesscalls1 as mybusinessbusinesscalls1;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use mybusinessbusinesscalls1::{MyBusinessBusinessCalls, oauth2, hyper, hyper_rustls};
+/// # use mybusinessbusinesscalls1::{MyBusinessBusinessCalls, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
 /// # let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -420,9 +449,9 @@ impl<'a, S> LocationMethods<'a, S> {
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.locations().businesscallsinsights_list("parent")
-///              .page_token("sed")
-///              .page_size(-2)
-///              .filter("takimata")
+///              .page_token("voluptua.")
+///              .page_size(-27)
+///              .filter("sanctus")
 ///              .doit().await;
 /// # }
 /// ```
@@ -442,7 +471,7 @@ impl<'a, S> client::CallBuilder for LocationBusinesscallsinsightListCall<'a, S> 
 
 impl<'a, S> LocationBusinesscallsinsightListCall<'a, S>
 where
-    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
     S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
     S::Future: Send + Unpin + 'static,
     S::Error: Into<Box<dyn StdError + Send + Sync>>,
@@ -451,45 +480,42 @@ where
 
     /// Perform the operation you have build so far.
     pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, ListBusinessCallsInsightsResponse)> {
-        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
         use std::io::{Read, Seek};
         use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::ToParts;
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
         let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
         dlg.begin(client::MethodInfo { id: "mybusinessbusinesscalls.locations.businesscallsinsights.list",
                                http_method: hyper::Method::GET });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(6 + self._additional_params.len());
-        params.push(("parent", self._parent.to_string()));
-        if let Some(value) = self._page_token {
-            params.push(("pageToken", value.to_string()));
-        }
-        if let Some(value) = self._page_size {
-            params.push(("pageSize", value.to_string()));
-        }
-        if let Some(value) = self._filter {
-            params.push(("filter", value.to_string()));
-        }
+
         for &field in ["alt", "parent", "pageToken", "pageSize", "filter"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(client::Error::FieldClash(field));
             }
         }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
+
+        let mut params = Params::with_capacity(6 + self._additional_params.len());
+        params.push("parent", self._parent);
+        if let Some(value) = self._page_token.as_ref() {
+            params.push("pageToken", value);
+        }
+        if let Some(value) = self._page_size.as_ref() {
+            params.push("pageSize", value.to_string());
+        }
+        if let Some(value) = self._filter.as_ref() {
+            params.push("filter", value);
         }
 
-        params.push(("alt", "json".to_string()));
+        params.extend(self._additional_params.iter());
 
+        params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "v1/{+parent}/businesscallsinsights";
         
-        let key = dlg.api_key();
-        match key {
-            Some(value) => params.push(("key", value)),
+        match dlg.api_key() {
+            Some(value) => params.push("key", value),
             None => {
                 dlg.finished(false);
                 return Err(client::Error::MissingAPIKey)
@@ -497,31 +523,14 @@ where
         }
 
         for &(find_this, param_name) in [("{+parent}", "parent")].iter() {
-            let mut replace_with = String::new();
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = value.to_string();
-                    break;
-                }
-            }
-            if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
-            }
-            url = url.replace(find_this, &replace_with);
+            url = params.uri_replacement(url, param_name, find_this, true);
         }
         {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
-            for param_name in ["parent"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
+            let to_remove = ["parent"];
+            params.remove_params(&to_remove);
         }
 
-        let url = url::Url::parse_with_params(&url, params).unwrap();
+        let url = params.parse_with_url(&url);
 
 
 
@@ -529,21 +538,24 @@ where
             let mut req_result = {
                 let client = &self.hub.client;
                 dlg.pre_request();
-                let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
-                        .header(USER_AGENT, self.hub._user_agent.clone());
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::GET)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
 
 
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
-                
+
             };
 
             match req_result {
                 Err(err) => {
                     if let client::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep(d).await;
                         continue;
                     }
                     dlg.finished(false);
@@ -559,7 +571,7 @@ where
                         let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
                         if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
-                            sleep(d);
+                            sleep(d).await;
                             continue;
                         }
 
@@ -624,7 +636,8 @@ where
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.````
     ///
     /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> LocationBusinesscallsinsightListCall<'a, S> {
@@ -664,7 +677,7 @@ where
 /// Returns the Business calls settings resource for the given location.
 ///
 /// A builder for the *getBusinesscallssettings* method supported by a *location* resource.
-/// It is not used directly, but through a `LocationMethods` instance.
+/// It is not used directly, but through a [`LocationMethods`] instance.
 ///
 /// # Example
 ///
@@ -676,7 +689,7 @@ where
 /// # extern crate google_mybusinessbusinesscalls1 as mybusinessbusinesscalls1;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use mybusinessbusinesscalls1::{MyBusinessBusinessCalls, oauth2, hyper, hyper_rustls};
+/// # use mybusinessbusinesscalls1::{MyBusinessBusinessCalls, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
 /// # let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -704,7 +717,7 @@ impl<'a, S> client::CallBuilder for LocationGetBusinesscallssettingCall<'a, S> {
 
 impl<'a, S> LocationGetBusinesscallssettingCall<'a, S>
 where
-    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
     S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
     S::Future: Send + Unpin + 'static,
     S::Error: Into<Box<dyn StdError + Send + Sync>>,
@@ -713,36 +726,33 @@ where
 
     /// Perform the operation you have build so far.
     pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, BusinessCallsSettings)> {
-        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
         use std::io::{Read, Seek};
         use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::ToParts;
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
         let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
         dlg.begin(client::MethodInfo { id: "mybusinessbusinesscalls.locations.getBusinesscallssettings",
                                http_method: hyper::Method::GET });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
-        params.push(("name", self._name.to_string()));
+
         for &field in ["alt", "name"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(client::Error::FieldClash(field));
             }
         }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
 
-        params.push(("alt", "json".to_string()));
+        let mut params = Params::with_capacity(3 + self._additional_params.len());
+        params.push("name", self._name);
 
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "v1/{+name}";
         
-        let key = dlg.api_key();
-        match key {
-            Some(value) => params.push(("key", value)),
+        match dlg.api_key() {
+            Some(value) => params.push("key", value),
             None => {
                 dlg.finished(false);
                 return Err(client::Error::MissingAPIKey)
@@ -750,31 +760,14 @@ where
         }
 
         for &(find_this, param_name) in [("{+name}", "name")].iter() {
-            let mut replace_with = String::new();
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = value.to_string();
-                    break;
-                }
-            }
-            if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
-            }
-            url = url.replace(find_this, &replace_with);
+            url = params.uri_replacement(url, param_name, find_this, true);
         }
         {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
-            for param_name in ["name"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
+            let to_remove = ["name"];
+            params.remove_params(&to_remove);
         }
 
-        let url = url::Url::parse_with_params(&url, params).unwrap();
+        let url = params.parse_with_url(&url);
 
 
 
@@ -782,21 +775,24 @@ where
             let mut req_result = {
                 let client = &self.hub.client;
                 dlg.pre_request();
-                let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
-                        .header(USER_AGENT, self.hub._user_agent.clone());
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::GET)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
 
 
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
-                
+
             };
 
             match req_result {
                 Err(err) => {
                     if let client::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep(d).await;
                         continue;
                     }
                     dlg.finished(false);
@@ -812,7 +808,7 @@ where
                         let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
                         if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
-                            sleep(d);
+                            sleep(d).await;
                             continue;
                         }
 
@@ -856,7 +852,8 @@ where
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.````
     ///
     /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> LocationGetBusinesscallssettingCall<'a, S> {
@@ -896,7 +893,7 @@ where
 /// Updates the Business call settings for the specified location.
 ///
 /// A builder for the *updateBusinesscallssettings* method supported by a *location* resource.
-/// It is not used directly, but through a `LocationMethods` instance.
+/// It is not used directly, but through a [`LocationMethods`] instance.
 ///
 /// # Example
 ///
@@ -909,7 +906,7 @@ where
 /// use mybusinessbusinesscalls1::api::BusinessCallsSettings;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use mybusinessbusinesscalls1::{MyBusinessBusinessCalls, oauth2, hyper, hyper_rustls};
+/// # use mybusinessbusinesscalls1::{MyBusinessBusinessCalls, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
 /// # let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -926,7 +923,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.locations().update_businesscallssettings(req, "name")
-///              .update_mask("ipsum")
+///              .update_mask(&Default::default())
 ///              .doit().await;
 /// # }
 /// ```
@@ -936,7 +933,7 @@ pub struct LocationUpdateBusinesscallssettingCall<'a, S>
     hub: &'a MyBusinessBusinessCalls<S>,
     _request: BusinessCallsSettings,
     _name: String,
-    _update_mask: Option<String>,
+    _update_mask: Option<client::FieldMask>,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
 }
@@ -945,7 +942,7 @@ impl<'a, S> client::CallBuilder for LocationUpdateBusinesscallssettingCall<'a, S
 
 impl<'a, S> LocationUpdateBusinesscallssettingCall<'a, S>
 where
-    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
     S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
     S::Future: Send + Unpin + 'static,
     S::Error: Into<Box<dyn StdError + Send + Sync>>,
@@ -954,39 +951,36 @@ where
 
     /// Perform the operation you have build so far.
     pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, BusinessCallsSettings)> {
-        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
         use std::io::{Read, Seek};
         use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::ToParts;
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
         let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
         dlg.begin(client::MethodInfo { id: "mybusinessbusinesscalls.locations.updateBusinesscallssettings",
                                http_method: hyper::Method::PATCH });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
-        params.push(("name", self._name.to_string()));
-        if let Some(value) = self._update_mask {
-            params.push(("updateMask", value.to_string()));
-        }
+
         for &field in ["alt", "name", "updateMask"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(client::Error::FieldClash(field));
             }
         }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
+
+        let mut params = Params::with_capacity(5 + self._additional_params.len());
+        params.push("name", self._name);
+        if let Some(value) = self._update_mask.as_ref() {
+            params.push("updateMask", value.to_string());
         }
 
-        params.push(("alt", "json".to_string()));
+        params.extend(self._additional_params.iter());
 
+        params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "v1/{+name}";
         
-        let key = dlg.api_key();
-        match key {
-            Some(value) => params.push(("key", value)),
+        match dlg.api_key() {
+            Some(value) => params.push("key", value),
             None => {
                 dlg.finished(false);
                 return Err(client::Error::MissingAPIKey)
@@ -994,33 +988,16 @@ where
         }
 
         for &(find_this, param_name) in [("{+name}", "name")].iter() {
-            let mut replace_with = String::new();
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = value.to_string();
-                    break;
-                }
-            }
-            if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
-            }
-            url = url.replace(find_this, &replace_with);
+            url = params.uri_replacement(url, param_name, find_this, true);
         }
         {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
-            for param_name in ["name"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
+            let to_remove = ["name"];
+            params.remove_params(&to_remove);
         }
 
-        let url = url::Url::parse_with_params(&url, params).unwrap();
+        let url = params.parse_with_url(&url);
 
-        let mut json_mime_type: mime::Mime = "application/json".parse().unwrap();
+        let mut json_mime_type = mime::APPLICATION_JSON;
         let mut request_value_reader =
             {
                 let mut value = json::value::to_value(&self._request).expect("serde to work");
@@ -1038,23 +1015,26 @@ where
             let mut req_result = {
                 let client = &self.hub.client;
                 dlg.pre_request();
-                let mut req_builder = hyper::Request::builder().method(hyper::Method::PATCH).uri(url.clone().into_string())
-                        .header(USER_AGENT, self.hub._user_agent.clone());
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::PATCH)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
 
 
                         let request = req_builder
-                        .header(CONTENT_TYPE, format!("{}", json_mime_type.to_string()))
+                        .header(CONTENT_TYPE, json_mime_type.to_string())
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
                 client.request(request.unwrap()).await
-                
+
             };
 
             match req_result {
                 Err(err) => {
                     if let client::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep(d).await;
                         continue;
                     }
                     dlg.finished(false);
@@ -1070,7 +1050,7 @@ where
                         let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
                         if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
-                            sleep(d);
+                            sleep(d).await;
                             continue;
                         }
 
@@ -1123,14 +1103,15 @@ where
     /// Required. The list of fields to update.
     ///
     /// Sets the *update mask* query property to the given value.
-    pub fn update_mask(mut self, new_value: &str) -> LocationUpdateBusinesscallssettingCall<'a, S> {
-        self._update_mask = Some(new_value.to_string());
+    pub fn update_mask(mut self, new_value: client::FieldMask) -> LocationUpdateBusinesscallssettingCall<'a, S> {
+        self._update_mask = Some(new_value);
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.````
     ///
     /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> LocationUpdateBusinesscallssettingCall<'a, S> {

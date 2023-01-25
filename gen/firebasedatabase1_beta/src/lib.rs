@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/generator/templates/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Firebase Realtime Database* crate version *4.0.1+20220304*, where *20220304* is the exact revision of the *firebasedatabase:v1beta* schema built by the [mako](http://www.makotemplates.org/) code generator *v4.0.1*.
+//! This documentation was generated from *Firebase Realtime Database* crate version *5.0.2-beta-1+20230123*, where *20230123* is the exact revision of the *firebasedatabase:v1beta* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.2-beta-1*.
 //! 
 //! Everything else about the *Firebase Realtime Database* *v1_beta* API can be found at the
 //! [official documentation site](https://firebase.google.com/docs/reference/rest/database/database-management/rest/).
@@ -12,7 +12,7 @@
 //! Handle the following *Resources* with ease from the central [hub](FirebaseRealtimeDatabase) ... 
 //! 
 //! * projects
-//!  * [*locations instances create*](api::ProjectLocationInstanceCreateCall), [*locations instances delete*](api::ProjectLocationInstanceDeleteCall), [*locations instances disable*](api::ProjectLocationInstanceDisableCall), [*locations instances get*](api::ProjectLocationInstanceGetCall), [*locations instances list*](api::ProjectLocationInstanceListCall) and [*locations instances reenable*](api::ProjectLocationInstanceReenableCall)
+//!  * [*locations instances create*](api::ProjectLocationInstanceCreateCall), [*locations instances delete*](api::ProjectLocationInstanceDeleteCall), [*locations instances disable*](api::ProjectLocationInstanceDisableCall), [*locations instances get*](api::ProjectLocationInstanceGetCall), [*locations instances list*](api::ProjectLocationInstanceListCall), [*locations instances reenable*](api::ProjectLocationInstanceReenableCall) and [*locations instances undelete*](api::ProjectLocationInstanceUndeleteCall)
 //! 
 //! 
 //! 
@@ -52,6 +52,7 @@
 //! let r = hub.projects().locations_instances_disable(...).doit().await
 //! let r = hub.projects().locations_instances_get(...).doit().await
 //! let r = hub.projects().locations_instances_reenable(...).doit().await
+//! let r = hub.projects().locations_instances_undelete(...).doit().await
 //! ```
 //! 
 //! The `resource()` and `activity(...)` calls create [builders][builder-pattern]. The second one dealing with `Activities` 
@@ -82,7 +83,7 @@
 //! use firebasedatabase1_beta::{Result, Error};
 //! # async fn dox() {
 //! use std::default::Default;
-//! use firebasedatabase1_beta::{FirebaseRealtimeDatabase, oauth2, hyper, hyper_rustls};
+//! use firebasedatabase1_beta::{FirebaseRealtimeDatabase, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 //! 
 //! // Get an ApplicationSecret instance by some means. It contains the `client_id` and 
 //! // `client_secret`, among other things.
@@ -193,22 +194,17 @@
 // This file was generated automatically from 'src/generator/templates/api/lib.rs.mako'
 // DO NOT EDIT !
 
-#[macro_use]
-extern crate serde_derive;
-
 // Re-export the hyper and hyper_rustls crate, they are required to build the hub
-pub extern crate hyper;
-pub extern crate hyper_rustls;
-extern crate serde;
-extern crate serde_json;
-// Re-export the yup_oauth2 crate, that is required to call some methods of the hub and the client
-pub extern crate yup_oauth2 as oauth2;
-extern crate mime;
-extern crate url;
-
+pub use hyper;
+pub use hyper_rustls;
+pub extern crate google_apis_common as client;
+pub use client::chrono;
 pub mod api;
-pub mod client;
 
 // Re-export the hub type and some basic client structs
 pub use api::FirebaseRealtimeDatabase;
-pub use client::{Result, Error, Delegate};
+pub use client::{Result, Error, Delegate, FieldMask};
+
+// Re-export the yup_oauth2 crate, that is required to call some methods of the hub and the client
+#[cfg(feature = "yup-oauth2")]
+pub use client::oauth2;

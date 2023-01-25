@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/generator/templates/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Gmail* crate version *4.0.1+20220228*, where *20220228* is the exact revision of the *gmail:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v4.0.1*.
+//! This documentation was generated from *Gmail* crate version *5.0.2-beta-1+20230116*, where *20230116* is the exact revision of the *gmail:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.2-beta-1*.
 //! 
 //! Everything else about the *Gmail* *v1* API can be found at the
 //! [official documentation site](https://developers.google.com/gmail/api/).
@@ -12,7 +12,7 @@
 //! Handle the following *Resources* with ease from the central [hub](Gmail) ... 
 //! 
 //! * users
-//!  * [*drafts create*](api::UserDraftCreateCall), [*drafts delete*](api::UserDraftDeleteCall), [*drafts get*](api::UserDraftGetCall), [*drafts list*](api::UserDraftListCall), [*drafts send*](api::UserDraftSendCall), [*drafts update*](api::UserDraftUpdateCall), [*get profile*](api::UserGetProfileCall), [*history list*](api::UserHistoryListCall), [*labels create*](api::UserLabelCreateCall), [*labels delete*](api::UserLabelDeleteCall), [*labels get*](api::UserLabelGetCall), [*labels list*](api::UserLabelListCall), [*labels patch*](api::UserLabelPatchCall), [*labels update*](api::UserLabelUpdateCall), [*messages attachments get*](api::UserMessageAttachmentGetCall), [*messages batch delete*](api::UserMessageBatchDeleteCall), [*messages batch modify*](api::UserMessageBatchModifyCall), [*messages delete*](api::UserMessageDeleteCall), [*messages get*](api::UserMessageGetCall), [*messages import*](api::UserMessageImportCall), [*messages insert*](api::UserMessageInsertCall), [*messages list*](api::UserMessageListCall), [*messages modify*](api::UserMessageModifyCall), [*messages send*](api::UserMessageSendCall), [*messages trash*](api::UserMessageTrashCall), [*messages untrash*](api::UserMessageUntrashCall), [*settings delegates create*](api::UserSettingDelegateCreateCall), [*settings delegates delete*](api::UserSettingDelegateDeleteCall), [*settings delegates get*](api::UserSettingDelegateGetCall), [*settings delegates list*](api::UserSettingDelegateListCall), [*settings filters create*](api::UserSettingFilterCreateCall), [*settings filters delete*](api::UserSettingFilterDeleteCall), [*settings filters get*](api::UserSettingFilterGetCall), [*settings filters list*](api::UserSettingFilterListCall), [*settings forwarding addresses create*](api::UserSettingForwardingAddresseCreateCall), [*settings forwarding addresses delete*](api::UserSettingForwardingAddresseDeleteCall), [*settings forwarding addresses get*](api::UserSettingForwardingAddresseGetCall), [*settings forwarding addresses list*](api::UserSettingForwardingAddresseListCall), [*settings get auto forwarding*](api::UserSettingGetAutoForwardingCall), [*settings get imap*](api::UserSettingGetImapCall), [*settings get language*](api::UserSettingGetLanguageCall), [*settings get pop*](api::UserSettingGetPopCall), [*settings get vacation*](api::UserSettingGetVacationCall), [*settings send as create*](api::UserSettingSendACreateCall), [*settings send as delete*](api::UserSettingSendADeleteCall), [*settings send as get*](api::UserSettingSendAGetCall), [*settings send as list*](api::UserSettingSendAListCall), [*settings send as patch*](api::UserSettingSendAPatchCall), [*settings send as smime info delete*](api::UserSettingSendASmimeInfoDeleteCall), [*settings send as smime info get*](api::UserSettingSendASmimeInfoGetCall), [*settings send as smime info insert*](api::UserSettingSendASmimeInfoInsertCall), [*settings send as smime info list*](api::UserSettingSendASmimeInfoListCall), [*settings send as smime info set default*](api::UserSettingSendASmimeInfoSetDefaultCall), [*settings send as update*](api::UserSettingSendAUpdateCall), [*settings send as verify*](api::UserSettingSendAVerifyCall), [*settings update auto forwarding*](api::UserSettingUpdateAutoForwardingCall), [*settings update imap*](api::UserSettingUpdateImapCall), [*settings update language*](api::UserSettingUpdateLanguageCall), [*settings update pop*](api::UserSettingUpdatePopCall), [*settings update vacation*](api::UserSettingUpdateVacationCall), [*stop*](api::UserStopCall), [*threads delete*](api::UserThreadDeleteCall), [*threads get*](api::UserThreadGetCall), [*threads list*](api::UserThreadListCall), [*threads modify*](api::UserThreadModifyCall), [*threads trash*](api::UserThreadTrashCall), [*threads untrash*](api::UserThreadUntrashCall) and [*watch*](api::UserWatchCall)
+//!  * [*drafts create*](api::UserDraftCreateCall), [*drafts delete*](api::UserDraftDeleteCall), [*drafts get*](api::UserDraftGetCall), [*drafts list*](api::UserDraftListCall), [*drafts send*](api::UserDraftSendCall), [*drafts update*](api::UserDraftUpdateCall), [*get profile*](api::UserGetProfileCall), [*history list*](api::UserHistoryListCall), [*labels create*](api::UserLabelCreateCall), [*labels delete*](api::UserLabelDeleteCall), [*labels get*](api::UserLabelGetCall), [*labels list*](api::UserLabelListCall), [*labels patch*](api::UserLabelPatchCall), [*labels update*](api::UserLabelUpdateCall), [*messages attachments get*](api::UserMessageAttachmentGetCall), [*messages batch delete*](api::UserMessageBatchDeleteCall), [*messages batch modify*](api::UserMessageBatchModifyCall), [*messages delete*](api::UserMessageDeleteCall), [*messages get*](api::UserMessageGetCall), [*messages import*](api::UserMessageImportCall), [*messages insert*](api::UserMessageInsertCall), [*messages list*](api::UserMessageListCall), [*messages modify*](api::UserMessageModifyCall), [*messages send*](api::UserMessageSendCall), [*messages trash*](api::UserMessageTrashCall), [*messages untrash*](api::UserMessageUntrashCall), [*settings cse identities create*](api::UserSettingCseIdentityCreateCall), [*settings cse identities delete*](api::UserSettingCseIdentityDeleteCall), [*settings cse identities get*](api::UserSettingCseIdentityGetCall), [*settings cse identities list*](api::UserSettingCseIdentityListCall), [*settings cse identities patch*](api::UserSettingCseIdentityPatchCall), [*settings cse keypairs create*](api::UserSettingCseKeypairCreateCall), [*settings cse keypairs disable*](api::UserSettingCseKeypairDisableCall), [*settings cse keypairs enable*](api::UserSettingCseKeypairEnableCall), [*settings cse keypairs get*](api::UserSettingCseKeypairGetCall), [*settings cse keypairs list*](api::UserSettingCseKeypairListCall), [*settings cse keypairs obliterate*](api::UserSettingCseKeypairObliterateCall), [*settings delegates create*](api::UserSettingDelegateCreateCall), [*settings delegates delete*](api::UserSettingDelegateDeleteCall), [*settings delegates get*](api::UserSettingDelegateGetCall), [*settings delegates list*](api::UserSettingDelegateListCall), [*settings filters create*](api::UserSettingFilterCreateCall), [*settings filters delete*](api::UserSettingFilterDeleteCall), [*settings filters get*](api::UserSettingFilterGetCall), [*settings filters list*](api::UserSettingFilterListCall), [*settings forwarding addresses create*](api::UserSettingForwardingAddressCreateCall), [*settings forwarding addresses delete*](api::UserSettingForwardingAddressDeleteCall), [*settings forwarding addresses get*](api::UserSettingForwardingAddressGetCall), [*settings forwarding addresses list*](api::UserSettingForwardingAddressListCall), [*settings get auto forwarding*](api::UserSettingGetAutoForwardingCall), [*settings get imap*](api::UserSettingGetImapCall), [*settings get language*](api::UserSettingGetLanguageCall), [*settings get pop*](api::UserSettingGetPopCall), [*settings get vacation*](api::UserSettingGetVacationCall), [*settings send as create*](api::UserSettingSendACreateCall), [*settings send as delete*](api::UserSettingSendADeleteCall), [*settings send as get*](api::UserSettingSendAGetCall), [*settings send as list*](api::UserSettingSendAListCall), [*settings send as patch*](api::UserSettingSendAPatchCall), [*settings send as smime info delete*](api::UserSettingSendASmimeInfoDeleteCall), [*settings send as smime info get*](api::UserSettingSendASmimeInfoGetCall), [*settings send as smime info insert*](api::UserSettingSendASmimeInfoInsertCall), [*settings send as smime info list*](api::UserSettingSendASmimeInfoListCall), [*settings send as smime info set default*](api::UserSettingSendASmimeInfoSetDefaultCall), [*settings send as update*](api::UserSettingSendAUpdateCall), [*settings send as verify*](api::UserSettingSendAVerifyCall), [*settings update auto forwarding*](api::UserSettingUpdateAutoForwardingCall), [*settings update imap*](api::UserSettingUpdateImapCall), [*settings update language*](api::UserSettingUpdateLanguageCall), [*settings update pop*](api::UserSettingUpdatePopCall), [*settings update vacation*](api::UserSettingUpdateVacationCall), [*stop*](api::UserStopCall), [*threads delete*](api::UserThreadDeleteCall), [*threads get*](api::UserThreadGetCall), [*threads list*](api::UserThreadListCall), [*threads modify*](api::UserThreadModifyCall), [*threads trash*](api::UserThreadTrashCall), [*threads untrash*](api::UserThreadUntrashCall) and [*watch*](api::UserWatchCall)
 //! 
 //! 
 //! Upload supported by ...
@@ -95,7 +95,7 @@
 //! use std::fs;
 //! # async fn dox() {
 //! use std::default::Default;
-//! use gmail1::{Gmail, oauth2, hyper, hyper_rustls};
+//! use gmail1::{Gmail, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 //! 
 //! // Get an ApplicationSecret instance by some means. It contains the `client_id` and 
 //! // `client_secret`, among other things.
@@ -208,22 +208,17 @@
 // This file was generated automatically from 'src/generator/templates/api/lib.rs.mako'
 // DO NOT EDIT !
 
-#[macro_use]
-extern crate serde_derive;
-
 // Re-export the hyper and hyper_rustls crate, they are required to build the hub
-pub extern crate hyper;
-pub extern crate hyper_rustls;
-extern crate serde;
-extern crate serde_json;
-// Re-export the yup_oauth2 crate, that is required to call some methods of the hub and the client
-pub extern crate yup_oauth2 as oauth2;
-extern crate mime;
-extern crate url;
-
+pub use hyper;
+pub use hyper_rustls;
+pub extern crate google_apis_common as client;
+pub use client::chrono;
 pub mod api;
-pub mod client;
 
 // Re-export the hub type and some basic client structs
 pub use api::Gmail;
-pub use client::{Result, Error, Delegate};
+pub use client::{Result, Error, Delegate, FieldMask};
+
+// Re-export the yup_oauth2 crate, that is required to call some methods of the hub and the client
+#[cfg(feature = "yup-oauth2")]
+pub use client::oauth2;

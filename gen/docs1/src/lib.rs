@@ -2,33 +2,17 @@
 // This file was generated automatically from 'src/generator/templates/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Dns* crate version *4.0.1+20220217*, where *20220217* is the exact revision of the *dns:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v4.0.1*.
+//! This documentation was generated from *Docs* crate version *5.0.2-beta-1+20230119*, where *20230119* is the exact revision of the *docs:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.2-beta-1*.
 //! 
-//! Everything else about the *Dns* *v2* API can be found at the
-//! [official documentation site](https://cloud.google.com/dns/docs).
-//! The original source code is [on github](https://github.com/Byron/google-apis-rs/tree/main/gen/dns2).
+//! Everything else about the *Docs* *v1* API can be found at the
+//! [official documentation site](https://developers.google.com/docs/).
+//! The original source code is [on github](https://github.com/Byron/google-apis-rs/tree/main/gen/docs1).
 //! # Features
 //! 
-//! Handle the following *Resources* with ease from the central [hub](Dns) ... 
+//! Handle the following *Resources* with ease from the central [hub](Docs) ... 
 //! 
-//! * [changes](api::Change)
-//!  * [*create*](api::ChangeCreateCall), [*get*](api::ChangeGetCall) and [*list*](api::ChangeListCall)
-//! * [dns keys](api::DnsKey)
-//!  * [*get*](api::DnsKeyGetCall) and [*list*](api::DnsKeyListCall)
-//! * managed zone operations
-//!  * [*get*](api::ManagedZoneOperationGetCall) and [*list*](api::ManagedZoneOperationListCall)
-//! * [managed zones](api::ManagedZone)
-//!  * [*create*](api::ManagedZoneCreateCall), [*delete*](api::ManagedZoneDeleteCall), [*get*](api::ManagedZoneGetCall), [*list*](api::ManagedZoneListCall), [*patch*](api::ManagedZonePatchCall) and [*update*](api::ManagedZoneUpdateCall)
-//! * [policies](api::Policy)
-//!  * [*create*](api::PolicyCreateCall), [*delete*](api::PolicyDeleteCall), [*get*](api::PolicyGetCall), [*list*](api::PolicyListCall), [*patch*](api::PolicyPatchCall) and [*update*](api::PolicyUpdateCall)
-//! * [projects](api::Project)
-//!  * [*get*](api::ProjectGetCall)
-//! * [resource record sets](api::ResourceRecordSet)
-//!  * [*create*](api::ResourceRecordSetCreateCall), [*delete*](api::ResourceRecordSetDeleteCall), [*get*](api::ResourceRecordSetGetCall), [*list*](api::ResourceRecordSetListCall) and [*patch*](api::ResourceRecordSetPatchCall)
-//! * [response policies](api::ResponsePolicy)
-//!  * [*create*](api::ResponsePolicyCreateCall), [*delete*](api::ResponsePolicyDeleteCall), [*get*](api::ResponsePolicyGetCall), [*list*](api::ResponsePolicyListCall), [*patch*](api::ResponsePolicyPatchCall) and [*update*](api::ResponsePolicyUpdateCall)
-//! * [response policy rules](api::ResponsePolicyRule)
-//!  * [*create*](api::ResponsePolicyRuleCreateCall), [*delete*](api::ResponsePolicyRuleDeleteCall), [*get*](api::ResponsePolicyRuleGetCall), [*list*](api::ResponsePolicyRuleListCall), [*patch*](api::ResponsePolicyRulePatchCall) and [*update*](api::ResponsePolicyRuleUpdateCall)
+//! * [documents](api::Document)
+//!  * [*batch update*](api::DocumentBatchUpdateCall), [*create*](api::DocumentCreateCall) and [*get*](api::DocumentGetCall)
 //! 
 //! 
 //! 
@@ -39,7 +23,7 @@
 //! 
 //! The API is structured into the following primary items:
 //! 
-//! * **[Hub](Dns)**
+//! * **[Hub](Docs)**
 //!     * a central object to maintain state and allow accessing all *Activities*
 //!     * creates [*Method Builders*](client::MethodsBuilder) which in turn
 //!       allow access to individual [*Call Builders*](client::CallBuilder)
@@ -63,12 +47,9 @@
 //! Or specifically ...
 //! 
 //! ```ignore
-//! let r = hub.managed_zones().create(...).doit().await
-//! let r = hub.managed_zones().delete(...).doit().await
-//! let r = hub.managed_zones().get(...).doit().await
-//! let r = hub.managed_zones().list(...).doit().await
-//! let r = hub.managed_zones().patch(...).doit().await
-//! let r = hub.managed_zones().update(...).doit().await
+//! let r = hub.documents().batch_update(...).doit().await
+//! let r = hub.documents().create(...).doit().await
+//! let r = hub.documents().get(...).doit().await
 //! ```
 //! 
 //! The `resource()` and `activity(...)` calls create [builders][builder-pattern]. The second one dealing with `Activities` 
@@ -84,7 +65,7 @@
 //! 
 //! ```toml
 //! [dependencies]
-//! google-dns2 = "*"
+//! google-docs1 = "*"
 //! serde = "^1.0"
 //! serde_json = "^1.0"
 //! ```
@@ -94,11 +75,12 @@
 //! ```test_harness,no_run
 //! extern crate hyper;
 //! extern crate hyper_rustls;
-//! extern crate google_dns2 as dns2;
-//! use dns2::{Result, Error};
+//! extern crate google_docs1 as docs1;
+//! use docs1::api::BatchUpdateDocumentRequest;
+//! use docs1::{Result, Error};
 //! # async fn dox() {
 //! use std::default::Default;
-//! use dns2::{Dns, oauth2, hyper, hyper_rustls};
+//! use docs1::{Docs, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 //! 
 //! // Get an ApplicationSecret instance by some means. It contains the `client_id` and 
 //! // `client_secret`, among other things.
@@ -112,14 +94,16 @@
 //!         secret,
 //!         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 //!     ).build().await.unwrap();
-//! let mut hub = Dns::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+//! let mut hub = Docs::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+//! // As the method needs a request, you would usually fill it with the desired information
+//! // into the respective structure. Some of the parts shown here might not be applicable !
+//! // Values shown here are possibly random and not representative !
+//! let mut req = BatchUpdateDocumentRequest::default();
+//! 
 //! // You can configure optional parameters by calling the respective setters at will, and
 //! // execute the final call using `doit()`.
 //! // Values shown here are possibly random and not representative !
-//! let result = hub.managed_zones().list("project", "location")
-//!              .page_token("sed")
-//!              .max_results(-2)
-//!              .dns_name("takimata")
+//! let result = hub.documents().batch_update(req, "documentId")
 //!              .doit().await;
 //! 
 //! match result {
@@ -205,22 +189,17 @@
 // This file was generated automatically from 'src/generator/templates/api/lib.rs.mako'
 // DO NOT EDIT !
 
-#[macro_use]
-extern crate serde_derive;
-
 // Re-export the hyper and hyper_rustls crate, they are required to build the hub
-pub extern crate hyper;
-pub extern crate hyper_rustls;
-extern crate serde;
-extern crate serde_json;
-// Re-export the yup_oauth2 crate, that is required to call some methods of the hub and the client
-pub extern crate yup_oauth2 as oauth2;
-extern crate mime;
-extern crate url;
-
+pub use hyper;
+pub use hyper_rustls;
+pub extern crate google_apis_common as client;
+pub use client::chrono;
 pub mod api;
-pub mod client;
 
 // Re-export the hub type and some basic client structs
-pub use api::Dns;
-pub use client::{Result, Error, Delegate};
+pub use api::Docs;
+pub use client::{Result, Error, Delegate, FieldMask};
+
+// Re-export the yup_oauth2 crate, that is required to call some methods of the hub and the client
+#[cfg(feature = "yup-oauth2")]
+pub use client::oauth2;

@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/generator/templates/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *My Business* crate version *4.0.1+0*, where *0* is the exact revision of the *mybusiness:v4* schema built by the [mako](http://www.makotemplates.org/) code generator *v4.0.1*.
+//! This documentation was generated from *My Business* crate version *5.0.2-beta-1+0*, where *0* is the exact revision of the *mybusiness:v4* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.2-beta-1*.
 //! 
 //! Everything else about the *My Business* *v4* API can be found at the
 //! [official documentation site](https://developers.google.com/my-business/).
@@ -12,7 +12,7 @@
 //! Handle the following *Resources* with ease from the central [hub](MyBusiness) ... 
 //! 
 //! * [accounts](api::Account)
-//!  * [*admins create*](api::AccountAdminCreateCall), [*admins delete*](api::AccountAdminDeleteCall), [*admins list*](api::AccountAdminListCall), [*admins patch*](api::AccountAdminPatchCall), [*create*](api::AccountCreateCall), [*delete notifications*](api::AccountDeleteNotificationCall), [*generate account number*](api::AccountGenerateAccountNumberCall), [*get*](api::AccountGetCall), [*get notifications*](api::AccountGetNotificationCall), [*invitations accept*](api::AccountInvitationAcceptCall), [*invitations decline*](api::AccountInvitationDeclineCall), [*invitations list*](api::AccountInvitationListCall), [*list*](api::AccountListCall), [*list recommend google locations*](api::AccountListRecommendGoogleLocationCall), [*locations admins create*](api::AccountLocationAdminCreateCall), [*locations admins delete*](api::AccountLocationAdminDeleteCall), [*locations admins list*](api::AccountLocationAdminListCall), [*locations admins patch*](api::AccountLocationAdminPatchCall), [*locations associate*](api::AccountLocationAssociateCall), [*locations batch get*](api::AccountLocationBatchGetCall), [*locations batch get reviews*](api::AccountLocationBatchGetReviewCall), [*locations clear association*](api::AccountLocationClearAssociationCall), [*locations create*](api::AccountLocationCreateCall), [*locations delete*](api::AccountLocationDeleteCall), [*locations fetch verification options*](api::AccountLocationFetchVerificationOptionCall), [*locations find matches*](api::AccountLocationFindMatcheCall), [*locations followers get metadata*](api::AccountLocationFollowerGetMetadataCall), [*locations get*](api::AccountLocationGetCall), [*locations get google updated*](api::AccountLocationGetGoogleUpdatedCall), [*locations list*](api::AccountLocationListCall), [*locations local posts create*](api::AccountLocationLocalPostCreateCall), [*locations local posts delete*](api::AccountLocationLocalPostDeleteCall), [*locations local posts get*](api::AccountLocationLocalPostGetCall), [*locations local posts list*](api::AccountLocationLocalPostListCall), [*locations local posts patch*](api::AccountLocationLocalPostPatchCall), [*locations local posts report insights*](api::AccountLocationLocalPostReportInsightCall), [*locations media create*](api::AccountLocationMediaCreateCall), [*locations media customers get*](api::AccountLocationMediaCustomerGetCall), [*locations media customers list*](api::AccountLocationMediaCustomerListCall), [*locations media delete*](api::AccountLocationMediaDeleteCall), [*locations media get*](api::AccountLocationMediaGetCall), [*locations media list*](api::AccountLocationMediaListCall), [*locations media patch*](api::AccountLocationMediaPatchCall), [*locations media start upload*](api::AccountLocationMediaStartUploadCall), [*locations patch*](api::AccountLocationPatchCall), [*locations questions answers delete*](api::AccountLocationQuestionAnswerDeleteCall), [*locations questions answers list*](api::AccountLocationQuestionAnswerListCall), [*locations questions answers upsert*](api::AccountLocationQuestionAnswerUpsertCall), [*locations questions create*](api::AccountLocationQuestionCreateCall), [*locations questions delete*](api::AccountLocationQuestionDeleteCall), [*locations questions list*](api::AccountLocationQuestionListCall), [*locations questions patch*](api::AccountLocationQuestionPatchCall), [*locations report insights*](api::AccountLocationReportInsightCall), [*locations reviews delete reply*](api::AccountLocationReviewDeleteReplyCall), [*locations reviews get*](api::AccountLocationReviewGetCall), [*locations reviews list*](api::AccountLocationReviewListCall), [*locations reviews update reply*](api::AccountLocationReviewUpdateReplyCall), [*locations transfer*](api::AccountLocationTransferCall), [*locations verifications complete*](api::AccountLocationVerificationCompleteCall), [*locations verifications list*](api::AccountLocationVerificationListCall), [*locations verify*](api::AccountLocationVerifyCall), [*update*](api::AccountUpdateCall) and [*update notifications*](api::AccountUpdateNotificationCall)
+//!  * [*admins create*](api::AccountAdminCreateCall), [*admins delete*](api::AccountAdminDeleteCall), [*admins list*](api::AccountAdminListCall), [*admins patch*](api::AccountAdminPatchCall), [*create*](api::AccountCreateCall), [*delete notifications*](api::AccountDeleteNotificationCall), [*generate account number*](api::AccountGenerateAccountNumberCall), [*get*](api::AccountGetCall), [*get notifications*](api::AccountGetNotificationCall), [*invitations accept*](api::AccountInvitationAcceptCall), [*invitations decline*](api::AccountInvitationDeclineCall), [*invitations list*](api::AccountInvitationListCall), [*list*](api::AccountListCall), [*list recommend google locations*](api::AccountListRecommendGoogleLocationCall), [*locations admins create*](api::AccountLocationAdminCreateCall), [*locations admins delete*](api::AccountLocationAdminDeleteCall), [*locations admins list*](api::AccountLocationAdminListCall), [*locations admins patch*](api::AccountLocationAdminPatchCall), [*locations associate*](api::AccountLocationAssociateCall), [*locations batch get*](api::AccountLocationBatchGetCall), [*locations batch get reviews*](api::AccountLocationBatchGetReviewCall), [*locations clear association*](api::AccountLocationClearAssociationCall), [*locations create*](api::AccountLocationCreateCall), [*locations delete*](api::AccountLocationDeleteCall), [*locations fetch verification options*](api::AccountLocationFetchVerificationOptionCall), [*locations find matches*](api::AccountLocationFindMatchCall), [*locations followers get metadata*](api::AccountLocationFollowerGetMetadataCall), [*locations get*](api::AccountLocationGetCall), [*locations get google updated*](api::AccountLocationGetGoogleUpdatedCall), [*locations list*](api::AccountLocationListCall), [*locations local posts create*](api::AccountLocationLocalPostCreateCall), [*locations local posts delete*](api::AccountLocationLocalPostDeleteCall), [*locations local posts get*](api::AccountLocationLocalPostGetCall), [*locations local posts list*](api::AccountLocationLocalPostListCall), [*locations local posts patch*](api::AccountLocationLocalPostPatchCall), [*locations local posts report insights*](api::AccountLocationLocalPostReportInsightCall), [*locations media create*](api::AccountLocationMediaCreateCall), [*locations media customers get*](api::AccountLocationMediaCustomerGetCall), [*locations media customers list*](api::AccountLocationMediaCustomerListCall), [*locations media delete*](api::AccountLocationMediaDeleteCall), [*locations media get*](api::AccountLocationMediaGetCall), [*locations media list*](api::AccountLocationMediaListCall), [*locations media patch*](api::AccountLocationMediaPatchCall), [*locations media start upload*](api::AccountLocationMediaStartUploadCall), [*locations patch*](api::AccountLocationPatchCall), [*locations questions answers delete*](api::AccountLocationQuestionAnswerDeleteCall), [*locations questions answers list*](api::AccountLocationQuestionAnswerListCall), [*locations questions answers upsert*](api::AccountLocationQuestionAnswerUpsertCall), [*locations questions create*](api::AccountLocationQuestionCreateCall), [*locations questions delete*](api::AccountLocationQuestionDeleteCall), [*locations questions list*](api::AccountLocationQuestionListCall), [*locations questions patch*](api::AccountLocationQuestionPatchCall), [*locations report insights*](api::AccountLocationReportInsightCall), [*locations reviews delete reply*](api::AccountLocationReviewDeleteReplyCall), [*locations reviews get*](api::AccountLocationReviewGetCall), [*locations reviews list*](api::AccountLocationReviewListCall), [*locations reviews update reply*](api::AccountLocationReviewUpdateReplyCall), [*locations transfer*](api::AccountLocationTransferCall), [*locations verifications complete*](api::AccountLocationVerificationCompleteCall), [*locations verifications list*](api::AccountLocationVerificationListCall), [*locations verify*](api::AccountLocationVerifyCall), [*update*](api::AccountUpdateCall) and [*update notifications*](api::AccountUpdateNotificationCall)
 //! * [attributes](api::Attribute)
 //!  * [*list*](api::AttributeListCall)
 //! * [categories](api::Category)
@@ -149,7 +149,7 @@
 //! use mybusiness4::{Result, Error};
 //! # async fn dox() {
 //! use std::default::Default;
-//! use mybusiness4::{MyBusiness, oauth2, hyper, hyper_rustls};
+//! use mybusiness4::{MyBusiness, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 //! 
 //! // Get an ApplicationSecret instance by some means. It contains the `client_id` and 
 //! // `client_secret`, among other things.
@@ -258,22 +258,17 @@
 // This file was generated automatically from 'src/generator/templates/api/lib.rs.mako'
 // DO NOT EDIT !
 
-#[macro_use]
-extern crate serde_derive;
-
 // Re-export the hyper and hyper_rustls crate, they are required to build the hub
-pub extern crate hyper;
-pub extern crate hyper_rustls;
-extern crate serde;
-extern crate serde_json;
-// Re-export the yup_oauth2 crate, that is required to call some methods of the hub and the client
-pub extern crate yup_oauth2 as oauth2;
-extern crate mime;
-extern crate url;
-
+pub use hyper;
+pub use hyper_rustls;
+pub extern crate google_apis_common as client;
+pub use client::chrono;
 pub mod api;
-pub mod client;
 
 // Re-export the hub type and some basic client structs
 pub use api::MyBusiness;
-pub use client::{Result, Error, Delegate};
+pub use client::{Result, Error, Delegate, FieldMask};
+
+// Re-export the yup_oauth2 crate, that is required to call some methods of the hub and the client
+#[cfg(feature = "yup-oauth2")]
+pub use client::oauth2;

@@ -1,19 +1,20 @@
 use std::collections::HashMap;
 use std::cell::RefCell;
 use std::default::Default;
-use std::collections::BTreeMap;
+use std::collections::BTreeSet;
 use std::error::Error as StdError;
 use serde_json as json;
 use std::io;
 use std::fs;
 use std::mem;
-use std::thread::sleep;
 
-use http::Uri;
 use hyper::client::connect;
 use tokio::io::{AsyncRead, AsyncWrite};
+use tokio::time::sleep;
 use tower_service;
-use crate::client;
+use serde::{Serialize, Deserialize};
+
+use crate::{client, client::GetToken, client::serde_with};
 
 // ##############
 // UTILITIES ###
@@ -62,7 +63,7 @@ impl Default for Scope {
 /// use videointelligence1_beta1::{Result, Error};
 /// # async fn dox() {
 /// use std::default::Default;
-/// use videointelligence1_beta1::{CloudVideoIntelligence, oauth2, hyper, hyper_rustls};
+/// use videointelligence1_beta1::{CloudVideoIntelligence, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// // Get an ApplicationSecret instance by some means. It contains the `client_id` and 
 /// // `client_secret`, among other things.
@@ -110,7 +111,7 @@ impl Default for Scope {
 #[derive(Clone)]
 pub struct CloudVideoIntelligence<S> {
     pub client: hyper::Client<S, hyper::body::Body>,
-    pub auth: oauth2::authenticator::Authenticator<S>,
+    pub auth: Box<dyn client::GetToken>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
@@ -120,11 +121,11 @@ impl<'a, S> client::Hub for CloudVideoIntelligence<S> {}
 
 impl<'a, S> CloudVideoIntelligence<S> {
 
-    pub fn new(client: hyper::Client<S, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<S>) -> CloudVideoIntelligence<S> {
+    pub fn new<A: 'static + client::GetToken>(client: hyper::Client<S, hyper::body::Body>, auth: A) -> CloudVideoIntelligence<S> {
         CloudVideoIntelligence {
             client,
-            auth: authenticator,
-            _user_agent: "google-api-rust-client/4.0.1".to_string(),
+            auth: Box::new(auth),
+            _user_agent: "google-api-rust-client/5.0.2-beta-1".to_string(),
             _base_url: "https://videointelligence.googleapis.com/".to_string(),
             _root_url: "https://videointelligence.googleapis.com/".to_string(),
         }
@@ -135,7 +136,7 @@ impl<'a, S> CloudVideoIntelligence<S> {
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/4.0.1`.
+    /// It defaults to `google-api-rust-client/5.0.2-beta-1`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -173,11 +174,13 @@ impl<'a, S> CloudVideoIntelligence<S> {
 /// 
 /// * [annotate videos](VideoAnnotateCall) (response)
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleLongrunning_Operation {
     /// If the value is `false`, it means the operation is still in progress.
     /// If `true`, the operation is completed, and either `error` or `response` is
     /// available.
+    
     pub done: Option<bool>,
     /// The normal response of the operation in case of success.  If the original
     /// method returns no data on success, such as `Delete`, the response is
@@ -187,18 +190,22 @@ pub struct GoogleLongrunning_Operation {
     /// is the original method name.  For example, if the original method name
     /// is `TakeSnapshot()`, the inferred response type is
     /// `TakeSnapshotResponse`.
-    pub response: Option<HashMap<String, String>>,
+    
+    pub response: Option<HashMap<String, json::Value>>,
     /// The server-assigned name, which is only unique within the same service that
     /// originally returns it. If you use the default HTTP mapping, the
     /// `name` should have the format of `operations/some/unique/name`.
+    
     pub name: Option<String>,
     /// The error result of the operation in case of failure or cancellation.
+    
     pub error: Option<GoogleRpc_Status>,
     /// Service-specific metadata associated with the operation.  It typically
     /// contains progress information and common metadata such as create time.
     /// Some services might not provide such metadata.  Any method that returns a
     /// long-running operation should document the metadata type, if any.
-    pub metadata: Option<HashMap<String, String>>,
+    
+    pub metadata: Option<HashMap<String, json::Value>>,
 }
 
 impl client::ResponseResult for GoogleLongrunning_Operation {}
@@ -213,6 +220,7 @@ impl client::ResponseResult for GoogleLongrunning_Operation {}
 /// 
 /// * [annotate videos](VideoAnnotateCall) (request)
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudVideointelligenceV1beta1_AnnotateVideoRequest {
     /// Optional location where the output (in JSON format) should be stored.
@@ -222,16 +230,20 @@ pub struct GoogleCloudVideointelligenceV1beta1_AnnotateVideoRequest {
     /// google.rpc.Code.INVALID_ARGUMENT). For more information, see
     /// [Request URIs](/storage/docs/reference-uris).
     #[serde(rename="outputUri")]
+    
     pub output_uri: Option<String>,
     /// Requested video annotation features.
+    
     pub features: Option<Vec<String>>,
     /// Additional video context and/or feature-specific parameters.
     #[serde(rename="videoContext")]
+    
     pub video_context: Option<GoogleCloudVideointelligenceV1beta1_VideoContext>,
     /// Optional cloud region where annotation should take place. Supported cloud
     /// regions: `us-east1`, `us-west1`, `europe-west1`, `asia-east1`. If no region
     /// is specified, a region will be determined based on video file location.
     #[serde(rename="locationId")]
+    
     pub location_id: Option<String>,
     /// Input video location. Currently, only
     /// [Google Cloud Storage](https://cloud.google.com/storage/) URIs are
@@ -244,10 +256,12 @@ pub struct GoogleCloudVideointelligenceV1beta1_AnnotateVideoRequest {
     /// '?' to match 1 character. If unset, the input video should be embedded
     /// in the request as `input_content`. If set, `input_content` should be unset.
     #[serde(rename="inputUri")]
+    
     pub input_uri: Option<String>,
     /// The video data bytes. Encoding: base64. If unset, the input video(s)
     /// should be specified via `input_uri`. If set, `input_uri` should be unset.
     #[serde(rename="inputContent")]
+    
     pub input_content: Option<String>,
 }
 
@@ -258,14 +272,19 @@ impl client::RequestValue for GoogleCloudVideointelligenceV1beta1_AnnotateVideoR
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudVideointelligenceV1beta1_VideoSegment {
     /// End offset in microseconds (inclusive). Unset means 0.
     #[serde(rename="endTimeOffset")]
-    pub end_time_offset: Option<String>,
+    
+    #[serde_as(as = "Option<::client::serde_with::DisplayFromStr>")]
+    pub end_time_offset: Option<i64>,
     /// Start offset in microseconds (inclusive). Unset means 0.
     #[serde(rename="startTimeOffset")]
-    pub start_time_offset: Option<String>,
+    
+    #[serde_as(as = "Option<::client::serde_with::DisplayFromStr>")]
+    pub start_time_offset: Option<i64>,
 }
 
 impl client::Part for GoogleCloudVideointelligenceV1beta1_VideoSegment {}
@@ -275,32 +294,39 @@ impl client::Part for GoogleCloudVideointelligenceV1beta1_VideoSegment {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudVideointelligenceV1beta1_VideoContext {
     /// Model to use for safe search detection.
     /// Supported values: "latest" and "stable" (the default).
     #[serde(rename="safeSearchDetectionModel")]
+    
     pub safe_search_detection_model: Option<String>,
     /// Video segments to annotate. The segments may overlap and are not required
     /// to be contiguous or span the whole video. If unspecified, each video
     /// is treated as a single segment.
+    
     pub segments: Option<Vec<GoogleCloudVideointelligenceV1beta1_VideoSegment>>,
     /// Model to use for label detection.
     /// Supported values: "latest" and "stable" (the default).
     #[serde(rename="labelDetectionModel")]
+    
     pub label_detection_model: Option<String>,
     /// Model to use for shot change detection.
     /// Supported values: "latest" and "stable" (the default).
     #[serde(rename="shotChangeDetectionModel")]
+    
     pub shot_change_detection_model: Option<String>,
     /// If label detection has been requested, what labels should be detected
     /// in addition to video-level labels or segment-level labels. If unspecified,
     /// defaults to `SHOT_MODE`.
     #[serde(rename="labelDetectionMode")]
+    
     pub label_detection_mode: Option<String>,
     /// Whether the video has been shot from a stationary (i.e. non-moving) camera.
     /// When set to true, might improve detection accuracy for moving objects.
     #[serde(rename="stationaryCamera")]
+    
     pub stationary_camera: Option<bool>,
 }
 
@@ -361,16 +387,20 @@ impl client::Part for GoogleCloudVideointelligenceV1beta1_VideoContext {}
 ///   be used directly after any stripping needed for security/privacy reasons.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleRpc_Status {
     /// A list of messages that carry the error details.  There is a common set of
     /// message types for APIs to use.
-    pub details: Option<Vec<HashMap<String, String>>>,
+    
+    pub details: Option<Vec<HashMap<String, json::Value>>>,
     /// The status code, which should be an enum value of google.rpc.Code.
+    
     pub code: Option<i32>,
     /// A developer-facing error message, which should be in English. Any
     /// user-facing error message should be localized and sent in the
     /// google.rpc.Status.details field, or localized by the client.
+    
     pub message: Option<String>,
 }
 
@@ -383,7 +413,7 @@ impl client::Part for GoogleRpc_Status {}
 // #################
 
 /// A builder providing access to all methods supported on *video* resources.
-/// It is not used directly, but through the `CloudVideoIntelligence` hub.
+/// It is not used directly, but through the [`CloudVideoIntelligence`] hub.
 ///
 /// # Example
 ///
@@ -396,7 +426,7 @@ impl client::Part for GoogleRpc_Status {}
 /// 
 /// # async fn dox() {
 /// use std::default::Default;
-/// use videointelligence1_beta1::{CloudVideoIntelligence, oauth2, hyper, hyper_rustls};
+/// use videointelligence1_beta1::{CloudVideoIntelligence, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// let secret: oauth2::ApplicationSecret = Default::default();
 /// let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -455,7 +485,7 @@ impl<'a, S> VideoMethods<'a, S> {
 /// `Operation.response` contains `AnnotateVideoResponse` (results).
 ///
 /// A builder for the *annotate* method supported by a *video* resource.
-/// It is not used directly, but through a `VideoMethods` instance.
+/// It is not used directly, but through a [`VideoMethods`] instance.
 ///
 /// # Example
 ///
@@ -468,7 +498,7 @@ impl<'a, S> VideoMethods<'a, S> {
 /// use videointelligence1_beta1::api::GoogleCloudVideointelligenceV1beta1_AnnotateVideoRequest;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use videointelligence1_beta1::{CloudVideoIntelligence, oauth2, hyper, hyper_rustls};
+/// # use videointelligence1_beta1::{CloudVideoIntelligence, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
 /// # let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -495,14 +525,14 @@ pub struct VideoAnnotateCall<'a, S>
     _request: GoogleCloudVideointelligenceV1beta1_AnnotateVideoRequest,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
+    _scopes: BTreeSet<String>
 }
 
 impl<'a, S> client::CallBuilder for VideoAnnotateCall<'a, S> {}
 
 impl<'a, S> VideoAnnotateCall<'a, S>
 where
-    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
     S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
     S::Future: Send + Unpin + 'static,
     S::Error: Into<Box<dyn StdError + Send + Sync>>,
@@ -513,36 +543,35 @@ where
     pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, GoogleLongrunning_Operation)> {
         use std::io::{Read, Seek};
         use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::ToParts;
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
         let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
         dlg.begin(client::MethodInfo { id: "videointelligence.videos.annotate",
                                http_method: hyper::Method::POST });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
+
         for &field in ["alt"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(client::Error::FieldClash(field));
             }
         }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
 
-        params.push(("alt", "json".to_string()));
+        let mut params = Params::with_capacity(3 + self._additional_params.len());
 
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "v1beta1/videos:annotate";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string());
         }
 
 
-        let url = url::Url::parse_with_params(&url, params).unwrap();
+        let url = params.parse_with_url(&url);
 
-        let mut json_mime_type: mime::Mime = "application/json".parse().unwrap();
+        let mut json_mime_type = mime::APPLICATION_JSON;
         let mut request_value_reader =
             {
                 let mut value = json::value::to_value(&self._request).expect("serde to work");
@@ -556,14 +585,14 @@ where
 
 
         loop {
-            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
-                Ok(token) => token.clone(),
-                Err(err) => {
-                    match  dlg.token(&err) {
-                        Some(token) => token,
-                        None => {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
                             dlg.finished(false);
-                            return Err(client::Error::MissingToken(err))
+                            return Err(client::Error::MissingToken(e));
                         }
                     }
                 }
@@ -572,23 +601,29 @@ where
             let mut req_result = {
                 let client = &self.hub.client;
                 dlg.pre_request();
-                let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
-                        .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::POST)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
 
 
                         let request = req_builder
-                        .header(CONTENT_TYPE, format!("{}", json_mime_type.to_string()))
+                        .header(CONTENT_TYPE, json_mime_type.to_string())
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
                 client.request(request.unwrap()).await
-                
+
             };
 
             match req_result {
                 Err(err) => {
                     if let client::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep(d).await;
                         continue;
                     }
                     dlg.finished(false);
@@ -604,7 +639,7 @@ where
                         let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
                         if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
-                            sleep(d);
+                            sleep(d).await;
                             continue;
                         }
 
@@ -647,7 +682,8 @@ where
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.````
     ///
     /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> VideoAnnotateCall<'a, S> {
@@ -685,25 +721,36 @@ where
 
     /// Identifies the authorization scope for the method you are building.
     ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::CloudPlatform`.
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::CloudPlatform`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
     ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, St>(mut self, scope: T) -> VideoAnnotateCall<'a, S>
-                                                        where T: Into<Option<St>>,
-                                                              St: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
+    pub fn add_scope<St>(mut self, scope: St) -> VideoAnnotateCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> VideoAnnotateCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> VideoAnnotateCall<'a, S> {
+        self._scopes.clear();
         self
     }
 }

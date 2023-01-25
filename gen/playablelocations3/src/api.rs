@@ -1,19 +1,20 @@
 use std::collections::HashMap;
 use std::cell::RefCell;
 use std::default::Default;
-use std::collections::BTreeMap;
+use std::collections::BTreeSet;
 use std::error::Error as StdError;
 use serde_json as json;
 use std::io;
 use std::fs;
 use std::mem;
-use std::thread::sleep;
 
-use http::Uri;
 use hyper::client::connect;
 use tokio::io::{AsyncRead, AsyncWrite};
+use tokio::time::sleep;
 use tower_service;
-use crate::client;
+use serde::{Serialize, Deserialize};
+
+use crate::{client, client::GetToken, client::serde_with};
 
 // ##############
 // UTILITIES ###
@@ -40,7 +41,7 @@ use crate::client;
 /// use playablelocations3::{Result, Error};
 /// # async fn dox() {
 /// use std::default::Default;
-/// use playablelocations3::{PlayableLocations, oauth2, hyper, hyper_rustls};
+/// use playablelocations3::{PlayableLocations, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// // Get an ApplicationSecret instance by some means. It contains the `client_id` and 
 /// // `client_secret`, among other things.
@@ -88,7 +89,7 @@ use crate::client;
 #[derive(Clone)]
 pub struct PlayableLocations<S> {
     pub client: hyper::Client<S, hyper::body::Body>,
-    pub auth: oauth2::authenticator::Authenticator<S>,
+    pub auth: Box<dyn client::GetToken>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
@@ -98,11 +99,11 @@ impl<'a, S> client::Hub for PlayableLocations<S> {}
 
 impl<'a, S> PlayableLocations<S> {
 
-    pub fn new(client: hyper::Client<S, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<S>) -> PlayableLocations<S> {
+    pub fn new<A: 'static + client::GetToken>(client: hyper::Client<S, hyper::body::Body>, auth: A) -> PlayableLocations<S> {
         PlayableLocations {
             client,
-            auth: authenticator,
-            _user_agent: "google-api-rust-client/4.0.1".to_string(),
+            auth: Box::new(auth),
+            _user_agent: "google-api-rust-client/5.0.2-beta-1".to_string(),
             _base_url: "https://playablelocations.googleapis.com/".to_string(),
             _root_url: "https://playablelocations.googleapis.com/".to_string(),
         }
@@ -113,7 +114,7 @@ impl<'a, S> PlayableLocations<S> {
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/4.0.1`.
+    /// It defaults to `google-api-rust-client/5.0.2-beta-1`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -145,6 +146,7 @@ impl<'a, S> PlayableLocations<S> {
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleMapsPlayablelocationsV3Impression {
     /// An arbitrary, developer-defined type identifier for each type of game
@@ -158,12 +160,15 @@ pub struct GoogleMapsPlayablelocationsV3Impression {
     /// 
     /// For example, 1=monster location, 2=powerup location.
     #[serde(rename="gameObjectType")]
+    
     pub game_object_type: Option<i32>,
     /// Required. The type of impression event.
     #[serde(rename="impressionType")]
+    
     pub impression_type: Option<String>,
     /// Required. The name of the playable location.
     #[serde(rename="locationName")]
+    
     pub location_name: Option<String>,
 }
 
@@ -179,14 +184,17 @@ impl client::Part for GoogleMapsPlayablelocationsV3Impression {}
 /// 
 /// * [log impressions](MethodLogImpressionCall) (request)
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleMapsPlayablelocationsV3LogImpressionsRequest {
     /// Required. Information about the client device. For example, device model and
     /// operating system.
     #[serde(rename="clientInfo")]
+    
     pub client_info: Option<GoogleMapsUnityClientInfo>,
     /// Required. Impression event details. The maximum number of impression reports that you
     /// can log at once is 50.
+    
     pub impressions: Option<Vec<GoogleMapsPlayablelocationsV3Impression>>,
     /// Required. A string that uniquely identifies the log impressions request. This allows
     /// you to detect duplicate requests. We recommend that you use UUIDs for this
@@ -196,6 +204,7 @@ pub struct GoogleMapsPlayablelocationsV3LogImpressionsRequest {
     /// failure. In this case, the request must be identical to the one that
     /// failed.
     #[serde(rename="requestId")]
+    
     pub request_id: Option<String>,
 }
 
@@ -212,6 +221,7 @@ impl client::RequestValue for GoogleMapsPlayablelocationsV3LogImpressionsRequest
 /// 
 /// * [log impressions](MethodLogImpressionCall) (response)
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleMapsPlayablelocationsV3LogImpressionsResponse { _never_set: Option<bool> }
 
@@ -227,15 +237,18 @@ impl client::ResponseResult for GoogleMapsPlayablelocationsV3LogImpressionsRespo
 /// 
 /// * [log player reports](MethodLogPlayerReportCall) (request)
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleMapsPlayablelocationsV3LogPlayerReportsRequest {
     /// Required. Information about the client device (for example, device model and
     /// operating system).
     #[serde(rename="clientInfo")]
+    
     pub client_info: Option<GoogleMapsUnityClientInfo>,
     /// Required. Player reports. The maximum number of player reports that you can log at
     /// once is 50.
     #[serde(rename="playerReports")]
+    
     pub player_reports: Option<Vec<GoogleMapsPlayablelocationsV3PlayerReport>>,
     /// Required. A string that uniquely identifies the log player reports request. This
     /// allows you to detect duplicate requests. We recommend that you use UUIDs
@@ -245,6 +258,7 @@ pub struct GoogleMapsPlayablelocationsV3LogPlayerReportsRequest {
     /// of a failure. In that case, the request must be identical to the one that
     /// failed.
     #[serde(rename="requestId")]
+    
     pub request_id: Option<String>,
 }
 
@@ -263,6 +277,7 @@ impl client::RequestValue for GoogleMapsPlayablelocationsV3LogPlayerReportsReque
 /// 
 /// * [log player reports](MethodLogPlayerReportCall) (response)
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleMapsPlayablelocationsV3LogPlayerReportsResponse { _never_set: Option<bool> }
 
@@ -274,6 +289,7 @@ impl client::ResponseResult for GoogleMapsPlayablelocationsV3LogPlayerReportsRes
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleMapsPlayablelocationsV3PlayerReport {
     /// Language code (in BCP-47 format) indicating the language of the freeform
@@ -281,15 +297,19 @@ pub struct GoogleMapsPlayablelocationsV3PlayerReport {
     /// "ja-Latn". For more information, see
     /// http://www.unicode.org/reports/tr35/#Unicode_locale_identifier.
     #[serde(rename="languageCode")]
+    
     pub language_code: Option<String>,
     /// Required. The name of the playable location.
     #[serde(rename="locationName")]
+    
     pub location_name: Option<String>,
     /// Required. A free-form description detailing why the playable location is
     /// considered bad.
     #[serde(rename="reasonDetails")]
+    
     pub reason_details: Option<String>,
     /// Required. One or more reasons why this playable location is considered bad.
+    
     pub reasons: Option<Vec<String>>,
 }
 
@@ -300,6 +320,7 @@ impl client::Part for GoogleMapsPlayablelocationsV3PlayerReport {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleMapsPlayablelocationsV3SampleAreaFilter {
     /// Required. The S2 cell ID of the area you want. This must be between cell level 11 and
@@ -315,7 +336,9 @@ pub struct GoogleMapsPlayablelocationsV3SampleAreaFilter {
     ///   * [Go](https://github.com/golang/geo)
     ///   * [Python](https://github.com/google/s2geometry/tree/master/src/python)
     #[serde(rename="s2CellId")]
-    pub s2_cell_id: Option<String>,
+    
+    #[serde_as(as = "Option<::client::serde_with::DisplayFromStr>")]
+    pub s2_cell_id: Option<u64>,
 }
 
 impl client::Part for GoogleMapsPlayablelocationsV3SampleAreaFilter {}
@@ -326,6 +349,7 @@ impl client::Part for GoogleMapsPlayablelocationsV3SampleAreaFilter {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleMapsPlayablelocationsV3SampleCriterion {
     /// Specifies which `PlayableLocation` fields are returned.
@@ -341,9 +365,11 @@ pub struct GoogleMapsPlayablelocationsV3SampleCriterion {
     /// Note: The more fields you include, the more expensive in terms of data and
     /// associated latency your query will be.
     #[serde(rename="fieldsToReturn")]
-    pub fields_to_return: Option<String>,
+    
+    pub fields_to_return: Option<client::FieldMask>,
     /// Specifies filtering options, and specifies what will be included in the
     /// result set.
+    
     pub filter: Option<GoogleMapsPlayablelocationsV3SampleFilter>,
     /// Required. An arbitrary, developer-defined identifier of the type of game object that
     /// the playable location is used for. This field allows you to specify
@@ -355,6 +381,7 @@ pub struct GoogleMapsPlayablelocationsV3SampleCriterion {
     /// 
     /// The response contains a map<game_object_type, Response>.
     #[serde(rename="gameObjectType")]
+    
     pub game_object_type: Option<i32>,
 }
 
@@ -365,20 +392,24 @@ impl client::Part for GoogleMapsPlayablelocationsV3SampleCriterion {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleMapsPlayablelocationsV3SampleFilter {
     /// Restricts the set of playable locations to just the
     /// [types](/maps/documentation/gaming/tt/types) that you want.
     #[serde(rename="includedTypes")]
+    
     pub included_types: Option<Vec<String>>,
     /// Specifies the maximum number of playable locations to return. This value
     /// must not be greater than 1000. The default value is 100.
     /// 
     /// Only the top-ranking playable locations are returned.
     #[serde(rename="maxLocationCount")]
+    
     pub max_location_count: Option<i32>,
     /// A set of options that control the spacing between playable locations. By
     /// default the minimum distance between locations is 200m.
+    
     pub spacing: Option<GoogleMapsPlayablelocationsV3SampleSpacingOptions>,
 }
 
@@ -390,6 +421,7 @@ impl client::Part for GoogleMapsPlayablelocationsV3SampleFilter {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleMapsPlayablelocationsV3SamplePlayableLocation {
     /// Required. The latitude and longitude associated with the center of the playable
@@ -399,24 +431,30 @@ pub struct GoogleMapsPlayablelocationsV3SamplePlayableLocation {
     /// SamplePlayableLocations use
     /// center-point coordinates.
     #[serde(rename="centerPoint")]
+    
     pub center_point: Option<GoogleTypeLatLng>,
     /// Required. The name of this playable location.
+    
     pub name: Option<String>,
     /// A [place ID] (https://developers.google.com/places/place-id)
     #[serde(rename="placeId")]
+    
     pub place_id: Option<String>,
     /// A [plus code] (http://openlocationcode.com)
     #[serde(rename="plusCode")]
+    
     pub plus_code: Option<String>,
     /// The playable location's coordinates, snapped to the sidewalk of the
     /// nearest road, if a nearby road exists.
     #[serde(rename="snappedPoint")]
+    
     pub snapped_point: Option<GoogleTypeLatLng>,
     /// A collection of [Playable Location
     /// Types](/maps/documentation/gaming/tt/types) for this playable location. The
     /// first type in the collection is the primary type.
     /// 
     /// Type information might not be available for all playable locations.
+    
     pub types: Option<Vec<String>>,
 }
 
@@ -427,9 +465,11 @@ impl client::Part for GoogleMapsPlayablelocationsV3SamplePlayableLocation {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleMapsPlayablelocationsV3SamplePlayableLocationList {
     /// A list of playable locations for this game object type.
+    
     pub locations: Option<Vec<GoogleMapsPlayablelocationsV3SamplePlayableLocation>>,
 }
 
@@ -468,13 +508,16 @@ impl client::Part for GoogleMapsPlayablelocationsV3SamplePlayableLocationList {}
 /// 
 /// * [sample playable locations](MethodSamplePlayableLocationCall) (request)
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleMapsPlayablelocationsV3SamplePlayableLocationsRequest {
     /// Required. Specifies the area to search within for playable locations.
     #[serde(rename="areaFilter")]
+    
     pub area_filter: Option<GoogleMapsPlayablelocationsV3SampleAreaFilter>,
     /// Required. Specifies one or more (up to 5) criteria for filtering the
     /// returned playable locations.
+    
     pub criteria: Option<Vec<GoogleMapsPlayablelocationsV3SampleCriterion>>,
 }
 
@@ -493,11 +536,13 @@ impl client::RequestValue for GoogleMapsPlayablelocationsV3SamplePlayableLocatio
 /// 
 /// * [sample playable locations](MethodSamplePlayableLocationCall) (response)
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleMapsPlayablelocationsV3SamplePlayableLocationsResponse {
     /// Each PlayableLocation object corresponds to a game_object_type specified
     /// in the request.
     #[serde(rename="locationsPerGameObjectType")]
+    
     pub locations_per_game_object_type: Option<HashMap<String, GoogleMapsPlayablelocationsV3SamplePlayableLocationList>>,
     /// Required. Specifies the "time-to-live" for the set of playable locations. You can use
     /// this value to determine how long to cache the set of playable locations.
@@ -506,7 +551,9 @@ pub struct GoogleMapsPlayablelocationsV3SamplePlayableLocationsResponse {
     /// request to get a fresh set of playable locations (because for example, they
     /// might have been removed, a park might have closed for the day, a
     /// business might have closed permanently).
-    pub ttl: Option<String>,
+    
+    #[serde_as(as = "Option<::client::serde::duration::Wrapper>")]
+    pub ttl: Option<client::chrono::Duration>,
 }
 
 impl client::ResponseResult for GoogleMapsPlayablelocationsV3SamplePlayableLocationsResponse {}
@@ -516,6 +563,7 @@ impl client::ResponseResult for GoogleMapsPlayablelocationsV3SamplePlayableLocat
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleMapsPlayablelocationsV3SampleSpacingOptions {
     /// Required. The minimum spacing between any two playable locations, measured in meters.
@@ -559,6 +607,7 @@ pub struct GoogleMapsPlayablelocationsV3SampleSpacingOptions {
     ///   * Y->X, Y->Y: unspecified.
     ///   * Z->X, Z->Y, Z->Z: 200m.
     #[serde(rename="minSpacingMeters")]
+    
     pub min_spacing_meters: Option<f64>,
     /// Specifies whether the minimum spacing constraint applies to the
     /// center-point or to the snapped point of playable locations. The default
@@ -569,6 +618,7 @@ pub struct GoogleMapsPlayablelocationsV3SampleSpacingOptions {
     /// 
     /// Set this to the point type used in your game.
     #[serde(rename="pointType")]
+    
     pub point_type: Option<String>,
 }
 
@@ -579,39 +629,48 @@ impl client::Part for GoogleMapsPlayablelocationsV3SampleSpacingOptions {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleMapsUnityClientInfo {
     /// API client name and version. For example, the SDK calling the API. The
     /// exact format is up to the client.
     #[serde(rename="apiClient")]
+    
     pub api_client: Option<String>,
     /// Application ID, such as the package name on Android and the bundle
     /// identifier on iOS platforms.
     #[serde(rename="applicationId")]
+    
     pub application_id: Option<String>,
     /// Application version number, such as "1.2.3". The exact format is
     /// application-dependent.
     #[serde(rename="applicationVersion")]
+    
     pub application_version: Option<String>,
     /// Device model as reported by the device. The exact format is
     /// platform-dependent.
     #[serde(rename="deviceModel")]
+    
     pub device_model: Option<String>,
     /// Language code (in BCP-47 format) indicating the UI language of the client.
     /// Examples are "en", "en-US" or "ja-Latn". For more information, see
     /// http://www.unicode.org/reports/tr35/#Unicode_locale_identifier.
     #[serde(rename="languageCode")]
+    
     pub language_code: Option<String>,
     /// Operating system name and version as reported by the OS. For example,
     /// "Mac OS X 10.10.4". The exact format is platform-dependent.
     #[serde(rename="operatingSystem")]
+    
     pub operating_system: Option<String>,
     /// Build number/version of the operating system. e.g., the contents of
     /// android.os.Build.ID in Android, or the contents of sysctl "kern.osversion"
     /// in iOS.
     #[serde(rename="operatingSystemBuild")]
+    
     pub operating_system_build: Option<String>,
     /// Platform where the application is running.
+    
     pub platform: Option<String>,
 }
 
@@ -626,11 +685,14 @@ impl client::Part for GoogleMapsUnityClientInfo {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleTypeLatLng {
     /// The latitude in degrees. It must be in the range [-90.0, +90.0].
+    
     pub latitude: Option<f64>,
     /// The longitude in degrees. It must be in the range [-180.0, +180.0].
+    
     pub longitude: Option<f64>,
 }
 
@@ -643,7 +705,7 @@ impl client::Part for GoogleTypeLatLng {}
 // #################
 
 /// A builder providing access to all free methods, which are not associated with a particular resource.
-/// It is not used directly, but through the `PlayableLocations` hub.
+/// It is not used directly, but through the [`PlayableLocations`] hub.
 ///
 /// # Example
 ///
@@ -656,7 +718,7 @@ impl client::Part for GoogleTypeLatLng {}
 /// 
 /// # async fn dox() {
 /// use std::default::Default;
-/// use playablelocations3::{PlayableLocations, oauth2, hyper, hyper_rustls};
+/// use playablelocations3::{PlayableLocations, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// let secret: oauth2::ApplicationSecret = Default::default();
 /// let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -755,7 +817,7 @@ impl<'a, S> MethodMethods<'a, S> {
 /// this request succeeds, or no impressions are saved, and this request fails.
 ///
 /// A builder for the *logImpressions* method.
-/// It is not used directly, but through a `MethodMethods` instance.
+/// It is not used directly, but through a [`MethodMethods`] instance.
 ///
 /// # Example
 ///
@@ -768,7 +830,7 @@ impl<'a, S> MethodMethods<'a, S> {
 /// use playablelocations3::api::GoogleMapsPlayablelocationsV3LogImpressionsRequest;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use playablelocations3::{PlayableLocations, oauth2, hyper, hyper_rustls};
+/// # use playablelocations3::{PlayableLocations, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
 /// # let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -801,7 +863,7 @@ impl<'a, S> client::CallBuilder for MethodLogImpressionCall<'a, S> {}
 
 impl<'a, S> MethodLogImpressionCall<'a, S>
 where
-    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
     S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
     S::Future: Send + Unpin + 'static,
     S::Error: Into<Box<dyn StdError + Send + Sync>>,
@@ -812,32 +874,30 @@ where
     pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, GoogleMapsPlayablelocationsV3LogImpressionsResponse)> {
         use std::io::{Read, Seek};
         use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::ToParts;
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
         let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
         dlg.begin(client::MethodInfo { id: "playablelocations.logImpressions",
                                http_method: hyper::Method::POST });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
+
         for &field in ["alt"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(client::Error::FieldClash(field));
             }
         }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
 
-        params.push(("alt", "json".to_string()));
+        let mut params = Params::with_capacity(3 + self._additional_params.len());
 
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "v3:logImpressions";
         
-        let key = dlg.api_key();
-        match key {
-            Some(value) => params.push(("key", value)),
+        match dlg.api_key() {
+            Some(value) => params.push("key", value),
             None => {
                 dlg.finished(false);
                 return Err(client::Error::MissingAPIKey)
@@ -845,9 +905,9 @@ where
         }
 
 
-        let url = url::Url::parse_with_params(&url, params).unwrap();
+        let url = params.parse_with_url(&url);
 
-        let mut json_mime_type: mime::Mime = "application/json".parse().unwrap();
+        let mut json_mime_type = mime::APPLICATION_JSON;
         let mut request_value_reader =
             {
                 let mut value = json::value::to_value(&self._request).expect("serde to work");
@@ -865,23 +925,26 @@ where
             let mut req_result = {
                 let client = &self.hub.client;
                 dlg.pre_request();
-                let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
-                        .header(USER_AGENT, self.hub._user_agent.clone());
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::POST)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
 
 
                         let request = req_builder
-                        .header(CONTENT_TYPE, format!("{}", json_mime_type.to_string()))
+                        .header(CONTENT_TYPE, json_mime_type.to_string())
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
                 client.request(request.unwrap()).await
-                
+
             };
 
             match req_result {
                 Err(err) => {
                     if let client::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep(d).await;
                         continue;
                     }
                     dlg.finished(false);
@@ -897,7 +960,7 @@ where
                         let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
                         if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
-                            sleep(d);
+                            sleep(d).await;
                             continue;
                         }
 
@@ -940,7 +1003,8 @@ where
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.````
     ///
     /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MethodLogImpressionCall<'a, S> {
@@ -983,7 +1047,7 @@ where
 /// request succeeds, or no reports are saved, and this request fails.
 ///
 /// A builder for the *logPlayerReports* method.
-/// It is not used directly, but through a `MethodMethods` instance.
+/// It is not used directly, but through a [`MethodMethods`] instance.
 ///
 /// # Example
 ///
@@ -996,7 +1060,7 @@ where
 /// use playablelocations3::api::GoogleMapsPlayablelocationsV3LogPlayerReportsRequest;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use playablelocations3::{PlayableLocations, oauth2, hyper, hyper_rustls};
+/// # use playablelocations3::{PlayableLocations, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
 /// # let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -1029,7 +1093,7 @@ impl<'a, S> client::CallBuilder for MethodLogPlayerReportCall<'a, S> {}
 
 impl<'a, S> MethodLogPlayerReportCall<'a, S>
 where
-    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
     S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
     S::Future: Send + Unpin + 'static,
     S::Error: Into<Box<dyn StdError + Send + Sync>>,
@@ -1040,32 +1104,30 @@ where
     pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, GoogleMapsPlayablelocationsV3LogPlayerReportsResponse)> {
         use std::io::{Read, Seek};
         use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::ToParts;
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
         let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
         dlg.begin(client::MethodInfo { id: "playablelocations.logPlayerReports",
                                http_method: hyper::Method::POST });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
+
         for &field in ["alt"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(client::Error::FieldClash(field));
             }
         }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
 
-        params.push(("alt", "json".to_string()));
+        let mut params = Params::with_capacity(3 + self._additional_params.len());
 
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "v3:logPlayerReports";
         
-        let key = dlg.api_key();
-        match key {
-            Some(value) => params.push(("key", value)),
+        match dlg.api_key() {
+            Some(value) => params.push("key", value),
             None => {
                 dlg.finished(false);
                 return Err(client::Error::MissingAPIKey)
@@ -1073,9 +1135,9 @@ where
         }
 
 
-        let url = url::Url::parse_with_params(&url, params).unwrap();
+        let url = params.parse_with_url(&url);
 
-        let mut json_mime_type: mime::Mime = "application/json".parse().unwrap();
+        let mut json_mime_type = mime::APPLICATION_JSON;
         let mut request_value_reader =
             {
                 let mut value = json::value::to_value(&self._request).expect("serde to work");
@@ -1093,23 +1155,26 @@ where
             let mut req_result = {
                 let client = &self.hub.client;
                 dlg.pre_request();
-                let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
-                        .header(USER_AGENT, self.hub._user_agent.clone());
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::POST)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
 
 
                         let request = req_builder
-                        .header(CONTENT_TYPE, format!("{}", json_mime_type.to_string()))
+                        .header(CONTENT_TYPE, json_mime_type.to_string())
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
                 client.request(request.unwrap()).await
-                
+
             };
 
             match req_result {
                 Err(err) => {
                     if let client::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep(d).await;
                         continue;
                     }
                     dlg.finished(false);
@@ -1125,7 +1190,7 @@ where
                         let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
                         if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
-                            sleep(d);
+                            sleep(d).await;
                             continue;
                         }
 
@@ -1168,7 +1233,8 @@ where
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.````
     ///
     /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MethodLogPlayerReportCall<'a, S> {
@@ -1212,7 +1278,7 @@ where
 /// results as the state of the world changes over time.
 ///
 /// A builder for the *samplePlayableLocations* method.
-/// It is not used directly, but through a `MethodMethods` instance.
+/// It is not used directly, but through a [`MethodMethods`] instance.
 ///
 /// # Example
 ///
@@ -1225,7 +1291,7 @@ where
 /// use playablelocations3::api::GoogleMapsPlayablelocationsV3SamplePlayableLocationsRequest;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use playablelocations3::{PlayableLocations, oauth2, hyper, hyper_rustls};
+/// # use playablelocations3::{PlayableLocations, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
 /// # let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -1258,7 +1324,7 @@ impl<'a, S> client::CallBuilder for MethodSamplePlayableLocationCall<'a, S> {}
 
 impl<'a, S> MethodSamplePlayableLocationCall<'a, S>
 where
-    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
     S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
     S::Future: Send + Unpin + 'static,
     S::Error: Into<Box<dyn StdError + Send + Sync>>,
@@ -1269,32 +1335,30 @@ where
     pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, GoogleMapsPlayablelocationsV3SamplePlayableLocationsResponse)> {
         use std::io::{Read, Seek};
         use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::ToParts;
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
         let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
         dlg.begin(client::MethodInfo { id: "playablelocations.samplePlayableLocations",
                                http_method: hyper::Method::POST });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
+
         for &field in ["alt"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(client::Error::FieldClash(field));
             }
         }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
 
-        params.push(("alt", "json".to_string()));
+        let mut params = Params::with_capacity(3 + self._additional_params.len());
 
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "v3:samplePlayableLocations";
         
-        let key = dlg.api_key();
-        match key {
-            Some(value) => params.push(("key", value)),
+        match dlg.api_key() {
+            Some(value) => params.push("key", value),
             None => {
                 dlg.finished(false);
                 return Err(client::Error::MissingAPIKey)
@@ -1302,9 +1366,9 @@ where
         }
 
 
-        let url = url::Url::parse_with_params(&url, params).unwrap();
+        let url = params.parse_with_url(&url);
 
-        let mut json_mime_type: mime::Mime = "application/json".parse().unwrap();
+        let mut json_mime_type = mime::APPLICATION_JSON;
         let mut request_value_reader =
             {
                 let mut value = json::value::to_value(&self._request).expect("serde to work");
@@ -1322,23 +1386,26 @@ where
             let mut req_result = {
                 let client = &self.hub.client;
                 dlg.pre_request();
-                let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
-                        .header(USER_AGENT, self.hub._user_agent.clone());
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::POST)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
 
 
                         let request = req_builder
-                        .header(CONTENT_TYPE, format!("{}", json_mime_type.to_string()))
+                        .header(CONTENT_TYPE, json_mime_type.to_string())
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
                 client.request(request.unwrap()).await
-                
+
             };
 
             match req_result {
                 Err(err) => {
                     if let client::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep(d).await;
                         continue;
                     }
                     dlg.finished(false);
@@ -1354,7 +1421,7 @@ where
                         let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
                         if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
-                            sleep(d);
+                            sleep(d).await;
                             continue;
                         }
 
@@ -1397,7 +1464,8 @@ where
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.````
     ///
     /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MethodSamplePlayableLocationCall<'a, S> {

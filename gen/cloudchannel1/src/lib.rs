@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/generator/templates/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Cloudchannel* crate version *4.0.1+20220303*, where *20220303* is the exact revision of the *cloudchannel:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v4.0.1*.
+//! This documentation was generated from *Cloudchannel* crate version *5.0.2-beta-1+20230123*, where *20230123* is the exact revision of the *cloudchannel:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.2-beta-1*.
 //! 
 //! Everything else about the *Cloudchannel* *v1* API can be found at the
 //! [official documentation site](https://cloud.google.com/channel).
@@ -12,7 +12,7 @@
 //! Handle the following *Resources* with ease from the central [hub](Cloudchannel) ... 
 //! 
 //! * accounts
-//!  * [*channel partner links create*](api::AccountChannelPartnerLinkCreateCall), [*channel partner links customers create*](api::AccountChannelPartnerLinkCustomerCreateCall), [*channel partner links customers delete*](api::AccountChannelPartnerLinkCustomerDeleteCall), [*channel partner links customers get*](api::AccountChannelPartnerLinkCustomerGetCall), [*channel partner links customers import*](api::AccountChannelPartnerLinkCustomerImportCall), [*channel partner links customers list*](api::AccountChannelPartnerLinkCustomerListCall), [*channel partner links customers patch*](api::AccountChannelPartnerLinkCustomerPatchCall), [*channel partner links get*](api::AccountChannelPartnerLinkGetCall), [*channel partner links list*](api::AccountChannelPartnerLinkListCall), [*channel partner links patch*](api::AccountChannelPartnerLinkPatchCall), [*check cloud identity accounts exist*](api::AccountCheckCloudIdentityAccountsExistCall), [*customers create*](api::AccountCustomerCreateCall), [*customers delete*](api::AccountCustomerDeleteCall), [*customers entitlements activate*](api::AccountCustomerEntitlementActivateCall), [*customers entitlements cancel*](api::AccountCustomerEntitlementCancelCall), [*customers entitlements change offer*](api::AccountCustomerEntitlementChangeOfferCall), [*customers entitlements change parameters*](api::AccountCustomerEntitlementChangeParameterCall), [*customers entitlements change renewal settings*](api::AccountCustomerEntitlementChangeRenewalSettingCall), [*customers entitlements create*](api::AccountCustomerEntitlementCreateCall), [*customers entitlements get*](api::AccountCustomerEntitlementGetCall), [*customers entitlements list*](api::AccountCustomerEntitlementListCall), [*customers entitlements lookup offer*](api::AccountCustomerEntitlementLookupOfferCall), [*customers entitlements start paid service*](api::AccountCustomerEntitlementStartPaidServiceCall), [*customers entitlements suspend*](api::AccountCustomerEntitlementSuspendCall), [*customers get*](api::AccountCustomerGetCall), [*customers import*](api::AccountCustomerImportCall), [*customers list*](api::AccountCustomerListCall), [*customers list purchasable offers*](api::AccountCustomerListPurchasableOfferCall), [*customers list purchasable skus*](api::AccountCustomerListPurchasableSkuCall), [*customers patch*](api::AccountCustomerPatchCall), [*customers provision cloud identity*](api::AccountCustomerProvisionCloudIdentityCall), [*customers transfer entitlements*](api::AccountCustomerTransferEntitlementCall), [*customers transfer entitlements to google*](api::AccountCustomerTransferEntitlementsToGoogleCall), [*list subscribers*](api::AccountListSubscriberCall), [*list transferable offers*](api::AccountListTransferableOfferCall), [*list transferable skus*](api::AccountListTransferableSkuCall), [*offers list*](api::AccountOfferListCall), [*register*](api::AccountRegisterCall) and [*unregister*](api::AccountUnregisterCall)
+//!  * [*channel partner links channel partner repricing configs create*](api::AccountChannelPartnerLinkChannelPartnerRepricingConfigCreateCall), [*channel partner links channel partner repricing configs delete*](api::AccountChannelPartnerLinkChannelPartnerRepricingConfigDeleteCall), [*channel partner links channel partner repricing configs get*](api::AccountChannelPartnerLinkChannelPartnerRepricingConfigGetCall), [*channel partner links channel partner repricing configs list*](api::AccountChannelPartnerLinkChannelPartnerRepricingConfigListCall), [*channel partner links channel partner repricing configs patch*](api::AccountChannelPartnerLinkChannelPartnerRepricingConfigPatchCall), [*channel partner links create*](api::AccountChannelPartnerLinkCreateCall), [*channel partner links customers create*](api::AccountChannelPartnerLinkCustomerCreateCall), [*channel partner links customers delete*](api::AccountChannelPartnerLinkCustomerDeleteCall), [*channel partner links customers get*](api::AccountChannelPartnerLinkCustomerGetCall), [*channel partner links customers import*](api::AccountChannelPartnerLinkCustomerImportCall), [*channel partner links customers list*](api::AccountChannelPartnerLinkCustomerListCall), [*channel partner links customers patch*](api::AccountChannelPartnerLinkCustomerPatchCall), [*channel partner links get*](api::AccountChannelPartnerLinkGetCall), [*channel partner links list*](api::AccountChannelPartnerLinkListCall), [*channel partner links patch*](api::AccountChannelPartnerLinkPatchCall), [*check cloud identity accounts exist*](api::AccountCheckCloudIdentityAccountsExistCall), [*customers create*](api::AccountCustomerCreateCall), [*customers customer repricing configs create*](api::AccountCustomerCustomerRepricingConfigCreateCall), [*customers customer repricing configs delete*](api::AccountCustomerCustomerRepricingConfigDeleteCall), [*customers customer repricing configs get*](api::AccountCustomerCustomerRepricingConfigGetCall), [*customers customer repricing configs list*](api::AccountCustomerCustomerRepricingConfigListCall), [*customers customer repricing configs patch*](api::AccountCustomerCustomerRepricingConfigPatchCall), [*customers delete*](api::AccountCustomerDeleteCall), [*customers entitlements activate*](api::AccountCustomerEntitlementActivateCall), [*customers entitlements cancel*](api::AccountCustomerEntitlementCancelCall), [*customers entitlements change offer*](api::AccountCustomerEntitlementChangeOfferCall), [*customers entitlements change parameters*](api::AccountCustomerEntitlementChangeParameterCall), [*customers entitlements change renewal settings*](api::AccountCustomerEntitlementChangeRenewalSettingCall), [*customers entitlements create*](api::AccountCustomerEntitlementCreateCall), [*customers entitlements get*](api::AccountCustomerEntitlementGetCall), [*customers entitlements list*](api::AccountCustomerEntitlementListCall), [*customers entitlements lookup offer*](api::AccountCustomerEntitlementLookupOfferCall), [*customers entitlements start paid service*](api::AccountCustomerEntitlementStartPaidServiceCall), [*customers entitlements suspend*](api::AccountCustomerEntitlementSuspendCall), [*customers get*](api::AccountCustomerGetCall), [*customers import*](api::AccountCustomerImportCall), [*customers list*](api::AccountCustomerListCall), [*customers list purchasable offers*](api::AccountCustomerListPurchasableOfferCall), [*customers list purchasable skus*](api::AccountCustomerListPurchasableSkuCall), [*customers patch*](api::AccountCustomerPatchCall), [*customers provision cloud identity*](api::AccountCustomerProvisionCloudIdentityCall), [*customers transfer entitlements*](api::AccountCustomerTransferEntitlementCall), [*customers transfer entitlements to google*](api::AccountCustomerTransferEntitlementsToGoogleCall), [*list subscribers*](api::AccountListSubscriberCall), [*list transferable offers*](api::AccountListTransferableOfferCall), [*list transferable skus*](api::AccountListTransferableSkuCall), [*offers list*](api::AccountOfferListCall), [*register*](api::AccountRegisterCall), [*report jobs fetch report results*](api::AccountReportJobFetchReportResultCall), [*reports list*](api::AccountReportListCall), [*reports run*](api::AccountReportRunCall) and [*unregister*](api::AccountUnregisterCall)
 //! * operations
 //!  * [*cancel*](api::OperationCancelCall), [*delete*](api::OperationDeleteCall), [*get*](api::OperationGetCall) and [*list*](api::OperationListCall)
 //! * products
@@ -62,6 +62,7 @@
 //! let r = hub.accounts().customers_provision_cloud_identity(...).doit().await
 //! let r = hub.accounts().customers_transfer_entitlements(...).doit().await
 //! let r = hub.accounts().customers_transfer_entitlements_to_google(...).doit().await
+//! let r = hub.accounts().reports_run(...).doit().await
 //! let r = hub.operations().get(...).doit().await
 //! ```
 //! 
@@ -93,7 +94,7 @@
 //! use cloudchannel1::{Result, Error};
 //! # async fn dox() {
 //! use std::default::Default;
-//! use cloudchannel1::{Cloudchannel, oauth2, hyper, hyper_rustls};
+//! use cloudchannel1::{Cloudchannel, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 //! 
 //! // Get an ApplicationSecret instance by some means. It contains the `client_id` and 
 //! // `client_secret`, among other things.
@@ -202,22 +203,17 @@
 // This file was generated automatically from 'src/generator/templates/api/lib.rs.mako'
 // DO NOT EDIT !
 
-#[macro_use]
-extern crate serde_derive;
-
 // Re-export the hyper and hyper_rustls crate, they are required to build the hub
-pub extern crate hyper;
-pub extern crate hyper_rustls;
-extern crate serde;
-extern crate serde_json;
-// Re-export the yup_oauth2 crate, that is required to call some methods of the hub and the client
-pub extern crate yup_oauth2 as oauth2;
-extern crate mime;
-extern crate url;
-
+pub use hyper;
+pub use hyper_rustls;
+pub extern crate google_apis_common as client;
+pub use client::chrono;
 pub mod api;
-pub mod client;
 
 // Re-export the hub type and some basic client structs
 pub use api::Cloudchannel;
-pub use client::{Result, Error, Delegate};
+pub use client::{Result, Error, Delegate, FieldMask};
+
+// Re-export the yup_oauth2 crate, that is required to call some methods of the hub and the client
+#[cfg(feature = "yup-oauth2")]
+pub use client::oauth2;

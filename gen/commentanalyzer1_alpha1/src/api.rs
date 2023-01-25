@@ -1,19 +1,20 @@
 use std::collections::HashMap;
 use std::cell::RefCell;
 use std::default::Default;
-use std::collections::BTreeMap;
+use std::collections::BTreeSet;
 use std::error::Error as StdError;
 use serde_json as json;
 use std::io;
 use std::fs;
 use std::mem;
-use std::thread::sleep;
 
-use http::Uri;
 use hyper::client::connect;
 use tokio::io::{AsyncRead, AsyncWrite};
+use tokio::time::sleep;
 use tower_service;
-use crate::client;
+use serde::{Serialize, Deserialize};
+
+use crate::{client, client::GetToken, client::serde_with};
 
 // ##############
 // UTILITIES ###
@@ -62,7 +63,7 @@ impl Default for Scope {
 /// use commentanalyzer1_alpha1::{Result, Error};
 /// # async fn dox() {
 /// use std::default::Default;
-/// use commentanalyzer1_alpha1::{CommentAnalyzer, oauth2, hyper, hyper_rustls};
+/// use commentanalyzer1_alpha1::{CommentAnalyzer, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// // Get an ApplicationSecret instance by some means. It contains the `client_id` and 
 /// // `client_secret`, among other things.
@@ -110,7 +111,7 @@ impl Default for Scope {
 #[derive(Clone)]
 pub struct CommentAnalyzer<S> {
     pub client: hyper::Client<S, hyper::body::Body>,
-    pub auth: oauth2::authenticator::Authenticator<S>,
+    pub auth: Box<dyn client::GetToken>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
@@ -120,11 +121,11 @@ impl<'a, S> client::Hub for CommentAnalyzer<S> {}
 
 impl<'a, S> CommentAnalyzer<S> {
 
-    pub fn new(client: hyper::Client<S, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<S>) -> CommentAnalyzer<S> {
+    pub fn new<A: 'static + client::GetToken>(client: hyper::Client<S, hyper::body::Body>, auth: A) -> CommentAnalyzer<S> {
         CommentAnalyzer {
             client,
-            auth: authenticator,
-            _user_agent: "google-api-rust-client/4.0.1".to_string(),
+            auth: Box::new(auth),
+            _user_agent: "google-api-rust-client/5.0.2-beta-1".to_string(),
             _base_url: "https://commentanalyzer.googleapis.com/".to_string(),
             _root_url: "https://commentanalyzer.googleapis.com/".to_string(),
         }
@@ -135,7 +136,7 @@ impl<'a, S> CommentAnalyzer<S> {
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/4.0.1`.
+    /// It defaults to `google-api-rust-client/5.0.2-beta-1`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -173,24 +174,30 @@ impl<'a, S> CommentAnalyzer<S> {
 /// 
 /// * [analyze comments](CommentAnalyzeCall) (request)
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AnalyzeCommentRequest {
     /// Opaque token that is echoed from the request to the response.
     #[serde(rename="clientToken")]
+    
     pub client_token: Option<String>,
     /// The comment to analyze.
+    
     pub comment: Option<TextEntry>,
     /// Optional identifier associating this AnalyzeCommentRequest with a
     /// particular client's community. Different communities may have different
     /// norms and rules. Specifying this value enables us to explore building
     /// community-specific models for clients.
     #[serde(rename="communityId")]
+    
     pub community_id: Option<String>,
     /// The context of the comment.
+    
     pub context: Option<Context>,
     /// Do not store the comment or context sent in this request. By default, the
     /// service may store comments/context for debugging purposes.
     #[serde(rename="doNotStore")]
+    
     pub do_not_store: Option<bool>,
     /// The language(s) of the comment and context. If none are specified, we
     /// attempt to automatically detect the language. Specifying multiple languages
@@ -201,6 +208,7 @@ pub struct AnalyzeCommentRequest {
     /// detection fails. The server also returns an error if the languages (either
     /// specified by the caller, or auto-detected) are not *all* supported by the
     /// service.
+    
     pub languages: Option<Vec<String>>,
     /// Specification of requested attributes. The AttributeParameters serve as
     /// configuration for each associated attribute. The map keys are attribute
@@ -211,17 +219,20 @@ pub struct AnalyzeCommentRequest {
     /// go/checker-models (internal) and
     /// https://github.com/conversationai/perspectiveapi/blob/master/2-api/models.md#all-attribute-types.
     #[serde(rename="requestedAttributes")]
+    
     pub requested_attributes: Option<HashMap<String, AttributeParameters>>,
     /// Session ID. Used to join related RPCs into a single session. For example,
     /// an interactive tool that calls both the AnalyzeComment and
     /// SuggestCommentScore RPCs should set all invocations of both RPCs to the
     /// same Session ID, typically a random 64-bit integer.
     #[serde(rename="sessionId")]
+    
     pub session_id: Option<String>,
     /// An advisory parameter that will return span annotations if the model
     /// is capable of providing scores with sub-comment resolution. This will
     /// likely increase the size of the returned message.
     #[serde(rename="spanAnnotations")]
+    
     pub span_annotations: Option<bool>,
 }
 
@@ -237,19 +248,23 @@ impl client::RequestValue for AnalyzeCommentRequest {}
 /// 
 /// * [analyze comments](CommentAnalyzeCall) (response)
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AnalyzeCommentResponse {
     /// Scores for the requested attributes. The map keys are attribute names (same
     /// as the requested_attribute field in AnalyzeCommentRequest, for example
     /// "ATTACK_ON_AUTHOR", "INFLAMMATORY", etc).
     #[serde(rename="attributeScores")]
+    
     pub attribute_scores: Option<HashMap<String, AttributeScores>>,
     /// Same token from the original AnalyzeCommentRequest.
     #[serde(rename="clientToken")]
+    
     pub client_token: Option<String>,
     /// Contains the languages detected from the text content, sorted in order of
     /// likelihood.
     #[serde(rename="detectedLanguages")]
+    
     pub detected_languages: Option<Vec<String>>,
     /// The language(s) used by CommentAnalyzer service to choose which Model to
     /// use when analyzing the comment. Might better be called
@@ -258,6 +273,7 @@ pub struct AnalyzeCommentResponse {
     /// effective_languages = Request.languages
     /// else
     /// effective_languages = detected_languages[0]
+    
     pub languages: Option<Vec<String>>,
 }
 
@@ -270,16 +286,19 @@ impl client::ResponseResult for AnalyzeCommentResponse {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ArticleAndParentComment {
     /// The source content about which the comment was made (article text, article
     /// summary, video transcript, etc).
+    
     pub article: Option<TextEntry>,
     /// Refers to text that is a direct parent of the source comment, such as in a
     /// one-deep threaded message board. This field will only be present for
     /// comments that are replies to other comments and will not be populated for
     /// direct comments on the article_text.
     #[serde(rename="parentComment")]
+    
     pub parent_comment: Option<TextEntry>,
 }
 
@@ -290,15 +309,18 @@ impl client::Part for ArticleAndParentComment {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AttributeParameters {
     /// Don't return scores for this attribute that are below this threshold. If
     /// unset, a default threshold will be applied. A FloatValue wrapper is used to
     /// distinguish between 0 vs. default/unset.
     #[serde(rename="scoreThreshold")]
+    
     pub score_threshold: Option<f32>,
     /// What type of scores to return. If unset, defaults to probability scores.
     #[serde(rename="scoreType")]
+    
     pub score_type: Option<String>,
 }
 
@@ -310,13 +332,16 @@ impl client::Part for AttributeParameters {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AttributeScores {
     /// Per-span scores.
     #[serde(rename="spanScores")]
+    
     pub span_scores: Option<Vec<SpanScore>>,
     /// Overall score for comment as a whole.
     #[serde(rename="summaryScore")]
+    
     pub summary_score: Option<Score>,
 }
 
@@ -332,13 +357,16 @@ impl client::Part for AttributeScores {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Context {
     /// Information about the source for which the original comment was made, and
     /// any parent comment info.
     #[serde(rename="articleAndParentComment")]
+    
     pub article_and_parent_comment: Option<ArticleAndParentComment>,
     /// A list of messages. For example, a linear comments section or forum thread.
+    
     pub entries: Option<Vec<TextEntry>>,
 }
 
@@ -349,12 +377,15 @@ impl client::Part for Context {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Score {
     /// The type of the above value.
     #[serde(rename="type")]
+    
     pub type_: Option<String>,
     /// Score value. Semantics described by type below.
+    
     pub value: Option<f32>,
 }
 
@@ -365,6 +396,7 @@ impl client::Part for Score {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct SpanScore {
     /// "begin" and "end" describe the span of the original text that the attribute
@@ -373,10 +405,13 @@ pub struct SpanScore {
     /// describes the text "Hi".
     /// 
     /// If "begin" and "end" are unset, the score applies to the full text.
+    
     pub begin: Option<i32>,
     /// no description provided
+    
     pub end: Option<i32>,
     /// The score value.
+    
     pub score: Option<Score>,
 }
 
@@ -392,6 +427,7 @@ impl client::Part for SpanScore {}
 /// 
 /// * [suggestscore comments](CommentSuggestscoreCall) (request)
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct SuggestCommentScoreRequest {
     /// Attribute scores for the comment. The map keys are attribute names, same as
@@ -412,29 +448,36 @@ pub struct SuggestCommentScoreRequest {
     /// also must not be empty. An `INVALID_ARGUMENT` error is returned for all
     /// malformed requests.
     #[serde(rename="attributeScores")]
+    
     pub attribute_scores: Option<HashMap<String, AttributeScores>>,
     /// Opaque token that is echoed from the request to the response.
     #[serde(rename="clientToken")]
+    
     pub client_token: Option<String>,
     /// The comment being scored.
+    
     pub comment: Option<TextEntry>,
     /// Optional identifier associating this comment score suggestion with a
     /// particular sub-community. Different communities may have different norms
     /// and rules. Specifying this value enables training community-specific
     /// models.
     #[serde(rename="communityId")]
+    
     pub community_id: Option<String>,
     /// The context of the comment.
+    
     pub context: Option<Context>,
     /// The language(s) of the comment and context. If none are specified, we
     /// attempt to automatically detect the language. Both ISO and BCP-47 language
     /// codes are accepted.
+    
     pub languages: Option<Vec<String>>,
     /// Session ID. Used to join related RPCs into a single session. For example,
     /// an interactive tool that calls both the AnalyzeComment and
     /// SuggestCommentScore RPCs should set all invocations of both RPCs to the
     /// same Session ID, typically a random 64-bit integer.
     #[serde(rename="sessionId")]
+    
     pub session_id: Option<String>,
 }
 
@@ -450,16 +493,20 @@ impl client::RequestValue for SuggestCommentScoreRequest {}
 /// 
 /// * [suggestscore comments](CommentSuggestscoreCall) (response)
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct SuggestCommentScoreResponse {
     /// Same token from the original SuggestCommentScoreRequest.
     #[serde(rename="clientToken")]
+    
     pub client_token: Option<String>,
     /// The list of languages detected from the comment text.
     #[serde(rename="detectedLanguages")]
+    
     pub detected_languages: Option<Vec<String>>,
     /// The list of languages provided in the request.
     #[serde(rename="requestedLanguages")]
+    
     pub requested_languages: Option<Vec<String>>,
 }
 
@@ -470,12 +517,15 @@ impl client::ResponseResult for SuggestCommentScoreResponse {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct TextEntry {
     /// UTF-8 encoded text.
+    
     pub text: Option<String>,
     /// Type of the text field.
     #[serde(rename="type")]
+    
     pub type_: Option<String>,
 }
 
@@ -488,7 +538,7 @@ impl client::Part for TextEntry {}
 // #################
 
 /// A builder providing access to all methods supported on *comment* resources.
-/// It is not used directly, but through the `CommentAnalyzer` hub.
+/// It is not used directly, but through the [`CommentAnalyzer`] hub.
 ///
 /// # Example
 ///
@@ -501,7 +551,7 @@ impl client::Part for TextEntry {}
 /// 
 /// # async fn dox() {
 /// use std::default::Default;
-/// use commentanalyzer1_alpha1::{CommentAnalyzer, oauth2, hyper, hyper_rustls};
+/// use commentanalyzer1_alpha1::{CommentAnalyzer, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// let secret: oauth2::ApplicationSecret = Default::default();
 /// let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -571,7 +621,7 @@ impl<'a, S> CommentMethods<'a, S> {
 /// Analyzes the provided text and returns scores for requested attributes.
 ///
 /// A builder for the *analyze* method supported by a *comment* resource.
-/// It is not used directly, but through a `CommentMethods` instance.
+/// It is not used directly, but through a [`CommentMethods`] instance.
 ///
 /// # Example
 ///
@@ -584,7 +634,7 @@ impl<'a, S> CommentMethods<'a, S> {
 /// use commentanalyzer1_alpha1::api::AnalyzeCommentRequest;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use commentanalyzer1_alpha1::{CommentAnalyzer, oauth2, hyper, hyper_rustls};
+/// # use commentanalyzer1_alpha1::{CommentAnalyzer, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
 /// # let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -611,14 +661,14 @@ pub struct CommentAnalyzeCall<'a, S>
     _request: AnalyzeCommentRequest,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
+    _scopes: BTreeSet<String>
 }
 
 impl<'a, S> client::CallBuilder for CommentAnalyzeCall<'a, S> {}
 
 impl<'a, S> CommentAnalyzeCall<'a, S>
 where
-    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
     S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
     S::Future: Send + Unpin + 'static,
     S::Error: Into<Box<dyn StdError + Send + Sync>>,
@@ -629,36 +679,35 @@ where
     pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, AnalyzeCommentResponse)> {
         use std::io::{Read, Seek};
         use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::ToParts;
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
         let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
         dlg.begin(client::MethodInfo { id: "commentanalyzer.comments.analyze",
                                http_method: hyper::Method::POST });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
+
         for &field in ["alt"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(client::Error::FieldClash(field));
             }
         }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
 
-        params.push(("alt", "json".to_string()));
+        let mut params = Params::with_capacity(3 + self._additional_params.len());
 
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "v1alpha1/comments:analyze";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::UserinfoEmail.as_ref().to_string(), ());
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::UserinfoEmail.as_ref().to_string());
         }
 
 
-        let url = url::Url::parse_with_params(&url, params).unwrap();
+        let url = params.parse_with_url(&url);
 
-        let mut json_mime_type: mime::Mime = "application/json".parse().unwrap();
+        let mut json_mime_type = mime::APPLICATION_JSON;
         let mut request_value_reader =
             {
                 let mut value = json::value::to_value(&self._request).expect("serde to work");
@@ -672,14 +721,14 @@ where
 
 
         loop {
-            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
-                Ok(token) => token.clone(),
-                Err(err) => {
-                    match  dlg.token(&err) {
-                        Some(token) => token,
-                        None => {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
                             dlg.finished(false);
-                            return Err(client::Error::MissingToken(err))
+                            return Err(client::Error::MissingToken(e));
                         }
                     }
                 }
@@ -688,23 +737,29 @@ where
             let mut req_result = {
                 let client = &self.hub.client;
                 dlg.pre_request();
-                let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
-                        .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::POST)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
 
 
                         let request = req_builder
-                        .header(CONTENT_TYPE, format!("{}", json_mime_type.to_string()))
+                        .header(CONTENT_TYPE, json_mime_type.to_string())
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
                 client.request(request.unwrap()).await
-                
+
             };
 
             match req_result {
                 Err(err) => {
                     if let client::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep(d).await;
                         continue;
                     }
                     dlg.finished(false);
@@ -720,7 +775,7 @@ where
                         let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
                         if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
-                            sleep(d);
+                            sleep(d).await;
                             continue;
                         }
 
@@ -763,7 +818,8 @@ where
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.````
     ///
     /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CommentAnalyzeCall<'a, S> {
@@ -799,25 +855,36 @@ where
 
     /// Identifies the authorization scope for the method you are building.
     ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::UserinfoEmail`.
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::UserinfoEmail`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
     ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, St>(mut self, scope: T) -> CommentAnalyzeCall<'a, S>
-                                                        where T: Into<Option<St>>,
-                                                              St: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
+    pub fn add_scope<St>(mut self, scope: St) -> CommentAnalyzeCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> CommentAnalyzeCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> CommentAnalyzeCall<'a, S> {
+        self._scopes.clear();
         self
     }
 }
@@ -826,7 +893,7 @@ where
 /// Suggest comment scores as training data.
 ///
 /// A builder for the *suggestscore* method supported by a *comment* resource.
-/// It is not used directly, but through a `CommentMethods` instance.
+/// It is not used directly, but through a [`CommentMethods`] instance.
 ///
 /// # Example
 ///
@@ -839,7 +906,7 @@ where
 /// use commentanalyzer1_alpha1::api::SuggestCommentScoreRequest;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use commentanalyzer1_alpha1::{CommentAnalyzer, oauth2, hyper, hyper_rustls};
+/// # use commentanalyzer1_alpha1::{CommentAnalyzer, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
 /// # let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -866,14 +933,14 @@ pub struct CommentSuggestscoreCall<'a, S>
     _request: SuggestCommentScoreRequest,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
+    _scopes: BTreeSet<String>
 }
 
 impl<'a, S> client::CallBuilder for CommentSuggestscoreCall<'a, S> {}
 
 impl<'a, S> CommentSuggestscoreCall<'a, S>
 where
-    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
     S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
     S::Future: Send + Unpin + 'static,
     S::Error: Into<Box<dyn StdError + Send + Sync>>,
@@ -884,36 +951,35 @@ where
     pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, SuggestCommentScoreResponse)> {
         use std::io::{Read, Seek};
         use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::ToParts;
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
         let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
         dlg.begin(client::MethodInfo { id: "commentanalyzer.comments.suggestscore",
                                http_method: hyper::Method::POST });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
+
         for &field in ["alt"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(client::Error::FieldClash(field));
             }
         }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
 
-        params.push(("alt", "json".to_string()));
+        let mut params = Params::with_capacity(3 + self._additional_params.len());
 
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "v1alpha1/comments:suggestscore";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::UserinfoEmail.as_ref().to_string(), ());
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::UserinfoEmail.as_ref().to_string());
         }
 
 
-        let url = url::Url::parse_with_params(&url, params).unwrap();
+        let url = params.parse_with_url(&url);
 
-        let mut json_mime_type: mime::Mime = "application/json".parse().unwrap();
+        let mut json_mime_type = mime::APPLICATION_JSON;
         let mut request_value_reader =
             {
                 let mut value = json::value::to_value(&self._request).expect("serde to work");
@@ -927,14 +993,14 @@ where
 
 
         loop {
-            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
-                Ok(token) => token.clone(),
-                Err(err) => {
-                    match  dlg.token(&err) {
-                        Some(token) => token,
-                        None => {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
                             dlg.finished(false);
-                            return Err(client::Error::MissingToken(err))
+                            return Err(client::Error::MissingToken(e));
                         }
                     }
                 }
@@ -943,23 +1009,29 @@ where
             let mut req_result = {
                 let client = &self.hub.client;
                 dlg.pre_request();
-                let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
-                        .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::POST)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
 
 
                         let request = req_builder
-                        .header(CONTENT_TYPE, format!("{}", json_mime_type.to_string()))
+                        .header(CONTENT_TYPE, json_mime_type.to_string())
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
                 client.request(request.unwrap()).await
-                
+
             };
 
             match req_result {
                 Err(err) => {
                     if let client::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep(d).await;
                         continue;
                     }
                     dlg.finished(false);
@@ -975,7 +1047,7 @@ where
                         let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
                         if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
-                            sleep(d);
+                            sleep(d).await;
                             continue;
                         }
 
@@ -1018,7 +1090,8 @@ where
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.````
     ///
     /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CommentSuggestscoreCall<'a, S> {
@@ -1054,25 +1127,36 @@ where
 
     /// Identifies the authorization scope for the method you are building.
     ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::UserinfoEmail`.
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::UserinfoEmail`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
     ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, St>(mut self, scope: T) -> CommentSuggestscoreCall<'a, S>
-                                                        where T: Into<Option<St>>,
-                                                              St: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
+    pub fn add_scope<St>(mut self, scope: St) -> CommentSuggestscoreCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> CommentSuggestscoreCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> CommentSuggestscoreCall<'a, S> {
+        self._scopes.clear();
         self
     }
 }

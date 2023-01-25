@@ -1,19 +1,20 @@
 use std::collections::HashMap;
 use std::cell::RefCell;
 use std::default::Default;
-use std::collections::BTreeMap;
+use std::collections::BTreeSet;
 use std::error::Error as StdError;
 use serde_json as json;
 use std::io;
 use std::fs;
 use std::mem;
-use std::thread::sleep;
 
-use http::Uri;
 use hyper::client::connect;
 use tokio::io::{AsyncRead, AsyncWrite};
+use tokio::time::sleep;
 use tower_service;
-use crate::client;
+use serde::{Serialize, Deserialize};
+
+use crate::{client, client::GetToken, client::serde_with};
 
 // ##############
 // UTILITIES ###
@@ -39,7 +40,7 @@ use crate::client;
 /// use pagespeedonline4::{Result, Error};
 /// # async fn dox() {
 /// use std::default::Default;
-/// use pagespeedonline4::{Pagespeedonline, oauth2, hyper, hyper_rustls};
+/// use pagespeedonline4::{Pagespeedonline, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// // Get an ApplicationSecret instance by some means. It contains the `client_id` and 
 /// // `client_secret`, among other things.
@@ -90,7 +91,7 @@ use crate::client;
 #[derive(Clone)]
 pub struct Pagespeedonline<S> {
     pub client: hyper::Client<S, hyper::body::Body>,
-    pub auth: oauth2::authenticator::Authenticator<S>,
+    pub auth: Box<dyn client::GetToken>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
@@ -100,11 +101,11 @@ impl<'a, S> client::Hub for Pagespeedonline<S> {}
 
 impl<'a, S> Pagespeedonline<S> {
 
-    pub fn new(client: hyper::Client<S, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<S>) -> Pagespeedonline<S> {
+    pub fn new<A: 'static + client::GetToken>(client: hyper::Client<S, hyper::body::Body>, auth: A) -> Pagespeedonline<S> {
         Pagespeedonline {
             client,
-            auth: authenticator,
-            _user_agent: "google-api-rust-client/4.0.1".to_string(),
+            auth: Box::new(auth),
+            _user_agent: "google-api-rust-client/5.0.2-beta-1".to_string(),
             _base_url: "https://www.googleapis.com/pagespeedonline/v4/".to_string(),
             _root_url: "https://www.googleapis.com/".to_string(),
         }
@@ -115,7 +116,7 @@ impl<'a, S> Pagespeedonline<S> {
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/4.0.1`.
+    /// It defaults to `google-api-rust-client/5.0.2-beta-1`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -147,11 +148,14 @@ impl<'a, S> Pagespeedonline<S> {
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PagespeedApiFormatStringV4 {
     /// List of arguments for the format string.
+    
     pub args: Option<Vec<PagespeedApiFormatStringV4Args>>,
     /// A localized format string with {{FOO}} placeholders, where 'FOO' is the key of the argument whose value should be substituted. For HYPERLINK arguments, the format string will instead contain {{BEGIN_FOO}} and {{END_FOO}} for the argument with key 'FOO'.
+    
     pub format: Option<String>,
 }
 
@@ -162,19 +166,27 @@ impl client::Part for PagespeedApiFormatStringV4 {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PagespeedApiImageV4 {
     /// Image data base64 encoded.
-    pub data: Option<String>,
+    
+    #[serde_as(as = "Option<::client::serde::urlsafe_base64::Wrapper>")]
+    pub data: Option<Vec<u8>>,
     /// Height of screenshot in pixels.
+    
     pub height: Option<i32>,
     /// Unique string key, if any, identifying this image.
+    
     pub key: Option<String>,
     /// Mime type of image data (e.g. "image/jpeg").
+    
     pub mime_type: Option<String>,
     /// no description provided
+    
     pub page_rect: Option<PagespeedApiImageV4PageRect>,
     /// Width of screenshot in pixels.
+    
     pub width: Option<i32>,
 }
 
@@ -190,40 +202,54 @@ impl client::Part for PagespeedApiImageV4 {}
 /// 
 /// * [runpagespeed pagespeedapi](PagespeedapiRunpagespeedCall) (response)
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PagespeedApiPagespeedResponseV4 {
     /// The captcha verify result
     #[serde(rename="captchaResult")]
+    
     pub captcha_result: Option<String>,
     /// Localized PageSpeed results. Contains a ruleResults entry for each PageSpeed rule instantiated and run by the server.
     #[serde(rename="formattedResults")]
+    
     pub formatted_results: Option<PagespeedApiPagespeedResponseV4FormattedResults>,
     /// Canonicalized and final URL for the document, after following page redirects (if any).
+    
     pub id: Option<String>,
     /// List of rules that were specified in the request, but which the server did not know how to instantiate.
     #[serde(rename="invalidRules")]
+    
     pub invalid_rules: Option<Vec<String>>,
     /// Kind of result.
+    
     pub kind: Option<String>,
     /// Metrics of end users' page loading experience.
     #[serde(rename="loadingExperience")]
+    
     pub loading_experience: Option<PagespeedApiPagespeedResponseV4LoadingExperience>,
     /// Summary statistics for the page, such as number of JavaScript bytes, number of HTML bytes, etc.
     #[serde(rename="pageStats")]
+    
     pub page_stats: Option<PagespeedApiPagespeedResponseV4PageStats>,
     /// Response code for the document. 200 indicates a normal page load. 4xx/5xx indicates an error.
     #[serde(rename="responseCode")]
+    
     pub response_code: Option<i32>,
     /// A map with one entry for each rule group in these results.
     #[serde(rename="ruleGroups")]
+    
     pub rule_groups: Option<HashMap<String, PagespeedApiPagespeedResponseV4RuleGroups>>,
     /// Base64-encoded screenshot of the page that was analyzed.
+    
     pub screenshot: Option<PagespeedApiImageV4>,
     /// Additional base64-encoded screenshots of the page, in various partial render states.
+    
     pub snapshots: Option<Vec<PagespeedApiImageV4>>,
     /// Title of the page, as displayed in the browser's title bar.
+    
     pub title: Option<String>,
     /// The version of PageSpeed used to generate these results.
+    
     pub version: Option<PagespeedApiPagespeedResponseV4Version>,
 }
 
@@ -234,18 +260,24 @@ impl client::ResponseResult for PagespeedApiPagespeedResponseV4 {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PagespeedApiFormatStringV4Args {
     /// The placeholder key for this arg, as a string.
+    
     pub key: Option<String>,
     /// The screen rectangles being referred to, with dimensions measured in CSS pixels. This is only ever used for SNAPSHOT_RECT arguments. If this is absent for a SNAPSHOT_RECT argument, it means that that argument refers to the entire snapshot.
+    
     pub rects: Option<Vec<PagespeedApiFormatStringV4ArgsRects>>,
     /// Secondary screen rectangles being referred to, with dimensions measured in CSS pixels. This is only ever used for SNAPSHOT_RECT arguments.
+    
     pub secondary_rects: Option<Vec<PagespeedApiFormatStringV4ArgsSecondaryRects>>,
     /// Type of argument. One of URL, STRING_LITERAL, INT_LITERAL, BYTES, DURATION, VERBATIM_STRING, PERCENTAGE, HYPERLINK, or SNAPSHOT_RECT.
     #[serde(rename="type")]
+    
     pub type_: Option<String>,
     /// Argument value, as a localized string.
+    
     pub value: Option<String>,
 }
 
@@ -257,15 +289,20 @@ impl client::Part for PagespeedApiFormatStringV4Args {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PagespeedApiFormatStringV4ArgsRects {
     /// no description provided
+    
     pub height: Option<i32>,
     /// no description provided
+    
     pub left: Option<i32>,
     /// no description provided
+    
     pub top: Option<i32>,
     /// no description provided
+    
     pub width: Option<i32>,
 }
 
@@ -277,15 +314,20 @@ impl client::Part for PagespeedApiFormatStringV4ArgsRects {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PagespeedApiFormatStringV4ArgsSecondaryRects {
     /// no description provided
+    
     pub height: Option<i32>,
     /// no description provided
+    
     pub left: Option<i32>,
     /// no description provided
+    
     pub top: Option<i32>,
     /// no description provided
+    
     pub width: Option<i32>,
 }
 
@@ -297,15 +339,20 @@ impl client::Part for PagespeedApiFormatStringV4ArgsSecondaryRects {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PagespeedApiImageV4PageRect {
     /// no description provided
+    
     pub height: Option<i32>,
     /// no description provided
+    
     pub left: Option<i32>,
     /// no description provided
+    
     pub top: Option<i32>,
     /// no description provided
+    
     pub width: Option<i32>,
 }
 
@@ -317,12 +364,15 @@ impl client::Part for PagespeedApiImageV4PageRect {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PagespeedApiPagespeedResponseV4FormattedResults {
     /// The locale of the formattedResults, e.g. "en_US".
+    
     pub locale: Option<String>,
     /// Dictionary of formatted rule results, with one entry for each PageSpeed rule instantiated and run by the server.
     #[serde(rename="ruleResults")]
+    
     pub rule_results: Option<HashMap<String, PagespeedApiPagespeedResponseV4FormattedResultsRuleResults>>,
 }
 
@@ -334,22 +384,29 @@ impl client::Part for PagespeedApiPagespeedResponseV4FormattedResults {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PagespeedApiPagespeedResponseV4FormattedResultsRuleResults {
     /// Whether this rule is in 'beta'. Rules in beta are new rules that are being tested, which do not impact the overall score.
+    
     pub beta: Option<bool>,
     /// List of rule groups that this rule belongs to. Each entry in the list is one of "SPEED", "USABILITY", or "SECURITY".
+    
     pub groups: Option<Vec<String>>,
     /// Localized name of the rule, intended for presentation to a user.
     #[serde(rename="localizedRuleName")]
+    
     pub localized_rule_name: Option<String>,
     /// The impact (unbounded floating point value) that implementing the suggestions for this rule would have on making the page faster. Impact is comparable between rules to determine which rule's suggestions would have a higher or lower impact on making a page faster. For instance, if enabling compression would save 1MB, while optimizing images would save 500kB, the enable compression rule would have 2x the impact of the image optimization rule, all other things being equal.
     #[serde(rename="ruleImpact")]
+    
     pub rule_impact: Option<f64>,
     /// A brief summary description for the rule, indicating at a high level what should be done to follow the rule and what benefit can be gained by doing so.
+    
     pub summary: Option<PagespeedApiFormatStringV4>,
     /// List of blocks of URLs. Each block may contain a heading and a list of URLs. Each URL may optionally include additional details.
     #[serde(rename="urlBlocks")]
+    
     pub url_blocks: Option<Vec<PagespeedApiPagespeedResponseV4FormattedResultsRuleResultsUrlBlocks>>,
 }
 
@@ -361,11 +418,14 @@ impl client::Part for PagespeedApiPagespeedResponseV4FormattedResultsRuleResults
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PagespeedApiPagespeedResponseV4FormattedResultsRuleResultsUrlBlocks {
     /// Heading to be displayed with the list of URLs.
+    
     pub header: Option<PagespeedApiFormatStringV4>,
     /// List of entries that provide information about URLs in the url block. Optional.
+    
     pub urls: Option<Vec<PagespeedApiPagespeedResponseV4FormattedResultsRuleResultsUrlBlocksUrls>>,
 }
 
@@ -377,11 +437,14 @@ impl client::Part for PagespeedApiPagespeedResponseV4FormattedResultsRuleResults
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PagespeedApiPagespeedResponseV4FormattedResultsRuleResultsUrlBlocksUrls {
     /// List of entries that provide additional details about a single URL. Optional.
+    
     pub details: Option<Vec<PagespeedApiFormatStringV4>>,
     /// A format string that gives information about the URL, and a list of arguments for that format string.
+    
     pub result: Option<PagespeedApiFormatStringV4>,
 }
 
@@ -393,15 +456,20 @@ impl client::Part for PagespeedApiPagespeedResponseV4FormattedResultsRuleResults
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PagespeedApiPagespeedResponseV4LoadingExperience {
     /// The url, pattern or origin which the metrics are on.
+    
     pub id: Option<String>,
     /// no description provided
+    
     pub initial_url: Option<String>,
     /// no description provided
+    
     pub metrics: Option<HashMap<String, PagespeedApiPagespeedResponseV4LoadingExperienceMetrics>>,
     /// no description provided
+    
     pub overall_category: Option<String>,
 }
 
@@ -413,13 +481,17 @@ impl client::Part for PagespeedApiPagespeedResponseV4LoadingExperience {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PagespeedApiPagespeedResponseV4LoadingExperienceMetrics {
     /// no description provided
+    
     pub category: Option<String>,
     /// no description provided
+    
     pub distributions: Option<Vec<PagespeedApiPagespeedResponseV4LoadingExperienceMetricsDistributions>>,
     /// no description provided
+    
     pub median: Option<i32>,
 }
 
@@ -431,13 +503,17 @@ impl client::Part for PagespeedApiPagespeedResponseV4LoadingExperienceMetrics {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PagespeedApiPagespeedResponseV4LoadingExperienceMetricsDistributions {
     /// no description provided
+    
     pub max: Option<i32>,
     /// no description provided
+    
     pub min: Option<i32>,
     /// no description provided
+    
     pub proportion: Option<f64>,
 }
 
@@ -449,69 +525,100 @@ impl client::Part for PagespeedApiPagespeedResponseV4LoadingExperienceMetricsDis
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PagespeedApiPagespeedResponseV4PageStats {
     /// Content management system (CMS) used for the page.
+    
     pub cms: Option<String>,
     /// Number of uncompressed response bytes for CSS resources on the page.
     #[serde(rename="cssResponseBytes")]
-    pub css_response_bytes: Option<String>,
+    
+    #[serde_as(as = "Option<::client::serde_with::DisplayFromStr>")]
+    pub css_response_bytes: Option<i64>,
     /// Number of response bytes for flash resources on the page.
     #[serde(rename="flashResponseBytes")]
-    pub flash_response_bytes: Option<String>,
+    
+    #[serde_as(as = "Option<::client::serde_with::DisplayFromStr>")]
+    pub flash_response_bytes: Option<i64>,
     /// Number of uncompressed response bytes for the main HTML document and all iframes on the page.
     #[serde(rename="htmlResponseBytes")]
-    pub html_response_bytes: Option<String>,
+    
+    #[serde_as(as = "Option<::client::serde_with::DisplayFromStr>")]
+    pub html_response_bytes: Option<i64>,
     /// Number of response bytes for image resources on the page.
     #[serde(rename="imageResponseBytes")]
-    pub image_response_bytes: Option<String>,
+    
+    #[serde_as(as = "Option<::client::serde_with::DisplayFromStr>")]
+    pub image_response_bytes: Option<i64>,
     /// Number of uncompressed response bytes for JS resources on the page.
     #[serde(rename="javascriptResponseBytes")]
-    pub javascript_response_bytes: Option<String>,
+    
+    #[serde_as(as = "Option<::client::serde_with::DisplayFromStr>")]
+    pub javascript_response_bytes: Option<i64>,
     /// The needed round trips to load render blocking resources
     #[serde(rename="numRenderBlockingRoundTrips")]
+    
     pub num_render_blocking_round_trips: Option<i32>,
     /// The needed round trips to load the full page
     #[serde(rename="numTotalRoundTrips")]
+    
     pub num_total_round_trips: Option<i32>,
     /// Number of CSS resources referenced by the page.
     #[serde(rename="numberCssResources")]
+    
     pub number_css_resources: Option<i32>,
     /// Number of unique hosts referenced by the page.
     #[serde(rename="numberHosts")]
+    
     pub number_hosts: Option<i32>,
     /// Number of JavaScript resources referenced by the page.
     #[serde(rename="numberJsResources")]
+    
     pub number_js_resources: Option<i32>,
     /// Number of HTTP resources loaded by the page.
     #[serde(rename="numberResources")]
+    
     pub number_resources: Option<i32>,
     /// Number of roboted resources.
     #[serde(rename="numberRobotedResources")]
+    
     pub number_roboted_resources: Option<i32>,
     /// Number of static (i.e. cacheable) resources on the page.
     #[serde(rename="numberStaticResources")]
+    
     pub number_static_resources: Option<i32>,
     /// Number of transient-failed resources.
     #[serde(rename="numberTransientFetchFailureResources")]
+    
     pub number_transient_fetch_failure_resources: Option<i32>,
     /// Number of response bytes for other resources on the page.
     #[serde(rename="otherResponseBytes")]
-    pub other_response_bytes: Option<String>,
+    
+    #[serde_as(as = "Option<::client::serde_with::DisplayFromStr>")]
+    pub other_response_bytes: Option<i64>,
     /// Number of over-the-wire bytes, uses the default gzip compression strategy as an estimation.
     #[serde(rename="overTheWireResponseBytes")]
-    pub over_the_wire_response_bytes: Option<String>,
+    
+    #[serde_as(as = "Option<::client::serde_with::DisplayFromStr>")]
+    pub over_the_wire_response_bytes: Option<i64>,
     /// List of roboted urls.
     #[serde(rename="robotedUrls")]
+    
     pub roboted_urls: Option<Vec<String>>,
     /// Number of uncompressed response bytes for text resources not covered by other statistics (i.e non-HTML, non-script, non-CSS resources) on the page.
     #[serde(rename="textResponseBytes")]
-    pub text_response_bytes: Option<String>,
+    
+    #[serde_as(as = "Option<::client::serde_with::DisplayFromStr>")]
+    pub text_response_bytes: Option<i64>,
     /// Total size of all request bytes sent by the page.
     #[serde(rename="totalRequestBytes")]
-    pub total_request_bytes: Option<String>,
+    
+    #[serde_as(as = "Option<::client::serde_with::DisplayFromStr>")]
+    pub total_request_bytes: Option<i64>,
     /// List of transient fetch failure urls.
     #[serde(rename="transientFetchFailureUrls")]
+    
     pub transient_fetch_failure_urls: Option<Vec<String>>,
 }
 
@@ -523,11 +630,14 @@ impl client::Part for PagespeedApiPagespeedResponseV4PageStats {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PagespeedApiPagespeedResponseV4RuleGroups {
     /// no description provided
+    
     pub pass: Option<bool>,
     /// The score (0-100) for this rule group, which indicates how much better a page could be in that category (e.g. how much faster, or how much more usable, or how much more secure). A high score indicates little room for improvement, while a lower score indicates more room for improvement.
+    
     pub score: Option<i32>,
 }
 
@@ -539,11 +649,14 @@ impl client::Part for PagespeedApiPagespeedResponseV4RuleGroups {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PagespeedApiPagespeedResponseV4Version {
     /// The major version number of PageSpeed used to generate these results.
+    
     pub major: Option<i32>,
     /// The minor version number of PageSpeed used to generate these results.
+    
     pub minor: Option<i32>,
 }
 
@@ -557,7 +670,7 @@ impl client::Part for PagespeedApiPagespeedResponseV4Version {}
 // #################
 
 /// A builder providing access to all methods supported on *pagespeedapi* resources.
-/// It is not used directly, but through the `Pagespeedonline` hub.
+/// It is not used directly, but through the [`Pagespeedonline`] hub.
 ///
 /// # Example
 ///
@@ -570,7 +683,7 @@ impl client::Part for PagespeedApiPagespeedResponseV4Version {}
 /// 
 /// # async fn dox() {
 /// use std::default::Default;
-/// use pagespeedonline4::{Pagespeedonline, oauth2, hyper, hyper_rustls};
+/// use pagespeedonline4::{Pagespeedonline, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// let secret: oauth2::ApplicationSecret = Default::default();
 /// let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -630,7 +743,7 @@ impl<'a, S> PagespeedapiMethods<'a, S> {
 /// Runs PageSpeed analysis on the page at the specified URL, and returns PageSpeed scores, a list of suggestions to make that page faster, and other information.
 ///
 /// A builder for the *runpagespeed* method supported by a *pagespeedapi* resource.
-/// It is not used directly, but through a `PagespeedapiMethods` instance.
+/// It is not used directly, but through a [`PagespeedapiMethods`] instance.
 ///
 /// # Example
 ///
@@ -642,7 +755,7 @@ impl<'a, S> PagespeedapiMethods<'a, S> {
 /// # extern crate google_pagespeedonline4 as pagespeedonline4;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use pagespeedonline4::{Pagespeedonline, oauth2, hyper, hyper_rustls};
+/// # use pagespeedonline4::{Pagespeedonline, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
 /// # let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -686,7 +799,7 @@ impl<'a, S> client::CallBuilder for PagespeedapiRunpagespeedCall<'a, S> {}
 
 impl<'a, S> PagespeedapiRunpagespeedCall<'a, S>
 where
-    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
     S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
     S::Future: Send + Unpin + 'static,
     S::Error: Into<Box<dyn StdError + Send + Sync>>,
@@ -697,59 +810,57 @@ where
     pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, PagespeedApiPagespeedResponseV4)> {
         use std::io::{Read, Seek};
         use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::ToParts;
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
         let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
         dlg.begin(client::MethodInfo { id: "pagespeedonline.pagespeedapi.runpagespeed",
                                http_method: hyper::Method::GET });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(11 + self._additional_params.len());
-        params.push(("url", self._url.to_string()));
-        if let Some(value) = self._utm_source {
-            params.push(("utm_source", value.to_string()));
-        }
-        if let Some(value) = self._utm_campaign {
-            params.push(("utm_campaign", value.to_string()));
-        }
-        if let Some(value) = self._strategy {
-            params.push(("strategy", value.to_string()));
-        }
-        if let Some(value) = self._snapshots {
-            params.push(("snapshots", value.to_string()));
-        }
-        if let Some(value) = self._screenshot {
-            params.push(("screenshot", value.to_string()));
-        }
-        if self._rule.len() > 0 {
-            for f in self._rule.iter() {
-                params.push(("rule", f.to_string()));
-            }
-        }
-        if let Some(value) = self._locale {
-            params.push(("locale", value.to_string()));
-        }
-        if let Some(value) = self._filter_third_party_resources {
-            params.push(("filter_third_party_resources", value.to_string()));
-        }
+
         for &field in ["alt", "url", "utm_source", "utm_campaign", "strategy", "snapshots", "screenshot", "rule", "locale", "filter_third_party_resources"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(client::Error::FieldClash(field));
             }
         }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
+
+        let mut params = Params::with_capacity(11 + self._additional_params.len());
+        params.push("url", self._url);
+        if let Some(value) = self._utm_source.as_ref() {
+            params.push("utm_source", value);
+        }
+        if let Some(value) = self._utm_campaign.as_ref() {
+            params.push("utm_campaign", value);
+        }
+        if let Some(value) = self._strategy.as_ref() {
+            params.push("strategy", value);
+        }
+        if let Some(value) = self._snapshots.as_ref() {
+            params.push("snapshots", value.to_string());
+        }
+        if let Some(value) = self._screenshot.as_ref() {
+            params.push("screenshot", value.to_string());
+        }
+        if self._rule.len() > 0 {
+            for f in self._rule.iter() {
+                params.push("rule", f);
+            }
+        }
+        if let Some(value) = self._locale.as_ref() {
+            params.push("locale", value);
+        }
+        if let Some(value) = self._filter_third_party_resources.as_ref() {
+            params.push("filter_third_party_resources", value.to_string());
         }
 
-        params.push(("alt", "json".to_string()));
+        params.extend(self._additional_params.iter());
 
+        params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "runPagespeed";
         
-        let key = dlg.api_key();
-        match key {
-            Some(value) => params.push(("key", value)),
+        match dlg.api_key() {
+            Some(value) => params.push("key", value),
             None => {
                 dlg.finished(false);
                 return Err(client::Error::MissingAPIKey)
@@ -757,7 +868,7 @@ where
         }
 
 
-        let url = url::Url::parse_with_params(&url, params).unwrap();
+        let url = params.parse_with_url(&url);
 
 
 
@@ -765,21 +876,24 @@ where
             let mut req_result = {
                 let client = &self.hub.client;
                 dlg.pre_request();
-                let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
-                        .header(USER_AGENT, self.hub._user_agent.clone());
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::GET)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
 
 
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
-                
+
             };
 
             match req_result {
                 Err(err) => {
                     if let client::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep(d).await;
                         continue;
                     }
                     dlg.finished(false);
@@ -795,7 +909,7 @@ where
                         let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
                         if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
-                            sleep(d);
+                            sleep(d).await;
                             continue;
                         }
 
@@ -896,7 +1010,8 @@ where
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.````
     ///
     /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PagespeedapiRunpagespeedCall<'a, S> {

@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/generator/templates/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Android Management* crate version *4.0.1+20220302*, where *20220302* is the exact revision of the *androidmanagement:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v4.0.1*.
+//! This documentation was generated from *Android Management* crate version *5.0.2-beta-1+20230119*, where *20230119* is the exact revision of the *androidmanagement:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.2-beta-1*.
 //! 
 //! Everything else about the *Android Management* *v1* API can be found at the
 //! [official documentation site](https://developers.google.com/android/management).
@@ -12,7 +12,7 @@
 //! Handle the following *Resources* with ease from the central [hub](AndroidManagement) ... 
 //! 
 //! * [enterprises](api::Enterprise)
-//!  * [*applications get*](api::EnterpriseApplicationGetCall), [*create*](api::EnterpriseCreateCall), [*delete*](api::EnterpriseDeleteCall), [*devices delete*](api::EnterpriseDeviceDeleteCall), [*devices get*](api::EnterpriseDeviceGetCall), [*devices issue command*](api::EnterpriseDeviceIssueCommandCall), [*devices list*](api::EnterpriseDeviceListCall), [*devices operations cancel*](api::EnterpriseDeviceOperationCancelCall), [*devices operations delete*](api::EnterpriseDeviceOperationDeleteCall), [*devices operations get*](api::EnterpriseDeviceOperationGetCall), [*devices operations list*](api::EnterpriseDeviceOperationListCall), [*devices patch*](api::EnterpriseDevicePatchCall), [*enrollment tokens create*](api::EnterpriseEnrollmentTokenCreateCall), [*enrollment tokens delete*](api::EnterpriseEnrollmentTokenDeleteCall), [*get*](api::EnterpriseGetCall), [*list*](api::EnterpriseListCall), [*patch*](api::EnterprisePatchCall), [*policies delete*](api::EnterprisePolicyDeleteCall), [*policies get*](api::EnterprisePolicyGetCall), [*policies list*](api::EnterprisePolicyListCall), [*policies patch*](api::EnterprisePolicyPatchCall), [*web apps create*](api::EnterpriseWebAppCreateCall), [*web apps delete*](api::EnterpriseWebAppDeleteCall), [*web apps get*](api::EnterpriseWebAppGetCall), [*web apps list*](api::EnterpriseWebAppListCall), [*web apps patch*](api::EnterpriseWebAppPatchCall) and [*web tokens create*](api::EnterpriseWebTokenCreateCall)
+//!  * [*applications get*](api::EnterpriseApplicationGetCall), [*create*](api::EnterpriseCreateCall), [*delete*](api::EnterpriseDeleteCall), [*devices delete*](api::EnterpriseDeviceDeleteCall), [*devices get*](api::EnterpriseDeviceGetCall), [*devices issue command*](api::EnterpriseDeviceIssueCommandCall), [*devices list*](api::EnterpriseDeviceListCall), [*devices operations cancel*](api::EnterpriseDeviceOperationCancelCall), [*devices operations delete*](api::EnterpriseDeviceOperationDeleteCall), [*devices operations get*](api::EnterpriseDeviceOperationGetCall), [*devices operations list*](api::EnterpriseDeviceOperationListCall), [*devices patch*](api::EnterpriseDevicePatchCall), [*enrollment tokens create*](api::EnterpriseEnrollmentTokenCreateCall), [*enrollment tokens delete*](api::EnterpriseEnrollmentTokenDeleteCall), [*enrollment tokens get*](api::EnterpriseEnrollmentTokenGetCall), [*enrollment tokens list*](api::EnterpriseEnrollmentTokenListCall), [*get*](api::EnterpriseGetCall), [*list*](api::EnterpriseListCall), [*patch*](api::EnterprisePatchCall), [*policies delete*](api::EnterprisePolicyDeleteCall), [*policies get*](api::EnterprisePolicyGetCall), [*policies list*](api::EnterprisePolicyListCall), [*policies patch*](api::EnterprisePolicyPatchCall), [*web apps create*](api::EnterpriseWebAppCreateCall), [*web apps delete*](api::EnterpriseWebAppDeleteCall), [*web apps get*](api::EnterpriseWebAppGetCall), [*web apps list*](api::EnterpriseWebAppListCall), [*web apps patch*](api::EnterpriseWebAppPatchCall) and [*web tokens create*](api::EnterpriseWebTokenCreateCall)
 //! * [signup urls](api::SignupUrl)
 //!  * [*create*](api::SignupUrlCreateCall)
 //! 
@@ -61,6 +61,8 @@
 //! let r = hub.enterprises().devices_patch(...).doit().await
 //! let r = hub.enterprises().enrollment_tokens_create(...).doit().await
 //! let r = hub.enterprises().enrollment_tokens_delete(...).doit().await
+//! let r = hub.enterprises().enrollment_tokens_get(...).doit().await
+//! let r = hub.enterprises().enrollment_tokens_list(...).doit().await
 //! let r = hub.enterprises().policies_delete(...).doit().await
 //! let r = hub.enterprises().policies_get(...).doit().await
 //! let r = hub.enterprises().policies_list(...).doit().await
@@ -106,7 +108,7 @@
 //! use androidmanagement1::{Result, Error};
 //! # async fn dox() {
 //! use std::default::Default;
-//! use androidmanagement1::{AndroidManagement, oauth2, hyper, hyper_rustls};
+//! use androidmanagement1::{AndroidManagement, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 //! 
 //! // Get an ApplicationSecret instance by some means. It contains the `client_id` and 
 //! // `client_secret`, among other things.
@@ -219,22 +221,17 @@
 // This file was generated automatically from 'src/generator/templates/api/lib.rs.mako'
 // DO NOT EDIT !
 
-#[macro_use]
-extern crate serde_derive;
-
 // Re-export the hyper and hyper_rustls crate, they are required to build the hub
-pub extern crate hyper;
-pub extern crate hyper_rustls;
-extern crate serde;
-extern crate serde_json;
-// Re-export the yup_oauth2 crate, that is required to call some methods of the hub and the client
-pub extern crate yup_oauth2 as oauth2;
-extern crate mime;
-extern crate url;
-
+pub use hyper;
+pub use hyper_rustls;
+pub extern crate google_apis_common as client;
+pub use client::chrono;
 pub mod api;
-pub mod client;
 
 // Re-export the hub type and some basic client structs
 pub use api::AndroidManagement;
-pub use client::{Result, Error, Delegate};
+pub use client::{Result, Error, Delegate, FieldMask};
+
+// Re-export the yup_oauth2 crate, that is required to call some methods of the hub and the client
+#[cfg(feature = "yup-oauth2")]
+pub use client::oauth2;

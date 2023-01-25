@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/generator/templates/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Eventarc* crate version *4.0.1+20220301*, where *20220301* is the exact revision of the *eventarc:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v4.0.1*.
+//! This documentation was generated from *Eventarc* crate version *5.0.2-beta-1+20230113*, where *20230113* is the exact revision of the *eventarc:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.2-beta-1*.
 //! 
 //! Everything else about the *Eventarc* *v1* API can be found at the
 //! [official documentation site](https://cloud.google.com/eventarc).
@@ -12,7 +12,7 @@
 //! Handle the following *Resources* with ease from the central [hub](Eventarc) ... 
 //! 
 //! * projects
-//!  * [*locations channel connections get iam policy*](api::ProjectLocationChannelConnectionGetIamPolicyCall), [*locations channel connections set iam policy*](api::ProjectLocationChannelConnectionSetIamPolicyCall), [*locations channel connections test iam permissions*](api::ProjectLocationChannelConnectionTestIamPermissionCall), [*locations channels get iam policy*](api::ProjectLocationChannelGetIamPolicyCall), [*locations channels set iam policy*](api::ProjectLocationChannelSetIamPolicyCall), [*locations channels test iam permissions*](api::ProjectLocationChannelTestIamPermissionCall), [*locations get*](api::ProjectLocationGetCall), [*locations list*](api::ProjectLocationListCall), [*locations operations cancel*](api::ProjectLocationOperationCancelCall), [*locations operations delete*](api::ProjectLocationOperationDeleteCall), [*locations operations get*](api::ProjectLocationOperationGetCall), [*locations operations list*](api::ProjectLocationOperationListCall), [*locations providers get*](api::ProjectLocationProviderGetCall), [*locations providers list*](api::ProjectLocationProviderListCall), [*locations triggers create*](api::ProjectLocationTriggerCreateCall), [*locations triggers delete*](api::ProjectLocationTriggerDeleteCall), [*locations triggers get*](api::ProjectLocationTriggerGetCall), [*locations triggers get iam policy*](api::ProjectLocationTriggerGetIamPolicyCall), [*locations triggers list*](api::ProjectLocationTriggerListCall), [*locations triggers patch*](api::ProjectLocationTriggerPatchCall), [*locations triggers set iam policy*](api::ProjectLocationTriggerSetIamPolicyCall) and [*locations triggers test iam permissions*](api::ProjectLocationTriggerTestIamPermissionCall)
+//!  * [*locations channel connections create*](api::ProjectLocationChannelConnectionCreateCall), [*locations channel connections delete*](api::ProjectLocationChannelConnectionDeleteCall), [*locations channel connections get*](api::ProjectLocationChannelConnectionGetCall), [*locations channel connections get iam policy*](api::ProjectLocationChannelConnectionGetIamPolicyCall), [*locations channel connections list*](api::ProjectLocationChannelConnectionListCall), [*locations channel connections set iam policy*](api::ProjectLocationChannelConnectionSetIamPolicyCall), [*locations channel connections test iam permissions*](api::ProjectLocationChannelConnectionTestIamPermissionCall), [*locations channels create*](api::ProjectLocationChannelCreateCall), [*locations channels delete*](api::ProjectLocationChannelDeleteCall), [*locations channels get*](api::ProjectLocationChannelGetCall), [*locations channels get iam policy*](api::ProjectLocationChannelGetIamPolicyCall), [*locations channels list*](api::ProjectLocationChannelListCall), [*locations channels patch*](api::ProjectLocationChannelPatchCall), [*locations channels set iam policy*](api::ProjectLocationChannelSetIamPolicyCall), [*locations channels test iam permissions*](api::ProjectLocationChannelTestIamPermissionCall), [*locations get*](api::ProjectLocationGetCall), [*locations get google channel config*](api::ProjectLocationGetGoogleChannelConfigCall), [*locations list*](api::ProjectLocationListCall), [*locations operations cancel*](api::ProjectLocationOperationCancelCall), [*locations operations delete*](api::ProjectLocationOperationDeleteCall), [*locations operations get*](api::ProjectLocationOperationGetCall), [*locations operations list*](api::ProjectLocationOperationListCall), [*locations providers get*](api::ProjectLocationProviderGetCall), [*locations providers list*](api::ProjectLocationProviderListCall), [*locations triggers create*](api::ProjectLocationTriggerCreateCall), [*locations triggers delete*](api::ProjectLocationTriggerDeleteCall), [*locations triggers get*](api::ProjectLocationTriggerGetCall), [*locations triggers get iam policy*](api::ProjectLocationTriggerGetIamPolicyCall), [*locations triggers list*](api::ProjectLocationTriggerListCall), [*locations triggers patch*](api::ProjectLocationTriggerPatchCall), [*locations triggers set iam policy*](api::ProjectLocationTriggerSetIamPolicyCall), [*locations triggers test iam permissions*](api::ProjectLocationTriggerTestIamPermissionCall) and [*locations update google channel config*](api::ProjectLocationUpdateGoogleChannelConfigCall)
 //! 
 //! 
 //! 
@@ -47,12 +47,15 @@
 //! Or specifically ...
 //! 
 //! ```ignore
-//! let r = hub.projects().locations_channel_connections_get_iam_policy(...).doit().await
-//! let r = hub.projects().locations_channel_connections_set_iam_policy(...).doit().await
-//! let r = hub.projects().locations_channels_get_iam_policy(...).doit().await
-//! let r = hub.projects().locations_channels_set_iam_policy(...).doit().await
-//! let r = hub.projects().locations_triggers_get_iam_policy(...).doit().await
-//! let r = hub.projects().locations_triggers_set_iam_policy(...).doit().await
+//! let r = hub.projects().locations_channel_connections_create(...).doit().await
+//! let r = hub.projects().locations_channel_connections_delete(...).doit().await
+//! let r = hub.projects().locations_channels_create(...).doit().await
+//! let r = hub.projects().locations_channels_delete(...).doit().await
+//! let r = hub.projects().locations_channels_patch(...).doit().await
+//! let r = hub.projects().locations_operations_get(...).doit().await
+//! let r = hub.projects().locations_triggers_create(...).doit().await
+//! let r = hub.projects().locations_triggers_delete(...).doit().await
+//! let r = hub.projects().locations_triggers_patch(...).doit().await
 //! ```
 //! 
 //! The `resource()` and `activity(...)` calls create [builders][builder-pattern]. The second one dealing with `Activities` 
@@ -79,10 +82,11 @@
 //! extern crate hyper;
 //! extern crate hyper_rustls;
 //! extern crate google_eventarc1 as eventarc1;
+//! use eventarc1::api::Trigger;
 //! use eventarc1::{Result, Error};
 //! # async fn dox() {
 //! use std::default::Default;
-//! use eventarc1::{Eventarc, oauth2, hyper, hyper_rustls};
+//! use eventarc1::{Eventarc, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 //! 
 //! // Get an ApplicationSecret instance by some means. It contains the `client_id` and 
 //! // `client_secret`, among other things.
@@ -97,11 +101,18 @@
 //!         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 //!     ).build().await.unwrap();
 //! let mut hub = Eventarc::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+//! // As the method needs a request, you would usually fill it with the desired information
+//! // into the respective structure. Some of the parts shown here might not be applicable !
+//! // Values shown here are possibly random and not representative !
+//! let mut req = Trigger::default();
+//! 
 //! // You can configure optional parameters by calling the respective setters at will, and
 //! // execute the final call using `doit()`.
 //! // Values shown here are possibly random and not representative !
-//! let result = hub.projects().locations_channel_connections_get_iam_policy("resource")
-//!              .options_requested_policy_version(-55)
+//! let result = hub.projects().locations_triggers_patch(req, "name")
+//!              .validate_only(true)
+//!              .update_mask(&Default::default())
+//!              .allow_missing(true)
 //!              .doit().await;
 //! 
 //! match result {
@@ -187,22 +198,17 @@
 // This file was generated automatically from 'src/generator/templates/api/lib.rs.mako'
 // DO NOT EDIT !
 
-#[macro_use]
-extern crate serde_derive;
-
 // Re-export the hyper and hyper_rustls crate, they are required to build the hub
-pub extern crate hyper;
-pub extern crate hyper_rustls;
-extern crate serde;
-extern crate serde_json;
-// Re-export the yup_oauth2 crate, that is required to call some methods of the hub and the client
-pub extern crate yup_oauth2 as oauth2;
-extern crate mime;
-extern crate url;
-
+pub use hyper;
+pub use hyper_rustls;
+pub extern crate google_apis_common as client;
+pub use client::chrono;
 pub mod api;
-pub mod client;
 
 // Re-export the hub type and some basic client structs
 pub use api::Eventarc;
-pub use client::{Result, Error, Delegate};
+pub use client::{Result, Error, Delegate, FieldMask};
+
+// Re-export the yup_oauth2 crate, that is required to call some methods of the hub and the client
+#[cfg(feature = "yup-oauth2")]
+pub use client::oauth2;

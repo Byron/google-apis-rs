@@ -1,19 +1,20 @@
 use std::collections::HashMap;
 use std::cell::RefCell;
 use std::default::Default;
-use std::collections::BTreeMap;
+use std::collections::BTreeSet;
 use std::error::Error as StdError;
 use serde_json as json;
 use std::io;
 use std::fs;
 use std::mem;
-use std::thread::sleep;
 
-use http::Uri;
 use hyper::client::connect;
 use tokio::io::{AsyncRead, AsyncWrite};
+use tokio::time::sleep;
 use tower_service;
-use crate::client;
+use serde::{Serialize, Deserialize};
+
+use crate::{client, client::GetToken, client::serde_with};
 
 // ##############
 // UTILITIES ###
@@ -40,7 +41,7 @@ use crate::client;
 /// use digitalassetlinks1::{Result, Error};
 /// # async fn dox() {
 /// use std::default::Default;
-/// use digitalassetlinks1::{Digitalassetlinks, oauth2, hyper, hyper_rustls};
+/// use digitalassetlinks1::{Digitalassetlinks, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// // Get an ApplicationSecret instance by some means. It contains the `client_id` and 
 /// // `client_secret`, among other things.
@@ -88,7 +89,7 @@ use crate::client;
 #[derive(Clone)]
 pub struct Digitalassetlinks<S> {
     pub client: hyper::Client<S, hyper::body::Body>,
-    pub auth: oauth2::authenticator::Authenticator<S>,
+    pub auth: Box<dyn client::GetToken>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
@@ -98,11 +99,11 @@ impl<'a, S> client::Hub for Digitalassetlinks<S> {}
 
 impl<'a, S> Digitalassetlinks<S> {
 
-    pub fn new(client: hyper::Client<S, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<S>) -> Digitalassetlinks<S> {
+    pub fn new<A: 'static + client::GetToken>(client: hyper::Client<S, hyper::body::Body>, auth: A) -> Digitalassetlinks<S> {
         Digitalassetlinks {
             client,
-            auth: authenticator,
-            _user_agent: "google-api-rust-client/4.0.1".to_string(),
+            auth: Box::new(auth),
+            _user_agent: "google-api-rust-client/5.0.2-beta-1".to_string(),
             _base_url: "https://digitalassetlinks.googleapis.com/".to_string(),
             _root_url: "https://digitalassetlinks.googleapis.com/".to_string(),
         }
@@ -116,7 +117,7 @@ impl<'a, S> Digitalassetlinks<S> {
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/4.0.1`.
+    /// It defaults to `google-api-rust-client/5.0.2-beta-1`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -148,12 +149,15 @@ impl<'a, S> Digitalassetlinks<S> {
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AndroidAppAsset {
     /// Because there is no global enforcement of package name uniqueness, we also require a signing certificate, which in combination with the package name uniquely identifies an app. Some apps' signing keys are rotated, so they may be signed by different keys over time. We treat these as distinct assets, since we use (package name, cert) as the unique ID. This should not normally pose any problems as both versions of the app will make the same or similar statements. Other assets making statements about the app will have to be updated when a key is rotated, however. (Note that the syntaxes for publishing and querying for statements contain syntactic sugar to easily let you specify apps that are known by multiple certificates.) REQUIRED
+    
     pub certificate: Option<CertificateInfo>,
     /// Android App assets are naturally identified by their Java package name. For example, the Google Maps app uses the package name `com.google.android.apps.maps`. REQUIRED
     #[serde(rename="packageName")]
+    
     pub package_name: Option<String>,
 }
 
@@ -164,12 +168,15 @@ impl client::Part for AndroidAppAsset {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Asset {
     /// Set if this is an Android App asset.
     #[serde(rename="androidApp")]
+    
     pub android_app: Option<AndroidAppAsset>,
     /// Set if this is a web asset.
+    
     pub web: Option<WebAsset>,
 }
 
@@ -185,24 +192,31 @@ impl client::Part for Asset {}
 /// 
 /// * [bulk check assetlinks](AssetlinkBulkCheckCall) (request)
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct BulkCheckRequest {
     /// Same configuration as in Check request, all statements checks will use same configurations.
     #[serde(rename="allowGoogleInternalDataSources")]
+    
     pub allow_google_internal_data_sources: Option<bool>,
     /// If specified, will be used in any given template statement that doesn’t specify a relation.
     #[serde(rename="defaultRelation")]
+    
     pub default_relation: Option<String>,
     /// If specified, will be used in any given template statement that doesn’t specify a source.
     #[serde(rename="defaultSource")]
+    
     pub default_source: Option<Asset>,
     /// If specified, will be used in any given template statement that doesn’t specify a target.
     #[serde(rename="defaultTarget")]
+    
     pub default_target: Option<Asset>,
     /// Same configuration as in Check request, all statements checks will use same configurations.
     #[serde(rename="skipCacheLookup")]
+    
     pub skip_cache_lookup: Option<bool>,
     /// List of statements to check. For each statement, you can omit a field if the corresponding default_* field below was supplied. Minimum 1 statement; maximum 1,000 statements. Any additional statements will be ignored.
+    
     pub statements: Option<Vec<StatementTemplate>>,
 }
 
@@ -218,13 +232,16 @@ impl client::RequestValue for BulkCheckRequest {}
 /// 
 /// * [bulk check assetlinks](AssetlinkBulkCheckCall) (response)
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct BulkCheckResponse {
     /// Error code for the entire request. Present only if the entire request failed. Individual check errors will not trigger the presence of this field.
     #[serde(rename="bulkErrorCode")]
+    
     pub bulk_error_code: Option<String>,
     /// List of results for each check request. Results are returned in the same order in which they were sent in the request.
     #[serde(rename="checkResults")]
+    
     pub check_results: Option<Vec<CheckResponse>>,
 }
 
@@ -235,10 +252,12 @@ impl client::ResponseResult for BulkCheckResponse {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct CertificateInfo {
     /// The uppercase SHA-265 fingerprint of the certificate. From the PEM certificate, it can be acquired like this: $ keytool -printcert -file $CERTFILE | grep SHA256: SHA256: 14:6D:E9:83:C5:73:06:50:D8:EE:B9:95:2F:34:FC:64:16:A0:83: \ 42:E6:1D:BE:A8:8A:04:96:B2:3F:CF:44:E5 or like this: $ openssl x509 -in $CERTFILE -noout -fingerprint -sha256 SHA256 Fingerprint=14:6D:E9:83:C5:73:06:50:D8:EE:B9:95:2F:34:FC:64: \ 16:A0:83:42:E6:1D:BE:A8:8A:04:96:B2:3F:CF:44:E5 In this example, the contents of this field would be `14:6D:E9:83:C5:73: 06:50:D8:EE:B9:95:2F:34:FC:64:16:A0:83:42:E6:1D:BE:A8:8A:04:96:B2:3F:CF: 44:E5`. If these tools are not available to you, you can convert the PEM certificate into the DER format, compute the SHA-256 hash of that string and represent the result as a hexstring (that is, uppercase hexadecimal representations of each octet, separated by colons).
     #[serde(rename="sha256Fingerprint")]
+    
     pub sha256_fingerprint: Option<String>,
 }
 
@@ -254,19 +273,25 @@ impl client::Part for CertificateInfo {}
 /// 
 /// * [check assetlinks](AssetlinkCheckCall) (response)
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct CheckResponse {
     /// Human-readable message containing information intended to help end users understand, reproduce and debug the result. The message will be in English and we are currently not planning to offer any translations. Please note that no guarantees are made about the contents or format of this string. Any aspect of it may be subject to change without notice. You should not attempt to programmatically parse this data. For programmatic access, use the error_code field below.
     #[serde(rename="debugString")]
+    
     pub debug_string: Option<String>,
     /// Error codes that describe the result of the Check operation.
     #[serde(rename="errorCode")]
+    
     pub error_code: Option<Vec<String>>,
     /// Set to true if the assets specified in the request are linked by the relation specified in the request.
+    
     pub linked: Option<bool>,
     /// From serving time, how much longer the response should be considered valid barring further updates. REQUIRED
     #[serde(rename="maxAge")]
-    pub max_age: Option<String>,
+    
+    #[serde_as(as = "Option<::client::serde::duration::Wrapper>")]
+    pub max_age: Option<client::chrono::Duration>,
 }
 
 impl client::ResponseResult for CheckResponse {}
@@ -281,18 +306,24 @@ impl client::ResponseResult for CheckResponse {}
 /// 
 /// * [list statements](StatementListCall) (response)
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ListResponse {
     /// Human-readable message containing information intended to help end users understand, reproduce and debug the result. The message will be in English and we are currently not planning to offer any translations. Please note that no guarantees are made about the contents or format of this string. Any aspect of it may be subject to change without notice. You should not attempt to programmatically parse this data. For programmatic access, use the error_code field below.
     #[serde(rename="debugString")]
+    
     pub debug_string: Option<String>,
     /// Error codes that describe the result of the List operation.
     #[serde(rename="errorCode")]
+    
     pub error_code: Option<Vec<String>>,
     /// From serving time, how much longer the response should be considered valid barring further updates. REQUIRED
     #[serde(rename="maxAge")]
-    pub max_age: Option<String>,
+    
+    #[serde_as(as = "Option<::client::serde::duration::Wrapper>")]
+    pub max_age: Option<client::chrono::Duration>,
     /// A list of all the matching statements that have been found.
+    
     pub statements: Option<Vec<Statement>>,
 }
 
@@ -308,13 +339,17 @@ impl client::ResponseResult for ListResponse {}
 /// 
 /// * [list statements](StatementListCall) (none)
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Statement {
     /// The relation identifies the use of the statement as intended by the source asset's owner (that is, the person or entity who issued the statement). Every complete statement has a relation. We identify relations with strings of the format `/`, where `` must be one of a set of pre-defined purpose categories, and `` is a free-form lowercase alphanumeric string that describes the specific use case of the statement. Refer to [our API documentation](/digital-asset-links/v1/relation-strings) for the current list of supported relations. Example: `delegate_permission/common.handle_all_urls` REQUIRED
+    
     pub relation: Option<String>,
     /// Every statement has a source asset. REQUIRED
+    
     pub source: Option<Asset>,
     /// Every statement has a target asset. REQUIRED
+    
     pub target: Option<Asset>,
 }
 
@@ -325,13 +360,17 @@ impl client::Resource for Statement {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct StatementTemplate {
     /// The relationship being asserted between the source and target. If omitted, you must specify a BulkCheckRequest.default_relation value to use here.
+    
     pub relation: Option<String>,
     /// The source asset that is asserting the statement. If omitted, you must specify a BulkCheckRequest.default_source value to use here.
+    
     pub source: Option<Asset>,
     /// The target that the source is declaring the relationship with. If omitted, you must specify a BulkCheckRequest.default_target to use here.
+    
     pub target: Option<Asset>,
 }
 
@@ -342,9 +381,11 @@ impl client::Part for StatementTemplate {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct WebAsset {
     /// Web assets are identified by a URL that contains only the scheme, hostname and port parts. The format is http[s]://[:] Hostnames must be fully qualified: they must end in a single period ("`.`"). Only the schemes "http" and "https" are currently allowed. Port numbers are given as a decimal number, and they must be omitted if the standard port numbers are used: 80 for http and 443 for https. We call this limited URL the "site". All URLs that share the same scheme, hostname and port are considered to be a part of the site and thus belong to the web asset. Example: the asset with the site `https://www.google.com` contains all these URLs: * `https://www.google.com/` * `https://www.google.com:443/` * `https://www.google.com/foo` * `https://www.google.com/foo?bar` * `https://www.google.com/foo#bar` * `https://user@password:www.google.com/` But it does not contain these URLs: * `http://www.google.com/` (wrong scheme) * `https://google.com/` (hostname does not match) * `https://www.google.com:444/` (port does not match) REQUIRED
+    
     pub site: Option<String>,
 }
 
@@ -357,7 +398,7 @@ impl client::Part for WebAsset {}
 // #################
 
 /// A builder providing access to all methods supported on *assetlink* resources.
-/// It is not used directly, but through the `Digitalassetlinks` hub.
+/// It is not used directly, but through the [`Digitalassetlinks`] hub.
 ///
 /// # Example
 ///
@@ -370,7 +411,7 @@ impl client::Part for WebAsset {}
 /// 
 /// # async fn dox() {
 /// use std::default::Default;
-/// use digitalassetlinks1::{Digitalassetlinks, oauth2, hyper, hyper_rustls};
+/// use digitalassetlinks1::{Digitalassetlinks, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// let secret: oauth2::ApplicationSecret = Default::default();
 /// let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -432,7 +473,7 @@ impl<'a, S> AssetlinkMethods<'a, S> {
 
 
 /// A builder providing access to all methods supported on *statement* resources.
-/// It is not used directly, but through the `Digitalassetlinks` hub.
+/// It is not used directly, but through the [`Digitalassetlinks`] hub.
 ///
 /// # Example
 ///
@@ -445,7 +486,7 @@ impl<'a, S> AssetlinkMethods<'a, S> {
 /// 
 /// # async fn dox() {
 /// use std::default::Default;
-/// use digitalassetlinks1::{Digitalassetlinks, oauth2, hyper, hyper_rustls};
+/// use digitalassetlinks1::{Digitalassetlinks, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// let secret: oauth2::ApplicationSecret = Default::default();
 /// let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -496,7 +537,7 @@ impl<'a, S> StatementMethods<'a, S> {
 /// Send a bundle of statement checks in a single RPC to minimize latency and service load. Statements need not be all for the same source and/or target. We recommend using this method when you need to check more than one statement in a short period of time.
 ///
 /// A builder for the *bulkCheck* method supported by a *assetlink* resource.
-/// It is not used directly, but through a `AssetlinkMethods` instance.
+/// It is not used directly, but through a [`AssetlinkMethods`] instance.
 ///
 /// # Example
 ///
@@ -509,7 +550,7 @@ impl<'a, S> StatementMethods<'a, S> {
 /// use digitalassetlinks1::api::BulkCheckRequest;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use digitalassetlinks1::{Digitalassetlinks, oauth2, hyper, hyper_rustls};
+/// # use digitalassetlinks1::{Digitalassetlinks, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
 /// # let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -542,7 +583,7 @@ impl<'a, S> client::CallBuilder for AssetlinkBulkCheckCall<'a, S> {}
 
 impl<'a, S> AssetlinkBulkCheckCall<'a, S>
 where
-    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
     S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
     S::Future: Send + Unpin + 'static,
     S::Error: Into<Box<dyn StdError + Send + Sync>>,
@@ -553,32 +594,30 @@ where
     pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, BulkCheckResponse)> {
         use std::io::{Read, Seek};
         use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::ToParts;
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
         let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
         dlg.begin(client::MethodInfo { id: "digitalassetlinks.assetlinks.bulkCheck",
                                http_method: hyper::Method::POST });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
+
         for &field in ["alt"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(client::Error::FieldClash(field));
             }
         }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
 
-        params.push(("alt", "json".to_string()));
+        let mut params = Params::with_capacity(3 + self._additional_params.len());
 
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "v1/assetlinks:bulkCheck";
         
-        let key = dlg.api_key();
-        match key {
-            Some(value) => params.push(("key", value)),
+        match dlg.api_key() {
+            Some(value) => params.push("key", value),
             None => {
                 dlg.finished(false);
                 return Err(client::Error::MissingAPIKey)
@@ -586,9 +625,9 @@ where
         }
 
 
-        let url = url::Url::parse_with_params(&url, params).unwrap();
+        let url = params.parse_with_url(&url);
 
-        let mut json_mime_type: mime::Mime = "application/json".parse().unwrap();
+        let mut json_mime_type = mime::APPLICATION_JSON;
         let mut request_value_reader =
             {
                 let mut value = json::value::to_value(&self._request).expect("serde to work");
@@ -606,23 +645,26 @@ where
             let mut req_result = {
                 let client = &self.hub.client;
                 dlg.pre_request();
-                let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
-                        .header(USER_AGENT, self.hub._user_agent.clone());
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::POST)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
 
 
                         let request = req_builder
-                        .header(CONTENT_TYPE, format!("{}", json_mime_type.to_string()))
+                        .header(CONTENT_TYPE, json_mime_type.to_string())
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
                 client.request(request.unwrap()).await
-                
+
             };
 
             match req_result {
                 Err(err) => {
                     if let client::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep(d).await;
                         continue;
                     }
                     dlg.finished(false);
@@ -638,7 +680,7 @@ where
                         let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
                         if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
-                            sleep(d);
+                            sleep(d).await;
                             continue;
                         }
 
@@ -681,7 +723,8 @@ where
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.````
     ///
     /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AssetlinkBulkCheckCall<'a, S> {
@@ -721,7 +764,7 @@ where
 /// Determines whether the specified (directional) relationship exists between the specified source and target assets. The relation describes the intent of the link between the two assets as claimed by the source asset. An example for such relationships is the delegation of privileges or permissions. This command is most often used by infrastructure systems to check preconditions for an action. For example, a client may want to know if it is OK to send a web URL to a particular mobile app instead. The client can check for the relevant asset link from the website to the mobile app to decide if the operation should be allowed. A note about security: if you specify a secure asset as the source, such as an HTTPS website or an Android app, the API will ensure that any statements used to generate the response have been made in a secure way by the owner of that asset. Conversely, if the source asset is an insecure HTTP website (that is, the URL starts with `http://` instead of `https://`), the API cannot verify its statements securely, and it is not possible to ensure that the website's statements have not been altered by a third party. For more information, see the [Digital Asset Links technical design specification](https://github.com/google/digitalassetlinks/blob/master/well-known/details.md).
 ///
 /// A builder for the *check* method supported by a *assetlink* resource.
-/// It is not used directly, but through a `AssetlinkMethods` instance.
+/// It is not used directly, but through a [`AssetlinkMethods`] instance.
 ///
 /// # Example
 ///
@@ -733,7 +776,7 @@ where
 /// # extern crate google_digitalassetlinks1 as digitalassetlinks1;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use digitalassetlinks1::{Digitalassetlinks, oauth2, hyper, hyper_rustls};
+/// # use digitalassetlinks1::{Digitalassetlinks, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
 /// # let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -774,7 +817,7 @@ impl<'a, S> client::CallBuilder for AssetlinkCheckCall<'a, S> {}
 
 impl<'a, S> AssetlinkCheckCall<'a, S>
 where
-    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
     S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
     S::Future: Send + Unpin + 'static,
     S::Error: Into<Box<dyn StdError + Send + Sync>>,
@@ -785,53 +828,51 @@ where
     pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, CheckResponse)> {
         use std::io::{Read, Seek};
         use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::ToParts;
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
         let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
         dlg.begin(client::MethodInfo { id: "digitalassetlinks.assetlinks.check",
                                http_method: hyper::Method::GET });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(9 + self._additional_params.len());
-        if let Some(value) = self._target_web_site {
-            params.push(("target.web.site", value.to_string()));
-        }
-        if let Some(value) = self._target_android_app_package_name {
-            params.push(("target.androidApp.packageName", value.to_string()));
-        }
-        if let Some(value) = self._target_android_app_certificate_sha256_fingerprint {
-            params.push(("target.androidApp.certificate.sha256Fingerprint", value.to_string()));
-        }
-        if let Some(value) = self._source_web_site {
-            params.push(("source.web.site", value.to_string()));
-        }
-        if let Some(value) = self._source_android_app_package_name {
-            params.push(("source.androidApp.packageName", value.to_string()));
-        }
-        if let Some(value) = self._source_android_app_certificate_sha256_fingerprint {
-            params.push(("source.androidApp.certificate.sha256Fingerprint", value.to_string()));
-        }
-        if let Some(value) = self._relation {
-            params.push(("relation", value.to_string()));
-        }
+
         for &field in ["alt", "target.web.site", "target.androidApp.packageName", "target.androidApp.certificate.sha256Fingerprint", "source.web.site", "source.androidApp.packageName", "source.androidApp.certificate.sha256Fingerprint", "relation"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(client::Error::FieldClash(field));
             }
         }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
+
+        let mut params = Params::with_capacity(9 + self._additional_params.len());
+        if let Some(value) = self._target_web_site.as_ref() {
+            params.push("target.web.site", value);
+        }
+        if let Some(value) = self._target_android_app_package_name.as_ref() {
+            params.push("target.androidApp.packageName", value);
+        }
+        if let Some(value) = self._target_android_app_certificate_sha256_fingerprint.as_ref() {
+            params.push("target.androidApp.certificate.sha256Fingerprint", value);
+        }
+        if let Some(value) = self._source_web_site.as_ref() {
+            params.push("source.web.site", value);
+        }
+        if let Some(value) = self._source_android_app_package_name.as_ref() {
+            params.push("source.androidApp.packageName", value);
+        }
+        if let Some(value) = self._source_android_app_certificate_sha256_fingerprint.as_ref() {
+            params.push("source.androidApp.certificate.sha256Fingerprint", value);
+        }
+        if let Some(value) = self._relation.as_ref() {
+            params.push("relation", value);
         }
 
-        params.push(("alt", "json".to_string()));
+        params.extend(self._additional_params.iter());
 
+        params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "v1/assetlinks:check";
         
-        let key = dlg.api_key();
-        match key {
-            Some(value) => params.push(("key", value)),
+        match dlg.api_key() {
+            Some(value) => params.push("key", value),
             None => {
                 dlg.finished(false);
                 return Err(client::Error::MissingAPIKey)
@@ -839,7 +880,7 @@ where
         }
 
 
-        let url = url::Url::parse_with_params(&url, params).unwrap();
+        let url = params.parse_with_url(&url);
 
 
 
@@ -847,21 +888,24 @@ where
             let mut req_result = {
                 let client = &self.hub.client;
                 dlg.pre_request();
-                let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
-                        .header(USER_AGENT, self.hub._user_agent.clone());
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::GET)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
 
 
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
-                
+
             };
 
             match req_result {
                 Err(err) => {
                     if let client::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep(d).await;
                         continue;
                     }
                     dlg.finished(false);
@@ -877,7 +921,7 @@ where
                         let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
                         if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
-                            sleep(d);
+                            sleep(d).await;
                             continue;
                         }
 
@@ -960,7 +1004,8 @@ where
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.````
     ///
     /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AssetlinkCheckCall<'a, S> {
@@ -1000,7 +1045,7 @@ where
 /// Retrieves a list of all statements from a given source that match the specified target and statement string. The API guarantees that all statements with secure source assets, such as HTTPS websites or Android apps, have been made in a secure way by the owner of those assets, as described in the [Digital Asset Links technical design specification](https://github.com/google/digitalassetlinks/blob/master/well-known/details.md). Specifically, you should consider that for insecure websites (that is, where the URL starts with `http://` instead of `https://`), this guarantee cannot be made. The `List` command is most useful in cases where the API client wants to know all the ways in which two assets are related, or enumerate all the relationships from a particular source asset. Example: a feature that helps users navigate to related items. When a mobile app is running on a device, the feature would make it easy to navigate to the corresponding web site or Google+ profile.
 ///
 /// A builder for the *list* method supported by a *statement* resource.
-/// It is not used directly, but through a `StatementMethods` instance.
+/// It is not used directly, but through a [`StatementMethods`] instance.
 ///
 /// # Example
 ///
@@ -1012,7 +1057,7 @@ where
 /// # extern crate google_digitalassetlinks1 as digitalassetlinks1;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use digitalassetlinks1::{Digitalassetlinks, oauth2, hyper, hyper_rustls};
+/// # use digitalassetlinks1::{Digitalassetlinks, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
 /// # let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -1047,7 +1092,7 @@ impl<'a, S> client::CallBuilder for StatementListCall<'a, S> {}
 
 impl<'a, S> StatementListCall<'a, S>
 where
-    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
     S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
     S::Future: Send + Unpin + 'static,
     S::Error: Into<Box<dyn StdError + Send + Sync>>,
@@ -1058,44 +1103,42 @@ where
     pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, ListResponse)> {
         use std::io::{Read, Seek};
         use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::ToParts;
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
         let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
         dlg.begin(client::MethodInfo { id: "digitalassetlinks.statements.list",
                                http_method: hyper::Method::GET });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(6 + self._additional_params.len());
-        if let Some(value) = self._source_web_site {
-            params.push(("source.web.site", value.to_string()));
-        }
-        if let Some(value) = self._source_android_app_package_name {
-            params.push(("source.androidApp.packageName", value.to_string()));
-        }
-        if let Some(value) = self._source_android_app_certificate_sha256_fingerprint {
-            params.push(("source.androidApp.certificate.sha256Fingerprint", value.to_string()));
-        }
-        if let Some(value) = self._relation {
-            params.push(("relation", value.to_string()));
-        }
+
         for &field in ["alt", "source.web.site", "source.androidApp.packageName", "source.androidApp.certificate.sha256Fingerprint", "relation"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(client::Error::FieldClash(field));
             }
         }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
+
+        let mut params = Params::with_capacity(6 + self._additional_params.len());
+        if let Some(value) = self._source_web_site.as_ref() {
+            params.push("source.web.site", value);
+        }
+        if let Some(value) = self._source_android_app_package_name.as_ref() {
+            params.push("source.androidApp.packageName", value);
+        }
+        if let Some(value) = self._source_android_app_certificate_sha256_fingerprint.as_ref() {
+            params.push("source.androidApp.certificate.sha256Fingerprint", value);
+        }
+        if let Some(value) = self._relation.as_ref() {
+            params.push("relation", value);
         }
 
-        params.push(("alt", "json".to_string()));
+        params.extend(self._additional_params.iter());
 
+        params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "v1/statements:list";
         
-        let key = dlg.api_key();
-        match key {
-            Some(value) => params.push(("key", value)),
+        match dlg.api_key() {
+            Some(value) => params.push("key", value),
             None => {
                 dlg.finished(false);
                 return Err(client::Error::MissingAPIKey)
@@ -1103,7 +1146,7 @@ where
         }
 
 
-        let url = url::Url::parse_with_params(&url, params).unwrap();
+        let url = params.parse_with_url(&url);
 
 
 
@@ -1111,21 +1154,24 @@ where
             let mut req_result = {
                 let client = &self.hub.client;
                 dlg.pre_request();
-                let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
-                        .header(USER_AGENT, self.hub._user_agent.clone());
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::GET)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
 
 
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
-                
+
             };
 
             match req_result {
                 Err(err) => {
                     if let client::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep(d).await;
                         continue;
                     }
                     dlg.finished(false);
@@ -1141,7 +1187,7 @@ where
                         let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
                         if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
-                            sleep(d);
+                            sleep(d).await;
                             continue;
                         }
 
@@ -1203,7 +1249,8 @@ where
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.````
     ///
     /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> StatementListCall<'a, S> {

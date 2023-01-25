@@ -1,19 +1,20 @@
 use std::collections::HashMap;
 use std::cell::RefCell;
 use std::default::Default;
-use std::collections::BTreeMap;
+use std::collections::BTreeSet;
 use std::error::Error as StdError;
 use serde_json as json;
 use std::io;
 use std::fs;
 use std::mem;
-use std::thread::sleep;
 
-use http::Uri;
 use hyper::client::connect;
 use tokio::io::{AsyncRead, AsyncWrite};
+use tokio::time::sleep;
 use tower_service;
-use crate::client;
+use serde::{Serialize, Deserialize};
+
+use crate::{client, client::GetToken, client::serde_with};
 
 // ##############
 // UTILITIES ###
@@ -39,7 +40,7 @@ use crate::client;
 /// use gan1_beta1::{Result, Error};
 /// # async fn dox() {
 /// use std::default::Default;
-/// use gan1_beta1::{Gan, oauth2, hyper, hyper_rustls};
+/// use gan1_beta1::{Gan, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// // Get an ApplicationSecret instance by some means. It contains the `client_id` and 
 /// // `client_secret`, among other things.
@@ -70,7 +71,7 @@ use crate::client;
 ///              .create_date_max("no")
 ///              .authorship("Stet")
 ///              .add_asset_size("kasd")
-///              .add_advertiser_id("et")
+///              .add_advertiser_id(-24)
 ///              .doit().await;
 /// 
 /// match result {
@@ -95,7 +96,7 @@ use crate::client;
 #[derive(Clone)]
 pub struct Gan<S> {
     pub client: hyper::Client<S, hyper::body::Body>,
-    pub auth: oauth2::authenticator::Authenticator<S>,
+    pub auth: Box<dyn client::GetToken>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
@@ -105,11 +106,11 @@ impl<'a, S> client::Hub for Gan<S> {}
 
 impl<'a, S> Gan<S> {
 
-    pub fn new(client: hyper::Client<S, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<S>) -> Gan<S> {
+    pub fn new<A: 'static + client::GetToken>(client: hyper::Client<S, hyper::body::Body>, auth: A) -> Gan<S> {
         Gan {
             client,
-            auth: authenticator,
-            _user_agent: "google-api-rust-client/4.0.1".to_string(),
+            auth: Box::new(auth),
+            _user_agent: "google-api-rust-client/5.0.2-beta-1".to_string(),
             _base_url: "https://www.googleapis.com/gan/v1beta1/".to_string(),
             _root_url: "https://www.googleapis.com/".to_string(),
         }
@@ -135,7 +136,7 @@ impl<'a, S> Gan<S> {
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/4.0.1`.
+    /// It defaults to `google-api-rust-client/5.0.2-beta-1`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -173,63 +174,88 @@ impl<'a, S> Gan<S> {
 /// * [get advertisers](AdvertiserGetCall) (response)
 /// * [list advertisers](AdvertiserListCall) (none)
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Advertiser {
     /// True if the advertiser allows publisher created links, otherwise false.
     #[serde(rename="allowPublisherCreatedLinks")]
+    
     pub allow_publisher_created_links: Option<bool>,
     /// Category that this advertiser belongs to. A valid list of categories can be found here: http://www.google.com/support/affiliatenetwork/advertiser/bin/answer.py?hl=en&answer=107581
+    
     pub category: Option<String>,
     /// The longest possible length of a commission (how long the cookies on the customer's browser last before they expire).
     #[serde(rename="commissionDuration")]
+    
     pub commission_duration: Option<i32>,
     /// Email that this advertiser would like publishers to contact them with.
     #[serde(rename="contactEmail")]
+    
     pub contact_email: Option<String>,
     /// Phone that this advertiser would like publishers to contact them with.
     #[serde(rename="contactPhone")]
+    
     pub contact_phone: Option<String>,
     /// The default link id for this advertiser.
     #[serde(rename="defaultLinkId")]
-    pub default_link_id: Option<String>,
+    
+    #[serde_as(as = "Option<::client::serde_with::DisplayFromStr>")]
+    pub default_link_id: Option<i64>,
     /// Description of the website the advertiser advertises from.
+    
     pub description: Option<String>,
     /// The sum of fees paid to publishers divided by the total number of clicks over the past three months. This value should be multiplied by 100 at the time of display.
     #[serde(rename="epcNinetyDayAverage")]
+    
     pub epc_ninety_day_average: Option<Money>,
     /// The sum of fees paid to publishers divided by the total number of clicks over the past seven days. This value should be multiplied by 100 at the time of display.
     #[serde(rename="epcSevenDayAverage")]
+    
     pub epc_seven_day_average: Option<Money>,
     /// The ID of this advertiser.
-    pub id: Option<String>,
+    
+    #[serde_as(as = "Option<::client::serde_with::DisplayFromStr>")]
+    pub id: Option<i64>,
     /// The requested advertiser.
+    
     pub item: Option<Option<Box<Advertiser>>>,
     /// Date that this advertiser was approved as a Google Affiliate Network advertiser.
     #[serde(rename="joinDate")]
-    pub join_date: Option<String>,
+    
+    pub join_date: Option<client::chrono::DateTime<client::chrono::offset::Utc>>,
     /// The kind for an advertiser.
+    
     pub kind: Option<String>,
     /// URL to the logo this advertiser uses on the Google Affiliate Network.
     #[serde(rename="logoUrl")]
+    
     pub logo_url: Option<String>,
     /// List of merchant center ids for this advertiser
     #[serde(rename="merchantCenterIds")]
-    pub merchant_center_ids: Option<Vec<String>>,
+    
+    #[serde_as(as = "Option<Vec<::client::serde_with::DisplayFromStr>>")]
+    pub merchant_center_ids: Option<Vec<i64>>,
     /// The name of this advertiser.
+    
     pub name: Option<String>,
     /// A rank based on commissions paid to publishers over the past 90 days. A number between 1 and 4 where 4 means the top quartile (most money paid) and 1 means the bottom quartile (least money paid).
     #[serde(rename="payoutRank")]
+    
     pub payout_rank: Option<String>,
     /// Allows advertisers to submit product listings to Google Product Search.
     #[serde(rename="productFeedsEnabled")]
+    
     pub product_feeds_enabled: Option<bool>,
     /// List of redirect URLs for this advertiser
     #[serde(rename="redirectDomains")]
+    
     pub redirect_domains: Option<Vec<String>>,
     /// URL of the website this advertiser advertises from.
     #[serde(rename="siteUrl")]
+    
     pub site_url: Option<String>,
     /// The status of the requesting publisher's relationship this advertiser.
+    
     pub status: Option<String>,
 }
 
@@ -246,14 +272,18 @@ impl client::ResponseResult for Advertiser {}
 /// 
 /// * [list advertisers](AdvertiserListCall) (response)
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Advertisers {
     /// The advertiser list.
+    
     pub items: Option<Vec<Advertiser>>,
     /// The kind for a page of advertisers.
+    
     pub kind: Option<String>,
     /// The 'pageToken' to pass to the next request to get the next page, if there are more to retrieve.
     #[serde(rename="nextPageToken")]
+    
     pub next_page_token: Option<String>,
 }
 
@@ -269,191 +299,255 @@ impl client::ResponseResult for Advertisers {}
 /// 
 /// * [list cc offers](CcOfferListCall) (none)
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct CcOffer {
     /// More marketing copy about the card's benefits. A summary field.
     #[serde(rename="additionalCardBenefits")]
+    
     pub additional_card_benefits: Option<Vec<String>>,
     /// Any extra fees levied on card holders.
     #[serde(rename="additionalCardHolderFee")]
+    
     pub additional_card_holder_fee: Option<String>,
     /// The youngest a recipient of this card may be.
     #[serde(rename="ageMinimum")]
+    
     pub age_minimum: Option<f64>,
     /// Text describing the details of the age minimum restriction.
     #[serde(rename="ageMinimumDetails")]
+    
     pub age_minimum_details: Option<String>,
     /// The ongoing annual fee, in dollars.
     #[serde(rename="annualFee")]
+    
     pub annual_fee: Option<f64>,
     /// Text describing the annual fee, including any difference for the first year. A summary field.
     #[serde(rename="annualFeeDisplay")]
+    
     pub annual_fee_display: Option<String>,
     /// The largest number of units you may accumulate in a year.
     #[serde(rename="annualRewardMaximum")]
+    
     pub annual_reward_maximum: Option<f64>,
     /// Possible categories for this card, eg "Low Interest" or "Good." A summary field.
     #[serde(rename="approvedCategories")]
+    
     pub approved_categories: Option<Vec<String>>,
     /// Text describing the purchase APR. A summary field.
     #[serde(rename="aprDisplay")]
+    
     pub apr_display: Option<String>,
     /// Text describing how the balance is computed. A summary field.
     #[serde(rename="balanceComputationMethod")]
+    
     pub balance_computation_method: Option<String>,
     /// Text describing the terms for balance transfers. A summary field.
     #[serde(rename="balanceTransferTerms")]
+    
     pub balance_transfer_terms: Option<String>,
     /// For cards with rewards programs, extra circumstances whereby additional rewards may be granted.
     #[serde(rename="bonusRewards")]
+    
     pub bonus_rewards: Option<Vec<CcOfferBonusRewards>>,
     /// If you get coverage when you use the card for the given activity, this field describes it.
     #[serde(rename="carRentalInsurance")]
+    
     pub car_rental_insurance: Option<String>,
     /// A list of what the issuer thinks are the most important benefits of the card. Usually summarizes the rewards program, if there is one. A summary field.
     #[serde(rename="cardBenefits")]
+    
     pub card_benefits: Option<Vec<String>>,
     /// The issuer's name for the card, including any trademark or service mark designators. A summary field.
     #[serde(rename="cardName")]
+    
     pub card_name: Option<String>,
     /// What kind of credit card this is, for example secured or unsecured.
     #[serde(rename="cardType")]
+    
     pub card_type: Option<String>,
     /// Text describing the terms for cash advances. A summary field.
     #[serde(rename="cashAdvanceTerms")]
+    
     pub cash_advance_terms: Option<String>,
     /// The high end for credit limits the issuer imposes on recipients of this card.
     #[serde(rename="creditLimitMax")]
+    
     pub credit_limit_max: Option<f64>,
     /// The low end for credit limits the issuer imposes on recipients of this card.
     #[serde(rename="creditLimitMin")]
+    
     pub credit_limit_min: Option<f64>,
     /// Text describing the credit ratings required for recipients of this card, for example "Excellent/Good." A summary field.
     #[serde(rename="creditRatingDisplay")]
+    
     pub credit_rating_display: Option<String>,
     /// Fees for defaulting on your payments.
     #[serde(rename="defaultFees")]
+    
     pub default_fees: Option<Vec<CcOfferDefaultFees>>,
     /// A notice that, if present, is referenced via an asterisk by many of the other summary fields. If this field is present, it will always start with an asterisk ("*"), and must be prominently displayed with the offer. A summary field.
+    
     pub disclaimer: Option<String>,
     /// If you get coverage when you use the card for the given activity, this field describes it.
     #[serde(rename="emergencyInsurance")]
+    
     pub emergency_insurance: Option<String>,
     /// Whether this card is only available to existing customers of the issuer.
     #[serde(rename="existingCustomerOnly")]
+    
     pub existing_customer_only: Option<bool>,
     /// If you get coverage when you use the card for the given activity, this field describes it.
     #[serde(rename="extendedWarranty")]
+    
     pub extended_warranty: Option<String>,
     /// The annual fee for the first year, if different from the ongoing fee. Optional.
     #[serde(rename="firstYearAnnualFee")]
+    
     pub first_year_annual_fee: Option<f64>,
     /// If you get coverage when you use the card for the given activity, this field describes it.
     #[serde(rename="flightAccidentInsurance")]
+    
     pub flight_accident_insurance: Option<String>,
     /// Fee for each transaction involving a foreign currency.
     #[serde(rename="foreignCurrencyTransactionFee")]
+    
     pub foreign_currency_transaction_fee: Option<String>,
     /// If you get coverage when you use the card for the given activity, this field describes it.
     #[serde(rename="fraudLiability")]
+    
     pub fraud_liability: Option<String>,
     /// Text describing the grace period before finance charges apply. A summary field.
     #[serde(rename="gracePeriodDisplay")]
+    
     pub grace_period_display: Option<String>,
     /// The link to the image of the card that is shown on Connect Commerce. A summary field.
     #[serde(rename="imageUrl")]
+    
     pub image_url: Option<String>,
     /// Fee for setting up the card.
     #[serde(rename="initialSetupAndProcessingFee")]
+    
     pub initial_setup_and_processing_fee: Option<String>,
     /// Text describing the terms for introductory period balance transfers. A summary field.
     #[serde(rename="introBalanceTransferTerms")]
+    
     pub intro_balance_transfer_terms: Option<String>,
     /// Text describing the terms for introductory period cash advances. A summary field.
     #[serde(rename="introCashAdvanceTerms")]
+    
     pub intro_cash_advance_terms: Option<String>,
     /// Text describing the terms for introductory period purchases. A summary field.
     #[serde(rename="introPurchaseTerms")]
+    
     pub intro_purchase_terms: Option<String>,
     /// Name of card issuer. A summary field.
+    
     pub issuer: Option<String>,
     /// The Google Affiliate Network ID of the advertiser making this offer.
     #[serde(rename="issuerId")]
+    
     pub issuer_id: Option<String>,
     /// The generic link to the issuer's site.
     #[serde(rename="issuerWebsite")]
+    
     pub issuer_website: Option<String>,
     /// The kind for one credit card offer. A summary field.
+    
     pub kind: Option<String>,
     /// The link to the issuer's page for this card. A summary field.
     #[serde(rename="landingPageUrl")]
+    
     pub landing_page_url: Option<String>,
     /// Text describing how much a late payment will cost, eg "up to $35." A summary field.
     #[serde(rename="latePaymentFee")]
+    
     pub late_payment_fee: Option<String>,
     /// If you get coverage when you use the card for the given activity, this field describes it.
     #[serde(rename="luggageInsurance")]
+    
     pub luggage_insurance: Option<String>,
     /// The highest interest rate the issuer charges on this card. Expressed as an absolute number, not as a percentage.
     #[serde(rename="maxPurchaseRate")]
+    
     pub max_purchase_rate: Option<f64>,
     /// The lowest interest rate the issuer charges on this card. Expressed as an absolute number, not as a percentage.
     #[serde(rename="minPurchaseRate")]
+    
     pub min_purchase_rate: Option<f64>,
     /// Text describing how much missing the grace period will cost.
     #[serde(rename="minimumFinanceCharge")]
+    
     pub minimum_finance_charge: Option<String>,
     /// Which network (eg Visa) the card belongs to. A summary field.
+    
     pub network: Option<String>,
     /// This offer's ID. A summary field.
     #[serde(rename="offerId")]
+    
     pub offer_id: Option<String>,
     /// Whether a cash reward program lets you get cash back sooner than end of year or other longish period.
     #[serde(rename="offersImmediateCashReward")]
+    
     pub offers_immediate_cash_reward: Option<bool>,
     /// Fee for exceeding the card's charge limit.
     #[serde(rename="overLimitFee")]
+    
     pub over_limit_fee: Option<String>,
     /// Categories in which the issuer does not wish the card to be displayed. A summary field.
     #[serde(rename="prohibitedCategories")]
+    
     pub prohibited_categories: Option<Vec<String>>,
     /// Text describing any additional details for the purchase rate. A summary field.
     #[serde(rename="purchaseRateAdditionalDetails")]
+    
     pub purchase_rate_additional_details: Option<String>,
     /// Fixed or variable.
     #[serde(rename="purchaseRateType")]
+    
     pub purchase_rate_type: Option<String>,
     /// Text describing the fee for a payment that doesn't clear. A summary field.
     #[serde(rename="returnedPaymentFee")]
+    
     pub returned_payment_fee: Option<String>,
     /// The company that redeems the rewards, if different from the issuer.
     #[serde(rename="rewardPartner")]
+    
     pub reward_partner: Option<String>,
     /// For cards with rewards programs, the unit of reward. For example, miles, cash back, points.
     #[serde(rename="rewardUnit")]
+    
     pub reward_unit: Option<String>,
     /// For cards with rewards programs, detailed rules about how the program works.
+    
     pub rewards: Option<Vec<CcOfferRewards>>,
     /// Whether accumulated rewards ever expire.
     #[serde(rename="rewardsExpire")]
+    
     pub rewards_expire: Option<bool>,
     /// For airline miles rewards, tells whether blackout dates apply to the miles.
     #[serde(rename="rewardsHaveBlackoutDates")]
+    
     pub rewards_have_blackout_dates: Option<bool>,
     /// Fee for requesting a copy of your statement.
     #[serde(rename="statementCopyFee")]
+    
     pub statement_copy_fee: Option<String>,
     /// The link to ping to register a click on this offer. A summary field.
     #[serde(rename="trackingUrl")]
+    
     pub tracking_url: Option<String>,
     /// If you get coverage when you use the card for the given activity, this field describes it.
     #[serde(rename="travelInsurance")]
+    
     pub travel_insurance: Option<String>,
     /// When variable rates were last updated.
     #[serde(rename="variableRatesLastUpdated")]
+    
     pub variable_rates_last_updated: Option<String>,
     /// How often variable rates are updated.
     #[serde(rename="variableRatesUpdateFrequency")]
+    
     pub variable_rates_update_frequency: Option<String>,
 }
 
@@ -469,11 +563,14 @@ impl client::Resource for CcOffer {}
 /// 
 /// * [list cc offers](CcOfferListCall) (response)
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct CcOffers {
     /// The credit card offers.
+    
     pub items: Option<Vec<CcOffer>>,
     /// The kind for a page of credit card offers.
+    
     pub kind: Option<String>,
 }
 
@@ -489,57 +586,78 @@ impl client::ResponseResult for CcOffers {}
 /// 
 /// * [list events](EventListCall) (none)
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Event {
     /// The ID of advertiser for this event.
     #[serde(rename="advertiserId")]
-    pub advertiser_id: Option<String>,
+    
+    #[serde_as(as = "Option<::client::serde_with::DisplayFromStr>")]
+    pub advertiser_id: Option<i64>,
     /// The name of the advertiser for this event.
     #[serde(rename="advertiserName")]
+    
     pub advertiser_name: Option<String>,
     /// The charge ID for this event. Only returned for charge events.
     #[serde(rename="chargeId")]
+    
     pub charge_id: Option<String>,
     /// Charge type of the event (other|slotting_fee|monthly_minimum|tier_bonus|debit|credit). Only returned for charge events.
     #[serde(rename="chargeType")]
+    
     pub charge_type: Option<String>,
     /// Amount of money exchanged during the transaction. Only returned for charge and conversion events.
     #[serde(rename="commissionableSales")]
+    
     pub commissionable_sales: Option<Money>,
     /// Earnings by the publisher.
+    
     pub earnings: Option<Money>,
     /// The date-time this event was initiated as a RFC 3339 date-time value.
     #[serde(rename="eventDate")]
-    pub event_date: Option<String>,
+    
+    pub event_date: Option<client::chrono::DateTime<client::chrono::offset::Utc>>,
     /// The kind for one event.
+    
     pub kind: Option<String>,
     /// The ID of the member attached to this event. Only returned for conversion events.
     #[serde(rename="memberId")]
+    
     pub member_id: Option<String>,
     /// The date-time this event was last modified as a RFC 3339 date-time value.
     #[serde(rename="modifyDate")]
-    pub modify_date: Option<String>,
+    
+    pub modify_date: Option<client::chrono::DateTime<client::chrono::offset::Utc>>,
     /// Fee that the advertiser paid to the Google Affiliate Network.
     #[serde(rename="networkFee")]
+    
     pub network_fee: Option<Money>,
     /// The order ID for this event. Only returned for conversion events.
     #[serde(rename="orderId")]
+    
     pub order_id: Option<String>,
     /// Products associated with the event.
+    
     pub products: Option<Vec<EventProducts>>,
     /// Fee that the advertiser paid to the publisher.
     #[serde(rename="publisherFee")]
+    
     pub publisher_fee: Option<Money>,
     /// The ID of the publisher for this event.
     #[serde(rename="publisherId")]
-    pub publisher_id: Option<String>,
+    
+    #[serde_as(as = "Option<::client::serde_with::DisplayFromStr>")]
+    pub publisher_id: Option<i64>,
     /// The name of the publisher for this event.
     #[serde(rename="publisherName")]
+    
     pub publisher_name: Option<String>,
     /// Status of the event (active|canceled). Only returned for charge and conversion events.
+    
     pub status: Option<String>,
     /// Type of the event (action|transaction|charge).
     #[serde(rename="type")]
+    
     pub type_: Option<String>,
 }
 
@@ -555,14 +673,18 @@ impl client::Resource for Event {}
 /// 
 /// * [list events](EventListCall) (response)
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Events {
     /// The event list.
+    
     pub items: Option<Vec<Event>>,
     /// The kind for a page of events.
+    
     pub kind: Option<String>,
     /// The 'pageToken' to pass to the next request to get the next page, if there are more to retrieve.
     #[serde(rename="nextPageToken")]
+    
     pub next_page_token: Option<String>,
 }
 
@@ -580,64 +702,88 @@ impl client::ResponseResult for Events {}
 /// * [insert links](LinkInsertCall) (request|response)
 /// * [list links](LinkListCall) (none)
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Link {
     /// The advertiser id for the advertiser who owns this link.
     #[serde(rename="advertiserId")]
-    pub advertiser_id: Option<String>,
+    
+    #[serde_as(as = "Option<::client::serde_with::DisplayFromStr>")]
+    pub advertiser_id: Option<i64>,
     /// Authorship
+    
     pub authorship: Option<String>,
     /// Availability.
+    
     pub availability: Option<String>,
     /// Tracking url for clicks.
     #[serde(rename="clickTrackingUrl")]
+    
     pub click_tracking_url: Option<String>,
     /// Date that this link was created.
     #[serde(rename="createDate")]
-    pub create_date: Option<String>,
+    
+    pub create_date: Option<client::chrono::DateTime<client::chrono::offset::Utc>>,
     /// Description.
+    
     pub description: Option<String>,
     /// The destination URL for the link.
     #[serde(rename="destinationUrl")]
+    
     pub destination_url: Option<String>,
     /// Duration
+    
     pub duration: Option<String>,
     /// Date that this link becomes inactive.
     #[serde(rename="endDate")]
-    pub end_date: Option<String>,
+    
+    pub end_date: Option<client::chrono::DateTime<client::chrono::offset::Utc>>,
     /// The sum of fees paid to publishers divided by the total number of clicks over the past three months on this link. This value should be multiplied by 100 at the time of display.
     #[serde(rename="epcNinetyDayAverage")]
+    
     pub epc_ninety_day_average: Option<Money>,
     /// The sum of fees paid to publishers divided by the total number of clicks over the past seven days on this link. This value should be multiplied by 100 at the time of display.
     #[serde(rename="epcSevenDayAverage")]
+    
     pub epc_seven_day_average: Option<Money>,
     /// The ID of this link.
-    pub id: Option<String>,
+    
+    #[serde_as(as = "Option<::client::serde_with::DisplayFromStr>")]
+    pub id: Option<i64>,
     /// image alt text.
     #[serde(rename="imageAltText")]
+    
     pub image_alt_text: Option<String>,
     /// Tracking url for impressions.
     #[serde(rename="impressionTrackingUrl")]
+    
     pub impression_tracking_url: Option<String>,
     /// Flag for if this link is active.
     #[serde(rename="isActive")]
+    
     pub is_active: Option<bool>,
     /// The kind for one entity.
+    
     pub kind: Option<String>,
     /// The link type.
     #[serde(rename="linkType")]
+    
     pub link_type: Option<String>,
     /// The logical name for this link.
+    
     pub name: Option<String>,
     /// Promotion Type
     #[serde(rename="promotionType")]
+    
     pub promotion_type: Option<String>,
     /// Special offers on the link.
     #[serde(rename="specialOffers")]
+    
     pub special_offers: Option<LinkSpecialOffers>,
     /// Date that this link becomes active.
     #[serde(rename="startDate")]
-    pub start_date: Option<String>,
+    
+    pub start_date: Option<client::chrono::DateTime<client::chrono::offset::Utc>>,
 }
 
 impl client::RequestValue for Link {}
@@ -654,14 +800,18 @@ impl client::ResponseResult for Link {}
 /// 
 /// * [list links](LinkListCall) (response)
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Links {
     /// The links.
+    
     pub items: Option<Vec<Link>>,
     /// The kind for a page of links.
+    
     pub kind: Option<String>,
     /// The next page token.
     #[serde(rename="nextPageToken")]
+    
     pub next_page_token: Option<String>,
 }
 
@@ -672,12 +822,15 @@ impl client::ResponseResult for Links {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Money {
     /// The amount of money.
+    
     pub amount: Option<f64>,
     /// The 3-letter code of the currency in question.
     #[serde(rename="currencyCode")]
+    
     pub currency_code: Option<String>,
 }
 
@@ -694,33 +847,46 @@ impl client::Part for Money {}
 /// * [get publishers](PublisherGetCall) (response)
 /// * [list publishers](PublisherListCall) (none)
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Publisher {
     /// Classification that this publisher belongs to. See this link for all publisher classifications: http://www.google.com/support/affiliatenetwork/advertiser/bin/answer.py?hl=en&answer=107625&ctx=cb&src=cb&cbid=-k5fihzthfaik&cbrank=4
+    
     pub classification: Option<String>,
     /// The sum of fees paid to this publisher divided by the total number of clicks over the past three months. Values are multiplied by 100 for display purposes.
     #[serde(rename="epcNinetyDayAverage")]
+    
     pub epc_ninety_day_average: Option<Money>,
     /// The sum of fees paid to this publisher divided by the total number of clicks over the past seven days. Values are multiplied by 100 for display purposes.
     #[serde(rename="epcSevenDayAverage")]
+    
     pub epc_seven_day_average: Option<Money>,
     /// The ID of this publisher.
-    pub id: Option<String>,
+    
+    #[serde_as(as = "Option<::client::serde_with::DisplayFromStr>")]
+    pub id: Option<i64>,
     /// The requested publisher.
+    
     pub item: Option<Option<Box<Publisher>>>,
     /// Date that this publisher was approved as a Google Affiliate Network publisher.
     #[serde(rename="joinDate")]
-    pub join_date: Option<String>,
+    
+    pub join_date: Option<client::chrono::DateTime<client::chrono::offset::Utc>>,
     /// The kind for a publisher.
+    
     pub kind: Option<String>,
     /// The name of this publisher.
+    
     pub name: Option<String>,
     /// A rank based on commissions paid to this publisher over the past 90 days. A number between 1 and 4 where 4 means the top quartile (most money paid) and 1 means the bottom quartile (least money paid).
     #[serde(rename="payoutRank")]
+    
     pub payout_rank: Option<String>,
     /// Websites that this publisher uses to advertise.
+    
     pub sites: Option<Vec<String>>,
     /// The status of the requesting advertiser's relationship with this publisher.
+    
     pub status: Option<String>,
 }
 
@@ -737,14 +903,18 @@ impl client::ResponseResult for Publisher {}
 /// 
 /// * [list publishers](PublisherListCall) (response)
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Publishers {
     /// The entity list.
+    
     pub items: Option<Vec<Publisher>>,
     /// The kind for a page of entities.
+    
     pub kind: Option<String>,
     /// The 'pageToken' to pass to the next request to get the next page, if there are more to retrieve.
     #[serde(rename="nextPageToken")]
+    
     pub next_page_token: Option<String>,
 }
 
@@ -760,24 +930,34 @@ impl client::ResponseResult for Publishers {}
 /// 
 /// * [get reports](ReportGetCall) (response)
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Report {
     /// The column names for the report
+    
     pub column_names: Option<Vec<String>>,
     /// The end of the date range for this report, exclusive.
+    
     pub end_date: Option<String>,
     /// The kind for a report.
+    
     pub kind: Option<String>,
     /// The number of matching rows before paging is applied.
-    pub matching_row_count: Option<String>,
+    
+    #[serde_as(as = "Option<::client::serde_with::DisplayFromStr>")]
+    pub matching_row_count: Option<i64>,
     /// The rows of data for the report
-    pub rows: Option<Vec<Vec<String>>>,
+    
+    pub rows: Option<Vec<Vec<json::Value>>>,
     /// The start of the date range for this report, inclusive.
+    
     pub start_date: Option<String>,
     /// The totals rows for the report
-    pub totals_rows: Option<Vec<Vec<String>>>,
+    
+    pub totals_rows: Option<Vec<Vec<json::Value>>>,
     /// The report type.
     #[serde(rename="type")]
+    
     pub type_: Option<String>,
 }
 
@@ -789,11 +969,14 @@ impl client::ResponseResult for Report {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct CcOfferBonusRewards {
     /// How many units of reward will be granted.
+    
     pub amount: Option<f64>,
     /// The circumstances under which this rule applies, for example, booking a flight via Orbitz.
+    
     pub details: Option<String>,
 }
 
@@ -805,18 +988,23 @@ impl client::Part for CcOfferBonusRewards {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct CcOfferDefaultFees {
     /// The type of charge, for example Purchases.
+    
     pub category: Option<String>,
     /// The highest rate the issuer may charge for defaulting on debt in this category. Expressed as an absolute number, not as a percentage.
     #[serde(rename="maxRate")]
+    
     pub max_rate: Option<f64>,
     /// The lowest rate the issuer may charge for defaulting on debt in this category. Expressed as an absolute number, not as a percentage.
     #[serde(rename="minRate")]
+    
     pub min_rate: Option<f64>,
     /// Fixed or variable.
     #[serde(rename="rateType")]
+    
     pub rate_type: Option<String>,
 }
 
@@ -828,23 +1016,30 @@ impl client::Part for CcOfferDefaultFees {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct CcOfferRewards {
     /// Other limits, for example, if this rule only applies during an introductory period.
     #[serde(rename="additionalDetails")]
+    
     pub additional_details: Option<String>,
     /// The number of units rewarded per purchase dollar.
+    
     pub amount: Option<f64>,
     /// The kind of purchases covered by this rule.
+    
     pub category: Option<String>,
     /// How long rewards granted by this rule last.
     #[serde(rename="expirationMonths")]
+    
     pub expiration_months: Option<f64>,
     /// The maximum purchase amount in the given category for this rule to apply.
     #[serde(rename="maxRewardTier")]
+    
     pub max_reward_tier: Option<f64>,
     /// The minimum purchase amount in the given category before this rule applies.
     #[serde(rename="minRewardTier")]
+    
     pub min_reward_tier: Option<f64>,
 }
 
@@ -856,31 +1051,42 @@ impl client::Part for CcOfferRewards {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct EventProducts {
     /// Id of the category this product belongs to.
     #[serde(rename="categoryId")]
+    
     pub category_id: Option<String>,
     /// Name of the category this product belongs to.
     #[serde(rename="categoryName")]
+    
     pub category_name: Option<String>,
     /// Amount earned by the publisher on this product.
+    
     pub earnings: Option<Money>,
     /// Fee that the advertiser paid to the Google Affiliate Network for this product.
     #[serde(rename="networkFee")]
+    
     pub network_fee: Option<Money>,
     /// Fee that the advertiser paid to the publisehr for this product.
     #[serde(rename="publisherFee")]
+    
     pub publisher_fee: Option<Money>,
     /// Quantity of this product bought/exchanged.
-    pub quantity: Option<String>,
+    
+    #[serde_as(as = "Option<::client::serde_with::DisplayFromStr>")]
+    pub quantity: Option<i64>,
     /// Sku of this product.
+    
     pub sku: Option<String>,
     /// Sku name of this product.
     #[serde(rename="skuName")]
+    
     pub sku_name: Option<String>,
     /// Price per unit of this product.
     #[serde(rename="unitPrice")]
+    
     pub unit_price: Option<Money>,
 }
 
@@ -892,31 +1098,40 @@ impl client::Part for EventProducts {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct LinkSpecialOffers {
     /// Whether there is a free gift
     #[serde(rename="freeGift")]
+    
     pub free_gift: Option<bool>,
     /// Whether there is free shipping
     #[serde(rename="freeShipping")]
+    
     pub free_shipping: Option<bool>,
     /// Minimum purchase amount for free shipping promotion
     #[serde(rename="freeShippingMin")]
+    
     pub free_shipping_min: Option<Money>,
     /// Percent off on the purchase
     #[serde(rename="percentOff")]
+    
     pub percent_off: Option<f64>,
     /// Minimum purchase amount for percent off promotion
     #[serde(rename="percentOffMin")]
+    
     pub percent_off_min: Option<Money>,
     /// Price cut on the purchase
     #[serde(rename="priceCut")]
+    
     pub price_cut: Option<Money>,
     /// Minimum purchase amount for price cut promotion
     #[serde(rename="priceCutMin")]
+    
     pub price_cut_min: Option<Money>,
     /// List of promotion code associated with the link
     #[serde(rename="promotionCodes")]
+    
     pub promotion_codes: Option<Vec<String>>,
 }
 
@@ -930,7 +1145,7 @@ impl client::Part for LinkSpecialOffers {}
 // #################
 
 /// A builder providing access to all methods supported on *advertiser* resources.
-/// It is not used directly, but through the `Gan` hub.
+/// It is not used directly, but through the [`Gan`] hub.
 ///
 /// # Example
 ///
@@ -943,7 +1158,7 @@ impl client::Part for LinkSpecialOffers {}
 /// 
 /// # async fn dox() {
 /// use std::default::Default;
-/// use gan1_beta1::{Gan, oauth2, hyper, hyper_rustls};
+/// use gan1_beta1::{Gan, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// let secret: oauth2::ApplicationSecret = Default::default();
 /// let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -1015,7 +1230,7 @@ impl<'a, S> AdvertiserMethods<'a, S> {
 
 
 /// A builder providing access to all methods supported on *ccOffer* resources.
-/// It is not used directly, but through the `Gan` hub.
+/// It is not used directly, but through the [`Gan`] hub.
 ///
 /// # Example
 ///
@@ -1028,7 +1243,7 @@ impl<'a, S> AdvertiserMethods<'a, S> {
 /// 
 /// # async fn dox() {
 /// use std::default::Default;
-/// use gan1_beta1::{Gan, oauth2, hyper, hyper_rustls};
+/// use gan1_beta1::{Gan, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// let secret: oauth2::ApplicationSecret = Default::default();
 /// let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -1074,7 +1289,7 @@ impl<'a, S> CcOfferMethods<'a, S> {
 
 
 /// A builder providing access to all methods supported on *event* resources.
-/// It is not used directly, but through the `Gan` hub.
+/// It is not used directly, but through the [`Gan`] hub.
 ///
 /// # Example
 ///
@@ -1087,7 +1302,7 @@ impl<'a, S> CcOfferMethods<'a, S> {
 /// 
 /// # async fn dox() {
 /// use std::default::Default;
-/// use gan1_beta1::{Gan, oauth2, hyper, hyper_rustls};
+/// use gan1_beta1::{Gan, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// let secret: oauth2::ApplicationSecret = Default::default();
 /// let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -1149,7 +1364,7 @@ impl<'a, S> EventMethods<'a, S> {
 
 
 /// A builder providing access to all methods supported on *link* resources.
-/// It is not used directly, but through the `Gan` hub.
+/// It is not used directly, but through the [`Gan`] hub.
 ///
 /// # Example
 ///
@@ -1162,7 +1377,7 @@ impl<'a, S> EventMethods<'a, S> {
 /// 
 /// # async fn dox() {
 /// use std::default::Default;
-/// use gan1_beta1::{Gan, oauth2, hyper, hyper_rustls};
+/// use gan1_beta1::{Gan, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// let secret: oauth2::ApplicationSecret = Default::default();
 /// let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -1195,12 +1410,12 @@ impl<'a, S> LinkMethods<'a, S> {
     /// * `role` - The role of the requester. Valid values: 'advertisers' or 'publishers'.
     /// * `roleId` - The ID of the requesting advertiser or publisher.
     /// * `linkId` - The ID of the link to look up.
-    pub fn get(&self, role: &str, role_id: &str, link_id: &str) -> LinkGetCall<'a, S> {
+    pub fn get(&self, role: &str, role_id: &str, link_id: i64) -> LinkGetCall<'a, S> {
         LinkGetCall {
             hub: self.hub,
             _role: role.to_string(),
             _role_id: role_id.to_string(),
-            _link_id: link_id.to_string(),
+            _link_id: link_id,
             _delegate: Default::default(),
             _additional_params: Default::default(),
         }
@@ -1261,7 +1476,7 @@ impl<'a, S> LinkMethods<'a, S> {
 
 
 /// A builder providing access to all methods supported on *publisher* resources.
-/// It is not used directly, but through the `Gan` hub.
+/// It is not used directly, but through the [`Gan`] hub.
 ///
 /// # Example
 ///
@@ -1274,7 +1489,7 @@ impl<'a, S> LinkMethods<'a, S> {
 /// 
 /// # async fn dox() {
 /// use std::default::Default;
-/// use gan1_beta1::{Gan, oauth2, hyper, hyper_rustls};
+/// use gan1_beta1::{Gan, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// let secret: oauth2::ApplicationSecret = Default::default();
 /// let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -1346,7 +1561,7 @@ impl<'a, S> PublisherMethods<'a, S> {
 
 
 /// A builder providing access to all methods supported on *report* resources.
-/// It is not used directly, but through the `Gan` hub.
+/// It is not used directly, but through the [`Gan`] hub.
 ///
 /// # Example
 ///
@@ -1359,7 +1574,7 @@ impl<'a, S> PublisherMethods<'a, S> {
 /// 
 /// # async fn dox() {
 /// use std::default::Default;
-/// use gan1_beta1::{Gan, oauth2, hyper, hyper_rustls};
+/// use gan1_beta1::{Gan, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// let secret: oauth2::ApplicationSecret = Default::default();
 /// let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -1426,7 +1641,7 @@ impl<'a, S> ReportMethods<'a, S> {
 /// Retrieves data about a single advertiser if that the requesting advertiser/publisher has access to it. Only publishers can lookup advertisers. Advertisers can request information about themselves by omitting the advertiserId query parameter.
 ///
 /// A builder for the *get* method supported by a *advertiser* resource.
-/// It is not used directly, but through a `AdvertiserMethods` instance.
+/// It is not used directly, but through a [`AdvertiserMethods`] instance.
 ///
 /// # Example
 ///
@@ -1438,7 +1653,7 @@ impl<'a, S> ReportMethods<'a, S> {
 /// # extern crate google_gan1_beta1 as gan1_beta1;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use gan1_beta1::{Gan, oauth2, hyper, hyper_rustls};
+/// # use gan1_beta1::{Gan, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
 /// # let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -1469,7 +1684,7 @@ impl<'a, S> client::CallBuilder for AdvertiserGetCall<'a, S> {}
 
 impl<'a, S> AdvertiserGetCall<'a, S>
 where
-    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
     S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
     S::Future: Send + Unpin + 'static,
     S::Error: Into<Box<dyn StdError + Send + Sync>>,
@@ -1480,37 +1695,35 @@ where
     pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, Advertiser)> {
         use std::io::{Read, Seek};
         use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::ToParts;
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
         let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
         dlg.begin(client::MethodInfo { id: "gan.advertisers.get",
                                http_method: hyper::Method::GET });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
-        params.push(("role", self._role.to_string()));
-        params.push(("roleId", self._role_id.to_string()));
-        if let Some(value) = self._advertiser_id {
-            params.push(("advertiserId", value.to_string()));
-        }
+
         for &field in ["alt", "role", "roleId", "advertiserId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(client::Error::FieldClash(field));
             }
         }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
+
+        let mut params = Params::with_capacity(5 + self._additional_params.len());
+        params.push("role", self._role);
+        params.push("roleId", self._role_id);
+        if let Some(value) = self._advertiser_id.as_ref() {
+            params.push("advertiserId", value);
         }
 
-        params.push(("alt", "json".to_string()));
+        params.extend(self._additional_params.iter());
 
+        params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "{role}/{roleId}/advertiser";
         
-        let key = dlg.api_key();
-        match key {
-            Some(value) => params.push(("key", value)),
+        match dlg.api_key() {
+            Some(value) => params.push("key", value),
             None => {
                 dlg.finished(false);
                 return Err(client::Error::MissingAPIKey)
@@ -1518,28 +1731,14 @@ where
         }
 
         for &(find_this, param_name) in [("{role}", "role"), ("{roleId}", "roleId")].iter() {
-            let mut replace_with: Option<&str> = None;
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = Some(value);
-                    break;
-                }
-            }
-            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+            url = params.uri_replacement(url, param_name, find_this, false);
         }
         {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(2);
-            for param_name in ["roleId", "role"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
+            let to_remove = ["roleId", "role"];
+            params.remove_params(&to_remove);
         }
 
-        let url = url::Url::parse_with_params(&url, params).unwrap();
+        let url = params.parse_with_url(&url);
 
 
 
@@ -1547,21 +1746,24 @@ where
             let mut req_result = {
                 let client = &self.hub.client;
                 dlg.pre_request();
-                let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
-                        .header(USER_AGENT, self.hub._user_agent.clone());
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::GET)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
 
 
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
-                
+
             };
 
             match req_result {
                 Err(err) => {
                     if let client::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep(d).await;
                         continue;
                     }
                     dlg.finished(false);
@@ -1577,7 +1779,7 @@ where
                         let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
                         if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
-                            sleep(d);
+                            sleep(d).await;
                             continue;
                         }
 
@@ -1638,7 +1840,8 @@ where
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.````
     ///
     /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AdvertiserGetCall<'a, S> {
@@ -1674,7 +1877,7 @@ where
 /// Retrieves data about all advertisers that the requesting advertiser/publisher has access to.
 ///
 /// A builder for the *list* method supported by a *advertiser* resource.
-/// It is not used directly, but through a `AdvertiserMethods` instance.
+/// It is not used directly, but through a [`AdvertiserMethods`] instance.
 ///
 /// # Example
 ///
@@ -1686,7 +1889,7 @@ where
 /// # extern crate google_gan1_beta1 as gan1_beta1;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use gan1_beta1::{Gan, oauth2, hyper, hyper_rustls};
+/// # use gan1_beta1::{Gan, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
 /// # let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -1729,7 +1932,7 @@ impl<'a, S> client::CallBuilder for AdvertiserListCall<'a, S> {}
 
 impl<'a, S> AdvertiserListCall<'a, S>
 where
-    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
     S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
     S::Future: Send + Unpin + 'static,
     S::Error: Into<Box<dyn StdError + Send + Sync>>,
@@ -1740,55 +1943,53 @@ where
     pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, Advertisers)> {
         use std::io::{Read, Seek};
         use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::ToParts;
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
         let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
         dlg.begin(client::MethodInfo { id: "gan.advertisers.list",
                                http_method: hyper::Method::GET });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(11 + self._additional_params.len());
-        params.push(("role", self._role.to_string()));
-        params.push(("roleId", self._role_id.to_string()));
-        if let Some(value) = self._relationship_status {
-            params.push(("relationshipStatus", value.to_string()));
-        }
-        if let Some(value) = self._page_token {
-            params.push(("pageToken", value.to_string()));
-        }
-        if let Some(value) = self._min_seven_day_epc {
-            params.push(("minSevenDayEpc", value.to_string()));
-        }
-        if let Some(value) = self._min_payout_rank {
-            params.push(("minPayoutRank", value.to_string()));
-        }
-        if let Some(value) = self._min_ninety_day_epc {
-            params.push(("minNinetyDayEpc", value.to_string()));
-        }
-        if let Some(value) = self._max_results {
-            params.push(("maxResults", value.to_string()));
-        }
-        if let Some(value) = self._advertiser_category {
-            params.push(("advertiserCategory", value.to_string()));
-        }
+
         for &field in ["alt", "role", "roleId", "relationshipStatus", "pageToken", "minSevenDayEpc", "minPayoutRank", "minNinetyDayEpc", "maxResults", "advertiserCategory"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(client::Error::FieldClash(field));
             }
         }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
+
+        let mut params = Params::with_capacity(11 + self._additional_params.len());
+        params.push("role", self._role);
+        params.push("roleId", self._role_id);
+        if let Some(value) = self._relationship_status.as_ref() {
+            params.push("relationshipStatus", value);
+        }
+        if let Some(value) = self._page_token.as_ref() {
+            params.push("pageToken", value);
+        }
+        if let Some(value) = self._min_seven_day_epc.as_ref() {
+            params.push("minSevenDayEpc", value.to_string());
+        }
+        if let Some(value) = self._min_payout_rank.as_ref() {
+            params.push("minPayoutRank", value.to_string());
+        }
+        if let Some(value) = self._min_ninety_day_epc.as_ref() {
+            params.push("minNinetyDayEpc", value.to_string());
+        }
+        if let Some(value) = self._max_results.as_ref() {
+            params.push("maxResults", value.to_string());
+        }
+        if let Some(value) = self._advertiser_category.as_ref() {
+            params.push("advertiserCategory", value);
         }
 
-        params.push(("alt", "json".to_string()));
+        params.extend(self._additional_params.iter());
 
+        params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "{role}/{roleId}/advertisers";
         
-        let key = dlg.api_key();
-        match key {
-            Some(value) => params.push(("key", value)),
+        match dlg.api_key() {
+            Some(value) => params.push("key", value),
             None => {
                 dlg.finished(false);
                 return Err(client::Error::MissingAPIKey)
@@ -1796,28 +1997,14 @@ where
         }
 
         for &(find_this, param_name) in [("{role}", "role"), ("{roleId}", "roleId")].iter() {
-            let mut replace_with: Option<&str> = None;
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = Some(value);
-                    break;
-                }
-            }
-            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+            url = params.uri_replacement(url, param_name, find_this, false);
         }
         {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(2);
-            for param_name in ["roleId", "role"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
+            let to_remove = ["roleId", "role"];
+            params.remove_params(&to_remove);
         }
 
-        let url = url::Url::parse_with_params(&url, params).unwrap();
+        let url = params.parse_with_url(&url);
 
 
 
@@ -1825,21 +2012,24 @@ where
             let mut req_result = {
                 let client = &self.hub.client;
                 dlg.pre_request();
-                let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
-                        .header(USER_AGENT, self.hub._user_agent.clone());
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::GET)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
 
 
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
-                
+
             };
 
             match req_result {
                 Err(err) => {
                     if let client::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep(d).await;
                         continue;
                     }
                     dlg.finished(false);
@@ -1855,7 +2045,7 @@ where
                         let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
                         if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
-                            sleep(d);
+                            sleep(d).await;
                             continue;
                         }
 
@@ -1958,7 +2148,8 @@ where
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.````
     ///
     /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AdvertiserListCall<'a, S> {
@@ -1994,7 +2185,7 @@ where
 /// Retrieves credit card offers for the given publisher.
 ///
 /// A builder for the *list* method supported by a *ccOffer* resource.
-/// It is not used directly, but through a `CcOfferMethods` instance.
+/// It is not used directly, but through a [`CcOfferMethods`] instance.
 ///
 /// # Example
 ///
@@ -2006,7 +2197,7 @@ where
 /// # extern crate google_gan1_beta1 as gan1_beta1;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use gan1_beta1::{Gan, oauth2, hyper, hyper_rustls};
+/// # use gan1_beta1::{Gan, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
 /// # let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -2038,7 +2229,7 @@ impl<'a, S> client::CallBuilder for CcOfferListCall<'a, S> {}
 
 impl<'a, S> CcOfferListCall<'a, S>
 where
-    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
     S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
     S::Future: Send + Unpin + 'static,
     S::Error: Into<Box<dyn StdError + Send + Sync>>,
@@ -2049,41 +2240,39 @@ where
     pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, CcOffers)> {
         use std::io::{Read, Seek};
         use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::ToParts;
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
         let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
         dlg.begin(client::MethodInfo { id: "gan.ccOffers.list",
                                http_method: hyper::Method::GET });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
-        params.push(("publisher", self._publisher.to_string()));
-        if let Some(value) = self._projection {
-            params.push(("projection", value.to_string()));
-        }
-        if self._advertiser.len() > 0 {
-            for f in self._advertiser.iter() {
-                params.push(("advertiser", f.to_string()));
-            }
-        }
+
         for &field in ["alt", "publisher", "projection", "advertiser"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(client::Error::FieldClash(field));
             }
         }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
+
+        let mut params = Params::with_capacity(5 + self._additional_params.len());
+        params.push("publisher", self._publisher);
+        if let Some(value) = self._projection.as_ref() {
+            params.push("projection", value);
+        }
+        if self._advertiser.len() > 0 {
+            for f in self._advertiser.iter() {
+                params.push("advertiser", f);
+            }
         }
 
-        params.push(("alt", "json".to_string()));
+        params.extend(self._additional_params.iter());
 
+        params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "publishers/{publisher}/ccOffers";
         
-        let key = dlg.api_key();
-        match key {
-            Some(value) => params.push(("key", value)),
+        match dlg.api_key() {
+            Some(value) => params.push("key", value),
             None => {
                 dlg.finished(false);
                 return Err(client::Error::MissingAPIKey)
@@ -2091,28 +2280,14 @@ where
         }
 
         for &(find_this, param_name) in [("{publisher}", "publisher")].iter() {
-            let mut replace_with: Option<&str> = None;
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = Some(value);
-                    break;
-                }
-            }
-            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+            url = params.uri_replacement(url, param_name, find_this, false);
         }
         {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
-            for param_name in ["publisher"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
+            let to_remove = ["publisher"];
+            params.remove_params(&to_remove);
         }
 
-        let url = url::Url::parse_with_params(&url, params).unwrap();
+        let url = params.parse_with_url(&url);
 
 
 
@@ -2120,21 +2295,24 @@ where
             let mut req_result = {
                 let client = &self.hub.client;
                 dlg.pre_request();
-                let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
-                        .header(USER_AGENT, self.hub._user_agent.clone());
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::GET)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
 
 
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
-                
+
             };
 
             match req_result {
                 Err(err) => {
                     if let client::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep(d).await;
                         continue;
                     }
                     dlg.finished(false);
@@ -2150,7 +2328,7 @@ where
                         let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
                         if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
-                            sleep(d);
+                            sleep(d).await;
                             continue;
                         }
 
@@ -2209,7 +2387,8 @@ where
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.````
     ///
     /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CcOfferListCall<'a, S> {
@@ -2245,7 +2424,7 @@ where
 /// Retrieves event data for a given advertiser/publisher.
 ///
 /// A builder for the *list* method supported by a *event* resource.
-/// It is not used directly, but through a `EventMethods` instance.
+/// It is not used directly, but through a [`EventMethods`] instance.
 ///
 /// # Example
 ///
@@ -2257,7 +2436,7 @@ where
 /// # extern crate google_gan1_beta1 as gan1_beta1;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use gan1_beta1::{Gan, oauth2, hyper, hyper_rustls};
+/// # use gan1_beta1::{Gan, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
 /// # let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -2318,7 +2497,7 @@ impl<'a, S> client::CallBuilder for EventListCall<'a, S> {}
 
 impl<'a, S> EventListCall<'a, S>
 where
-    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
     S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
     S::Future: Send + Unpin + 'static,
     S::Error: Into<Box<dyn StdError + Send + Sync>>,
@@ -2329,82 +2508,80 @@ where
     pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, Events)> {
         use std::io::{Read, Seek};
         use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::ToParts;
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
         let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
         dlg.begin(client::MethodInfo { id: "gan.events.list",
                                http_method: hyper::Method::GET });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(20 + self._additional_params.len());
-        params.push(("role", self._role.to_string()));
-        params.push(("roleId", self._role_id.to_string()));
-        if let Some(value) = self._type_ {
-            params.push(("type", value.to_string()));
-        }
-        if let Some(value) = self._status {
-            params.push(("status", value.to_string()));
-        }
-        if let Some(value) = self._sku {
-            params.push(("sku", value.to_string()));
-        }
-        if let Some(value) = self._publisher_id {
-            params.push(("publisherId", value.to_string()));
-        }
-        if let Some(value) = self._product_category {
-            params.push(("productCategory", value.to_string()));
-        }
-        if let Some(value) = self._page_token {
-            params.push(("pageToken", value.to_string()));
-        }
-        if let Some(value) = self._order_id {
-            params.push(("orderId", value.to_string()));
-        }
-        if let Some(value) = self._modify_date_min {
-            params.push(("modifyDateMin", value.to_string()));
-        }
-        if let Some(value) = self._modify_date_max {
-            params.push(("modifyDateMax", value.to_string()));
-        }
-        if let Some(value) = self._member_id {
-            params.push(("memberId", value.to_string()));
-        }
-        if let Some(value) = self._max_results {
-            params.push(("maxResults", value.to_string()));
-        }
-        if let Some(value) = self._link_id {
-            params.push(("linkId", value.to_string()));
-        }
-        if let Some(value) = self._event_date_min {
-            params.push(("eventDateMin", value.to_string()));
-        }
-        if let Some(value) = self._event_date_max {
-            params.push(("eventDateMax", value.to_string()));
-        }
-        if let Some(value) = self._charge_type {
-            params.push(("chargeType", value.to_string()));
-        }
-        if let Some(value) = self._advertiser_id {
-            params.push(("advertiserId", value.to_string()));
-        }
+
         for &field in ["alt", "role", "roleId", "type", "status", "sku", "publisherId", "productCategory", "pageToken", "orderId", "modifyDateMin", "modifyDateMax", "memberId", "maxResults", "linkId", "eventDateMin", "eventDateMax", "chargeType", "advertiserId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(client::Error::FieldClash(field));
             }
         }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
+
+        let mut params = Params::with_capacity(20 + self._additional_params.len());
+        params.push("role", self._role);
+        params.push("roleId", self._role_id);
+        if let Some(value) = self._type_.as_ref() {
+            params.push("type", value);
+        }
+        if let Some(value) = self._status.as_ref() {
+            params.push("status", value);
+        }
+        if let Some(value) = self._sku.as_ref() {
+            params.push("sku", value);
+        }
+        if let Some(value) = self._publisher_id.as_ref() {
+            params.push("publisherId", value);
+        }
+        if let Some(value) = self._product_category.as_ref() {
+            params.push("productCategory", value);
+        }
+        if let Some(value) = self._page_token.as_ref() {
+            params.push("pageToken", value);
+        }
+        if let Some(value) = self._order_id.as_ref() {
+            params.push("orderId", value);
+        }
+        if let Some(value) = self._modify_date_min.as_ref() {
+            params.push("modifyDateMin", value);
+        }
+        if let Some(value) = self._modify_date_max.as_ref() {
+            params.push("modifyDateMax", value);
+        }
+        if let Some(value) = self._member_id.as_ref() {
+            params.push("memberId", value);
+        }
+        if let Some(value) = self._max_results.as_ref() {
+            params.push("maxResults", value.to_string());
+        }
+        if let Some(value) = self._link_id.as_ref() {
+            params.push("linkId", value);
+        }
+        if let Some(value) = self._event_date_min.as_ref() {
+            params.push("eventDateMin", value);
+        }
+        if let Some(value) = self._event_date_max.as_ref() {
+            params.push("eventDateMax", value);
+        }
+        if let Some(value) = self._charge_type.as_ref() {
+            params.push("chargeType", value);
+        }
+        if let Some(value) = self._advertiser_id.as_ref() {
+            params.push("advertiserId", value);
         }
 
-        params.push(("alt", "json".to_string()));
+        params.extend(self._additional_params.iter());
 
+        params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "{role}/{roleId}/events";
         
-        let key = dlg.api_key();
-        match key {
-            Some(value) => params.push(("key", value)),
+        match dlg.api_key() {
+            Some(value) => params.push("key", value),
             None => {
                 dlg.finished(false);
                 return Err(client::Error::MissingAPIKey)
@@ -2412,28 +2589,14 @@ where
         }
 
         for &(find_this, param_name) in [("{role}", "role"), ("{roleId}", "roleId")].iter() {
-            let mut replace_with: Option<&str> = None;
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = Some(value);
-                    break;
-                }
-            }
-            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+            url = params.uri_replacement(url, param_name, find_this, false);
         }
         {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(2);
-            for param_name in ["roleId", "role"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
+            let to_remove = ["roleId", "role"];
+            params.remove_params(&to_remove);
         }
 
-        let url = url::Url::parse_with_params(&url, params).unwrap();
+        let url = params.parse_with_url(&url);
 
 
 
@@ -2441,21 +2604,24 @@ where
             let mut req_result = {
                 let client = &self.hub.client;
                 dlg.pre_request();
-                let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
-                        .header(USER_AGENT, self.hub._user_agent.clone());
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::GET)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
 
 
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
-                
+
             };
 
             match req_result {
                 Err(err) => {
                     if let client::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep(d).await;
                         continue;
                     }
                     dlg.finished(false);
@@ -2471,7 +2637,7 @@ where
                         let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
                         if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
-                            sleep(d);
+                            sleep(d).await;
                             continue;
                         }
 
@@ -2637,7 +2803,8 @@ where
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.````
     ///
     /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> EventListCall<'a, S> {
@@ -2673,7 +2840,7 @@ where
 /// Retrieves data about a single link if the requesting advertiser/publisher has access to it. Advertisers can look up their own links. Publishers can look up visible links or links belonging to advertisers they are in a relationship with.
 ///
 /// A builder for the *get* method supported by a *link* resource.
-/// It is not used directly, but through a `LinkMethods` instance.
+/// It is not used directly, but through a [`LinkMethods`] instance.
 ///
 /// # Example
 ///
@@ -2685,7 +2852,7 @@ where
 /// # extern crate google_gan1_beta1 as gan1_beta1;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use gan1_beta1::{Gan, oauth2, hyper, hyper_rustls};
+/// # use gan1_beta1::{Gan, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
 /// # let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -2696,7 +2863,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.links().get("role", "roleId", "linkId")
+/// let result = hub.links().get("role", "roleId", -31)
 ///              .doit().await;
 /// # }
 /// ```
@@ -2706,7 +2873,7 @@ pub struct LinkGetCall<'a, S>
     hub: &'a Gan<S>,
     _role: String,
     _role_id: String,
-    _link_id: String,
+    _link_id: i64,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
 }
@@ -2715,7 +2882,7 @@ impl<'a, S> client::CallBuilder for LinkGetCall<'a, S> {}
 
 impl<'a, S> LinkGetCall<'a, S>
 where
-    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
     S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
     S::Future: Send + Unpin + 'static,
     S::Error: Into<Box<dyn StdError + Send + Sync>>,
@@ -2726,35 +2893,33 @@ where
     pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, Link)> {
         use std::io::{Read, Seek};
         use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::ToParts;
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
         let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
         dlg.begin(client::MethodInfo { id: "gan.links.get",
                                http_method: hyper::Method::GET });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
-        params.push(("role", self._role.to_string()));
-        params.push(("roleId", self._role_id.to_string()));
-        params.push(("linkId", self._link_id.to_string()));
+
         for &field in ["alt", "role", "roleId", "linkId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(client::Error::FieldClash(field));
             }
         }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
 
-        params.push(("alt", "json".to_string()));
+        let mut params = Params::with_capacity(5 + self._additional_params.len());
+        params.push("role", self._role);
+        params.push("roleId", self._role_id);
+        params.push("linkId", self._link_id.to_string());
 
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "{role}/{roleId}/link/{linkId}";
         
-        let key = dlg.api_key();
-        match key {
-            Some(value) => params.push(("key", value)),
+        match dlg.api_key() {
+            Some(value) => params.push("key", value),
             None => {
                 dlg.finished(false);
                 return Err(client::Error::MissingAPIKey)
@@ -2762,28 +2927,14 @@ where
         }
 
         for &(find_this, param_name) in [("{role}", "role"), ("{roleId}", "roleId"), ("{linkId}", "linkId")].iter() {
-            let mut replace_with: Option<&str> = None;
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = Some(value);
-                    break;
-                }
-            }
-            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+            url = params.uri_replacement(url, param_name, find_this, false);
         }
         {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(3);
-            for param_name in ["linkId", "roleId", "role"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
+            let to_remove = ["linkId", "roleId", "role"];
+            params.remove_params(&to_remove);
         }
 
-        let url = url::Url::parse_with_params(&url, params).unwrap();
+        let url = params.parse_with_url(&url);
 
 
 
@@ -2791,21 +2942,24 @@ where
             let mut req_result = {
                 let client = &self.hub.client;
                 dlg.pre_request();
-                let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
-                        .header(USER_AGENT, self.hub._user_agent.clone());
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::GET)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
 
 
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
-                
+
             };
 
             match req_result {
                 Err(err) => {
                     if let client::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep(d).await;
                         continue;
                     }
                     dlg.finished(false);
@@ -2821,7 +2975,7 @@ where
                         let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
                         if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
-                            sleep(d);
+                            sleep(d).await;
                             continue;
                         }
 
@@ -2878,14 +3032,15 @@ where
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn link_id(mut self, new_value: &str) -> LinkGetCall<'a, S> {
-        self._link_id = new_value.to_string();
+    pub fn link_id(mut self, new_value: i64) -> LinkGetCall<'a, S> {
+        self._link_id = new_value;
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.````
     ///
     /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> LinkGetCall<'a, S> {
@@ -2921,7 +3076,7 @@ where
 /// Inserts a new link.
 ///
 /// A builder for the *insert* method supported by a *link* resource.
-/// It is not used directly, but through a `LinkMethods` instance.
+/// It is not used directly, but through a [`LinkMethods`] instance.
 ///
 /// # Example
 ///
@@ -2934,7 +3089,7 @@ where
 /// use gan1_beta1::api::Link;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use gan1_beta1::{Gan, oauth2, hyper, hyper_rustls};
+/// # use gan1_beta1::{Gan, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
 /// # let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -2969,7 +3124,7 @@ impl<'a, S> client::CallBuilder for LinkInsertCall<'a, S> {}
 
 impl<'a, S> LinkInsertCall<'a, S>
 where
-    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
     S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
     S::Future: Send + Unpin + 'static,
     S::Error: Into<Box<dyn StdError + Send + Sync>>,
@@ -2980,34 +3135,32 @@ where
     pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, Link)> {
         use std::io::{Read, Seek};
         use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::ToParts;
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
         let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
         dlg.begin(client::MethodInfo { id: "gan.links.insert",
                                http_method: hyper::Method::POST });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
-        params.push(("role", self._role.to_string()));
-        params.push(("roleId", self._role_id.to_string()));
+
         for &field in ["alt", "role", "roleId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(client::Error::FieldClash(field));
             }
         }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
 
-        params.push(("alt", "json".to_string()));
+        let mut params = Params::with_capacity(5 + self._additional_params.len());
+        params.push("role", self._role);
+        params.push("roleId", self._role_id);
 
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "{role}/{roleId}/link";
         
-        let key = dlg.api_key();
-        match key {
-            Some(value) => params.push(("key", value)),
+        match dlg.api_key() {
+            Some(value) => params.push("key", value),
             None => {
                 dlg.finished(false);
                 return Err(client::Error::MissingAPIKey)
@@ -3015,30 +3168,16 @@ where
         }
 
         for &(find_this, param_name) in [("{role}", "role"), ("{roleId}", "roleId")].iter() {
-            let mut replace_with: Option<&str> = None;
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = Some(value);
-                    break;
-                }
-            }
-            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+            url = params.uri_replacement(url, param_name, find_this, false);
         }
         {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(2);
-            for param_name in ["roleId", "role"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
+            let to_remove = ["roleId", "role"];
+            params.remove_params(&to_remove);
         }
 
-        let url = url::Url::parse_with_params(&url, params).unwrap();
+        let url = params.parse_with_url(&url);
 
-        let mut json_mime_type: mime::Mime = "application/json".parse().unwrap();
+        let mut json_mime_type = mime::APPLICATION_JSON;
         let mut request_value_reader =
             {
                 let mut value = json::value::to_value(&self._request).expect("serde to work");
@@ -3056,23 +3195,26 @@ where
             let mut req_result = {
                 let client = &self.hub.client;
                 dlg.pre_request();
-                let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
-                        .header(USER_AGENT, self.hub._user_agent.clone());
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::POST)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
 
 
                         let request = req_builder
-                        .header(CONTENT_TYPE, format!("{}", json_mime_type.to_string()))
+                        .header(CONTENT_TYPE, json_mime_type.to_string())
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
                 client.request(request.unwrap()).await
-                
+
             };
 
             match req_result {
                 Err(err) => {
                     if let client::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep(d).await;
                         continue;
                     }
                     dlg.finished(false);
@@ -3088,7 +3230,7 @@ where
                         let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
                         if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
-                            sleep(d);
+                            sleep(d).await;
                             continue;
                         }
 
@@ -3151,7 +3293,8 @@ where
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.````
     ///
     /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> LinkInsertCall<'a, S> {
@@ -3187,7 +3330,7 @@ where
 /// Retrieves all links that match the query parameters.
 ///
 /// A builder for the *list* method supported by a *link* resource.
-/// It is not used directly, but through a `LinkMethods` instance.
+/// It is not used directly, but through a [`LinkMethods`] instance.
 ///
 /// # Example
 ///
@@ -3199,7 +3342,7 @@ where
 /// # extern crate google_gan1_beta1 as gan1_beta1;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use gan1_beta1::{Gan, oauth2, hyper, hyper_rustls};
+/// # use gan1_beta1::{Gan, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
 /// # let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -3223,7 +3366,7 @@ where
 ///              .create_date_max("amet.")
 ///              .authorship("ea")
 ///              .add_asset_size("sadipscing")
-///              .add_advertiser_id("Lorem")
+///              .add_advertiser_id(-6)
 ///              .doit().await;
 /// # }
 /// ```
@@ -3245,7 +3388,7 @@ pub struct LinkListCall<'a, S>
     _create_date_max: Option<String>,
     _authorship: Option<String>,
     _asset_size: Vec<String>,
-    _advertiser_id: Vec<String>,
+    _advertiser_id: Vec<i64>,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
 }
@@ -3254,7 +3397,7 @@ impl<'a, S> client::CallBuilder for LinkListCall<'a, S> {}
 
 impl<'a, S> LinkListCall<'a, S>
 where
-    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
     S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
     S::Future: Send + Unpin + 'static,
     S::Error: Into<Box<dyn StdError + Send + Sync>>,
@@ -3265,79 +3408,77 @@ where
     pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, Links)> {
         use std::io::{Read, Seek};
         use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::ToParts;
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
         let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
         dlg.begin(client::MethodInfo { id: "gan.links.list",
                                http_method: hyper::Method::GET });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(17 + self._additional_params.len());
-        params.push(("role", self._role.to_string()));
-        params.push(("roleId", self._role_id.to_string()));
-        if let Some(value) = self._start_date_min {
-            params.push(("startDateMin", value.to_string()));
-        }
-        if let Some(value) = self._start_date_max {
-            params.push(("startDateMax", value.to_string()));
-        }
-        if let Some(value) = self._search_text {
-            params.push(("searchText", value.to_string()));
-        }
-        if let Some(value) = self._relationship_status {
-            params.push(("relationshipStatus", value.to_string()));
-        }
-        if self._promotion_type.len() > 0 {
-            for f in self._promotion_type.iter() {
-                params.push(("promotionType", f.to_string()));
-            }
-        }
-        if let Some(value) = self._page_token {
-            params.push(("pageToken", value.to_string()));
-        }
-        if let Some(value) = self._max_results {
-            params.push(("maxResults", value.to_string()));
-        }
-        if let Some(value) = self._link_type {
-            params.push(("linkType", value.to_string()));
-        }
-        if let Some(value) = self._create_date_min {
-            params.push(("createDateMin", value.to_string()));
-        }
-        if let Some(value) = self._create_date_max {
-            params.push(("createDateMax", value.to_string()));
-        }
-        if let Some(value) = self._authorship {
-            params.push(("authorship", value.to_string()));
-        }
-        if self._asset_size.len() > 0 {
-            for f in self._asset_size.iter() {
-                params.push(("assetSize", f.to_string()));
-            }
-        }
-        if self._advertiser_id.len() > 0 {
-            for f in self._advertiser_id.iter() {
-                params.push(("advertiserId", f.to_string()));
-            }
-        }
+
         for &field in ["alt", "role", "roleId", "startDateMin", "startDateMax", "searchText", "relationshipStatus", "promotionType", "pageToken", "maxResults", "linkType", "createDateMin", "createDateMax", "authorship", "assetSize", "advertiserId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(client::Error::FieldClash(field));
             }
         }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
+
+        let mut params = Params::with_capacity(17 + self._additional_params.len());
+        params.push("role", self._role);
+        params.push("roleId", self._role_id);
+        if let Some(value) = self._start_date_min.as_ref() {
+            params.push("startDateMin", value);
+        }
+        if let Some(value) = self._start_date_max.as_ref() {
+            params.push("startDateMax", value);
+        }
+        if let Some(value) = self._search_text.as_ref() {
+            params.push("searchText", value);
+        }
+        if let Some(value) = self._relationship_status.as_ref() {
+            params.push("relationshipStatus", value);
+        }
+        if self._promotion_type.len() > 0 {
+            for f in self._promotion_type.iter() {
+                params.push("promotionType", f);
+            }
+        }
+        if let Some(value) = self._page_token.as_ref() {
+            params.push("pageToken", value);
+        }
+        if let Some(value) = self._max_results.as_ref() {
+            params.push("maxResults", value.to_string());
+        }
+        if let Some(value) = self._link_type.as_ref() {
+            params.push("linkType", value);
+        }
+        if let Some(value) = self._create_date_min.as_ref() {
+            params.push("createDateMin", value);
+        }
+        if let Some(value) = self._create_date_max.as_ref() {
+            params.push("createDateMax", value);
+        }
+        if let Some(value) = self._authorship.as_ref() {
+            params.push("authorship", value);
+        }
+        if self._asset_size.len() > 0 {
+            for f in self._asset_size.iter() {
+                params.push("assetSize", f);
+            }
+        }
+        if self._advertiser_id.len() > 0 {
+            for f in self._advertiser_id.iter() {
+                params.push("advertiserId", f.to_string());
+            }
         }
 
-        params.push(("alt", "json".to_string()));
+        params.extend(self._additional_params.iter());
 
+        params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "{role}/{roleId}/links";
         
-        let key = dlg.api_key();
-        match key {
-            Some(value) => params.push(("key", value)),
+        match dlg.api_key() {
+            Some(value) => params.push("key", value),
             None => {
                 dlg.finished(false);
                 return Err(client::Error::MissingAPIKey)
@@ -3345,28 +3486,14 @@ where
         }
 
         for &(find_this, param_name) in [("{role}", "role"), ("{roleId}", "roleId")].iter() {
-            let mut replace_with: Option<&str> = None;
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = Some(value);
-                    break;
-                }
-            }
-            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+            url = params.uri_replacement(url, param_name, find_this, false);
         }
         {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(2);
-            for param_name in ["roleId", "role"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
+            let to_remove = ["roleId", "role"];
+            params.remove_params(&to_remove);
         }
 
-        let url = url::Url::parse_with_params(&url, params).unwrap();
+        let url = params.parse_with_url(&url);
 
 
 
@@ -3374,21 +3501,24 @@ where
             let mut req_result = {
                 let client = &self.hub.client;
                 dlg.pre_request();
-                let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
-                        .header(USER_AGENT, self.hub._user_agent.clone());
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::GET)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
 
 
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
-                
+
             };
 
             match req_result {
                 Err(err) => {
                     if let client::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep(d).await;
                         continue;
                     }
                     dlg.finished(false);
@@ -3404,7 +3534,7 @@ where
                         let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
                         if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
-                            sleep(d);
+                            sleep(d).await;
                             continue;
                         }
 
@@ -3545,14 +3675,15 @@ where
     ///
     /// Append the given value to the *advertiser id* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_advertiser_id(mut self, new_value: &str) -> LinkListCall<'a, S> {
-        self._advertiser_id.push(new_value.to_string());
+    pub fn add_advertiser_id(mut self, new_value: i64) -> LinkListCall<'a, S> {
+        self._advertiser_id.push(new_value);
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.````
     ///
     /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> LinkListCall<'a, S> {
@@ -3588,7 +3719,7 @@ where
 /// Retrieves data about a single advertiser if that the requesting advertiser/publisher has access to it. Only advertisers can look up publishers. Publishers can request information about themselves by omitting the publisherId query parameter.
 ///
 /// A builder for the *get* method supported by a *publisher* resource.
-/// It is not used directly, but through a `PublisherMethods` instance.
+/// It is not used directly, but through a [`PublisherMethods`] instance.
 ///
 /// # Example
 ///
@@ -3600,7 +3731,7 @@ where
 /// # extern crate google_gan1_beta1 as gan1_beta1;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use gan1_beta1::{Gan, oauth2, hyper, hyper_rustls};
+/// # use gan1_beta1::{Gan, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
 /// # let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -3631,7 +3762,7 @@ impl<'a, S> client::CallBuilder for PublisherGetCall<'a, S> {}
 
 impl<'a, S> PublisherGetCall<'a, S>
 where
-    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
     S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
     S::Future: Send + Unpin + 'static,
     S::Error: Into<Box<dyn StdError + Send + Sync>>,
@@ -3642,37 +3773,35 @@ where
     pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, Publisher)> {
         use std::io::{Read, Seek};
         use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::ToParts;
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
         let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
         dlg.begin(client::MethodInfo { id: "gan.publishers.get",
                                http_method: hyper::Method::GET });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
-        params.push(("role", self._role.to_string()));
-        params.push(("roleId", self._role_id.to_string()));
-        if let Some(value) = self._publisher_id {
-            params.push(("publisherId", value.to_string()));
-        }
+
         for &field in ["alt", "role", "roleId", "publisherId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(client::Error::FieldClash(field));
             }
         }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
+
+        let mut params = Params::with_capacity(5 + self._additional_params.len());
+        params.push("role", self._role);
+        params.push("roleId", self._role_id);
+        if let Some(value) = self._publisher_id.as_ref() {
+            params.push("publisherId", value);
         }
 
-        params.push(("alt", "json".to_string()));
+        params.extend(self._additional_params.iter());
 
+        params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "{role}/{roleId}/publisher";
         
-        let key = dlg.api_key();
-        match key {
-            Some(value) => params.push(("key", value)),
+        match dlg.api_key() {
+            Some(value) => params.push("key", value),
             None => {
                 dlg.finished(false);
                 return Err(client::Error::MissingAPIKey)
@@ -3680,28 +3809,14 @@ where
         }
 
         for &(find_this, param_name) in [("{role}", "role"), ("{roleId}", "roleId")].iter() {
-            let mut replace_with: Option<&str> = None;
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = Some(value);
-                    break;
-                }
-            }
-            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+            url = params.uri_replacement(url, param_name, find_this, false);
         }
         {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(2);
-            for param_name in ["roleId", "role"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
+            let to_remove = ["roleId", "role"];
+            params.remove_params(&to_remove);
         }
 
-        let url = url::Url::parse_with_params(&url, params).unwrap();
+        let url = params.parse_with_url(&url);
 
 
 
@@ -3709,21 +3824,24 @@ where
             let mut req_result = {
                 let client = &self.hub.client;
                 dlg.pre_request();
-                let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
-                        .header(USER_AGENT, self.hub._user_agent.clone());
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::GET)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
 
 
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
-                
+
             };
 
             match req_result {
                 Err(err) => {
                     if let client::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep(d).await;
                         continue;
                     }
                     dlg.finished(false);
@@ -3739,7 +3857,7 @@ where
                         let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
                         if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
-                            sleep(d);
+                            sleep(d).await;
                             continue;
                         }
 
@@ -3800,7 +3918,8 @@ where
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.````
     ///
     /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PublisherGetCall<'a, S> {
@@ -3836,7 +3955,7 @@ where
 /// Retrieves data about all publishers that the requesting advertiser/publisher has access to.
 ///
 /// A builder for the *list* method supported by a *publisher* resource.
-/// It is not used directly, but through a `PublisherMethods` instance.
+/// It is not used directly, but through a [`PublisherMethods`] instance.
 ///
 /// # Example
 ///
@@ -3848,7 +3967,7 @@ where
 /// # extern crate google_gan1_beta1 as gan1_beta1;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use gan1_beta1::{Gan, oauth2, hyper, hyper_rustls};
+/// # use gan1_beta1::{Gan, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
 /// # let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -3891,7 +4010,7 @@ impl<'a, S> client::CallBuilder for PublisherListCall<'a, S> {}
 
 impl<'a, S> PublisherListCall<'a, S>
 where
-    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
     S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
     S::Future: Send + Unpin + 'static,
     S::Error: Into<Box<dyn StdError + Send + Sync>>,
@@ -3902,55 +4021,53 @@ where
     pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, Publishers)> {
         use std::io::{Read, Seek};
         use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::ToParts;
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
         let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
         dlg.begin(client::MethodInfo { id: "gan.publishers.list",
                                http_method: hyper::Method::GET });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(11 + self._additional_params.len());
-        params.push(("role", self._role.to_string()));
-        params.push(("roleId", self._role_id.to_string()));
-        if let Some(value) = self._relationship_status {
-            params.push(("relationshipStatus", value.to_string()));
-        }
-        if let Some(value) = self._publisher_category {
-            params.push(("publisherCategory", value.to_string()));
-        }
-        if let Some(value) = self._page_token {
-            params.push(("pageToken", value.to_string()));
-        }
-        if let Some(value) = self._min_seven_day_epc {
-            params.push(("minSevenDayEpc", value.to_string()));
-        }
-        if let Some(value) = self._min_payout_rank {
-            params.push(("minPayoutRank", value.to_string()));
-        }
-        if let Some(value) = self._min_ninety_day_epc {
-            params.push(("minNinetyDayEpc", value.to_string()));
-        }
-        if let Some(value) = self._max_results {
-            params.push(("maxResults", value.to_string()));
-        }
+
         for &field in ["alt", "role", "roleId", "relationshipStatus", "publisherCategory", "pageToken", "minSevenDayEpc", "minPayoutRank", "minNinetyDayEpc", "maxResults"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(client::Error::FieldClash(field));
             }
         }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
+
+        let mut params = Params::with_capacity(11 + self._additional_params.len());
+        params.push("role", self._role);
+        params.push("roleId", self._role_id);
+        if let Some(value) = self._relationship_status.as_ref() {
+            params.push("relationshipStatus", value);
+        }
+        if let Some(value) = self._publisher_category.as_ref() {
+            params.push("publisherCategory", value);
+        }
+        if let Some(value) = self._page_token.as_ref() {
+            params.push("pageToken", value);
+        }
+        if let Some(value) = self._min_seven_day_epc.as_ref() {
+            params.push("minSevenDayEpc", value.to_string());
+        }
+        if let Some(value) = self._min_payout_rank.as_ref() {
+            params.push("minPayoutRank", value.to_string());
+        }
+        if let Some(value) = self._min_ninety_day_epc.as_ref() {
+            params.push("minNinetyDayEpc", value.to_string());
+        }
+        if let Some(value) = self._max_results.as_ref() {
+            params.push("maxResults", value.to_string());
         }
 
-        params.push(("alt", "json".to_string()));
+        params.extend(self._additional_params.iter());
 
+        params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "{role}/{roleId}/publishers";
         
-        let key = dlg.api_key();
-        match key {
-            Some(value) => params.push(("key", value)),
+        match dlg.api_key() {
+            Some(value) => params.push("key", value),
             None => {
                 dlg.finished(false);
                 return Err(client::Error::MissingAPIKey)
@@ -3958,28 +4075,14 @@ where
         }
 
         for &(find_this, param_name) in [("{role}", "role"), ("{roleId}", "roleId")].iter() {
-            let mut replace_with: Option<&str> = None;
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = Some(value);
-                    break;
-                }
-            }
-            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+            url = params.uri_replacement(url, param_name, find_this, false);
         }
         {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(2);
-            for param_name in ["roleId", "role"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
+            let to_remove = ["roleId", "role"];
+            params.remove_params(&to_remove);
         }
 
-        let url = url::Url::parse_with_params(&url, params).unwrap();
+        let url = params.parse_with_url(&url);
 
 
 
@@ -3987,21 +4090,24 @@ where
             let mut req_result = {
                 let client = &self.hub.client;
                 dlg.pre_request();
-                let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
-                        .header(USER_AGENT, self.hub._user_agent.clone());
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::GET)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
 
 
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
-                
+
             };
 
             match req_result {
                 Err(err) => {
                     if let client::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep(d).await;
                         continue;
                     }
                     dlg.finished(false);
@@ -4017,7 +4123,7 @@ where
                         let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
                         if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
-                            sleep(d);
+                            sleep(d).await;
                             continue;
                         }
 
@@ -4120,7 +4226,8 @@ where
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.````
     ///
     /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PublisherListCall<'a, S> {
@@ -4156,7 +4263,7 @@ where
 /// Retrieves a report of the specified type.
 ///
 /// A builder for the *get* method supported by a *report* resource.
-/// It is not used directly, but through a `ReportMethods` instance.
+/// It is not used directly, but through a [`ReportMethods`] instance.
 ///
 /// # Example
 ///
@@ -4168,7 +4275,7 @@ where
 /// # extern crate google_gan1_beta1 as gan1_beta1;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use gan1_beta1::{Gan, oauth2, hyper, hyper_rustls};
+/// # use gan1_beta1::{Gan, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
 /// # let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -4220,7 +4327,7 @@ impl<'a, S> client::CallBuilder for ReportGetCall<'a, S> {}
 
 impl<'a, S> ReportGetCall<'a, S>
 where
-    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
     S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
     S::Future: Send + Unpin + 'static,
     S::Error: Into<Box<dyn StdError + Send + Sync>>,
@@ -4231,76 +4338,74 @@ where
     pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, Report)> {
         use std::io::{Read, Seek};
         use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::ToParts;
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
         let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
         dlg.begin(client::MethodInfo { id: "gan.reports.get",
                                http_method: hyper::Method::GET });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(16 + self._additional_params.len());
-        params.push(("role", self._role.to_string()));
-        params.push(("roleId", self._role_id.to_string()));
-        params.push(("reportType", self._report_type.to_string()));
-        if let Some(value) = self._status {
-            params.push(("status", value.to_string()));
-        }
-        if let Some(value) = self._start_index {
-            params.push(("startIndex", value.to_string()));
-        }
-        if let Some(value) = self._start_date {
-            params.push(("startDate", value.to_string()));
-        }
-        if self._publisher_id.len() > 0 {
-            for f in self._publisher_id.iter() {
-                params.push(("publisherId", f.to_string()));
-            }
-        }
-        if self._order_id.len() > 0 {
-            for f in self._order_id.iter() {
-                params.push(("orderId", f.to_string()));
-            }
-        }
-        if let Some(value) = self._max_results {
-            params.push(("maxResults", value.to_string()));
-        }
-        if self._link_id.len() > 0 {
-            for f in self._link_id.iter() {
-                params.push(("linkId", f.to_string()));
-            }
-        }
-        if let Some(value) = self._event_type {
-            params.push(("eventType", value.to_string()));
-        }
-        if let Some(value) = self._end_date {
-            params.push(("endDate", value.to_string()));
-        }
-        if let Some(value) = self._calculate_totals {
-            params.push(("calculateTotals", value.to_string()));
-        }
-        if self._advertiser_id.len() > 0 {
-            for f in self._advertiser_id.iter() {
-                params.push(("advertiserId", f.to_string()));
-            }
-        }
+
         for &field in ["alt", "role", "roleId", "reportType", "status", "startIndex", "startDate", "publisherId", "orderId", "maxResults", "linkId", "eventType", "endDate", "calculateTotals", "advertiserId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(client::Error::FieldClash(field));
             }
         }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
+
+        let mut params = Params::with_capacity(16 + self._additional_params.len());
+        params.push("role", self._role);
+        params.push("roleId", self._role_id);
+        params.push("reportType", self._report_type);
+        if let Some(value) = self._status.as_ref() {
+            params.push("status", value);
+        }
+        if let Some(value) = self._start_index.as_ref() {
+            params.push("startIndex", value.to_string());
+        }
+        if let Some(value) = self._start_date.as_ref() {
+            params.push("startDate", value);
+        }
+        if self._publisher_id.len() > 0 {
+            for f in self._publisher_id.iter() {
+                params.push("publisherId", f);
+            }
+        }
+        if self._order_id.len() > 0 {
+            for f in self._order_id.iter() {
+                params.push("orderId", f);
+            }
+        }
+        if let Some(value) = self._max_results.as_ref() {
+            params.push("maxResults", value.to_string());
+        }
+        if self._link_id.len() > 0 {
+            for f in self._link_id.iter() {
+                params.push("linkId", f);
+            }
+        }
+        if let Some(value) = self._event_type.as_ref() {
+            params.push("eventType", value);
+        }
+        if let Some(value) = self._end_date.as_ref() {
+            params.push("endDate", value);
+        }
+        if let Some(value) = self._calculate_totals.as_ref() {
+            params.push("calculateTotals", value.to_string());
+        }
+        if self._advertiser_id.len() > 0 {
+            for f in self._advertiser_id.iter() {
+                params.push("advertiserId", f);
+            }
         }
 
-        params.push(("alt", "json".to_string()));
+        params.extend(self._additional_params.iter());
 
+        params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "{role}/{roleId}/report/{reportType}";
         
-        let key = dlg.api_key();
-        match key {
-            Some(value) => params.push(("key", value)),
+        match dlg.api_key() {
+            Some(value) => params.push("key", value),
             None => {
                 dlg.finished(false);
                 return Err(client::Error::MissingAPIKey)
@@ -4308,28 +4413,14 @@ where
         }
 
         for &(find_this, param_name) in [("{role}", "role"), ("{roleId}", "roleId"), ("{reportType}", "reportType")].iter() {
-            let mut replace_with: Option<&str> = None;
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = Some(value);
-                    break;
-                }
-            }
-            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+            url = params.uri_replacement(url, param_name, find_this, false);
         }
         {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(3);
-            for param_name in ["reportType", "roleId", "role"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
+            let to_remove = ["reportType", "roleId", "role"];
+            params.remove_params(&to_remove);
         }
 
-        let url = url::Url::parse_with_params(&url, params).unwrap();
+        let url = params.parse_with_url(&url);
 
 
 
@@ -4337,21 +4428,24 @@ where
             let mut req_result = {
                 let client = &self.hub.client;
                 dlg.pre_request();
-                let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
-                        .header(USER_AGENT, self.hub._user_agent.clone());
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::GET)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
 
 
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
-                
+
             };
 
             match req_result {
                 Err(err) => {
                     if let client::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep(d).await;
                         continue;
                     }
                     dlg.finished(false);
@@ -4367,7 +4461,7 @@ where
                         let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
                         if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
-                            sleep(d);
+                            sleep(d).await;
                             continue;
                         }
 
@@ -4512,7 +4606,8 @@ where
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.````
     ///
     /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ReportGetCall<'a, S> {

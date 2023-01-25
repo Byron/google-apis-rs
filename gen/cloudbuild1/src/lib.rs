@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/generator/templates/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Cloud Build* crate version *4.0.1+20220218*, where *20220218* is the exact revision of the *cloudbuild:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v4.0.1*.
+//! This documentation was generated from *Cloud Build* crate version *5.0.2-beta-1+20230120*, where *20230120* is the exact revision of the *cloudbuild:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.2-beta-1*.
 //! 
 //! Everything else about the *Cloud Build* *v1* API can be found at the
 //! [official documentation site](https://cloud.google.com/cloud-build/docs/).
@@ -11,12 +11,14 @@
 //! 
 //! Handle the following *Resources* with ease from the central [hub](CloudBuild) ... 
 //! 
+//! * github dot com webhook
+//!  * [*receive*](api::GithubDotComWebhookReceiveCall)
 //! * locations
 //!  * [*regional webhook*](api::LocationRegionalWebhookCall)
 //! * [operations](api::Operation)
 //!  * [*cancel*](api::OperationCancelCall) and [*get*](api::OperationGetCall)
 //! * projects
-//!  * [*builds approve*](api::ProjectBuildApproveCall), [*builds cancel*](api::ProjectBuildCancelCall), [*builds create*](api::ProjectBuildCreateCall), [*builds get*](api::ProjectBuildGetCall), [*builds list*](api::ProjectBuildListCall), [*builds retry*](api::ProjectBuildRetryCall), [*github enterprise configs create*](api::ProjectGithubEnterpriseConfigCreateCall), [*github enterprise configs delete*](api::ProjectGithubEnterpriseConfigDeleteCall), [*github enterprise configs get*](api::ProjectGithubEnterpriseConfigGetCall), [*github enterprise configs list*](api::ProjectGithubEnterpriseConfigListCall), [*github enterprise configs patch*](api::ProjectGithubEnterpriseConfigPatchCall), [*locations bitbucket server configs add bitbucket server connected repository*](api::ProjectLocationBitbucketServerConfigAddBitbucketServerConnectedRepositoryCall), [*locations bitbucket server configs connected repositories batch create*](api::ProjectLocationBitbucketServerConfigConnectedRepositoryBatchCreateCall), [*locations bitbucket server configs create*](api::ProjectLocationBitbucketServerConfigCreateCall), [*locations bitbucket server configs delete*](api::ProjectLocationBitbucketServerConfigDeleteCall), [*locations bitbucket server configs get*](api::ProjectLocationBitbucketServerConfigGetCall), [*locations bitbucket server configs list*](api::ProjectLocationBitbucketServerConfigListCall), [*locations bitbucket server configs patch*](api::ProjectLocationBitbucketServerConfigPatchCall), [*locations bitbucket server configs remove bitbucket server connected repository*](api::ProjectLocationBitbucketServerConfigRemoveBitbucketServerConnectedRepositoryCall), [*locations bitbucket server configs repos list*](api::ProjectLocationBitbucketServerConfigRepoListCall), [*locations builds approve*](api::ProjectLocationBuildApproveCall), [*locations builds cancel*](api::ProjectLocationBuildCancelCall), [*locations builds create*](api::ProjectLocationBuildCreateCall), [*locations builds get*](api::ProjectLocationBuildGetCall), [*locations builds list*](api::ProjectLocationBuildListCall), [*locations builds retry*](api::ProjectLocationBuildRetryCall), [*locations github enterprise configs create*](api::ProjectLocationGithubEnterpriseConfigCreateCall), [*locations github enterprise configs delete*](api::ProjectLocationGithubEnterpriseConfigDeleteCall), [*locations github enterprise configs get*](api::ProjectLocationGithubEnterpriseConfigGetCall), [*locations github enterprise configs list*](api::ProjectLocationGithubEnterpriseConfigListCall), [*locations github enterprise configs patch*](api::ProjectLocationGithubEnterpriseConfigPatchCall), [*locations operations cancel*](api::ProjectLocationOperationCancelCall), [*locations operations get*](api::ProjectLocationOperationGetCall), [*locations triggers create*](api::ProjectLocationTriggerCreateCall), [*locations triggers delete*](api::ProjectLocationTriggerDeleteCall), [*locations triggers get*](api::ProjectLocationTriggerGetCall), [*locations triggers list*](api::ProjectLocationTriggerListCall), [*locations triggers patch*](api::ProjectLocationTriggerPatchCall), [*locations triggers run*](api::ProjectLocationTriggerRunCall), [*locations triggers webhook*](api::ProjectLocationTriggerWebhookCall), [*locations worker pools create*](api::ProjectLocationWorkerPoolCreateCall), [*locations worker pools delete*](api::ProjectLocationWorkerPoolDeleteCall), [*locations worker pools get*](api::ProjectLocationWorkerPoolGetCall), [*locations worker pools list*](api::ProjectLocationWorkerPoolListCall), [*locations worker pools patch*](api::ProjectLocationWorkerPoolPatchCall), [*triggers create*](api::ProjectTriggerCreateCall), [*triggers delete*](api::ProjectTriggerDeleteCall), [*triggers get*](api::ProjectTriggerGetCall), [*triggers list*](api::ProjectTriggerListCall), [*triggers patch*](api::ProjectTriggerPatchCall), [*triggers run*](api::ProjectTriggerRunCall) and [*triggers webhook*](api::ProjectTriggerWebhookCall)
+//!  * [*builds approve*](api::ProjectBuildApproveCall), [*builds cancel*](api::ProjectBuildCancelCall), [*builds create*](api::ProjectBuildCreateCall), [*builds get*](api::ProjectBuildGetCall), [*builds list*](api::ProjectBuildListCall), [*builds retry*](api::ProjectBuildRetryCall), [*github enterprise configs create*](api::ProjectGithubEnterpriseConfigCreateCall), [*github enterprise configs delete*](api::ProjectGithubEnterpriseConfigDeleteCall), [*github enterprise configs get*](api::ProjectGithubEnterpriseConfigGetCall), [*github enterprise configs list*](api::ProjectGithubEnterpriseConfigListCall), [*github enterprise configs patch*](api::ProjectGithubEnterpriseConfigPatchCall), [*locations bitbucket server configs connected repositories batch create*](api::ProjectLocationBitbucketServerConfigConnectedRepositoryBatchCreateCall), [*locations bitbucket server configs create*](api::ProjectLocationBitbucketServerConfigCreateCall), [*locations bitbucket server configs delete*](api::ProjectLocationBitbucketServerConfigDeleteCall), [*locations bitbucket server configs get*](api::ProjectLocationBitbucketServerConfigGetCall), [*locations bitbucket server configs list*](api::ProjectLocationBitbucketServerConfigListCall), [*locations bitbucket server configs patch*](api::ProjectLocationBitbucketServerConfigPatchCall), [*locations bitbucket server configs remove bitbucket server connected repository*](api::ProjectLocationBitbucketServerConfigRemoveBitbucketServerConnectedRepositoryCall), [*locations bitbucket server configs repos list*](api::ProjectLocationBitbucketServerConfigRepoListCall), [*locations builds approve*](api::ProjectLocationBuildApproveCall), [*locations builds cancel*](api::ProjectLocationBuildCancelCall), [*locations builds create*](api::ProjectLocationBuildCreateCall), [*locations builds get*](api::ProjectLocationBuildGetCall), [*locations builds list*](api::ProjectLocationBuildListCall), [*locations builds retry*](api::ProjectLocationBuildRetryCall), [*locations git lab configs connected repositories batch create*](api::ProjectLocationGitLabConfigConnectedRepositoryBatchCreateCall), [*locations git lab configs create*](api::ProjectLocationGitLabConfigCreateCall), [*locations git lab configs delete*](api::ProjectLocationGitLabConfigDeleteCall), [*locations git lab configs get*](api::ProjectLocationGitLabConfigGetCall), [*locations git lab configs list*](api::ProjectLocationGitLabConfigListCall), [*locations git lab configs patch*](api::ProjectLocationGitLabConfigPatchCall), [*locations git lab configs remove git lab connected repository*](api::ProjectLocationGitLabConfigRemoveGitLabConnectedRepositoryCall), [*locations git lab configs repos list*](api::ProjectLocationGitLabConfigRepoListCall), [*locations github enterprise configs create*](api::ProjectLocationGithubEnterpriseConfigCreateCall), [*locations github enterprise configs delete*](api::ProjectLocationGithubEnterpriseConfigDeleteCall), [*locations github enterprise configs get*](api::ProjectLocationGithubEnterpriseConfigGetCall), [*locations github enterprise configs list*](api::ProjectLocationGithubEnterpriseConfigListCall), [*locations github enterprise configs patch*](api::ProjectLocationGithubEnterpriseConfigPatchCall), [*locations operations cancel*](api::ProjectLocationOperationCancelCall), [*locations operations get*](api::ProjectLocationOperationGetCall), [*locations triggers create*](api::ProjectLocationTriggerCreateCall), [*locations triggers delete*](api::ProjectLocationTriggerDeleteCall), [*locations triggers get*](api::ProjectLocationTriggerGetCall), [*locations triggers list*](api::ProjectLocationTriggerListCall), [*locations triggers patch*](api::ProjectLocationTriggerPatchCall), [*locations triggers run*](api::ProjectLocationTriggerRunCall), [*locations triggers webhook*](api::ProjectLocationTriggerWebhookCall), [*locations worker pools create*](api::ProjectLocationWorkerPoolCreateCall), [*locations worker pools delete*](api::ProjectLocationWorkerPoolDeleteCall), [*locations worker pools get*](api::ProjectLocationWorkerPoolGetCall), [*locations worker pools list*](api::ProjectLocationWorkerPoolListCall), [*locations worker pools patch*](api::ProjectLocationWorkerPoolPatchCall), [*triggers create*](api::ProjectTriggerCreateCall), [*triggers delete*](api::ProjectTriggerDeleteCall), [*triggers get*](api::ProjectTriggerGetCall), [*triggers list*](api::ProjectTriggerListCall), [*triggers patch*](api::ProjectTriggerPatchCall), [*triggers run*](api::ProjectTriggerRunCall) and [*triggers webhook*](api::ProjectTriggerWebhookCall)
 //! 
 //! Other activities are ...
 //! 
@@ -69,6 +71,10 @@
 //! let r = hub.projects().locations_builds_approve(...).doit().await
 //! let r = hub.projects().locations_builds_create(...).doit().await
 //! let r = hub.projects().locations_builds_retry(...).doit().await
+//! let r = hub.projects().locations_git_lab_configs_connected_repositories_batch_create(...).doit().await
+//! let r = hub.projects().locations_git_lab_configs_create(...).doit().await
+//! let r = hub.projects().locations_git_lab_configs_delete(...).doit().await
+//! let r = hub.projects().locations_git_lab_configs_patch(...).doit().await
 //! let r = hub.projects().locations_github_enterprise_configs_create(...).doit().await
 //! let r = hub.projects().locations_github_enterprise_configs_delete(...).doit().await
 //! let r = hub.projects().locations_github_enterprise_configs_patch(...).doit().await
@@ -108,7 +114,7 @@
 //! use cloudbuild1::{Result, Error};
 //! # async fn dox() {
 //! use std::default::Default;
-//! use cloudbuild1::{CloudBuild, oauth2, hyper, hyper_rustls};
+//! use cloudbuild1::{CloudBuild, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 //! 
 //! // Get an ApplicationSecret instance by some means. It contains the `client_id` and 
 //! // `client_secret`, among other things.
@@ -219,22 +225,17 @@
 // This file was generated automatically from 'src/generator/templates/api/lib.rs.mako'
 // DO NOT EDIT !
 
-#[macro_use]
-extern crate serde_derive;
-
 // Re-export the hyper and hyper_rustls crate, they are required to build the hub
-pub extern crate hyper;
-pub extern crate hyper_rustls;
-extern crate serde;
-extern crate serde_json;
-// Re-export the yup_oauth2 crate, that is required to call some methods of the hub and the client
-pub extern crate yup_oauth2 as oauth2;
-extern crate mime;
-extern crate url;
-
+pub use hyper;
+pub use hyper_rustls;
+pub extern crate google_apis_common as client;
+pub use client::chrono;
 pub mod api;
-pub mod client;
 
 // Re-export the hub type and some basic client structs
 pub use api::CloudBuild;
-pub use client::{Result, Error, Delegate};
+pub use client::{Result, Error, Delegate, FieldMask};
+
+// Re-export the yup_oauth2 crate, that is required to call some methods of the hub and the client
+#[cfg(feature = "yup-oauth2")]
+pub use client::oauth2;

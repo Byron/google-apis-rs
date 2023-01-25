@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/generator/templates/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Game Services* crate version *4.0.1+20220223*, where *20220223* is the exact revision of the *gameservices:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v4.0.1*.
+//! This documentation was generated from *Game Services* crate version *5.0.2-beta-1+20230105*, where *20230105* is the exact revision of the *gameservices:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.2-beta-1*.
 //! 
 //! Everything else about the *Game Services* *v1* API can be found at the
 //! [official documentation site](https://cloud.google.com/solutions/gaming/).
@@ -12,7 +12,7 @@
 //! Handle the following *Resources* with ease from the central [hub](GameServices) ... 
 //! 
 //! * projects
-//!  * [*locations game server deployments configs create*](api::ProjectLocationGameServerDeploymentConfigCreateCall), [*locations game server deployments configs delete*](api::ProjectLocationGameServerDeploymentConfigDeleteCall), [*locations game server deployments configs get*](api::ProjectLocationGameServerDeploymentConfigGetCall), [*locations game server deployments configs list*](api::ProjectLocationGameServerDeploymentConfigListCall), [*locations game server deployments create*](api::ProjectLocationGameServerDeploymentCreateCall), [*locations game server deployments delete*](api::ProjectLocationGameServerDeploymentDeleteCall), [*locations game server deployments fetch deployment state*](api::ProjectLocationGameServerDeploymentFetchDeploymentStateCall), [*locations game server deployments get*](api::ProjectLocationGameServerDeploymentGetCall), [*locations game server deployments get iam policy*](api::ProjectLocationGameServerDeploymentGetIamPolicyCall), [*locations game server deployments get rollout*](api::ProjectLocationGameServerDeploymentGetRolloutCall), [*locations game server deployments list*](api::ProjectLocationGameServerDeploymentListCall), [*locations game server deployments patch*](api::ProjectLocationGameServerDeploymentPatchCall), [*locations game server deployments preview rollout*](api::ProjectLocationGameServerDeploymentPreviewRolloutCall), [*locations game server deployments set iam policy*](api::ProjectLocationGameServerDeploymentSetIamPolicyCall), [*locations game server deployments test iam permissions*](api::ProjectLocationGameServerDeploymentTestIamPermissionCall), [*locations game server deployments update rollout*](api::ProjectLocationGameServerDeploymentUpdateRolloutCall), [*locations get*](api::ProjectLocationGetCall), [*locations list*](api::ProjectLocationListCall), [*locations operations cancel*](api::ProjectLocationOperationCancelCall), [*locations operations delete*](api::ProjectLocationOperationDeleteCall), [*locations operations get*](api::ProjectLocationOperationGetCall), [*locations operations list*](api::ProjectLocationOperationListCall), [*locations realms create*](api::ProjectLocationRealmCreateCall), [*locations realms delete*](api::ProjectLocationRealmDeleteCall), [*locations realms game server clusters create*](api::ProjectLocationRealmGameServerClusterCreateCall), [*locations realms game server clusters delete*](api::ProjectLocationRealmGameServerClusterDeleteCall), [*locations realms game server clusters get*](api::ProjectLocationRealmGameServerClusterGetCall), [*locations realms game server clusters list*](api::ProjectLocationRealmGameServerClusterListCall), [*locations realms game server clusters patch*](api::ProjectLocationRealmGameServerClusterPatchCall), [*locations realms game server clusters preview create*](api::ProjectLocationRealmGameServerClusterPreviewCreateCall), [*locations realms game server clusters preview delete*](api::ProjectLocationRealmGameServerClusterPreviewDeleteCall), [*locations realms game server clusters preview update*](api::ProjectLocationRealmGameServerClusterPreviewUpdateCall), [*locations realms get*](api::ProjectLocationRealmGetCall), [*locations realms list*](api::ProjectLocationRealmListCall), [*locations realms patch*](api::ProjectLocationRealmPatchCall) and [*locations realms preview update*](api::ProjectLocationRealmPreviewUpdateCall)
+//!  * [*locations game server deployments get iam policy*](api::ProjectLocationGameServerDeploymentGetIamPolicyCall), [*locations game server deployments set iam policy*](api::ProjectLocationGameServerDeploymentSetIamPolicyCall), [*locations game server deployments test iam permissions*](api::ProjectLocationGameServerDeploymentTestIamPermissionCall), [*locations get*](api::ProjectLocationGetCall), [*locations list*](api::ProjectLocationListCall), [*locations operations cancel*](api::ProjectLocationOperationCancelCall), [*locations operations delete*](api::ProjectLocationOperationDeleteCall), [*locations operations get*](api::ProjectLocationOperationGetCall) and [*locations operations list*](api::ProjectLocationOperationListCall)
 //! 
 //! 
 //! 
@@ -47,19 +47,8 @@
 //! Or specifically ...
 //! 
 //! ```ignore
-//! let r = hub.projects().locations_game_server_deployments_configs_create(...).doit().await
-//! let r = hub.projects().locations_game_server_deployments_configs_delete(...).doit().await
-//! let r = hub.projects().locations_game_server_deployments_create(...).doit().await
-//! let r = hub.projects().locations_game_server_deployments_delete(...).doit().await
-//! let r = hub.projects().locations_game_server_deployments_patch(...).doit().await
-//! let r = hub.projects().locations_game_server_deployments_update_rollout(...).doit().await
-//! let r = hub.projects().locations_operations_get(...).doit().await
-//! let r = hub.projects().locations_realms_game_server_clusters_create(...).doit().await
-//! let r = hub.projects().locations_realms_game_server_clusters_delete(...).doit().await
-//! let r = hub.projects().locations_realms_game_server_clusters_patch(...).doit().await
-//! let r = hub.projects().locations_realms_create(...).doit().await
-//! let r = hub.projects().locations_realms_delete(...).doit().await
-//! let r = hub.projects().locations_realms_patch(...).doit().await
+//! let r = hub.projects().locations_game_server_deployments_get_iam_policy(...).doit().await
+//! let r = hub.projects().locations_game_server_deployments_set_iam_policy(...).doit().await
 //! ```
 //! 
 //! The `resource()` and `activity(...)` calls create [builders][builder-pattern]. The second one dealing with `Activities` 
@@ -86,11 +75,10 @@
 //! extern crate hyper;
 //! extern crate hyper_rustls;
 //! extern crate google_gameservices1 as gameservices1;
-//! use gameservices1::api::GameServerConfig;
 //! use gameservices1::{Result, Error};
 //! # async fn dox() {
 //! use std::default::Default;
-//! use gameservices1::{GameServices, oauth2, hyper, hyper_rustls};
+//! use gameservices1::{GameServices, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 //! 
 //! // Get an ApplicationSecret instance by some means. It contains the `client_id` and 
 //! // `client_secret`, among other things.
@@ -105,16 +93,11 @@
 //!         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 //!     ).build().await.unwrap();
 //! let mut hub = GameServices::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
-//! // As the method needs a request, you would usually fill it with the desired information
-//! // into the respective structure. Some of the parts shown here might not be applicable !
-//! // Values shown here are possibly random and not representative !
-//! let mut req = GameServerConfig::default();
-//! 
 //! // You can configure optional parameters by calling the respective setters at will, and
 //! // execute the final call using `doit()`.
 //! // Values shown here are possibly random and not representative !
-//! let result = hub.projects().locations_game_server_deployments_configs_create(req, "parent")
-//!              .config_id("ipsum")
+//! let result = hub.projects().locations_game_server_deployments_get_iam_policy("resource")
+//!              .options_requested_policy_version(-55)
 //!              .doit().await;
 //! 
 //! match result {
@@ -200,22 +183,17 @@
 // This file was generated automatically from 'src/generator/templates/api/lib.rs.mako'
 // DO NOT EDIT !
 
-#[macro_use]
-extern crate serde_derive;
-
 // Re-export the hyper and hyper_rustls crate, they are required to build the hub
-pub extern crate hyper;
-pub extern crate hyper_rustls;
-extern crate serde;
-extern crate serde_json;
-// Re-export the yup_oauth2 crate, that is required to call some methods of the hub and the client
-pub extern crate yup_oauth2 as oauth2;
-extern crate mime;
-extern crate url;
-
+pub use hyper;
+pub use hyper_rustls;
+pub extern crate google_apis_common as client;
+pub use client::chrono;
 pub mod api;
-pub mod client;
 
 // Re-export the hub type and some basic client structs
 pub use api::GameServices;
-pub use client::{Result, Error, Delegate};
+pub use client::{Result, Error, Delegate, FieldMask};
+
+// Re-export the yup_oauth2 crate, that is required to call some methods of the hub and the client
+#[cfg(feature = "yup-oauth2")]
+pub use client::oauth2;

@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/generator/templates/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *appengine* crate version *4.0.1+20220226*, where *20220226* is the exact revision of the *appengine:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v4.0.1*.
+//! This documentation was generated from *appengine* crate version *5.0.2-beta-1+20230114*, where *20230114* is the exact revision of the *appengine:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.2-beta-1*.
 //! 
 //! Everything else about the *appengine* *v1* API can be found at the
 //! [official documentation site](https://cloud.google.com/appengine/docs/admin-api/).
@@ -13,6 +13,8 @@
 //! 
 //! * apps
 //!  * [*authorized certificates create*](api::AppAuthorizedCertificateCreateCall), [*authorized certificates delete*](api::AppAuthorizedCertificateDeleteCall), [*authorized certificates get*](api::AppAuthorizedCertificateGetCall), [*authorized certificates list*](api::AppAuthorizedCertificateListCall), [*authorized certificates patch*](api::AppAuthorizedCertificatePatchCall), [*authorized domains list*](api::AppAuthorizedDomainListCall), [*create*](api::AppCreateCall), [*domain mappings create*](api::AppDomainMappingCreateCall), [*domain mappings delete*](api::AppDomainMappingDeleteCall), [*domain mappings get*](api::AppDomainMappingGetCall), [*domain mappings list*](api::AppDomainMappingListCall), [*domain mappings patch*](api::AppDomainMappingPatchCall), [*firewall ingress rules batch update*](api::AppFirewallIngressRuleBatchUpdateCall), [*firewall ingress rules create*](api::AppFirewallIngressRuleCreateCall), [*firewall ingress rules delete*](api::AppFirewallIngressRuleDeleteCall), [*firewall ingress rules get*](api::AppFirewallIngressRuleGetCall), [*firewall ingress rules list*](api::AppFirewallIngressRuleListCall), [*firewall ingress rules patch*](api::AppFirewallIngressRulePatchCall), [*get*](api::AppGetCall), [*locations get*](api::AppLocationGetCall), [*locations list*](api::AppLocationListCall), [*operations get*](api::AppOperationGetCall), [*operations list*](api::AppOperationListCall), [*patch*](api::AppPatchCall), [*repair*](api::AppRepairCall), [*services delete*](api::AppServiceDeleteCall), [*services get*](api::AppServiceGetCall), [*services list*](api::AppServiceListCall), [*services patch*](api::AppServicePatchCall), [*services versions create*](api::AppServiceVersionCreateCall), [*services versions delete*](api::AppServiceVersionDeleteCall), [*services versions get*](api::AppServiceVersionGetCall), [*services versions instances debug*](api::AppServiceVersionInstanceDebugCall), [*services versions instances delete*](api::AppServiceVersionInstanceDeleteCall), [*services versions instances get*](api::AppServiceVersionInstanceGetCall), [*services versions instances list*](api::AppServiceVersionInstanceListCall), [*services versions list*](api::AppServiceVersionListCall) and [*services versions patch*](api::AppServiceVersionPatchCall)
+//! * projects
+//!  * [*locations applications get*](api::ProjectLocationApplicationGetCall)
 //! 
 //! 
 //! 
@@ -91,7 +93,7 @@
 //! use appengine1::{Result, Error};
 //! # async fn dox() {
 //! use std::default::Default;
-//! use appengine1::{Appengine, oauth2, hyper, hyper_rustls};
+//! use appengine1::{Appengine, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 //! 
 //! // Get an ApplicationSecret instance by some means. It contains the `client_id` and 
 //! // `client_secret`, among other things.
@@ -200,22 +202,17 @@
 // This file was generated automatically from 'src/generator/templates/api/lib.rs.mako'
 // DO NOT EDIT !
 
-#[macro_use]
-extern crate serde_derive;
-
 // Re-export the hyper and hyper_rustls crate, they are required to build the hub
-pub extern crate hyper;
-pub extern crate hyper_rustls;
-extern crate serde;
-extern crate serde_json;
-// Re-export the yup_oauth2 crate, that is required to call some methods of the hub and the client
-pub extern crate yup_oauth2 as oauth2;
-extern crate mime;
-extern crate url;
-
+pub use hyper;
+pub use hyper_rustls;
+pub extern crate google_apis_common as client;
+pub use client::chrono;
 pub mod api;
-pub mod client;
 
 // Re-export the hub type and some basic client structs
 pub use api::Appengine;
-pub use client::{Result, Error, Delegate};
+pub use client::{Result, Error, Delegate, FieldMask};
+
+// Re-export the yup_oauth2 crate, that is required to call some methods of the hub and the client
+#[cfg(feature = "yup-oauth2")]
+pub use client::oauth2;

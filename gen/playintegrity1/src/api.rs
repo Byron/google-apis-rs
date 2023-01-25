@@ -1,19 +1,20 @@
 use std::collections::HashMap;
 use std::cell::RefCell;
 use std::default::Default;
-use std::collections::BTreeMap;
+use std::collections::BTreeSet;
 use std::error::Error as StdError;
 use serde_json as json;
 use std::io;
 use std::fs;
 use std::mem;
-use std::thread::sleep;
 
-use http::Uri;
 use hyper::client::connect;
 use tokio::io::{AsyncRead, AsyncWrite};
+use tokio::time::sleep;
 use tower_service;
-use crate::client;
+use serde::{Serialize, Deserialize};
+
+use crate::{client, client::GetToken, client::serde_with};
 
 // ##############
 // UTILITIES ###
@@ -62,7 +63,7 @@ impl Default for Scope {
 /// use playintegrity1::{Result, Error};
 /// # async fn dox() {
 /// use std::default::Default;
-/// use playintegrity1::{PlayIntegrity, oauth2, hyper, hyper_rustls};
+/// use playintegrity1::{PlayIntegrity, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// // Get an ApplicationSecret instance by some means. It contains the `client_id` and 
 /// // `client_secret`, among other things.
@@ -110,7 +111,7 @@ impl Default for Scope {
 #[derive(Clone)]
 pub struct PlayIntegrity<S> {
     pub client: hyper::Client<S, hyper::body::Body>,
-    pub auth: oauth2::authenticator::Authenticator<S>,
+    pub auth: Box<dyn client::GetToken>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
@@ -120,11 +121,11 @@ impl<'a, S> client::Hub for PlayIntegrity<S> {}
 
 impl<'a, S> PlayIntegrity<S> {
 
-    pub fn new(client: hyper::Client<S, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<S>) -> PlayIntegrity<S> {
+    pub fn new<A: 'static + client::GetToken>(client: hyper::Client<S, hyper::body::Body>, auth: A) -> PlayIntegrity<S> {
         PlayIntegrity {
             client,
-            auth: authenticator,
-            _user_agent: "google-api-rust-client/4.0.1".to_string(),
+            auth: Box::new(auth),
+            _user_agent: "google-api-rust-client/5.0.2-beta-1".to_string(),
             _base_url: "https://playintegrity.googleapis.com/".to_string(),
             _root_url: "https://playintegrity.googleapis.com/".to_string(),
         }
@@ -135,7 +136,7 @@ impl<'a, S> PlayIntegrity<S> {
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/4.0.1`.
+    /// It defaults to `google-api-rust-client/5.0.2-beta-1`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -163,14 +164,36 @@ impl<'a, S> PlayIntegrity<S> {
 // ############
 // SCHEMAS ###
 // ##########
+/// Contains a signal helping apps differentiating between likely genuine users and likely non-genuine traffic (such as accounts being used for fraud, accounts used by automated traffic, or accounts used in device farms) based on the presence and volume of Play store activity.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct AccountActivity {
+    /// Required. Indicates the activity level of the account.
+    #[serde(rename="activityLevel")]
+    
+    pub activity_level: Option<String>,
+}
+
+impl client::Part for AccountActivity {}
+
+
 /// Contains the account information such as the licensing status for the user in the scope.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AccountDetails {
+    /// Details about the account activity for the user in the scope.
+    #[serde(rename="accountActivity")]
+    
+    pub account_activity: Option<AccountActivity>,
     /// Required. Details about the licensing status of the user for the app in the scope.
     #[serde(rename="appLicensingVerdict")]
+    
     pub app_licensing_verdict: Option<String>,
 }
 
@@ -181,20 +204,26 @@ impl client::Part for AccountDetails {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AppIntegrity {
     /// Required. Details about the app recognition verdict
     #[serde(rename="appRecognitionVerdict")]
+    
     pub app_recognition_verdict: Option<String>,
-    /// Hex fingerprint of the application signing certificate. e.g. “ABCE1F....” Set iff app_recognition_verdict != UNEVALUATED.
+    /// The SHA256 hash of the requesting app's signing certificates (base64 web-safe encoded). Set iff app_recognition_verdict != UNEVALUATED.
     #[serde(rename="certificateSha256Digest")]
+    
     pub certificate_sha256_digest: Option<Vec<String>>,
     /// Package name of the application under attestation. Set iff app_recognition_verdict != UNEVALUATED.
     #[serde(rename="packageName")]
+    
     pub package_name: Option<String>,
     /// Version code of the application. Set iff app_recognition_verdict != UNEVALUATED.
     #[serde(rename="versionCode")]
-    pub version_code: Option<String>,
+    
+    #[serde_as(as = "Option<::client::serde_with::DisplayFromStr>")]
+    pub version_code: Option<i64>,
 }
 
 impl client::Part for AppIntegrity {}
@@ -209,10 +238,12 @@ impl client::Part for AppIntegrity {}
 /// 
 /// * [decode integrity token](MethodDecodeIntegrityTokenCall) (request)
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct DecodeIntegrityTokenRequest {
     /// Encoded integrity token.
     #[serde(rename="integrityToken")]
+    
     pub integrity_token: Option<String>,
 }
 
@@ -228,10 +259,12 @@ impl client::RequestValue for DecodeIntegrityTokenRequest {}
 /// 
 /// * [decode integrity token](MethodDecodeIntegrityTokenCall) (response)
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct DecodeIntegrityTokenResponse {
     /// Plain token payload generated from the decoded integrity token.
     #[serde(rename="tokenPayloadExternal")]
+    
     pub token_payload_external: Option<TokenPayloadExternal>,
 }
 
@@ -242,10 +275,12 @@ impl client::ResponseResult for DecodeIntegrityTokenResponse {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct DeviceIntegrity {
     /// Details about the integrity of the device the app is running on
     #[serde(rename="deviceRecognitionVerdict")]
+    
     pub device_recognition_verdict: Option<Vec<String>>,
 }
 
@@ -256,16 +291,25 @@ impl client::Part for DeviceIntegrity {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct RequestDetails {
-    /// Required. Nonce that was provided in the request (which is base64 web-safe no-wrap).
+    /// Nonce that was provided in the request (which is base64 web-safe no-wrap).
+    
     pub nonce: Option<String>,
+    /// Request hash that was provided in the request.
+    #[serde(rename="requestHash")]
+    
+    pub request_hash: Option<String>,
     /// Required. Application package name this attestation was requested for. Note: This field makes no guarantees or promises on the caller integrity. For details on application integrity, check application_integrity.
     #[serde(rename="requestPackageName")]
+    
     pub request_package_name: Option<String>,
     /// Required. Timestamp, in milliseconds, of the integrity application request.
     #[serde(rename="timestampMillis")]
-    pub timestamp_millis: Option<String>,
+    
+    #[serde_as(as = "Option<::client::serde_with::DisplayFromStr>")]
+    pub timestamp_millis: Option<i64>,
 }
 
 impl client::Part for RequestDetails {}
@@ -275,10 +319,12 @@ impl client::Part for RequestDetails {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct TestingDetails {
     /// Required. Indicates that the information contained in this payload is a testing response that is statically overridden for a tester.
     #[serde(rename="isTestingResponse")]
+    
     pub is_testing_response: Option<bool>,
 }
 
@@ -289,22 +335,28 @@ impl client::Part for TestingDetails {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct TokenPayloadExternal {
     /// Required. Details about the Play Store account.
     #[serde(rename="accountDetails")]
+    
     pub account_details: Option<AccountDetails>,
     /// Required. Details about the application integrity.
     #[serde(rename="appIntegrity")]
+    
     pub app_integrity: Option<AppIntegrity>,
     /// Required. Details about the device integrity.
     #[serde(rename="deviceIntegrity")]
+    
     pub device_integrity: Option<DeviceIntegrity>,
     /// Required. Details about the integrity request.
     #[serde(rename="requestDetails")]
+    
     pub request_details: Option<RequestDetails>,
     /// Indicates that this payload is generated for testing purposes and contains any additional data that is linked with testing status.
     #[serde(rename="testingDetails")]
+    
     pub testing_details: Option<TestingDetails>,
 }
 
@@ -317,7 +369,7 @@ impl client::Part for TokenPayloadExternal {}
 // #################
 
 /// A builder providing access to all free methods, which are not associated with a particular resource.
-/// It is not used directly, but through the `PlayIntegrity` hub.
+/// It is not used directly, but through the [`PlayIntegrity`] hub.
 ///
 /// # Example
 ///
@@ -330,7 +382,7 @@ impl client::Part for TokenPayloadExternal {}
 /// 
 /// # async fn dox() {
 /// use std::default::Default;
-/// use playintegrity1::{PlayIntegrity, oauth2, hyper, hyper_rustls};
+/// use playintegrity1::{PlayIntegrity, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// let secret: oauth2::ApplicationSecret = Default::default();
 /// let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -385,7 +437,7 @@ impl<'a, S> MethodMethods<'a, S> {
 /// Decodes the integrity token and returns the token payload.
 ///
 /// A builder for the *decodeIntegrityToken* method.
-/// It is not used directly, but through a `MethodMethods` instance.
+/// It is not used directly, but through a [`MethodMethods`] instance.
 ///
 /// # Example
 ///
@@ -398,7 +450,7 @@ impl<'a, S> MethodMethods<'a, S> {
 /// use playintegrity1::api::DecodeIntegrityTokenRequest;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use playintegrity1::{PlayIntegrity, oauth2, hyper, hyper_rustls};
+/// # use playintegrity1::{PlayIntegrity, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
 /// # let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -426,14 +478,14 @@ pub struct MethodDecodeIntegrityTokenCall<'a, S>
     _package_name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
+    _scopes: BTreeSet<String>
 }
 
 impl<'a, S> client::CallBuilder for MethodDecodeIntegrityTokenCall<'a, S> {}
 
 impl<'a, S> MethodDecodeIntegrityTokenCall<'a, S>
 where
-    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
     S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
     S::Future: Send + Unpin + 'static,
     S::Error: Into<Box<dyn StdError + Send + Sync>>,
@@ -442,64 +494,45 @@ where
 
     /// Perform the operation you have build so far.
     pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, DecodeIntegrityTokenResponse)> {
-        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
         use std::io::{Read, Seek};
         use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::ToParts;
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
         let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
         dlg.begin(client::MethodInfo { id: "playintegrity.decodeIntegrityToken",
                                http_method: hyper::Method::POST });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
-        params.push(("packageName", self._package_name.to_string()));
+
         for &field in ["alt", "packageName"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(client::Error::FieldClash(field));
             }
         }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
 
-        params.push(("alt", "json".to_string()));
+        let mut params = Params::with_capacity(4 + self._additional_params.len());
+        params.push("packageName", self._package_name);
 
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "v1/{+packageName}:decodeIntegrityToken";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::Full.as_ref().to_string());
         }
 
         for &(find_this, param_name) in [("{+packageName}", "packageName")].iter() {
-            let mut replace_with = String::new();
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = value.to_string();
-                    break;
-                }
-            }
-            if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
-            }
-            url = url.replace(find_this, &replace_with);
+            url = params.uri_replacement(url, param_name, find_this, true);
         }
         {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
-            for param_name in ["packageName"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
+            let to_remove = ["packageName"];
+            params.remove_params(&to_remove);
         }
 
-        let url = url::Url::parse_with_params(&url, params).unwrap();
+        let url = params.parse_with_url(&url);
 
-        let mut json_mime_type: mime::Mime = "application/json".parse().unwrap();
+        let mut json_mime_type = mime::APPLICATION_JSON;
         let mut request_value_reader =
             {
                 let mut value = json::value::to_value(&self._request).expect("serde to work");
@@ -513,14 +546,14 @@ where
 
 
         loop {
-            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
-                Ok(token) => token.clone(),
-                Err(err) => {
-                    match  dlg.token(&err) {
-                        Some(token) => token,
-                        None => {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
                             dlg.finished(false);
-                            return Err(client::Error::MissingToken(err))
+                            return Err(client::Error::MissingToken(e));
                         }
                     }
                 }
@@ -529,23 +562,29 @@ where
             let mut req_result = {
                 let client = &self.hub.client;
                 dlg.pre_request();
-                let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
-                        .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::POST)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
 
 
                         let request = req_builder
-                        .header(CONTENT_TYPE, format!("{}", json_mime_type.to_string()))
+                        .header(CONTENT_TYPE, json_mime_type.to_string())
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
                 client.request(request.unwrap()).await
-                
+
             };
 
             match req_result {
                 Err(err) => {
                     if let client::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep(d).await;
                         continue;
                     }
                     dlg.finished(false);
@@ -561,7 +600,7 @@ where
                         let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
                         if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
-                            sleep(d);
+                            sleep(d).await;
                             continue;
                         }
 
@@ -614,7 +653,8 @@ where
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.````
     ///
     /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MethodDecodeIntegrityTokenCall<'a, S> {
@@ -650,25 +690,36 @@ where
 
     /// Identifies the authorization scope for the method you are building.
     ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::Full`.
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::Full`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
     ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, St>(mut self, scope: T) -> MethodDecodeIntegrityTokenCall<'a, S>
-                                                        where T: Into<Option<St>>,
-                                                              St: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
+    pub fn add_scope<St>(mut self, scope: St) -> MethodDecodeIntegrityTokenCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> MethodDecodeIntegrityTokenCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> MethodDecodeIntegrityTokenCall<'a, S> {
+        self._scopes.clear();
         self
     }
 }

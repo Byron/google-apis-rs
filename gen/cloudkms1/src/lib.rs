@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/generator/templates/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Cloud KMS* crate version *4.0.1+20220225*, where *20220225* is the exact revision of the *cloudkms:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v4.0.1*.
+//! This documentation was generated from *Cloud KMS* crate version *5.0.2-beta-1+20230106*, where *20230106* is the exact revision of the *cloudkms:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.2-beta-1*.
 //! 
 //! Everything else about the *Cloud KMS* *v1* API can be found at the
 //! [official documentation site](https://cloud.google.com/kms/).
@@ -12,7 +12,7 @@
 //! Handle the following *Resources* with ease from the central [hub](CloudKMS) ... 
 //! 
 //! * projects
-//!  * [*locations ekm connections create*](api::ProjectLocationEkmConnectionCreateCall), [*locations ekm connections get*](api::ProjectLocationEkmConnectionGetCall), [*locations ekm connections get iam policy*](api::ProjectLocationEkmConnectionGetIamPolicyCall), [*locations ekm connections list*](api::ProjectLocationEkmConnectionListCall), [*locations ekm connections patch*](api::ProjectLocationEkmConnectionPatchCall), [*locations ekm connections set iam policy*](api::ProjectLocationEkmConnectionSetIamPolicyCall), [*locations ekm connections test iam permissions*](api::ProjectLocationEkmConnectionTestIamPermissionCall), [*locations generate random bytes*](api::ProjectLocationGenerateRandomByteCall), [*locations get*](api::ProjectLocationGetCall), [*locations key rings create*](api::ProjectLocationKeyRingCreateCall), [*locations key rings crypto keys create*](api::ProjectLocationKeyRingCryptoKeyCreateCall), [*locations key rings crypto keys crypto key versions asymmetric decrypt*](api::ProjectLocationKeyRingCryptoKeyCryptoKeyVersionAsymmetricDecryptCall), [*locations key rings crypto keys crypto key versions asymmetric sign*](api::ProjectLocationKeyRingCryptoKeyCryptoKeyVersionAsymmetricSignCall), [*locations key rings crypto keys crypto key versions create*](api::ProjectLocationKeyRingCryptoKeyCryptoKeyVersionCreateCall), [*locations key rings crypto keys crypto key versions destroy*](api::ProjectLocationKeyRingCryptoKeyCryptoKeyVersionDestroyCall), [*locations key rings crypto keys crypto key versions get*](api::ProjectLocationKeyRingCryptoKeyCryptoKeyVersionGetCall), [*locations key rings crypto keys crypto key versions get public key*](api::ProjectLocationKeyRingCryptoKeyCryptoKeyVersionGetPublicKeyCall), [*locations key rings crypto keys crypto key versions import*](api::ProjectLocationKeyRingCryptoKeyCryptoKeyVersionImportCall), [*locations key rings crypto keys crypto key versions list*](api::ProjectLocationKeyRingCryptoKeyCryptoKeyVersionListCall), [*locations key rings crypto keys crypto key versions mac sign*](api::ProjectLocationKeyRingCryptoKeyCryptoKeyVersionMacSignCall), [*locations key rings crypto keys crypto key versions mac verify*](api::ProjectLocationKeyRingCryptoKeyCryptoKeyVersionMacVerifyCall), [*locations key rings crypto keys crypto key versions patch*](api::ProjectLocationKeyRingCryptoKeyCryptoKeyVersionPatchCall), [*locations key rings crypto keys crypto key versions restore*](api::ProjectLocationKeyRingCryptoKeyCryptoKeyVersionRestoreCall), [*locations key rings crypto keys decrypt*](api::ProjectLocationKeyRingCryptoKeyDecryptCall), [*locations key rings crypto keys encrypt*](api::ProjectLocationKeyRingCryptoKeyEncryptCall), [*locations key rings crypto keys get*](api::ProjectLocationKeyRingCryptoKeyGetCall), [*locations key rings crypto keys get iam policy*](api::ProjectLocationKeyRingCryptoKeyGetIamPolicyCall), [*locations key rings crypto keys list*](api::ProjectLocationKeyRingCryptoKeyListCall), [*locations key rings crypto keys patch*](api::ProjectLocationKeyRingCryptoKeyPatchCall), [*locations key rings crypto keys set iam policy*](api::ProjectLocationKeyRingCryptoKeySetIamPolicyCall), [*locations key rings crypto keys test iam permissions*](api::ProjectLocationKeyRingCryptoKeyTestIamPermissionCall), [*locations key rings crypto keys update primary version*](api::ProjectLocationKeyRingCryptoKeyUpdatePrimaryVersionCall), [*locations key rings get*](api::ProjectLocationKeyRingGetCall), [*locations key rings get iam policy*](api::ProjectLocationKeyRingGetIamPolicyCall), [*locations key rings import jobs create*](api::ProjectLocationKeyRingImportJobCreateCall), [*locations key rings import jobs get*](api::ProjectLocationKeyRingImportJobGetCall), [*locations key rings import jobs get iam policy*](api::ProjectLocationKeyRingImportJobGetIamPolicyCall), [*locations key rings import jobs list*](api::ProjectLocationKeyRingImportJobListCall), [*locations key rings import jobs set iam policy*](api::ProjectLocationKeyRingImportJobSetIamPolicyCall), [*locations key rings import jobs test iam permissions*](api::ProjectLocationKeyRingImportJobTestIamPermissionCall), [*locations key rings list*](api::ProjectLocationKeyRingListCall), [*locations key rings set iam policy*](api::ProjectLocationKeyRingSetIamPolicyCall), [*locations key rings test iam permissions*](api::ProjectLocationKeyRingTestIamPermissionCall) and [*locations list*](api::ProjectLocationListCall)
+//!  * [*locations ekm config get iam policy*](api::ProjectLocationEkmConfigGetIamPolicyCall), [*locations ekm config set iam policy*](api::ProjectLocationEkmConfigSetIamPolicyCall), [*locations ekm config test iam permissions*](api::ProjectLocationEkmConfigTestIamPermissionCall), [*locations ekm connections create*](api::ProjectLocationEkmConnectionCreateCall), [*locations ekm connections get*](api::ProjectLocationEkmConnectionGetCall), [*locations ekm connections get iam policy*](api::ProjectLocationEkmConnectionGetIamPolicyCall), [*locations ekm connections list*](api::ProjectLocationEkmConnectionListCall), [*locations ekm connections patch*](api::ProjectLocationEkmConnectionPatchCall), [*locations ekm connections set iam policy*](api::ProjectLocationEkmConnectionSetIamPolicyCall), [*locations ekm connections test iam permissions*](api::ProjectLocationEkmConnectionTestIamPermissionCall), [*locations generate random bytes*](api::ProjectLocationGenerateRandomByteCall), [*locations get*](api::ProjectLocationGetCall), [*locations key rings create*](api::ProjectLocationKeyRingCreateCall), [*locations key rings crypto keys create*](api::ProjectLocationKeyRingCryptoKeyCreateCall), [*locations key rings crypto keys crypto key versions asymmetric decrypt*](api::ProjectLocationKeyRingCryptoKeyCryptoKeyVersionAsymmetricDecryptCall), [*locations key rings crypto keys crypto key versions asymmetric sign*](api::ProjectLocationKeyRingCryptoKeyCryptoKeyVersionAsymmetricSignCall), [*locations key rings crypto keys crypto key versions create*](api::ProjectLocationKeyRingCryptoKeyCryptoKeyVersionCreateCall), [*locations key rings crypto keys crypto key versions destroy*](api::ProjectLocationKeyRingCryptoKeyCryptoKeyVersionDestroyCall), [*locations key rings crypto keys crypto key versions get*](api::ProjectLocationKeyRingCryptoKeyCryptoKeyVersionGetCall), [*locations key rings crypto keys crypto key versions get public key*](api::ProjectLocationKeyRingCryptoKeyCryptoKeyVersionGetPublicKeyCall), [*locations key rings crypto keys crypto key versions import*](api::ProjectLocationKeyRingCryptoKeyCryptoKeyVersionImportCall), [*locations key rings crypto keys crypto key versions list*](api::ProjectLocationKeyRingCryptoKeyCryptoKeyVersionListCall), [*locations key rings crypto keys crypto key versions mac sign*](api::ProjectLocationKeyRingCryptoKeyCryptoKeyVersionMacSignCall), [*locations key rings crypto keys crypto key versions mac verify*](api::ProjectLocationKeyRingCryptoKeyCryptoKeyVersionMacVerifyCall), [*locations key rings crypto keys crypto key versions patch*](api::ProjectLocationKeyRingCryptoKeyCryptoKeyVersionPatchCall), [*locations key rings crypto keys crypto key versions restore*](api::ProjectLocationKeyRingCryptoKeyCryptoKeyVersionRestoreCall), [*locations key rings crypto keys decrypt*](api::ProjectLocationKeyRingCryptoKeyDecryptCall), [*locations key rings crypto keys encrypt*](api::ProjectLocationKeyRingCryptoKeyEncryptCall), [*locations key rings crypto keys get*](api::ProjectLocationKeyRingCryptoKeyGetCall), [*locations key rings crypto keys get iam policy*](api::ProjectLocationKeyRingCryptoKeyGetIamPolicyCall), [*locations key rings crypto keys list*](api::ProjectLocationKeyRingCryptoKeyListCall), [*locations key rings crypto keys patch*](api::ProjectLocationKeyRingCryptoKeyPatchCall), [*locations key rings crypto keys set iam policy*](api::ProjectLocationKeyRingCryptoKeySetIamPolicyCall), [*locations key rings crypto keys test iam permissions*](api::ProjectLocationKeyRingCryptoKeyTestIamPermissionCall), [*locations key rings crypto keys update primary version*](api::ProjectLocationKeyRingCryptoKeyUpdatePrimaryVersionCall), [*locations key rings get*](api::ProjectLocationKeyRingGetCall), [*locations key rings get iam policy*](api::ProjectLocationKeyRingGetIamPolicyCall), [*locations key rings import jobs create*](api::ProjectLocationKeyRingImportJobCreateCall), [*locations key rings import jobs get*](api::ProjectLocationKeyRingImportJobGetCall), [*locations key rings import jobs get iam policy*](api::ProjectLocationKeyRingImportJobGetIamPolicyCall), [*locations key rings import jobs list*](api::ProjectLocationKeyRingImportJobListCall), [*locations key rings import jobs set iam policy*](api::ProjectLocationKeyRingImportJobSetIamPolicyCall), [*locations key rings import jobs test iam permissions*](api::ProjectLocationKeyRingImportJobTestIamPermissionCall), [*locations key rings list*](api::ProjectLocationKeyRingListCall), [*locations key rings set iam policy*](api::ProjectLocationKeyRingSetIamPolicyCall), [*locations key rings test iam permissions*](api::ProjectLocationKeyRingTestIamPermissionCall) and [*locations list*](api::ProjectLocationListCall)
 //! 
 //! 
 //! 
@@ -47,6 +47,8 @@
 //! Or specifically ...
 //! 
 //! ```ignore
+//! let r = hub.projects().locations_ekm_config_get_iam_policy(...).doit().await
+//! let r = hub.projects().locations_ekm_config_set_iam_policy(...).doit().await
 //! let r = hub.projects().locations_ekm_connections_get_iam_policy(...).doit().await
 //! let r = hub.projects().locations_ekm_connections_set_iam_policy(...).doit().await
 //! let r = hub.projects().locations_key_rings_crypto_keys_get_iam_policy(...).doit().await
@@ -84,7 +86,7 @@
 //! use cloudkms1::{Result, Error};
 //! # async fn dox() {
 //! use std::default::Default;
-//! use cloudkms1::{CloudKMS, oauth2, hyper, hyper_rustls};
+//! use cloudkms1::{CloudKMS, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 //! 
 //! // Get an ApplicationSecret instance by some means. It contains the `client_id` and 
 //! // `client_secret`, among other things.
@@ -102,7 +104,7 @@
 //! // You can configure optional parameters by calling the respective setters at will, and
 //! // execute the final call using `doit()`.
 //! // Values shown here are possibly random and not representative !
-//! let result = hub.projects().locations_ekm_connections_get_iam_policy("resource")
+//! let result = hub.projects().locations_ekm_config_get_iam_policy("resource")
 //!              .options_requested_policy_version(-55)
 //!              .doit().await;
 //! 
@@ -189,22 +191,17 @@
 // This file was generated automatically from 'src/generator/templates/api/lib.rs.mako'
 // DO NOT EDIT !
 
-#[macro_use]
-extern crate serde_derive;
-
 // Re-export the hyper and hyper_rustls crate, they are required to build the hub
-pub extern crate hyper;
-pub extern crate hyper_rustls;
-extern crate serde;
-extern crate serde_json;
-// Re-export the yup_oauth2 crate, that is required to call some methods of the hub and the client
-pub extern crate yup_oauth2 as oauth2;
-extern crate mime;
-extern crate url;
-
+pub use hyper;
+pub use hyper_rustls;
+pub extern crate google_apis_common as client;
+pub use client::chrono;
 pub mod api;
-pub mod client;
 
 // Re-export the hub type and some basic client structs
 pub use api::CloudKMS;
-pub use client::{Result, Error, Delegate};
+pub use client::{Result, Error, Delegate, FieldMask};
+
+// Re-export the yup_oauth2 crate, that is required to call some methods of the hub and the client
+#[cfg(feature = "yup-oauth2")]
+pub use client::oauth2;

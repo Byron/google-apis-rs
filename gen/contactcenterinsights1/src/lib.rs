@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/generator/templates/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Contactcenterinsights* crate version *4.0.1+20220227*, where *20220227* is the exact revision of the *contactcenterinsights:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v4.0.1*.
+//! This documentation was generated from *Contactcenterinsights* crate version *5.0.2-beta-1+20230115*, where *20230115* is the exact revision of the *contactcenterinsights:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.2-beta-1*.
 //! 
 //! Everything else about the *Contactcenterinsights* *v1* API can be found at the
 //! [official documentation site](https://cloud.google.com/contact-center/insights/docs).
@@ -12,7 +12,7 @@
 //! Handle the following *Resources* with ease from the central [hub](Contactcenterinsights) ... 
 //! 
 //! * projects
-//!  * [*locations conversations analyses create*](api::ProjectLocationConversationAnalyseCreateCall), [*locations conversations analyses delete*](api::ProjectLocationConversationAnalyseDeleteCall), [*locations conversations analyses get*](api::ProjectLocationConversationAnalyseGetCall), [*locations conversations analyses list*](api::ProjectLocationConversationAnalyseListCall), [*locations conversations calculate stats*](api::ProjectLocationConversationCalculateStatCall), [*locations conversations create*](api::ProjectLocationConversationCreateCall), [*locations conversations delete*](api::ProjectLocationConversationDeleteCall), [*locations conversations get*](api::ProjectLocationConversationGetCall), [*locations conversations list*](api::ProjectLocationConversationListCall), [*locations conversations patch*](api::ProjectLocationConversationPatchCall), [*locations get settings*](api::ProjectLocationGetSettingCall), [*locations insightsdata export*](api::ProjectLocationInsightsdataExportCall), [*locations issue models calculate issue model stats*](api::ProjectLocationIssueModelCalculateIssueModelStatCall), [*locations issue models create*](api::ProjectLocationIssueModelCreateCall), [*locations issue models delete*](api::ProjectLocationIssueModelDeleteCall), [*locations issue models deploy*](api::ProjectLocationIssueModelDeployCall), [*locations issue models get*](api::ProjectLocationIssueModelGetCall), [*locations issue models issues get*](api::ProjectLocationIssueModelIssueGetCall), [*locations issue models issues list*](api::ProjectLocationIssueModelIssueListCall), [*locations issue models issues patch*](api::ProjectLocationIssueModelIssuePatchCall), [*locations issue models list*](api::ProjectLocationIssueModelListCall), [*locations issue models patch*](api::ProjectLocationIssueModelPatchCall), [*locations issue models undeploy*](api::ProjectLocationIssueModelUndeployCall), [*locations operations cancel*](api::ProjectLocationOperationCancelCall), [*locations operations get*](api::ProjectLocationOperationGetCall), [*locations operations list*](api::ProjectLocationOperationListCall), [*locations phrase matchers create*](api::ProjectLocationPhraseMatcherCreateCall), [*locations phrase matchers delete*](api::ProjectLocationPhraseMatcherDeleteCall), [*locations phrase matchers get*](api::ProjectLocationPhraseMatcherGetCall), [*locations phrase matchers list*](api::ProjectLocationPhraseMatcherListCall), [*locations phrase matchers patch*](api::ProjectLocationPhraseMatcherPatchCall), [*locations update settings*](api::ProjectLocationUpdateSettingCall), [*locations views create*](api::ProjectLocationViewCreateCall), [*locations views delete*](api::ProjectLocationViewDeleteCall), [*locations views get*](api::ProjectLocationViewGetCall), [*locations views list*](api::ProjectLocationViewListCall) and [*locations views patch*](api::ProjectLocationViewPatchCall)
+//!  * [*locations conversations analyses create*](api::ProjectLocationConversationAnalysisCreateCall), [*locations conversations analyses delete*](api::ProjectLocationConversationAnalysisDeleteCall), [*locations conversations analyses get*](api::ProjectLocationConversationAnalysisGetCall), [*locations conversations analyses list*](api::ProjectLocationConversationAnalysisListCall), [*locations conversations bulk analyze*](api::ProjectLocationConversationBulkAnalyzeCall), [*locations conversations calculate stats*](api::ProjectLocationConversationCalculateStatCall), [*locations conversations create*](api::ProjectLocationConversationCreateCall), [*locations conversations delete*](api::ProjectLocationConversationDeleteCall), [*locations conversations get*](api::ProjectLocationConversationGetCall), [*locations conversations ingest*](api::ProjectLocationConversationIngestCall), [*locations conversations list*](api::ProjectLocationConversationListCall), [*locations conversations patch*](api::ProjectLocationConversationPatchCall), [*locations get settings*](api::ProjectLocationGetSettingCall), [*locations insightsdata export*](api::ProjectLocationInsightsdataExportCall), [*locations issue models calculate issue model stats*](api::ProjectLocationIssueModelCalculateIssueModelStatCall), [*locations issue models create*](api::ProjectLocationIssueModelCreateCall), [*locations issue models delete*](api::ProjectLocationIssueModelDeleteCall), [*locations issue models deploy*](api::ProjectLocationIssueModelDeployCall), [*locations issue models get*](api::ProjectLocationIssueModelGetCall), [*locations issue models issues delete*](api::ProjectLocationIssueModelIssueDeleteCall), [*locations issue models issues get*](api::ProjectLocationIssueModelIssueGetCall), [*locations issue models issues list*](api::ProjectLocationIssueModelIssueListCall), [*locations issue models issues patch*](api::ProjectLocationIssueModelIssuePatchCall), [*locations issue models list*](api::ProjectLocationIssueModelListCall), [*locations issue models patch*](api::ProjectLocationIssueModelPatchCall), [*locations issue models undeploy*](api::ProjectLocationIssueModelUndeployCall), [*locations operations cancel*](api::ProjectLocationOperationCancelCall), [*locations operations get*](api::ProjectLocationOperationGetCall), [*locations operations list*](api::ProjectLocationOperationListCall), [*locations phrase matchers create*](api::ProjectLocationPhraseMatcherCreateCall), [*locations phrase matchers delete*](api::ProjectLocationPhraseMatcherDeleteCall), [*locations phrase matchers get*](api::ProjectLocationPhraseMatcherGetCall), [*locations phrase matchers list*](api::ProjectLocationPhraseMatcherListCall), [*locations phrase matchers patch*](api::ProjectLocationPhraseMatcherPatchCall), [*locations update settings*](api::ProjectLocationUpdateSettingCall), [*locations views create*](api::ProjectLocationViewCreateCall), [*locations views delete*](api::ProjectLocationViewDeleteCall), [*locations views get*](api::ProjectLocationViewGetCall), [*locations views list*](api::ProjectLocationViewListCall) and [*locations views patch*](api::ProjectLocationViewPatchCall)
 //! 
 //! 
 //! 
@@ -48,6 +48,8 @@
 //! 
 //! ```ignore
 //! let r = hub.projects().locations_conversations_analyses_create(...).doit().await
+//! let r = hub.projects().locations_conversations_bulk_analyze(...).doit().await
+//! let r = hub.projects().locations_conversations_ingest(...).doit().await
 //! let r = hub.projects().locations_insightsdata_export(...).doit().await
 //! let r = hub.projects().locations_issue_models_create(...).doit().await
 //! let r = hub.projects().locations_issue_models_delete(...).doit().await
@@ -84,7 +86,7 @@
 //! use contactcenterinsights1::{Result, Error};
 //! # async fn dox() {
 //! use std::default::Default;
-//! use contactcenterinsights1::{Contactcenterinsights, oauth2, hyper, hyper_rustls};
+//! use contactcenterinsights1::{Contactcenterinsights, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 //! 
 //! // Get an ApplicationSecret instance by some means. It contains the `client_id` and 
 //! // `client_secret`, among other things.
@@ -193,22 +195,17 @@
 // This file was generated automatically from 'src/generator/templates/api/lib.rs.mako'
 // DO NOT EDIT !
 
-#[macro_use]
-extern crate serde_derive;
-
 // Re-export the hyper and hyper_rustls crate, they are required to build the hub
-pub extern crate hyper;
-pub extern crate hyper_rustls;
-extern crate serde;
-extern crate serde_json;
-// Re-export the yup_oauth2 crate, that is required to call some methods of the hub and the client
-pub extern crate yup_oauth2 as oauth2;
-extern crate mime;
-extern crate url;
-
+pub use hyper;
+pub use hyper_rustls;
+pub extern crate google_apis_common as client;
+pub use client::chrono;
 pub mod api;
-pub mod client;
 
 // Re-export the hub type and some basic client structs
 pub use api::Contactcenterinsights;
-pub use client::{Result, Error, Delegate};
+pub use client::{Result, Error, Delegate, FieldMask};
+
+// Re-export the yup_oauth2 crate, that is required to call some methods of the hub and the client
+#[cfg(feature = "yup-oauth2")]
+pub use client::oauth2;

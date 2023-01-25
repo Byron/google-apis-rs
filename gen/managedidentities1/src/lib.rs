@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/generator/templates/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Managed Service for Microsoft Active Directory Consumer API* crate version *4.0.1+20220216*, where *20220216* is the exact revision of the *managedidentities:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v4.0.1*.
+//! This documentation was generated from *Managed Service for Microsoft Active Directory Consumer API* crate version *5.0.2-beta-1+20221227*, where *20221227* is the exact revision of the *managedidentities:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.2-beta-1*.
 //! 
 //! Everything else about the *Managed Service for Microsoft Active Directory Consumer API* *v1* API can be found at the
 //! [official documentation site](https://cloud.google.com/managed-microsoft-ad/).
@@ -12,7 +12,7 @@
 //! Handle the following *Resources* with ease from the central [hub](ManagedServiceForMicrosoftActiveDirectoryConsumerAPI) ... 
 //! 
 //! * projects
-//!  * [*locations get*](api::ProjectLocationGetCall), [*locations global domains attach trust*](api::ProjectLocationGlobalDomainAttachTrustCall), [*locations global domains backups create*](api::ProjectLocationGlobalDomainBackupCreateCall), [*locations global domains backups delete*](api::ProjectLocationGlobalDomainBackupDeleteCall), [*locations global domains backups get*](api::ProjectLocationGlobalDomainBackupGetCall), [*locations global domains backups get iam policy*](api::ProjectLocationGlobalDomainBackupGetIamPolicyCall), [*locations global domains backups list*](api::ProjectLocationGlobalDomainBackupListCall), [*locations global domains backups patch*](api::ProjectLocationGlobalDomainBackupPatchCall), [*locations global domains backups set iam policy*](api::ProjectLocationGlobalDomainBackupSetIamPolicyCall), [*locations global domains backups test iam permissions*](api::ProjectLocationGlobalDomainBackupTestIamPermissionCall), [*locations global domains create*](api::ProjectLocationGlobalDomainCreateCall), [*locations global domains delete*](api::ProjectLocationGlobalDomainDeleteCall), [*locations global domains detach trust*](api::ProjectLocationGlobalDomainDetachTrustCall), [*locations global domains get*](api::ProjectLocationGlobalDomainGetCall), [*locations global domains get iam policy*](api::ProjectLocationGlobalDomainGetIamPolicyCall), [*locations global domains get ldapssettings*](api::ProjectLocationGlobalDomainGetLdapssettingCall), [*locations global domains list*](api::ProjectLocationGlobalDomainListCall), [*locations global domains patch*](api::ProjectLocationGlobalDomainPatchCall), [*locations global domains reconfigure trust*](api::ProjectLocationGlobalDomainReconfigureTrustCall), [*locations global domains reset admin password*](api::ProjectLocationGlobalDomainResetAdminPasswordCall), [*locations global domains restore*](api::ProjectLocationGlobalDomainRestoreCall), [*locations global domains set iam policy*](api::ProjectLocationGlobalDomainSetIamPolicyCall), [*locations global domains sql integrations get*](api::ProjectLocationGlobalDomainSqlIntegrationGetCall), [*locations global domains sql integrations list*](api::ProjectLocationGlobalDomainSqlIntegrationListCall), [*locations global domains test iam permissions*](api::ProjectLocationGlobalDomainTestIamPermissionCall), [*locations global domains update ldapssettings*](api::ProjectLocationGlobalDomainUpdateLdapssettingCall), [*locations global domains validate trust*](api::ProjectLocationGlobalDomainValidateTrustCall), [*locations global operations cancel*](api::ProjectLocationGlobalOperationCancelCall), [*locations global operations delete*](api::ProjectLocationGlobalOperationDeleteCall), [*locations global operations get*](api::ProjectLocationGlobalOperationGetCall), [*locations global operations list*](api::ProjectLocationGlobalOperationListCall), [*locations global peerings create*](api::ProjectLocationGlobalPeeringCreateCall), [*locations global peerings delete*](api::ProjectLocationGlobalPeeringDeleteCall), [*locations global peerings get*](api::ProjectLocationGlobalPeeringGetCall), [*locations global peerings get iam policy*](api::ProjectLocationGlobalPeeringGetIamPolicyCall), [*locations global peerings list*](api::ProjectLocationGlobalPeeringListCall), [*locations global peerings patch*](api::ProjectLocationGlobalPeeringPatchCall), [*locations global peerings set iam policy*](api::ProjectLocationGlobalPeeringSetIamPolicyCall), [*locations global peerings test iam permissions*](api::ProjectLocationGlobalPeeringTestIamPermissionCall) and [*locations list*](api::ProjectLocationListCall)
+//!  * [*locations get*](api::ProjectLocationGetCall), [*locations global domains attach trust*](api::ProjectLocationGlobalDomainAttachTrustCall), [*locations global domains backups create*](api::ProjectLocationGlobalDomainBackupCreateCall), [*locations global domains backups delete*](api::ProjectLocationGlobalDomainBackupDeleteCall), [*locations global domains backups get*](api::ProjectLocationGlobalDomainBackupGetCall), [*locations global domains backups get iam policy*](api::ProjectLocationGlobalDomainBackupGetIamPolicyCall), [*locations global domains backups list*](api::ProjectLocationGlobalDomainBackupListCall), [*locations global domains backups patch*](api::ProjectLocationGlobalDomainBackupPatchCall), [*locations global domains backups set iam policy*](api::ProjectLocationGlobalDomainBackupSetIamPolicyCall), [*locations global domains backups test iam permissions*](api::ProjectLocationGlobalDomainBackupTestIamPermissionCall), [*locations global domains create*](api::ProjectLocationGlobalDomainCreateCall), [*locations global domains delete*](api::ProjectLocationGlobalDomainDeleteCall), [*locations global domains detach trust*](api::ProjectLocationGlobalDomainDetachTrustCall), [*locations global domains extend schema*](api::ProjectLocationGlobalDomainExtendSchemaCall), [*locations global domains get*](api::ProjectLocationGlobalDomainGetCall), [*locations global domains get iam policy*](api::ProjectLocationGlobalDomainGetIamPolicyCall), [*locations global domains get ldapssettings*](api::ProjectLocationGlobalDomainGetLdapssettingCall), [*locations global domains list*](api::ProjectLocationGlobalDomainListCall), [*locations global domains patch*](api::ProjectLocationGlobalDomainPatchCall), [*locations global domains reconfigure trust*](api::ProjectLocationGlobalDomainReconfigureTrustCall), [*locations global domains reset admin password*](api::ProjectLocationGlobalDomainResetAdminPasswordCall), [*locations global domains restore*](api::ProjectLocationGlobalDomainRestoreCall), [*locations global domains set iam policy*](api::ProjectLocationGlobalDomainSetIamPolicyCall), [*locations global domains sql integrations get*](api::ProjectLocationGlobalDomainSqlIntegrationGetCall), [*locations global domains sql integrations list*](api::ProjectLocationGlobalDomainSqlIntegrationListCall), [*locations global domains test iam permissions*](api::ProjectLocationGlobalDomainTestIamPermissionCall), [*locations global domains update ldapssettings*](api::ProjectLocationGlobalDomainUpdateLdapssettingCall), [*locations global domains validate trust*](api::ProjectLocationGlobalDomainValidateTrustCall), [*locations global operations cancel*](api::ProjectLocationGlobalOperationCancelCall), [*locations global operations delete*](api::ProjectLocationGlobalOperationDeleteCall), [*locations global operations get*](api::ProjectLocationGlobalOperationGetCall), [*locations global operations list*](api::ProjectLocationGlobalOperationListCall), [*locations global peerings create*](api::ProjectLocationGlobalPeeringCreateCall), [*locations global peerings delete*](api::ProjectLocationGlobalPeeringDeleteCall), [*locations global peerings get*](api::ProjectLocationGlobalPeeringGetCall), [*locations global peerings get iam policy*](api::ProjectLocationGlobalPeeringGetIamPolicyCall), [*locations global peerings list*](api::ProjectLocationGlobalPeeringListCall), [*locations global peerings patch*](api::ProjectLocationGlobalPeeringPatchCall), [*locations global peerings set iam policy*](api::ProjectLocationGlobalPeeringSetIamPolicyCall), [*locations global peerings test iam permissions*](api::ProjectLocationGlobalPeeringTestIamPermissionCall) and [*locations list*](api::ProjectLocationListCall)
 //! 
 //! 
 //! 
@@ -54,6 +54,7 @@
 //! let r = hub.projects().locations_global_domains_create(...).doit().await
 //! let r = hub.projects().locations_global_domains_delete(...).doit().await
 //! let r = hub.projects().locations_global_domains_detach_trust(...).doit().await
+//! let r = hub.projects().locations_global_domains_extend_schema(...).doit().await
 //! let r = hub.projects().locations_global_domains_patch(...).doit().await
 //! let r = hub.projects().locations_global_domains_reconfigure_trust(...).doit().await
 //! let r = hub.projects().locations_global_domains_restore(...).doit().await
@@ -93,7 +94,7 @@
 //! use managedidentities1::{Result, Error};
 //! # async fn dox() {
 //! use std::default::Default;
-//! use managedidentities1::{ManagedServiceForMicrosoftActiveDirectoryConsumerAPI, oauth2, hyper, hyper_rustls};
+//! use managedidentities1::{ManagedServiceForMicrosoftActiveDirectoryConsumerAPI, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 //! 
 //! // Get an ApplicationSecret instance by some means. It contains the `client_id` and 
 //! // `client_secret`, among other things.
@@ -203,22 +204,17 @@
 // This file was generated automatically from 'src/generator/templates/api/lib.rs.mako'
 // DO NOT EDIT !
 
-#[macro_use]
-extern crate serde_derive;
-
 // Re-export the hyper and hyper_rustls crate, they are required to build the hub
-pub extern crate hyper;
-pub extern crate hyper_rustls;
-extern crate serde;
-extern crate serde_json;
-// Re-export the yup_oauth2 crate, that is required to call some methods of the hub and the client
-pub extern crate yup_oauth2 as oauth2;
-extern crate mime;
-extern crate url;
-
+pub use hyper;
+pub use hyper_rustls;
+pub extern crate google_apis_common as client;
+pub use client::chrono;
 pub mod api;
-pub mod client;
 
 // Re-export the hub type and some basic client structs
 pub use api::ManagedServiceForMicrosoftActiveDirectoryConsumerAPI;
-pub use client::{Result, Error, Delegate};
+pub use client::{Result, Error, Delegate, FieldMask};
+
+// Re-export the yup_oauth2 crate, that is required to call some methods of the hub and the client
+#[cfg(feature = "yup-oauth2")]
+pub use client::oauth2;

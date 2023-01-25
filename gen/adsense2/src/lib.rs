@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/generator/templates/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *adsense* crate version *4.0.1+20220304*, where *20220304* is the exact revision of the *adsense:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v4.0.1*.
+//! This documentation was generated from *adsense* crate version *5.0.2-beta-1+20230124*, where *20230124* is the exact revision of the *adsense:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.2-beta-1*.
 //! 
 //! Everything else about the *adsense* *v2* API can be found at the
 //! [official documentation site](https://developers.google.com/adsense/management/).
@@ -12,7 +12,7 @@
 //! Handle the following *Resources* with ease from the central [hub](Adsense) ... 
 //! 
 //! * [accounts](api::Account)
-//!  * [*adclients adunits get*](api::AccountAdclientAdunitGetCall), [*adclients adunits get adcode*](api::AccountAdclientAdunitGetAdcodeCall), [*adclients adunits list*](api::AccountAdclientAdunitListCall), [*adclients adunits list linked custom channels*](api::AccountAdclientAdunitListLinkedCustomChannelCall), [*adclients customchannels get*](api::AccountAdclientCustomchannelGetCall), [*adclients customchannels list*](api::AccountAdclientCustomchannelListCall), [*adclients customchannels list linked ad units*](api::AccountAdclientCustomchannelListLinkedAdUnitCall), [*adclients get adcode*](api::AccountAdclientGetAdcodeCall), [*adclients list*](api::AccountAdclientListCall), [*adclients urlchannels list*](api::AccountAdclientUrlchannelListCall), [*alerts list*](api::AccountAlertListCall), [*get*](api::AccountGetCall), [*list*](api::AccountListCall), [*list child accounts*](api::AccountListChildAccountCall), [*payments list*](api::AccountPaymentListCall), [*reports generate*](api::AccountReportGenerateCall), [*reports generate csv*](api::AccountReportGenerateCsvCall), [*reports saved generate*](api::AccountReportSavedGenerateCall), [*reports saved generate csv*](api::AccountReportSavedGenerateCsvCall), [*reports saved list*](api::AccountReportSavedListCall), [*sites get*](api::AccountSiteGetCall) and [*sites list*](api::AccountSiteListCall)
+//!  * [*adclients adunits create*](api::AccountAdclientAdunitCreateCall), [*adclients adunits get*](api::AccountAdclientAdunitGetCall), [*adclients adunits get adcode*](api::AccountAdclientAdunitGetAdcodeCall), [*adclients adunits list*](api::AccountAdclientAdunitListCall), [*adclients adunits list linked custom channels*](api::AccountAdclientAdunitListLinkedCustomChannelCall), [*adclients adunits patch*](api::AccountAdclientAdunitPatchCall), [*adclients customchannels create*](api::AccountAdclientCustomchannelCreateCall), [*adclients customchannels delete*](api::AccountAdclientCustomchannelDeleteCall), [*adclients customchannels get*](api::AccountAdclientCustomchannelGetCall), [*adclients customchannels list*](api::AccountAdclientCustomchannelListCall), [*adclients customchannels list linked ad units*](api::AccountAdclientCustomchannelListLinkedAdUnitCall), [*adclients customchannels patch*](api::AccountAdclientCustomchannelPatchCall), [*adclients get*](api::AccountAdclientGetCall), [*adclients get adcode*](api::AccountAdclientGetAdcodeCall), [*adclients list*](api::AccountAdclientListCall), [*adclients urlchannels get*](api::AccountAdclientUrlchannelGetCall), [*adclients urlchannels list*](api::AccountAdclientUrlchannelListCall), [*alerts list*](api::AccountAlertListCall), [*get*](api::AccountGetCall), [*get ad blocking recovery tag*](api::AccountGetAdBlockingRecoveryTagCall), [*list*](api::AccountListCall), [*list child accounts*](api::AccountListChildAccountCall), [*payments list*](api::AccountPaymentListCall), [*reports generate*](api::AccountReportGenerateCall), [*reports generate csv*](api::AccountReportGenerateCsvCall), [*reports get saved*](api::AccountReportGetSavedCall), [*reports saved generate*](api::AccountReportSavedGenerateCall), [*reports saved generate csv*](api::AccountReportSavedGenerateCsvCall), [*reports saved list*](api::AccountReportSavedListCall), [*sites get*](api::AccountSiteGetCall) and [*sites list*](api::AccountSiteListCall)
 //! 
 //! 
 //! 
@@ -47,14 +47,21 @@
 //! Or specifically ...
 //! 
 //! ```ignore
+//! let r = hub.accounts().adclients_adunits_create(...).doit().await
 //! let r = hub.accounts().adclients_adunits_get(...).doit().await
 //! let r = hub.accounts().adclients_adunits_get_adcode(...).doit().await
 //! let r = hub.accounts().adclients_adunits_list(...).doit().await
 //! let r = hub.accounts().adclients_adunits_list_linked_custom_channels(...).doit().await
+//! let r = hub.accounts().adclients_adunits_patch(...).doit().await
+//! let r = hub.accounts().adclients_customchannels_create(...).doit().await
+//! let r = hub.accounts().adclients_customchannels_delete(...).doit().await
 //! let r = hub.accounts().adclients_customchannels_get(...).doit().await
 //! let r = hub.accounts().adclients_customchannels_list(...).doit().await
 //! let r = hub.accounts().adclients_customchannels_list_linked_ad_units(...).doit().await
+//! let r = hub.accounts().adclients_customchannels_patch(...).doit().await
+//! let r = hub.accounts().adclients_urlchannels_get(...).doit().await
 //! let r = hub.accounts().adclients_urlchannels_list(...).doit().await
+//! let r = hub.accounts().adclients_get(...).doit().await
 //! let r = hub.accounts().adclients_get_adcode(...).doit().await
 //! let r = hub.accounts().adclients_list(...).doit().await
 //! let r = hub.accounts().alerts_list(...).doit().await
@@ -64,9 +71,11 @@
 //! let r = hub.accounts().reports_saved_list(...).doit().await
 //! let r = hub.accounts().reports_generate(...).doit().await
 //! let r = hub.accounts().reports_generate_csv(...).doit().await
+//! let r = hub.accounts().reports_get_saved(...).doit().await
 //! let r = hub.accounts().sites_get(...).doit().await
 //! let r = hub.accounts().sites_list(...).doit().await
 //! let r = hub.accounts().get(...).doit().await
+//! let r = hub.accounts().get_ad_blocking_recovery_tag(...).doit().await
 //! let r = hub.accounts().list(...).doit().await
 //! let r = hub.accounts().list_child_accounts(...).doit().await
 //! ```
@@ -98,7 +107,7 @@
 //! use adsense2::{Result, Error};
 //! # async fn dox() {
 //! use std::default::Default;
-//! use adsense2::{Adsense, oauth2, hyper, hyper_rustls};
+//! use adsense2::{Adsense, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 //! 
 //! // Get an ApplicationSecret instance by some means. It contains the `client_id` and 
 //! // `client_secret`, among other things.
@@ -217,22 +226,17 @@
 // This file was generated automatically from 'src/generator/templates/api/lib.rs.mako'
 // DO NOT EDIT !
 
-#[macro_use]
-extern crate serde_derive;
-
 // Re-export the hyper and hyper_rustls crate, they are required to build the hub
-pub extern crate hyper;
-pub extern crate hyper_rustls;
-extern crate serde;
-extern crate serde_json;
-// Re-export the yup_oauth2 crate, that is required to call some methods of the hub and the client
-pub extern crate yup_oauth2 as oauth2;
-extern crate mime;
-extern crate url;
-
+pub use hyper;
+pub use hyper_rustls;
+pub extern crate google_apis_common as client;
+pub use client::chrono;
 pub mod api;
-pub mod client;
 
 // Re-export the hub type and some basic client structs
 pub use api::Adsense;
-pub use client::{Result, Error, Delegate};
+pub use client::{Result, Error, Delegate, FieldMask};
+
+// Re-export the yup_oauth2 crate, that is required to call some methods of the hub and the client
+#[cfg(feature = "yup-oauth2")]
+pub use client::oauth2;

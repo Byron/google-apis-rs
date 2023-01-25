@@ -5,38 +5,38 @@ DO NOT EDIT !
 -->
 The `google-fusiontables2` library allows access to all features of the *Google fusiontables* service.
 
-This documentation was generated from *fusiontables* crate version *4.0.1+20171117*, where *20171117* is the exact revision of the *fusiontables:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v4.0.1*.
+This documentation was generated from *fusiontables* crate version *5.0.2-beta-1+20171117*, where *20171117* is the exact revision of the *fusiontables:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.2-beta-1*.
 
 Everything else about the *fusiontables* *v2* API can be found at the
 [official documentation site](https://developers.google.com/fusiontables).
 # Features
 
-Handle the following *Resources* with ease from the central [hub](https://docs.rs/google-fusiontables2/4.0.1+20171117/google_fusiontables2/Fusiontables) ... 
+Handle the following *Resources* with ease from the central [hub](https://docs.rs/google-fusiontables2/5.0.2-beta-1+20171117/google_fusiontables2/Fusiontables) ... 
 
-* [column](https://docs.rs/google-fusiontables2/4.0.1+20171117/google_fusiontables2/api::Column)
- * [*delete*](https://docs.rs/google-fusiontables2/4.0.1+20171117/google_fusiontables2/api::ColumnDeleteCall), [*get*](https://docs.rs/google-fusiontables2/4.0.1+20171117/google_fusiontables2/api::ColumnGetCall), [*insert*](https://docs.rs/google-fusiontables2/4.0.1+20171117/google_fusiontables2/api::ColumnInsertCall), [*list*](https://docs.rs/google-fusiontables2/4.0.1+20171117/google_fusiontables2/api::ColumnListCall), [*patch*](https://docs.rs/google-fusiontables2/4.0.1+20171117/google_fusiontables2/api::ColumnPatchCall) and [*update*](https://docs.rs/google-fusiontables2/4.0.1+20171117/google_fusiontables2/api::ColumnUpdateCall)
+* [column](https://docs.rs/google-fusiontables2/5.0.2-beta-1+20171117/google_fusiontables2/api::Column)
+ * [*delete*](https://docs.rs/google-fusiontables2/5.0.2-beta-1+20171117/google_fusiontables2/api::ColumnDeleteCall), [*get*](https://docs.rs/google-fusiontables2/5.0.2-beta-1+20171117/google_fusiontables2/api::ColumnGetCall), [*insert*](https://docs.rs/google-fusiontables2/5.0.2-beta-1+20171117/google_fusiontables2/api::ColumnInsertCall), [*list*](https://docs.rs/google-fusiontables2/5.0.2-beta-1+20171117/google_fusiontables2/api::ColumnListCall), [*patch*](https://docs.rs/google-fusiontables2/5.0.2-beta-1+20171117/google_fusiontables2/api::ColumnPatchCall) and [*update*](https://docs.rs/google-fusiontables2/5.0.2-beta-1+20171117/google_fusiontables2/api::ColumnUpdateCall)
 * query
- * [*sql*](https://docs.rs/google-fusiontables2/4.0.1+20171117/google_fusiontables2/api::QuerySqlCall) and [*sql get*](https://docs.rs/google-fusiontables2/4.0.1+20171117/google_fusiontables2/api::QuerySqlGetCall)
+ * [*sql*](https://docs.rs/google-fusiontables2/5.0.2-beta-1+20171117/google_fusiontables2/api::QuerySqlCall) and [*sql get*](https://docs.rs/google-fusiontables2/5.0.2-beta-1+20171117/google_fusiontables2/api::QuerySqlGetCall)
 * style
- * [*delete*](https://docs.rs/google-fusiontables2/4.0.1+20171117/google_fusiontables2/api::StyleDeleteCall), [*get*](https://docs.rs/google-fusiontables2/4.0.1+20171117/google_fusiontables2/api::StyleGetCall), [*insert*](https://docs.rs/google-fusiontables2/4.0.1+20171117/google_fusiontables2/api::StyleInsertCall), [*list*](https://docs.rs/google-fusiontables2/4.0.1+20171117/google_fusiontables2/api::StyleListCall), [*patch*](https://docs.rs/google-fusiontables2/4.0.1+20171117/google_fusiontables2/api::StylePatchCall) and [*update*](https://docs.rs/google-fusiontables2/4.0.1+20171117/google_fusiontables2/api::StyleUpdateCall)
-* [table](https://docs.rs/google-fusiontables2/4.0.1+20171117/google_fusiontables2/api::Table)
- * [*copy*](https://docs.rs/google-fusiontables2/4.0.1+20171117/google_fusiontables2/api::TableCopyCall), [*delete*](https://docs.rs/google-fusiontables2/4.0.1+20171117/google_fusiontables2/api::TableDeleteCall), [*get*](https://docs.rs/google-fusiontables2/4.0.1+20171117/google_fusiontables2/api::TableGetCall), [*import rows*](https://docs.rs/google-fusiontables2/4.0.1+20171117/google_fusiontables2/api::TableImportRowCall), [*import table*](https://docs.rs/google-fusiontables2/4.0.1+20171117/google_fusiontables2/api::TableImportTableCall), [*insert*](https://docs.rs/google-fusiontables2/4.0.1+20171117/google_fusiontables2/api::TableInsertCall), [*list*](https://docs.rs/google-fusiontables2/4.0.1+20171117/google_fusiontables2/api::TableListCall), [*patch*](https://docs.rs/google-fusiontables2/4.0.1+20171117/google_fusiontables2/api::TablePatchCall), [*refetch sheet*](https://docs.rs/google-fusiontables2/4.0.1+20171117/google_fusiontables2/api::TableRefetchSheetCall), [*replace rows*](https://docs.rs/google-fusiontables2/4.0.1+20171117/google_fusiontables2/api::TableReplaceRowCall) and [*update*](https://docs.rs/google-fusiontables2/4.0.1+20171117/google_fusiontables2/api::TableUpdateCall)
-* [task](https://docs.rs/google-fusiontables2/4.0.1+20171117/google_fusiontables2/api::Task)
- * [*delete*](https://docs.rs/google-fusiontables2/4.0.1+20171117/google_fusiontables2/api::TaskDeleteCall), [*get*](https://docs.rs/google-fusiontables2/4.0.1+20171117/google_fusiontables2/api::TaskGetCall) and [*list*](https://docs.rs/google-fusiontables2/4.0.1+20171117/google_fusiontables2/api::TaskListCall)
-* [template](https://docs.rs/google-fusiontables2/4.0.1+20171117/google_fusiontables2/api::Template)
- * [*delete*](https://docs.rs/google-fusiontables2/4.0.1+20171117/google_fusiontables2/api::TemplateDeleteCall), [*get*](https://docs.rs/google-fusiontables2/4.0.1+20171117/google_fusiontables2/api::TemplateGetCall), [*insert*](https://docs.rs/google-fusiontables2/4.0.1+20171117/google_fusiontables2/api::TemplateInsertCall), [*list*](https://docs.rs/google-fusiontables2/4.0.1+20171117/google_fusiontables2/api::TemplateListCall), [*patch*](https://docs.rs/google-fusiontables2/4.0.1+20171117/google_fusiontables2/api::TemplatePatchCall) and [*update*](https://docs.rs/google-fusiontables2/4.0.1+20171117/google_fusiontables2/api::TemplateUpdateCall)
+ * [*delete*](https://docs.rs/google-fusiontables2/5.0.2-beta-1+20171117/google_fusiontables2/api::StyleDeleteCall), [*get*](https://docs.rs/google-fusiontables2/5.0.2-beta-1+20171117/google_fusiontables2/api::StyleGetCall), [*insert*](https://docs.rs/google-fusiontables2/5.0.2-beta-1+20171117/google_fusiontables2/api::StyleInsertCall), [*list*](https://docs.rs/google-fusiontables2/5.0.2-beta-1+20171117/google_fusiontables2/api::StyleListCall), [*patch*](https://docs.rs/google-fusiontables2/5.0.2-beta-1+20171117/google_fusiontables2/api::StylePatchCall) and [*update*](https://docs.rs/google-fusiontables2/5.0.2-beta-1+20171117/google_fusiontables2/api::StyleUpdateCall)
+* [table](https://docs.rs/google-fusiontables2/5.0.2-beta-1+20171117/google_fusiontables2/api::Table)
+ * [*copy*](https://docs.rs/google-fusiontables2/5.0.2-beta-1+20171117/google_fusiontables2/api::TableCopyCall), [*delete*](https://docs.rs/google-fusiontables2/5.0.2-beta-1+20171117/google_fusiontables2/api::TableDeleteCall), [*get*](https://docs.rs/google-fusiontables2/5.0.2-beta-1+20171117/google_fusiontables2/api::TableGetCall), [*import rows*](https://docs.rs/google-fusiontables2/5.0.2-beta-1+20171117/google_fusiontables2/api::TableImportRowCall), [*import table*](https://docs.rs/google-fusiontables2/5.0.2-beta-1+20171117/google_fusiontables2/api::TableImportTableCall), [*insert*](https://docs.rs/google-fusiontables2/5.0.2-beta-1+20171117/google_fusiontables2/api::TableInsertCall), [*list*](https://docs.rs/google-fusiontables2/5.0.2-beta-1+20171117/google_fusiontables2/api::TableListCall), [*patch*](https://docs.rs/google-fusiontables2/5.0.2-beta-1+20171117/google_fusiontables2/api::TablePatchCall), [*refetch sheet*](https://docs.rs/google-fusiontables2/5.0.2-beta-1+20171117/google_fusiontables2/api::TableRefetchSheetCall), [*replace rows*](https://docs.rs/google-fusiontables2/5.0.2-beta-1+20171117/google_fusiontables2/api::TableReplaceRowCall) and [*update*](https://docs.rs/google-fusiontables2/5.0.2-beta-1+20171117/google_fusiontables2/api::TableUpdateCall)
+* [task](https://docs.rs/google-fusiontables2/5.0.2-beta-1+20171117/google_fusiontables2/api::Task)
+ * [*delete*](https://docs.rs/google-fusiontables2/5.0.2-beta-1+20171117/google_fusiontables2/api::TaskDeleteCall), [*get*](https://docs.rs/google-fusiontables2/5.0.2-beta-1+20171117/google_fusiontables2/api::TaskGetCall) and [*list*](https://docs.rs/google-fusiontables2/5.0.2-beta-1+20171117/google_fusiontables2/api::TaskListCall)
+* [template](https://docs.rs/google-fusiontables2/5.0.2-beta-1+20171117/google_fusiontables2/api::Template)
+ * [*delete*](https://docs.rs/google-fusiontables2/5.0.2-beta-1+20171117/google_fusiontables2/api::TemplateDeleteCall), [*get*](https://docs.rs/google-fusiontables2/5.0.2-beta-1+20171117/google_fusiontables2/api::TemplateGetCall), [*insert*](https://docs.rs/google-fusiontables2/5.0.2-beta-1+20171117/google_fusiontables2/api::TemplateInsertCall), [*list*](https://docs.rs/google-fusiontables2/5.0.2-beta-1+20171117/google_fusiontables2/api::TemplateListCall), [*patch*](https://docs.rs/google-fusiontables2/5.0.2-beta-1+20171117/google_fusiontables2/api::TemplatePatchCall) and [*update*](https://docs.rs/google-fusiontables2/5.0.2-beta-1+20171117/google_fusiontables2/api::TemplateUpdateCall)
 
 
 Upload supported by ...
 
-* [*import rows table*](https://docs.rs/google-fusiontables2/4.0.1+20171117/google_fusiontables2/api::TableImportRowCall)
-* [*import table table*](https://docs.rs/google-fusiontables2/4.0.1+20171117/google_fusiontables2/api::TableImportTableCall)
-* [*replace rows table*](https://docs.rs/google-fusiontables2/4.0.1+20171117/google_fusiontables2/api::TableReplaceRowCall)
+* [*import rows table*](https://docs.rs/google-fusiontables2/5.0.2-beta-1+20171117/google_fusiontables2/api::TableImportRowCall)
+* [*import table table*](https://docs.rs/google-fusiontables2/5.0.2-beta-1+20171117/google_fusiontables2/api::TableImportTableCall)
+* [*replace rows table*](https://docs.rs/google-fusiontables2/5.0.2-beta-1+20171117/google_fusiontables2/api::TableReplaceRowCall)
 
 Download supported by ...
 
-* [*sql query*](https://docs.rs/google-fusiontables2/4.0.1+20171117/google_fusiontables2/api::QuerySqlCall)
-* [*sql get query*](https://docs.rs/google-fusiontables2/4.0.1+20171117/google_fusiontables2/api::QuerySqlGetCall)
+* [*sql query*](https://docs.rs/google-fusiontables2/5.0.2-beta-1+20171117/google_fusiontables2/api::QuerySqlCall)
+* [*sql get query*](https://docs.rs/google-fusiontables2/5.0.2-beta-1+20171117/google_fusiontables2/api::QuerySqlGetCall)
 
 
 
@@ -44,17 +44,17 @@ Download supported by ...
 
 The API is structured into the following primary items:
 
-* **[Hub](https://docs.rs/google-fusiontables2/4.0.1+20171117/google_fusiontables2/Fusiontables)**
+* **[Hub](https://docs.rs/google-fusiontables2/5.0.2-beta-1+20171117/google_fusiontables2/Fusiontables)**
     * a central object to maintain state and allow accessing all *Activities*
-    * creates [*Method Builders*](https://docs.rs/google-fusiontables2/4.0.1+20171117/google_fusiontables2/client::MethodsBuilder) which in turn
-      allow access to individual [*Call Builders*](https://docs.rs/google-fusiontables2/4.0.1+20171117/google_fusiontables2/client::CallBuilder)
-* **[Resources](https://docs.rs/google-fusiontables2/4.0.1+20171117/google_fusiontables2/client::Resource)**
+    * creates [*Method Builders*](https://docs.rs/google-fusiontables2/5.0.2-beta-1+20171117/google_fusiontables2/client::MethodsBuilder) which in turn
+      allow access to individual [*Call Builders*](https://docs.rs/google-fusiontables2/5.0.2-beta-1+20171117/google_fusiontables2/client::CallBuilder)
+* **[Resources](https://docs.rs/google-fusiontables2/5.0.2-beta-1+20171117/google_fusiontables2/client::Resource)**
     * primary types that you can apply *Activities* to
     * a collection of properties and *Parts*
-    * **[Parts](https://docs.rs/google-fusiontables2/4.0.1+20171117/google_fusiontables2/client::Part)**
+    * **[Parts](https://docs.rs/google-fusiontables2/5.0.2-beta-1+20171117/google_fusiontables2/client::Part)**
         * a collection of properties
         * never directly used in *Activities*
-* **[Activities](https://docs.rs/google-fusiontables2/4.0.1+20171117/google_fusiontables2/client::CallBuilder)**
+* **[Activities](https://docs.rs/google-fusiontables2/5.0.2-beta-1+20171117/google_fusiontables2/client::CallBuilder)**
     * operations to apply to *Resources*
 
 All *structures* are marked with applicable traits to further categorize them and ease browsing.
@@ -103,7 +103,7 @@ extern crate google_fusiontables2 as fusiontables2;
 use fusiontables2::{Result, Error};
 use std::fs;
 use std::default::Default;
-use fusiontables2::{Fusiontables, oauth2, hyper, hyper_rustls};
+use fusiontables2::{Fusiontables, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 
 // Get an ApplicationSecret instance by some means. It contains the `client_id` and 
 // `client_secret`, among other things.
@@ -147,17 +147,17 @@ match result {
 ```
 ## Handling Errors
 
-All errors produced by the system are provided either as [Result](https://docs.rs/google-fusiontables2/4.0.1+20171117/google_fusiontables2/client::Result) enumeration as return value of
+All errors produced by the system are provided either as [Result](https://docs.rs/google-fusiontables2/5.0.2-beta-1+20171117/google_fusiontables2/client::Result) enumeration as return value of
 the doit() methods, or handed as possibly intermediate results to either the 
-[Hub Delegate](https://docs.rs/google-fusiontables2/4.0.1+20171117/google_fusiontables2/client::Delegate), or the [Authenticator Delegate](https://docs.rs/yup-oauth2/*/yup_oauth2/trait.AuthenticatorDelegate.html).
+[Hub Delegate](https://docs.rs/google-fusiontables2/5.0.2-beta-1+20171117/google_fusiontables2/client::Delegate), or the [Authenticator Delegate](https://docs.rs/yup-oauth2/*/yup_oauth2/trait.AuthenticatorDelegate.html).
 
 When delegates handle errors or intermediate values, they may have a chance to instruct the system to retry. This 
 makes the system potentially resilient to all kinds of errors.
 
 ## Uploads and Downloads
-If a method supports downloads, the response body, which is part of the [Result](https://docs.rs/google-fusiontables2/4.0.1+20171117/google_fusiontables2/client::Result), should be
+If a method supports downloads, the response body, which is part of the [Result](https://docs.rs/google-fusiontables2/5.0.2-beta-1+20171117/google_fusiontables2/client::Result), should be
 read by you to obtain the media.
-If such a method also supports a [Response Result](https://docs.rs/google-fusiontables2/4.0.1+20171117/google_fusiontables2/client::ResponseResult), it will return that by default.
+If such a method also supports a [Response Result](https://docs.rs/google-fusiontables2/5.0.2-beta-1+20171117/google_fusiontables2/client::ResponseResult), it will return that by default.
 You can see it as meta-data for the actual media. To trigger a media download, you will have to set up the builder by making
 this call: `.param("alt", "media")`.
 
@@ -167,29 +167,29 @@ Methods supporting uploads can do so using up to 2 different protocols:
 
 ## Customization and Callbacks
 
-You may alter the way an `doit()` method is called by providing a [delegate](https://docs.rs/google-fusiontables2/4.0.1+20171117/google_fusiontables2/client::Delegate) to the 
-[Method Builder](https://docs.rs/google-fusiontables2/4.0.1+20171117/google_fusiontables2/client::CallBuilder) before making the final `doit()` call. 
+You may alter the way an `doit()` method is called by providing a [delegate](https://docs.rs/google-fusiontables2/5.0.2-beta-1+20171117/google_fusiontables2/client::Delegate) to the 
+[Method Builder](https://docs.rs/google-fusiontables2/5.0.2-beta-1+20171117/google_fusiontables2/client::CallBuilder) before making the final `doit()` call. 
 Respective methods will be called to provide progress information, as well as determine whether the system should 
 retry on failure.
 
-The [delegate trait](https://docs.rs/google-fusiontables2/4.0.1+20171117/google_fusiontables2/client::Delegate) is default-implemented, allowing you to customize it with minimal effort.
+The [delegate trait](https://docs.rs/google-fusiontables2/5.0.2-beta-1+20171117/google_fusiontables2/client::Delegate) is default-implemented, allowing you to customize it with minimal effort.
 
 ## Optional Parts in Server-Requests
 
-All structures provided by this library are made to be [encodable](https://docs.rs/google-fusiontables2/4.0.1+20171117/google_fusiontables2/client::RequestValue) and 
-[decodable](https://docs.rs/google-fusiontables2/4.0.1+20171117/google_fusiontables2/client::ResponseResult) via *json*. Optionals are used to indicate that partial requests are responses 
+All structures provided by this library are made to be [encodable](https://docs.rs/google-fusiontables2/5.0.2-beta-1+20171117/google_fusiontables2/client::RequestValue) and 
+[decodable](https://docs.rs/google-fusiontables2/5.0.2-beta-1+20171117/google_fusiontables2/client::ResponseResult) via *json*. Optionals are used to indicate that partial requests are responses 
 are valid.
-Most optionals are are considered [Parts](https://docs.rs/google-fusiontables2/4.0.1+20171117/google_fusiontables2/client::Part) which are identifiable by name, which will be sent to 
+Most optionals are are considered [Parts](https://docs.rs/google-fusiontables2/5.0.2-beta-1+20171117/google_fusiontables2/client::Part) which are identifiable by name, which will be sent to 
 the server to indicate either the set parts of the request or the desired parts in the response.
 
 ## Builder Arguments
 
-Using [method builders](https://docs.rs/google-fusiontables2/4.0.1+20171117/google_fusiontables2/client::CallBuilder), you are able to prepare an action call by repeatedly calling it's methods.
+Using [method builders](https://docs.rs/google-fusiontables2/5.0.2-beta-1+20171117/google_fusiontables2/client::CallBuilder), you are able to prepare an action call by repeatedly calling it's methods.
 These will always take a single argument, for which the following statements are true.
 
 * [PODs][wiki-pod] are handed by copy
 * strings are passed as `&str`
-* [request values](https://docs.rs/google-fusiontables2/4.0.1+20171117/google_fusiontables2/client::RequestValue) are moved
+* [request values](https://docs.rs/google-fusiontables2/5.0.2-beta-1+20171117/google_fusiontables2/client::RequestValue) are moved
 
 Arguments will always be copied or cloned into the builder, to make them independent of their original life times.
 

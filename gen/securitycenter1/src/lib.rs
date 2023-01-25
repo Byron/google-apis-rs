@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/generator/templates/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Security Command Center* crate version *4.0.1+20220224*, where *20220224* is the exact revision of the *securitycenter:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v4.0.1*.
+//! This documentation was generated from *Security Command Center* crate version *5.0.2-beta-1+20230123*, where *20230123* is the exact revision of the *securitycenter:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.2-beta-1*.
 //! 
 //! Everything else about the *Security Command Center* *v1* API can be found at the
 //! [official documentation site](https://cloud.google.com/security-command-center).
@@ -12,11 +12,11 @@
 //! Handle the following *Resources* with ease from the central [hub](SecurityCommandCenter) ... 
 //! 
 //! * [folders](api::Folder)
-//!  * [*assets group*](api::FolderAssetGroupCall), [*assets list*](api::FolderAssetListCall), [*assets update security marks*](api::FolderAssetUpdateSecurityMarkCall), [*big query exports create*](api::FolderBigQueryExportCreateCall), [*big query exports delete*](api::FolderBigQueryExportDeleteCall), [*big query exports get*](api::FolderBigQueryExportGetCall), [*big query exports list*](api::FolderBigQueryExportListCall), [*big query exports patch*](api::FolderBigQueryExportPatchCall), [*findings bulk mute*](api::FolderFindingBulkMuteCall), [*mute configs create*](api::FolderMuteConfigCreateCall), [*mute configs delete*](api::FolderMuteConfigDeleteCall), [*mute configs get*](api::FolderMuteConfigGetCall), [*mute configs list*](api::FolderMuteConfigListCall), [*mute configs patch*](api::FolderMuteConfigPatchCall), [*sources findings external systems patch*](api::FolderSourceFindingExternalSystemPatchCall), [*sources findings group*](api::FolderSourceFindingGroupCall), [*sources findings list*](api::FolderSourceFindingListCall), [*sources findings patch*](api::FolderSourceFindingPatchCall), [*sources findings set mute*](api::FolderSourceFindingSetMuteCall), [*sources findings set state*](api::FolderSourceFindingSetStateCall), [*sources findings update security marks*](api::FolderSourceFindingUpdateSecurityMarkCall) and [*sources list*](api::FolderSourceListCall)
+//!  * [*assets group*](api::FolderAssetGroupCall), [*assets list*](api::FolderAssetListCall), [*assets update security marks*](api::FolderAssetUpdateSecurityMarkCall), [*big query exports create*](api::FolderBigQueryExportCreateCall), [*big query exports delete*](api::FolderBigQueryExportDeleteCall), [*big query exports get*](api::FolderBigQueryExportGetCall), [*big query exports list*](api::FolderBigQueryExportListCall), [*big query exports patch*](api::FolderBigQueryExportPatchCall), [*findings bulk mute*](api::FolderFindingBulkMuteCall), [*mute configs create*](api::FolderMuteConfigCreateCall), [*mute configs delete*](api::FolderMuteConfigDeleteCall), [*mute configs get*](api::FolderMuteConfigGetCall), [*mute configs list*](api::FolderMuteConfigListCall), [*mute configs patch*](api::FolderMuteConfigPatchCall), [*notification configs create*](api::FolderNotificationConfigCreateCall), [*notification configs delete*](api::FolderNotificationConfigDeleteCall), [*notification configs get*](api::FolderNotificationConfigGetCall), [*notification configs list*](api::FolderNotificationConfigListCall), [*notification configs patch*](api::FolderNotificationConfigPatchCall), [*sources findings external systems patch*](api::FolderSourceFindingExternalSystemPatchCall), [*sources findings group*](api::FolderSourceFindingGroupCall), [*sources findings list*](api::FolderSourceFindingListCall), [*sources findings patch*](api::FolderSourceFindingPatchCall), [*sources findings set mute*](api::FolderSourceFindingSetMuteCall), [*sources findings set state*](api::FolderSourceFindingSetStateCall), [*sources findings update security marks*](api::FolderSourceFindingUpdateSecurityMarkCall) and [*sources list*](api::FolderSourceListCall)
 //! * organizations
 //!  * [*assets group*](api::OrganizationAssetGroupCall), [*assets list*](api::OrganizationAssetListCall), [*assets run discovery*](api::OrganizationAssetRunDiscoveryCall), [*assets update security marks*](api::OrganizationAssetUpdateSecurityMarkCall), [*big query exports create*](api::OrganizationBigQueryExportCreateCall), [*big query exports delete*](api::OrganizationBigQueryExportDeleteCall), [*big query exports get*](api::OrganizationBigQueryExportGetCall), [*big query exports list*](api::OrganizationBigQueryExportListCall), [*big query exports patch*](api::OrganizationBigQueryExportPatchCall), [*findings bulk mute*](api::OrganizationFindingBulkMuteCall), [*get organization settings*](api::OrganizationGetOrganizationSettingCall), [*mute configs create*](api::OrganizationMuteConfigCreateCall), [*mute configs delete*](api::OrganizationMuteConfigDeleteCall), [*mute configs get*](api::OrganizationMuteConfigGetCall), [*mute configs list*](api::OrganizationMuteConfigListCall), [*mute configs patch*](api::OrganizationMuteConfigPatchCall), [*notification configs create*](api::OrganizationNotificationConfigCreateCall), [*notification configs delete*](api::OrganizationNotificationConfigDeleteCall), [*notification configs get*](api::OrganizationNotificationConfigGetCall), [*notification configs list*](api::OrganizationNotificationConfigListCall), [*notification configs patch*](api::OrganizationNotificationConfigPatchCall), [*operations cancel*](api::OrganizationOperationCancelCall), [*operations delete*](api::OrganizationOperationDeleteCall), [*operations get*](api::OrganizationOperationGetCall), [*operations list*](api::OrganizationOperationListCall), [*sources create*](api::OrganizationSourceCreateCall), [*sources findings create*](api::OrganizationSourceFindingCreateCall), [*sources findings external systems patch*](api::OrganizationSourceFindingExternalSystemPatchCall), [*sources findings group*](api::OrganizationSourceFindingGroupCall), [*sources findings list*](api::OrganizationSourceFindingListCall), [*sources findings patch*](api::OrganizationSourceFindingPatchCall), [*sources findings set mute*](api::OrganizationSourceFindingSetMuteCall), [*sources findings set state*](api::OrganizationSourceFindingSetStateCall), [*sources findings update security marks*](api::OrganizationSourceFindingUpdateSecurityMarkCall), [*sources get*](api::OrganizationSourceGetCall), [*sources get iam policy*](api::OrganizationSourceGetIamPolicyCall), [*sources list*](api::OrganizationSourceListCall), [*sources patch*](api::OrganizationSourcePatchCall), [*sources set iam policy*](api::OrganizationSourceSetIamPolicyCall), [*sources test iam permissions*](api::OrganizationSourceTestIamPermissionCall) and [*update organization settings*](api::OrganizationUpdateOrganizationSettingCall)
 //! * projects
-//!  * [*assets group*](api::ProjectAssetGroupCall), [*assets list*](api::ProjectAssetListCall), [*assets update security marks*](api::ProjectAssetUpdateSecurityMarkCall), [*big query exports create*](api::ProjectBigQueryExportCreateCall), [*big query exports delete*](api::ProjectBigQueryExportDeleteCall), [*big query exports get*](api::ProjectBigQueryExportGetCall), [*big query exports list*](api::ProjectBigQueryExportListCall), [*big query exports patch*](api::ProjectBigQueryExportPatchCall), [*findings bulk mute*](api::ProjectFindingBulkMuteCall), [*mute configs create*](api::ProjectMuteConfigCreateCall), [*mute configs delete*](api::ProjectMuteConfigDeleteCall), [*mute configs get*](api::ProjectMuteConfigGetCall), [*mute configs list*](api::ProjectMuteConfigListCall), [*mute configs patch*](api::ProjectMuteConfigPatchCall), [*sources findings external systems patch*](api::ProjectSourceFindingExternalSystemPatchCall), [*sources findings group*](api::ProjectSourceFindingGroupCall), [*sources findings list*](api::ProjectSourceFindingListCall), [*sources findings patch*](api::ProjectSourceFindingPatchCall), [*sources findings set mute*](api::ProjectSourceFindingSetMuteCall), [*sources findings set state*](api::ProjectSourceFindingSetStateCall), [*sources findings update security marks*](api::ProjectSourceFindingUpdateSecurityMarkCall) and [*sources list*](api::ProjectSourceListCall)
+//!  * [*assets group*](api::ProjectAssetGroupCall), [*assets list*](api::ProjectAssetListCall), [*assets update security marks*](api::ProjectAssetUpdateSecurityMarkCall), [*big query exports create*](api::ProjectBigQueryExportCreateCall), [*big query exports delete*](api::ProjectBigQueryExportDeleteCall), [*big query exports get*](api::ProjectBigQueryExportGetCall), [*big query exports list*](api::ProjectBigQueryExportListCall), [*big query exports patch*](api::ProjectBigQueryExportPatchCall), [*findings bulk mute*](api::ProjectFindingBulkMuteCall), [*mute configs create*](api::ProjectMuteConfigCreateCall), [*mute configs delete*](api::ProjectMuteConfigDeleteCall), [*mute configs get*](api::ProjectMuteConfigGetCall), [*mute configs list*](api::ProjectMuteConfigListCall), [*mute configs patch*](api::ProjectMuteConfigPatchCall), [*notification configs create*](api::ProjectNotificationConfigCreateCall), [*notification configs delete*](api::ProjectNotificationConfigDeleteCall), [*notification configs get*](api::ProjectNotificationConfigGetCall), [*notification configs list*](api::ProjectNotificationConfigListCall), [*notification configs patch*](api::ProjectNotificationConfigPatchCall), [*sources findings external systems patch*](api::ProjectSourceFindingExternalSystemPatchCall), [*sources findings group*](api::ProjectSourceFindingGroupCall), [*sources findings list*](api::ProjectSourceFindingListCall), [*sources findings patch*](api::ProjectSourceFindingPatchCall), [*sources findings set mute*](api::ProjectSourceFindingSetMuteCall), [*sources findings set state*](api::ProjectSourceFindingSetStateCall), [*sources findings update security marks*](api::ProjectSourceFindingUpdateSecurityMarkCall) and [*sources list*](api::ProjectSourceListCall)
 //! 
 //! 
 //! 
@@ -65,6 +65,11 @@
 //! let r = hub.folders().mute_configs_get(...).doit().await
 //! let r = hub.folders().mute_configs_list(...).doit().await
 //! let r = hub.folders().mute_configs_patch(...).doit().await
+//! let r = hub.folders().notification_configs_create(...).doit().await
+//! let r = hub.folders().notification_configs_delete(...).doit().await
+//! let r = hub.folders().notification_configs_get(...).doit().await
+//! let r = hub.folders().notification_configs_list(...).doit().await
+//! let r = hub.folders().notification_configs_patch(...).doit().await
 //! let r = hub.folders().sources_findings_external_systems_patch(...).doit().await
 //! let r = hub.folders().sources_findings_group(...).doit().await
 //! let r = hub.folders().sources_findings_list(...).doit().await
@@ -102,7 +107,7 @@
 //! use securitycenter1::{Result, Error};
 //! # async fn dox() {
 //! use std::default::Default;
-//! use securitycenter1::{SecurityCommandCenter, oauth2, hyper, hyper_rustls};
+//! use securitycenter1::{SecurityCommandCenter, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 //! 
 //! // Get an ApplicationSecret instance by some means. It contains the `client_id` and 
 //! // `client_secret`, among other things.
@@ -121,13 +126,13 @@
 //! // execute the final call using `doit()`.
 //! // Values shown here are possibly random and not representative !
 //! let result = hub.folders().assets_list("parent")
-//!              .read_time("takimata")
-//!              .page_token("amet.")
-//!              .page_size(-20)
-//!              .order_by("ipsum")
-//!              .filter("gubergren")
-//!              .field_mask("Lorem")
-//!              .compare_duration("gubergren")
+//!              .read_time(chrono::Utc::now())
+//!              .page_token("sed")
+//!              .page_size(-2)
+//!              .order_by("takimata")
+//!              .filter("amet.")
+//!              .field_mask(&Default::default())
+//!              .compare_duration(chrono::Duration::seconds(6037203))
 //!              .doit().await;
 //! 
 //! match result {
@@ -213,22 +218,17 @@
 // This file was generated automatically from 'src/generator/templates/api/lib.rs.mako'
 // DO NOT EDIT !
 
-#[macro_use]
-extern crate serde_derive;
-
 // Re-export the hyper and hyper_rustls crate, they are required to build the hub
-pub extern crate hyper;
-pub extern crate hyper_rustls;
-extern crate serde;
-extern crate serde_json;
-// Re-export the yup_oauth2 crate, that is required to call some methods of the hub and the client
-pub extern crate yup_oauth2 as oauth2;
-extern crate mime;
-extern crate url;
-
+pub use hyper;
+pub use hyper_rustls;
+pub extern crate google_apis_common as client;
+pub use client::chrono;
 pub mod api;
-pub mod client;
 
 // Re-export the hub type and some basic client structs
 pub use api::SecurityCommandCenter;
-pub use client::{Result, Error, Delegate};
+pub use client::{Result, Error, Delegate, FieldMask};
+
+// Re-export the yup_oauth2 crate, that is required to call some methods of the hub and the client
+#[cfg(feature = "yup-oauth2")]
+pub use client::oauth2;

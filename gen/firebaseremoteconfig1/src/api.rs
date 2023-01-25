@@ -1,19 +1,20 @@
 use std::collections::HashMap;
 use std::cell::RefCell;
 use std::default::Default;
-use std::collections::BTreeMap;
+use std::collections::BTreeSet;
 use std::error::Error as StdError;
 use serde_json as json;
 use std::io;
 use std::fs;
 use std::mem;
-use std::thread::sleep;
 
-use http::Uri;
 use hyper::client::connect;
 use tokio::io::{AsyncRead, AsyncWrite};
+use tokio::time::sleep;
 use tower_service;
-use crate::client;
+use serde::{Serialize, Deserialize};
+
+use crate::{client, client::GetToken, client::serde_with};
 
 // ##############
 // UTILITIES ###
@@ -40,7 +41,7 @@ use crate::client;
 /// use firebaseremoteconfig1::{Result, Error};
 /// # async fn dox() {
 /// use std::default::Default;
-/// use firebaseremoteconfig1::{FirebaseRemoteConfig, oauth2, hyper, hyper_rustls};
+/// use firebaseremoteconfig1::{FirebaseRemoteConfig, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// // Get an ApplicationSecret instance by some means. It contains the `client_id` and 
 /// // `client_secret`, among other things.
@@ -89,7 +90,7 @@ use crate::client;
 #[derive(Clone)]
 pub struct FirebaseRemoteConfig<S> {
     pub client: hyper::Client<S, hyper::body::Body>,
-    pub auth: oauth2::authenticator::Authenticator<S>,
+    pub auth: Box<dyn client::GetToken>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
@@ -99,11 +100,11 @@ impl<'a, S> client::Hub for FirebaseRemoteConfig<S> {}
 
 impl<'a, S> FirebaseRemoteConfig<S> {
 
-    pub fn new(client: hyper::Client<S, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<S>) -> FirebaseRemoteConfig<S> {
+    pub fn new<A: 'static + client::GetToken>(client: hyper::Client<S, hyper::body::Body>, auth: A) -> FirebaseRemoteConfig<S> {
         FirebaseRemoteConfig {
             client,
-            auth: authenticator,
-            _user_agent: "google-api-rust-client/4.0.1".to_string(),
+            auth: Box::new(auth),
+            _user_agent: "google-api-rust-client/5.0.2-beta-1".to_string(),
             _base_url: "https://firebaseremoteconfig.googleapis.com/".to_string(),
             _root_url: "https://firebaseremoteconfig.googleapis.com/".to_string(),
         }
@@ -114,7 +115,7 @@ impl<'a, S> FirebaseRemoteConfig<S> {
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/4.0.1`.
+    /// It defaults to `google-api-rust-client/5.0.2-beta-1`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -148,22 +149,26 @@ impl<'a, S> FirebaseRemoteConfig<S> {
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct RemoteConfigParameter {
     /// Optional - value to set the parameter to, when none of the named conditions
     /// evaluate to <code>true</code>.
     #[serde(rename="defaultValue")]
+    
     pub default_value: Option<RemoteConfigParameterValue>,
     /// Optional.
     /// A description for this Parameter. Length must be less than or equal to
     /// 100 characters (or more precisely, unicode code points, which is defined in
     /// java/com/google/wireless/android/config/ConstsExporter.java).
     /// A description may contain any Unicode characters
+    
     pub description: Option<String>,
     /// Optional - a map of (condition_name, value). The condition_name of the
     /// highest priority (the one listed first in the conditions array) determines
     /// the value of this parameter.
     #[serde(rename="conditionalValues")]
+    
     pub conditional_values: Option<HashMap<String, RemoteConfigParameterValue>>,
 }
 
@@ -175,6 +180,7 @@ impl client::Part for RemoteConfigParameter {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct RemoteConfigCondition {
     /// Optional.
@@ -188,17 +194,21 @@ pub struct RemoteConfigCondition {
     /// value (0) have the same meaning:  Let the UI choose any valid color when
     /// displaying the condition.
     #[serde(rename="tagColor")]
+    
     pub tag_color: Option<String>,
     /// Required.
     /// A non empty and unique name of this condition.
+    
     pub name: Option<String>,
     /// Optional.
     /// A description for this Condition. Length must be less than or equal to
     /// 100 characters (or more precisely, unicode code points, which is defined in
     /// java/com/google/wireless/android/config/ConstsExporter.java).
     /// A description may contain any Unicode characters
+    
     pub description: Option<String>,
     /// Required.
+    
     pub expression: Option<String>,
 }
 
@@ -214,12 +224,15 @@ impl client::Part for RemoteConfigCondition {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct RemoteConfigParameterValue {
     /// the string to set the parameter to
+    
     pub value: Option<String>,
     /// if true, omit the parameter from the map of fetched parameter values
     #[serde(rename="useInAppDefault")]
+    
     pub use_in_app_default: Option<bool>,
 }
 
@@ -240,11 +253,13 @@ impl client::Part for RemoteConfigParameterValue {}
 /// * [get remote config projects](ProjectGetRemoteConfigCall) (response)
 /// * [update remote config projects](ProjectUpdateRemoteConfigCall) (request|response)
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct RemoteConfig {
     /// Map of parameter keys to their optional default values and optional submap
     /// of (condition name : value). Order doesn't affect semantics, and so is
     /// sorted by the server. The 'key' values of the params must be unique.
+    
     pub parameters: Option<HashMap<String, RemoteConfigParameter>>,
     /// The list of named conditions. The order *does* affect the semantics.
     /// The condition_name values of these entries must be unique.
@@ -265,6 +280,7 @@ pub struct RemoteConfig {
     /// p1 would evaluate to v3, and if c1 and c2 are both false, p1 would evaluate
     /// to v1.  If no default value was specified, and c1 and c2 were both false,
     /// no value for p1 would be generated.
+    
     pub conditions: Option<Vec<RemoteConfigCondition>>,
 }
 
@@ -278,7 +294,7 @@ impl client::ResponseResult for RemoteConfig {}
 // #################
 
 /// A builder providing access to all methods supported on *project* resources.
-/// It is not used directly, but through the `FirebaseRemoteConfig` hub.
+/// It is not used directly, but through the [`FirebaseRemoteConfig`] hub.
 ///
 /// # Example
 ///
@@ -291,7 +307,7 @@ impl client::ResponseResult for RemoteConfig {}
 /// 
 /// # async fn dox() {
 /// use std::default::Default;
-/// use firebaseremoteconfig1::{FirebaseRemoteConfig, oauth2, hyper, hyper_rustls};
+/// use firebaseremoteconfig1::{FirebaseRemoteConfig, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// let secret: oauth2::ApplicationSecret = Default::default();
 /// let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -385,7 +401,7 @@ impl<'a, S> ProjectMethods<'a, S> {
 /// response header.
 ///
 /// A builder for the *getRemoteConfig* method supported by a *project* resource.
-/// It is not used directly, but through a `ProjectMethods` instance.
+/// It is not used directly, but through a [`ProjectMethods`] instance.
 ///
 /// # Example
 ///
@@ -397,7 +413,7 @@ impl<'a, S> ProjectMethods<'a, S> {
 /// # extern crate google_firebaseremoteconfig1 as firebaseremoteconfig1;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use firebaseremoteconfig1::{FirebaseRemoteConfig, oauth2, hyper, hyper_rustls};
+/// # use firebaseremoteconfig1::{FirebaseRemoteConfig, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
 /// # let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -425,7 +441,7 @@ impl<'a, S> client::CallBuilder for ProjectGetRemoteConfigCall<'a, S> {}
 
 impl<'a, S> ProjectGetRemoteConfigCall<'a, S>
 where
-    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
     S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
     S::Future: Send + Unpin + 'static,
     S::Error: Into<Box<dyn StdError + Send + Sync>>,
@@ -434,36 +450,33 @@ where
 
     /// Perform the operation you have build so far.
     pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, RemoteConfig)> {
-        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
         use std::io::{Read, Seek};
         use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::ToParts;
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
         let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
         dlg.begin(client::MethodInfo { id: "firebaseremoteconfig.projects.getRemoteConfig",
                                http_method: hyper::Method::GET });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
-        params.push(("project", self._project.to_string()));
+
         for &field in ["alt", "project"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(client::Error::FieldClash(field));
             }
         }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
 
-        params.push(("alt", "json".to_string()));
+        let mut params = Params::with_capacity(3 + self._additional_params.len());
+        params.push("project", self._project);
 
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "v1/{+project}/remoteConfig";
         
-        let key = dlg.api_key();
-        match key {
-            Some(value) => params.push(("key", value)),
+        match dlg.api_key() {
+            Some(value) => params.push("key", value),
             None => {
                 dlg.finished(false);
                 return Err(client::Error::MissingAPIKey)
@@ -471,31 +484,14 @@ where
         }
 
         for &(find_this, param_name) in [("{+project}", "project")].iter() {
-            let mut replace_with = String::new();
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = value.to_string();
-                    break;
-                }
-            }
-            if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
-            }
-            url = url.replace(find_this, &replace_with);
+            url = params.uri_replacement(url, param_name, find_this, true);
         }
         {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
-            for param_name in ["project"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
+            let to_remove = ["project"];
+            params.remove_params(&to_remove);
         }
 
-        let url = url::Url::parse_with_params(&url, params).unwrap();
+        let url = params.parse_with_url(&url);
 
 
 
@@ -503,21 +499,24 @@ where
             let mut req_result = {
                 let client = &self.hub.client;
                 dlg.pre_request();
-                let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
-                        .header(USER_AGENT, self.hub._user_agent.clone());
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::GET)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
 
 
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
-                
+
             };
 
             match req_result {
                 Err(err) => {
                     if let client::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep(d).await;
                         continue;
                     }
                     dlg.finished(false);
@@ -533,7 +532,7 @@ where
                         let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
                         if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
-                            sleep(d);
+                            sleep(d).await;
                             continue;
                         }
 
@@ -578,7 +577,8 @@ where
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.````
     ///
     /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectGetRemoteConfigCall<'a, S> {
@@ -637,7 +637,7 @@ where
 /// errors.
 ///
 /// A builder for the *updateRemoteConfig* method supported by a *project* resource.
-/// It is not used directly, but through a `ProjectMethods` instance.
+/// It is not used directly, but through a [`ProjectMethods`] instance.
 ///
 /// # Example
 ///
@@ -650,7 +650,7 @@ where
 /// use firebaseremoteconfig1::api::RemoteConfig;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use firebaseremoteconfig1::{FirebaseRemoteConfig, oauth2, hyper, hyper_rustls};
+/// # use firebaseremoteconfig1::{FirebaseRemoteConfig, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
 /// # let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -686,7 +686,7 @@ impl<'a, S> client::CallBuilder for ProjectUpdateRemoteConfigCall<'a, S> {}
 
 impl<'a, S> ProjectUpdateRemoteConfigCall<'a, S>
 where
-    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
     S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
     S::Future: Send + Unpin + 'static,
     S::Error: Into<Box<dyn StdError + Send + Sync>>,
@@ -695,39 +695,36 @@ where
 
     /// Perform the operation you have build so far.
     pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, RemoteConfig)> {
-        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
         use std::io::{Read, Seek};
         use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::ToParts;
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
         let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
         dlg.begin(client::MethodInfo { id: "firebaseremoteconfig.projects.updateRemoteConfig",
                                http_method: hyper::Method::PUT });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
-        params.push(("project", self._project.to_string()));
-        if let Some(value) = self._validate_only {
-            params.push(("validateOnly", value.to_string()));
-        }
+
         for &field in ["alt", "project", "validateOnly"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(client::Error::FieldClash(field));
             }
         }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
+
+        let mut params = Params::with_capacity(5 + self._additional_params.len());
+        params.push("project", self._project);
+        if let Some(value) = self._validate_only.as_ref() {
+            params.push("validateOnly", value.to_string());
         }
 
-        params.push(("alt", "json".to_string()));
+        params.extend(self._additional_params.iter());
 
+        params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "v1/{+project}/remoteConfig";
         
-        let key = dlg.api_key();
-        match key {
-            Some(value) => params.push(("key", value)),
+        match dlg.api_key() {
+            Some(value) => params.push("key", value),
             None => {
                 dlg.finished(false);
                 return Err(client::Error::MissingAPIKey)
@@ -735,33 +732,16 @@ where
         }
 
         for &(find_this, param_name) in [("{+project}", "project")].iter() {
-            let mut replace_with = String::new();
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = value.to_string();
-                    break;
-                }
-            }
-            if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
-            }
-            url = url.replace(find_this, &replace_with);
+            url = params.uri_replacement(url, param_name, find_this, true);
         }
         {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
-            for param_name in ["project"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
+            let to_remove = ["project"];
+            params.remove_params(&to_remove);
         }
 
-        let url = url::Url::parse_with_params(&url, params).unwrap();
+        let url = params.parse_with_url(&url);
 
-        let mut json_mime_type: mime::Mime = "application/json".parse().unwrap();
+        let mut json_mime_type = mime::APPLICATION_JSON;
         let mut request_value_reader =
             {
                 let mut value = json::value::to_value(&self._request).expect("serde to work");
@@ -779,23 +759,26 @@ where
             let mut req_result = {
                 let client = &self.hub.client;
                 dlg.pre_request();
-                let mut req_builder = hyper::Request::builder().method(hyper::Method::PUT).uri(url.clone().into_string())
-                        .header(USER_AGENT, self.hub._user_agent.clone());
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::PUT)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
 
 
                         let request = req_builder
-                        .header(CONTENT_TYPE, format!("{}", json_mime_type.to_string()))
+                        .header(CONTENT_TYPE, json_mime_type.to_string())
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
                 client.request(request.unwrap()).await
-                
+
             };
 
             match req_result {
                 Err(err) => {
                     if let client::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep(d).await;
                         continue;
                     }
                     dlg.finished(false);
@@ -811,7 +794,7 @@ where
                         let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
                         if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
-                            sleep(d);
+                            sleep(d).await;
                             continue;
                         }
 
@@ -878,7 +861,8 @@ where
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.````
     ///
     /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectUpdateRemoteConfigCall<'a, S> {

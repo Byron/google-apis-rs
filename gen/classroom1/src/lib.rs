@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/generator/templates/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *classroom* crate version *4.0.1+20220224*, where *20220224* is the exact revision of the *classroom:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v4.0.1*.
+//! This documentation was generated from *classroom* crate version *5.0.2-beta-1+20230119*, where *20230119* is the exact revision of the *classroom:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.2-beta-1*.
 //! 
 //! Everything else about the *classroom* *v1* API can be found at the
 //! [official documentation site](https://developers.google.com/classroom/).
@@ -12,7 +12,7 @@
 //! Handle the following *Resources* with ease from the central [hub](Classroom) ... 
 //! 
 //! * [courses](api::Course)
-//!  * [*aliases create*](api::CourseAliaseCreateCall), [*aliases delete*](api::CourseAliaseDeleteCall), [*aliases list*](api::CourseAliaseListCall), [*announcements create*](api::CourseAnnouncementCreateCall), [*announcements delete*](api::CourseAnnouncementDeleteCall), [*announcements get*](api::CourseAnnouncementGetCall), [*announcements list*](api::CourseAnnouncementListCall), [*announcements modify assignees*](api::CourseAnnouncementModifyAssigneeCall), [*announcements patch*](api::CourseAnnouncementPatchCall), [*course work create*](api::CourseCourseWorkCreateCall), [*course work delete*](api::CourseCourseWorkDeleteCall), [*course work get*](api::CourseCourseWorkGetCall), [*course work list*](api::CourseCourseWorkListCall), [*course work modify assignees*](api::CourseCourseWorkModifyAssigneeCall), [*course work patch*](api::CourseCourseWorkPatchCall), [*course work student submissions get*](api::CourseCourseWorkStudentSubmissionGetCall), [*course work student submissions list*](api::CourseCourseWorkStudentSubmissionListCall), [*course work student submissions modify attachments*](api::CourseCourseWorkStudentSubmissionModifyAttachmentCall), [*course work student submissions patch*](api::CourseCourseWorkStudentSubmissionPatchCall), [*course work student submissions reclaim*](api::CourseCourseWorkStudentSubmissionReclaimCall), [*course work student submissions return*](api::CourseCourseWorkStudentSubmissionReturnCall), [*course work student submissions turn in*](api::CourseCourseWorkStudentSubmissionTurnInCall), [*course work materials create*](api::CourseCourseWorkMaterialCreateCall), [*course work materials delete*](api::CourseCourseWorkMaterialDeleteCall), [*course work materials get*](api::CourseCourseWorkMaterialGetCall), [*course work materials list*](api::CourseCourseWorkMaterialListCall), [*course work materials patch*](api::CourseCourseWorkMaterialPatchCall), [*create*](api::CourseCreateCall), [*delete*](api::CourseDeleteCall), [*get*](api::CourseGetCall), [*list*](api::CourseListCall), [*patch*](api::CoursePatchCall), [*students create*](api::CourseStudentCreateCall), [*students delete*](api::CourseStudentDeleteCall), [*students get*](api::CourseStudentGetCall), [*students list*](api::CourseStudentListCall), [*teachers create*](api::CourseTeacherCreateCall), [*teachers delete*](api::CourseTeacherDeleteCall), [*teachers get*](api::CourseTeacherGetCall), [*teachers list*](api::CourseTeacherListCall), [*topics create*](api::CourseTopicCreateCall), [*topics delete*](api::CourseTopicDeleteCall), [*topics get*](api::CourseTopicGetCall), [*topics list*](api::CourseTopicListCall), [*topics patch*](api::CourseTopicPatchCall) and [*update*](api::CourseUpdateCall)
+//!  * [*aliases create*](api::CourseAliasCreateCall), [*aliases delete*](api::CourseAliasDeleteCall), [*aliases list*](api::CourseAliasListCall), [*announcements create*](api::CourseAnnouncementCreateCall), [*announcements delete*](api::CourseAnnouncementDeleteCall), [*announcements get*](api::CourseAnnouncementGetCall), [*announcements list*](api::CourseAnnouncementListCall), [*announcements modify assignees*](api::CourseAnnouncementModifyAssigneeCall), [*announcements patch*](api::CourseAnnouncementPatchCall), [*course work create*](api::CourseCourseWorkCreateCall), [*course work delete*](api::CourseCourseWorkDeleteCall), [*course work get*](api::CourseCourseWorkGetCall), [*course work list*](api::CourseCourseWorkListCall), [*course work modify assignees*](api::CourseCourseWorkModifyAssigneeCall), [*course work patch*](api::CourseCourseWorkPatchCall), [*course work student submissions get*](api::CourseCourseWorkStudentSubmissionGetCall), [*course work student submissions list*](api::CourseCourseWorkStudentSubmissionListCall), [*course work student submissions modify attachments*](api::CourseCourseWorkStudentSubmissionModifyAttachmentCall), [*course work student submissions patch*](api::CourseCourseWorkStudentSubmissionPatchCall), [*course work student submissions reclaim*](api::CourseCourseWorkStudentSubmissionReclaimCall), [*course work student submissions return*](api::CourseCourseWorkStudentSubmissionReturnCall), [*course work student submissions turn in*](api::CourseCourseWorkStudentSubmissionTurnInCall), [*course work materials create*](api::CourseCourseWorkMaterialCreateCall), [*course work materials delete*](api::CourseCourseWorkMaterialDeleteCall), [*course work materials get*](api::CourseCourseWorkMaterialGetCall), [*course work materials list*](api::CourseCourseWorkMaterialListCall), [*course work materials patch*](api::CourseCourseWorkMaterialPatchCall), [*create*](api::CourseCreateCall), [*delete*](api::CourseDeleteCall), [*get*](api::CourseGetCall), [*list*](api::CourseListCall), [*patch*](api::CoursePatchCall), [*students create*](api::CourseStudentCreateCall), [*students delete*](api::CourseStudentDeleteCall), [*students get*](api::CourseStudentGetCall), [*students list*](api::CourseStudentListCall), [*teachers create*](api::CourseTeacherCreateCall), [*teachers delete*](api::CourseTeacherDeleteCall), [*teachers get*](api::CourseTeacherGetCall), [*teachers list*](api::CourseTeacherListCall), [*topics create*](api::CourseTopicCreateCall), [*topics delete*](api::CourseTopicDeleteCall), [*topics get*](api::CourseTopicGetCall), [*topics list*](api::CourseTopicListCall), [*topics patch*](api::CourseTopicPatchCall) and [*update*](api::CourseUpdateCall)
 //! * [invitations](api::Invitation)
 //!  * [*accept*](api::InvitationAcceptCall), [*create*](api::InvitationCreateCall), [*delete*](api::InvitationDeleteCall), [*get*](api::InvitationGetCall) and [*list*](api::InvitationListCall)
 //! * [registrations](api::Registration)
@@ -128,7 +128,7 @@
 //! use classroom1::{Result, Error};
 //! # async fn dox() {
 //! use std::default::Default;
-//! use classroom1::{Classroom, oauth2, hyper, hyper_rustls};
+//! use classroom1::{Classroom, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 //! 
 //! // Get an ApplicationSecret instance by some means. It contains the `client_id` and 
 //! // `client_secret`, among other things.
@@ -237,22 +237,17 @@
 // This file was generated automatically from 'src/generator/templates/api/lib.rs.mako'
 // DO NOT EDIT !
 
-#[macro_use]
-extern crate serde_derive;
-
 // Re-export the hyper and hyper_rustls crate, they are required to build the hub
-pub extern crate hyper;
-pub extern crate hyper_rustls;
-extern crate serde;
-extern crate serde_json;
-// Re-export the yup_oauth2 crate, that is required to call some methods of the hub and the client
-pub extern crate yup_oauth2 as oauth2;
-extern crate mime;
-extern crate url;
-
+pub use hyper;
+pub use hyper_rustls;
+pub extern crate google_apis_common as client;
+pub use client::chrono;
 pub mod api;
-pub mod client;
 
 // Re-export the hub type and some basic client structs
 pub use api::Classroom;
-pub use client::{Result, Error, Delegate};
+pub use client::{Result, Error, Delegate, FieldMask};
+
+// Re-export the yup_oauth2 crate, that is required to call some methods of the hub and the client
+#[cfg(feature = "yup-oauth2")]
+pub use client::oauth2;

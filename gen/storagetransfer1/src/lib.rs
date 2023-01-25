@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/generator/templates/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *storagetransfer* crate version *4.0.1+20220223*, where *20220223* is the exact revision of the *storagetransfer:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v4.0.1*.
+//! This documentation was generated from *storagetransfer* crate version *5.0.2-beta-1+20230111*, where *20230111* is the exact revision of the *storagetransfer:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.2-beta-1*.
 //! 
 //! Everything else about the *storagetransfer* *v1* API can be found at the
 //! [official documentation site](https://cloud.google.com/storage-transfer/docs).
@@ -16,7 +16,7 @@
 //! * projects
 //!  * [*agent pools create*](api::ProjectAgentPoolCreateCall), [*agent pools delete*](api::ProjectAgentPoolDeleteCall), [*agent pools get*](api::ProjectAgentPoolGetCall), [*agent pools list*](api::ProjectAgentPoolListCall) and [*agent pools patch*](api::ProjectAgentPoolPatchCall)
 //! * [transfer jobs](api::TransferJob)
-//!  * [*create*](api::TransferJobCreateCall), [*get*](api::TransferJobGetCall), [*list*](api::TransferJobListCall), [*patch*](api::TransferJobPatchCall) and [*run*](api::TransferJobRunCall)
+//!  * [*create*](api::TransferJobCreateCall), [*delete*](api::TransferJobDeleteCall), [*get*](api::TransferJobGetCall), [*list*](api::TransferJobListCall), [*patch*](api::TransferJobPatchCall) and [*run*](api::TransferJobRunCall)
 //! * [transfer operations](api::TransferOperation)
 //!  * [*cancel*](api::TransferOperationCancelCall), [*get*](api::TransferOperationGetCall), [*list*](api::TransferOperationListCall), [*pause*](api::TransferOperationPauseCall) and [*resume*](api::TransferOperationResumeCall)
 //! 
@@ -54,6 +54,7 @@
 //! 
 //! ```ignore
 //! let r = hub.transfer_jobs().create(...).doit().await
+//! let r = hub.transfer_jobs().delete(...).doit().await
 //! let r = hub.transfer_jobs().get(...).doit().await
 //! let r = hub.transfer_jobs().list(...).doit().await
 //! let r = hub.transfer_jobs().patch(...).doit().await
@@ -87,7 +88,7 @@
 //! use storagetransfer1::{Result, Error};
 //! # async fn dox() {
 //! use std::default::Default;
-//! use storagetransfer1::{Storagetransfer, oauth2, hyper, hyper_rustls};
+//! use storagetransfer1::{Storagetransfer, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 //! 
 //! // Get an ApplicationSecret instance by some means. It contains the `client_id` and 
 //! // `client_secret`, among other things.
@@ -193,22 +194,17 @@
 // This file was generated automatically from 'src/generator/templates/api/lib.rs.mako'
 // DO NOT EDIT !
 
-#[macro_use]
-extern crate serde_derive;
-
 // Re-export the hyper and hyper_rustls crate, they are required to build the hub
-pub extern crate hyper;
-pub extern crate hyper_rustls;
-extern crate serde;
-extern crate serde_json;
-// Re-export the yup_oauth2 crate, that is required to call some methods of the hub and the client
-pub extern crate yup_oauth2 as oauth2;
-extern crate mime;
-extern crate url;
-
+pub use hyper;
+pub use hyper_rustls;
+pub extern crate google_apis_common as client;
+pub use client::chrono;
 pub mod api;
-pub mod client;
 
 // Re-export the hub type and some basic client structs
 pub use api::Storagetransfer;
-pub use client::{Result, Error, Delegate};
+pub use client::{Result, Error, Delegate, FieldMask};
+
+// Re-export the yup_oauth2 crate, that is required to call some methods of the hub and the client
+#[cfg(feature = "yup-oauth2")]
+pub use client::oauth2;

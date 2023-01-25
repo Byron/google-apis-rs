@@ -1,19 +1,20 @@
 use std::collections::HashMap;
 use std::cell::RefCell;
 use std::default::Default;
-use std::collections::BTreeMap;
+use std::collections::BTreeSet;
 use std::error::Error as StdError;
 use serde_json as json;
 use std::io;
 use std::fs;
 use std::mem;
-use std::thread::sleep;
 
-use http::Uri;
 use hyper::client::connect;
 use tokio::io::{AsyncRead, AsyncWrite};
+use tokio::time::sleep;
 use tower_service;
-use crate::client;
+use serde::{Serialize, Deserialize};
+
+use crate::{client, client::GetToken, client::serde_with};
 
 // ##############
 // UTILITIES ###
@@ -39,7 +40,7 @@ use crate::client;
 /// use webfonts1::{Result, Error};
 /// # async fn dox() {
 /// use std::default::Default;
-/// use webfonts1::{Webfonts, oauth2, hyper, hyper_rustls};
+/// use webfonts1::{Webfonts, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// // Get an ApplicationSecret instance by some means. It contains the `client_id` and 
 /// // `client_secret`, among other things.
@@ -83,7 +84,7 @@ use crate::client;
 #[derive(Clone)]
 pub struct Webfonts<S> {
     pub client: hyper::Client<S, hyper::body::Body>,
-    pub auth: oauth2::authenticator::Authenticator<S>,
+    pub auth: Box<dyn client::GetToken>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
@@ -93,11 +94,11 @@ impl<'a, S> client::Hub for Webfonts<S> {}
 
 impl<'a, S> Webfonts<S> {
 
-    pub fn new(client: hyper::Client<S, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<S>) -> Webfonts<S> {
+    pub fn new<A: 'static + client::GetToken>(client: hyper::Client<S, hyper::body::Body>, auth: A) -> Webfonts<S> {
         Webfonts {
             client,
-            auth: authenticator,
-            _user_agent: "google-api-rust-client/4.0.1".to_string(),
+            auth: Box::new(auth),
+            _user_agent: "google-api-rust-client/5.0.2-beta-1".to_string(),
             _base_url: "https://webfonts.googleapis.com/".to_string(),
             _root_url: "https://webfonts.googleapis.com/".to_string(),
         }
@@ -108,7 +109,7 @@ impl<'a, S> Webfonts<S> {
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/4.0.1`.
+    /// It defaults to `google-api-rust-client/5.0.2-beta-1`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -145,24 +146,33 @@ impl<'a, S> Webfonts<S> {
 /// 
 /// * [list webfonts](WebfontListCall) (none)
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Webfont {
     /// The category of the font.
+    
     pub category: Option<String>,
     /// The name of the font.
+    
     pub family: Option<String>,
     /// The font files (with all supported scripts) for each one of the available variants, as a key : value map.
+    
     pub files: Option<HashMap<String, String>>,
     /// This kind represents a webfont object in the webfonts service.
+    
     pub kind: Option<String>,
     /// The date (format "yyyy-MM-dd") the font was modified for the last time.
     #[serde(rename="lastModified")]
+    
     pub last_modified: Option<String>,
     /// The scripts supported by the font.
+    
     pub subsets: Option<Vec<String>>,
     /// The available variants for the font.
+    
     pub variants: Option<Vec<String>>,
     /// The font version.
+    
     pub version: Option<String>,
 }
 
@@ -178,11 +188,14 @@ impl client::Resource for Webfont {}
 /// 
 /// * [list webfonts](WebfontListCall) (response)
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct WebfontList {
     /// The list of fonts currently served by the Google Fonts API.
+    
     pub items: Option<Vec<Webfont>>,
     /// This kind represents a list of webfont objects in the webfonts service.
+    
     pub kind: Option<String>,
 }
 
@@ -195,7 +208,7 @@ impl client::ResponseResult for WebfontList {}
 // #################
 
 /// A builder providing access to all methods supported on *webfont* resources.
-/// It is not used directly, but through the `Webfonts` hub.
+/// It is not used directly, but through the [`Webfonts`] hub.
 ///
 /// # Example
 ///
@@ -208,7 +221,7 @@ impl client::ResponseResult for WebfontList {}
 /// 
 /// # async fn dox() {
 /// use std::default::Default;
-/// use webfonts1::{Webfonts, oauth2, hyper, hyper_rustls};
+/// use webfonts1::{Webfonts, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// let secret: oauth2::ApplicationSecret = Default::default();
 /// let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -256,7 +269,7 @@ impl<'a, S> WebfontMethods<'a, S> {
 /// Retrieves the list of fonts currently served by the Google Fonts Developer API.
 ///
 /// A builder for the *list* method supported by a *webfont* resource.
-/// It is not used directly, but through a `WebfontMethods` instance.
+/// It is not used directly, but through a [`WebfontMethods`] instance.
 ///
 /// # Example
 ///
@@ -268,7 +281,7 @@ impl<'a, S> WebfontMethods<'a, S> {
 /// # extern crate google_webfonts1 as webfonts1;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use webfonts1::{Webfonts, oauth2, hyper, hyper_rustls};
+/// # use webfonts1::{Webfonts, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
 /// # let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -297,7 +310,7 @@ impl<'a, S> client::CallBuilder for WebfontListCall<'a, S> {}
 
 impl<'a, S> WebfontListCall<'a, S>
 where
-    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
     S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
     S::Future: Send + Unpin + 'static,
     S::Error: Into<Box<dyn StdError + Send + Sync>>,
@@ -308,35 +321,33 @@ where
     pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, WebfontList)> {
         use std::io::{Read, Seek};
         use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::ToParts;
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
         let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
         dlg.begin(client::MethodInfo { id: "webfonts.webfonts.list",
                                http_method: hyper::Method::GET });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
-        if let Some(value) = self._sort {
-            params.push(("sort", value.to_string()));
-        }
+
         for &field in ["alt", "sort"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(client::Error::FieldClash(field));
             }
         }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
+
+        let mut params = Params::with_capacity(3 + self._additional_params.len());
+        if let Some(value) = self._sort.as_ref() {
+            params.push("sort", value);
         }
 
-        params.push(("alt", "json".to_string()));
+        params.extend(self._additional_params.iter());
 
+        params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "v1/webfonts";
         
-        let key = dlg.api_key();
-        match key {
-            Some(value) => params.push(("key", value)),
+        match dlg.api_key() {
+            Some(value) => params.push("key", value),
             None => {
                 dlg.finished(false);
                 return Err(client::Error::MissingAPIKey)
@@ -344,7 +355,7 @@ where
         }
 
 
-        let url = url::Url::parse_with_params(&url, params).unwrap();
+        let url = params.parse_with_url(&url);
 
 
 
@@ -352,21 +363,24 @@ where
             let mut req_result = {
                 let client = &self.hub.client;
                 dlg.pre_request();
-                let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
-                        .header(USER_AGENT, self.hub._user_agent.clone());
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::GET)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
 
 
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
-                
+
             };
 
             match req_result {
                 Err(err) => {
                     if let client::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep(d).await;
                         continue;
                     }
                     dlg.finished(false);
@@ -382,7 +396,7 @@ where
                         let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
                         if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
-                            sleep(d);
+                            sleep(d).await;
                             continue;
                         }
 
@@ -423,7 +437,8 @@ where
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.````
     ///
     /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> WebfontListCall<'a, S> {

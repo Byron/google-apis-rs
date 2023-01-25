@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/generator/templates/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Real-time Bidding* crate version *4.0.1+20220307*, where *20220307* is the exact revision of the *realtimebidding:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v4.0.1*.
+//! This documentation was generated from *Real-time Bidding* crate version *5.0.2-beta-1+20230124*, where *20230124* is the exact revision of the *realtimebidding:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.2-beta-1*.
 //! 
 //! Everything else about the *Real-time Bidding* *v1* API can be found at the
 //! [official documentation site](https://developers.google.com/authorized-buyers/apis/realtimebidding/reference/rest/).
@@ -12,7 +12,7 @@
 //! Handle the following *Resources* with ease from the central [hub](RealTimeBidding) ... 
 //! 
 //! * [bidders](api::Bidder)
-//!  * [*creatives list*](api::BidderCreativeListCall), [*creatives watch*](api::BidderCreativeWatchCall), [*endpoints get*](api::BidderEndpointGetCall), [*endpoints list*](api::BidderEndpointListCall), [*endpoints patch*](api::BidderEndpointPatchCall), [*get*](api::BidderGetCall), [*list*](api::BidderListCall), [*pretargeting configs activate*](api::BidderPretargetingConfigActivateCall), [*pretargeting configs add targeted apps*](api::BidderPretargetingConfigAddTargetedAppCall), [*pretargeting configs add targeted publishers*](api::BidderPretargetingConfigAddTargetedPublisherCall), [*pretargeting configs add targeted sites*](api::BidderPretargetingConfigAddTargetedSiteCall), [*pretargeting configs create*](api::BidderPretargetingConfigCreateCall), [*pretargeting configs delete*](api::BidderPretargetingConfigDeleteCall), [*pretargeting configs get*](api::BidderPretargetingConfigGetCall), [*pretargeting configs list*](api::BidderPretargetingConfigListCall), [*pretargeting configs patch*](api::BidderPretargetingConfigPatchCall), [*pretargeting configs remove targeted apps*](api::BidderPretargetingConfigRemoveTargetedAppCall), [*pretargeting configs remove targeted publishers*](api::BidderPretargetingConfigRemoveTargetedPublisherCall), [*pretargeting configs remove targeted sites*](api::BidderPretargetingConfigRemoveTargetedSiteCall) and [*pretargeting configs suspend*](api::BidderPretargetingConfigSuspendCall)
+//!  * [*creatives list*](api::BidderCreativeListCall), [*creatives watch*](api::BidderCreativeWatchCall), [*endpoints get*](api::BidderEndpointGetCall), [*endpoints list*](api::BidderEndpointListCall), [*endpoints patch*](api::BidderEndpointPatchCall), [*get*](api::BidderGetCall), [*list*](api::BidderListCall), [*pretargeting configs activate*](api::BidderPretargetingConfigActivateCall), [*pretargeting configs add targeted apps*](api::BidderPretargetingConfigAddTargetedAppCall), [*pretargeting configs add targeted publishers*](api::BidderPretargetingConfigAddTargetedPublisherCall), [*pretargeting configs add targeted sites*](api::BidderPretargetingConfigAddTargetedSiteCall), [*pretargeting configs create*](api::BidderPretargetingConfigCreateCall), [*pretargeting configs delete*](api::BidderPretargetingConfigDeleteCall), [*pretargeting configs get*](api::BidderPretargetingConfigGetCall), [*pretargeting configs list*](api::BidderPretargetingConfigListCall), [*pretargeting configs patch*](api::BidderPretargetingConfigPatchCall), [*pretargeting configs remove targeted apps*](api::BidderPretargetingConfigRemoveTargetedAppCall), [*pretargeting configs remove targeted publishers*](api::BidderPretargetingConfigRemoveTargetedPublisherCall), [*pretargeting configs remove targeted sites*](api::BidderPretargetingConfigRemoveTargetedSiteCall), [*pretargeting configs suspend*](api::BidderPretargetingConfigSuspendCall), [*publisher connections batch approve*](api::BidderPublisherConnectionBatchApproveCall), [*publisher connections batch reject*](api::BidderPublisherConnectionBatchRejectCall), [*publisher connections get*](api::BidderPublisherConnectionGetCall) and [*publisher connections list*](api::BidderPublisherConnectionListCall)
 //! * [buyers](api::Buyer)
 //!  * [*creatives create*](api::BuyerCreativeCreateCall), [*creatives get*](api::BuyerCreativeGetCall), [*creatives list*](api::BuyerCreativeListCall), [*creatives patch*](api::BuyerCreativePatchCall), [*get*](api::BuyerGetCall), [*get remarketing tag*](api::BuyerGetRemarketingTagCall), [*list*](api::BuyerListCall), [*user lists close*](api::BuyerUserListCloseCall), [*user lists create*](api::BuyerUserListCreateCall), [*user lists get*](api::BuyerUserListGetCall), [*user lists get remarketing tag*](api::BuyerUserListGetRemarketingTagCall), [*user lists list*](api::BuyerUserListListCall), [*user lists open*](api::BuyerUserListOpenCall) and [*user lists update*](api::BuyerUserListUpdateCall)
 //! 
@@ -67,6 +67,10 @@
 //! let r = hub.bidders().pretargeting_configs_remove_targeted_publishers(...).doit().await
 //! let r = hub.bidders().pretargeting_configs_remove_targeted_sites(...).doit().await
 //! let r = hub.bidders().pretargeting_configs_suspend(...).doit().await
+//! let r = hub.bidders().publisher_connections_batch_approve(...).doit().await
+//! let r = hub.bidders().publisher_connections_batch_reject(...).doit().await
+//! let r = hub.bidders().publisher_connections_get(...).doit().await
+//! let r = hub.bidders().publisher_connections_list(...).doit().await
 //! let r = hub.bidders().get(...).doit().await
 //! let r = hub.bidders().list(...).doit().await
 //! ```
@@ -98,7 +102,7 @@
 //! use realtimebidding1::{Result, Error};
 //! # async fn dox() {
 //! use std::default::Default;
-//! use realtimebidding1::{RealTimeBidding, oauth2, hyper, hyper_rustls};
+//! use realtimebidding1::{RealTimeBidding, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 //! 
 //! // Get an ApplicationSecret instance by some means. It contains the `client_id` and 
 //! // `client_secret`, among other things.
@@ -206,22 +210,17 @@
 // This file was generated automatically from 'src/generator/templates/api/lib.rs.mako'
 // DO NOT EDIT !
 
-#[macro_use]
-extern crate serde_derive;
-
 // Re-export the hyper and hyper_rustls crate, they are required to build the hub
-pub extern crate hyper;
-pub extern crate hyper_rustls;
-extern crate serde;
-extern crate serde_json;
-// Re-export the yup_oauth2 crate, that is required to call some methods of the hub and the client
-pub extern crate yup_oauth2 as oauth2;
-extern crate mime;
-extern crate url;
-
+pub use hyper;
+pub use hyper_rustls;
+pub extern crate google_apis_common as client;
+pub use client::chrono;
 pub mod api;
-pub mod client;
 
 // Re-export the hub type and some basic client structs
 pub use api::RealTimeBidding;
-pub use client::{Result, Error, Delegate};
+pub use client::{Result, Error, Delegate, FieldMask};
+
+// Re-export the yup_oauth2 crate, that is required to call some methods of the hub and the client
+#[cfg(feature = "yup-oauth2")]
+pub use client::oauth2;

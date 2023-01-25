@@ -1,19 +1,20 @@
 use std::collections::HashMap;
 use std::cell::RefCell;
 use std::default::Default;
-use std::collections::BTreeMap;
+use std::collections::BTreeSet;
 use std::error::Error as StdError;
 use serde_json as json;
 use std::io;
 use std::fs;
 use std::mem;
-use std::thread::sleep;
 
-use http::Uri;
 use hyper::client::connect;
 use tokio::io::{AsyncRead, AsyncWrite};
+use tokio::time::sleep;
 use tower_service;
-use crate::client;
+use serde::{Serialize, Deserialize};
+
+use crate::{client, client::GetToken, client::serde_with};
 
 // ##############
 // UTILITIES ###
@@ -61,7 +62,7 @@ impl Default for Scope {
 /// use dlp2_beta1::{Result, Error};
 /// # async fn dox() {
 /// use std::default::Default;
-/// use dlp2_beta1::{DLP, oauth2, hyper, hyper_rustls};
+/// use dlp2_beta1::{DLP, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// // Get an ApplicationSecret instance by some means. It contains the `client_id` and 
 /// // `client_secret`, among other things.
@@ -104,7 +105,7 @@ impl Default for Scope {
 #[derive(Clone)]
 pub struct DLP<S> {
     pub client: hyper::Client<S, hyper::body::Body>,
-    pub auth: oauth2::authenticator::Authenticator<S>,
+    pub auth: Box<dyn client::GetToken>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
@@ -114,11 +115,11 @@ impl<'a, S> client::Hub for DLP<S> {}
 
 impl<'a, S> DLP<S> {
 
-    pub fn new(client: hyper::Client<S, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<S>) -> DLP<S> {
+    pub fn new<A: 'static + client::GetToken>(client: hyper::Client<S, hyper::body::Body>, auth: A) -> DLP<S> {
         DLP {
             client,
-            auth: authenticator,
-            _user_agent: "google-api-rust-client/4.0.1".to_string(),
+            auth: Box::new(auth),
+            _user_agent: "google-api-rust-client/5.0.2-beta-1".to_string(),
             _base_url: "https://dlp.googleapis.com/".to_string(),
             _root_url: "https://dlp.googleapis.com/".to_string(),
         }
@@ -141,7 +142,7 @@ impl<'a, S> DLP<S> {
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/4.0.1`.
+    /// It defaults to `google-api-rust-client/5.0.2-beta-1`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -173,6 +174,7 @@ impl<'a, S> DLP<S> {
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GooglePrivacyDlpV2beta1FieldTransformation {
     /// Only apply the transformation if the condition evaluates to true for the
@@ -184,15 +186,19 @@ pub struct GooglePrivacyDlpV2beta1FieldTransformation {
     /// - Apply a different bucket transformation to an age column if the zip code
     /// column for the same record is within a specific range.
     /// - Redact a field if the date of birth field is greater than 85.
+    
     pub condition: Option<GooglePrivacyDlpV2beta1RecordCondition>,
     /// Treat the contents of the field as free text, and selectively
     /// transform content that matches an `InfoType`.
     #[serde(rename="infoTypeTransformations")]
+    
     pub info_type_transformations: Option<GooglePrivacyDlpV2beta1InfoTypeTransformations>,
     /// Input field(s) to apply the transformation to. [required]
+    
     pub fields: Option<Vec<GooglePrivacyDlpV2beta1FieldId>>,
     /// Apply the transformation to the entire field.
     #[serde(rename="primitiveTransformation")]
+    
     pub primitive_transformation: Option<GooglePrivacyDlpV2beta1PrimitiveTransformation>,
 }
 
@@ -203,6 +209,7 @@ impl client::Part for GooglePrivacyDlpV2beta1FieldTransformation {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GooglePrivacyDlpV2beta1OutputStorageConfig {
     /// The path to a Google Cloud Storage location to store output.
@@ -244,8 +251,10 @@ pub struct GooglePrivacyDlpV2beta1OutputStorageConfig {
     /// - dataset_id
     /// - table_id
     #[serde(rename="storagePath")]
+    
     pub storage_path: Option<GooglePrivacyDlpV2beta1CloudStoragePath>,
     /// Store findings in a new table in the dataset.
+    
     pub table: Option<GooglePrivacyDlpV2beta1BigQueryTable>,
 }
 
@@ -263,9 +272,11 @@ impl client::Part for GooglePrivacyDlpV2beta1OutputStorageConfig {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GooglePrivacyDlpV2beta1BucketingConfig {
     /// no description provided
+    
     pub buckets: Option<Vec<GooglePrivacyDlpV2beta1Bucket>>,
 }
 
@@ -281,11 +292,14 @@ impl client::Part for GooglePrivacyDlpV2beta1BucketingConfig {}
 /// 
 /// * [deidentify content](ContentDeidentifyCall) (response)
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GooglePrivacyDlpV2beta1DeidentifyContentResponse {
     /// no description provided
+    
     pub items: Option<Vec<GooglePrivacyDlpV2beta1ContentItem>>,
     /// A review of the transformations that took place for each item.
+    
     pub summaries: Option<Vec<GooglePrivacyDlpV2beta1DeidentificationSummary>>,
 }
 
@@ -305,20 +319,26 @@ impl client::ResponseResult for GooglePrivacyDlpV2beta1DeidentifyContentResponse
 /// * [operations create inspect](InspectOperationCreateCall) (response)
 /// * [operations get inspect](InspectOperationGetCall) (response)
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleLongrunningOperation {
     /// If the value is `false`, it means the operation is still in progress.
     /// If `true`, the operation is completed, and either `error` or `response` is
     /// available.
+    
     pub done: Option<bool>,
     /// This field will contain an InspectOperationResult object for `inspect.operations.create` or a RiskAnalysisOperationResult object for `dataSource.analyze`.
-    pub response: Option<HashMap<String, String>>,
+    
+    pub response: Option<HashMap<String, json::Value>>,
     /// The server-assigned name. The `name` should have the format of `inspect/operations/<identifier>`.
+    
     pub name: Option<String>,
     /// The error result of the operation in case of failure or cancellation.
+    
     pub error: Option<GoogleRpcStatus>,
     /// This field will contain an InspectOperationMetadata object for `inspect.operations.create` or a RiskAnalysisOperationMetadata object for `dataSource.analyze`.  This will always be returned with the Operation.
-    pub metadata: Option<HashMap<String, String>>,
+    
+    pub metadata: Option<HashMap<String, json::Value>>,
 }
 
 impl client::ResponseResult for GoogleLongrunningOperation {}
@@ -331,13 +351,17 @@ impl client::ResponseResult for GoogleLongrunningOperation {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GooglePrivacyDlpV2beta1KmsWrappedCryptoKey {
     /// The wrapped data crypto key. [required]
     #[serde(rename="wrappedKey")]
-    pub wrapped_key: Option<String>,
+    
+    #[serde_as(as = "Option<::client::serde::urlsafe_base64::Wrapper>")]
+    pub wrapped_key: Option<Vec<u8>>,
     /// The resource name of the KMS CryptoKey to use for unwrapping. [required]
     #[serde(rename="cryptoKeyName")]
+    
     pub crypto_key_name: Option<String>,
 }
 
@@ -348,9 +372,11 @@ impl client::Part for GooglePrivacyDlpV2beta1KmsWrappedCryptoKey {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GooglePrivacyDlpV2beta1InfoType {
     /// Name of the information type.
+    
     pub name: Option<String>,
 }
 
@@ -362,13 +388,16 @@ impl client::Part for GooglePrivacyDlpV2beta1InfoType {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GooglePrivacyDlpV2beta1CharsToIgnore {
     /// no description provided
     #[serde(rename="charactersToSkip")]
+    
     pub characters_to_skip: Option<String>,
     /// no description provided
     #[serde(rename="commonCharactersToIgnore")]
+    
     pub common_characters_to_ignore: Option<String>,
 }
 
@@ -388,6 +417,7 @@ impl client::Part for GooglePrivacyDlpV2beta1CharsToIgnore {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GooglePrivacyDlpV2beta1FixedSizeBucketingConfig {
     /// Upper bound value of buckets. All values greater than upper_bound are
@@ -395,17 +425,20 @@ pub struct GooglePrivacyDlpV2beta1FixedSizeBucketingConfig {
     /// then all values greater than 89 are replaced with the value “89+”.
     /// [Required].
     #[serde(rename="upperBound")]
+    
     pub upper_bound: Option<GooglePrivacyDlpV2beta1Value>,
     /// Lower bound value of buckets. All values less than `lower_bound` are
     /// grouped together into a single bucket; for example if `lower_bound` = 10,
     /// then all values less than 10 are replaced with the value “-10”. [Required].
     #[serde(rename="lowerBound")]
+    
     pub lower_bound: Option<GooglePrivacyDlpV2beta1Value>,
     /// Size of each bucket (except for minimum and maximum buckets). So if
     /// `lower_bound` = 10, `upper_bound` = 89, and `bucket_size` = 10, then the
     /// following buckets would be used: -10, 10-20, 20-30, 30-40, 40-50, 50-60,
     /// 60-70, 70-80, 80-89, 89+. Precision up to 2 decimals works. [Required].
     #[serde(rename="bucketSize")]
+    
     pub bucket_size: Option<f64>,
 }
 
@@ -416,12 +449,15 @@ impl client::Part for GooglePrivacyDlpV2beta1FixedSizeBucketingConfig {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GooglePrivacyDlpV2beta1CategoryDescription {
     /// Internal name of the category.
+    
     pub name: Option<String>,
     /// Human readable form of the category name.
     #[serde(rename="displayName")]
+    
     pub display_name: Option<String>,
 }
 
@@ -432,9 +468,11 @@ impl client::Part for GooglePrivacyDlpV2beta1CategoryDescription {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GooglePrivacyDlpV2beta1Conditions {
     /// no description provided
+    
     pub conditions: Option<Vec<GooglePrivacyDlpV2beta1Condition>>,
 }
 
@@ -445,34 +483,44 @@ impl client::Part for GooglePrivacyDlpV2beta1Conditions {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GooglePrivacyDlpV2beta1PrimitiveTransformation {
     /// no description provided
     #[serde(rename="replaceWithInfoTypeConfig")]
+    
     pub replace_with_info_type_config: Option<GooglePrivacyDlpV2beta1ReplaceWithInfoTypeConfig>,
     /// no description provided
     #[serde(rename="cryptoHashConfig")]
+    
     pub crypto_hash_config: Option<GooglePrivacyDlpV2beta1CryptoHashConfig>,
     /// no description provided
     #[serde(rename="cryptoReplaceFfxFpeConfig")]
+    
     pub crypto_replace_ffx_fpe_config: Option<GooglePrivacyDlpV2beta1CryptoReplaceFfxFpeConfig>,
     /// no description provided
     #[serde(rename="replaceConfig")]
+    
     pub replace_config: Option<GooglePrivacyDlpV2beta1ReplaceValueConfig>,
     /// no description provided
     #[serde(rename="timePartConfig")]
+    
     pub time_part_config: Option<GooglePrivacyDlpV2beta1TimePartConfig>,
     /// no description provided
     #[serde(rename="fixedSizeBucketingConfig")]
+    
     pub fixed_size_bucketing_config: Option<GooglePrivacyDlpV2beta1FixedSizeBucketingConfig>,
     /// no description provided
     #[serde(rename="characterMaskConfig")]
+    
     pub character_mask_config: Option<GooglePrivacyDlpV2beta1CharacterMaskConfig>,
     /// no description provided
     #[serde(rename="bucketingConfig")]
+    
     pub bucketing_config: Option<GooglePrivacyDlpV2beta1BucketingConfig>,
     /// no description provided
     #[serde(rename="redactConfig")]
+    
     pub redact_config: Option<GooglePrivacyDlpV2beta1RedactConfig>,
 }
 
@@ -484,12 +532,14 @@ impl client::Part for GooglePrivacyDlpV2beta1PrimitiveTransformation {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GooglePrivacyDlpV2beta1CategoricalStatsConfig {
     /// Field to compute categorical stats on. All column types are
     /// supported except for arrays and structs. However, it may be more
     /// informative to use NumericalStats when the field type is supported,
     /// depending on the data.
+    
     pub field: Option<GooglePrivacyDlpV2beta1FieldId>,
 }
 
@@ -500,20 +550,26 @@ impl client::Part for GooglePrivacyDlpV2beta1CategoricalStatsConfig {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GooglePrivacyDlpV2beta1Finding {
     /// The specific string that may be potentially sensitive info.
+    
     pub quote: Option<String>,
     /// Location of the info found.
+    
     pub location: Option<GooglePrivacyDlpV2beta1Location>,
     /// Estimate of how likely it is that the info_type is correct.
+    
     pub likelihood: Option<String>,
     /// The specific type of info the string might be.
     #[serde(rename="infoType")]
+    
     pub info_type: Option<GooglePrivacyDlpV2beta1InfoType>,
     /// Timestamp when finding was detected.
     #[serde(rename="createTime")]
-    pub create_time: Option<String>,
+    
+    pub create_time: Option<client::chrono::DateTime<client::chrono::offset::Utc>>,
 }
 
 impl client::Part for GooglePrivacyDlpV2beta1Finding {}
@@ -528,21 +584,25 @@ impl client::Part for GooglePrivacyDlpV2beta1Finding {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GooglePrivacyDlpV2beta1KMapEstimationConfig {
     /// Several auxiliary tables can be used in the analysis. Each custom_tag
     /// used to tag a quasi-identifiers column must appear in exactly one column
     /// of one auxiliary table.
     #[serde(rename="auxiliaryTables")]
+    
     pub auxiliary_tables: Option<Vec<GooglePrivacyDlpV2beta1AuxiliaryTable>>,
     /// Fields considered to be quasi-identifiers. No two columns can have the
     /// same tag. [required]
     #[serde(rename="quasiIds")]
+    
     pub quasi_ids: Option<Vec<GooglePrivacyDlpV2beta1TaggedField>>,
     /// ISO 3166-1 alpha-2 region code to use in the statistical modeling.
     /// Required if no column is tagged with a region-specific InfoType (like
     /// US_ZIP_5) or a region code.
     #[serde(rename="regionCode")]
+    
     pub region_code: Option<String>,
 }
 
@@ -559,12 +619,15 @@ impl client::Part for GooglePrivacyDlpV2beta1KMapEstimationConfig {}
 /// * [operations list risk analysis](RiskAnalysiOperationListCall) (response)
 /// * [operations list inspect](InspectOperationListCall) (response)
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleLongrunningListOperationsResponse {
     /// A list of operations that matches the specified filter in the request.
+    
     pub operations: Option<Vec<GoogleLongrunningOperation>>,
     /// The standard List next-page token.
     #[serde(rename="nextPageToken")]
+    
     pub next_page_token: Option<String>,
 }
 
@@ -575,9 +638,11 @@ impl client::ResponseResult for GoogleLongrunningListOperationsResponse {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GooglePrivacyDlpV2beta1Row {
     /// no description provided
+    
     pub values: Option<Vec<GooglePrivacyDlpV2beta1Value>>,
 }
 
@@ -605,6 +670,7 @@ impl client::Part for GooglePrivacyDlpV2beta1Row {}
 /// * [operations delete risk analysis](RiskAnalysiOperationDeleteCall) (response)
 /// * [operations cancel inspect](InspectOperationCancelCall) (response)
 /// * [operations delete inspect](InspectOperationDeleteCall) (response)
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleProtobufEmpty { _never_set: Option<bool> }
 
@@ -620,13 +686,16 @@ impl client::ResponseResult for GoogleProtobufEmpty {}
 /// 
 /// * [results findings list inspect](InspectResultFindingListCall) (response)
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GooglePrivacyDlpV2beta1ListInspectFindingsResponse {
     /// The results.
+    
     pub result: Option<GooglePrivacyDlpV2beta1InspectResult>,
     /// If not empty, indicates that there may be more results that match the
     /// request; this value should be passed in a new `ListInspectFindingsRequest`.
     #[serde(rename="nextPageToken")]
+    
     pub next_page_token: Option<String>,
 }
 
@@ -637,13 +706,16 @@ impl client::ResponseResult for GooglePrivacyDlpV2beta1ListInspectFindingsRespon
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GooglePrivacyDlpV2beta1Expressions {
     /// The operator to apply to the result of conditions. Default and currently
     /// only supported value is `AND`.
     #[serde(rename="logicalOperator")]
+    
     pub logical_operator: Option<String>,
     /// no description provided
+    
     pub conditions: Option<GooglePrivacyDlpV2beta1Conditions>,
 }
 
@@ -655,10 +727,12 @@ impl client::Part for GooglePrivacyDlpV2beta1Expressions {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GooglePrivacyDlpV2beta1CloudStorageOptions {
     /// no description provided
     #[serde(rename="fileSet")]
+    
     pub file_set: Option<GooglePrivacyDlpV2beta1FileSet>,
 }
 
@@ -669,9 +743,11 @@ impl client::Part for GooglePrivacyDlpV2beta1CloudStorageOptions {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GooglePrivacyDlpV2beta1CloudStoragePath {
     /// The url, in the format of `gs://bucket/<path>`.
+    
     pub path: Option<String>,
 }
 
@@ -682,12 +758,17 @@ impl client::Part for GooglePrivacyDlpV2beta1CloudStoragePath {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GooglePrivacyDlpV2beta1Range {
     /// Index of the first character of the range (inclusive).
-    pub start: Option<String>,
+    
+    #[serde_as(as = "Option<::client::serde_with::DisplayFromStr>")]
+    pub start: Option<i64>,
     /// Index of the last character of the range (exclusive).
-    pub end: Option<String>,
+    
+    #[serde_as(as = "Option<::client::serde_with::DisplayFromStr>")]
+    pub end: Option<i64>,
 }
 
 impl client::Part for GooglePrivacyDlpV2beta1Range {}
@@ -699,17 +780,22 @@ impl client::Part for GooglePrivacyDlpV2beta1Range {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleTypeTimeOfDay {
     /// Fractions of seconds in nanoseconds. Must be from 0 to 999,999,999.
+    
     pub nanos: Option<i32>,
     /// Seconds of minutes of the time. Must normally be from 0 to 59. An API may
     /// allow the value 60 if it allows leap-seconds.
+    
     pub seconds: Option<i32>,
     /// Minutes of hour of day. Must be from 0 to 59.
+    
     pub minutes: Option<i32>,
     /// Hours of day in 24 hour format. Should be from 0 to 23. An API may choose
     /// to allow the value "24:00:00" for scenarios like business closing time.
+    
     pub hours: Option<i32>,
 }
 
@@ -720,16 +806,19 @@ impl client::Part for GoogleTypeTimeOfDay {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GooglePrivacyDlpV2beta1DeidentifyConfig {
     /// Treat the dataset as structured. Transformations can be applied to
     /// specific locations within structured datasets, such as transforming
     /// a column within a table.
     #[serde(rename="recordTransformations")]
+    
     pub record_transformations: Option<GooglePrivacyDlpV2beta1RecordTransformations>,
     /// Treat the dataset as free-form text and apply the same free text
     /// transformation everywhere.
     #[serde(rename="infoTypeTransformations")]
+    
     pub info_type_transformations: Option<GooglePrivacyDlpV2beta1InfoTypeTransformations>,
 }
 
@@ -740,15 +829,18 @@ impl client::Part for GooglePrivacyDlpV2beta1DeidentifyConfig {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GooglePrivacyDlpV2beta1LDiversityConfig {
     /// Sensitive field for computing the l-value.
     #[serde(rename="sensitiveAttribute")]
+    
     pub sensitive_attribute: Option<GooglePrivacyDlpV2beta1FieldId>,
     /// Set of quasi-identifiers indicating how equivalence classes are
     /// defined for the l-diversity computation. When multiple fields are
     /// specified, they are considered a single composite key.
     #[serde(rename="quasiIds")]
+    
     pub quasi_ids: Option<Vec<GooglePrivacyDlpV2beta1FieldId>>,
 }
 
@@ -759,16 +851,20 @@ impl client::Part for GooglePrivacyDlpV2beta1LDiversityConfig {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GooglePrivacyDlpV2beta1StorageConfig {
     /// BigQuery options specification.
     #[serde(rename="bigQueryOptions")]
+    
     pub big_query_options: Option<GooglePrivacyDlpV2beta1BigQueryOptions>,
     /// Google Cloud Storage options specification.
     #[serde(rename="cloudStorageOptions")]
+    
     pub cloud_storage_options: Option<GooglePrivacyDlpV2beta1CloudStorageOptions>,
     /// Google Cloud Datastore options specification.
     #[serde(rename="datastoreOptions")]
+    
     pub datastore_options: Option<GooglePrivacyDlpV2beta1DatastoreOptions>,
 }
 
@@ -779,11 +875,14 @@ impl client::Part for GooglePrivacyDlpV2beta1StorageConfig {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GooglePrivacyDlpV2beta1OperationConfig {
     /// Max number of findings per file, Datastore entity, or database row.
     #[serde(rename="maxItemFindings")]
-    pub max_item_findings: Option<String>,
+    
+    #[serde_as(as = "Option<::client::serde_with::DisplayFromStr>")]
+    pub max_item_findings: Option<i64>,
 }
 
 impl client::Part for GooglePrivacyDlpV2beta1OperationConfig {}
@@ -793,14 +892,17 @@ impl client::Part for GooglePrivacyDlpV2beta1OperationConfig {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GooglePrivacyDlpV2beta1BigQueryOptions {
     /// References to fields uniquely identifying rows within the table.
     /// Nested fields in the format, like `person.birthdate.year`, are allowed.
     #[serde(rename="identifyingFields")]
+    
     pub identifying_fields: Option<Vec<GooglePrivacyDlpV2beta1FieldId>>,
     /// Complete BigQuery table reference.
     #[serde(rename="tableReference")]
+    
     pub table_reference: Option<GooglePrivacyDlpV2beta1BigQueryTable>,
 }
 
@@ -811,22 +913,28 @@ impl client::Part for GooglePrivacyDlpV2beta1BigQueryOptions {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GooglePrivacyDlpV2beta1PrivacyMetric {
     /// no description provided
     #[serde(rename="kMapEstimationConfig")]
+    
     pub k_map_estimation_config: Option<GooglePrivacyDlpV2beta1KMapEstimationConfig>,
     /// no description provided
     #[serde(rename="lDiversityConfig")]
+    
     pub l_diversity_config: Option<GooglePrivacyDlpV2beta1LDiversityConfig>,
     /// no description provided
     #[serde(rename="numericalStatsConfig")]
+    
     pub numerical_stats_config: Option<GooglePrivacyDlpV2beta1NumericalStatsConfig>,
     /// no description provided
     #[serde(rename="kAnonymityConfig")]
+    
     pub k_anonymity_config: Option<GooglePrivacyDlpV2beta1KAnonymityConfig>,
     /// no description provided
     #[serde(rename="categoricalStatsConfig")]
+    
     pub categorical_stats_config: Option<GooglePrivacyDlpV2beta1CategoricalStatsConfig>,
 }
 
@@ -837,16 +945,19 @@ impl client::Part for GooglePrivacyDlpV2beta1PrivacyMetric {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GooglePrivacyDlpV2beta1ReplaceConfig {
     /// Content replacing sensitive information of given type. Max 256 chars.
     #[serde(rename="replaceWith")]
+    
     pub replace_with: Option<String>,
     /// Type of information to replace. Only one ReplaceConfig per info_type
     /// should be provided. If ReplaceConfig does not have an info_type, the DLP
     /// API matches it against all info_types that are found but not specified in
     /// another ReplaceConfig.
     #[serde(rename="infoType")]
+    
     pub info_type: Option<GooglePrivacyDlpV2beta1InfoType>,
 }
 
@@ -858,10 +969,12 @@ impl client::Part for GooglePrivacyDlpV2beta1ReplaceConfig {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GooglePrivacyDlpV2beta1NumericalStatsConfig {
     /// Field to compute numerical stats on. Supported types are
     /// integer, float, date, datetime, timestamp, time.
+    
     pub field: Option<GooglePrivacyDlpV2beta1FieldId>,
 }
 
@@ -872,13 +985,17 @@ impl client::Part for GooglePrivacyDlpV2beta1NumericalStatsConfig {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GooglePrivacyDlpV2beta1DeidentificationSummary {
     /// Total size in bytes that were transformed in some way.
     #[serde(rename="transformedBytes")]
-    pub transformed_bytes: Option<String>,
+    
+    #[serde_as(as = "Option<::client::serde_with::DisplayFromStr>")]
+    pub transformed_bytes: Option<i64>,
     /// Transformations applied to the dataset.
     #[serde(rename="transformationSummaries")]
+    
     pub transformation_summaries: Option<Vec<GooglePrivacyDlpV2beta1TransformationSummary>>,
 }
 
@@ -890,9 +1007,11 @@ impl client::Part for GooglePrivacyDlpV2beta1DeidentificationSummary {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GooglePrivacyDlpV2beta1RecordCondition {
     /// no description provided
+    
     pub expressions: Option<GooglePrivacyDlpV2beta1Expressions>,
 }
 
@@ -904,10 +1023,12 @@ impl client::Part for GooglePrivacyDlpV2beta1RecordCondition {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GooglePrivacyDlpV2beta1TimePartConfig {
     /// no description provided
     #[serde(rename="partToExtract")]
+    
     pub part_to_extract: Option<String>,
 }
 
@@ -923,10 +1044,12 @@ impl client::Part for GooglePrivacyDlpV2beta1TimePartConfig {}
 /// 
 /// * [info types list root categories](RootCategoryInfoTypeListCall) (response)
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GooglePrivacyDlpV2beta1ListInfoTypesResponse {
     /// Set of sensitive info types belonging to a category.
     #[serde(rename="infoTypes")]
+    
     pub info_types: Option<Vec<GooglePrivacyDlpV2beta1InfoTypeDescription>>,
 }
 
@@ -937,14 +1060,18 @@ impl client::ResponseResult for GooglePrivacyDlpV2beta1ListInfoTypesResponse {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GooglePrivacyDlpV2beta1CloudStorageKey {
     /// Path to the file.
     #[serde(rename="filePath")]
+    
     pub file_path: Option<String>,
     /// Byte offset of the referenced data in the file.
     #[serde(rename="startOffset")]
-    pub start_offset: Option<String>,
+    
+    #[serde_as(as = "Option<::client::serde_with::DisplayFromStr>")]
+    pub start_offset: Option<i64>,
 }
 
 impl client::Part for GooglePrivacyDlpV2beta1CloudStorageKey {}
@@ -972,10 +1099,12 @@ impl client::Part for GooglePrivacyDlpV2beta1CloudStorageKey {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GooglePrivacyDlpV2beta1Dictionary {
     /// List of words or phrases to search for.
     #[serde(rename="wordList")]
+    
     pub word_list: Option<GooglePrivacyDlpV2beta1WordList>,
 }
 
@@ -986,16 +1115,20 @@ impl client::Part for GooglePrivacyDlpV2beta1Dictionary {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GooglePrivacyDlpV2beta1DatastoreOptions {
     /// A partition ID identifies a grouping of entities. The grouping is always
     /// by project and namespace, however the namespace ID may be empty.
     #[serde(rename="partitionId")]
+    
     pub partition_id: Option<GooglePrivacyDlpV2beta1PartitionId>,
     /// The kind to process.
+    
     pub kind: Option<GooglePrivacyDlpV2beta1KindExpression>,
     /// Properties to scan. If none are specified, all properties will be scanned
     /// by default.
+    
     pub projection: Option<Vec<GooglePrivacyDlpV2beta1Projection>>,
 }
 
@@ -1007,14 +1140,17 @@ impl client::Part for GooglePrivacyDlpV2beta1DatastoreOptions {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GooglePrivacyDlpV2beta1RecordTransformations {
     /// Transform the record by applying various field transformations.
     #[serde(rename="fieldTransformations")]
+    
     pub field_transformations: Option<Vec<GooglePrivacyDlpV2beta1FieldTransformation>>,
     /// Configuration defining which records get suppressed entirely. Records that
     /// match any suppression rule are omitted from the output [optional].
     #[serde(rename="recordSuppressions")]
+    
     pub record_suppressions: Option<Vec<GooglePrivacyDlpV2beta1RecordSuppression>>,
 }
 
@@ -1027,31 +1163,39 @@ impl client::Part for GooglePrivacyDlpV2beta1RecordTransformations {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GooglePrivacyDlpV2beta1InspectConfig {
     /// Configuration of findings limit given for specified info types.
     #[serde(rename="infoTypeLimits")]
+    
     pub info_type_limits: Option<Vec<GooglePrivacyDlpV2beta1InfoTypeLimit>>,
     /// Limits the number of findings per content item or long running operation.
     #[serde(rename="maxFindings")]
+    
     pub max_findings: Option<i32>,
     /// Restricts what info_types to look for. The values must correspond to
     /// InfoType values returned by ListInfoTypes or found in documentation.
     /// Empty info_types runs all enabled detectors.
     #[serde(rename="infoTypes")]
+    
     pub info_types: Option<Vec<GooglePrivacyDlpV2beta1InfoType>>,
     /// When true, a contextual quote from the data that triggered a finding is
     /// included in the response; see Finding.quote.
     #[serde(rename="includeQuote")]
+    
     pub include_quote: Option<bool>,
     /// Custom info types provided by the user.
     #[serde(rename="customInfoTypes")]
+    
     pub custom_info_types: Option<Vec<GooglePrivacyDlpV2beta1CustomInfoType>>,
     /// When true, excludes type information of the findings.
     #[serde(rename="excludeTypes")]
+    
     pub exclude_types: Option<bool>,
     /// Only returns findings equal or above this threshold.
     #[serde(rename="minLikelihood")]
+    
     pub min_likelihood: Option<String>,
 }
 
@@ -1062,9 +1206,11 @@ impl client::Part for GooglePrivacyDlpV2beta1InspectConfig {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GooglePrivacyDlpV2beta1Projection {
     /// The property to project.
+    
     pub property: Option<GooglePrivacyDlpV2beta1PropertyReference>,
 }
 
@@ -1077,6 +1223,7 @@ impl client::Part for GooglePrivacyDlpV2beta1Projection {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GooglePrivacyDlpV2beta1RedactConfig { _never_set: Option<bool> }
 
@@ -1091,10 +1238,12 @@ impl client::Part for GooglePrivacyDlpV2beta1RedactConfig {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GooglePrivacyDlpV2beta1CryptoHashConfig {
     /// The key used by the hash function.
     #[serde(rename="cryptoKey")]
+    
     pub crypto_key: Option<GooglePrivacyDlpV2beta1CryptoKey>,
 }
 
@@ -1108,6 +1257,7 @@ impl client::Part for GooglePrivacyDlpV2beta1CryptoHashConfig {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GooglePrivacyDlpV2beta1Key {
     /// The entity path.
@@ -1119,11 +1269,13 @@ pub struct GooglePrivacyDlpV2beta1Key {
     /// the path are called the element's _ancestors_.
     /// 
     /// A path can never be empty, and a path can have at most 100 elements.
+    
     pub path: Option<Vec<GooglePrivacyDlpV2beta1PathElement>>,
     /// Entities are partitioned into subsets, currently identified by a project
     /// ID and namespace ID.
     /// Queries are scoped to a single partition.
     #[serde(rename="partitionId")]
+    
     pub partition_id: Option<GooglePrivacyDlpV2beta1PartitionId>,
 }
 
@@ -1139,14 +1291,17 @@ impl client::Part for GooglePrivacyDlpV2beta1Key {}
 /// 
 /// * [inspect content](ContentInspectCall) (request)
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GooglePrivacyDlpV2beta1InspectContentRequest {
     /// The list of items to inspect. Items in a single request are
     /// considered "related" unless inspect_config.independent_inputs is true.
     /// Up to 100 are allowed per request.
+    
     pub items: Option<Vec<GooglePrivacyDlpV2beta1ContentItem>>,
     /// Configuration for the inspector.
     #[serde(rename="inspectConfig")]
+    
     pub inspect_config: Option<GooglePrivacyDlpV2beta1InspectConfig>,
 }
 
@@ -1163,15 +1318,19 @@ impl client::RequestValue for GooglePrivacyDlpV2beta1InspectContentRequest {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleTypeDate {
     /// Month of year. Must be from 1 to 12.
+    
     pub month: Option<i32>,
     /// Year of date. Must be from 1 to 9999, or 0 if specifying a date without
     /// a year.
+    
     pub year: Option<i32>,
     /// Day of month. Must be from 1 to 31 and valid for the year and month, or 0
     /// if specifying a year/month where the day is not significant.
+    
     pub day: Option<i32>,
 }
 
@@ -1182,21 +1341,25 @@ impl client::Part for GoogleTypeDate {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GooglePrivacyDlpV2beta1ImageRedactionConfig {
     /// The color to use when redacting content from an image. If not specified,
     /// the default is black.
     #[serde(rename="redactionColor")]
+    
     pub redaction_color: Option<GooglePrivacyDlpV2beta1Color>,
     /// If true, all text found in the image, regardless whether it matches an
     /// info_type, is redacted.
     #[serde(rename="redactAllText")]
+    
     pub redact_all_text: Option<bool>,
     /// Only one per info_type should be provided per request. If not
     /// specified, and redact_all_text is false, the DLP API will redact all
     /// text that it matches against all info_types that are found, but not
     /// specified in another ImageRedactionConfig.
     #[serde(rename="infoType")]
+    
     pub info_type: Option<GooglePrivacyDlpV2beta1InfoType>,
 }
 
@@ -1207,6 +1370,7 @@ impl client::Part for GooglePrivacyDlpV2beta1ImageRedactionConfig {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GooglePrivacyDlpV2beta1ReplaceWithInfoTypeConfig { _never_set: Option<bool> }
 
@@ -1217,26 +1381,33 @@ impl client::Part for GooglePrivacyDlpV2beta1ReplaceWithInfoTypeConfig {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GooglePrivacyDlpV2beta1Location {
     /// Key of the finding.
     #[serde(rename="recordKey")]
+    
     pub record_key: Option<GooglePrivacyDlpV2beta1RecordKey>,
     /// Location within a `ContentItem.Table`.
     #[serde(rename="tableLocation")]
+    
     pub table_location: Option<GooglePrivacyDlpV2beta1TableLocation>,
     /// Character offsets within a content item, included when content type
     /// is a text. Default charset assumed to be UTF-8.
     #[serde(rename="codepointRange")]
+    
     pub codepoint_range: Option<GooglePrivacyDlpV2beta1Range>,
     /// Field id of the field containing the finding.
     #[serde(rename="fieldId")]
+    
     pub field_id: Option<GooglePrivacyDlpV2beta1FieldId>,
     /// Location within an image's pixels.
     #[serde(rename="imageBoxes")]
+    
     pub image_boxes: Option<Vec<GooglePrivacyDlpV2beta1ImageLocation>>,
     /// Zero-based byte offsets within a content item.
     #[serde(rename="byteRange")]
+    
     pub byte_range: Option<GooglePrivacyDlpV2beta1Range>,
 }
 
@@ -1248,9 +1419,11 @@ impl client::Part for GooglePrivacyDlpV2beta1Location {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GooglePrivacyDlpV2beta1RecordSuppression {
     /// no description provided
+    
     pub condition: Option<GooglePrivacyDlpV2beta1RecordCondition>,
 }
 
@@ -1265,9 +1438,11 @@ impl client::Part for GooglePrivacyDlpV2beta1RecordSuppression {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GooglePrivacyDlpV2beta1EntityId {
     /// Composite key indicating which field contains the entity identifier.
+    
     pub field: Option<GooglePrivacyDlpV2beta1FieldId>,
 }
 
@@ -1279,10 +1454,13 @@ impl client::Part for GooglePrivacyDlpV2beta1EntityId {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GooglePrivacyDlpV2beta1UnwrappedCryptoKey {
     /// The AES 128/192/256 bit key. [required]
-    pub key: Option<String>,
+    
+    #[serde_as(as = "Option<::client::serde::urlsafe_base64::Wrapper>")]
+    pub key: Option<Vec<u8>>,
 }
 
 impl client::Part for GooglePrivacyDlpV2beta1UnwrappedCryptoKey {}
@@ -1293,16 +1471,20 @@ impl client::Part for GooglePrivacyDlpV2beta1UnwrappedCryptoKey {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GooglePrivacyDlpV2beta1CustomInfoType {
     /// Info type configuration. All custom info types must have configurations
     /// that do not conflict with built-in info types or other custom info types.
     #[serde(rename="infoType")]
+    
     pub info_type: Option<GooglePrivacyDlpV2beta1InfoType>,
     /// Dictionary-based custom info type.
+    
     pub dictionary: Option<GooglePrivacyDlpV2beta1Dictionary>,
     /// Surrogate info type.
     #[serde(rename="surrogateType")]
+    
     pub surrogate_type: Option<GooglePrivacyDlpV2beta1SurrogateType>,
 }
 
@@ -1313,14 +1495,18 @@ impl client::Part for GooglePrivacyDlpV2beta1CustomInfoType {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GooglePrivacyDlpV2beta1InfoTypeDescription {
     /// Human readable form of the infoType name.
     #[serde(rename="displayName")]
+    
     pub display_name: Option<String>,
     /// List of categories this infoType belongs to.
+    
     pub categories: Option<Vec<GooglePrivacyDlpV2beta1CategoryDescription>>,
     /// Internal name of the infoType.
+    
     pub name: Option<String>,
 }
 
@@ -1337,17 +1523,21 @@ impl client::Part for GooglePrivacyDlpV2beta1InfoTypeDescription {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GooglePrivacyDlpV2beta1AuxiliaryTable {
     /// Auxiliary table location. [required]
+    
     pub table: Option<GooglePrivacyDlpV2beta1BigQueryTable>,
     /// Quasi-identifier columns. [required]
     #[serde(rename="quasiIds")]
+    
     pub quasi_ids: Option<Vec<GooglePrivacyDlpV2beta1QuasiIdField>>,
     /// The relative frequency column must contain a floating-point number
     /// between 0 and 1 (inclusive). Null values are assumed to be zero.
     /// [required]
     #[serde(rename="relativeFrequency")]
+    
     pub relative_frequency: Option<GooglePrivacyDlpV2beta1FieldId>,
 }
 
@@ -1408,17 +1598,21 @@ impl client::Part for GooglePrivacyDlpV2beta1AuxiliaryTable {}
 ///   be used directly after any stripping needed for security/privacy reasons.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleRpcStatus {
     /// The status code, which should be an enum value of google.rpc.Code.
+    
     pub code: Option<i32>,
     /// A developer-facing error message, which should be in English. Any
     /// user-facing error message should be localized and sent in the
     /// google.rpc.Status.details field, or localized by the client.
+    
     pub message: Option<String>,
     /// A list of messages that carry the error details.  There is a common set of
     /// message types for APIs to use.
-    pub details: Option<Vec<HashMap<String, String>>>,
+    
+    pub details: Option<Vec<HashMap<String, json::Value>>>,
 }
 
 impl client::Part for GoogleRpcStatus {}
@@ -1431,21 +1625,26 @@ impl client::Part for GoogleRpcStatus {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GooglePrivacyDlpV2beta1PathElement {
     /// The auto-allocated ID of the entity.
     /// Never equal to zero. Values less than zero are discouraged and may not
     /// be supported in the future.
-    pub id: Option<String>,
+    
+    #[serde_as(as = "Option<::client::serde_with::DisplayFromStr>")]
+    pub id: Option<i64>,
     /// The name of the entity.
     /// A name matching regex `__.*__` is reserved/read-only.
     /// A name must not be more than 1500 bytes when UTF-8 encoded.
     /// Cannot be `""`.
+    
     pub name: Option<String>,
     /// The kind of the entity.
     /// A kind matching regex `__.*__` is reserved/read-only.
     /// A kind must not contain more than 1500 bytes when UTF-8 encoded.
     /// Cannot be `""`.
+    
     pub kind: Option<String>,
 }
 
@@ -1457,14 +1656,19 @@ impl client::Part for GooglePrivacyDlpV2beta1PathElement {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GooglePrivacyDlpV2beta1SummaryResult {
     /// A place for warnings or errors to show up if a transformation didn't
     /// work as expected.
+    
     pub details: Option<String>,
     /// no description provided
-    pub count: Option<String>,
+    
+    #[serde_as(as = "Option<::client::serde_with::DisplayFromStr>")]
+    pub count: Option<i64>,
     /// no description provided
+    
     pub code: Option<String>,
 }
 
@@ -1479,17 +1683,21 @@ impl client::Part for GooglePrivacyDlpV2beta1SummaryResult {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GooglePrivacyDlpV2beta1BigQueryTable {
     /// Name of the table.
     #[serde(rename="tableId")]
+    
     pub table_id: Option<String>,
     /// The Google Cloud Platform project ID of the project containing the table.
     /// If omitted, project ID is inferred from the API call.
     #[serde(rename="projectId")]
+    
     pub project_id: Option<String>,
     /// Dataset ID of the table.
     #[serde(rename="datasetId")]
+    
     pub dataset_id: Option<String>,
 }
 
@@ -1505,9 +1713,11 @@ impl client::Part for GooglePrivacyDlpV2beta1BigQueryTable {}
 /// 
 /// * [list root categories](RootCategoryListCall) (response)
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GooglePrivacyDlpV2beta1ListRootCategoriesResponse {
     /// List of all into type categories supported by the API.
+    
     pub categories: Option<Vec<GooglePrivacyDlpV2beta1CategoryDescription>>,
 }
 
@@ -1521,10 +1731,12 @@ impl client::ResponseResult for GooglePrivacyDlpV2beta1ListRootCategoriesRespons
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GooglePrivacyDlpV2beta1InfoTypeTransformations {
     /// Transformation for each info type. Cannot specify more than one
     /// for a given info type. [required]
+    
     pub transformations: Option<Vec<GooglePrivacyDlpV2beta1InfoTypeTransformation>>,
 }
 
@@ -1535,9 +1747,11 @@ impl client::Part for GooglePrivacyDlpV2beta1InfoTypeTransformations {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GooglePrivacyDlpV2beta1KindExpression {
     /// The name of the kind.
+    
     pub name: Option<String>,
 }
 
@@ -1548,10 +1762,12 @@ impl client::Part for GooglePrivacyDlpV2beta1KindExpression {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GooglePrivacyDlpV2beta1FileSet {
     /// The url, in the format `gs://<bucket>/<path>`. Trailing wildcard in the
     /// path is allowed.
+    
     pub url: Option<String>,
 }
 
@@ -1563,14 +1779,17 @@ impl client::Part for GooglePrivacyDlpV2beta1FileSet {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GooglePrivacyDlpV2beta1InfoTypeTransformation {
     /// Primitive transformation to apply to the info type. [required]
     #[serde(rename="primitiveTransformation")]
+    
     pub primitive_transformation: Option<GooglePrivacyDlpV2beta1PrimitiveTransformation>,
     /// Info types to apply the transformation to. Empty list will match all
     /// available info types for this transformation.
     #[serde(rename="infoTypes")]
+    
     pub info_types: Option<Vec<GooglePrivacyDlpV2beta1InfoType>>,
 }
 
@@ -1586,13 +1805,16 @@ impl client::Part for GooglePrivacyDlpV2beta1InfoTypeTransformation {}
 /// 
 /// * [analyze data source](DataSourceAnalyzeCall) (request)
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GooglePrivacyDlpV2beta1AnalyzeDataSourceRiskRequest {
     /// Input dataset to compute metrics over.
     #[serde(rename="sourceTable")]
+    
     pub source_table: Option<GooglePrivacyDlpV2beta1BigQueryTable>,
     /// Privacy metric to compute.
     #[serde(rename="privacyMetric")]
+    
     pub privacy_metric: Option<GooglePrivacyDlpV2beta1PrivacyMetric>,
 }
 
@@ -1604,16 +1826,20 @@ impl client::RequestValue for GooglePrivacyDlpV2beta1AnalyzeDataSourceRiskReques
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GooglePrivacyDlpV2beta1Bucket {
     /// Upper bound of the range, exclusive; type must match min.
+    
     pub max: Option<GooglePrivacyDlpV2beta1Value>,
     /// Replacement value for this bucket. If not provided
     /// the default behavior will be to hyphenate the min-max range.
     #[serde(rename="replacementValue")]
+    
     pub replacement_value: Option<GooglePrivacyDlpV2beta1Value>,
     /// Lower bound of the range, inclusive. Type should be the same as max if
     /// used.
+    
     pub min: Option<GooglePrivacyDlpV2beta1Value>,
 }
 
@@ -1624,11 +1850,14 @@ impl client::Part for GooglePrivacyDlpV2beta1Bucket {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GooglePrivacyDlpV2beta1TableLocation {
     /// The zero-based index of the row where the finding is located.
     #[serde(rename="rowIndex")]
-    pub row_index: Option<String>,
+    
+    #[serde_as(as = "Option<::client::serde_with::DisplayFromStr>")]
+    pub row_index: Option<i64>,
 }
 
 impl client::Part for GooglePrivacyDlpV2beta1TableLocation {}
@@ -1638,6 +1867,7 @@ impl client::Part for GooglePrivacyDlpV2beta1TableLocation {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GooglePrivacyDlpV2beta1KAnonymityConfig {
     /// Optional message indicating that each distinct entity_id should not
@@ -1652,6 +1882,7 @@ pub struct GooglePrivacyDlpV2beta1KAnonymityConfig {
     /// be 2, even if it is the only ID to be associated to both values "foo" and
     /// "bar".
     #[serde(rename="entityId")]
+    
     pub entity_id: Option<GooglePrivacyDlpV2beta1EntityId>,
     /// Set of fields to compute k-anonymity over. When multiple fields are
     /// specified, they are considered a single composite key. Structs and
@@ -1659,6 +1890,7 @@ pub struct GooglePrivacyDlpV2beta1KAnonymityConfig {
     /// supported so long as they are not structs themselves or nested within
     /// a repeated field.
     #[serde(rename="quasiIds")]
+    
     pub quasi_ids: Option<Vec<GooglePrivacyDlpV2beta1FieldId>>,
 }
 
@@ -1669,10 +1901,12 @@ impl client::Part for GooglePrivacyDlpV2beta1KAnonymityConfig {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GooglePrivacyDlpV2beta1DatastoreKey {
     /// Datastore entity key.
     #[serde(rename="entityKey")]
+    
     pub entity_key: Option<GooglePrivacyDlpV2beta1Key>,
 }
 
@@ -1683,13 +1917,16 @@ impl client::Part for GooglePrivacyDlpV2beta1DatastoreKey {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GooglePrivacyDlpV2beta1RecordKey {
     /// no description provided
     #[serde(rename="cloudStorageKey")]
+    
     pub cloud_storage_key: Option<GooglePrivacyDlpV2beta1CloudStorageKey>,
     /// no description provided
     #[serde(rename="datastoreKey")]
+    
     pub datastore_key: Option<GooglePrivacyDlpV2beta1DatastoreKey>,
 }
 
@@ -1705,16 +1942,20 @@ impl client::Part for GooglePrivacyDlpV2beta1RecordKey {}
 /// 
 /// * [deidentify content](ContentDeidentifyCall) (request)
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GooglePrivacyDlpV2beta1DeidentifyContentRequest {
     /// Configuration for the inspector.
     #[serde(rename="inspectConfig")]
+    
     pub inspect_config: Option<GooglePrivacyDlpV2beta1InspectConfig>,
     /// The list of items to inspect. Up to 100 are allowed per request.
     /// All items will be treated as text/*.
+    
     pub items: Option<Vec<GooglePrivacyDlpV2beta1ContentItem>>,
     /// Configuration for the de-identification of the list of content items.
     #[serde(rename="deidentifyConfig")]
+    
     pub deidentify_config: Option<GooglePrivacyDlpV2beta1DeidentifyConfig>,
 }
 
@@ -1725,6 +1966,7 @@ impl client::RequestValue for GooglePrivacyDlpV2beta1DeidentifyContentRequest {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GooglePrivacyDlpV2beta1InspectResult {
     /// If true, then this item might have more findings than were returned,
@@ -1734,8 +1976,10 @@ pub struct GooglePrivacyDlpV2beta1InspectResult {
     /// allowed for a single API call. For best results, divide the input into
     /// smaller batches.
     #[serde(rename="findingsTruncated")]
+    
     pub findings_truncated: Option<bool>,
     /// List of findings for an item.
+    
     pub findings: Option<Vec<GooglePrivacyDlpV2beta1Finding>>,
 }
 
@@ -1747,12 +1991,15 @@ impl client::Part for GooglePrivacyDlpV2beta1InspectResult {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GooglePrivacyDlpV2beta1QuasiIdField {
     /// no description provided
+    
     pub field: Option<GooglePrivacyDlpV2beta1FieldId>,
     /// no description provided
     #[serde(rename="customTag")]
+    
     pub custom_tag: Option<String>,
 }
 
@@ -1763,15 +2010,20 @@ impl client::Part for GooglePrivacyDlpV2beta1QuasiIdField {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GooglePrivacyDlpV2beta1ImageLocation {
     /// Height of the bounding box in pixels.
+    
     pub height: Option<i32>,
     /// Top coordinate of the bounding box. (0,0) is upper left.
+    
     pub top: Option<i32>,
     /// Left coordinate of the bounding box. (0,0) is upper left.
+    
     pub left: Option<i32>,
     /// Width of the bounding box in pixels.
+    
     pub width: Option<i32>,
 }
 
@@ -1782,10 +2034,12 @@ impl client::Part for GooglePrivacyDlpV2beta1ImageLocation {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GooglePrivacyDlpV2beta1ReplaceValueConfig {
     /// Value to replace it with.
     #[serde(rename="newValue")]
+    
     pub new_value: Option<GooglePrivacyDlpV2beta1Value>,
 }
 
@@ -1796,18 +2050,24 @@ impl client::Part for GooglePrivacyDlpV2beta1ReplaceValueConfig {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GooglePrivacyDlpV2beta1ContentItem {
     /// Structured content for inspection.
+    
     pub table: Option<GooglePrivacyDlpV2beta1Table>,
     /// Content data to inspect or redact.
-    pub data: Option<String>,
+    
+    #[serde_as(as = "Option<::client::serde::urlsafe_base64::Wrapper>")]
+    pub data: Option<Vec<u8>>,
     /// Type of the content, as defined in Content-Type HTTP header.
     /// Supported types are: all "text" types, octet streams, PNG images,
     /// JPEG images.
     #[serde(rename="type")]
+    
     pub type_: Option<String>,
     /// String data to inspect or redact.
+    
     pub value: Option<String>,
 }
 
@@ -1824,10 +2084,12 @@ impl client::Part for GooglePrivacyDlpV2beta1ContentItem {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GooglePrivacyDlpV2beta1CryptoReplaceFfxFpeConfig {
     /// The key used by the encryption algorithm. [required]
     #[serde(rename="cryptoKey")]
+    
     pub crypto_key: Option<GooglePrivacyDlpV2beta1CryptoKey>,
     /// A context may be used for higher security since the same
     /// identifier in two different contexts likely will be given a distinct
@@ -1855,6 +2117,7 @@ pub struct GooglePrivacyDlpV2beta1CryptoReplaceFfxFpeConfig {
     /// - a string is encoded in UTF-8 format followed by a single byte of value 2
     /// 
     /// This is also known as the 'tweak', as in tweakable encryption.
+    
     pub context: Option<GooglePrivacyDlpV2beta1FieldId>,
     /// The custom info type to annotate the surrogate with.
     /// This annotation will be applied to the surrogate by prefixing it with
@@ -1882,11 +2145,14 @@ pub struct GooglePrivacyDlpV2beta1CryptoReplaceFfxFpeConfig {
     /// the symbol with the hex code point 29DD might be used like so:
     /// ⧝MY_TOKEN_TYPE
     #[serde(rename="surrogateInfoType")]
+    
     pub surrogate_info_type: Option<GooglePrivacyDlpV2beta1InfoType>,
     /// no description provided
     #[serde(rename="commonAlphabet")]
+    
     pub common_alphabet: Option<String>,
     /// The native way to select the alphabet. Must be in the range [2, 62].
+    
     pub radix: Option<i32>,
     /// This is supported by mapping these to the alphanumeric characters
     /// that the FFX mode natively supports. This happens before/after
@@ -1896,6 +2162,7 @@ pub struct GooglePrivacyDlpV2beta1CryptoReplaceFfxFpeConfig {
     /// This must be encoded as ASCII.
     /// The order of characters does not matter.
     #[serde(rename="customAlphabet")]
+    
     pub custom_alphabet: Option<String>,
 }
 
@@ -1906,13 +2173,17 @@ impl client::Part for GooglePrivacyDlpV2beta1CryptoReplaceFfxFpeConfig {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GooglePrivacyDlpV2beta1Color {
     /// The amount of red in the color as a value in the interval [0, 1].
+    
     pub red: Option<f32>,
     /// The amount of green in the color as a value in the interval [0, 1].
+    
     pub green: Option<f32>,
     /// The amount of blue in the color as a value in the interval [0, 1].
+    
     pub blue: Option<f32>,
 }
 
@@ -1923,11 +2194,14 @@ impl client::Part for GooglePrivacyDlpV2beta1Color {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GooglePrivacyDlpV2beta1Table {
     /// no description provided
+    
     pub rows: Option<Vec<GooglePrivacyDlpV2beta1Row>>,
     /// no description provided
+    
     pub headers: Option<Vec<GooglePrivacyDlpV2beta1FieldId>>,
 }
 
@@ -1944,6 +2218,7 @@ impl client::Part for GooglePrivacyDlpV2beta1Table {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GooglePrivacyDlpV2beta1SurrogateType { _never_set: Option<bool> }
 
@@ -1958,14 +2233,18 @@ impl client::Part for GooglePrivacyDlpV2beta1SurrogateType {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GooglePrivacyDlpV2beta1CryptoKey {
     /// no description provided
     #[serde(rename="kmsWrapped")]
+    
     pub kms_wrapped: Option<GooglePrivacyDlpV2beta1KmsWrappedCryptoKey>,
     /// no description provided
+    
     pub unwrapped: Option<GooglePrivacyDlpV2beta1UnwrappedCryptoKey>,
     /// no description provided
+    
     pub transient: Option<GooglePrivacyDlpV2beta1TransientCryptoKey>,
 }
 
@@ -1977,6 +2256,7 @@ impl client::Part for GooglePrivacyDlpV2beta1CryptoKey {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GooglePrivacyDlpV2beta1InfoTypeLimit {
     /// Type of information the findings limit applies to. Only one limit per
@@ -1984,9 +2264,11 @@ pub struct GooglePrivacyDlpV2beta1InfoTypeLimit {
     /// info_type, the DLP API applies the limit against all info_types that are
     /// found but not specified in another InfoTypeLimit.
     #[serde(rename="infoType")]
+    
     pub info_type: Option<GooglePrivacyDlpV2beta1InfoType>,
     /// Max findings limit for the given infoType.
     #[serde(rename="maxFindings")]
+    
     pub max_findings: Option<i32>,
 }
 
@@ -1997,28 +2279,37 @@ impl client::Part for GooglePrivacyDlpV2beta1InfoTypeLimit {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GooglePrivacyDlpV2beta1Value {
     /// no description provided
     #[serde(rename="floatValue")]
+    
     pub float_value: Option<f64>,
     /// no description provided
     #[serde(rename="timeValue")]
+    
     pub time_value: Option<GoogleTypeTimeOfDay>,
     /// no description provided
     #[serde(rename="integerValue")]
-    pub integer_value: Option<String>,
+    
+    #[serde_as(as = "Option<::client::serde_with::DisplayFromStr>")]
+    pub integer_value: Option<i64>,
     /// no description provided
     #[serde(rename="stringValue")]
+    
     pub string_value: Option<String>,
     /// no description provided
     #[serde(rename="dateValue")]
+    
     pub date_value: Option<GoogleTypeDate>,
     /// no description provided
     #[serde(rename="timestampValue")]
-    pub timestamp_value: Option<String>,
+    
+    pub timestamp_value: Option<client::chrono::DateTime<client::chrono::offset::Utc>>,
     /// no description provided
     #[serde(rename="booleanValue")]
+    
     pub boolean_value: Option<bool>,
 }
 
@@ -2046,13 +2337,17 @@ impl client::Part for GooglePrivacyDlpV2beta1Value {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GooglePrivacyDlpV2beta1Condition {
     /// Field within the record this condition is evaluated against. [required]
+    
     pub field: Option<GooglePrivacyDlpV2beta1FieldId>,
     /// Operator used to compare the field or info type to the value. [required]
+    
     pub operator: Option<String>,
     /// Value to compare against. [Required, except for `EXISTS` tests.]
+    
     pub value: Option<GooglePrivacyDlpV2beta1Value>,
 }
 
@@ -2068,13 +2363,16 @@ impl client::Part for GooglePrivacyDlpV2beta1Condition {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GooglePrivacyDlpV2beta1PartitionId {
     /// If not empty, the ID of the namespace to which the entities belong.
     #[serde(rename="namespaceId")]
+    
     pub namespace_id: Option<String>,
     /// The ID of the project to which the entities belong.
     #[serde(rename="projectId")]
+    
     pub project_id: Option<String>,
 }
 
@@ -2090,10 +2388,12 @@ impl client::Part for GooglePrivacyDlpV2beta1PartitionId {}
 /// 
 /// * [inspect content](ContentInspectCall) (response)
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GooglePrivacyDlpV2beta1InspectContentResponse {
     /// Each content_item from the request has a result in this list, in the
     /// same order as the request.
+    
     pub results: Option<Vec<GooglePrivacyDlpV2beta1InspectResult>>,
 }
 
@@ -2110,19 +2410,24 @@ impl client::ResponseResult for GooglePrivacyDlpV2beta1InspectContentResponse {}
 /// 
 /// * [redact content](ContentRedactCall) (request)
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GooglePrivacyDlpV2beta1RedactContentRequest {
     /// The list of items to inspect. Up to 100 are allowed per request.
+    
     pub items: Option<Vec<GooglePrivacyDlpV2beta1ContentItem>>,
     /// The strings to replace findings text findings with. Must specify at least
     /// one of these or one ImageRedactionConfig if redacting images.
     #[serde(rename="replaceConfigs")]
+    
     pub replace_configs: Option<Vec<GooglePrivacyDlpV2beta1ReplaceConfig>>,
     /// The configuration for specifying what content to redact from images.
     #[serde(rename="imageRedactionConfigs")]
+    
     pub image_redaction_configs: Option<Vec<GooglePrivacyDlpV2beta1ImageRedactionConfig>>,
     /// Configuration for the inspector.
     #[serde(rename="inspectConfig")]
+    
     pub inspect_config: Option<GooglePrivacyDlpV2beta1InspectConfig>,
 }
 
@@ -2133,11 +2438,13 @@ impl client::RequestValue for GooglePrivacyDlpV2beta1RedactContentRequest {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GooglePrivacyDlpV2beta1WordList {
     /// Words or phrases defining the dictionary. The dictionary must contain
     /// at least one phrase and every phrase must contain at least 2 characters
     /// that are letters or digits. [required]
+    
     pub words: Option<Vec<String>>,
 }
 
@@ -2148,10 +2455,12 @@ impl client::Part for GooglePrivacyDlpV2beta1WordList {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GooglePrivacyDlpV2beta1FieldId {
     /// Name describing the field.
     #[serde(rename="columnName")]
+    
     pub column_name: Option<String>,
 }
 
@@ -2162,23 +2471,30 @@ impl client::Part for GooglePrivacyDlpV2beta1FieldId {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GooglePrivacyDlpV2beta1TransformationSummary {
     /// The field transformation that was applied. This list will contain
     /// multiple only in the case of errors.
     #[serde(rename="fieldTransformations")]
+    
     pub field_transformations: Option<Vec<GooglePrivacyDlpV2beta1FieldTransformation>>,
     /// The specific suppression option these stats apply to.
     #[serde(rename="recordSuppress")]
+    
     pub record_suppress: Option<GooglePrivacyDlpV2beta1RecordSuppression>,
     /// Set if the transformation was limited to a specific info_type.
     #[serde(rename="infoType")]
+    
     pub info_type: Option<GooglePrivacyDlpV2beta1InfoType>,
     /// The specific transformation these stats apply to.
+    
     pub transformation: Option<GooglePrivacyDlpV2beta1PrimitiveTransformation>,
     /// no description provided
+    
     pub results: Option<Vec<GooglePrivacyDlpV2beta1SummaryResult>>,
     /// Set if the transformation was limited to a specific FieldId.
+    
     pub field: Option<GooglePrivacyDlpV2beta1FieldId>,
 }
 
@@ -2195,6 +2511,7 @@ impl client::Part for GooglePrivacyDlpV2beta1TransformationSummary {}
 /// * [operations cancel risk analysis](RiskAnalysiOperationCancelCall) (request)
 /// * [operations cancel inspect](InspectOperationCancelCall) (request)
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleLongrunningCancelOperationRequest { _never_set: Option<bool> }
 
@@ -2210,18 +2527,21 @@ impl client::RequestValue for GoogleLongrunningCancelOperationRequest {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GooglePrivacyDlpV2beta1CharacterMaskConfig {
     /// When masking a string, items in this list will be skipped when replacing.
     /// For example, if your string is 555-555-5555 and you ask us to skip `-` and
     /// mask 5 chars with * we would produce ***-*55-5555.
     #[serde(rename="charactersToIgnore")]
+    
     pub characters_to_ignore: Option<Vec<GooglePrivacyDlpV2beta1CharsToIgnore>>,
     /// Character to mask the sensitive values&mdash;for example, "*" for an
     /// alphabetic string such as name, or "0" for a numeric string such as ZIP
     /// code or credit card number. String must have length 1. If not supplied, we
     /// will default to "*" for strings, 0 for digits.
     #[serde(rename="maskingCharacter")]
+    
     pub masking_character: Option<String>,
     /// Mask characters in reverse order. For example, if `masking_character` is
     /// '0', number_to_mask is 14, and `reverse_order` is false, then
@@ -2229,10 +2549,12 @@ pub struct GooglePrivacyDlpV2beta1CharacterMaskConfig {
     /// If `masking_character` is '*', `number_to_mask` is 3, and `reverse_order`
     /// is true, then 12345 -> 12***
     #[serde(rename="reverseOrder")]
+    
     pub reverse_order: Option<bool>,
     /// Number of characters to mask. If not set, all matching chars will be
     /// masked. Skipped characters do not count towards this tally.
     #[serde(rename="numberToMask")]
+    
     pub number_to_mask: Option<i32>,
 }
 
@@ -2244,6 +2566,7 @@ impl client::Part for GooglePrivacyDlpV2beta1CharacterMaskConfig {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GooglePrivacyDlpV2beta1TransientCryptoKey {
     /// Name of the key. [required]
@@ -2252,6 +2575,7 @@ pub struct GooglePrivacyDlpV2beta1TransientCryptoKey {
     /// protos share the same generated key if their names are the same.
     /// When the data crypto key is generated, this name is not used in any way
     /// (repeating the api call will result in a different key being generated).
+    
     pub name: Option<String>,
 }
 
@@ -2268,19 +2592,24 @@ impl client::Part for GooglePrivacyDlpV2beta1TransientCryptoKey {}
 /// 
 /// * [operations create inspect](InspectOperationCreateCall) (request)
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GooglePrivacyDlpV2beta1CreateInspectOperationRequest {
     /// Specification of the data set to process.
     #[serde(rename="storageConfig")]
+    
     pub storage_config: Option<GooglePrivacyDlpV2beta1StorageConfig>,
     /// Optional location to store findings.
     #[serde(rename="outputConfig")]
+    
     pub output_config: Option<GooglePrivacyDlpV2beta1OutputStorageConfig>,
     /// Additional configuration settings for long running operations.
     #[serde(rename="operationConfig")]
+    
     pub operation_config: Option<GooglePrivacyDlpV2beta1OperationConfig>,
     /// Configuration for the inspector.
     #[serde(rename="inspectConfig")]
+    
     pub inspect_config: Option<GooglePrivacyDlpV2beta1InspectConfig>,
 }
 
@@ -2291,22 +2620,27 @@ impl client::RequestValue for GooglePrivacyDlpV2beta1CreateInspectOperationReque
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GooglePrivacyDlpV2beta1TaggedField {
     /// A column can be tagged with a custom tag. In this case, the user must
     /// indicate an auxiliary table that contains statistical information on
     /// the possible values of this column (below).
     #[serde(rename="customTag")]
+    
     pub custom_tag: Option<String>,
     /// A column can be tagged with a InfoType to use the relevant public
     /// dataset as a statistical model of population, if available. We
     /// currently support US ZIP codes, region codes, ages and genders.
     #[serde(rename="infoType")]
+    
     pub info_type: Option<GooglePrivacyDlpV2beta1InfoType>,
     /// If no semantic tag is indicated, we infer the statistical model from
     /// the distribution of values in the input data
+    
     pub inferred: Option<GoogleProtobufEmpty>,
     /// Identifies the column. [required]
+    
     pub field: Option<GooglePrivacyDlpV2beta1FieldId>,
 }
 
@@ -2322,9 +2656,11 @@ impl client::Part for GooglePrivacyDlpV2beta1TaggedField {}
 /// 
 /// * [redact content](ContentRedactCall) (response)
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GooglePrivacyDlpV2beta1RedactContentResponse {
     /// The redacted content.
+    
     pub items: Option<Vec<GooglePrivacyDlpV2beta1ContentItem>>,
 }
 
@@ -2335,10 +2671,12 @@ impl client::ResponseResult for GooglePrivacyDlpV2beta1RedactContentResponse {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GooglePrivacyDlpV2beta1PropertyReference {
     /// The name of the property.
     /// If name includes "."s, it may be interpreted as a property name path.
+    
     pub name: Option<String>,
 }
 
@@ -2351,7 +2689,7 @@ impl client::Part for GooglePrivacyDlpV2beta1PropertyReference {}
 // #################
 
 /// A builder providing access to all methods supported on *content* resources.
-/// It is not used directly, but through the `DLP` hub.
+/// It is not used directly, but through the [`DLP`] hub.
 ///
 /// # Example
 ///
@@ -2364,7 +2702,7 @@ impl client::Part for GooglePrivacyDlpV2beta1PropertyReference {}
 /// 
 /// # async fn dox() {
 /// use std::default::Default;
-/// use dlp2_beta1::{DLP, oauth2, hyper, hyper_rustls};
+/// use dlp2_beta1::{DLP, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// let secret: oauth2::ApplicationSecret = Default::default();
 /// let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -2446,7 +2784,7 @@ impl<'a, S> ContentMethods<'a, S> {
 
 
 /// A builder providing access to all methods supported on *rootCategory* resources.
-/// It is not used directly, but through the `DLP` hub.
+/// It is not used directly, but through the [`DLP`] hub.
 ///
 /// # Example
 ///
@@ -2459,7 +2797,7 @@ impl<'a, S> ContentMethods<'a, S> {
 /// 
 /// # async fn dox() {
 /// use std::default::Default;
-/// use dlp2_beta1::{DLP, oauth2, hyper, hyper_rustls};
+/// use dlp2_beta1::{DLP, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// let secret: oauth2::ApplicationSecret = Default::default();
 /// let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -2518,7 +2856,7 @@ impl<'a, S> RootCategoryMethods<'a, S> {
 
 
 /// A builder providing access to all methods supported on *riskAnalysi* resources.
-/// It is not used directly, but through the `DLP` hub.
+/// It is not used directly, but through the [`DLP`] hub.
 ///
 /// # Example
 ///
@@ -2531,7 +2869,7 @@ impl<'a, S> RootCategoryMethods<'a, S> {
 /// 
 /// # async fn dox() {
 /// use std::default::Default;
-/// use dlp2_beta1::{DLP, oauth2, hyper, hyper_rustls};
+/// use dlp2_beta1::{DLP, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// let secret: oauth2::ApplicationSecret = Default::default();
 /// let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -2634,7 +2972,7 @@ impl<'a, S> RiskAnalysiMethods<'a, S> {
 
 
 /// A builder providing access to all methods supported on *dataSource* resources.
-/// It is not used directly, but through the `DLP` hub.
+/// It is not used directly, but through the [`DLP`] hub.
 ///
 /// # Example
 ///
@@ -2647,7 +2985,7 @@ impl<'a, S> RiskAnalysiMethods<'a, S> {
 /// 
 /// # async fn dox() {
 /// use std::default::Default;
-/// use dlp2_beta1::{DLP, oauth2, hyper, hyper_rustls};
+/// use dlp2_beta1::{DLP, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// let secret: oauth2::ApplicationSecret = Default::default();
 /// let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -2693,7 +3031,7 @@ impl<'a, S> DataSourceMethods<'a, S> {
 
 
 /// A builder providing access to all methods supported on *inspect* resources.
-/// It is not used directly, but through the `DLP` hub.
+/// It is not used directly, but through the [`DLP`] hub.
 ///
 /// # Example
 ///
@@ -2706,7 +3044,7 @@ impl<'a, S> DataSourceMethods<'a, S> {
 /// 
 /// # async fn dox() {
 /// use std::default::Default;
-/// use dlp2_beta1::{DLP, oauth2, hyper, hyper_rustls};
+/// use dlp2_beta1::{DLP, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// let secret: oauth2::ApplicationSecret = Default::default();
 /// let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -2858,7 +3196,7 @@ impl<'a, S> InspectMethods<'a, S> {
 /// This method has limits on input size and output size.
 ///
 /// A builder for the *deidentify* method supported by a *content* resource.
-/// It is not used directly, but through a `ContentMethods` instance.
+/// It is not used directly, but through a [`ContentMethods`] instance.
 ///
 /// # Example
 ///
@@ -2871,7 +3209,7 @@ impl<'a, S> InspectMethods<'a, S> {
 /// use dlp2_beta1::api::GooglePrivacyDlpV2beta1DeidentifyContentRequest;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use dlp2_beta1::{DLP, oauth2, hyper, hyper_rustls};
+/// # use dlp2_beta1::{DLP, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
 /// # let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -2898,14 +3236,14 @@ pub struct ContentDeidentifyCall<'a, S>
     _request: GooglePrivacyDlpV2beta1DeidentifyContentRequest,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
+    _scopes: BTreeSet<String>
 }
 
 impl<'a, S> client::CallBuilder for ContentDeidentifyCall<'a, S> {}
 
 impl<'a, S> ContentDeidentifyCall<'a, S>
 where
-    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
     S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
     S::Future: Send + Unpin + 'static,
     S::Error: Into<Box<dyn StdError + Send + Sync>>,
@@ -2916,36 +3254,35 @@ where
     pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, GooglePrivacyDlpV2beta1DeidentifyContentResponse)> {
         use std::io::{Read, Seek};
         use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::ToParts;
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
         let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
         dlg.begin(client::MethodInfo { id: "dlp.content.deidentify",
                                http_method: hyper::Method::POST });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
+
         for &field in ["alt"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(client::Error::FieldClash(field));
             }
         }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
 
-        params.push(("alt", "json".to_string()));
+        let mut params = Params::with_capacity(3 + self._additional_params.len());
 
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "v2beta1/content:deidentify";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string());
         }
 
 
-        let url = url::Url::parse_with_params(&url, params).unwrap();
+        let url = params.parse_with_url(&url);
 
-        let mut json_mime_type: mime::Mime = "application/json".parse().unwrap();
+        let mut json_mime_type = mime::APPLICATION_JSON;
         let mut request_value_reader =
             {
                 let mut value = json::value::to_value(&self._request).expect("serde to work");
@@ -2959,14 +3296,14 @@ where
 
 
         loop {
-            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
-                Ok(token) => token.clone(),
-                Err(err) => {
-                    match  dlg.token(&err) {
-                        Some(token) => token,
-                        None => {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
                             dlg.finished(false);
-                            return Err(client::Error::MissingToken(err))
+                            return Err(client::Error::MissingToken(e));
                         }
                     }
                 }
@@ -2975,23 +3312,29 @@ where
             let mut req_result = {
                 let client = &self.hub.client;
                 dlg.pre_request();
-                let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
-                        .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::POST)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
 
 
                         let request = req_builder
-                        .header(CONTENT_TYPE, format!("{}", json_mime_type.to_string()))
+                        .header(CONTENT_TYPE, json_mime_type.to_string())
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
                 client.request(request.unwrap()).await
-                
+
             };
 
             match req_result {
                 Err(err) => {
                     if let client::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep(d).await;
                         continue;
                     }
                     dlg.finished(false);
@@ -3007,7 +3350,7 @@ where
                         let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
                         if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
-                            sleep(d);
+                            sleep(d).await;
                             continue;
                         }
 
@@ -3050,7 +3393,8 @@ where
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.````
     ///
     /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ContentDeidentifyCall<'a, S> {
@@ -3088,25 +3432,36 @@ where
 
     /// Identifies the authorization scope for the method you are building.
     ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::CloudPlatform`.
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::CloudPlatform`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
     ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, St>(mut self, scope: T) -> ContentDeidentifyCall<'a, S>
-                                                        where T: Into<Option<St>>,
-                                                              St: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
+    pub fn add_scope<St>(mut self, scope: St) -> ContentDeidentifyCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> ContentDeidentifyCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> ContentDeidentifyCall<'a, S> {
+        self._scopes.clear();
         self
     }
 }
@@ -3116,7 +3471,7 @@ where
 /// This method has limits on input size, processing time, and output size.
 ///
 /// A builder for the *inspect* method supported by a *content* resource.
-/// It is not used directly, but through a `ContentMethods` instance.
+/// It is not used directly, but through a [`ContentMethods`] instance.
 ///
 /// # Example
 ///
@@ -3129,7 +3484,7 @@ where
 /// use dlp2_beta1::api::GooglePrivacyDlpV2beta1InspectContentRequest;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use dlp2_beta1::{DLP, oauth2, hyper, hyper_rustls};
+/// # use dlp2_beta1::{DLP, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
 /// # let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -3156,14 +3511,14 @@ pub struct ContentInspectCall<'a, S>
     _request: GooglePrivacyDlpV2beta1InspectContentRequest,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
+    _scopes: BTreeSet<String>
 }
 
 impl<'a, S> client::CallBuilder for ContentInspectCall<'a, S> {}
 
 impl<'a, S> ContentInspectCall<'a, S>
 where
-    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
     S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
     S::Future: Send + Unpin + 'static,
     S::Error: Into<Box<dyn StdError + Send + Sync>>,
@@ -3174,36 +3529,35 @@ where
     pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, GooglePrivacyDlpV2beta1InspectContentResponse)> {
         use std::io::{Read, Seek};
         use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::ToParts;
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
         let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
         dlg.begin(client::MethodInfo { id: "dlp.content.inspect",
                                http_method: hyper::Method::POST });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
+
         for &field in ["alt"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(client::Error::FieldClash(field));
             }
         }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
 
-        params.push(("alt", "json".to_string()));
+        let mut params = Params::with_capacity(3 + self._additional_params.len());
 
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "v2beta1/content:inspect";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string());
         }
 
 
-        let url = url::Url::parse_with_params(&url, params).unwrap();
+        let url = params.parse_with_url(&url);
 
-        let mut json_mime_type: mime::Mime = "application/json".parse().unwrap();
+        let mut json_mime_type = mime::APPLICATION_JSON;
         let mut request_value_reader =
             {
                 let mut value = json::value::to_value(&self._request).expect("serde to work");
@@ -3217,14 +3571,14 @@ where
 
 
         loop {
-            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
-                Ok(token) => token.clone(),
-                Err(err) => {
-                    match  dlg.token(&err) {
-                        Some(token) => token,
-                        None => {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
                             dlg.finished(false);
-                            return Err(client::Error::MissingToken(err))
+                            return Err(client::Error::MissingToken(e));
                         }
                     }
                 }
@@ -3233,23 +3587,29 @@ where
             let mut req_result = {
                 let client = &self.hub.client;
                 dlg.pre_request();
-                let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
-                        .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::POST)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
 
 
                         let request = req_builder
-                        .header(CONTENT_TYPE, format!("{}", json_mime_type.to_string()))
+                        .header(CONTENT_TYPE, json_mime_type.to_string())
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
                 client.request(request.unwrap()).await
-                
+
             };
 
             match req_result {
                 Err(err) => {
                     if let client::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep(d).await;
                         continue;
                     }
                     dlg.finished(false);
@@ -3265,7 +3625,7 @@ where
                         let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
                         if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
-                            sleep(d);
+                            sleep(d).await;
                             continue;
                         }
 
@@ -3308,7 +3668,8 @@ where
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.````
     ///
     /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ContentInspectCall<'a, S> {
@@ -3346,25 +3707,36 @@ where
 
     /// Identifies the authorization scope for the method you are building.
     ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::CloudPlatform`.
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::CloudPlatform`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
     ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, St>(mut self, scope: T) -> ContentInspectCall<'a, S>
-                                                        where T: Into<Option<St>>,
-                                                              St: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
+    pub fn add_scope<St>(mut self, scope: St) -> ContentInspectCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> ContentInspectCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> ContentInspectCall<'a, S> {
+        self._scopes.clear();
         self
     }
 }
@@ -3374,7 +3746,7 @@ where
 /// This method has limits on input size, processing time, and output size.
 ///
 /// A builder for the *redact* method supported by a *content* resource.
-/// It is not used directly, but through a `ContentMethods` instance.
+/// It is not used directly, but through a [`ContentMethods`] instance.
 ///
 /// # Example
 ///
@@ -3387,7 +3759,7 @@ where
 /// use dlp2_beta1::api::GooglePrivacyDlpV2beta1RedactContentRequest;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use dlp2_beta1::{DLP, oauth2, hyper, hyper_rustls};
+/// # use dlp2_beta1::{DLP, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
 /// # let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -3414,14 +3786,14 @@ pub struct ContentRedactCall<'a, S>
     _request: GooglePrivacyDlpV2beta1RedactContentRequest,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
+    _scopes: BTreeSet<String>
 }
 
 impl<'a, S> client::CallBuilder for ContentRedactCall<'a, S> {}
 
 impl<'a, S> ContentRedactCall<'a, S>
 where
-    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
     S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
     S::Future: Send + Unpin + 'static,
     S::Error: Into<Box<dyn StdError + Send + Sync>>,
@@ -3432,36 +3804,35 @@ where
     pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, GooglePrivacyDlpV2beta1RedactContentResponse)> {
         use std::io::{Read, Seek};
         use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::ToParts;
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
         let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
         dlg.begin(client::MethodInfo { id: "dlp.content.redact",
                                http_method: hyper::Method::POST });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
+
         for &field in ["alt"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(client::Error::FieldClash(field));
             }
         }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
 
-        params.push(("alt", "json".to_string()));
+        let mut params = Params::with_capacity(3 + self._additional_params.len());
 
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "v2beta1/content:redact";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string());
         }
 
 
-        let url = url::Url::parse_with_params(&url, params).unwrap();
+        let url = params.parse_with_url(&url);
 
-        let mut json_mime_type: mime::Mime = "application/json".parse().unwrap();
+        let mut json_mime_type = mime::APPLICATION_JSON;
         let mut request_value_reader =
             {
                 let mut value = json::value::to_value(&self._request).expect("serde to work");
@@ -3475,14 +3846,14 @@ where
 
 
         loop {
-            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
-                Ok(token) => token.clone(),
-                Err(err) => {
-                    match  dlg.token(&err) {
-                        Some(token) => token,
-                        None => {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
                             dlg.finished(false);
-                            return Err(client::Error::MissingToken(err))
+                            return Err(client::Error::MissingToken(e));
                         }
                     }
                 }
@@ -3491,23 +3862,29 @@ where
             let mut req_result = {
                 let client = &self.hub.client;
                 dlg.pre_request();
-                let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
-                        .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::POST)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
 
 
                         let request = req_builder
-                        .header(CONTENT_TYPE, format!("{}", json_mime_type.to_string()))
+                        .header(CONTENT_TYPE, json_mime_type.to_string())
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
                 client.request(request.unwrap()).await
-                
+
             };
 
             match req_result {
                 Err(err) => {
                     if let client::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep(d).await;
                         continue;
                     }
                     dlg.finished(false);
@@ -3523,7 +3900,7 @@ where
                         let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
                         if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
-                            sleep(d);
+                            sleep(d).await;
                             continue;
                         }
 
@@ -3566,7 +3943,8 @@ where
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.````
     ///
     /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ContentRedactCall<'a, S> {
@@ -3604,25 +3982,36 @@ where
 
     /// Identifies the authorization scope for the method you are building.
     ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::CloudPlatform`.
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::CloudPlatform`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
     ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, St>(mut self, scope: T) -> ContentRedactCall<'a, S>
-                                                        where T: Into<Option<St>>,
-                                                              St: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
+    pub fn add_scope<St>(mut self, scope: St) -> ContentRedactCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> ContentRedactCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> ContentRedactCall<'a, S> {
+        self._scopes.clear();
         self
     }
 }
@@ -3631,7 +4020,7 @@ where
 /// Returns sensitive information types for given category.
 ///
 /// A builder for the *infoTypes.list* method supported by a *rootCategory* resource.
-/// It is not used directly, but through a `RootCategoryMethods` instance.
+/// It is not used directly, but through a [`RootCategoryMethods`] instance.
 ///
 /// # Example
 ///
@@ -3643,7 +4032,7 @@ where
 /// # extern crate google_dlp2_beta1 as dlp2_beta1;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use dlp2_beta1::{DLP, oauth2, hyper, hyper_rustls};
+/// # use dlp2_beta1::{DLP, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
 /// # let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -3667,14 +4056,14 @@ pub struct RootCategoryInfoTypeListCall<'a, S>
     _language_code: Option<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
+    _scopes: BTreeSet<String>
 }
 
 impl<'a, S> client::CallBuilder for RootCategoryInfoTypeListCall<'a, S> {}
 
 impl<'a, S> RootCategoryInfoTypeListCall<'a, S>
 where
-    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
     S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
     S::Future: Send + Unpin + 'static,
     S::Error: Into<Box<dyn StdError + Send + Sync>>,
@@ -3683,77 +4072,58 @@ where
 
     /// Perform the operation you have build so far.
     pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, GooglePrivacyDlpV2beta1ListInfoTypesResponse)> {
-        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
         use std::io::{Read, Seek};
         use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::ToParts;
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
         let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
         dlg.begin(client::MethodInfo { id: "dlp.rootCategories.infoTypes.list",
                                http_method: hyper::Method::GET });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
-        params.push(("category", self._category.to_string()));
-        if let Some(value) = self._language_code {
-            params.push(("languageCode", value.to_string()));
-        }
+
         for &field in ["alt", "category", "languageCode"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(client::Error::FieldClash(field));
             }
         }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
+
+        let mut params = Params::with_capacity(4 + self._additional_params.len());
+        params.push("category", self._category);
+        if let Some(value) = self._language_code.as_ref() {
+            params.push("languageCode", value);
         }
 
-        params.push(("alt", "json".to_string()));
+        params.extend(self._additional_params.iter());
 
+        params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "v2beta1/rootCategories/{+category}/infoTypes";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string());
         }
 
         for &(find_this, param_name) in [("{+category}", "category")].iter() {
-            let mut replace_with = String::new();
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = value.to_string();
-                    break;
-                }
-            }
-            if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
-            }
-            url = url.replace(find_this, &replace_with);
+            url = params.uri_replacement(url, param_name, find_this, true);
         }
         {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
-            for param_name in ["category"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
+            let to_remove = ["category"];
+            params.remove_params(&to_remove);
         }
 
-        let url = url::Url::parse_with_params(&url, params).unwrap();
+        let url = params.parse_with_url(&url);
 
 
 
         loop {
-            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
-                Ok(token) => token.clone(),
-                Err(err) => {
-                    match  dlg.token(&err) {
-                        Some(token) => token,
-                        None => {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
                             dlg.finished(false);
-                            return Err(client::Error::MissingToken(err))
+                            return Err(client::Error::MissingToken(e));
                         }
                     }
                 }
@@ -3761,21 +4131,27 @@ where
             let mut req_result = {
                 let client = &self.hub.client;
                 dlg.pre_request();
-                let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
-                        .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::GET)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
 
 
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
-                
+
             };
 
             match req_result {
                 Err(err) => {
                     if let client::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep(d).await;
                         continue;
                     }
                     dlg.finished(false);
@@ -3791,7 +4167,7 @@ where
                         let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
                         if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
-                            sleep(d);
+                            sleep(d).await;
                             continue;
                         }
 
@@ -3844,7 +4220,8 @@ where
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.````
     ///
     /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> RootCategoryInfoTypeListCall<'a, S> {
@@ -3882,25 +4259,36 @@ where
 
     /// Identifies the authorization scope for the method you are building.
     ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::CloudPlatform`.
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::CloudPlatform`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
     ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, St>(mut self, scope: T) -> RootCategoryInfoTypeListCall<'a, S>
-                                                        where T: Into<Option<St>>,
-                                                              St: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
+    pub fn add_scope<St>(mut self, scope: St) -> RootCategoryInfoTypeListCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> RootCategoryInfoTypeListCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> RootCategoryInfoTypeListCall<'a, S> {
+        self._scopes.clear();
         self
     }
 }
@@ -3909,7 +4297,7 @@ where
 /// Returns the list of root categories of sensitive information.
 ///
 /// A builder for the *list* method supported by a *rootCategory* resource.
-/// It is not used directly, but through a `RootCategoryMethods` instance.
+/// It is not used directly, but through a [`RootCategoryMethods`] instance.
 ///
 /// # Example
 ///
@@ -3921,7 +4309,7 @@ where
 /// # extern crate google_dlp2_beta1 as dlp2_beta1;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use dlp2_beta1::{DLP, oauth2, hyper, hyper_rustls};
+/// # use dlp2_beta1::{DLP, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
 /// # let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -3944,14 +4332,14 @@ pub struct RootCategoryListCall<'a, S>
     _language_code: Option<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
+    _scopes: BTreeSet<String>
 }
 
 impl<'a, S> client::CallBuilder for RootCategoryListCall<'a, S> {}
 
 impl<'a, S> RootCategoryListCall<'a, S>
 where
-    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
     S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
     S::Future: Send + Unpin + 'static,
     S::Error: Into<Box<dyn StdError + Send + Sync>>,
@@ -3962,49 +4350,48 @@ where
     pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, GooglePrivacyDlpV2beta1ListRootCategoriesResponse)> {
         use std::io::{Read, Seek};
         use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::ToParts;
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
         let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
         dlg.begin(client::MethodInfo { id: "dlp.rootCategories.list",
                                http_method: hyper::Method::GET });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
-        if let Some(value) = self._language_code {
-            params.push(("languageCode", value.to_string()));
-        }
+
         for &field in ["alt", "languageCode"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(client::Error::FieldClash(field));
             }
         }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
+
+        let mut params = Params::with_capacity(3 + self._additional_params.len());
+        if let Some(value) = self._language_code.as_ref() {
+            params.push("languageCode", value);
         }
 
-        params.push(("alt", "json".to_string()));
+        params.extend(self._additional_params.iter());
 
+        params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "v2beta1/rootCategories";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string());
         }
 
 
-        let url = url::Url::parse_with_params(&url, params).unwrap();
+        let url = params.parse_with_url(&url);
 
 
 
         loop {
-            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
-                Ok(token) => token.clone(),
-                Err(err) => {
-                    match  dlg.token(&err) {
-                        Some(token) => token,
-                        None => {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
                             dlg.finished(false);
-                            return Err(client::Error::MissingToken(err))
+                            return Err(client::Error::MissingToken(e));
                         }
                     }
                 }
@@ -4012,21 +4399,27 @@ where
             let mut req_result = {
                 let client = &self.hub.client;
                 dlg.pre_request();
-                let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
-                        .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::GET)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
 
 
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
-                
+
             };
 
             match req_result {
                 Err(err) => {
                     if let client::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep(d).await;
                         continue;
                     }
                     dlg.finished(false);
@@ -4042,7 +4435,7 @@ where
                         let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
                         if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
-                            sleep(d);
+                            sleep(d).await;
                             continue;
                         }
 
@@ -4085,7 +4478,8 @@ where
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.````
     ///
     /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> RootCategoryListCall<'a, S> {
@@ -4123,25 +4517,36 @@ where
 
     /// Identifies the authorization scope for the method you are building.
     ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::CloudPlatform`.
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::CloudPlatform`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
     ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, St>(mut self, scope: T) -> RootCategoryListCall<'a, S>
-                                                        where T: Into<Option<St>>,
-                                                              St: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
+    pub fn add_scope<St>(mut self, scope: St) -> RootCategoryListCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> RootCategoryListCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> RootCategoryListCall<'a, S> {
+        self._scopes.clear();
         self
     }
 }
@@ -4150,7 +4555,7 @@ where
 /// Cancels an operation. Use the `inspect.operations.get` to check whether the cancellation succeeded or the operation completed despite cancellation.
 ///
 /// A builder for the *operations.cancel* method supported by a *riskAnalysi* resource.
-/// It is not used directly, but through a `RiskAnalysiMethods` instance.
+/// It is not used directly, but through a [`RiskAnalysiMethods`] instance.
 ///
 /// # Example
 ///
@@ -4163,7 +4568,7 @@ where
 /// use dlp2_beta1::api::GoogleLongrunningCancelOperationRequest;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use dlp2_beta1::{DLP, oauth2, hyper, hyper_rustls};
+/// # use dlp2_beta1::{DLP, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
 /// # let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -4191,14 +4596,14 @@ pub struct RiskAnalysiOperationCancelCall<'a, S>
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
+    _scopes: BTreeSet<String>
 }
 
 impl<'a, S> client::CallBuilder for RiskAnalysiOperationCancelCall<'a, S> {}
 
 impl<'a, S> RiskAnalysiOperationCancelCall<'a, S>
 where
-    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
     S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
     S::Future: Send + Unpin + 'static,
     S::Error: Into<Box<dyn StdError + Send + Sync>>,
@@ -4207,64 +4612,45 @@ where
 
     /// Perform the operation you have build so far.
     pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, GoogleProtobufEmpty)> {
-        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
         use std::io::{Read, Seek};
         use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::ToParts;
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
         let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
         dlg.begin(client::MethodInfo { id: "dlp.riskAnalysis.operations.cancel",
                                http_method: hyper::Method::POST });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
-        params.push(("name", self._name.to_string()));
+
         for &field in ["alt", "name"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(client::Error::FieldClash(field));
             }
         }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
 
-        params.push(("alt", "json".to_string()));
+        let mut params = Params::with_capacity(4 + self._additional_params.len());
+        params.push("name", self._name);
 
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "v2beta1/{+name}:cancel";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string());
         }
 
         for &(find_this, param_name) in [("{+name}", "name")].iter() {
-            let mut replace_with = String::new();
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = value.to_string();
-                    break;
-                }
-            }
-            if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
-            }
-            url = url.replace(find_this, &replace_with);
+            url = params.uri_replacement(url, param_name, find_this, true);
         }
         {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
-            for param_name in ["name"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
+            let to_remove = ["name"];
+            params.remove_params(&to_remove);
         }
 
-        let url = url::Url::parse_with_params(&url, params).unwrap();
+        let url = params.parse_with_url(&url);
 
-        let mut json_mime_type: mime::Mime = "application/json".parse().unwrap();
+        let mut json_mime_type = mime::APPLICATION_JSON;
         let mut request_value_reader =
             {
                 let mut value = json::value::to_value(&self._request).expect("serde to work");
@@ -4278,14 +4664,14 @@ where
 
 
         loop {
-            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
-                Ok(token) => token.clone(),
-                Err(err) => {
-                    match  dlg.token(&err) {
-                        Some(token) => token,
-                        None => {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
                             dlg.finished(false);
-                            return Err(client::Error::MissingToken(err))
+                            return Err(client::Error::MissingToken(e));
                         }
                     }
                 }
@@ -4294,23 +4680,29 @@ where
             let mut req_result = {
                 let client = &self.hub.client;
                 dlg.pre_request();
-                let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
-                        .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::POST)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
 
 
                         let request = req_builder
-                        .header(CONTENT_TYPE, format!("{}", json_mime_type.to_string()))
+                        .header(CONTENT_TYPE, json_mime_type.to_string())
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
                 client.request(request.unwrap()).await
-                
+
             };
 
             match req_result {
                 Err(err) => {
                     if let client::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep(d).await;
                         continue;
                     }
                     dlg.finished(false);
@@ -4326,7 +4718,7 @@ where
                         let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
                         if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
-                            sleep(d);
+                            sleep(d).await;
                             continue;
                         }
 
@@ -4379,7 +4771,8 @@ where
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.````
     ///
     /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> RiskAnalysiOperationCancelCall<'a, S> {
@@ -4417,25 +4810,36 @@ where
 
     /// Identifies the authorization scope for the method you are building.
     ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::CloudPlatform`.
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::CloudPlatform`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
     ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, St>(mut self, scope: T) -> RiskAnalysiOperationCancelCall<'a, S>
-                                                        where T: Into<Option<St>>,
-                                                              St: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
+    pub fn add_scope<St>(mut self, scope: St) -> RiskAnalysiOperationCancelCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> RiskAnalysiOperationCancelCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> RiskAnalysiOperationCancelCall<'a, S> {
+        self._scopes.clear();
         self
     }
 }
@@ -4444,7 +4848,7 @@ where
 /// This method is not supported and the server returns `UNIMPLEMENTED`.
 ///
 /// A builder for the *operations.delete* method supported by a *riskAnalysi* resource.
-/// It is not used directly, but through a `RiskAnalysiMethods` instance.
+/// It is not used directly, but through a [`RiskAnalysiMethods`] instance.
 ///
 /// # Example
 ///
@@ -4456,7 +4860,7 @@ where
 /// # extern crate google_dlp2_beta1 as dlp2_beta1;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use dlp2_beta1::{DLP, oauth2, hyper, hyper_rustls};
+/// # use dlp2_beta1::{DLP, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
 /// # let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -4478,14 +4882,14 @@ pub struct RiskAnalysiOperationDeleteCall<'a, S>
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
+    _scopes: BTreeSet<String>
 }
 
 impl<'a, S> client::CallBuilder for RiskAnalysiOperationDeleteCall<'a, S> {}
 
 impl<'a, S> RiskAnalysiOperationDeleteCall<'a, S>
 where
-    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
     S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
     S::Future: Send + Unpin + 'static,
     S::Error: Into<Box<dyn StdError + Send + Sync>>,
@@ -4494,74 +4898,55 @@ where
 
     /// Perform the operation you have build so far.
     pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, GoogleProtobufEmpty)> {
-        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
         use std::io::{Read, Seek};
         use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::ToParts;
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
         let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
         dlg.begin(client::MethodInfo { id: "dlp.riskAnalysis.operations.delete",
                                http_method: hyper::Method::DELETE });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
-        params.push(("name", self._name.to_string()));
+
         for &field in ["alt", "name"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(client::Error::FieldClash(field));
             }
         }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
 
-        params.push(("alt", "json".to_string()));
+        let mut params = Params::with_capacity(3 + self._additional_params.len());
+        params.push("name", self._name);
 
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "v2beta1/{+name}";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string());
         }
 
         for &(find_this, param_name) in [("{+name}", "name")].iter() {
-            let mut replace_with = String::new();
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = value.to_string();
-                    break;
-                }
-            }
-            if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
-            }
-            url = url.replace(find_this, &replace_with);
+            url = params.uri_replacement(url, param_name, find_this, true);
         }
         {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
-            for param_name in ["name"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
+            let to_remove = ["name"];
+            params.remove_params(&to_remove);
         }
 
-        let url = url::Url::parse_with_params(&url, params).unwrap();
+        let url = params.parse_with_url(&url);
 
 
 
         loop {
-            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
-                Ok(token) => token.clone(),
-                Err(err) => {
-                    match  dlg.token(&err) {
-                        Some(token) => token,
-                        None => {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
                             dlg.finished(false);
-                            return Err(client::Error::MissingToken(err))
+                            return Err(client::Error::MissingToken(e));
                         }
                     }
                 }
@@ -4569,21 +4954,27 @@ where
             let mut req_result = {
                 let client = &self.hub.client;
                 dlg.pre_request();
-                let mut req_builder = hyper::Request::builder().method(hyper::Method::DELETE).uri(url.clone().into_string())
-                        .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::DELETE)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
 
 
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
-                
+
             };
 
             match req_result {
                 Err(err) => {
                     if let client::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep(d).await;
                         continue;
                     }
                     dlg.finished(false);
@@ -4599,7 +4990,7 @@ where
                         let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
                         if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
-                            sleep(d);
+                            sleep(d).await;
                             continue;
                         }
 
@@ -4643,7 +5034,8 @@ where
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.````
     ///
     /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> RiskAnalysiOperationDeleteCall<'a, S> {
@@ -4681,25 +5073,36 @@ where
 
     /// Identifies the authorization scope for the method you are building.
     ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::CloudPlatform`.
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::CloudPlatform`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
     ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, St>(mut self, scope: T) -> RiskAnalysiOperationDeleteCall<'a, S>
-                                                        where T: Into<Option<St>>,
-                                                              St: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
+    pub fn add_scope<St>(mut self, scope: St) -> RiskAnalysiOperationDeleteCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> RiskAnalysiOperationDeleteCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> RiskAnalysiOperationDeleteCall<'a, S> {
+        self._scopes.clear();
         self
     }
 }
@@ -4708,7 +5111,7 @@ where
 /// Fetches the list of long running operations.
 ///
 /// A builder for the *operations.list* method supported by a *riskAnalysi* resource.
-/// It is not used directly, but through a `RiskAnalysiMethods` instance.
+/// It is not used directly, but through a [`RiskAnalysiMethods`] instance.
 ///
 /// # Example
 ///
@@ -4720,7 +5123,7 @@ where
 /// # extern crate google_dlp2_beta1 as dlp2_beta1;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use dlp2_beta1::{DLP, oauth2, hyper, hyper_rustls};
+/// # use dlp2_beta1::{DLP, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
 /// # let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -4748,14 +5151,14 @@ pub struct RiskAnalysiOperationListCall<'a, S>
     _filter: Option<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
+    _scopes: BTreeSet<String>
 }
 
 impl<'a, S> client::CallBuilder for RiskAnalysiOperationListCall<'a, S> {}
 
 impl<'a, S> RiskAnalysiOperationListCall<'a, S>
 where
-    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
     S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
     S::Future: Send + Unpin + 'static,
     S::Error: Into<Box<dyn StdError + Send + Sync>>,
@@ -4764,83 +5167,64 @@ where
 
     /// Perform the operation you have build so far.
     pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, GoogleLongrunningListOperationsResponse)> {
-        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
         use std::io::{Read, Seek};
         use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::ToParts;
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
         let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
         dlg.begin(client::MethodInfo { id: "dlp.riskAnalysis.operations.list",
                                http_method: hyper::Method::GET });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(6 + self._additional_params.len());
-        params.push(("name", self._name.to_string()));
-        if let Some(value) = self._page_token {
-            params.push(("pageToken", value.to_string()));
-        }
-        if let Some(value) = self._page_size {
-            params.push(("pageSize", value.to_string()));
-        }
-        if let Some(value) = self._filter {
-            params.push(("filter", value.to_string()));
-        }
+
         for &field in ["alt", "name", "pageToken", "pageSize", "filter"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(client::Error::FieldClash(field));
             }
         }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
+
+        let mut params = Params::with_capacity(6 + self._additional_params.len());
+        params.push("name", self._name);
+        if let Some(value) = self._page_token.as_ref() {
+            params.push("pageToken", value);
+        }
+        if let Some(value) = self._page_size.as_ref() {
+            params.push("pageSize", value.to_string());
+        }
+        if let Some(value) = self._filter.as_ref() {
+            params.push("filter", value);
         }
 
-        params.push(("alt", "json".to_string()));
+        params.extend(self._additional_params.iter());
 
+        params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "v2beta1/{+name}";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string());
         }
 
         for &(find_this, param_name) in [("{+name}", "name")].iter() {
-            let mut replace_with = String::new();
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = value.to_string();
-                    break;
-                }
-            }
-            if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
-            }
-            url = url.replace(find_this, &replace_with);
+            url = params.uri_replacement(url, param_name, find_this, true);
         }
         {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
-            for param_name in ["name"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
+            let to_remove = ["name"];
+            params.remove_params(&to_remove);
         }
 
-        let url = url::Url::parse_with_params(&url, params).unwrap();
+        let url = params.parse_with_url(&url);
 
 
 
         loop {
-            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
-                Ok(token) => token.clone(),
-                Err(err) => {
-                    match  dlg.token(&err) {
-                        Some(token) => token,
-                        None => {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
                             dlg.finished(false);
-                            return Err(client::Error::MissingToken(err))
+                            return Err(client::Error::MissingToken(e));
                         }
                     }
                 }
@@ -4848,21 +5232,27 @@ where
             let mut req_result = {
                 let client = &self.hub.client;
                 dlg.pre_request();
-                let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
-                        .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::GET)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
 
 
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
-                
+
             };
 
             match req_result {
                 Err(err) => {
                     if let client::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep(d).await;
                         continue;
                     }
                     dlg.finished(false);
@@ -4878,7 +5268,7 @@ where
                         let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
                         if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
-                            sleep(d);
+                            sleep(d).await;
                             continue;
                         }
 
@@ -4943,7 +5333,8 @@ where
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.````
     ///
     /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> RiskAnalysiOperationListCall<'a, S> {
@@ -4981,25 +5372,36 @@ where
 
     /// Identifies the authorization scope for the method you are building.
     ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::CloudPlatform`.
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::CloudPlatform`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
     ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, St>(mut self, scope: T) -> RiskAnalysiOperationListCall<'a, S>
-                                                        where T: Into<Option<St>>,
-                                                              St: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
+    pub fn add_scope<St>(mut self, scope: St) -> RiskAnalysiOperationListCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> RiskAnalysiOperationListCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> RiskAnalysiOperationListCall<'a, S> {
+        self._scopes.clear();
         self
     }
 }
@@ -5010,7 +5412,7 @@ where
 /// service.
 ///
 /// A builder for the *operations.get* method supported by a *riskAnalysi* resource.
-/// It is not used directly, but through a `RiskAnalysiMethods` instance.
+/// It is not used directly, but through a [`RiskAnalysiMethods`] instance.
 ///
 /// # Example
 ///
@@ -5022,7 +5424,7 @@ where
 /// # extern crate google_dlp2_beta1 as dlp2_beta1;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use dlp2_beta1::{DLP, oauth2, hyper, hyper_rustls};
+/// # use dlp2_beta1::{DLP, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
 /// # let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -5044,14 +5446,14 @@ pub struct RiskAnalysiOperationGetCall<'a, S>
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
+    _scopes: BTreeSet<String>
 }
 
 impl<'a, S> client::CallBuilder for RiskAnalysiOperationGetCall<'a, S> {}
 
 impl<'a, S> RiskAnalysiOperationGetCall<'a, S>
 where
-    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
     S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
     S::Future: Send + Unpin + 'static,
     S::Error: Into<Box<dyn StdError + Send + Sync>>,
@@ -5060,74 +5462,55 @@ where
 
     /// Perform the operation you have build so far.
     pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, GoogleLongrunningOperation)> {
-        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
         use std::io::{Read, Seek};
         use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::ToParts;
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
         let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
         dlg.begin(client::MethodInfo { id: "dlp.riskAnalysis.operations.get",
                                http_method: hyper::Method::GET });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
-        params.push(("name", self._name.to_string()));
+
         for &field in ["alt", "name"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(client::Error::FieldClash(field));
             }
         }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
 
-        params.push(("alt", "json".to_string()));
+        let mut params = Params::with_capacity(3 + self._additional_params.len());
+        params.push("name", self._name);
 
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "v2beta1/{+name}";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string());
         }
 
         for &(find_this, param_name) in [("{+name}", "name")].iter() {
-            let mut replace_with = String::new();
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = value.to_string();
-                    break;
-                }
-            }
-            if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
-            }
-            url = url.replace(find_this, &replace_with);
+            url = params.uri_replacement(url, param_name, find_this, true);
         }
         {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
-            for param_name in ["name"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
+            let to_remove = ["name"];
+            params.remove_params(&to_remove);
         }
 
-        let url = url::Url::parse_with_params(&url, params).unwrap();
+        let url = params.parse_with_url(&url);
 
 
 
         loop {
-            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
-                Ok(token) => token.clone(),
-                Err(err) => {
-                    match  dlg.token(&err) {
-                        Some(token) => token,
-                        None => {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
                             dlg.finished(false);
-                            return Err(client::Error::MissingToken(err))
+                            return Err(client::Error::MissingToken(e));
                         }
                     }
                 }
@@ -5135,21 +5518,27 @@ where
             let mut req_result = {
                 let client = &self.hub.client;
                 dlg.pre_request();
-                let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
-                        .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::GET)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
 
 
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
-                
+
             };
 
             match req_result {
                 Err(err) => {
                     if let client::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep(d).await;
                         continue;
                     }
                     dlg.finished(false);
@@ -5165,7 +5554,7 @@ where
                         let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
                         if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
-                            sleep(d);
+                            sleep(d).await;
                             continue;
                         }
 
@@ -5209,7 +5598,8 @@ where
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.````
     ///
     /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> RiskAnalysiOperationGetCall<'a, S> {
@@ -5247,25 +5637,36 @@ where
 
     /// Identifies the authorization scope for the method you are building.
     ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::CloudPlatform`.
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::CloudPlatform`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
     ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, St>(mut self, scope: T) -> RiskAnalysiOperationGetCall<'a, S>
-                                                        where T: Into<Option<St>>,
-                                                              St: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
+    pub fn add_scope<St>(mut self, scope: St) -> RiskAnalysiOperationGetCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> RiskAnalysiOperationGetCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> RiskAnalysiOperationGetCall<'a, S> {
+        self._scopes.clear();
         self
     }
 }
@@ -5275,7 +5676,7 @@ where
 /// Cloud Platform repository.
 ///
 /// A builder for the *analyze* method supported by a *dataSource* resource.
-/// It is not used directly, but through a `DataSourceMethods` instance.
+/// It is not used directly, but through a [`DataSourceMethods`] instance.
 ///
 /// # Example
 ///
@@ -5288,7 +5689,7 @@ where
 /// use dlp2_beta1::api::GooglePrivacyDlpV2beta1AnalyzeDataSourceRiskRequest;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use dlp2_beta1::{DLP, oauth2, hyper, hyper_rustls};
+/// # use dlp2_beta1::{DLP, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
 /// # let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -5315,14 +5716,14 @@ pub struct DataSourceAnalyzeCall<'a, S>
     _request: GooglePrivacyDlpV2beta1AnalyzeDataSourceRiskRequest,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
+    _scopes: BTreeSet<String>
 }
 
 impl<'a, S> client::CallBuilder for DataSourceAnalyzeCall<'a, S> {}
 
 impl<'a, S> DataSourceAnalyzeCall<'a, S>
 where
-    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
     S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
     S::Future: Send + Unpin + 'static,
     S::Error: Into<Box<dyn StdError + Send + Sync>>,
@@ -5333,36 +5734,35 @@ where
     pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, GoogleLongrunningOperation)> {
         use std::io::{Read, Seek};
         use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::ToParts;
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
         let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
         dlg.begin(client::MethodInfo { id: "dlp.dataSource.analyze",
                                http_method: hyper::Method::POST });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
+
         for &field in ["alt"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(client::Error::FieldClash(field));
             }
         }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
 
-        params.push(("alt", "json".to_string()));
+        let mut params = Params::with_capacity(3 + self._additional_params.len());
 
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "v2beta1/dataSource:analyze";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string());
         }
 
 
-        let url = url::Url::parse_with_params(&url, params).unwrap();
+        let url = params.parse_with_url(&url);
 
-        let mut json_mime_type: mime::Mime = "application/json".parse().unwrap();
+        let mut json_mime_type = mime::APPLICATION_JSON;
         let mut request_value_reader =
             {
                 let mut value = json::value::to_value(&self._request).expect("serde to work");
@@ -5376,14 +5776,14 @@ where
 
 
         loop {
-            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
-                Ok(token) => token.clone(),
-                Err(err) => {
-                    match  dlg.token(&err) {
-                        Some(token) => token,
-                        None => {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
                             dlg.finished(false);
-                            return Err(client::Error::MissingToken(err))
+                            return Err(client::Error::MissingToken(e));
                         }
                     }
                 }
@@ -5392,23 +5792,29 @@ where
             let mut req_result = {
                 let client = &self.hub.client;
                 dlg.pre_request();
-                let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
-                        .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::POST)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
 
 
                         let request = req_builder
-                        .header(CONTENT_TYPE, format!("{}", json_mime_type.to_string()))
+                        .header(CONTENT_TYPE, json_mime_type.to_string())
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
                 client.request(request.unwrap()).await
-                
+
             };
 
             match req_result {
                 Err(err) => {
                     if let client::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep(d).await;
                         continue;
                     }
                     dlg.finished(false);
@@ -5424,7 +5830,7 @@ where
                         let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
                         if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
-                            sleep(d);
+                            sleep(d).await;
                             continue;
                         }
 
@@ -5467,7 +5873,8 @@ where
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.````
     ///
     /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> DataSourceAnalyzeCall<'a, S> {
@@ -5505,25 +5912,36 @@ where
 
     /// Identifies the authorization scope for the method you are building.
     ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::CloudPlatform`.
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::CloudPlatform`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
     ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, St>(mut self, scope: T) -> DataSourceAnalyzeCall<'a, S>
-                                                        where T: Into<Option<St>>,
-                                                              St: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
+    pub fn add_scope<St>(mut self, scope: St) -> DataSourceAnalyzeCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> DataSourceAnalyzeCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> DataSourceAnalyzeCall<'a, S> {
+        self._scopes.clear();
         self
     }
 }
@@ -5533,7 +5951,7 @@ where
 /// repository.
 ///
 /// A builder for the *operations.create* method supported by a *inspect* resource.
-/// It is not used directly, but through a `InspectMethods` instance.
+/// It is not used directly, but through a [`InspectMethods`] instance.
 ///
 /// # Example
 ///
@@ -5546,7 +5964,7 @@ where
 /// use dlp2_beta1::api::GooglePrivacyDlpV2beta1CreateInspectOperationRequest;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use dlp2_beta1::{DLP, oauth2, hyper, hyper_rustls};
+/// # use dlp2_beta1::{DLP, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
 /// # let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -5573,14 +5991,14 @@ pub struct InspectOperationCreateCall<'a, S>
     _request: GooglePrivacyDlpV2beta1CreateInspectOperationRequest,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
+    _scopes: BTreeSet<String>
 }
 
 impl<'a, S> client::CallBuilder for InspectOperationCreateCall<'a, S> {}
 
 impl<'a, S> InspectOperationCreateCall<'a, S>
 where
-    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
     S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
     S::Future: Send + Unpin + 'static,
     S::Error: Into<Box<dyn StdError + Send + Sync>>,
@@ -5591,36 +6009,35 @@ where
     pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, GoogleLongrunningOperation)> {
         use std::io::{Read, Seek};
         use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::ToParts;
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
         let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
         dlg.begin(client::MethodInfo { id: "dlp.inspect.operations.create",
                                http_method: hyper::Method::POST });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
+
         for &field in ["alt"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(client::Error::FieldClash(field));
             }
         }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
 
-        params.push(("alt", "json".to_string()));
+        let mut params = Params::with_capacity(3 + self._additional_params.len());
 
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "v2beta1/inspect/operations";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string());
         }
 
 
-        let url = url::Url::parse_with_params(&url, params).unwrap();
+        let url = params.parse_with_url(&url);
 
-        let mut json_mime_type: mime::Mime = "application/json".parse().unwrap();
+        let mut json_mime_type = mime::APPLICATION_JSON;
         let mut request_value_reader =
             {
                 let mut value = json::value::to_value(&self._request).expect("serde to work");
@@ -5634,14 +6051,14 @@ where
 
 
         loop {
-            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
-                Ok(token) => token.clone(),
-                Err(err) => {
-                    match  dlg.token(&err) {
-                        Some(token) => token,
-                        None => {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
                             dlg.finished(false);
-                            return Err(client::Error::MissingToken(err))
+                            return Err(client::Error::MissingToken(e));
                         }
                     }
                 }
@@ -5650,23 +6067,29 @@ where
             let mut req_result = {
                 let client = &self.hub.client;
                 dlg.pre_request();
-                let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
-                        .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::POST)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
 
 
                         let request = req_builder
-                        .header(CONTENT_TYPE, format!("{}", json_mime_type.to_string()))
+                        .header(CONTENT_TYPE, json_mime_type.to_string())
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
                 client.request(request.unwrap()).await
-                
+
             };
 
             match req_result {
                 Err(err) => {
                     if let client::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep(d).await;
                         continue;
                     }
                     dlg.finished(false);
@@ -5682,7 +6105,7 @@ where
                         let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
                         if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
-                            sleep(d);
+                            sleep(d).await;
                             continue;
                         }
 
@@ -5725,7 +6148,8 @@ where
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.````
     ///
     /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> InspectOperationCreateCall<'a, S> {
@@ -5763,25 +6187,36 @@ where
 
     /// Identifies the authorization scope for the method you are building.
     ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::CloudPlatform`.
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::CloudPlatform`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
     ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, St>(mut self, scope: T) -> InspectOperationCreateCall<'a, S>
-                                                        where T: Into<Option<St>>,
-                                                              St: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
+    pub fn add_scope<St>(mut self, scope: St) -> InspectOperationCreateCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> InspectOperationCreateCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> InspectOperationCreateCall<'a, S> {
+        self._scopes.clear();
         self
     }
 }
@@ -5790,7 +6225,7 @@ where
 /// Cancels an operation. Use the `inspect.operations.get` to check whether the cancellation succeeded or the operation completed despite cancellation.
 ///
 /// A builder for the *operations.cancel* method supported by a *inspect* resource.
-/// It is not used directly, but through a `InspectMethods` instance.
+/// It is not used directly, but through a [`InspectMethods`] instance.
 ///
 /// # Example
 ///
@@ -5803,7 +6238,7 @@ where
 /// use dlp2_beta1::api::GoogleLongrunningCancelOperationRequest;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use dlp2_beta1::{DLP, oauth2, hyper, hyper_rustls};
+/// # use dlp2_beta1::{DLP, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
 /// # let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -5831,14 +6266,14 @@ pub struct InspectOperationCancelCall<'a, S>
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
+    _scopes: BTreeSet<String>
 }
 
 impl<'a, S> client::CallBuilder for InspectOperationCancelCall<'a, S> {}
 
 impl<'a, S> InspectOperationCancelCall<'a, S>
 where
-    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
     S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
     S::Future: Send + Unpin + 'static,
     S::Error: Into<Box<dyn StdError + Send + Sync>>,
@@ -5847,64 +6282,45 @@ where
 
     /// Perform the operation you have build so far.
     pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, GoogleProtobufEmpty)> {
-        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
         use std::io::{Read, Seek};
         use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::ToParts;
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
         let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
         dlg.begin(client::MethodInfo { id: "dlp.inspect.operations.cancel",
                                http_method: hyper::Method::POST });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
-        params.push(("name", self._name.to_string()));
+
         for &field in ["alt", "name"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(client::Error::FieldClash(field));
             }
         }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
 
-        params.push(("alt", "json".to_string()));
+        let mut params = Params::with_capacity(4 + self._additional_params.len());
+        params.push("name", self._name);
 
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "v2beta1/{+name}:cancel";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string());
         }
 
         for &(find_this, param_name) in [("{+name}", "name")].iter() {
-            let mut replace_with = String::new();
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = value.to_string();
-                    break;
-                }
-            }
-            if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
-            }
-            url = url.replace(find_this, &replace_with);
+            url = params.uri_replacement(url, param_name, find_this, true);
         }
         {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
-            for param_name in ["name"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
+            let to_remove = ["name"];
+            params.remove_params(&to_remove);
         }
 
-        let url = url::Url::parse_with_params(&url, params).unwrap();
+        let url = params.parse_with_url(&url);
 
-        let mut json_mime_type: mime::Mime = "application/json".parse().unwrap();
+        let mut json_mime_type = mime::APPLICATION_JSON;
         let mut request_value_reader =
             {
                 let mut value = json::value::to_value(&self._request).expect("serde to work");
@@ -5918,14 +6334,14 @@ where
 
 
         loop {
-            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
-                Ok(token) => token.clone(),
-                Err(err) => {
-                    match  dlg.token(&err) {
-                        Some(token) => token,
-                        None => {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
                             dlg.finished(false);
-                            return Err(client::Error::MissingToken(err))
+                            return Err(client::Error::MissingToken(e));
                         }
                     }
                 }
@@ -5934,23 +6350,29 @@ where
             let mut req_result = {
                 let client = &self.hub.client;
                 dlg.pre_request();
-                let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
-                        .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::POST)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
 
 
                         let request = req_builder
-                        .header(CONTENT_TYPE, format!("{}", json_mime_type.to_string()))
+                        .header(CONTENT_TYPE, json_mime_type.to_string())
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
                 client.request(request.unwrap()).await
-                
+
             };
 
             match req_result {
                 Err(err) => {
                     if let client::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep(d).await;
                         continue;
                     }
                     dlg.finished(false);
@@ -5966,7 +6388,7 @@ where
                         let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
                         if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
-                            sleep(d);
+                            sleep(d).await;
                             continue;
                         }
 
@@ -6019,7 +6441,8 @@ where
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.````
     ///
     /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> InspectOperationCancelCall<'a, S> {
@@ -6057,25 +6480,36 @@ where
 
     /// Identifies the authorization scope for the method you are building.
     ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::CloudPlatform`.
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::CloudPlatform`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
     ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, St>(mut self, scope: T) -> InspectOperationCancelCall<'a, S>
-                                                        where T: Into<Option<St>>,
-                                                              St: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
+    pub fn add_scope<St>(mut self, scope: St) -> InspectOperationCancelCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> InspectOperationCancelCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> InspectOperationCancelCall<'a, S> {
+        self._scopes.clear();
         self
     }
 }
@@ -6084,7 +6518,7 @@ where
 /// This method is not supported and the server returns `UNIMPLEMENTED`.
 ///
 /// A builder for the *operations.delete* method supported by a *inspect* resource.
-/// It is not used directly, but through a `InspectMethods` instance.
+/// It is not used directly, but through a [`InspectMethods`] instance.
 ///
 /// # Example
 ///
@@ -6096,7 +6530,7 @@ where
 /// # extern crate google_dlp2_beta1 as dlp2_beta1;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use dlp2_beta1::{DLP, oauth2, hyper, hyper_rustls};
+/// # use dlp2_beta1::{DLP, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
 /// # let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -6118,14 +6552,14 @@ pub struct InspectOperationDeleteCall<'a, S>
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
+    _scopes: BTreeSet<String>
 }
 
 impl<'a, S> client::CallBuilder for InspectOperationDeleteCall<'a, S> {}
 
 impl<'a, S> InspectOperationDeleteCall<'a, S>
 where
-    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
     S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
     S::Future: Send + Unpin + 'static,
     S::Error: Into<Box<dyn StdError + Send + Sync>>,
@@ -6134,74 +6568,55 @@ where
 
     /// Perform the operation you have build so far.
     pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, GoogleProtobufEmpty)> {
-        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
         use std::io::{Read, Seek};
         use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::ToParts;
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
         let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
         dlg.begin(client::MethodInfo { id: "dlp.inspect.operations.delete",
                                http_method: hyper::Method::DELETE });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
-        params.push(("name", self._name.to_string()));
+
         for &field in ["alt", "name"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(client::Error::FieldClash(field));
             }
         }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
 
-        params.push(("alt", "json".to_string()));
+        let mut params = Params::with_capacity(3 + self._additional_params.len());
+        params.push("name", self._name);
 
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "v2beta1/{+name}";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string());
         }
 
         for &(find_this, param_name) in [("{+name}", "name")].iter() {
-            let mut replace_with = String::new();
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = value.to_string();
-                    break;
-                }
-            }
-            if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
-            }
-            url = url.replace(find_this, &replace_with);
+            url = params.uri_replacement(url, param_name, find_this, true);
         }
         {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
-            for param_name in ["name"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
+            let to_remove = ["name"];
+            params.remove_params(&to_remove);
         }
 
-        let url = url::Url::parse_with_params(&url, params).unwrap();
+        let url = params.parse_with_url(&url);
 
 
 
         loop {
-            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
-                Ok(token) => token.clone(),
-                Err(err) => {
-                    match  dlg.token(&err) {
-                        Some(token) => token,
-                        None => {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
                             dlg.finished(false);
-                            return Err(client::Error::MissingToken(err))
+                            return Err(client::Error::MissingToken(e));
                         }
                     }
                 }
@@ -6209,21 +6624,27 @@ where
             let mut req_result = {
                 let client = &self.hub.client;
                 dlg.pre_request();
-                let mut req_builder = hyper::Request::builder().method(hyper::Method::DELETE).uri(url.clone().into_string())
-                        .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::DELETE)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
 
 
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
-                
+
             };
 
             match req_result {
                 Err(err) => {
                     if let client::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep(d).await;
                         continue;
                     }
                     dlg.finished(false);
@@ -6239,7 +6660,7 @@ where
                         let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
                         if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
-                            sleep(d);
+                            sleep(d).await;
                             continue;
                         }
 
@@ -6283,7 +6704,8 @@ where
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.````
     ///
     /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> InspectOperationDeleteCall<'a, S> {
@@ -6321,25 +6743,36 @@ where
 
     /// Identifies the authorization scope for the method you are building.
     ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::CloudPlatform`.
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::CloudPlatform`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
     ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, St>(mut self, scope: T) -> InspectOperationDeleteCall<'a, S>
-                                                        where T: Into<Option<St>>,
-                                                              St: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
+    pub fn add_scope<St>(mut self, scope: St) -> InspectOperationDeleteCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> InspectOperationDeleteCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> InspectOperationDeleteCall<'a, S> {
+        self._scopes.clear();
         self
     }
 }
@@ -6348,7 +6781,7 @@ where
 /// Fetches the list of long running operations.
 ///
 /// A builder for the *operations.list* method supported by a *inspect* resource.
-/// It is not used directly, but through a `InspectMethods` instance.
+/// It is not used directly, but through a [`InspectMethods`] instance.
 ///
 /// # Example
 ///
@@ -6360,7 +6793,7 @@ where
 /// # extern crate google_dlp2_beta1 as dlp2_beta1;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use dlp2_beta1::{DLP, oauth2, hyper, hyper_rustls};
+/// # use dlp2_beta1::{DLP, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
 /// # let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -6388,14 +6821,14 @@ pub struct InspectOperationListCall<'a, S>
     _filter: Option<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
+    _scopes: BTreeSet<String>
 }
 
 impl<'a, S> client::CallBuilder for InspectOperationListCall<'a, S> {}
 
 impl<'a, S> InspectOperationListCall<'a, S>
 where
-    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
     S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
     S::Future: Send + Unpin + 'static,
     S::Error: Into<Box<dyn StdError + Send + Sync>>,
@@ -6404,83 +6837,64 @@ where
 
     /// Perform the operation you have build so far.
     pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, GoogleLongrunningListOperationsResponse)> {
-        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
         use std::io::{Read, Seek};
         use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::ToParts;
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
         let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
         dlg.begin(client::MethodInfo { id: "dlp.inspect.operations.list",
                                http_method: hyper::Method::GET });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(6 + self._additional_params.len());
-        params.push(("name", self._name.to_string()));
-        if let Some(value) = self._page_token {
-            params.push(("pageToken", value.to_string()));
-        }
-        if let Some(value) = self._page_size {
-            params.push(("pageSize", value.to_string()));
-        }
-        if let Some(value) = self._filter {
-            params.push(("filter", value.to_string()));
-        }
+
         for &field in ["alt", "name", "pageToken", "pageSize", "filter"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(client::Error::FieldClash(field));
             }
         }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
+
+        let mut params = Params::with_capacity(6 + self._additional_params.len());
+        params.push("name", self._name);
+        if let Some(value) = self._page_token.as_ref() {
+            params.push("pageToken", value);
+        }
+        if let Some(value) = self._page_size.as_ref() {
+            params.push("pageSize", value.to_string());
+        }
+        if let Some(value) = self._filter.as_ref() {
+            params.push("filter", value);
         }
 
-        params.push(("alt", "json".to_string()));
+        params.extend(self._additional_params.iter());
 
+        params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "v2beta1/{+name}";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string());
         }
 
         for &(find_this, param_name) in [("{+name}", "name")].iter() {
-            let mut replace_with = String::new();
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = value.to_string();
-                    break;
-                }
-            }
-            if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
-            }
-            url = url.replace(find_this, &replace_with);
+            url = params.uri_replacement(url, param_name, find_this, true);
         }
         {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
-            for param_name in ["name"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
+            let to_remove = ["name"];
+            params.remove_params(&to_remove);
         }
 
-        let url = url::Url::parse_with_params(&url, params).unwrap();
+        let url = params.parse_with_url(&url);
 
 
 
         loop {
-            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
-                Ok(token) => token.clone(),
-                Err(err) => {
-                    match  dlg.token(&err) {
-                        Some(token) => token,
-                        None => {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
                             dlg.finished(false);
-                            return Err(client::Error::MissingToken(err))
+                            return Err(client::Error::MissingToken(e));
                         }
                     }
                 }
@@ -6488,21 +6902,27 @@ where
             let mut req_result = {
                 let client = &self.hub.client;
                 dlg.pre_request();
-                let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
-                        .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::GET)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
 
 
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
-                
+
             };
 
             match req_result {
                 Err(err) => {
                     if let client::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep(d).await;
                         continue;
                     }
                     dlg.finished(false);
@@ -6518,7 +6938,7 @@ where
                         let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
                         if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
-                            sleep(d);
+                            sleep(d).await;
                             continue;
                         }
 
@@ -6583,7 +7003,8 @@ where
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.````
     ///
     /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> InspectOperationListCall<'a, S> {
@@ -6621,25 +7042,36 @@ where
 
     /// Identifies the authorization scope for the method you are building.
     ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::CloudPlatform`.
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::CloudPlatform`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
     ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, St>(mut self, scope: T) -> InspectOperationListCall<'a, S>
-                                                        where T: Into<Option<St>>,
-                                                              St: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
+    pub fn add_scope<St>(mut self, scope: St) -> InspectOperationListCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> InspectOperationListCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> InspectOperationListCall<'a, S> {
+        self._scopes.clear();
         self
     }
 }
@@ -6650,7 +7082,7 @@ where
 /// service.
 ///
 /// A builder for the *operations.get* method supported by a *inspect* resource.
-/// It is not used directly, but through a `InspectMethods` instance.
+/// It is not used directly, but through a [`InspectMethods`] instance.
 ///
 /// # Example
 ///
@@ -6662,7 +7094,7 @@ where
 /// # extern crate google_dlp2_beta1 as dlp2_beta1;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use dlp2_beta1::{DLP, oauth2, hyper, hyper_rustls};
+/// # use dlp2_beta1::{DLP, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
 /// # let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -6684,14 +7116,14 @@ pub struct InspectOperationGetCall<'a, S>
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
+    _scopes: BTreeSet<String>
 }
 
 impl<'a, S> client::CallBuilder for InspectOperationGetCall<'a, S> {}
 
 impl<'a, S> InspectOperationGetCall<'a, S>
 where
-    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
     S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
     S::Future: Send + Unpin + 'static,
     S::Error: Into<Box<dyn StdError + Send + Sync>>,
@@ -6700,74 +7132,55 @@ where
 
     /// Perform the operation you have build so far.
     pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, GoogleLongrunningOperation)> {
-        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
         use std::io::{Read, Seek};
         use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::ToParts;
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
         let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
         dlg.begin(client::MethodInfo { id: "dlp.inspect.operations.get",
                                http_method: hyper::Method::GET });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
-        params.push(("name", self._name.to_string()));
+
         for &field in ["alt", "name"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(client::Error::FieldClash(field));
             }
         }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
 
-        params.push(("alt", "json".to_string()));
+        let mut params = Params::with_capacity(3 + self._additional_params.len());
+        params.push("name", self._name);
 
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "v2beta1/{+name}";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string());
         }
 
         for &(find_this, param_name) in [("{+name}", "name")].iter() {
-            let mut replace_with = String::new();
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = value.to_string();
-                    break;
-                }
-            }
-            if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
-            }
-            url = url.replace(find_this, &replace_with);
+            url = params.uri_replacement(url, param_name, find_this, true);
         }
         {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
-            for param_name in ["name"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
+            let to_remove = ["name"];
+            params.remove_params(&to_remove);
         }
 
-        let url = url::Url::parse_with_params(&url, params).unwrap();
+        let url = params.parse_with_url(&url);
 
 
 
         loop {
-            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
-                Ok(token) => token.clone(),
-                Err(err) => {
-                    match  dlg.token(&err) {
-                        Some(token) => token,
-                        None => {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
                             dlg.finished(false);
-                            return Err(client::Error::MissingToken(err))
+                            return Err(client::Error::MissingToken(e));
                         }
                     }
                 }
@@ -6775,21 +7188,27 @@ where
             let mut req_result = {
                 let client = &self.hub.client;
                 dlg.pre_request();
-                let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
-                        .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::GET)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
 
 
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
-                
+
             };
 
             match req_result {
                 Err(err) => {
                     if let client::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep(d).await;
                         continue;
                     }
                     dlg.finished(false);
@@ -6805,7 +7224,7 @@ where
                         let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
                         if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
-                            sleep(d);
+                            sleep(d).await;
                             continue;
                         }
 
@@ -6849,7 +7268,8 @@ where
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.````
     ///
     /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> InspectOperationGetCall<'a, S> {
@@ -6887,25 +7307,36 @@ where
 
     /// Identifies the authorization scope for the method you are building.
     ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::CloudPlatform`.
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::CloudPlatform`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
     ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, St>(mut self, scope: T) -> InspectOperationGetCall<'a, S>
-                                                        where T: Into<Option<St>>,
-                                                              St: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
+    pub fn add_scope<St>(mut self, scope: St) -> InspectOperationGetCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> InspectOperationGetCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> InspectOperationGetCall<'a, S> {
+        self._scopes.clear();
         self
     }
 }
@@ -6914,7 +7345,7 @@ where
 /// Returns list of results for given inspect operation result set id.
 ///
 /// A builder for the *results.findings.list* method supported by a *inspect* resource.
-/// It is not used directly, but through a `InspectMethods` instance.
+/// It is not used directly, but through a [`InspectMethods`] instance.
 ///
 /// # Example
 ///
@@ -6926,7 +7357,7 @@ where
 /// # extern crate google_dlp2_beta1 as dlp2_beta1;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use dlp2_beta1::{DLP, oauth2, hyper, hyper_rustls};
+/// # use dlp2_beta1::{DLP, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
 /// # let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -6954,14 +7385,14 @@ pub struct InspectResultFindingListCall<'a, S>
     _filter: Option<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
+    _scopes: BTreeSet<String>
 }
 
 impl<'a, S> client::CallBuilder for InspectResultFindingListCall<'a, S> {}
 
 impl<'a, S> InspectResultFindingListCall<'a, S>
 where
-    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
     S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
     S::Future: Send + Unpin + 'static,
     S::Error: Into<Box<dyn StdError + Send + Sync>>,
@@ -6970,83 +7401,64 @@ where
 
     /// Perform the operation you have build so far.
     pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, GooglePrivacyDlpV2beta1ListInspectFindingsResponse)> {
-        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
         use std::io::{Read, Seek};
         use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::ToParts;
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
         let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
         dlg.begin(client::MethodInfo { id: "dlp.inspect.results.findings.list",
                                http_method: hyper::Method::GET });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(6 + self._additional_params.len());
-        params.push(("name", self._name.to_string()));
-        if let Some(value) = self._page_token {
-            params.push(("pageToken", value.to_string()));
-        }
-        if let Some(value) = self._page_size {
-            params.push(("pageSize", value.to_string()));
-        }
-        if let Some(value) = self._filter {
-            params.push(("filter", value.to_string()));
-        }
+
         for &field in ["alt", "name", "pageToken", "pageSize", "filter"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(client::Error::FieldClash(field));
             }
         }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
+
+        let mut params = Params::with_capacity(6 + self._additional_params.len());
+        params.push("name", self._name);
+        if let Some(value) = self._page_token.as_ref() {
+            params.push("pageToken", value);
+        }
+        if let Some(value) = self._page_size.as_ref() {
+            params.push("pageSize", value.to_string());
+        }
+        if let Some(value) = self._filter.as_ref() {
+            params.push("filter", value);
         }
 
-        params.push(("alt", "json".to_string()));
+        params.extend(self._additional_params.iter());
 
+        params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "v2beta1/{+name}/findings";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string());
         }
 
         for &(find_this, param_name) in [("{+name}", "name")].iter() {
-            let mut replace_with = String::new();
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = value.to_string();
-                    break;
-                }
-            }
-            if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
-            }
-            url = url.replace(find_this, &replace_with);
+            url = params.uri_replacement(url, param_name, find_this, true);
         }
         {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
-            for param_name in ["name"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
+            let to_remove = ["name"];
+            params.remove_params(&to_remove);
         }
 
-        let url = url::Url::parse_with_params(&url, params).unwrap();
+        let url = params.parse_with_url(&url);
 
 
 
         loop {
-            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
-                Ok(token) => token.clone(),
-                Err(err) => {
-                    match  dlg.token(&err) {
-                        Some(token) => token,
-                        None => {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
                             dlg.finished(false);
-                            return Err(client::Error::MissingToken(err))
+                            return Err(client::Error::MissingToken(e));
                         }
                     }
                 }
@@ -7054,21 +7466,27 @@ where
             let mut req_result = {
                 let client = &self.hub.client;
                 dlg.pre_request();
-                let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
-                        .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::GET)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
 
 
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
-                
+
             };
 
             match req_result {
                 Err(err) => {
                     if let client::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep(d).await;
                         continue;
                     }
                     dlg.finished(false);
@@ -7084,7 +7502,7 @@ where
                         let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
                         if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
-                            sleep(d);
+                            sleep(d).await;
                             continue;
                         }
 
@@ -7162,7 +7580,8 @@ where
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.````
     ///
     /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> InspectResultFindingListCall<'a, S> {
@@ -7200,25 +7619,36 @@ where
 
     /// Identifies the authorization scope for the method you are building.
     ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::CloudPlatform`.
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::CloudPlatform`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
     ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, St>(mut self, scope: T) -> InspectResultFindingListCall<'a, S>
-                                                        where T: Into<Option<St>>,
-                                                              St: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
+    pub fn add_scope<St>(mut self, scope: St) -> InspectResultFindingListCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> InspectResultFindingListCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> InspectResultFindingListCall<'a, S> {
+        self._scopes.clear();
         self
     }
 }

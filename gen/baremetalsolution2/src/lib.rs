@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/generator/templates/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *baremetalsolution* crate version *4.0.1+20220209*, where *20220209* is the exact revision of the *baremetalsolution:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v4.0.1*.
+//! This documentation was generated from *baremetalsolution* crate version *5.0.2-beta-1+20230113*, where *20230113* is the exact revision of the *baremetalsolution:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.2-beta-1*.
 //! 
 //! Everything else about the *baremetalsolution* *v2* API can be found at the
 //! [official documentation site](https://cloud.google.com/bare-metal).
@@ -12,7 +12,7 @@
 //! Handle the following *Resources* with ease from the central [hub](Baremetalsolution) ... 
 //! 
 //! * projects
-//!  * [*locations get*](api::ProjectLocationGetCall), [*locations instances get*](api::ProjectLocationInstanceGetCall), [*locations instances list*](api::ProjectLocationInstanceListCall), [*locations instances patch*](api::ProjectLocationInstancePatchCall), [*locations instances reset*](api::ProjectLocationInstanceResetCall), [*locations instances start*](api::ProjectLocationInstanceStartCall), [*locations list*](api::ProjectLocationListCall), [*locations networks get*](api::ProjectLocationNetworkGetCall), [*locations networks list*](api::ProjectLocationNetworkListCall), [*locations networks list network usage*](api::ProjectLocationNetworkListNetworkUsageCall), [*locations networks patch*](api::ProjectLocationNetworkPatchCall), [*locations nfs shares get*](api::ProjectLocationNfsShareGetCall), [*locations nfs shares list*](api::ProjectLocationNfsShareListCall), [*locations nfs shares patch*](api::ProjectLocationNfsSharePatchCall), [*locations provisioning configs submit*](api::ProjectLocationProvisioningConfigSubmitCall), [*locations provisioning quotas list*](api::ProjectLocationProvisioningQuotaListCall), [*locations snapshot schedule policies create*](api::ProjectLocationSnapshotSchedulePolicyCreateCall), [*locations snapshot schedule policies delete*](api::ProjectLocationSnapshotSchedulePolicyDeleteCall), [*locations snapshot schedule policies get*](api::ProjectLocationSnapshotSchedulePolicyGetCall), [*locations snapshot schedule policies list*](api::ProjectLocationSnapshotSchedulePolicyListCall), [*locations snapshot schedule policies patch*](api::ProjectLocationSnapshotSchedulePolicyPatchCall), [*locations volumes get*](api::ProjectLocationVolumeGetCall), [*locations volumes list*](api::ProjectLocationVolumeListCall), [*locations volumes luns get*](api::ProjectLocationVolumeLunGetCall), [*locations volumes luns list*](api::ProjectLocationVolumeLunListCall), [*locations volumes patch*](api::ProjectLocationVolumePatchCall), [*locations volumes snapshots create*](api::ProjectLocationVolumeSnapshotCreateCall), [*locations volumes snapshots delete*](api::ProjectLocationVolumeSnapshotDeleteCall), [*locations volumes snapshots get*](api::ProjectLocationVolumeSnapshotGetCall), [*locations volumes snapshots list*](api::ProjectLocationVolumeSnapshotListCall) and [*locations volumes snapshots restore volume snapshot*](api::ProjectLocationVolumeSnapshotRestoreVolumeSnapshotCall)
+//!  * [*locations get*](api::ProjectLocationGetCall), [*locations instance provisioning settings fetch*](api::ProjectLocationInstanceProvisioningSettingFetchCall), [*locations instances create*](api::ProjectLocationInstanceCreateCall), [*locations instances detach lun*](api::ProjectLocationInstanceDetachLunCall), [*locations instances disable interactive serial console*](api::ProjectLocationInstanceDisableInteractiveSerialConsoleCall), [*locations instances enable interactive serial console*](api::ProjectLocationInstanceEnableInteractiveSerialConsoleCall), [*locations instances get*](api::ProjectLocationInstanceGetCall), [*locations instances list*](api::ProjectLocationInstanceListCall), [*locations instances patch*](api::ProjectLocationInstancePatchCall), [*locations instances reset*](api::ProjectLocationInstanceResetCall), [*locations instances start*](api::ProjectLocationInstanceStartCall), [*locations instances stop*](api::ProjectLocationInstanceStopCall), [*locations list*](api::ProjectLocationListCall), [*locations networks get*](api::ProjectLocationNetworkGetCall), [*locations networks list*](api::ProjectLocationNetworkListCall), [*locations networks list network usage*](api::ProjectLocationNetworkListNetworkUsageCall), [*locations networks patch*](api::ProjectLocationNetworkPatchCall), [*locations nfs shares create*](api::ProjectLocationNfsShareCreateCall), [*locations nfs shares delete*](api::ProjectLocationNfsShareDeleteCall), [*locations nfs shares get*](api::ProjectLocationNfsShareGetCall), [*locations nfs shares list*](api::ProjectLocationNfsShareListCall), [*locations nfs shares patch*](api::ProjectLocationNfsSharePatchCall), [*locations operations get*](api::ProjectLocationOperationGetCall), [*locations provisioning configs create*](api::ProjectLocationProvisioningConfigCreateCall), [*locations provisioning configs get*](api::ProjectLocationProvisioningConfigGetCall), [*locations provisioning configs patch*](api::ProjectLocationProvisioningConfigPatchCall), [*locations provisioning configs submit*](api::ProjectLocationProvisioningConfigSubmitCall), [*locations provisioning quotas list*](api::ProjectLocationProvisioningQuotaListCall), [*locations ssh keys create*](api::ProjectLocationSshKeyCreateCall), [*locations ssh keys delete*](api::ProjectLocationSshKeyDeleteCall), [*locations ssh keys list*](api::ProjectLocationSshKeyListCall), [*locations volumes get*](api::ProjectLocationVolumeGetCall), [*locations volumes list*](api::ProjectLocationVolumeListCall), [*locations volumes luns get*](api::ProjectLocationVolumeLunGetCall), [*locations volumes luns list*](api::ProjectLocationVolumeLunListCall), [*locations volumes patch*](api::ProjectLocationVolumePatchCall), [*locations volumes resize*](api::ProjectLocationVolumeResizeCall), [*locations volumes snapshots create*](api::ProjectLocationVolumeSnapshotCreateCall), [*locations volumes snapshots delete*](api::ProjectLocationVolumeSnapshotDeleteCall), [*locations volumes snapshots get*](api::ProjectLocationVolumeSnapshotGetCall), [*locations volumes snapshots list*](api::ProjectLocationVolumeSnapshotListCall) and [*locations volumes snapshots restore volume snapshot*](api::ProjectLocationVolumeSnapshotRestoreVolumeSnapshotCall)
 //! 
 //! 
 //! 
@@ -47,13 +47,22 @@
 //! Or specifically ...
 //! 
 //! ```ignore
+//! let r = hub.projects().locations_instances_create(...).doit().await
+//! let r = hub.projects().locations_instances_detach_lun(...).doit().await
+//! let r = hub.projects().locations_instances_disable_interactive_serial_console(...).doit().await
+//! let r = hub.projects().locations_instances_enable_interactive_serial_console(...).doit().await
 //! let r = hub.projects().locations_instances_patch(...).doit().await
 //! let r = hub.projects().locations_instances_reset(...).doit().await
 //! let r = hub.projects().locations_instances_start(...).doit().await
+//! let r = hub.projects().locations_instances_stop(...).doit().await
 //! let r = hub.projects().locations_networks_patch(...).doit().await
+//! let r = hub.projects().locations_nfs_shares_create(...).doit().await
+//! let r = hub.projects().locations_nfs_shares_delete(...).doit().await
 //! let r = hub.projects().locations_nfs_shares_patch(...).doit().await
+//! let r = hub.projects().locations_operations_get(...).doit().await
 //! let r = hub.projects().locations_volumes_snapshots_restore_volume_snapshot(...).doit().await
 //! let r = hub.projects().locations_volumes_patch(...).doit().await
+//! let r = hub.projects().locations_volumes_resize(...).doit().await
 //! ```
 //! 
 //! The `resource()` and `activity(...)` calls create [builders][builder-pattern]. The second one dealing with `Activities` 
@@ -84,7 +93,7 @@
 //! use baremetalsolution2::{Result, Error};
 //! # async fn dox() {
 //! use std::default::Default;
-//! use baremetalsolution2::{Baremetalsolution, oauth2, hyper, hyper_rustls};
+//! use baremetalsolution2::{Baremetalsolution, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 //! 
 //! // Get an ApplicationSecret instance by some means. It contains the `client_id` and 
 //! // `client_secret`, among other things.
@@ -108,7 +117,7 @@
 //! // execute the final call using `doit()`.
 //! // Values shown here are possibly random and not representative !
 //! let result = hub.projects().locations_instances_patch(req, "name")
-//!              .update_mask("ipsum")
+//!              .update_mask(&Default::default())
 //!              .doit().await;
 //! 
 //! match result {
@@ -194,22 +203,17 @@
 // This file was generated automatically from 'src/generator/templates/api/lib.rs.mako'
 // DO NOT EDIT !
 
-#[macro_use]
-extern crate serde_derive;
-
 // Re-export the hyper and hyper_rustls crate, they are required to build the hub
-pub extern crate hyper;
-pub extern crate hyper_rustls;
-extern crate serde;
-extern crate serde_json;
-// Re-export the yup_oauth2 crate, that is required to call some methods of the hub and the client
-pub extern crate yup_oauth2 as oauth2;
-extern crate mime;
-extern crate url;
-
+pub use hyper;
+pub use hyper_rustls;
+pub extern crate google_apis_common as client;
+pub use client::chrono;
 pub mod api;
-pub mod client;
 
 // Re-export the hub type and some basic client structs
 pub use api::Baremetalsolution;
-pub use client::{Result, Error, Delegate};
+pub use client::{Result, Error, Delegate, FieldMask};
+
+// Re-export the yup_oauth2 crate, that is required to call some methods of the hub and the client
+#[cfg(feature = "yup-oauth2")]
+pub use client::oauth2;

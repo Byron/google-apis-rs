@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/generator/templates/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Tag Manager* crate version *4.0.1+20220301*, where *20220301* is the exact revision of the *tagmanager:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v4.0.1*.
+//! This documentation was generated from *Tag Manager* crate version *5.0.2-beta-1+20230123*, where *20230123* is the exact revision of the *tagmanager:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.2-beta-1*.
 //! 
 //! Everything else about the *Tag Manager* *v2* API can be found at the
 //! [official documentation site](https://developers.google.com/tag-manager).
@@ -12,7 +12,7 @@
 //! Handle the following *Resources* with ease from the central [hub](TagManager) ... 
 //! 
 //! * [accounts](api::Account)
-//!  * [*containers create*](api::AccountContainerCreateCall), [*containers delete*](api::AccountContainerDeleteCall), [*containers environments create*](api::AccountContainerEnvironmentCreateCall), [*containers environments delete*](api::AccountContainerEnvironmentDeleteCall), [*containers environments get*](api::AccountContainerEnvironmentGetCall), [*containers environments list*](api::AccountContainerEnvironmentListCall), [*containers environments reauthorize*](api::AccountContainerEnvironmentReauthorizeCall), [*containers environments update*](api::AccountContainerEnvironmentUpdateCall), [*containers get*](api::AccountContainerGetCall), [*containers list*](api::AccountContainerListCall), [*containers update*](api::AccountContainerUpdateCall), [*containers version_headers latest*](api::AccountContainerVersionHeaderLatestCall), [*containers version_headers list*](api::AccountContainerVersionHeaderListCall), [*containers versions delete*](api::AccountContainerVersionDeleteCall), [*containers versions get*](api::AccountContainerVersionGetCall), [*containers versions live*](api::AccountContainerVersionLiveCall), [*containers versions publish*](api::AccountContainerVersionPublishCall), [*containers versions set_latest*](api::AccountContainerVersionSetLatestCall), [*containers versions undelete*](api::AccountContainerVersionUndeleteCall), [*containers versions update*](api::AccountContainerVersionUpdateCall), [*containers workspaces built_in_variables create*](api::AccountContainerWorkspaceBuiltInVariableCreateCall), [*containers workspaces built_in_variables delete*](api::AccountContainerWorkspaceBuiltInVariableDeleteCall), [*containers workspaces built_in_variables list*](api::AccountContainerWorkspaceBuiltInVariableListCall), [*containers workspaces built_in_variables revert*](api::AccountContainerWorkspaceBuiltInVariableRevertCall), [*containers workspaces clients create*](api::AccountContainerWorkspaceClientCreateCall), [*containers workspaces clients delete*](api::AccountContainerWorkspaceClientDeleteCall), [*containers workspaces clients get*](api::AccountContainerWorkspaceClientGetCall), [*containers workspaces clients list*](api::AccountContainerWorkspaceClientListCall), [*containers workspaces clients revert*](api::AccountContainerWorkspaceClientRevertCall), [*containers workspaces clients update*](api::AccountContainerWorkspaceClientUpdateCall), [*containers workspaces create*](api::AccountContainerWorkspaceCreateCall), [*containers workspaces create_version*](api::AccountContainerWorkspaceCreateVersionCall), [*containers workspaces delete*](api::AccountContainerWorkspaceDeleteCall), [*containers workspaces folders create*](api::AccountContainerWorkspaceFolderCreateCall), [*containers workspaces folders delete*](api::AccountContainerWorkspaceFolderDeleteCall), [*containers workspaces folders entities*](api::AccountContainerWorkspaceFolderEntityCall), [*containers workspaces folders get*](api::AccountContainerWorkspaceFolderGetCall), [*containers workspaces folders list*](api::AccountContainerWorkspaceFolderListCall), [*containers workspaces folders move_entities_to_folder*](api::AccountContainerWorkspaceFolderMoveEntitiesToFolderCall), [*containers workspaces folders revert*](api::AccountContainerWorkspaceFolderRevertCall), [*containers workspaces folders update*](api::AccountContainerWorkspaceFolderUpdateCall), [*containers workspaces get*](api::AccountContainerWorkspaceGetCall), [*containers workspaces get status*](api::AccountContainerWorkspaceGetStatuCall), [*containers workspaces list*](api::AccountContainerWorkspaceListCall), [*containers workspaces quick_preview*](api::AccountContainerWorkspaceQuickPreviewCall), [*containers workspaces resolve_conflict*](api::AccountContainerWorkspaceResolveConflictCall), [*containers workspaces sync*](api::AccountContainerWorkspaceSyncCall), [*containers workspaces tags create*](api::AccountContainerWorkspaceTagCreateCall), [*containers workspaces tags delete*](api::AccountContainerWorkspaceTagDeleteCall), [*containers workspaces tags get*](api::AccountContainerWorkspaceTagGetCall), [*containers workspaces tags list*](api::AccountContainerWorkspaceTagListCall), [*containers workspaces tags revert*](api::AccountContainerWorkspaceTagRevertCall), [*containers workspaces tags update*](api::AccountContainerWorkspaceTagUpdateCall), [*containers workspaces templates create*](api::AccountContainerWorkspaceTemplateCreateCall), [*containers workspaces templates delete*](api::AccountContainerWorkspaceTemplateDeleteCall), [*containers workspaces templates get*](api::AccountContainerWorkspaceTemplateGetCall), [*containers workspaces templates list*](api::AccountContainerWorkspaceTemplateListCall), [*containers workspaces templates revert*](api::AccountContainerWorkspaceTemplateRevertCall), [*containers workspaces templates update*](api::AccountContainerWorkspaceTemplateUpdateCall), [*containers workspaces triggers create*](api::AccountContainerWorkspaceTriggerCreateCall), [*containers workspaces triggers delete*](api::AccountContainerWorkspaceTriggerDeleteCall), [*containers workspaces triggers get*](api::AccountContainerWorkspaceTriggerGetCall), [*containers workspaces triggers list*](api::AccountContainerWorkspaceTriggerListCall), [*containers workspaces triggers revert*](api::AccountContainerWorkspaceTriggerRevertCall), [*containers workspaces triggers update*](api::AccountContainerWorkspaceTriggerUpdateCall), [*containers workspaces update*](api::AccountContainerWorkspaceUpdateCall), [*containers workspaces variables create*](api::AccountContainerWorkspaceVariableCreateCall), [*containers workspaces variables delete*](api::AccountContainerWorkspaceVariableDeleteCall), [*containers workspaces variables get*](api::AccountContainerWorkspaceVariableGetCall), [*containers workspaces variables list*](api::AccountContainerWorkspaceVariableListCall), [*containers workspaces variables revert*](api::AccountContainerWorkspaceVariableRevertCall), [*containers workspaces variables update*](api::AccountContainerWorkspaceVariableUpdateCall), [*containers workspaces zones create*](api::AccountContainerWorkspaceZoneCreateCall), [*containers workspaces zones delete*](api::AccountContainerWorkspaceZoneDeleteCall), [*containers workspaces zones get*](api::AccountContainerWorkspaceZoneGetCall), [*containers workspaces zones list*](api::AccountContainerWorkspaceZoneListCall), [*containers workspaces zones revert*](api::AccountContainerWorkspaceZoneRevertCall), [*containers workspaces zones update*](api::AccountContainerWorkspaceZoneUpdateCall), [*get*](api::AccountGetCall), [*list*](api::AccountListCall), [*update*](api::AccountUpdateCall), [*user_permissions create*](api::AccountUserPermissionCreateCall), [*user_permissions delete*](api::AccountUserPermissionDeleteCall), [*user_permissions get*](api::AccountUserPermissionGetCall), [*user_permissions list*](api::AccountUserPermissionListCall) and [*user_permissions update*](api::AccountUserPermissionUpdateCall)
+//!  * [*containers combine*](api::AccountContainerCombineCall), [*containers create*](api::AccountContainerCreateCall), [*containers delete*](api::AccountContainerDeleteCall), [*containers destinations get*](api::AccountContainerDestinationGetCall), [*containers destinations link*](api::AccountContainerDestinationLinkCall), [*containers destinations list*](api::AccountContainerDestinationListCall), [*containers environments create*](api::AccountContainerEnvironmentCreateCall), [*containers environments delete*](api::AccountContainerEnvironmentDeleteCall), [*containers environments get*](api::AccountContainerEnvironmentGetCall), [*containers environments list*](api::AccountContainerEnvironmentListCall), [*containers environments reauthorize*](api::AccountContainerEnvironmentReauthorizeCall), [*containers environments update*](api::AccountContainerEnvironmentUpdateCall), [*containers get*](api::AccountContainerGetCall), [*containers list*](api::AccountContainerListCall), [*containers lookup*](api::AccountContainerLookupCall), [*containers move_tag_id*](api::AccountContainerMoveTagIdCall), [*containers snippet*](api::AccountContainerSnippetCall), [*containers update*](api::AccountContainerUpdateCall), [*containers version_headers latest*](api::AccountContainerVersionHeaderLatestCall), [*containers version_headers list*](api::AccountContainerVersionHeaderListCall), [*containers versions delete*](api::AccountContainerVersionDeleteCall), [*containers versions get*](api::AccountContainerVersionGetCall), [*containers versions live*](api::AccountContainerVersionLiveCall), [*containers versions publish*](api::AccountContainerVersionPublishCall), [*containers versions set_latest*](api::AccountContainerVersionSetLatestCall), [*containers versions undelete*](api::AccountContainerVersionUndeleteCall), [*containers versions update*](api::AccountContainerVersionUpdateCall), [*containers workspaces built_in_variables create*](api::AccountContainerWorkspaceBuiltInVariableCreateCall), [*containers workspaces built_in_variables delete*](api::AccountContainerWorkspaceBuiltInVariableDeleteCall), [*containers workspaces built_in_variables list*](api::AccountContainerWorkspaceBuiltInVariableListCall), [*containers workspaces built_in_variables revert*](api::AccountContainerWorkspaceBuiltInVariableRevertCall), [*containers workspaces clients create*](api::AccountContainerWorkspaceClientCreateCall), [*containers workspaces clients delete*](api::AccountContainerWorkspaceClientDeleteCall), [*containers workspaces clients get*](api::AccountContainerWorkspaceClientGetCall), [*containers workspaces clients list*](api::AccountContainerWorkspaceClientListCall), [*containers workspaces clients revert*](api::AccountContainerWorkspaceClientRevertCall), [*containers workspaces clients update*](api::AccountContainerWorkspaceClientUpdateCall), [*containers workspaces create*](api::AccountContainerWorkspaceCreateCall), [*containers workspaces create_version*](api::AccountContainerWorkspaceCreateVersionCall), [*containers workspaces delete*](api::AccountContainerWorkspaceDeleteCall), [*containers workspaces folders create*](api::AccountContainerWorkspaceFolderCreateCall), [*containers workspaces folders delete*](api::AccountContainerWorkspaceFolderDeleteCall), [*containers workspaces folders entities*](api::AccountContainerWorkspaceFolderEntityCall), [*containers workspaces folders get*](api::AccountContainerWorkspaceFolderGetCall), [*containers workspaces folders list*](api::AccountContainerWorkspaceFolderListCall), [*containers workspaces folders move_entities_to_folder*](api::AccountContainerWorkspaceFolderMoveEntitiesToFolderCall), [*containers workspaces folders revert*](api::AccountContainerWorkspaceFolderRevertCall), [*containers workspaces folders update*](api::AccountContainerWorkspaceFolderUpdateCall), [*containers workspaces get*](api::AccountContainerWorkspaceGetCall), [*containers workspaces get status*](api::AccountContainerWorkspaceGetStatuCall), [*containers workspaces gtag_config create*](api::AccountContainerWorkspaceGtagConfigCreateCall), [*containers workspaces gtag_config delete*](api::AccountContainerWorkspaceGtagConfigDeleteCall), [*containers workspaces gtag_config get*](api::AccountContainerWorkspaceGtagConfigGetCall), [*containers workspaces gtag_config list*](api::AccountContainerWorkspaceGtagConfigListCall), [*containers workspaces gtag_config update*](api::AccountContainerWorkspaceGtagConfigUpdateCall), [*containers workspaces list*](api::AccountContainerWorkspaceListCall), [*containers workspaces quick_preview*](api::AccountContainerWorkspaceQuickPreviewCall), [*containers workspaces resolve_conflict*](api::AccountContainerWorkspaceResolveConflictCall), [*containers workspaces sync*](api::AccountContainerWorkspaceSyncCall), [*containers workspaces tags create*](api::AccountContainerWorkspaceTagCreateCall), [*containers workspaces tags delete*](api::AccountContainerWorkspaceTagDeleteCall), [*containers workspaces tags get*](api::AccountContainerWorkspaceTagGetCall), [*containers workspaces tags list*](api::AccountContainerWorkspaceTagListCall), [*containers workspaces tags revert*](api::AccountContainerWorkspaceTagRevertCall), [*containers workspaces tags update*](api::AccountContainerWorkspaceTagUpdateCall), [*containers workspaces templates create*](api::AccountContainerWorkspaceTemplateCreateCall), [*containers workspaces templates delete*](api::AccountContainerWorkspaceTemplateDeleteCall), [*containers workspaces templates get*](api::AccountContainerWorkspaceTemplateGetCall), [*containers workspaces templates list*](api::AccountContainerWorkspaceTemplateListCall), [*containers workspaces templates revert*](api::AccountContainerWorkspaceTemplateRevertCall), [*containers workspaces templates update*](api::AccountContainerWorkspaceTemplateUpdateCall), [*containers workspaces triggers create*](api::AccountContainerWorkspaceTriggerCreateCall), [*containers workspaces triggers delete*](api::AccountContainerWorkspaceTriggerDeleteCall), [*containers workspaces triggers get*](api::AccountContainerWorkspaceTriggerGetCall), [*containers workspaces triggers list*](api::AccountContainerWorkspaceTriggerListCall), [*containers workspaces triggers revert*](api::AccountContainerWorkspaceTriggerRevertCall), [*containers workspaces triggers update*](api::AccountContainerWorkspaceTriggerUpdateCall), [*containers workspaces update*](api::AccountContainerWorkspaceUpdateCall), [*containers workspaces variables create*](api::AccountContainerWorkspaceVariableCreateCall), [*containers workspaces variables delete*](api::AccountContainerWorkspaceVariableDeleteCall), [*containers workspaces variables get*](api::AccountContainerWorkspaceVariableGetCall), [*containers workspaces variables list*](api::AccountContainerWorkspaceVariableListCall), [*containers workspaces variables revert*](api::AccountContainerWorkspaceVariableRevertCall), [*containers workspaces variables update*](api::AccountContainerWorkspaceVariableUpdateCall), [*containers workspaces zones create*](api::AccountContainerWorkspaceZoneCreateCall), [*containers workspaces zones delete*](api::AccountContainerWorkspaceZoneDeleteCall), [*containers workspaces zones get*](api::AccountContainerWorkspaceZoneGetCall), [*containers workspaces zones list*](api::AccountContainerWorkspaceZoneListCall), [*containers workspaces zones revert*](api::AccountContainerWorkspaceZoneRevertCall), [*containers workspaces zones update*](api::AccountContainerWorkspaceZoneUpdateCall), [*get*](api::AccountGetCall), [*list*](api::AccountListCall), [*update*](api::AccountUpdateCall), [*user_permissions create*](api::AccountUserPermissionCreateCall), [*user_permissions delete*](api::AccountUserPermissionDeleteCall), [*user_permissions get*](api::AccountUserPermissionGetCall), [*user_permissions list*](api::AccountUserPermissionListCall) and [*user_permissions update*](api::AccountUserPermissionUpdateCall)
 //! 
 //! 
 //! 
@@ -47,6 +47,9 @@
 //! Or specifically ...
 //! 
 //! ```ignore
+//! let r = hub.accounts().containers_destinations_get(...).doit().await
+//! let r = hub.accounts().containers_destinations_link(...).doit().await
+//! let r = hub.accounts().containers_destinations_list(...).doit().await
 //! let r = hub.accounts().containers_environments_create(...).doit().await
 //! let r = hub.accounts().containers_environments_delete(...).doit().await
 //! let r = hub.accounts().containers_environments_get(...).doit().await
@@ -80,6 +83,11 @@
 //! let r = hub.accounts().containers_workspaces_folders_move_entities_to_folder(...).doit().await
 //! let r = hub.accounts().containers_workspaces_folders_revert(...).doit().await
 //! let r = hub.accounts().containers_workspaces_folders_update(...).doit().await
+//! let r = hub.accounts().containers_workspaces_gtag_config_create(...).doit().await
+//! let r = hub.accounts().containers_workspaces_gtag_config_delete(...).doit().await
+//! let r = hub.accounts().containers_workspaces_gtag_config_get(...).doit().await
+//! let r = hub.accounts().containers_workspaces_gtag_config_list(...).doit().await
+//! let r = hub.accounts().containers_workspaces_gtag_config_update(...).doit().await
 //! let r = hub.accounts().containers_workspaces_tags_create(...).doit().await
 //! let r = hub.accounts().containers_workspaces_tags_delete(...).doit().await
 //! let r = hub.accounts().containers_workspaces_tags_get(...).doit().await
@@ -120,10 +128,14 @@
 //! let r = hub.accounts().containers_workspaces_resolve_conflict(...).doit().await
 //! let r = hub.accounts().containers_workspaces_sync(...).doit().await
 //! let r = hub.accounts().containers_workspaces_update(...).doit().await
+//! let r = hub.accounts().containers_combine(...).doit().await
 //! let r = hub.accounts().containers_create(...).doit().await
 //! let r = hub.accounts().containers_delete(...).doit().await
 //! let r = hub.accounts().containers_get(...).doit().await
 //! let r = hub.accounts().containers_list(...).doit().await
+//! let r = hub.accounts().containers_lookup(...).doit().await
+//! let r = hub.accounts().containers_move_tag_id(...).doit().await
+//! let r = hub.accounts().containers_snippet(...).doit().await
 //! let r = hub.accounts().containers_update(...).doit().await
 //! let r = hub.accounts().user_permissions_create(...).doit().await
 //! let r = hub.accounts().user_permissions_delete(...).doit().await
@@ -159,11 +171,10 @@
 //! extern crate hyper;
 //! extern crate hyper_rustls;
 //! extern crate google_tagmanager2 as tagmanager2;
-//! use tagmanager2::api::Folder;
 //! use tagmanager2::{Result, Error};
 //! # async fn dox() {
 //! use std::default::Default;
-//! use tagmanager2::{TagManager, oauth2, hyper, hyper_rustls};
+//! use tagmanager2::{TagManager, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 //! 
 //! // Get an ApplicationSecret instance by some means. It contains the `client_id` and 
 //! // `client_secret`, among other things.
@@ -178,18 +189,16 @@
 //!         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 //!     ).build().await.unwrap();
 //! let mut hub = TagManager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
-//! // As the method needs a request, you would usually fill it with the desired information
-//! // into the respective structure. Some of the parts shown here might not be applicable !
-//! // Values shown here are possibly random and not representative !
-//! let mut req = Folder::default();
-//! 
 //! // You can configure optional parameters by calling the respective setters at will, and
 //! // execute the final call using `doit()`.
 //! // Values shown here are possibly random and not representative !
-//! let result = hub.accounts().containers_workspaces_folders_move_entities_to_folder(req, "path")
-//!              .add_variable_id("At")
-//!              .add_trigger_id("sanctus")
-//!              .add_tag_id("sed")
+//! let result = hub.accounts().containers_move_tag_id("path")
+//!              .tag_name("ipsum")
+//!              .tag_id("gubergren")
+//!              .copy_users(true)
+//!              .copy_terms_of_service(false)
+//!              .copy_settings(true)
+//!              .allow_user_permission_feature_update(false)
 //!              .doit().await;
 //! 
 //! match result {
@@ -275,22 +284,17 @@
 // This file was generated automatically from 'src/generator/templates/api/lib.rs.mako'
 // DO NOT EDIT !
 
-#[macro_use]
-extern crate serde_derive;
-
 // Re-export the hyper and hyper_rustls crate, they are required to build the hub
-pub extern crate hyper;
-pub extern crate hyper_rustls;
-extern crate serde;
-extern crate serde_json;
-// Re-export the yup_oauth2 crate, that is required to call some methods of the hub and the client
-pub extern crate yup_oauth2 as oauth2;
-extern crate mime;
-extern crate url;
-
+pub use hyper;
+pub use hyper_rustls;
+pub extern crate google_apis_common as client;
+pub use client::chrono;
 pub mod api;
-pub mod client;
 
 // Re-export the hub type and some basic client structs
 pub use api::TagManager;
-pub use client::{Result, Error, Delegate};
+pub use client::{Result, Error, Delegate, FieldMask};
+
+// Re-export the yup_oauth2 crate, that is required to call some methods of the hub and the client
+#[cfg(feature = "yup-oauth2")]
+pub use client::oauth2;

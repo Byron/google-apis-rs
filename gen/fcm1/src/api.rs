@@ -243,6 +243,10 @@ pub struct AndroidNotification {
     #[serde(rename="bodyLocKey")]
     
     pub body_loc_key: Option<String>,
+    /// If set, display notifications delivered to the device will be handled by the app instead of the proxy.
+    #[serde(rename="bypassProxyNotification")]
+    
+    pub bypass_proxy_notification: Option<bool>,
     /// The [notification's channel id](https://developer.android.com/guide/topics/ui/notifiers/notifications#ManageChannels) (new in Android O). The app must create a channel with this channel ID before any notification with this channel ID is received. If you don't send this channel ID in the request, or if the channel ID provided has not yet been created by the app, FCM uses the channel ID specified in the app manifest.
     #[serde(rename="channelId")]
     
@@ -339,10 +343,10 @@ pub struct ApnsConfig {
     #[serde(rename="fcmOptions")]
     
     pub fcm_options: Option<ApnsFcmOptions>,
-    /// HTTP request headers defined in Apple Push Notification Service. Refer to [APNs request headers](https://developer.apple.com/documentation/usernotifications/setting_up_a_remote_notification_server/sending_notification_requests_to_apns) for supported headers such as `apns-expiration` and `apns-priority`.
+    /// HTTP request headers defined in Apple Push Notification Service. Refer to [APNs request headers](https://developer.apple.com/documentation/usernotifications/setting_up_a_remote_notification_server/sending_notification_requests_to_apns) for supported headers such as `apns-expiration` and `apns-priority`. The backend sets a default value for `apns-expiration` of 30 days and a default value for `apns-priority` of 10 if not explicitly set.
     
     pub headers: Option<HashMap<String, String>>,
-    /// APNs payload as a JSON object, including both `aps` dictionary and custom payload. See [Payload Key Reference](https://developer.apple.com/documentation/usernotifications/setting_up_a_remote_notification_server/generating_a_remote_notification). If present, it overrides google.firebase.fcm.v1.Notification.title and google.firebase.fcm.v1.Notification.body. The backend sets a default value for `apns-expiration` of 30 days and a default value for `apns-priority` of 10 if not explicitly set.
+    /// APNs payload as a JSON object, including both `aps` dictionary and custom payload. See [Payload Key Reference](https://developer.apple.com/documentation/usernotifications/setting_up_a_remote_notification_server/generating_a_remote_notification). If present, it overrides google.firebase.fcm.v1.Notification.title and google.firebase.fcm.v1.Notification.body.
     
     pub payload: Option<HashMap<String, json::Value>>,
 }

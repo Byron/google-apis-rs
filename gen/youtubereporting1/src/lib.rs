@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/generator/templates/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *YouTube Reporting* crate version *4.0.1+20220305*, where *20220305* is the exact revision of the *youtubereporting:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v4.0.1*.
+//! This documentation was generated from *YouTube Reporting* crate version *5.0.2-beta-1+20230123*, where *20230123* is the exact revision of the *youtubereporting:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.2-beta-1*.
 //! 
 //! Everything else about the *YouTube Reporting* *v1* API can be found at the
 //! [official documentation site](https://developers.google.com/youtube/reporting/v1/reports/).
@@ -90,7 +90,7 @@
 //! use youtubereporting1::{Result, Error};
 //! # async fn dox() {
 //! use std::default::Default;
-//! use youtubereporting1::{YouTubeReporting, oauth2, hyper, hyper_rustls};
+//! use youtubereporting1::{YouTubeReporting, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 //! 
 //! // Get an ApplicationSecret instance by some means. It contains the `client_id` and 
 //! // `client_secret`, among other things.
@@ -109,12 +109,12 @@
 //! // execute the final call using `doit()`.
 //! // Values shown here are possibly random and not representative !
 //! let result = hub.jobs().reports_list("jobId")
-//!              .start_time_before("amet.")
-//!              .start_time_at_or_after("takimata")
-//!              .page_token("amet.")
-//!              .page_size(-20)
-//!              .on_behalf_of_content_owner("ipsum")
-//!              .created_after("gubergren")
+//!              .start_time_before(chrono::Utc::now())
+//!              .start_time_at_or_after(chrono::Utc::now())
+//!              .page_token("At")
+//!              .page_size(-8)
+//!              .on_behalf_of_content_owner("sed")
+//!              .created_after(chrono::Utc::now())
 //!              .doit().await;
 //! 
 //! match result {
@@ -200,22 +200,17 @@
 // This file was generated automatically from 'src/generator/templates/api/lib.rs.mako'
 // DO NOT EDIT !
 
-#[macro_use]
-extern crate serde_derive;
-
 // Re-export the hyper and hyper_rustls crate, they are required to build the hub
-pub extern crate hyper;
-pub extern crate hyper_rustls;
-extern crate serde;
-extern crate serde_json;
-// Re-export the yup_oauth2 crate, that is required to call some methods of the hub and the client
-pub extern crate yup_oauth2 as oauth2;
-extern crate mime;
-extern crate url;
-
+pub use hyper;
+pub use hyper_rustls;
+pub extern crate google_apis_common as client;
+pub use client::chrono;
 pub mod api;
-pub mod client;
 
 // Re-export the hub type and some basic client structs
 pub use api::YouTubeReporting;
-pub use client::{Result, Error, Delegate};
+pub use client::{Result, Error, Delegate, FieldMask};
+
+// Re-export the yup_oauth2 crate, that is required to call some methods of the hub and the client
+#[cfg(feature = "yup-oauth2")]
+pub use client::oauth2;

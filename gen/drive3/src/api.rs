@@ -119,10 +119,11 @@ impl Default for Scope {
 ///              .order_by("kasd")
 ///              .include_team_drive_items(true)
 ///              .include_permissions_for_view("et")
-///              .include_items_from_all_drives(true)
-///              .drive_id("vero")
-///              .corpus("erat")
-///              .corpora("sed")
+///              .include_labels("et")
+///              .include_items_from_all_drives(false)
+///              .drive_id("erat")
+///              .corpus("sed")
+///              .corpora("duo")
 ///              .doit().await;
 /// 
 /// match result {
@@ -670,6 +671,8 @@ impl client::ResponseResult for DriveList {}
 /// * [generate ids files](FileGenerateIdCall) (none)
 /// * [get files](FileGetCall) (response)
 /// * [list files](FileListCall) (none)
+/// * [list labels files](FileListLabelCall) (none)
+/// * [modify labels files](FileModifyLabelCall) (none)
 /// * [update files](FileUpdateCall) (request|response)
 /// * [watch files](FileWatchCall) (none)
 /// 
@@ -725,7 +728,7 @@ pub struct File {
     
     pub folder_color_rgb: Option<String>,
     /// The full file extension extracted from the name field. May contain multiple concatenated extensions, such as "tar.gz". This is only available for files with binary content in Google Drive.
-    /// This is automatically updated when the name field changes, however it is not cleared if the new name does not contain a valid extension.
+    /// This is automatically updated when the name field changes, however it isn't cleared if the new name does not contain a valid extension.
     #[serde(rename="fullFileExtension")]
     
     pub full_file_extension: Option<String>,
@@ -759,6 +762,10 @@ pub struct File {
     /// Identifies what kind of resource this is. Value: the fixed string "drive#file".
     
     pub kind: Option<String>,
+    /// An overview of the labels on the file.
+    #[serde(rename="labelInfo")]
+    
+    pub label_info: Option<FileLabelInfo>,
     /// The last user to modify the file.
     #[serde(rename="lastModifyingUser")]
     
@@ -828,6 +835,14 @@ pub struct File {
     #[serde(rename="resourceKey")]
     
     pub resource_key: Option<String>,
+    /// The SHA1 checksum associated with this file, if available. This field is only populated for files with content stored in Google Drive; it isn't populated for Docs Editors or shortcut files.
+    #[serde(rename="sha1Checksum")]
+    
+    pub sha1_checksum: Option<String>,
+    /// The SHA256 checksum associated with this file, if available. This field is only populated for files with content stored in Google Drive; it isn't populated for Docs Editors or shortcut files.
+    #[serde(rename="sha256Checksum")]
+    
+    pub sha256_checksum: Option<String>,
     /// Whether the file has been shared. Not populated for items in shared drives.
     
     pub shared: Option<bool>,
@@ -973,6 +988,221 @@ pub struct GeneratedIds {
 impl client::ResponseResult for GeneratedIds {}
 
 
+/// Representation of a label and its fields.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Label {
+    /// A map of the label's fields keyed by the field ID.
+    
+    pub fields: Option<HashMap<String, LabelField>>,
+    /// The ID of the label.
+    
+    pub id: Option<String>,
+    /// This is always drive#label
+    
+    pub kind: Option<String>,
+    /// The revision ID of the label.
+    #[serde(rename="revisionId")]
+    
+    pub revision_id: Option<String>,
+}
+
+impl client::Part for Label {}
+
+
+/// Representation of a label field.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct LabelField {
+    /// Only present if valueType is dateString. RFC 3339 formatted date: YYYY-MM-DD.
+    #[serde(rename="dateString")]
+    
+    pub date_string: Option<Vec<client::chrono::NaiveDate>>,
+    /// The identifier of this field.
+    
+    pub id: Option<String>,
+    /// Only present if valueType is integer.
+    
+    #[serde_as(as = "Option<Vec<::client::serde_with::DisplayFromStr>>")]
+    pub integer: Option<Vec<i64>>,
+    /// This is always drive#labelField.
+    
+    pub kind: Option<String>,
+    /// Only present if valueType is selection.
+    
+    pub selection: Option<Vec<String>>,
+    /// Only present if valueType is text.
+    
+    pub text: Option<Vec<String>>,
+    /// Only present if valueType is user.
+    
+    pub user: Option<Vec<User>>,
+    /// The field type. While new values may be supported in the future, the following are currently allowed:  
+    /// - dateString 
+    /// - integer 
+    /// - selection 
+    /// - text 
+    /// - user
+    #[serde(rename="valueType")]
+    
+    pub value_type: Option<String>,
+}
+
+impl client::Part for LabelField {}
+
+
+/// A modification to a label's field.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct LabelFieldModification {
+    /// The ID of the Field to be modified.
+    #[serde(rename="fieldId")]
+    
+    pub field_id: Option<String>,
+    /// This is always drive#labelFieldModification.
+    
+    pub kind: Option<String>,
+    /// Replaces a dateString field with these new values. The values must be strings in the RFC 3339 full-date format: YYYY-MM-DD.
+    #[serde(rename="setDateValues")]
+    
+    pub set_date_values: Option<Vec<client::chrono::NaiveDate>>,
+    /// Replaces an integer field with these new values.
+    #[serde(rename="setIntegerValues")]
+    
+    #[serde_as(as = "Option<Vec<::client::serde_with::DisplayFromStr>>")]
+    pub set_integer_values: Option<Vec<i64>>,
+    /// Replaces a selection field with these new values.
+    #[serde(rename="setSelectionValues")]
+    
+    pub set_selection_values: Option<Vec<String>>,
+    /// Replaces a text field with these new values.
+    #[serde(rename="setTextValues")]
+    
+    pub set_text_values: Option<Vec<String>>,
+    /// Replaces a user field with these new values. The values must be valid email addresses.
+    #[serde(rename="setUserValues")]
+    
+    pub set_user_values: Option<Vec<String>>,
+    /// Unsets the values for this field.
+    #[serde(rename="unsetValues")]
+    
+    pub unset_values: Option<bool>,
+}
+
+impl client::Part for LabelFieldModification {}
+
+
+/// A list of labels.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [list labels files](FileListLabelCall) (response)
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct LabelList {
+    /// This is always drive#labelList
+    
+    pub kind: Option<String>,
+    /// The list of labels.
+    
+    pub labels: Option<Vec<Label>>,
+    /// The page token for the next page of labels. This field will be absent if the end of the list has been reached. If the token is rejected for any reason, it should be discarded, and pagination should be restarted from the first page of results.
+    #[serde(rename="nextPageToken")]
+    
+    pub next_page_token: Option<String>,
+}
+
+impl client::ResponseResult for LabelList {}
+
+
+/// A modification to a label on a file. A LabelModification can be used to apply a label to a file, update an existing label on a file, or remove a label from a file.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct LabelModification {
+    /// The list of modifications to this label's fields.
+    #[serde(rename="fieldModifications")]
+    
+    pub field_modifications: Option<Vec<LabelFieldModification>>,
+    /// This is always drive#labelModification.
+    
+    pub kind: Option<String>,
+    /// The ID of the label to modify.
+    #[serde(rename="labelId")]
+    
+    pub label_id: Option<String>,
+    /// If true, the label will be removed from the file.
+    #[serde(rename="removeLabel")]
+    
+    pub remove_label: Option<bool>,
+}
+
+impl client::Part for LabelModification {}
+
+
+/// A request to modify the set of labels on a file. This request may contain many modifications that will either all succeed or all fail transactionally.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [modify labels files](FileModifyLabelCall) (request)
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ModifyLabelsRequest {
+    /// This is always drive#modifyLabelsRequest
+    
+    pub kind: Option<String>,
+    /// The list of modifications to apply to the labels on the file.
+    #[serde(rename="labelModifications")]
+    
+    pub label_modifications: Option<Vec<LabelModification>>,
+}
+
+impl client::RequestValue for ModifyLabelsRequest {}
+
+
+/// Response to a ModifyLabels request. This contains only those labels which were added or updated by the request.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [modify labels files](FileModifyLabelCall) (response)
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ModifyLabelsResponse {
+    /// This is always drive#modifyLabelsResponse
+    
+    pub kind: Option<String>,
+    /// The list of labels which were added or updated by the request.
+    #[serde(rename="modifiedLabels")]
+    
+    pub modified_labels: Option<Vec<Label>>,
+}
+
+impl client::ResponseResult for ModifyLabelsResponse {}
+
+
 /// A permission for a file. A permission grants a user, group, domain or the world access to a file or a folder hierarchy.
 /// 
 /// # Activities
@@ -1012,6 +1242,7 @@ pub struct Permission {
     
     pub email_address: Option<String>,
     /// The time at which this permission will expire (RFC 3339 date-time). Expiration times have the following restrictions:  
+    /// - They cannot be set on shared drive items 
     /// - They can only be set on user and group permissions 
     /// - The time must be in the future 
     /// - The time cannot be more than a year in the future
@@ -1619,6 +1850,10 @@ pub struct DriveCapabilities {
     #[serde(rename="canRenameDrive")]
     
     pub can_rename_drive: Option<bool>,
+    /// Whether the current user can reset the shared drive restrictions to defaults.
+    #[serde(rename="canResetDriveRestrictions")]
+    
+    pub can_reset_drive_restrictions: Option<bool>,
     /// Whether the current user can share files or folders in this shared drive.
     #[serde(rename="canShare")]
     
@@ -1733,6 +1968,10 @@ pub struct FileCapabilities {
     #[serde(rename="canModifyContentRestriction")]
     
     pub can_modify_content_restriction: Option<bool>,
+    /// Whether the current user can modify the labels on this file.
+    #[serde(rename="canModifyLabels")]
+    
+    pub can_modify_labels: Option<bool>,
     /// Whether the current user can move children of this folder outside of the shared drive. This is false when the item is not a folder. Only populated for items in shared drives.
     #[serde(rename="canMoveChildrenOutOfDrive")]
     
@@ -1777,7 +2016,11 @@ pub struct FileCapabilities {
     #[serde(rename="canReadDrive")]
     
     pub can_read_drive: Option<bool>,
-    /// Whether the current user can read the revisions resource of this file. For a shared drive item, whether revisions of non-folder descendants of this item, or this item itself if it is not a folder, can be read.
+    /// Whether the current user can read the labels on this file.
+    #[serde(rename="canReadLabels")]
+    
+    pub can_read_labels: Option<bool>,
+    /// Whether the current user can read the revisions resource of this file. For a shared drive item, whether revisions of non-folder descendants of this item, or this item itself if it isn't a folder, can be read.
     #[serde(rename="canReadRevisions")]
     
     pub can_read_revisions: Option<bool>,
@@ -1826,7 +2069,7 @@ impl client::Part for FileCapabilities {}
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct FileContentHints {
-    /// Text to be indexed for the file to improve fullText queries. This is limited to 128KB in length and may contain HTML elements.
+    /// Text to be indexed for the file to improve fullText queries. This is limited to 128 KB in length and may contain HTML elements. For more information, see Manage file metadata.
     #[serde(rename="indexableText")]
     
     pub indexable_text: Option<String>,
@@ -1969,6 +2212,22 @@ pub struct FileImageMediaMetadataLocation {
 
 impl client::NestedType for FileImageMediaMetadataLocation {}
 impl client::Part for FileImageMediaMetadataLocation {}
+
+
+/// An overview of the labels on the file.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct FileLabelInfo {
+    /// The set of labels on the file as requested by the label IDs in the includeLabels parameter. By default, no labels are returned.
+    
+    pub labels: Option<Vec<Label>>,
+}
+
+impl client::NestedType for FileLabelInfo {}
+impl client::Part for FileLabelInfo {}
 
 
 /// Contains details about the link URLs that clients are using to refer to this item.
@@ -2204,6 +2463,10 @@ pub struct TeamDriveCapabilities {
     #[serde(rename="canRenameTeamDrive")]
     
     pub can_rename_team_drive: Option<bool>,
+    /// Whether the current user can reset the Team Drive restrictions to defaults.
+    #[serde(rename="canResetTeamDriveRestrictions")]
+    
+    pub can_reset_team_drive_restrictions: Option<bool>,
     /// Whether the current user can share files or folders in this Team Drive.
     #[serde(rename="canShare")]
     
@@ -2379,6 +2642,7 @@ impl<'a, S> ChangeMethods<'a, S> {
             _include_team_drive_items: Default::default(),
             _include_removed: Default::default(),
             _include_permissions_for_view: Default::default(),
+            _include_labels: Default::default(),
             _include_items_from_all_drives: Default::default(),
             _include_corpus_removals: Default::default(),
             _drive_id: Default::default(),
@@ -2410,6 +2674,7 @@ impl<'a, S> ChangeMethods<'a, S> {
             _include_team_drive_items: Default::default(),
             _include_removed: Default::default(),
             _include_permissions_for_view: Default::default(),
+            _include_labels: Default::default(),
             _include_items_from_all_drives: Default::default(),
             _include_corpus_removals: Default::default(),
             _drive_id: Default::default(),
@@ -2520,7 +2785,7 @@ impl<'a, S> CommentMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Creates a new comment on a file.
+    /// Creates a comment on a file.
     /// 
     /// # Arguments
     ///
@@ -2661,7 +2926,7 @@ impl<'a, S> DriveMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Creates a new shared drive.
+    /// Creates a shared drive.
     /// 
     /// # Arguments
     ///
@@ -2689,6 +2954,8 @@ impl<'a, S> DriveMethods<'a, S> {
         DriveDeleteCall {
             hub: self.hub,
             _drive_id: drive_id.to_string(),
+            _use_domain_admin_access: Default::default(),
+            _allow_item_deletion: Default::default(),
             _delegate: Default::default(),
             _additional_params: Default::default(),
             _scopes: Default::default(),
@@ -2809,7 +3076,7 @@ impl<'a, S> DriveMethods<'a, S> {
 ///     ).build().await.unwrap();
 /// let mut hub = DriveHub::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
-/// // like `copy(...)`, `create(...)`, `delete(...)`, `empty_trash(...)`, `export(...)`, `generate_ids(...)`, `get(...)`, `list(...)`, `update(...)` and `watch(...)`
+/// // like `copy(...)`, `create(...)`, `delete(...)`, `empty_trash(...)`, `export(...)`, `generate_ids(...)`, `get(...)`, `list(...)`, `list_labels(...)`, `modify_labels(...)`, `update(...)` and `watch(...)`
 /// // to build up your call.
 /// let rb = hub.files();
 /// # }
@@ -2842,6 +3109,7 @@ impl<'a, S> FileMethods<'a, S> {
             _ocr_language: Default::default(),
             _keep_revision_forever: Default::default(),
             _include_permissions_for_view: Default::default(),
+            _include_labels: Default::default(),
             _ignore_default_visibility: Default::default(),
             _enforce_single_parent: Default::default(),
             _delegate: Default::default(),
@@ -2852,7 +3120,7 @@ impl<'a, S> FileMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Creates a new file.
+    /// Creates a file.
     /// 
     /// # Arguments
     ///
@@ -2867,6 +3135,7 @@ impl<'a, S> FileMethods<'a, S> {
             _ocr_language: Default::default(),
             _keep_revision_forever: Default::default(),
             _include_permissions_for_view: Default::default(),
+            _include_labels: Default::default(),
             _ignore_default_visibility: Default::default(),
             _enforce_single_parent: Default::default(),
             _delegate: Default::default(),
@@ -2956,6 +3225,7 @@ impl<'a, S> FileMethods<'a, S> {
             _supports_team_drives: Default::default(),
             _supports_all_drives: Default::default(),
             _include_permissions_for_view: Default::default(),
+            _include_labels: Default::default(),
             _acknowledge_abuse: Default::default(),
             _delegate: Default::default(),
             _additional_params: Default::default(),
@@ -2979,10 +3249,49 @@ impl<'a, S> FileMethods<'a, S> {
             _order_by: Default::default(),
             _include_team_drive_items: Default::default(),
             _include_permissions_for_view: Default::default(),
+            _include_labels: Default::default(),
             _include_items_from_all_drives: Default::default(),
             _drive_id: Default::default(),
             _corpus: Default::default(),
             _corpora: Default::default(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Lists the labels on a file.
+    /// 
+    /// # Arguments
+    ///
+    /// * `fileId` - The ID of the file.
+    pub fn list_labels(&self, file_id: &str) -> FileListLabelCall<'a, S> {
+        FileListLabelCall {
+            hub: self.hub,
+            _file_id: file_id.to_string(),
+            _page_token: Default::default(),
+            _max_results: Default::default(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Modifies the set of labels on a file.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `fileId` - The ID of the file for which the labels are modified.
+    pub fn modify_labels(&self, request: ModifyLabelsRequest, file_id: &str) -> FileModifyLabelCall<'a, S> {
+        FileModifyLabelCall {
+            hub: self.hub,
+            _request: request,
+            _file_id: file_id.to_string(),
             _delegate: Default::default(),
             _additional_params: Default::default(),
             _scopes: Default::default(),
@@ -3009,6 +3318,7 @@ impl<'a, S> FileMethods<'a, S> {
             _ocr_language: Default::default(),
             _keep_revision_forever: Default::default(),
             _include_permissions_for_view: Default::default(),
+            _include_labels: Default::default(),
             _enforce_single_parent: Default::default(),
             _add_parents: Default::default(),
             _delegate: Default::default(),
@@ -3019,7 +3329,7 @@ impl<'a, S> FileMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Subscribes to changes to a file. While you can establish a channel forchanges to a file on a shared drive, a change to a shared drive file won't create a notification.
+    /// Subscribes to changes to a file. While you can establish a channel for changes to a file on a shared drive, a change to a shared drive file won't create a notification.
     /// 
     /// # Arguments
     ///
@@ -3033,6 +3343,7 @@ impl<'a, S> FileMethods<'a, S> {
             _supports_team_drives: Default::default(),
             _supports_all_drives: Default::default(),
             _include_permissions_for_view: Default::default(),
+            _include_labels: Default::default(),
             _acknowledge_abuse: Default::default(),
             _delegate: Default::default(),
             _additional_params: Default::default(),
@@ -3244,7 +3555,7 @@ impl<'a, S> ReplyMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Creates a new reply to a comment.
+    /// Creates a reply to a comment.
     /// 
     /// # Arguments
     ///
@@ -3876,7 +4187,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.changes().get_start_page_token()
-///              .team_drive_id("duo")
+///              .team_drive_id("dolore")
 ///              .supports_team_drives(false)
 ///              .supports_all_drives(false)
 ///              .drive_id("dolor")
@@ -4171,9 +4482,10 @@ where
 ///              .include_team_drive_items(false)
 ///              .include_removed(true)
 ///              .include_permissions_for_view("vero")
+///              .include_labels("elitr")
 ///              .include_items_from_all_drives(true)
-///              .include_corpus_removals(true)
-///              .drive_id("ipsum")
+///              .include_corpus_removals(false)
+///              .drive_id("accusam")
 ///              .doit().await;
 /// # }
 /// ```
@@ -4191,6 +4503,7 @@ pub struct ChangeListCall<'a, S>
     _include_team_drive_items: Option<bool>,
     _include_removed: Option<bool>,
     _include_permissions_for_view: Option<String>,
+    _include_labels: Option<String>,
     _include_items_from_all_drives: Option<bool>,
     _include_corpus_removals: Option<bool>,
     _drive_id: Option<String>,
@@ -4222,14 +4535,14 @@ where
         dlg.begin(client::MethodInfo { id: "drive.changes.list",
                                http_method: hyper::Method::GET });
 
-        for &field in ["alt", "pageToken", "teamDriveId", "supportsTeamDrives", "supportsAllDrives", "spaces", "restrictToMyDrive", "pageSize", "includeTeamDriveItems", "includeRemoved", "includePermissionsForView", "includeItemsFromAllDrives", "includeCorpusRemovals", "driveId"].iter() {
+        for &field in ["alt", "pageToken", "teamDriveId", "supportsTeamDrives", "supportsAllDrives", "spaces", "restrictToMyDrive", "pageSize", "includeTeamDriveItems", "includeRemoved", "includePermissionsForView", "includeLabels", "includeItemsFromAllDrives", "includeCorpusRemovals", "driveId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(client::Error::FieldClash(field));
             }
         }
 
-        let mut params = Params::with_capacity(15 + self._additional_params.len());
+        let mut params = Params::with_capacity(16 + self._additional_params.len());
         params.push("pageToken", self._page_token);
         if let Some(value) = self._team_drive_id.as_ref() {
             params.push("teamDriveId", value);
@@ -4257,6 +4570,9 @@ where
         }
         if let Some(value) = self._include_permissions_for_view.as_ref() {
             params.push("includePermissionsForView", value);
+        }
+        if let Some(value) = self._include_labels.as_ref() {
+            params.push("includeLabels", value);
         }
         if let Some(value) = self._include_items_from_all_drives.as_ref() {
             params.push("includeItemsFromAllDrives", value.to_string());
@@ -4395,7 +4711,7 @@ where
         self._supports_all_drives = Some(new_value);
         self
     }
-    /// A comma-separated list of spaces to query within the user corpus. Supported values are 'drive', 'appDataFolder' and 'photos'.
+    /// A comma-separated list of spaces to query within the corpora. Supported values are 'drive' and 'appDataFolder'.
     ///
     /// Sets the *spaces* query property to the given value.
     pub fn spaces(mut self, new_value: &str) -> ChangeListCall<'a, S> {
@@ -4435,6 +4751,13 @@ where
     /// Sets the *include permissions for view* query property to the given value.
     pub fn include_permissions_for_view(mut self, new_value: &str) -> ChangeListCall<'a, S> {
         self._include_permissions_for_view = Some(new_value.to_string());
+        self
+    }
+    /// A comma-separated list of IDs of labels to include in the labelInfo part of the response.
+    ///
+    /// Sets the *include labels* query property to the given value.
+    pub fn include_labels(mut self, new_value: &str) -> ChangeListCall<'a, S> {
+        self._include_labels = Some(new_value.to_string());
         self
     }
     /// Whether both My Drive and shared drive items should be included in results.
@@ -4562,18 +4885,19 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.changes().watch(req, "pageToken")
-///              .team_drive_id("takimata")
-///              .supports_team_drives(true)
+///              .team_drive_id("consetetur")
+///              .supports_team_drives(false)
 ///              .supports_all_drives(false)
-///              .spaces("erat")
-///              .restrict_to_my_drive(false)
-///              .page_size(-2)
-///              .include_team_drive_items(true)
+///              .spaces("amet.")
+///              .restrict_to_my_drive(true)
+///              .page_size(-74)
+///              .include_team_drive_items(false)
 ///              .include_removed(false)
-///              .include_permissions_for_view("accusam")
+///              .include_permissions_for_view("amet.")
+///              .include_labels("ea")
 ///              .include_items_from_all_drives(false)
-///              .include_corpus_removals(false)
-///              .drive_id("amet.")
+///              .include_corpus_removals(true)
+///              .drive_id("no")
 ///              .doit().await;
 /// # }
 /// ```
@@ -4592,6 +4916,7 @@ pub struct ChangeWatchCall<'a, S>
     _include_team_drive_items: Option<bool>,
     _include_removed: Option<bool>,
     _include_permissions_for_view: Option<String>,
+    _include_labels: Option<String>,
     _include_items_from_all_drives: Option<bool>,
     _include_corpus_removals: Option<bool>,
     _drive_id: Option<String>,
@@ -4623,14 +4948,14 @@ where
         dlg.begin(client::MethodInfo { id: "drive.changes.watch",
                                http_method: hyper::Method::POST });
 
-        for &field in ["alt", "pageToken", "teamDriveId", "supportsTeamDrives", "supportsAllDrives", "spaces", "restrictToMyDrive", "pageSize", "includeTeamDriveItems", "includeRemoved", "includePermissionsForView", "includeItemsFromAllDrives", "includeCorpusRemovals", "driveId"].iter() {
+        for &field in ["alt", "pageToken", "teamDriveId", "supportsTeamDrives", "supportsAllDrives", "spaces", "restrictToMyDrive", "pageSize", "includeTeamDriveItems", "includeRemoved", "includePermissionsForView", "includeLabels", "includeItemsFromAllDrives", "includeCorpusRemovals", "driveId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(client::Error::FieldClash(field));
             }
         }
 
-        let mut params = Params::with_capacity(16 + self._additional_params.len());
+        let mut params = Params::with_capacity(17 + self._additional_params.len());
         params.push("pageToken", self._page_token);
         if let Some(value) = self._team_drive_id.as_ref() {
             params.push("teamDriveId", value);
@@ -4658,6 +4983,9 @@ where
         }
         if let Some(value) = self._include_permissions_for_view.as_ref() {
             params.push("includePermissionsForView", value);
+        }
+        if let Some(value) = self._include_labels.as_ref() {
+            params.push("includeLabels", value);
         }
         if let Some(value) = self._include_items_from_all_drives.as_ref() {
             params.push("includeItemsFromAllDrives", value.to_string());
@@ -4819,7 +5147,7 @@ where
         self._supports_all_drives = Some(new_value);
         self
     }
-    /// A comma-separated list of spaces to query within the user corpus. Supported values are 'drive', 'appDataFolder' and 'photos'.
+    /// A comma-separated list of spaces to query within the corpora. Supported values are 'drive' and 'appDataFolder'.
     ///
     /// Sets the *spaces* query property to the given value.
     pub fn spaces(mut self, new_value: &str) -> ChangeWatchCall<'a, S> {
@@ -4859,6 +5187,13 @@ where
     /// Sets the *include permissions for view* query property to the given value.
     pub fn include_permissions_for_view(mut self, new_value: &str) -> ChangeWatchCall<'a, S> {
         self._include_permissions_for_view = Some(new_value.to_string());
+        self
+    }
+    /// A comma-separated list of IDs of labels to include in the labelInfo part of the response.
+    ///
+    /// Sets the *include labels* query property to the given value.
+    pub fn include_labels(mut self, new_value: &str) -> ChangeWatchCall<'a, S> {
+        self._include_labels = Some(new_value.to_string());
         self
     }
     /// Whether both My Drive and shared drive items should be included in results.
@@ -5210,7 +5545,7 @@ where
 }
 
 
-/// Creates a new comment on a file.
+/// Creates a comment on a file.
 ///
 /// A builder for the *create* method supported by a *comment* resource.
 /// It is not used directly, but through a [`CommentMethods`] instance.
@@ -6063,9 +6398,9 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.comments().list("fileId")
-///              .start_modified_time("et")
-///              .page_token("tempor")
-///              .page_size(-32)
+///              .start_modified_time("ipsum")
+///              .page_token("et")
+///              .page_size(-8)
 ///              .include_deleted(true)
 ///              .doit().await;
 /// # }
@@ -6640,7 +6975,7 @@ where
 }
 
 
-/// Creates a new shared drive.
+/// Creates a shared drive.
 ///
 /// A builder for the *create* method supported by a *drive* resource.
 /// It is not used directly, but through a [`DriveMethods`] instance.
@@ -6947,6 +7282,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.drives().delete("driveId")
+///              .use_domain_admin_access(true)
+///              .allow_item_deletion(true)
 ///              .doit().await;
 /// # }
 /// ```
@@ -6955,6 +7292,8 @@ pub struct DriveDeleteCall<'a, S>
 
     hub: &'a DriveHub<S>,
     _drive_id: String,
+    _use_domain_admin_access: Option<bool>,
+    _allow_item_deletion: Option<bool>,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeSet<String>
@@ -6983,15 +7322,21 @@ where
         dlg.begin(client::MethodInfo { id: "drive.drives.delete",
                                http_method: hyper::Method::DELETE });
 
-        for &field in ["driveId"].iter() {
+        for &field in ["driveId", "useDomainAdminAccess", "allowItemDeletion"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(client::Error::FieldClash(field));
             }
         }
 
-        let mut params = Params::with_capacity(2 + self._additional_params.len());
+        let mut params = Params::with_capacity(4 + self._additional_params.len());
         params.push("driveId", self._drive_id);
+        if let Some(value) = self._use_domain_admin_access.as_ref() {
+            params.push("useDomainAdminAccess", value.to_string());
+        }
+        if let Some(value) = self._allow_item_deletion.as_ref() {
+            params.push("allowItemDeletion", value.to_string());
+        }
 
         params.extend(self._additional_params.iter());
 
@@ -7095,6 +7440,20 @@ where
         self._drive_id = new_value.to_string();
         self
     }
+    /// Issue the request as a domain administrator; if set to true, then the requester will be granted access if they are an administrator of the domain to which the shared drive belongs.
+    ///
+    /// Sets the *use domain admin access* query property to the given value.
+    pub fn use_domain_admin_access(mut self, new_value: bool) -> DriveDeleteCall<'a, S> {
+        self._use_domain_admin_access = Some(new_value);
+        self
+    }
+    /// Whether any items inside the shared drive should also be deleted. This option is only supported when useDomainAdminAccess is also set to true.
+    ///
+    /// Sets the *allow item deletion* query property to the given value.
+    pub fn allow_item_deletion(mut self, new_value: bool) -> DriveDeleteCall<'a, S> {
+        self._allow_item_deletion = Some(new_value);
+        self
+    }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
@@ -7193,7 +7552,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.drives().get("driveId")
-///              .use_domain_admin_access(true)
+///              .use_domain_admin_access(false)
 ///              .doit().await;
 /// # }
 /// ```
@@ -7720,9 +8079,9 @@ where
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.drives().list()
 ///              .use_domain_admin_access(false)
-///              .q("elitr")
-///              .page_token("sed")
-///              .page_size(-61)
+///              .q("no")
+///              .page_token("nonumy")
+///              .page_size(-77)
 ///              .doit().await;
 /// # }
 /// ```
@@ -8567,12 +8926,13 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.files().copy(req, "fileId")
-///              .supports_team_drives(true)
-///              .supports_all_drives(false)
-///              .ocr_language("erat")
+///              .supports_team_drives(false)
+///              .supports_all_drives(true)
+///              .ocr_language("est")
 ///              .keep_revision_forever(false)
-///              .include_permissions_for_view("amet")
-///              .ignore_default_visibility(true)
+///              .include_permissions_for_view("consetetur")
+///              .include_labels("Stet")
+///              .ignore_default_visibility(false)
 ///              .enforce_single_parent(false)
 ///              .doit().await;
 /// # }
@@ -8588,6 +8948,7 @@ pub struct FileCopyCall<'a, S>
     _ocr_language: Option<String>,
     _keep_revision_forever: Option<bool>,
     _include_permissions_for_view: Option<String>,
+    _include_labels: Option<String>,
     _ignore_default_visibility: Option<bool>,
     _enforce_single_parent: Option<bool>,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -8618,14 +8979,14 @@ where
         dlg.begin(client::MethodInfo { id: "drive.files.copy",
                                http_method: hyper::Method::POST });
 
-        for &field in ["alt", "fileId", "supportsTeamDrives", "supportsAllDrives", "ocrLanguage", "keepRevisionForever", "includePermissionsForView", "ignoreDefaultVisibility", "enforceSingleParent"].iter() {
+        for &field in ["alt", "fileId", "supportsTeamDrives", "supportsAllDrives", "ocrLanguage", "keepRevisionForever", "includePermissionsForView", "includeLabels", "ignoreDefaultVisibility", "enforceSingleParent"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(client::Error::FieldClash(field));
             }
         }
 
-        let mut params = Params::with_capacity(11 + self._additional_params.len());
+        let mut params = Params::with_capacity(12 + self._additional_params.len());
         params.push("fileId", self._file_id);
         if let Some(value) = self._supports_team_drives.as_ref() {
             params.push("supportsTeamDrives", value.to_string());
@@ -8641,6 +9002,9 @@ where
         }
         if let Some(value) = self._include_permissions_for_view.as_ref() {
             params.push("includePermissionsForView", value);
+        }
+        if let Some(value) = self._include_labels.as_ref() {
+            params.push("includeLabels", value);
         }
         if let Some(value) = self._ignore_default_visibility.as_ref() {
             params.push("ignoreDefaultVisibility", value.to_string());
@@ -8820,6 +9184,13 @@ where
         self._include_permissions_for_view = Some(new_value.to_string());
         self
     }
+    /// A comma-separated list of IDs of labels to include in the labelInfo part of the response.
+    ///
+    /// Sets the *include labels* query property to the given value.
+    pub fn include_labels(mut self, new_value: &str) -> FileCopyCall<'a, S> {
+        self._include_labels = Some(new_value.to_string());
+        self
+    }
     /// Whether to ignore the domain's default visibility settings for the created file. Domain administrators can choose to make all uploaded files visible to the domain by default; this parameter bypasses that behavior for the request. Permissions are still inherited from parent folders.
     ///
     /// Sets the *ignore default visibility* query property to the given value.
@@ -8905,7 +9276,7 @@ where
 }
 
 
-/// Creates a new file.
+/// Creates a file.
 ///
 /// A builder for the *create* method supported by a *file* resource.
 /// It is not used directly, but through a [`FileMethods`] instance.
@@ -8941,10 +9312,11 @@ where
 /// let result = hub.files().create(req)
 ///              .use_content_as_indexable_text(true)
 ///              .supports_team_drives(true)
-///              .supports_all_drives(false)
-///              .ocr_language("elitr")
-///              .keep_revision_forever(true)
-///              .include_permissions_for_view("est")
+///              .supports_all_drives(true)
+///              .ocr_language("sed")
+///              .keep_revision_forever(false)
+///              .include_permissions_for_view("Lorem")
+///              .include_labels("ea")
 ///              .ignore_default_visibility(true)
 ///              .enforce_single_parent(false)
 ///              .upload(fs::File::open("file.ext").unwrap(), "application/octet-stream".parse().unwrap()).await;
@@ -8961,6 +9333,7 @@ pub struct FileCreateCall<'a, S>
     _ocr_language: Option<String>,
     _keep_revision_forever: Option<bool>,
     _include_permissions_for_view: Option<String>,
+    _include_labels: Option<String>,
     _ignore_default_visibility: Option<bool>,
     _enforce_single_parent: Option<bool>,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -8992,14 +9365,14 @@ where
         dlg.begin(client::MethodInfo { id: "drive.files.create",
                                http_method: hyper::Method::POST });
 
-        for &field in ["alt", "useContentAsIndexableText", "supportsTeamDrives", "supportsAllDrives", "ocrLanguage", "keepRevisionForever", "includePermissionsForView", "ignoreDefaultVisibility", "enforceSingleParent"].iter() {
+        for &field in ["alt", "useContentAsIndexableText", "supportsTeamDrives", "supportsAllDrives", "ocrLanguage", "keepRevisionForever", "includePermissionsForView", "includeLabels", "ignoreDefaultVisibility", "enforceSingleParent"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(client::Error::FieldClash(field));
             }
         }
 
-        let mut params = Params::with_capacity(11 + self._additional_params.len());
+        let mut params = Params::with_capacity(12 + self._additional_params.len());
         if let Some(value) = self._use_content_as_indexable_text.as_ref() {
             params.push("useContentAsIndexableText", value.to_string());
         }
@@ -9017,6 +9390,9 @@ where
         }
         if let Some(value) = self._include_permissions_for_view.as_ref() {
             params.push("includePermissionsForView", value);
+        }
+        if let Some(value) = self._include_labels.as_ref() {
+            params.push("includeLabels", value);
         }
         if let Some(value) = self._ignore_default_visibility.as_ref() {
             params.push("ignoreDefaultVisibility", value.to_string());
@@ -9298,6 +9674,13 @@ where
         self._include_permissions_for_view = Some(new_value.to_string());
         self
     }
+    /// A comma-separated list of IDs of labels to include in the labelInfo part of the response.
+    ///
+    /// Sets the *include labels* query property to the given value.
+    pub fn include_labels(mut self, new_value: &str) -> FileCreateCall<'a, S> {
+        self._include_labels = Some(new_value.to_string());
+        self
+    }
     /// Whether to ignore the domain's default visibility settings for the created file. Domain administrators can choose to make all uploaded files visible to the domain by default; this parameter bypasses that behavior for the request. Permissions are still inherited from parent folders.
     ///
     /// Sets the *ignore default visibility* query property to the given value.
@@ -9410,9 +9793,9 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.files().delete("fileId")
-///              .supports_team_drives(true)
+///              .supports_team_drives(false)
 ///              .supports_all_drives(true)
-///              .enforce_single_parent(false)
+///              .enforce_single_parent(true)
 ///              .doit().await;
 /// # }
 /// ```
@@ -9692,7 +10075,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.files().empty_trash()
-///              .enforce_single_parent(false)
+///              .enforce_single_parent(true)
 ///              .doit().await;
 /// # }
 /// ```
@@ -10192,9 +10575,9 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.files().generate_ids()
-///              .type_("Lorem")
+///              .type_("erat")
 ///              .space("accusam")
-///              .count(-47)
+///              .count(-10)
 ///              .doit().await;
 /// # }
 /// ```
@@ -10473,7 +10856,8 @@ where
 /// let result = hub.files().get("fileId")
 ///              .supports_team_drives(true)
 ///              .supports_all_drives(false)
-///              .include_permissions_for_view("accusam")
+///              .include_permissions_for_view("dolor")
+///              .include_labels("et")
 ///              .acknowledge_abuse(true)
 ///              .doit().await;
 /// # }
@@ -10486,6 +10870,7 @@ pub struct FileGetCall<'a, S>
     _supports_team_drives: Option<bool>,
     _supports_all_drives: Option<bool>,
     _include_permissions_for_view: Option<String>,
+    _include_labels: Option<String>,
     _acknowledge_abuse: Option<bool>,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
@@ -10515,14 +10900,14 @@ where
         dlg.begin(client::MethodInfo { id: "drive.files.get",
                                http_method: hyper::Method::GET });
 
-        for &field in ["fileId", "supportsTeamDrives", "supportsAllDrives", "includePermissionsForView", "acknowledgeAbuse"].iter() {
+        for &field in ["fileId", "supportsTeamDrives", "supportsAllDrives", "includePermissionsForView", "includeLabels", "acknowledgeAbuse"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(client::Error::FieldClash(field));
             }
         }
 
-        let mut params = Params::with_capacity(6 + self._additional_params.len());
+        let mut params = Params::with_capacity(7 + self._additional_params.len());
         params.push("fileId", self._file_id);
         if let Some(value) = self._supports_team_drives.as_ref() {
             params.push("supportsTeamDrives", value.to_string());
@@ -10532,6 +10917,9 @@ where
         }
         if let Some(value) = self._include_permissions_for_view.as_ref() {
             params.push("includePermissionsForView", value);
+        }
+        if let Some(value) = self._include_labels.as_ref() {
+            params.push("includeLabels", value);
         }
         if let Some(value) = self._acknowledge_abuse.as_ref() {
             params.push("acknowledgeAbuse", value.to_string());
@@ -10680,6 +11068,13 @@ where
         self._include_permissions_for_view = Some(new_value.to_string());
         self
     }
+    /// A comma-separated list of IDs of labels to include in the labelInfo part of the response.
+    ///
+    /// Sets the *include labels* query property to the given value.
+    pub fn include_labels(mut self, new_value: &str) -> FileGetCall<'a, S> {
+        self._include_labels = Some(new_value.to_string());
+        self
+    }
     /// Whether the user is acknowledging the risk of downloading known malware or other abusive files. This is only applicable when alt=media.
     ///
     /// Sets the *acknowledge abuse* query property to the given value.
@@ -10785,20 +11180,21 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.files().list()
-///              .team_drive_id("Lorem")
-///              .supports_team_drives(false)
+///              .team_drive_id("erat")
+///              .supports_team_drives(true)
 ///              .supports_all_drives(true)
-///              .spaces("erat")
-///              .q("sea")
-///              .page_token("nonumy")
-///              .page_size(-22)
-///              .order_by("gubergren")
+///              .spaces("consetetur")
+///              .q("sit")
+///              .page_token("aliquyam")
+///              .page_size(-25)
+///              .order_by("At")
 ///              .include_team_drive_items(true)
-///              .include_permissions_for_view("consetetur")
-///              .include_items_from_all_drives(false)
-///              .drive_id("aliquyam")
-///              .corpus("eos")
-///              .corpora("At")
+///              .include_permissions_for_view("gubergren")
+///              .include_labels("dolor")
+///              .include_items_from_all_drives(true)
+///              .drive_id("amet.")
+///              .corpus("ipsum")
+///              .corpora("Lorem")
 ///              .doit().await;
 /// # }
 /// ```
@@ -10816,6 +11212,7 @@ pub struct FileListCall<'a, S>
     _order_by: Option<String>,
     _include_team_drive_items: Option<bool>,
     _include_permissions_for_view: Option<String>,
+    _include_labels: Option<String>,
     _include_items_from_all_drives: Option<bool>,
     _drive_id: Option<String>,
     _corpus: Option<String>,
@@ -10848,14 +11245,14 @@ where
         dlg.begin(client::MethodInfo { id: "drive.files.list",
                                http_method: hyper::Method::GET });
 
-        for &field in ["alt", "teamDriveId", "supportsTeamDrives", "supportsAllDrives", "spaces", "q", "pageToken", "pageSize", "orderBy", "includeTeamDriveItems", "includePermissionsForView", "includeItemsFromAllDrives", "driveId", "corpus", "corpora"].iter() {
+        for &field in ["alt", "teamDriveId", "supportsTeamDrives", "supportsAllDrives", "spaces", "q", "pageToken", "pageSize", "orderBy", "includeTeamDriveItems", "includePermissionsForView", "includeLabels", "includeItemsFromAllDrives", "driveId", "corpus", "corpora"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(client::Error::FieldClash(field));
             }
         }
 
-        let mut params = Params::with_capacity(16 + self._additional_params.len());
+        let mut params = Params::with_capacity(17 + self._additional_params.len());
         if let Some(value) = self._team_drive_id.as_ref() {
             params.push("teamDriveId", value);
         }
@@ -10885,6 +11282,9 @@ where
         }
         if let Some(value) = self._include_permissions_for_view.as_ref() {
             params.push("includePermissionsForView", value);
+        }
+        if let Some(value) = self._include_labels.as_ref() {
+            params.push("includeLabels", value);
         }
         if let Some(value) = self._include_items_from_all_drives.as_ref() {
             params.push("includeItemsFromAllDrives", value.to_string());
@@ -11016,7 +11416,7 @@ where
         self._supports_all_drives = Some(new_value);
         self
     }
-    /// A comma-separated list of spaces to query within the corpus. Supported values are 'drive' and 'appDataFolder'.
+    /// A comma-separated list of spaces to query within the corpora. Supported values are 'drive' and 'appDataFolder'.
     ///
     /// Sets the *spaces* query property to the given value.
     pub fn spaces(mut self, new_value: &str) -> FileListCall<'a, S> {
@@ -11063,6 +11463,13 @@ where
     /// Sets the *include permissions for view* query property to the given value.
     pub fn include_permissions_for_view(mut self, new_value: &str) -> FileListCall<'a, S> {
         self._include_permissions_for_view = Some(new_value.to_string());
+        self
+    }
+    /// A comma-separated list of IDs of labels to include in the labelInfo part of the response.
+    ///
+    /// Sets the *include labels* query property to the given value.
+    pub fn include_labels(mut self, new_value: &str) -> FileListCall<'a, S> {
+        self._include_labels = Some(new_value.to_string());
         self
     }
     /// Whether both My Drive and shared drive items should be included in results.
@@ -11164,6 +11571,574 @@ where
 }
 
 
+/// Lists the labels on a file.
+///
+/// A builder for the *listLabels* method supported by a *file* resource.
+/// It is not used directly, but through a [`FileMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_drive3 as drive3;
+/// # async fn dox() {
+/// # use std::default::Default;
+/// # use drive3::{DriveHub, oauth2, hyper, hyper_rustls, chrono, FieldMask};
+/// 
+/// # let secret: oauth2::ApplicationSecret = Default::default();
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
+/// #         secret,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     ).build().await.unwrap();
+/// # let mut hub = DriveHub::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.files().list_labels("fileId")
+///              .page_token("gubergren")
+///              .max_results(-45)
+///              .doit().await;
+/// # }
+/// ```
+pub struct FileListLabelCall<'a, S>
+    where S: 'a {
+
+    hub: &'a DriveHub<S>,
+    _file_id: String,
+    _page_token: Option<String>,
+    _max_results: Option<i32>,
+    _delegate: Option<&'a mut dyn client::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>
+}
+
+impl<'a, S> client::CallBuilder for FileListLabelCall<'a, S> {}
+
+impl<'a, S> FileListLabelCall<'a, S>
+where
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
+
+
+    /// Perform the operation you have build so far.
+    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, LabelList)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
+        let mut dd = client::DefaultDelegate;
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(client::MethodInfo { id: "drive.files.listLabels",
+                               http_method: hyper::Method::GET });
+
+        for &field in ["alt", "fileId", "pageToken", "maxResults"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(client::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(5 + self._additional_params.len());
+        params.push("fileId", self._file_id);
+        if let Some(value) = self._page_token.as_ref() {
+            params.push("pageToken", value);
+        }
+        if let Some(value) = self._max_results.as_ref() {
+            params.push("maxResults", value.to_string());
+        }
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "files/{fileId}/listLabels";
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::MetadataReadonly.as_ref().to_string());
+        }
+
+        for &(find_this, param_name) in [("{fileId}", "fileId")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, false);
+        }
+        {
+            let to_remove = ["fileId"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+
+
+        loop {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
+                            dlg.finished(false);
+                            return Err(client::Error::MissingToken(e));
+                        }
+                    }
+                }
+            };
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::GET)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+
+                        let request = req_builder
+                        .body(hyper::body::Body::empty());
+
+                client.request(request.unwrap()).await
+
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(client::Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
+
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
+
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
+                        }
+                    }
+                    let result_value = {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+
+                        match json::from_str(&res_body_string) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&res_body_string, &err);
+                                return Err(client::Error::JsonDecodeError(res_body_string, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// The ID of the file.
+    ///
+    /// Sets the *file id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn file_id(mut self, new_value: &str) -> FileListLabelCall<'a, S> {
+        self._file_id = new_value.to_string();
+        self
+    }
+    /// The token for continuing a previous list request on the next page. This should be set to the value of 'nextPageToken' from the previous response.
+    ///
+    /// Sets the *page token* query property to the given value.
+    pub fn page_token(mut self, new_value: &str) -> FileListLabelCall<'a, S> {
+        self._page_token = Some(new_value.to_string());
+        self
+    }
+    /// The maximum number of labels to return per page. When not set, this defaults to 100.
+    ///
+    /// Sets the *max results* query property to the given value.
+    pub fn max_results(mut self, new_value: i32) -> FileListLabelCall<'a, S> {
+        self._max_results = Some(new_value);
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> FileListLabelCall<'a, S> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *alt* (query-string) - Data format for the response.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
+    pub fn param<T>(mut self, name: T, value: T) -> FileListLabelCall<'a, S>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::MetadataReadonly`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(mut self, scope: St) -> FileListLabelCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> FileListLabelCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> FileListLabelCall<'a, S> {
+        self._scopes.clear();
+        self
+    }
+}
+
+
+/// Modifies the set of labels on a file.
+///
+/// A builder for the *modifyLabels* method supported by a *file* resource.
+/// It is not used directly, but through a [`FileMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_drive3 as drive3;
+/// use drive3::api::ModifyLabelsRequest;
+/// # async fn dox() {
+/// # use std::default::Default;
+/// # use drive3::{DriveHub, oauth2, hyper, hyper_rustls, chrono, FieldMask};
+/// 
+/// # let secret: oauth2::ApplicationSecret = Default::default();
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
+/// #         secret,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     ).build().await.unwrap();
+/// # let mut hub = DriveHub::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = ModifyLabelsRequest::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.files().modify_labels(req, "fileId")
+///              .doit().await;
+/// # }
+/// ```
+pub struct FileModifyLabelCall<'a, S>
+    where S: 'a {
+
+    hub: &'a DriveHub<S>,
+    _request: ModifyLabelsRequest,
+    _file_id: String,
+    _delegate: Option<&'a mut dyn client::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>
+}
+
+impl<'a, S> client::CallBuilder for FileModifyLabelCall<'a, S> {}
+
+impl<'a, S> FileModifyLabelCall<'a, S>
+where
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
+
+
+    /// Perform the operation you have build so far.
+    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, ModifyLabelsResponse)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
+        let mut dd = client::DefaultDelegate;
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(client::MethodInfo { id: "drive.files.modifyLabels",
+                               http_method: hyper::Method::POST });
+
+        for &field in ["alt", "fileId"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(client::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(4 + self._additional_params.len());
+        params.push("fileId", self._file_id);
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "files/{fileId}/modifyLabels";
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::Full.as_ref().to_string());
+        }
+
+        for &(find_this, param_name) in [("{fileId}", "fileId")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, false);
+        }
+        {
+            let to_remove = ["fileId"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+        let mut json_mime_type = mime::APPLICATION_JSON;
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                client::remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
+                            dlg.finished(false);
+                            return Err(client::Error::MissingToken(e));
+                        }
+                    }
+                }
+            };
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::POST)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+
+                        let request = req_builder
+                        .header(CONTENT_TYPE, json_mime_type.to_string())
+                        .header(CONTENT_LENGTH, request_size as u64)
+                        .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
+
+                client.request(request.unwrap()).await
+
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(client::Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
+
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
+
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
+                        }
+                    }
+                    let result_value = {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+
+                        match json::from_str(&res_body_string) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&res_body_string, &err);
+                                return Err(client::Error::JsonDecodeError(res_body_string, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: ModifyLabelsRequest) -> FileModifyLabelCall<'a, S> {
+        self._request = new_value;
+        self
+    }
+    /// The ID of the file for which the labels are modified.
+    ///
+    /// Sets the *file id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn file_id(mut self, new_value: &str) -> FileModifyLabelCall<'a, S> {
+        self._file_id = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> FileModifyLabelCall<'a, S> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *alt* (query-string) - Data format for the response.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
+    pub fn param<T>(mut self, name: T, value: T) -> FileModifyLabelCall<'a, S>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::Full`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(mut self, scope: St) -> FileModifyLabelCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> FileModifyLabelCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> FileModifyLabelCall<'a, S> {
+        self._scopes.clear();
+        self
+    }
+}
+
+
 /// Updates a file's metadata and/or content. When calling this method, only populate fields in the request that you want to modify. When updating fields, some fields might change automatically, such as modifiedDate. This method supports patch semantics.
 ///
 /// A builder for the *update* method supported by a *file* resource.
@@ -11199,14 +12174,15 @@ where
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.files().update(req, "fileId")
 ///              .use_content_as_indexable_text(true)
-///              .supports_team_drives(true)
+///              .supports_team_drives(false)
 ///              .supports_all_drives(true)
-///              .remove_parents("amet.")
-///              .ocr_language("ipsum")
-///              .keep_revision_forever(true)
-///              .include_permissions_for_view("accusam")
-///              .enforce_single_parent(true)
-///              .add_parents("sadipscing")
+///              .remove_parents("dolor")
+///              .ocr_language("Lorem")
+///              .keep_revision_forever(false)
+///              .include_permissions_for_view("amet.")
+///              .include_labels("no")
+///              .enforce_single_parent(false)
+///              .add_parents("sed")
 ///              .upload(fs::File::open("file.ext").unwrap(), "application/octet-stream".parse().unwrap()).await;
 /// # }
 /// ```
@@ -11223,6 +12199,7 @@ pub struct FileUpdateCall<'a, S>
     _ocr_language: Option<String>,
     _keep_revision_forever: Option<bool>,
     _include_permissions_for_view: Option<String>,
+    _include_labels: Option<String>,
     _enforce_single_parent: Option<bool>,
     _add_parents: Option<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -11252,14 +12229,14 @@ where
         dlg.begin(client::MethodInfo { id: "drive.files.update",
                                http_method: hyper::Method::PATCH });
 
-        for &field in ["alt", "fileId", "useContentAsIndexableText", "supportsTeamDrives", "supportsAllDrives", "removeParents", "ocrLanguage", "keepRevisionForever", "includePermissionsForView", "enforceSingleParent", "addParents"].iter() {
+        for &field in ["alt", "fileId", "useContentAsIndexableText", "supportsTeamDrives", "supportsAllDrives", "removeParents", "ocrLanguage", "keepRevisionForever", "includePermissionsForView", "includeLabels", "enforceSingleParent", "addParents"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(client::Error::FieldClash(field));
             }
         }
 
-        let mut params = Params::with_capacity(13 + self._additional_params.len());
+        let mut params = Params::with_capacity(14 + self._additional_params.len());
         params.push("fileId", self._file_id);
         if let Some(value) = self._use_content_as_indexable_text.as_ref() {
             params.push("useContentAsIndexableText", value.to_string());
@@ -11281,6 +12258,9 @@ where
         }
         if let Some(value) = self._include_permissions_for_view.as_ref() {
             params.push("includePermissionsForView", value);
+        }
+        if let Some(value) = self._include_labels.as_ref() {
+            params.push("includeLabels", value);
         }
         if let Some(value) = self._enforce_single_parent.as_ref() {
             params.push("enforceSingleParent", value.to_string());
@@ -11420,14 +12400,14 @@ where
         dlg.begin(client::MethodInfo { id: "drive.files.update",
                                http_method: hyper::Method::PATCH });
 
-        for &field in ["alt", "fileId", "useContentAsIndexableText", "supportsTeamDrives", "supportsAllDrives", "removeParents", "ocrLanguage", "keepRevisionForever", "includePermissionsForView", "enforceSingleParent", "addParents"].iter() {
+        for &field in ["alt", "fileId", "useContentAsIndexableText", "supportsTeamDrives", "supportsAllDrives", "removeParents", "ocrLanguage", "keepRevisionForever", "includePermissionsForView", "includeLabels", "enforceSingleParent", "addParents"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(client::Error::FieldClash(field));
             }
         }
 
-        let mut params = Params::with_capacity(13 + self._additional_params.len());
+        let mut params = Params::with_capacity(14 + self._additional_params.len());
         params.push("fileId", self._file_id);
         if let Some(value) = self._use_content_as_indexable_text.as_ref() {
             params.push("useContentAsIndexableText", value.to_string());
@@ -11449,6 +12429,9 @@ where
         }
         if let Some(value) = self._include_permissions_for_view.as_ref() {
             params.push("includePermissionsForView", value);
+        }
+        if let Some(value) = self._include_labels.as_ref() {
+            params.push("includeLabels", value);
         }
         if let Some(value) = self._enforce_single_parent.as_ref() {
             params.push("enforceSingleParent", value.to_string());
@@ -11754,6 +12737,13 @@ where
         self._include_permissions_for_view = Some(new_value.to_string());
         self
     }
+    /// A comma-separated list of IDs of labels to include in the labelInfo part of the response.
+    ///
+    /// Sets the *include labels* query property to the given value.
+    pub fn include_labels(mut self, new_value: &str) -> FileUpdateCall<'a, S> {
+        self._include_labels = Some(new_value.to_string());
+        self
+    }
     /// Deprecated. Adding files to multiple folders is no longer supported. Use shortcuts instead.
     ///
     /// Sets the *enforce single parent* query property to the given value.
@@ -11839,7 +12829,7 @@ where
 }
 
 
-/// Subscribes to changes to a file. While you can establish a channel forchanges to a file on a shared drive, a change to a shared drive file won't create a notification.
+/// Subscribes to changes to a file. While you can establish a channel for changes to a file on a shared drive, a change to a shared drive file won't create a notification.
 ///
 /// This method supports **media download**. To enable it, adjust the builder like this:
 /// `.param("alt", "media")`.
@@ -11877,9 +12867,10 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.files().watch(req, "fileId")
-///              .supports_team_drives(true)
+///              .supports_team_drives(false)
 ///              .supports_all_drives(true)
-///              .include_permissions_for_view("magna")
+///              .include_permissions_for_view("nonumy")
+///              .include_labels("rebum.")
 ///              .acknowledge_abuse(true)
 ///              .doit().await;
 /// # }
@@ -11893,6 +12884,7 @@ pub struct FileWatchCall<'a, S>
     _supports_team_drives: Option<bool>,
     _supports_all_drives: Option<bool>,
     _include_permissions_for_view: Option<String>,
+    _include_labels: Option<String>,
     _acknowledge_abuse: Option<bool>,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
@@ -11922,14 +12914,14 @@ where
         dlg.begin(client::MethodInfo { id: "drive.files.watch",
                                http_method: hyper::Method::POST });
 
-        for &field in ["fileId", "supportsTeamDrives", "supportsAllDrives", "includePermissionsForView", "acknowledgeAbuse"].iter() {
+        for &field in ["fileId", "supportsTeamDrives", "supportsAllDrives", "includePermissionsForView", "includeLabels", "acknowledgeAbuse"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(client::Error::FieldClash(field));
             }
         }
 
-        let mut params = Params::with_capacity(7 + self._additional_params.len());
+        let mut params = Params::with_capacity(8 + self._additional_params.len());
         params.push("fileId", self._file_id);
         if let Some(value) = self._supports_team_drives.as_ref() {
             params.push("supportsTeamDrives", value.to_string());
@@ -11939,6 +12931,9 @@ where
         }
         if let Some(value) = self._include_permissions_for_view.as_ref() {
             params.push("includePermissionsForView", value);
+        }
+        if let Some(value) = self._include_labels.as_ref() {
+            params.push("includeLabels", value);
         }
         if let Some(value) = self._acknowledge_abuse.as_ref() {
             params.push("acknowledgeAbuse", value.to_string());
@@ -12110,6 +13105,13 @@ where
         self._include_permissions_for_view = Some(new_value.to_string());
         self
     }
+    /// A comma-separated list of IDs of labels to include in the labelInfo part of the response.
+    ///
+    /// Sets the *include labels* query property to the given value.
+    pub fn include_labels(mut self, new_value: &str) -> FileWatchCall<'a, S> {
+        self._include_labels = Some(new_value.to_string());
+        self
+    }
     /// Whether the user is acknowledging the risk of downloading known malware or other abusive files. This is only applicable when alt=media.
     ///
     /// Sets the *acknowledge abuse* query property to the given value.
@@ -12221,8 +13223,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.permissions().create(req, "fileId")
-///              .use_domain_admin_access(false)
-///              .transfer_ownership(true)
+///              .use_domain_admin_access(true)
+///              .transfer_ownership(false)
 ///              .supports_team_drives(false)
 ///              .supports_all_drives(true)
 ///              .send_notification_email(false)
@@ -12598,8 +13600,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.permissions().delete("fileId", "permissionId")
-///              .use_domain_admin_access(true)
-///              .supports_team_drives(false)
+///              .use_domain_admin_access(false)
+///              .supports_team_drives(true)
 ///              .supports_all_drives(false)
 ///              .doit().await;
 /// # }
@@ -12893,8 +13895,8 @@ where
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.permissions().get("fileId", "permissionId")
 ///              .use_domain_admin_access(true)
-///              .supports_team_drives(false)
-///              .supports_all_drives(true)
+///              .supports_team_drives(true)
+///              .supports_all_drives(false)
 ///              .doit().await;
 /// # }
 /// ```
@@ -13198,11 +14200,11 @@ where
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.permissions().list("fileId")
 ///              .use_domain_admin_access(false)
-///              .supports_team_drives(true)
-///              .supports_all_drives(false)
-///              .page_token("tempor")
-///              .page_size(-10)
-///              .include_permissions_for_view("et")
+///              .supports_team_drives(false)
+///              .supports_all_drives(true)
+///              .page_token("clita")
+///              .page_size(-99)
+///              .include_permissions_for_view("aliquyam")
 ///              .doit().await;
 /// # }
 /// ```
@@ -13532,9 +14534,9 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.permissions().update(req, "fileId", "permissionId")
-///              .use_domain_admin_access(true)
+///              .use_domain_admin_access(false)
 ///              .transfer_ownership(true)
-///              .supports_team_drives(false)
+///              .supports_team_drives(true)
 ///              .supports_all_drives(false)
 ///              .remove_expiration(false)
 ///              .doit().await;
@@ -13858,7 +14860,7 @@ where
 }
 
 
-/// Creates a new reply to a comment.
+/// Creates a reply to a comment.
 ///
 /// A builder for the *create* method supported by a *reply* resource.
 /// It is not used directly, but through a [`ReplyMethods`] instance.
@@ -14454,7 +15456,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.replies().get("fileId", "commentId", "replyId")
-///              .include_deleted(false)
+///              .include_deleted(true)
 ///              .doit().await;
 /// # }
 /// ```
@@ -14747,8 +15749,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.replies().list("fileId", "commentId")
-///              .page_token("accusam")
-///              .page_size(-39)
+///              .page_token("ipsum")
+///              .page_size(-15)
 ///              .include_deleted(true)
 ///              .doit().await;
 /// # }
@@ -15916,8 +16918,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.revisions().list("fileId")
-///              .page_token("consetetur")
-///              .page_size(-11)
+///              .page_token("nonumy")
+///              .page_size(-10)
 ///              .doit().await;
 /// # }
 /// ```
@@ -17022,7 +18024,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.teamdrives().get("teamDriveId")
-///              .use_domain_admin_access(true)
+///              .use_domain_admin_access(false)
 ///              .doit().await;
 /// # }
 /// ```
@@ -17291,10 +18293,10 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.teamdrives().list()
-///              .use_domain_admin_access(true)
-///              .q("sit")
-///              .page_token("kasd")
-///              .page_size(-47)
+///              .use_domain_admin_access(false)
+///              .q("invidunt")
+///              .page_token("nonumy")
+///              .page_size(-81)
 ///              .doit().await;
 /// # }
 /// ```
@@ -17583,7 +18585,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.teamdrives().update(req, "teamDriveId")
-///              .use_domain_admin_access(false)
+///              .use_domain_admin_access(true)
 ///              .doit().await;
 /// # }
 /// ```

@@ -1,19 +1,20 @@
 use std::collections::HashMap;
 use std::cell::RefCell;
 use std::default::Default;
-use std::collections::BTreeMap;
+use std::collections::BTreeSet;
 use std::error::Error as StdError;
 use serde_json as json;
 use std::io;
 use std::fs;
 use std::mem;
-use std::thread::sleep;
 
-use http::Uri;
 use hyper::client::connect;
 use tokio::io::{AsyncRead, AsyncWrite};
+use tokio::time::sleep;
 use tower_service;
-use crate::client;
+use serde::{Serialize, Deserialize};
+
+use crate::{client, client::GetToken, client::serde_with};
 
 // ##############
 // UTILITIES ###
@@ -39,7 +40,7 @@ use crate::client;
 /// use safebrowsing4::{Result, Error};
 /// # async fn dox() {
 /// use std::default::Default;
-/// use safebrowsing4::{Safebrowsing, oauth2, hyper, hyper_rustls};
+/// use safebrowsing4::{Safebrowsing, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// // Get an ApplicationSecret instance by some means. It contains the `client_id` and 
 /// // `client_secret`, among other things.
@@ -57,9 +58,9 @@ use crate::client;
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.encoded_full_hashes().get("encodedRequest")
-///              .client_version("sed")
-///              .client_id("amet.")
+/// let result = hub.encoded_full_hashes().get(vec![0, 1, 2, 3])
+///              .client_version("voluptua.")
+///              .client_id("At")
 ///              .doit().await;
 /// 
 /// match result {
@@ -84,7 +85,7 @@ use crate::client;
 #[derive(Clone)]
 pub struct Safebrowsing<S> {
     pub client: hyper::Client<S, hyper::body::Body>,
-    pub auth: oauth2::authenticator::Authenticator<S>,
+    pub auth: Box<dyn client::GetToken>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
@@ -94,24 +95,24 @@ impl<'a, S> client::Hub for Safebrowsing<S> {}
 
 impl<'a, S> Safebrowsing<S> {
 
-    pub fn new(client: hyper::Client<S, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<S>) -> Safebrowsing<S> {
+    pub fn new<A: 'static + client::GetToken>(client: hyper::Client<S, hyper::body::Body>, auth: A) -> Safebrowsing<S> {
         Safebrowsing {
             client,
-            auth: authenticator,
-            _user_agent: "google-api-rust-client/4.0.1".to_string(),
+            auth: Box::new(auth),
+            _user_agent: "google-api-rust-client/5.0.2-beta-1".to_string(),
             _base_url: "https://safebrowsing.googleapis.com/".to_string(),
             _root_url: "https://safebrowsing.googleapis.com/".to_string(),
         }
     }
 
-    pub fn encoded_full_hashes(&'a self) -> EncodedFullHasheMethods<'a, S> {
-        EncodedFullHasheMethods { hub: &self }
+    pub fn encoded_full_hashes(&'a self) -> EncodedFullHashMethods<'a, S> {
+        EncodedFullHashMethods { hub: &self }
     }
     pub fn encoded_updates(&'a self) -> EncodedUpdateMethods<'a, S> {
         EncodedUpdateMethods { hub: &self }
     }
-    pub fn full_hashes(&'a self) -> FullHasheMethods<'a, S> {
-        FullHasheMethods { hub: &self }
+    pub fn full_hashes(&'a self) -> FullHashMethods<'a, S> {
+        FullHashMethods { hub: &self }
     }
     pub fn threat_hits(&'a self) -> ThreatHitMethods<'a, S> {
         ThreatHitMethods { hub: &self }
@@ -122,12 +123,12 @@ impl<'a, S> Safebrowsing<S> {
     pub fn threat_lists(&'a self) -> ThreatListMethods<'a, S> {
         ThreatListMethods { hub: &self }
     }
-    pub fn threat_matches(&'a self) -> ThreatMatcheMethods<'a, S> {
-        ThreatMatcheMethods { hub: &self }
+    pub fn threat_matches(&'a self) -> ThreatMatchMethods<'a, S> {
+        ThreatMatchMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/4.0.1`.
+    /// It defaults to `google-api-rust-client/5.0.2-beta-1`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -155,7 +156,7 @@ impl<'a, S> Safebrowsing<S> {
 // ############
 // SCHEMAS ###
 // ##########
-/// A generic empty message that you can re-use to avoid defining duplicated empty messages in your APIs. A typical example is to use it as the request or the response type of an API method. For instance: service Foo { rpc Bar(google.protobuf.Empty) returns (google.protobuf.Empty); } The JSON representation for `Empty` is empty JSON object `{}`.
+/// A generic empty message that you can re-use to avoid defining duplicated empty messages in your APIs. A typical example is to use it as the request or the response type of an API method. For instance: service Foo { rpc Bar(google.protobuf.Empty) returns (google.protobuf.Empty); }
 /// 
 /// # Activities
 /// 
@@ -164,6 +165,7 @@ impl<'a, S> Safebrowsing<S> {
 /// 
 /// * [create threat hits](ThreatHitCreateCall) (response)
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleProtobufEmpty { _never_set: Option<bool> }
 
@@ -174,10 +176,13 @@ impl client::ResponseResult for GoogleProtobufEmpty {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleSecuritySafebrowsingV4Checksum {
     /// The SHA256 hash of the client state; that is, of the sorted list of all hashes present in the database.
-    pub sha256: Option<String>,
+    
+    #[serde_as(as = "Option<::client::serde::urlsafe_base64::Wrapper>")]
+    pub sha256: Option<Vec<u8>>,
 }
 
 impl client::Part for GoogleSecuritySafebrowsingV4Checksum {}
@@ -187,13 +192,16 @@ impl client::Part for GoogleSecuritySafebrowsingV4Checksum {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleSecuritySafebrowsingV4ClientInfo {
     /// A client ID that (hopefully) uniquely identifies the client implementation of the Safe Browsing API.
     #[serde(rename="clientId")]
+    
     pub client_id: Option<String>,
     /// The version of the client implementation.
     #[serde(rename="clientVersion")]
+    
     pub client_version: Option<String>,
 }
 
@@ -209,12 +217,15 @@ impl client::Part for GoogleSecuritySafebrowsingV4ClientInfo {}
 /// 
 /// * [fetch threat list updates](ThreatListUpdateFetchCall) (request)
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleSecuritySafebrowsingV4FetchThreatListUpdatesRequest {
     /// The client metadata.
+    
     pub client: Option<GoogleSecuritySafebrowsingV4ClientInfo>,
     /// The requested threat list updates.
     #[serde(rename="listUpdateRequests")]
+    
     pub list_update_requests: Option<Vec<GoogleSecuritySafebrowsingV4FetchThreatListUpdatesRequestListUpdateRequest>>,
 }
 
@@ -225,20 +236,27 @@ impl client::RequestValue for GoogleSecuritySafebrowsingV4FetchThreatListUpdates
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleSecuritySafebrowsingV4FetchThreatListUpdatesRequestListUpdateRequest {
     /// The constraints associated with this request.
+    
     pub constraints: Option<GoogleSecuritySafebrowsingV4FetchThreatListUpdatesRequestListUpdateRequestConstraints>,
     /// The type of platform at risk by entries present in the list.
     #[serde(rename="platformType")]
+    
     pub platform_type: Option<String>,
     /// The current state of the client for the requested list (the encrypted client state that was received from the last successful list update).
-    pub state: Option<String>,
+    
+    #[serde_as(as = "Option<::client::serde::urlsafe_base64::Wrapper>")]
+    pub state: Option<Vec<u8>>,
     /// The types of entries present in the list.
     #[serde(rename="threatEntryType")]
+    
     pub threat_entry_type: Option<String>,
     /// The type of threat posed by entries present in the list.
     #[serde(rename="threatType")]
+    
     pub threat_type: Option<String>,
 }
 
@@ -249,23 +267,30 @@ impl client::Part for GoogleSecuritySafebrowsingV4FetchThreatListUpdatesRequestL
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleSecuritySafebrowsingV4FetchThreatListUpdatesRequestListUpdateRequestConstraints {
     /// A client's physical location, expressed as a ISO 31166-1 alpha-2 region code.
     #[serde(rename="deviceLocation")]
+    
     pub device_location: Option<String>,
     /// Requests the lists for a specific language. Expects ISO 639 alpha-2 format.
+    
     pub language: Option<String>,
     /// Sets the maximum number of entries that the client is willing to have in the local database for the specified list. This should be a power of 2 between 2**10 and 2**20. If zero, no database size limit is set.
     #[serde(rename="maxDatabaseEntries")]
+    
     pub max_database_entries: Option<i32>,
     /// The maximum size in number of entries. The update will not contain more entries than this value. This should be a power of 2 between 2**10 and 2**20. If zero, no update size limit is set.
     #[serde(rename="maxUpdateEntries")]
+    
     pub max_update_entries: Option<i32>,
     /// Requests the list for a specific geographic location. If not set the server may pick that value based on the user's IP address. Expects ISO 3166-1 alpha-2 format.
+    
     pub region: Option<String>,
     /// The compression types supported by the client.
     #[serde(rename="supportedCompressions")]
+    
     pub supported_compressions: Option<Vec<String>>,
 }
 
@@ -282,14 +307,18 @@ impl client::Part for GoogleSecuritySafebrowsingV4FetchThreatListUpdatesRequestL
 /// * [get encoded updates](EncodedUpdateGetCall) (response)
 /// * [fetch threat list updates](ThreatListUpdateFetchCall) (response)
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleSecuritySafebrowsingV4FetchThreatListUpdatesResponse {
     /// The list updates requested by the clients. The number of responses here may be less than the number of requests sent by clients. This is the case, for example, if the server has no updates for a particular list.
     #[serde(rename="listUpdateResponses")]
+    
     pub list_update_responses: Option<Vec<GoogleSecuritySafebrowsingV4FetchThreatListUpdatesResponseListUpdateResponse>>,
     /// The minimum duration the client must wait before issuing any update request. If this field is not set clients may update as soon as they want.
     #[serde(rename="minimumWaitDuration")]
-    pub minimum_wait_duration: Option<String>,
+    
+    #[serde_as(as = "Option<::client::serde::duration::Wrapper>")]
+    pub minimum_wait_duration: Option<client::chrono::Duration>,
 }
 
 impl client::ResponseResult for GoogleSecuritySafebrowsingV4FetchThreatListUpdatesResponse {}
@@ -299,28 +328,38 @@ impl client::ResponseResult for GoogleSecuritySafebrowsingV4FetchThreatListUpdat
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleSecuritySafebrowsingV4FetchThreatListUpdatesResponseListUpdateResponse {
     /// A set of entries to add to a local threat type's list. Repeated to allow for a combination of compressed and raw data to be sent in a single response.
+    
     pub additions: Option<Vec<GoogleSecuritySafebrowsingV4ThreatEntrySet>>,
     /// The expected SHA256 hash of the client state; that is, of the sorted list of all hashes present in the database after applying the provided update. If the client state doesn't match the expected state, the client must disregard this update and retry later.
+    
     pub checksum: Option<GoogleSecuritySafebrowsingV4Checksum>,
     /// The new client state, in encrypted format. Opaque to clients.
     #[serde(rename="newClientState")]
-    pub new_client_state: Option<String>,
+    
+    #[serde_as(as = "Option<::client::serde::urlsafe_base64::Wrapper>")]
+    pub new_client_state: Option<Vec<u8>>,
     /// The platform type for which data is returned.
     #[serde(rename="platformType")]
+    
     pub platform_type: Option<String>,
     /// A set of entries to remove from a local threat type's list. In practice, this field is empty or contains exactly one ThreatEntrySet.
+    
     pub removals: Option<Vec<GoogleSecuritySafebrowsingV4ThreatEntrySet>>,
     /// The type of response. This may indicate that an action is required by the client when the response is received.
     #[serde(rename="responseType")]
+    
     pub response_type: Option<String>,
     /// The format of the threats.
     #[serde(rename="threatEntryType")]
+    
     pub threat_entry_type: Option<String>,
     /// The threat type for which data is returned.
     #[serde(rename="threatType")]
+    
     pub threat_type: Option<String>,
 }
 
@@ -334,20 +373,26 @@ impl client::Part for GoogleSecuritySafebrowsingV4FetchThreatListUpdatesResponse
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [find full hashes](FullHasheFindCall) (request)
+/// * [find full hashes](FullHashFindCall) (request)
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleSecuritySafebrowsingV4FindFullHashesRequest {
     /// Client metadata associated with callers of higher-level APIs built on top of the client's implementation.
     #[serde(rename="apiClient")]
+    
     pub api_client: Option<GoogleSecuritySafebrowsingV4ClientInfo>,
     /// The client metadata.
+    
     pub client: Option<GoogleSecuritySafebrowsingV4ClientInfo>,
     /// The current client states for each of the client's local threat lists.
     #[serde(rename="clientStates")]
-    pub client_states: Option<Vec<String>>,
+    
+    #[serde_as(as = "Option<Vec<::client::serde::urlsafe_base64::Wrapper>>")]
+    pub client_states: Option<Vec<Vec<u8>>>,
     /// The lists and hashes to be checked.
     #[serde(rename="threatInfo")]
+    
     pub threat_info: Option<GoogleSecuritySafebrowsingV4ThreatInfo>,
 }
 
@@ -361,19 +406,25 @@ impl client::RequestValue for GoogleSecuritySafebrowsingV4FindFullHashesRequest 
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [get encoded full hashes](EncodedFullHasheGetCall) (response)
-/// * [find full hashes](FullHasheFindCall) (response)
+/// * [get encoded full hashes](EncodedFullHashGetCall) (response)
+/// * [find full hashes](FullHashFindCall) (response)
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleSecuritySafebrowsingV4FindFullHashesResponse {
     /// The full hashes that matched the requested prefixes.
+    
     pub matches: Option<Vec<GoogleSecuritySafebrowsingV4ThreatMatch>>,
     /// The minimum duration the client must wait before issuing any find hashes request. If this field is not set, clients can issue a request as soon as they want.
     #[serde(rename="minimumWaitDuration")]
-    pub minimum_wait_duration: Option<String>,
+    
+    #[serde_as(as = "Option<::client::serde::duration::Wrapper>")]
+    pub minimum_wait_duration: Option<client::chrono::Duration>,
     /// For requested entities that did not match the threat list, how long to cache the response.
     #[serde(rename="negativeCacheDuration")]
-    pub negative_cache_duration: Option<String>,
+    
+    #[serde_as(as = "Option<::client::serde::duration::Wrapper>")]
+    pub negative_cache_duration: Option<client::chrono::Duration>,
 }
 
 impl client::ResponseResult for GoogleSecuritySafebrowsingV4FindFullHashesResponse {}
@@ -386,14 +437,17 @@ impl client::ResponseResult for GoogleSecuritySafebrowsingV4FindFullHashesRespon
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [find threat matches](ThreatMatcheFindCall) (request)
+/// * [find threat matches](ThreatMatchFindCall) (request)
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleSecuritySafebrowsingV4FindThreatMatchesRequest {
     /// The client metadata.
+    
     pub client: Option<GoogleSecuritySafebrowsingV4ClientInfo>,
     /// The lists and entries to be checked for matches.
     #[serde(rename="threatInfo")]
+    
     pub threat_info: Option<GoogleSecuritySafebrowsingV4ThreatInfo>,
 }
 
@@ -407,11 +461,13 @@ impl client::RequestValue for GoogleSecuritySafebrowsingV4FindThreatMatchesReque
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [find threat matches](ThreatMatcheFindCall) (response)
+/// * [find threat matches](ThreatMatchFindCall) (response)
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleSecuritySafebrowsingV4FindThreatMatchesResponse {
     /// The threat list matches.
+    
     pub matches: Option<Vec<GoogleSecuritySafebrowsingV4ThreatMatch>>,
 }
 
@@ -427,10 +483,12 @@ impl client::ResponseResult for GoogleSecuritySafebrowsingV4FindThreatMatchesRes
 /// 
 /// * [list threat lists](ThreatListListCall) (response)
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleSecuritySafebrowsingV4ListThreatListsResponse {
     /// The lists available for download by the client.
     #[serde(rename="threatLists")]
+    
     pub threat_lists: Option<Vec<GoogleSecuritySafebrowsingV4ThreatListDescriptor>>,
 }
 
@@ -441,14 +499,18 @@ impl client::ResponseResult for GoogleSecuritySafebrowsingV4ListThreatListsRespo
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleSecuritySafebrowsingV4RawHashes {
     /// The number of bytes for each prefix encoded below. This field can be anywhere from 4 (shortest prefix) to 32 (full SHA256 hash).
     #[serde(rename="prefixSize")]
+    
     pub prefix_size: Option<i32>,
     /// The hashes, in binary format, concatenated into one long string. Hashes are sorted in lexicographic order. For JSON API users, hashes are base64-encoded.
     #[serde(rename="rawHashes")]
-    pub raw_hashes: Option<String>,
+    
+    #[serde_as(as = "Option<::client::serde::urlsafe_base64::Wrapper>")]
+    pub raw_hashes: Option<Vec<u8>>,
 }
 
 impl client::Part for GoogleSecuritySafebrowsingV4RawHashes {}
@@ -458,9 +520,11 @@ impl client::Part for GoogleSecuritySafebrowsingV4RawHashes {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleSecuritySafebrowsingV4RawIndices {
     /// The indices to remove from a lexicographically-sorted local list.
+    
     pub indices: Option<Vec<i32>>,
 }
 
@@ -471,19 +535,26 @@ impl client::Part for GoogleSecuritySafebrowsingV4RawIndices {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleSecuritySafebrowsingV4RiceDeltaEncoding {
     /// The encoded deltas that are encoded using the Golomb-Rice coder.
     #[serde(rename="encodedData")]
-    pub encoded_data: Option<String>,
+    
+    #[serde_as(as = "Option<::client::serde::urlsafe_base64::Wrapper>")]
+    pub encoded_data: Option<Vec<u8>>,
     /// The offset of the first entry in the encoded data, or, if only a single integer was encoded, that single integer's value. If the field is empty or missing, assume zero.
     #[serde(rename="firstValue")]
-    pub first_value: Option<String>,
+    
+    #[serde_as(as = "Option<::client::serde_with::DisplayFromStr>")]
+    pub first_value: Option<i64>,
     /// The number of entries that are delta encoded in the encoded data. If only a single integer was encoded, this will be zero and the single value will be stored in `first_value`.
     #[serde(rename="numEntries")]
+    
     pub num_entries: Option<i32>,
     /// The Golomb-Rice parameter, which is a number between 2 and 28. This field is missing (that is, zero) if `num_entries` is zero.
     #[serde(rename="riceParameter")]
+    
     pub rice_parameter: Option<i32>,
 }
 
@@ -494,13 +565,19 @@ impl client::Part for GoogleSecuritySafebrowsingV4RiceDeltaEncoding {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleSecuritySafebrowsingV4ThreatEntry {
     /// The digest of an executable in SHA256 format. The API supports both binary and hex digests. For JSON requests, digests are base64-encoded.
-    pub digest: Option<String>,
+    
+    #[serde_as(as = "Option<::client::serde::urlsafe_base64::Wrapper>")]
+    pub digest: Option<Vec<u8>>,
     /// A hash prefix, consisting of the most significant 4-32 bytes of a SHA256 hash. This field is in binary format. For JSON requests, hashes are base64-encoded.
-    pub hash: Option<String>,
+    
+    #[serde_as(as = "Option<::client::serde::urlsafe_base64::Wrapper>")]
+    pub hash: Option<Vec<u8>>,
     /// A URL.
+    
     pub url: Option<String>,
 }
 
@@ -511,9 +588,11 @@ impl client::Part for GoogleSecuritySafebrowsingV4ThreatEntry {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleSecuritySafebrowsingV4ThreatEntryMetadata {
     /// The metadata entries.
+    
     pub entries: Option<Vec<GoogleSecuritySafebrowsingV4ThreatEntryMetadataMetadataEntry>>,
 }
 
@@ -524,12 +603,17 @@ impl client::Part for GoogleSecuritySafebrowsingV4ThreatEntryMetadata {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleSecuritySafebrowsingV4ThreatEntryMetadataMetadataEntry {
     /// The metadata entry key. For JSON requests, the key is base64-encoded.
-    pub key: Option<String>,
+    
+    #[serde_as(as = "Option<::client::serde::urlsafe_base64::Wrapper>")]
+    pub key: Option<Vec<u8>>,
     /// The metadata entry value. For JSON requests, the value is base64-encoded.
-    pub value: Option<String>,
+    
+    #[serde_as(as = "Option<::client::serde::urlsafe_base64::Wrapper>")]
+    pub value: Option<Vec<u8>>,
 }
 
 impl client::Part for GoogleSecuritySafebrowsingV4ThreatEntryMetadataMetadataEntry {}
@@ -539,22 +623,28 @@ impl client::Part for GoogleSecuritySafebrowsingV4ThreatEntryMetadataMetadataEnt
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleSecuritySafebrowsingV4ThreatEntrySet {
     /// The compression type for the entries in this set.
     #[serde(rename="compressionType")]
+    
     pub compression_type: Option<String>,
     /// The raw SHA256-formatted entries.
     #[serde(rename="rawHashes")]
+    
     pub raw_hashes: Option<GoogleSecuritySafebrowsingV4RawHashes>,
     /// The raw removal indices for a local list.
     #[serde(rename="rawIndices")]
+    
     pub raw_indices: Option<GoogleSecuritySafebrowsingV4RawIndices>,
     /// The encoded 4-byte prefixes of SHA256-formatted entries, using a Golomb-Rice encoding. The hashes are converted to uint32, sorted in ascending order, then delta encoded and stored as encoded_data.
     #[serde(rename="riceHashes")]
+    
     pub rice_hashes: Option<GoogleSecuritySafebrowsingV4RiceDeltaEncoding>,
     /// The encoded local, lexicographically-sorted list indices, using a Golomb-Rice encoding. Used for sending compressed removal indices. The removal indices (uint32) are sorted in ascending order, then delta encoded and stored as encoded_data.
     #[serde(rename="riceIndices")]
+    
     pub rice_indices: Option<GoogleSecuritySafebrowsingV4RiceDeltaEncoding>,
 }
 
@@ -570,23 +660,30 @@ impl client::Part for GoogleSecuritySafebrowsingV4ThreatEntrySet {}
 /// 
 /// * [create threat hits](ThreatHitCreateCall) (request)
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleSecuritySafebrowsingV4ThreatHit {
     /// Client-reported identification.
     #[serde(rename="clientInfo")]
+    
     pub client_info: Option<GoogleSecuritySafebrowsingV4ClientInfo>,
     /// The threat entry responsible for the hit. Full hash should be reported for hash-based hits.
+    
     pub entry: Option<GoogleSecuritySafebrowsingV4ThreatEntry>,
     /// The platform type reported.
     #[serde(rename="platformType")]
+    
     pub platform_type: Option<String>,
     /// The resources related to the threat hit.
+    
     pub resources: Option<Vec<GoogleSecuritySafebrowsingV4ThreatHitThreatSource>>,
     /// The threat type reported.
     #[serde(rename="threatType")]
+    
     pub threat_type: Option<String>,
     /// Details about the user that encountered the threat.
     #[serde(rename="userInfo")]
+    
     pub user_info: Option<GoogleSecuritySafebrowsingV4ThreatHitUserInfo>,
 }
 
@@ -597,17 +694,22 @@ impl client::RequestValue for GoogleSecuritySafebrowsingV4ThreatHit {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleSecuritySafebrowsingV4ThreatHitThreatSource {
     /// Referrer of the resource. Only set if the referrer is available.
+    
     pub referrer: Option<String>,
     /// The remote IP of the resource in ASCII format. Either IPv4 or IPv6.
     #[serde(rename="remoteIp")]
+    
     pub remote_ip: Option<String>,
     /// The type of source reported.
     #[serde(rename="type")]
+    
     pub type_: Option<String>,
     /// The URL of the resource.
+    
     pub url: Option<String>,
 }
 
@@ -618,14 +720,18 @@ impl client::Part for GoogleSecuritySafebrowsingV4ThreatHitThreatSource {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleSecuritySafebrowsingV4ThreatHitUserInfo {
     /// The UN M.49 region code associated with the user's location.
     #[serde(rename="regionCode")]
+    
     pub region_code: Option<String>,
     /// Unique user identifier defined by the client.
     #[serde(rename="userId")]
-    pub user_id: Option<String>,
+    
+    #[serde_as(as = "Option<::client::serde::urlsafe_base64::Wrapper>")]
+    pub user_id: Option<Vec<u8>>,
 }
 
 impl client::Part for GoogleSecuritySafebrowsingV4ThreatHitUserInfo {}
@@ -635,19 +741,24 @@ impl client::Part for GoogleSecuritySafebrowsingV4ThreatHitUserInfo {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleSecuritySafebrowsingV4ThreatInfo {
     /// The platform types to be checked.
     #[serde(rename="platformTypes")]
+    
     pub platform_types: Option<Vec<String>>,
     /// The threat entries to be checked.
     #[serde(rename="threatEntries")]
+    
     pub threat_entries: Option<Vec<GoogleSecuritySafebrowsingV4ThreatEntry>>,
     /// The entry types to be checked.
     #[serde(rename="threatEntryTypes")]
+    
     pub threat_entry_types: Option<Vec<String>>,
     /// The threat types to be checked.
     #[serde(rename="threatTypes")]
+    
     pub threat_types: Option<Vec<String>>,
 }
 
@@ -658,16 +769,20 @@ impl client::Part for GoogleSecuritySafebrowsingV4ThreatInfo {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleSecuritySafebrowsingV4ThreatListDescriptor {
     /// The platform type targeted by the list's entries.
     #[serde(rename="platformType")]
+    
     pub platform_type: Option<String>,
     /// The entry types contained in the list.
     #[serde(rename="threatEntryType")]
+    
     pub threat_entry_type: Option<String>,
     /// The threat type posed by the list's entries.
     #[serde(rename="threatType")]
+    
     pub threat_type: Option<String>,
 }
 
@@ -678,24 +793,32 @@ impl client::Part for GoogleSecuritySafebrowsingV4ThreatListDescriptor {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleSecuritySafebrowsingV4ThreatMatch {
     /// The cache lifetime for the returned match. Clients must not cache this response for more than this duration to avoid false positives.
     #[serde(rename="cacheDuration")]
-    pub cache_duration: Option<String>,
+    
+    #[serde_as(as = "Option<::client::serde::duration::Wrapper>")]
+    pub cache_duration: Option<client::chrono::Duration>,
     /// The platform type matching this threat.
     #[serde(rename="platformType")]
+    
     pub platform_type: Option<String>,
     /// The threat matching this threat.
+    
     pub threat: Option<GoogleSecuritySafebrowsingV4ThreatEntry>,
     /// Optional metadata associated with this threat.
     #[serde(rename="threatEntryMetadata")]
+    
     pub threat_entry_metadata: Option<GoogleSecuritySafebrowsingV4ThreatEntryMetadata>,
     /// The threat entry type matching this threat.
     #[serde(rename="threatEntryType")]
+    
     pub threat_entry_type: Option<String>,
     /// The threat type matching this threat.
     #[serde(rename="threatType")]
+    
     pub threat_type: Option<String>,
 }
 
@@ -707,8 +830,8 @@ impl client::Part for GoogleSecuritySafebrowsingV4ThreatMatch {}
 // MethodBuilders ###
 // #################
 
-/// A builder providing access to all methods supported on *encodedFullHashe* resources.
-/// It is not used directly, but through the `Safebrowsing` hub.
+/// A builder providing access to all methods supported on *encodedFullHash* resources.
+/// It is not used directly, but through the [`Safebrowsing`] hub.
 ///
 /// # Example
 ///
@@ -721,7 +844,7 @@ impl client::Part for GoogleSecuritySafebrowsingV4ThreatMatch {}
 /// 
 /// # async fn dox() {
 /// use std::default::Default;
-/// use safebrowsing4::{Safebrowsing, oauth2, hyper, hyper_rustls};
+/// use safebrowsing4::{Safebrowsing, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// let secret: oauth2::ApplicationSecret = Default::default();
 /// let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -735,15 +858,15 @@ impl client::Part for GoogleSecuritySafebrowsingV4ThreatMatch {}
 /// let rb = hub.encoded_full_hashes();
 /// # }
 /// ```
-pub struct EncodedFullHasheMethods<'a, S>
+pub struct EncodedFullHashMethods<'a, S>
     where S: 'a {
 
     hub: &'a Safebrowsing<S>,
 }
 
-impl<'a, S> client::MethodsBuilder for EncodedFullHasheMethods<'a, S> {}
+impl<'a, S> client::MethodsBuilder for EncodedFullHashMethods<'a, S> {}
 
-impl<'a, S> EncodedFullHasheMethods<'a, S> {
+impl<'a, S> EncodedFullHashMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -752,10 +875,10 @@ impl<'a, S> EncodedFullHasheMethods<'a, S> {
     /// # Arguments
     ///
     /// * `encodedRequest` - A serialized FindFullHashesRequest proto.
-    pub fn get(&self, encoded_request: &str) -> EncodedFullHasheGetCall<'a, S> {
-        EncodedFullHasheGetCall {
+    pub fn get(&self, encoded_request: Vec<u8>) -> EncodedFullHashGetCall<'a, S> {
+        EncodedFullHashGetCall {
             hub: self.hub,
-            _encoded_request: encoded_request.to_string(),
+            _encoded_request: encoded_request,
             _client_version: Default::default(),
             _client_id: Default::default(),
             _delegate: Default::default(),
@@ -767,7 +890,7 @@ impl<'a, S> EncodedFullHasheMethods<'a, S> {
 
 
 /// A builder providing access to all methods supported on *encodedUpdate* resources.
-/// It is not used directly, but through the `Safebrowsing` hub.
+/// It is not used directly, but through the [`Safebrowsing`] hub.
 ///
 /// # Example
 ///
@@ -780,7 +903,7 @@ impl<'a, S> EncodedFullHasheMethods<'a, S> {
 /// 
 /// # async fn dox() {
 /// use std::default::Default;
-/// use safebrowsing4::{Safebrowsing, oauth2, hyper, hyper_rustls};
+/// use safebrowsing4::{Safebrowsing, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// let secret: oauth2::ApplicationSecret = Default::default();
 /// let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -811,10 +934,10 @@ impl<'a, S> EncodedUpdateMethods<'a, S> {
     /// # Arguments
     ///
     /// * `encodedRequest` - A serialized FetchThreatListUpdatesRequest proto.
-    pub fn get(&self, encoded_request: &str) -> EncodedUpdateGetCall<'a, S> {
+    pub fn get(&self, encoded_request: Vec<u8>) -> EncodedUpdateGetCall<'a, S> {
         EncodedUpdateGetCall {
             hub: self.hub,
-            _encoded_request: encoded_request.to_string(),
+            _encoded_request: encoded_request,
             _client_version: Default::default(),
             _client_id: Default::default(),
             _delegate: Default::default(),
@@ -825,8 +948,8 @@ impl<'a, S> EncodedUpdateMethods<'a, S> {
 
 
 
-/// A builder providing access to all methods supported on *fullHashe* resources.
-/// It is not used directly, but through the `Safebrowsing` hub.
+/// A builder providing access to all methods supported on *fullHash* resources.
+/// It is not used directly, but through the [`Safebrowsing`] hub.
 ///
 /// # Example
 ///
@@ -839,7 +962,7 @@ impl<'a, S> EncodedUpdateMethods<'a, S> {
 /// 
 /// # async fn dox() {
 /// use std::default::Default;
-/// use safebrowsing4::{Safebrowsing, oauth2, hyper, hyper_rustls};
+/// use safebrowsing4::{Safebrowsing, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// let secret: oauth2::ApplicationSecret = Default::default();
 /// let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -853,15 +976,15 @@ impl<'a, S> EncodedUpdateMethods<'a, S> {
 /// let rb = hub.full_hashes();
 /// # }
 /// ```
-pub struct FullHasheMethods<'a, S>
+pub struct FullHashMethods<'a, S>
     where S: 'a {
 
     hub: &'a Safebrowsing<S>,
 }
 
-impl<'a, S> client::MethodsBuilder for FullHasheMethods<'a, S> {}
+impl<'a, S> client::MethodsBuilder for FullHashMethods<'a, S> {}
 
-impl<'a, S> FullHasheMethods<'a, S> {
+impl<'a, S> FullHashMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -870,8 +993,8 @@ impl<'a, S> FullHasheMethods<'a, S> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn find(&self, request: GoogleSecuritySafebrowsingV4FindFullHashesRequest) -> FullHasheFindCall<'a, S> {
-        FullHasheFindCall {
+    pub fn find(&self, request: GoogleSecuritySafebrowsingV4FindFullHashesRequest) -> FullHashFindCall<'a, S> {
+        FullHashFindCall {
             hub: self.hub,
             _request: request,
             _delegate: Default::default(),
@@ -883,7 +1006,7 @@ impl<'a, S> FullHasheMethods<'a, S> {
 
 
 /// A builder providing access to all methods supported on *threatHit* resources.
-/// It is not used directly, but through the `Safebrowsing` hub.
+/// It is not used directly, but through the [`Safebrowsing`] hub.
 ///
 /// # Example
 ///
@@ -896,7 +1019,7 @@ impl<'a, S> FullHasheMethods<'a, S> {
 /// 
 /// # async fn dox() {
 /// use std::default::Default;
-/// use safebrowsing4::{Safebrowsing, oauth2, hyper, hyper_rustls};
+/// use safebrowsing4::{Safebrowsing, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// let secret: oauth2::ApplicationSecret = Default::default();
 /// let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -940,7 +1063,7 @@ impl<'a, S> ThreatHitMethods<'a, S> {
 
 
 /// A builder providing access to all methods supported on *threatListUpdate* resources.
-/// It is not used directly, but through the `Safebrowsing` hub.
+/// It is not used directly, but through the [`Safebrowsing`] hub.
 ///
 /// # Example
 ///
@@ -953,7 +1076,7 @@ impl<'a, S> ThreatHitMethods<'a, S> {
 /// 
 /// # async fn dox() {
 /// use std::default::Default;
-/// use safebrowsing4::{Safebrowsing, oauth2, hyper, hyper_rustls};
+/// use safebrowsing4::{Safebrowsing, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// let secret: oauth2::ApplicationSecret = Default::default();
 /// let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -997,7 +1120,7 @@ impl<'a, S> ThreatListUpdateMethods<'a, S> {
 
 
 /// A builder providing access to all methods supported on *threatList* resources.
-/// It is not used directly, but through the `Safebrowsing` hub.
+/// It is not used directly, but through the [`Safebrowsing`] hub.
 ///
 /// # Example
 ///
@@ -1010,7 +1133,7 @@ impl<'a, S> ThreatListUpdateMethods<'a, S> {
 /// 
 /// # async fn dox() {
 /// use std::default::Default;
-/// use safebrowsing4::{Safebrowsing, oauth2, hyper, hyper_rustls};
+/// use safebrowsing4::{Safebrowsing, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// let secret: oauth2::ApplicationSecret = Default::default();
 /// let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -1048,8 +1171,8 @@ impl<'a, S> ThreatListMethods<'a, S> {
 
 
 
-/// A builder providing access to all methods supported on *threatMatche* resources.
-/// It is not used directly, but through the `Safebrowsing` hub.
+/// A builder providing access to all methods supported on *threatMatch* resources.
+/// It is not used directly, but through the [`Safebrowsing`] hub.
 ///
 /// # Example
 ///
@@ -1062,7 +1185,7 @@ impl<'a, S> ThreatListMethods<'a, S> {
 /// 
 /// # async fn dox() {
 /// use std::default::Default;
-/// use safebrowsing4::{Safebrowsing, oauth2, hyper, hyper_rustls};
+/// use safebrowsing4::{Safebrowsing, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// let secret: oauth2::ApplicationSecret = Default::default();
 /// let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -1076,15 +1199,15 @@ impl<'a, S> ThreatListMethods<'a, S> {
 /// let rb = hub.threat_matches();
 /// # }
 /// ```
-pub struct ThreatMatcheMethods<'a, S>
+pub struct ThreatMatchMethods<'a, S>
     where S: 'a {
 
     hub: &'a Safebrowsing<S>,
 }
 
-impl<'a, S> client::MethodsBuilder for ThreatMatcheMethods<'a, S> {}
+impl<'a, S> client::MethodsBuilder for ThreatMatchMethods<'a, S> {}
 
-impl<'a, S> ThreatMatcheMethods<'a, S> {
+impl<'a, S> ThreatMatchMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -1093,8 +1216,8 @@ impl<'a, S> ThreatMatcheMethods<'a, S> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn find(&self, request: GoogleSecuritySafebrowsingV4FindThreatMatchesRequest) -> ThreatMatcheFindCall<'a, S> {
-        ThreatMatcheFindCall {
+    pub fn find(&self, request: GoogleSecuritySafebrowsingV4FindThreatMatchesRequest) -> ThreatMatchFindCall<'a, S> {
+        ThreatMatchFindCall {
             hub: self.hub,
             _request: request,
             _delegate: Default::default(),
@@ -1113,8 +1236,8 @@ impl<'a, S> ThreatMatcheMethods<'a, S> {
 
 /// 
 ///
-/// A builder for the *get* method supported by a *encodedFullHashe* resource.
-/// It is not used directly, but through a `EncodedFullHasheMethods` instance.
+/// A builder for the *get* method supported by a *encodedFullHash* resource.
+/// It is not used directly, but through a [`EncodedFullHashMethods`] instance.
 ///
 /// # Example
 ///
@@ -1126,7 +1249,7 @@ impl<'a, S> ThreatMatcheMethods<'a, S> {
 /// # extern crate google_safebrowsing4 as safebrowsing4;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use safebrowsing4::{Safebrowsing, oauth2, hyper, hyper_rustls};
+/// # use safebrowsing4::{Safebrowsing, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
 /// # let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -1137,28 +1260,28 @@ impl<'a, S> ThreatMatcheMethods<'a, S> {
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.encoded_full_hashes().get("encodedRequest")
-///              .client_version("amet.")
-///              .client_id("duo")
+/// let result = hub.encoded_full_hashes().get(vec![0, 1, 2, 3])
+///              .client_version("sanctus")
+///              .client_id("sed")
 ///              .doit().await;
 /// # }
 /// ```
-pub struct EncodedFullHasheGetCall<'a, S>
+pub struct EncodedFullHashGetCall<'a, S>
     where S: 'a {
 
     hub: &'a Safebrowsing<S>,
-    _encoded_request: String,
+    _encoded_request: Vec<u8>,
     _client_version: Option<String>,
     _client_id: Option<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a, S> client::CallBuilder for EncodedFullHasheGetCall<'a, S> {}
+impl<'a, S> client::CallBuilder for EncodedFullHashGetCall<'a, S> {}
 
-impl<'a, S> EncodedFullHasheGetCall<'a, S>
+impl<'a, S> EncodedFullHashGetCall<'a, S>
 where
-    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
     S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
     S::Future: Send + Unpin + 'static,
     S::Error: Into<Box<dyn StdError + Send + Sync>>,
@@ -1169,39 +1292,37 @@ where
     pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, GoogleSecuritySafebrowsingV4FindFullHashesResponse)> {
         use std::io::{Read, Seek};
         use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::ToParts;
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
         let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
         dlg.begin(client::MethodInfo { id: "safebrowsing.encodedFullHashes.get",
                                http_method: hyper::Method::GET });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
-        params.push(("encodedRequest", self._encoded_request.to_string()));
-        if let Some(value) = self._client_version {
-            params.push(("clientVersion", value.to_string()));
-        }
-        if let Some(value) = self._client_id {
-            params.push(("clientId", value.to_string()));
-        }
+
         for &field in ["alt", "encodedRequest", "clientVersion", "clientId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(client::Error::FieldClash(field));
             }
         }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
+
+        let mut params = Params::with_capacity(5 + self._additional_params.len());
+        params.push("encodedRequest", ::client::serde::urlsafe_base64::to_string(&self._encoded_request));
+        if let Some(value) = self._client_version.as_ref() {
+            params.push("clientVersion", value);
+        }
+        if let Some(value) = self._client_id.as_ref() {
+            params.push("clientId", value);
         }
 
-        params.push(("alt", "json".to_string()));
+        params.extend(self._additional_params.iter());
 
+        params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "v4/encodedFullHashes/{encodedRequest}";
         
-        let key = dlg.api_key();
-        match key {
-            Some(value) => params.push(("key", value)),
+        match dlg.api_key() {
+            Some(value) => params.push("key", value),
             None => {
                 dlg.finished(false);
                 return Err(client::Error::MissingAPIKey)
@@ -1209,28 +1330,14 @@ where
         }
 
         for &(find_this, param_name) in [("{encodedRequest}", "encodedRequest")].iter() {
-            let mut replace_with: Option<&str> = None;
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = Some(value);
-                    break;
-                }
-            }
-            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+            url = params.uri_replacement(url, param_name, find_this, false);
         }
         {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
-            for param_name in ["encodedRequest"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
+            let to_remove = ["encodedRequest"];
+            params.remove_params(&to_remove);
         }
 
-        let url = url::Url::parse_with_params(&url, params).unwrap();
+        let url = params.parse_with_url(&url);
 
 
 
@@ -1238,21 +1345,24 @@ where
             let mut req_result = {
                 let client = &self.hub.client;
                 dlg.pre_request();
-                let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
-                        .header(USER_AGENT, self.hub._user_agent.clone());
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::GET)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
 
 
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
-                
+
             };
 
             match req_result {
                 Err(err) => {
                     if let client::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep(d).await;
                         continue;
                     }
                     dlg.finished(false);
@@ -1268,7 +1378,7 @@ where
                         let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
                         if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
-                            sleep(d);
+                            sleep(d).await;
                             continue;
                         }
 
@@ -1305,31 +1415,32 @@ where
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn encoded_request(mut self, new_value: &str) -> EncodedFullHasheGetCall<'a, S> {
-        self._encoded_request = new_value.to_string();
+    pub fn encoded_request(mut self, new_value: Vec<u8>) -> EncodedFullHashGetCall<'a, S> {
+        self._encoded_request = new_value;
         self
     }
     /// The version of the client implementation.
     ///
     /// Sets the *client version* query property to the given value.
-    pub fn client_version(mut self, new_value: &str) -> EncodedFullHasheGetCall<'a, S> {
+    pub fn client_version(mut self, new_value: &str) -> EncodedFullHashGetCall<'a, S> {
         self._client_version = Some(new_value.to_string());
         self
     }
     /// A client ID that (hopefully) uniquely identifies the client implementation of the Safe Browsing API.
     ///
     /// Sets the *client id* query property to the given value.
-    pub fn client_id(mut self, new_value: &str) -> EncodedFullHasheGetCall<'a, S> {
+    pub fn client_id(mut self, new_value: &str) -> EncodedFullHashGetCall<'a, S> {
         self._client_id = Some(new_value.to_string());
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.````
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> EncodedFullHasheGetCall<'a, S> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> EncodedFullHashGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -1354,7 +1465,7 @@ where
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> EncodedFullHasheGetCall<'a, S>
+    pub fn param<T>(mut self, name: T, value: T) -> EncodedFullHashGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1366,7 +1477,7 @@ where
 /// 
 ///
 /// A builder for the *get* method supported by a *encodedUpdate* resource.
-/// It is not used directly, but through a `EncodedUpdateMethods` instance.
+/// It is not used directly, but through a [`EncodedUpdateMethods`] instance.
 ///
 /// # Example
 ///
@@ -1378,7 +1489,7 @@ where
 /// # extern crate google_safebrowsing4 as safebrowsing4;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use safebrowsing4::{Safebrowsing, oauth2, hyper, hyper_rustls};
+/// # use safebrowsing4::{Safebrowsing, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
 /// # let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -1389,9 +1500,9 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.encoded_updates().get("encodedRequest")
-///              .client_version("gubergren")
-///              .client_id("Lorem")
+/// let result = hub.encoded_updates().get(vec![0, 1, 2, 3])
+///              .client_version("amet.")
+///              .client_id("takimata")
 ///              .doit().await;
 /// # }
 /// ```
@@ -1399,7 +1510,7 @@ pub struct EncodedUpdateGetCall<'a, S>
     where S: 'a {
 
     hub: &'a Safebrowsing<S>,
-    _encoded_request: String,
+    _encoded_request: Vec<u8>,
     _client_version: Option<String>,
     _client_id: Option<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -1410,7 +1521,7 @@ impl<'a, S> client::CallBuilder for EncodedUpdateGetCall<'a, S> {}
 
 impl<'a, S> EncodedUpdateGetCall<'a, S>
 where
-    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
     S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
     S::Future: Send + Unpin + 'static,
     S::Error: Into<Box<dyn StdError + Send + Sync>>,
@@ -1421,39 +1532,37 @@ where
     pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, GoogleSecuritySafebrowsingV4FetchThreatListUpdatesResponse)> {
         use std::io::{Read, Seek};
         use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::ToParts;
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
         let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
         dlg.begin(client::MethodInfo { id: "safebrowsing.encodedUpdates.get",
                                http_method: hyper::Method::GET });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
-        params.push(("encodedRequest", self._encoded_request.to_string()));
-        if let Some(value) = self._client_version {
-            params.push(("clientVersion", value.to_string()));
-        }
-        if let Some(value) = self._client_id {
-            params.push(("clientId", value.to_string()));
-        }
+
         for &field in ["alt", "encodedRequest", "clientVersion", "clientId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(client::Error::FieldClash(field));
             }
         }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
+
+        let mut params = Params::with_capacity(5 + self._additional_params.len());
+        params.push("encodedRequest", ::client::serde::urlsafe_base64::to_string(&self._encoded_request));
+        if let Some(value) = self._client_version.as_ref() {
+            params.push("clientVersion", value);
+        }
+        if let Some(value) = self._client_id.as_ref() {
+            params.push("clientId", value);
         }
 
-        params.push(("alt", "json".to_string()));
+        params.extend(self._additional_params.iter());
 
+        params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "v4/encodedUpdates/{encodedRequest}";
         
-        let key = dlg.api_key();
-        match key {
-            Some(value) => params.push(("key", value)),
+        match dlg.api_key() {
+            Some(value) => params.push("key", value),
             None => {
                 dlg.finished(false);
                 return Err(client::Error::MissingAPIKey)
@@ -1461,28 +1570,14 @@ where
         }
 
         for &(find_this, param_name) in [("{encodedRequest}", "encodedRequest")].iter() {
-            let mut replace_with: Option<&str> = None;
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = Some(value);
-                    break;
-                }
-            }
-            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+            url = params.uri_replacement(url, param_name, find_this, false);
         }
         {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
-            for param_name in ["encodedRequest"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
+            let to_remove = ["encodedRequest"];
+            params.remove_params(&to_remove);
         }
 
-        let url = url::Url::parse_with_params(&url, params).unwrap();
+        let url = params.parse_with_url(&url);
 
 
 
@@ -1490,21 +1585,24 @@ where
             let mut req_result = {
                 let client = &self.hub.client;
                 dlg.pre_request();
-                let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
-                        .header(USER_AGENT, self.hub._user_agent.clone());
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::GET)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
 
 
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
-                
+
             };
 
             match req_result {
                 Err(err) => {
                     if let client::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep(d).await;
                         continue;
                     }
                     dlg.finished(false);
@@ -1520,7 +1618,7 @@ where
                         let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
                         if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
-                            sleep(d);
+                            sleep(d).await;
                             continue;
                         }
 
@@ -1557,8 +1655,8 @@ where
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn encoded_request(mut self, new_value: &str) -> EncodedUpdateGetCall<'a, S> {
-        self._encoded_request = new_value.to_string();
+    pub fn encoded_request(mut self, new_value: Vec<u8>) -> EncodedUpdateGetCall<'a, S> {
+        self._encoded_request = new_value;
         self
     }
     /// The version of the client implementation.
@@ -1578,7 +1676,8 @@ where
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.````
     ///
     /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> EncodedUpdateGetCall<'a, S> {
@@ -1617,8 +1716,8 @@ where
 
 /// Finds the full hashes that match the requested hash prefixes.
 ///
-/// A builder for the *find* method supported by a *fullHashe* resource.
-/// It is not used directly, but through a `FullHasheMethods` instance.
+/// A builder for the *find* method supported by a *fullHash* resource.
+/// It is not used directly, but through a [`FullHashMethods`] instance.
 ///
 /// # Example
 ///
@@ -1631,7 +1730,7 @@ where
 /// use safebrowsing4::api::GoogleSecuritySafebrowsingV4FindFullHashesRequest;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use safebrowsing4::{Safebrowsing, oauth2, hyper, hyper_rustls};
+/// # use safebrowsing4::{Safebrowsing, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
 /// # let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -1651,7 +1750,7 @@ where
 ///              .doit().await;
 /// # }
 /// ```
-pub struct FullHasheFindCall<'a, S>
+pub struct FullHashFindCall<'a, S>
     where S: 'a {
 
     hub: &'a Safebrowsing<S>,
@@ -1660,11 +1759,11 @@ pub struct FullHasheFindCall<'a, S>
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a, S> client::CallBuilder for FullHasheFindCall<'a, S> {}
+impl<'a, S> client::CallBuilder for FullHashFindCall<'a, S> {}
 
-impl<'a, S> FullHasheFindCall<'a, S>
+impl<'a, S> FullHashFindCall<'a, S>
 where
-    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
     S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
     S::Future: Send + Unpin + 'static,
     S::Error: Into<Box<dyn StdError + Send + Sync>>,
@@ -1675,32 +1774,30 @@ where
     pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, GoogleSecuritySafebrowsingV4FindFullHashesResponse)> {
         use std::io::{Read, Seek};
         use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::ToParts;
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
         let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
         dlg.begin(client::MethodInfo { id: "safebrowsing.fullHashes.find",
                                http_method: hyper::Method::POST });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
+
         for &field in ["alt"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(client::Error::FieldClash(field));
             }
         }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
 
-        params.push(("alt", "json".to_string()));
+        let mut params = Params::with_capacity(3 + self._additional_params.len());
 
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "v4/fullHashes:find";
         
-        let key = dlg.api_key();
-        match key {
-            Some(value) => params.push(("key", value)),
+        match dlg.api_key() {
+            Some(value) => params.push("key", value),
             None => {
                 dlg.finished(false);
                 return Err(client::Error::MissingAPIKey)
@@ -1708,9 +1805,9 @@ where
         }
 
 
-        let url = url::Url::parse_with_params(&url, params).unwrap();
+        let url = params.parse_with_url(&url);
 
-        let mut json_mime_type: mime::Mime = "application/json".parse().unwrap();
+        let mut json_mime_type = mime::APPLICATION_JSON;
         let mut request_value_reader =
             {
                 let mut value = json::value::to_value(&self._request).expect("serde to work");
@@ -1728,23 +1825,26 @@ where
             let mut req_result = {
                 let client = &self.hub.client;
                 dlg.pre_request();
-                let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
-                        .header(USER_AGENT, self.hub._user_agent.clone());
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::POST)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
 
 
                         let request = req_builder
-                        .header(CONTENT_TYPE, format!("{}", json_mime_type.to_string()))
+                        .header(CONTENT_TYPE, json_mime_type.to_string())
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
                 client.request(request.unwrap()).await
-                
+
             };
 
             match req_result {
                 Err(err) => {
                     if let client::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep(d).await;
                         continue;
                     }
                     dlg.finished(false);
@@ -1760,7 +1860,7 @@ where
                         let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
                         if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
-                            sleep(d);
+                            sleep(d).await;
                             continue;
                         }
 
@@ -1796,17 +1896,18 @@ where
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleSecuritySafebrowsingV4FindFullHashesRequest) -> FullHasheFindCall<'a, S> {
+    pub fn request(mut self, new_value: GoogleSecuritySafebrowsingV4FindFullHashesRequest) -> FullHashFindCall<'a, S> {
         self._request = new_value;
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.````
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> FullHasheFindCall<'a, S> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> FullHashFindCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -1831,7 +1932,7 @@ where
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> FullHasheFindCall<'a, S>
+    pub fn param<T>(mut self, name: T, value: T) -> FullHashFindCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1843,7 +1944,7 @@ where
 /// Reports a Safe Browsing threat list hit to Google. Only projects with TRUSTED_REPORTER visibility can use this method.
 ///
 /// A builder for the *create* method supported by a *threatHit* resource.
-/// It is not used directly, but through a `ThreatHitMethods` instance.
+/// It is not used directly, but through a [`ThreatHitMethods`] instance.
 ///
 /// # Example
 ///
@@ -1856,7 +1957,7 @@ where
 /// use safebrowsing4::api::GoogleSecuritySafebrowsingV4ThreatHit;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use safebrowsing4::{Safebrowsing, oauth2, hyper, hyper_rustls};
+/// # use safebrowsing4::{Safebrowsing, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
 /// # let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -1889,7 +1990,7 @@ impl<'a, S> client::CallBuilder for ThreatHitCreateCall<'a, S> {}
 
 impl<'a, S> ThreatHitCreateCall<'a, S>
 where
-    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
     S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
     S::Future: Send + Unpin + 'static,
     S::Error: Into<Box<dyn StdError + Send + Sync>>,
@@ -1900,32 +2001,30 @@ where
     pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, GoogleProtobufEmpty)> {
         use std::io::{Read, Seek};
         use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::ToParts;
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
         let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
         dlg.begin(client::MethodInfo { id: "safebrowsing.threatHits.create",
                                http_method: hyper::Method::POST });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
+
         for &field in ["alt"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(client::Error::FieldClash(field));
             }
         }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
 
-        params.push(("alt", "json".to_string()));
+        let mut params = Params::with_capacity(3 + self._additional_params.len());
 
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "v4/threatHits";
         
-        let key = dlg.api_key();
-        match key {
-            Some(value) => params.push(("key", value)),
+        match dlg.api_key() {
+            Some(value) => params.push("key", value),
             None => {
                 dlg.finished(false);
                 return Err(client::Error::MissingAPIKey)
@@ -1933,9 +2032,9 @@ where
         }
 
 
-        let url = url::Url::parse_with_params(&url, params).unwrap();
+        let url = params.parse_with_url(&url);
 
-        let mut json_mime_type: mime::Mime = "application/json".parse().unwrap();
+        let mut json_mime_type = mime::APPLICATION_JSON;
         let mut request_value_reader =
             {
                 let mut value = json::value::to_value(&self._request).expect("serde to work");
@@ -1953,23 +2052,26 @@ where
             let mut req_result = {
                 let client = &self.hub.client;
                 dlg.pre_request();
-                let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
-                        .header(USER_AGENT, self.hub._user_agent.clone());
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::POST)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
 
 
                         let request = req_builder
-                        .header(CONTENT_TYPE, format!("{}", json_mime_type.to_string()))
+                        .header(CONTENT_TYPE, json_mime_type.to_string())
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
                 client.request(request.unwrap()).await
-                
+
             };
 
             match req_result {
                 Err(err) => {
                     if let client::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep(d).await;
                         continue;
                     }
                     dlg.finished(false);
@@ -1985,7 +2087,7 @@ where
                         let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
                         if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
-                            sleep(d);
+                            sleep(d).await;
                             continue;
                         }
 
@@ -2028,7 +2130,8 @@ where
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.````
     ///
     /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ThreatHitCreateCall<'a, S> {
@@ -2068,7 +2171,7 @@ where
 /// Fetches the most recent threat list updates. A client can request updates for multiple lists at once.
 ///
 /// A builder for the *fetch* method supported by a *threatListUpdate* resource.
-/// It is not used directly, but through a `ThreatListUpdateMethods` instance.
+/// It is not used directly, but through a [`ThreatListUpdateMethods`] instance.
 ///
 /// # Example
 ///
@@ -2081,7 +2184,7 @@ where
 /// use safebrowsing4::api::GoogleSecuritySafebrowsingV4FetchThreatListUpdatesRequest;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use safebrowsing4::{Safebrowsing, oauth2, hyper, hyper_rustls};
+/// # use safebrowsing4::{Safebrowsing, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
 /// # let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -2114,7 +2217,7 @@ impl<'a, S> client::CallBuilder for ThreatListUpdateFetchCall<'a, S> {}
 
 impl<'a, S> ThreatListUpdateFetchCall<'a, S>
 where
-    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
     S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
     S::Future: Send + Unpin + 'static,
     S::Error: Into<Box<dyn StdError + Send + Sync>>,
@@ -2125,32 +2228,30 @@ where
     pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, GoogleSecuritySafebrowsingV4FetchThreatListUpdatesResponse)> {
         use std::io::{Read, Seek};
         use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::ToParts;
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
         let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
         dlg.begin(client::MethodInfo { id: "safebrowsing.threatListUpdates.fetch",
                                http_method: hyper::Method::POST });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
+
         for &field in ["alt"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(client::Error::FieldClash(field));
             }
         }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
 
-        params.push(("alt", "json".to_string()));
+        let mut params = Params::with_capacity(3 + self._additional_params.len());
 
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "v4/threatListUpdates:fetch";
         
-        let key = dlg.api_key();
-        match key {
-            Some(value) => params.push(("key", value)),
+        match dlg.api_key() {
+            Some(value) => params.push("key", value),
             None => {
                 dlg.finished(false);
                 return Err(client::Error::MissingAPIKey)
@@ -2158,9 +2259,9 @@ where
         }
 
 
-        let url = url::Url::parse_with_params(&url, params).unwrap();
+        let url = params.parse_with_url(&url);
 
-        let mut json_mime_type: mime::Mime = "application/json".parse().unwrap();
+        let mut json_mime_type = mime::APPLICATION_JSON;
         let mut request_value_reader =
             {
                 let mut value = json::value::to_value(&self._request).expect("serde to work");
@@ -2178,23 +2279,26 @@ where
             let mut req_result = {
                 let client = &self.hub.client;
                 dlg.pre_request();
-                let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
-                        .header(USER_AGENT, self.hub._user_agent.clone());
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::POST)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
 
 
                         let request = req_builder
-                        .header(CONTENT_TYPE, format!("{}", json_mime_type.to_string()))
+                        .header(CONTENT_TYPE, json_mime_type.to_string())
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
                 client.request(request.unwrap()).await
-                
+
             };
 
             match req_result {
                 Err(err) => {
                     if let client::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep(d).await;
                         continue;
                     }
                     dlg.finished(false);
@@ -2210,7 +2314,7 @@ where
                         let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
                         if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
-                            sleep(d);
+                            sleep(d).await;
                             continue;
                         }
 
@@ -2253,7 +2357,8 @@ where
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.````
     ///
     /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ThreatListUpdateFetchCall<'a, S> {
@@ -2293,7 +2398,7 @@ where
 /// Lists the Safe Browsing threat lists available for download.
 ///
 /// A builder for the *list* method supported by a *threatList* resource.
-/// It is not used directly, but through a `ThreatListMethods` instance.
+/// It is not used directly, but through a [`ThreatListMethods`] instance.
 ///
 /// # Example
 ///
@@ -2305,7 +2410,7 @@ where
 /// # extern crate google_safebrowsing4 as safebrowsing4;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use safebrowsing4::{Safebrowsing, oauth2, hyper, hyper_rustls};
+/// # use safebrowsing4::{Safebrowsing, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
 /// # let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -2332,7 +2437,7 @@ impl<'a, S> client::CallBuilder for ThreatListListCall<'a, S> {}
 
 impl<'a, S> ThreatListListCall<'a, S>
 where
-    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
     S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
     S::Future: Send + Unpin + 'static,
     S::Error: Into<Box<dyn StdError + Send + Sync>>,
@@ -2343,32 +2448,30 @@ where
     pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, GoogleSecuritySafebrowsingV4ListThreatListsResponse)> {
         use std::io::{Read, Seek};
         use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::ToParts;
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
         let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
         dlg.begin(client::MethodInfo { id: "safebrowsing.threatLists.list",
                                http_method: hyper::Method::GET });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(2 + self._additional_params.len());
+
         for &field in ["alt"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(client::Error::FieldClash(field));
             }
         }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
 
-        params.push(("alt", "json".to_string()));
+        let mut params = Params::with_capacity(2 + self._additional_params.len());
 
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "v4/threatLists";
         
-        let key = dlg.api_key();
-        match key {
-            Some(value) => params.push(("key", value)),
+        match dlg.api_key() {
+            Some(value) => params.push("key", value),
             None => {
                 dlg.finished(false);
                 return Err(client::Error::MissingAPIKey)
@@ -2376,7 +2479,7 @@ where
         }
 
 
-        let url = url::Url::parse_with_params(&url, params).unwrap();
+        let url = params.parse_with_url(&url);
 
 
 
@@ -2384,21 +2487,24 @@ where
             let mut req_result = {
                 let client = &self.hub.client;
                 dlg.pre_request();
-                let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
-                        .header(USER_AGENT, self.hub._user_agent.clone());
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::GET)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
 
 
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
-                
+
             };
 
             match req_result {
                 Err(err) => {
                     if let client::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep(d).await;
                         continue;
                     }
                     dlg.finished(false);
@@ -2414,7 +2520,7 @@ where
                         let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
                         if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
-                            sleep(d);
+                            sleep(d).await;
                             continue;
                         }
 
@@ -2448,7 +2554,8 @@ where
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.````
     ///
     /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ThreatListListCall<'a, S> {
@@ -2487,8 +2594,8 @@ where
 
 /// Finds the threat entries that match the Safe Browsing lists.
 ///
-/// A builder for the *find* method supported by a *threatMatche* resource.
-/// It is not used directly, but through a `ThreatMatcheMethods` instance.
+/// A builder for the *find* method supported by a *threatMatch* resource.
+/// It is not used directly, but through a [`ThreatMatchMethods`] instance.
 ///
 /// # Example
 ///
@@ -2501,7 +2608,7 @@ where
 /// use safebrowsing4::api::GoogleSecuritySafebrowsingV4FindThreatMatchesRequest;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use safebrowsing4::{Safebrowsing, oauth2, hyper, hyper_rustls};
+/// # use safebrowsing4::{Safebrowsing, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
 /// # let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -2521,7 +2628,7 @@ where
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ThreatMatcheFindCall<'a, S>
+pub struct ThreatMatchFindCall<'a, S>
     where S: 'a {
 
     hub: &'a Safebrowsing<S>,
@@ -2530,11 +2637,11 @@ pub struct ThreatMatcheFindCall<'a, S>
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a, S> client::CallBuilder for ThreatMatcheFindCall<'a, S> {}
+impl<'a, S> client::CallBuilder for ThreatMatchFindCall<'a, S> {}
 
-impl<'a, S> ThreatMatcheFindCall<'a, S>
+impl<'a, S> ThreatMatchFindCall<'a, S>
 where
-    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
     S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
     S::Future: Send + Unpin + 'static,
     S::Error: Into<Box<dyn StdError + Send + Sync>>,
@@ -2545,32 +2652,30 @@ where
     pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, GoogleSecuritySafebrowsingV4FindThreatMatchesResponse)> {
         use std::io::{Read, Seek};
         use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::ToParts;
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
         let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
         dlg.begin(client::MethodInfo { id: "safebrowsing.threatMatches.find",
                                http_method: hyper::Method::POST });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
+
         for &field in ["alt"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(client::Error::FieldClash(field));
             }
         }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
 
-        params.push(("alt", "json".to_string()));
+        let mut params = Params::with_capacity(3 + self._additional_params.len());
 
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "v4/threatMatches:find";
         
-        let key = dlg.api_key();
-        match key {
-            Some(value) => params.push(("key", value)),
+        match dlg.api_key() {
+            Some(value) => params.push("key", value),
             None => {
                 dlg.finished(false);
                 return Err(client::Error::MissingAPIKey)
@@ -2578,9 +2683,9 @@ where
         }
 
 
-        let url = url::Url::parse_with_params(&url, params).unwrap();
+        let url = params.parse_with_url(&url);
 
-        let mut json_mime_type: mime::Mime = "application/json".parse().unwrap();
+        let mut json_mime_type = mime::APPLICATION_JSON;
         let mut request_value_reader =
             {
                 let mut value = json::value::to_value(&self._request).expect("serde to work");
@@ -2598,23 +2703,26 @@ where
             let mut req_result = {
                 let client = &self.hub.client;
                 dlg.pre_request();
-                let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
-                        .header(USER_AGENT, self.hub._user_agent.clone());
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::POST)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
 
 
                         let request = req_builder
-                        .header(CONTENT_TYPE, format!("{}", json_mime_type.to_string()))
+                        .header(CONTENT_TYPE, json_mime_type.to_string())
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
                 client.request(request.unwrap()).await
-                
+
             };
 
             match req_result {
                 Err(err) => {
                     if let client::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep(d).await;
                         continue;
                     }
                     dlg.finished(false);
@@ -2630,7 +2738,7 @@ where
                         let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
                         if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
-                            sleep(d);
+                            sleep(d).await;
                             continue;
                         }
 
@@ -2666,17 +2774,18 @@ where
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleSecuritySafebrowsingV4FindThreatMatchesRequest) -> ThreatMatcheFindCall<'a, S> {
+    pub fn request(mut self, new_value: GoogleSecuritySafebrowsingV4FindThreatMatchesRequest) -> ThreatMatchFindCall<'a, S> {
         self._request = new_value;
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.````
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ThreatMatcheFindCall<'a, S> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ThreatMatchFindCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -2701,7 +2810,7 @@ where
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ThreatMatcheFindCall<'a, S>
+    pub fn param<T>(mut self, name: T, value: T) -> ThreatMatchFindCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self

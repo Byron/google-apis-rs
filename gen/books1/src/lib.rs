@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/generator/templates/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *books* crate version *4.0.1+20220301*, where *20220301* is the exact revision of the *books:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v4.0.1*.
+//! This documentation was generated from *books* crate version *5.0.2-beta-1+20230117*, where *20230117* is the exact revision of the *books:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.2-beta-1*.
 //! 
 //! Everything else about the *books* *v1* API can be found at the
 //! [official documentation site](https://code.google.com/apis/books/docs/v1/getting_started.html).
@@ -11,8 +11,8 @@
 //! 
 //! Handle the following *Resources* with ease from the central [hub](Books) ... 
 //! 
-//! * bookshelves
-//!  * [*get*](api::BookshelveGetCall), [*list*](api::BookshelveListCall) and [*volumes list*](api::BookshelveVolumeListCall)
+//! * [bookshelves](api::Bookshelf)
+//!  * [*get*](api::BookshelfGetCall), [*list*](api::BookshelfListCall) and [*volumes list*](api::BookshelfVolumeListCall)
 //! * cloudloading
 //!  * [*add book*](api::CloudloadingAddBookCall), [*delete book*](api::CloudloadingDeleteBookCall) and [*update book*](api::CloudloadingUpdateBookCall)
 //! * dictionary
@@ -24,7 +24,7 @@
 //! * myconfig
 //!  * [*get user settings*](api::MyconfigGetUserSettingCall), [*release download access*](api::MyconfigReleaseDownloadAccesCall), [*request access*](api::MyconfigRequestAccesCall), [*sync volume licenses*](api::MyconfigSyncVolumeLicenseCall) and [*update user settings*](api::MyconfigUpdateUserSettingCall)
 //! * mylibrary
-//!  * [*annotations delete*](api::MylibraryAnnotationDeleteCall), [*annotations insert*](api::MylibraryAnnotationInsertCall), [*annotations list*](api::MylibraryAnnotationListCall), [*annotations summary*](api::MylibraryAnnotationSummaryCall), [*annotations update*](api::MylibraryAnnotationUpdateCall), [*bookshelves add volume*](api::MylibraryBookshelveAddVolumeCall), [*bookshelves clear volumes*](api::MylibraryBookshelveClearVolumeCall), [*bookshelves get*](api::MylibraryBookshelveGetCall), [*bookshelves list*](api::MylibraryBookshelveListCall), [*bookshelves move volume*](api::MylibraryBookshelveMoveVolumeCall), [*bookshelves remove volume*](api::MylibraryBookshelveRemoveVolumeCall), [*bookshelves volumes list*](api::MylibraryBookshelveVolumeListCall), [*readingpositions get*](api::MylibraryReadingpositionGetCall) and [*readingpositions set position*](api::MylibraryReadingpositionSetPositionCall)
+//!  * [*annotations delete*](api::MylibraryAnnotationDeleteCall), [*annotations insert*](api::MylibraryAnnotationInsertCall), [*annotations list*](api::MylibraryAnnotationListCall), [*annotations summary*](api::MylibraryAnnotationSummaryCall), [*annotations update*](api::MylibraryAnnotationUpdateCall), [*bookshelves add volume*](api::MylibraryBookshelfAddVolumeCall), [*bookshelves clear volumes*](api::MylibraryBookshelfClearVolumeCall), [*bookshelves get*](api::MylibraryBookshelfGetCall), [*bookshelves list*](api::MylibraryBookshelfListCall), [*bookshelves move volume*](api::MylibraryBookshelfMoveVolumeCall), [*bookshelves remove volume*](api::MylibraryBookshelfRemoveVolumeCall), [*bookshelves volumes list*](api::MylibraryBookshelfVolumeListCall), [*readingpositions get*](api::MylibraryReadingpositionGetCall) and [*readingpositions set position*](api::MylibraryReadingpositionSetPositionCall)
 //! * [notification](api::Notification)
 //!  * [*get*](api::NotificationGetCall)
 //! * onboarding
@@ -33,8 +33,8 @@
 //!  * [*get*](api::PersonalizedstreamGetCall)
 //! * promooffer
 //!  * [*accept*](api::PromoofferAcceptCall), [*dismiss*](api::PromoofferDismisCall) and [*get*](api::PromoofferGetCall)
-//! * series
-//!  * [*get*](api::SeryGetCall) and [*membership get*](api::SeryMembershipGetCall)
+//! * [series](api::Series)
+//!  * [*get*](api::SeriesGetCall) and [*membership get*](api::SeriesMembershipGetCall)
 //! * [volumes](api::Volume)
 //!  * [*associated list*](api::VolumeAssociatedListCall), [*get*](api::VolumeGetCall), [*list*](api::VolumeListCall), [*mybooks list*](api::VolumeMybookListCall), [*recommended list*](api::VolumeRecommendedListCall), [*recommended rate*](api::VolumeRecommendedRateCall) and [*useruploaded list*](api::VolumeUseruploadedListCall)
 //! 
@@ -111,7 +111,7 @@
 //! use books1::{Result, Error};
 //! # async fn dox() {
 //! use std::default::Default;
-//! use books1::{Books, oauth2, hyper, hyper_rustls};
+//! use books1::{Books, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 //! 
 //! // Get an ApplicationSecret instance by some means. It contains the `client_id` and 
 //! // `client_secret`, among other things.
@@ -223,22 +223,17 @@
 // This file was generated automatically from 'src/generator/templates/api/lib.rs.mako'
 // DO NOT EDIT !
 
-#[macro_use]
-extern crate serde_derive;
-
 // Re-export the hyper and hyper_rustls crate, they are required to build the hub
-pub extern crate hyper;
-pub extern crate hyper_rustls;
-extern crate serde;
-extern crate serde_json;
-// Re-export the yup_oauth2 crate, that is required to call some methods of the hub and the client
-pub extern crate yup_oauth2 as oauth2;
-extern crate mime;
-extern crate url;
-
+pub use hyper;
+pub use hyper_rustls;
+pub extern crate google_apis_common as client;
+pub use client::chrono;
 pub mod api;
-pub mod client;
 
 // Re-export the hub type and some basic client structs
 pub use api::Books;
-pub use client::{Result, Error, Delegate};
+pub use client::{Result, Error, Delegate, FieldMask};
+
+// Re-export the yup_oauth2 crate, that is required to call some methods of the hub and the client
+#[cfg(feature = "yup-oauth2")]
+pub use client::oauth2;

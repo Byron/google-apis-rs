@@ -1,19 +1,20 @@
 use std::collections::HashMap;
 use std::cell::RefCell;
 use std::default::Default;
-use std::collections::BTreeMap;
+use std::collections::BTreeSet;
 use std::error::Error as StdError;
 use serde_json as json;
 use std::io;
 use std::fs;
 use std::mem;
-use std::thread::sleep;
 
-use http::Uri;
 use hyper::client::connect;
 use tokio::io::{AsyncRead, AsyncWrite};
+use tokio::time::sleep;
 use tower_service;
-use crate::client;
+use serde::{Serialize, Deserialize};
+
+use crate::{client, client::GetToken, client::serde_with};
 
 // ##############
 // UTILITIES ###
@@ -61,7 +62,7 @@ impl Default for Scope {
 /// use books1::{Result, Error};
 /// # async fn dox() {
 /// use std::default::Default;
-/// use books1::{Books, oauth2, hyper, hyper_rustls};
+/// use books1::{Books, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// // Get an ApplicationSecret instance by some means. It contains the `client_id` and 
 /// // `client_secret`, among other things.
@@ -112,7 +113,7 @@ impl Default for Scope {
 #[derive(Clone)]
 pub struct Books<S> {
     pub client: hyper::Client<S, hyper::body::Body>,
-    pub auth: oauth2::authenticator::Authenticator<S>,
+    pub auth: Box<dyn client::GetToken>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
@@ -122,18 +123,18 @@ impl<'a, S> client::Hub for Books<S> {}
 
 impl<'a, S> Books<S> {
 
-    pub fn new(client: hyper::Client<S, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<S>) -> Books<S> {
+    pub fn new<A: 'static + client::GetToken>(client: hyper::Client<S, hyper::body::Body>, auth: A) -> Books<S> {
         Books {
             client,
-            auth: authenticator,
-            _user_agent: "google-api-rust-client/4.0.1".to_string(),
+            auth: Box::new(auth),
+            _user_agent: "google-api-rust-client/5.0.2-beta-1".to_string(),
             _base_url: "https://books.googleapis.com/".to_string(),
             _root_url: "https://books.googleapis.com/".to_string(),
         }
     }
 
-    pub fn bookshelves(&'a self) -> BookshelveMethods<'a, S> {
-        BookshelveMethods { hub: &self }
+    pub fn bookshelves(&'a self) -> BookshelfMethods<'a, S> {
+        BookshelfMethods { hub: &self }
     }
     pub fn cloudloading(&'a self) -> CloudloadingMethods<'a, S> {
         CloudloadingMethods { hub: &self }
@@ -165,15 +166,15 @@ impl<'a, S> Books<S> {
     pub fn promooffer(&'a self) -> PromoofferMethods<'a, S> {
         PromoofferMethods { hub: &self }
     }
-    pub fn series(&'a self) -> SeryMethods<'a, S> {
-        SeryMethods { hub: &self }
+    pub fn series(&'a self) -> SeriesMethods<'a, S> {
+        SeriesMethods { hub: &self }
     }
     pub fn volumes(&'a self) -> VolumeMethods<'a, S> {
         VolumeMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/4.0.1`.
+    /// It defaults to `google-api-rust-client/5.0.2-beta-1`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -211,52 +212,70 @@ impl<'a, S> Books<S> {
 /// * [annotations insert mylibrary](MylibraryAnnotationInsertCall) (request|response)
 /// * [annotations update mylibrary](MylibraryAnnotationUpdateCall) (request|response)
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Annotation {
     /// Anchor text after excerpt. For requests, if the user bookmarked a screen that has no flowing text on it, then this field should be empty.
     #[serde(rename="afterSelectedText")]
+    
     pub after_selected_text: Option<String>,
     /// Anchor text before excerpt. For requests, if the user bookmarked a screen that has no flowing text on it, then this field should be empty.
     #[serde(rename="beforeSelectedText")]
+    
     pub before_selected_text: Option<String>,
     /// Selection ranges sent from the client.
     #[serde(rename="clientVersionRanges")]
+    
     pub client_version_ranges: Option<AnnotationClientVersionRanges>,
     /// Timestamp for the created time of this annotation.
+    
     pub created: Option<String>,
     /// Selection ranges for the most recent content version.
     #[serde(rename="currentVersionRanges")]
+    
     pub current_version_ranges: Option<AnnotationCurrentVersionRanges>,
     /// User-created data for this annotation.
+    
     pub data: Option<String>,
     /// Indicates that this annotation is deleted.
+    
     pub deleted: Option<bool>,
     /// The highlight style for this annotation.
     #[serde(rename="highlightStyle")]
+    
     pub highlight_style: Option<String>,
     /// Id of this annotation, in the form of a GUID.
+    
     pub id: Option<String>,
     /// Resource type.
+    
     pub kind: Option<String>,
     /// The layer this annotation is for.
     #[serde(rename="layerId")]
+    
     pub layer_id: Option<String>,
     /// no description provided
     #[serde(rename="layerSummary")]
+    
     pub layer_summary: Option<AnnotationLayerSummary>,
     /// Pages that this annotation spans.
     #[serde(rename="pageIds")]
+    
     pub page_ids: Option<Vec<String>>,
     /// Excerpt from the volume.
     #[serde(rename="selectedText")]
+    
     pub selected_text: Option<String>,
     /// URL to this resource.
     #[serde(rename="selfLink")]
+    
     pub self_link: Option<String>,
     /// Timestamp for the last time this annotation was modified.
+    
     pub updated: Option<String>,
     /// The volume that this annotation belongs to.
     #[serde(rename="volumeId")]
+    
     pub volume_id: Option<String>,
 }
 
@@ -273,17 +292,22 @@ impl client::ResponseResult for Annotation {}
 /// 
 /// * [annotations list mylibrary](MylibraryAnnotationListCall) (response)
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Annotations {
     /// A list of annotations.
+    
     pub items: Option<Vec<Annotation>>,
     /// Resource type.
+    
     pub kind: Option<String>,
     /// Token to pass in for pagination for the next page. This will not be present if this request does not have more results.
     #[serde(rename="nextPageToken")]
+    
     pub next_page_token: Option<String>,
     /// Total number of annotations found. This may be greater than the number of notes returned in this response if results have been paginated.
     #[serde(rename="totalItems")]
+    
     pub total_items: Option<i32>,
 }
 
@@ -299,11 +323,14 @@ impl client::ResponseResult for Annotations {}
 /// 
 /// * [annotations summary mylibrary](MylibraryAnnotationSummaryCall) (response)
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AnnotationsSummary {
     /// no description provided
+    
     pub kind: Option<String>,
     /// no description provided
+    
     pub layers: Option<Vec<AnnotationsSummaryLayers>>,
 }
 
@@ -319,17 +346,22 @@ impl client::ResponseResult for AnnotationsSummary {}
 /// 
 /// * [annotation data list layers](LayerAnnotationDataListCall) (response)
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Annotationsdata {
     /// A list of Annotation Data.
+    
     pub items: Option<Vec<GeoAnnotationdata>>,
     /// Resource type
+    
     pub kind: Option<String>,
     /// Token to pass in for pagination for the next page. This will not be present if this request does not have more results.
     #[serde(rename="nextPageToken")]
+    
     pub next_page_token: Option<String>,
     /// The total number of volume annotations found.
     #[serde(rename="totalItems")]
+    
     pub total_items: Option<i32>,
 }
 
@@ -340,19 +372,24 @@ impl client::ResponseResult for Annotationsdata {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct BooksAnnotationsRange {
     /// The offset from the ending position.
     #[serde(rename="endOffset")]
+    
     pub end_offset: Option<String>,
     /// The ending position for the range.
     #[serde(rename="endPosition")]
+    
     pub end_position: Option<String>,
     /// The offset from the starting position.
     #[serde(rename="startOffset")]
+    
     pub start_offset: Option<String>,
     /// The starting position for the range.
     #[serde(rename="startPosition")]
+    
     pub start_position: Option<String>,
 }
 
@@ -369,17 +406,22 @@ impl client::Part for BooksAnnotationsRange {}
 /// * [add book cloudloading](CloudloadingAddBookCall) (response)
 /// * [update book cloudloading](CloudloadingUpdateBookCall) (request|response)
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct BooksCloudloadingResource {
     /// no description provided
+    
     pub author: Option<String>,
     /// no description provided
     #[serde(rename="processingState")]
+    
     pub processing_state: Option<String>,
     /// no description provided
+    
     pub title: Option<String>,
     /// no description provided
     #[serde(rename="volumeId")]
+    
     pub volume_id: Option<String>,
 }
 
@@ -396,9 +438,11 @@ impl client::ResponseResult for BooksCloudloadingResource {}
 /// 
 /// * [recommended rate volumes](VolumeRecommendedRateCall) (response)
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct BooksVolumesRecommendedRateResponse {
     /// no description provided
+    
     pub consistency_token: Option<String>,
 }
 
@@ -412,33 +456,44 @@ impl client::ResponseResult for BooksVolumesRecommendedRateResponse {}
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [get bookshelves](BookshelveGetCall) (response)
-/// * [bookshelves get mylibrary](MylibraryBookshelveGetCall) (response)
+/// * [get bookshelves](BookshelfGetCall) (response)
+/// * [bookshelves get mylibrary](MylibraryBookshelfGetCall) (response)
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Bookshelf {
     /// Whether this bookshelf is PUBLIC or PRIVATE.
+    
     pub access: Option<String>,
     /// Created time for this bookshelf (formatted UTC timestamp with millisecond resolution).
+    
     pub created: Option<String>,
     /// Description of this bookshelf.
+    
     pub description: Option<String>,
     /// Id of this bookshelf, only unique by user.
+    
     pub id: Option<i32>,
     /// Resource type for bookshelf metadata.
+    
     pub kind: Option<String>,
     /// URL to this resource.
     #[serde(rename="selfLink")]
+    
     pub self_link: Option<String>,
     /// Title of this bookshelf.
+    
     pub title: Option<String>,
     /// Last modified time of this bookshelf (formatted UTC timestamp with millisecond resolution).
+    
     pub updated: Option<String>,
     /// Number of volumes in this bookshelf.
     #[serde(rename="volumeCount")]
+    
     pub volume_count: Option<i32>,
     /// Last time a volume was added or removed from this bookshelf (formatted UTC timestamp with millisecond resolution).
     #[serde(rename="volumesLastUpdated")]
+    
     pub volumes_last_updated: Option<String>,
 }
 
@@ -452,14 +507,17 @@ impl client::ResponseResult for Bookshelf {}
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [list bookshelves](BookshelveListCall) (response)
-/// * [bookshelves list mylibrary](MylibraryBookshelveListCall) (response)
+/// * [list bookshelves](BookshelfListCall) (response)
+/// * [bookshelves list mylibrary](MylibraryBookshelfListCall) (response)
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Bookshelves {
     /// A list of bookshelves.
+    
     pub items: Option<Vec<Bookshelf>>,
     /// Resource type.
+    
     pub kind: Option<String>,
 }
 
@@ -475,11 +533,14 @@ impl client::ResponseResult for Bookshelves {}
 /// 
 /// * [list categories onboarding](OnboardingListCategoryCall) (response)
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Category {
     /// A list of onboarding categories.
+    
     pub items: Option<Vec<CategoryItems>>,
     /// Resource type.
+    
     pub kind: Option<String>,
 }
 
@@ -490,34 +551,46 @@ impl client::ResponseResult for Category {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ConcurrentAccessRestriction {
     /// Whether access is granted for this (user, device, volume).
     #[serde(rename="deviceAllowed")]
+    
     pub device_allowed: Option<bool>,
     /// Resource type.
+    
     pub kind: Option<String>,
     /// The maximum number of concurrent access licenses for this volume.
     #[serde(rename="maxConcurrentDevices")]
+    
     pub max_concurrent_devices: Option<i32>,
     /// Error/warning message.
+    
     pub message: Option<String>,
     /// Client nonce for verification. Download access and client-validation only.
+    
     pub nonce: Option<String>,
     /// Error/warning reason code.
     #[serde(rename="reasonCode")]
+    
     pub reason_code: Option<String>,
     /// Whether this volume has any concurrent access restrictions.
+    
     pub restricted: Option<bool>,
     /// Response signature.
+    
     pub signature: Option<String>,
     /// Client app identifier for verification. Download access and client-validation only.
+    
     pub source: Option<String>,
     /// Time in seconds for license auto-expiration.
     #[serde(rename="timeWindowSeconds")]
+    
     pub time_window_seconds: Option<i32>,
     /// Identifies the volume for which this entry applies.
     #[serde(rename="volumeId")]
+    
     pub volume_id: Option<String>,
 }
 
@@ -533,30 +606,41 @@ impl client::Part for ConcurrentAccessRestriction {}
 /// 
 /// * [annotation data get layers](LayerAnnotationDataGetCall) (response)
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct DictionaryAnnotationdata {
     /// The type of annotation this data is for.
     #[serde(rename="annotationType")]
+    
     pub annotation_type: Option<String>,
     /// JSON encoded data for this dictionary annotation data. Emitted with name 'data' in JSON output. Either this or geo_data will be populated.
+    
     pub data: Option<Dictlayerdata>,
     /// Base64 encoded data for this annotation data.
     #[serde(rename="encodedData")]
-    pub encoded_data: Option<String>,
+    
+    #[serde_as(as = "Option<::client::serde::urlsafe_base64::Wrapper>")]
+    pub encoded_data: Option<Vec<u8>>,
     /// Unique id for this annotation data.
+    
     pub id: Option<String>,
     /// Resource Type
+    
     pub kind: Option<String>,
     /// The Layer id for this data. *
     #[serde(rename="layerId")]
+    
     pub layer_id: Option<String>,
     /// URL for this resource. *
     #[serde(rename="selfLink")]
+    
     pub self_link: Option<String>,
     /// Timestamp for the last time this data was updated. (RFC 3339 UTC date-time format).
+    
     pub updated: Option<String>,
     /// The volume id for this data. *
     #[serde(rename="volumeId")]
+    
     pub volume_id: Option<String>,
 }
 
@@ -567,13 +651,17 @@ impl client::ResponseResult for DictionaryAnnotationdata {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Dictlayerdata {
     /// no description provided
+    
     pub common: Option<DictlayerdataCommon>,
     /// no description provided
+    
     pub dict: Option<DictlayerdataDict>,
     /// no description provided
+    
     pub kind: Option<String>,
 }
 
@@ -589,14 +677,18 @@ impl client::Part for Dictlayerdata {}
 /// 
 /// * [get personalizedstream](PersonalizedstreamGetCall) (response)
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Discoveryclusters {
     /// no description provided
+    
     pub clusters: Option<Vec<DiscoveryclustersClusters>>,
     /// Resorce type.
+    
     pub kind: Option<String>,
     /// no description provided
     #[serde(rename="totalClusters")]
+    
     pub total_clusters: Option<i32>,
 }
 
@@ -607,37 +699,50 @@ impl client::ResponseResult for Discoveryclusters {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct DownloadAccessRestriction {
     /// If restricted, whether access is granted for this (user, device, volume).
     #[serde(rename="deviceAllowed")]
+    
     pub device_allowed: Option<bool>,
     /// If restricted, the number of content download licenses already acquired (including the requesting client, if licensed).
     #[serde(rename="downloadsAcquired")]
+    
     pub downloads_acquired: Option<i32>,
     /// If deviceAllowed, whether access was just acquired with this request.
     #[serde(rename="justAcquired")]
+    
     pub just_acquired: Option<bool>,
     /// Resource type.
+    
     pub kind: Option<String>,
     /// If restricted, the maximum number of content download licenses for this volume.
     #[serde(rename="maxDownloadDevices")]
+    
     pub max_download_devices: Option<i32>,
     /// Error/warning message.
+    
     pub message: Option<String>,
     /// Client nonce for verification. Download access and client-validation only.
+    
     pub nonce: Option<String>,
     /// Error/warning reason code. Additional codes may be added in the future. 0 OK 100 ACCESS_DENIED_PUBLISHER_LIMIT 101 ACCESS_DENIED_LIMIT 200 WARNING_USED_LAST_ACCESS
     #[serde(rename="reasonCode")]
+    
     pub reason_code: Option<String>,
     /// Whether this volume has any download access restrictions.
+    
     pub restricted: Option<bool>,
     /// Response signature.
+    
     pub signature: Option<String>,
     /// Client app identifier for verification. Download access and client-validation only.
+    
     pub source: Option<String>,
     /// Identifies the volume for which this entry applies.
     #[serde(rename="volumeId")]
+    
     pub volume_id: Option<String>,
 }
 
@@ -653,19 +758,22 @@ impl client::Part for DownloadAccessRestriction {}
 /// 
 /// * [release download access myconfig](MyconfigReleaseDownloadAccesCall) (response)
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct DownloadAccesses {
     /// A list of download access responses.
     #[serde(rename="downloadAccessList")]
+    
     pub download_access_list: Option<Vec<DownloadAccessRestriction>>,
     /// Resource type.
+    
     pub kind: Option<String>,
 }
 
 impl client::ResponseResult for DownloadAccesses {}
 
 
-/// A generic empty message that you can re-use to avoid defining duplicated empty messages in your APIs. A typical example is to use it as the request or the response type of an API method. For instance: service Foo { rpc Bar(google.protobuf.Empty) returns (google.protobuf.Empty); } The JSON representation for `Empty` is empty JSON object `{}`.
+/// A generic empty message that you can re-use to avoid defining duplicated empty messages in your APIs. A typical example is to use it as the request or the response type of an API method. For instance: service Foo { rpc Bar(google.protobuf.Empty) returns (google.protobuf.Empty); }
 /// 
 /// # Activities
 /// 
@@ -676,14 +784,15 @@ impl client::ResponseResult for DownloadAccesses {}
 /// * [share familysharing](FamilysharingShareCall) (response)
 /// * [unshare familysharing](FamilysharingUnshareCall) (response)
 /// * [annotations delete mylibrary](MylibraryAnnotationDeleteCall) (response)
-/// * [bookshelves add volume mylibrary](MylibraryBookshelveAddVolumeCall) (response)
-/// * [bookshelves clear volumes mylibrary](MylibraryBookshelveClearVolumeCall) (response)
-/// * [bookshelves move volume mylibrary](MylibraryBookshelveMoveVolumeCall) (response)
-/// * [bookshelves remove volume mylibrary](MylibraryBookshelveRemoveVolumeCall) (response)
+/// * [bookshelves add volume mylibrary](MylibraryBookshelfAddVolumeCall) (response)
+/// * [bookshelves clear volumes mylibrary](MylibraryBookshelfClearVolumeCall) (response)
+/// * [bookshelves move volume mylibrary](MylibraryBookshelfMoveVolumeCall) (response)
+/// * [bookshelves remove volume mylibrary](MylibraryBookshelfRemoveVolumeCall) (response)
 /// * [readingpositions set position mylibrary](MylibraryReadingpositionSetPositionCall) (response)
 /// * [accept promooffer](PromoofferAcceptCall) (response)
 /// * [dismiss promooffer](PromoofferDismisCall) (response)
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Empty { _never_set: Option<bool> }
 
@@ -699,11 +808,14 @@ impl client::ResponseResult for Empty {}
 /// 
 /// * [get family info familysharing](FamilysharingGetFamilyInfoCall) (response)
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct FamilyInfo {
     /// Resource type.
+    
     pub kind: Option<String>,
     /// Family membership info of the user that made the request.
+    
     pub membership: Option<FamilyInfoMembership>,
 }
 
@@ -714,30 +826,41 @@ impl client::ResponseResult for FamilyInfo {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GeoAnnotationdata {
     /// The type of annotation this data is for.
     #[serde(rename="annotationType")]
+    
     pub annotation_type: Option<String>,
     /// JSON encoded data for this geo annotation data. Emitted with name 'data' in JSON output. Either this or dict_data will be populated.
+    
     pub data: Option<Geolayerdata>,
     /// Base64 encoded data for this annotation data.
     #[serde(rename="encodedData")]
-    pub encoded_data: Option<String>,
+    
+    #[serde_as(as = "Option<::client::serde::urlsafe_base64::Wrapper>")]
+    pub encoded_data: Option<Vec<u8>>,
     /// Unique id for this annotation data.
+    
     pub id: Option<String>,
     /// Resource Type
+    
     pub kind: Option<String>,
     /// The Layer id for this data. *
     #[serde(rename="layerId")]
+    
     pub layer_id: Option<String>,
     /// URL for this resource. *
     #[serde(rename="selfLink")]
+    
     pub self_link: Option<String>,
     /// Timestamp for the last time this data was updated. (RFC 3339 UTC date-time format).
+    
     pub updated: Option<String>,
     /// The volume id for this data. *
     #[serde(rename="volumeId")]
+    
     pub volume_id: Option<String>,
 }
 
@@ -748,13 +871,17 @@ impl client::Part for GeoAnnotationdata {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Geolayerdata {
     /// no description provided
+    
     pub common: Option<GeolayerdataCommon>,
     /// no description provided
+    
     pub geo: Option<GeolayerdataGeo>,
     /// no description provided
+    
     pub kind: Option<String>,
 }
 
@@ -770,14 +897,18 @@ impl client::Part for Geolayerdata {}
 /// 
 /// * [list layers](LayerListCall) (response)
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Layersummaries {
     /// A list of layer summary items.
+    
     pub items: Option<Vec<Layersummary>>,
     /// Resource type.
+    
     pub kind: Option<String>,
     /// The total number of layer summaries found.
     #[serde(rename="totalItems")]
+    
     pub total_items: Option<i32>,
 }
 
@@ -793,43 +924,57 @@ impl client::ResponseResult for Layersummaries {}
 /// 
 /// * [get layers](LayerGetCall) (response)
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Layersummary {
     /// The number of annotations for this layer.
     #[serde(rename="annotationCount")]
+    
     pub annotation_count: Option<i32>,
     /// The list of annotation types contained for this layer.
     #[serde(rename="annotationTypes")]
+    
     pub annotation_types: Option<Vec<String>>,
     /// Link to get data for this annotation.
     #[serde(rename="annotationsDataLink")]
+    
     pub annotations_data_link: Option<String>,
     /// The link to get the annotations for this layer.
     #[serde(rename="annotationsLink")]
+    
     pub annotations_link: Option<String>,
     /// The content version this resource is for.
     #[serde(rename="contentVersion")]
+    
     pub content_version: Option<String>,
     /// The number of data items for this layer.
     #[serde(rename="dataCount")]
+    
     pub data_count: Option<i32>,
     /// Unique id of this layer summary.
+    
     pub id: Option<String>,
     /// Resource Type
+    
     pub kind: Option<String>,
     /// The layer id for this summary.
     #[serde(rename="layerId")]
+    
     pub layer_id: Option<String>,
     /// URL to this resource.
     #[serde(rename="selfLink")]
+    
     pub self_link: Option<String>,
     /// Timestamp for the last time an item in this layer was updated. (RFC 3339 UTC date-time format).
+    
     pub updated: Option<String>,
     /// The current version of this layer's volume annotations. Note that this version applies only to the data in the books.layers.volumeAnnotations.* responses. The actual annotation data is versioned separately.
     #[serde(rename="volumeAnnotationsVersion")]
+    
     pub volume_annotations_version: Option<String>,
     /// The volume id this resource is for.
     #[serde(rename="volumeId")]
+    
     pub volume_id: Option<String>,
 }
 
@@ -845,11 +990,14 @@ impl client::ResponseResult for Layersummary {}
 /// 
 /// * [list offline metadata dictionary](DictionaryListOfflineMetadataCall) (response)
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Metadata {
     /// A list of offline dictionary metadata.
+    
     pub items: Option<Vec<MetadataItems>>,
     /// Resource type.
+    
     pub kind: Option<String>,
 }
 
@@ -865,44 +1013,63 @@ impl client::ResponseResult for Metadata {}
 /// 
 /// * [get notification](NotificationGetCall) (response)
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Notification {
     /// no description provided
+    
     pub body: Option<String>,
     /// The list of crm experiment ids.
     #[serde(rename="crmExperimentIds")]
-    pub crm_experiment_ids: Option<Vec<String>>,
+    
+    #[serde_as(as = "Option<Vec<::client::serde_with::DisplayFromStr>>")]
+    pub crm_experiment_ids: Option<Vec<i64>>,
     /// no description provided
+    
     pub doc_id: Option<String>,
     /// no description provided
+    
     pub doc_type: Option<String>,
     /// no description provided
+    
     pub dont_show_notification: Option<bool>,
     /// no description provided
     #[serde(rename="iconUrl")]
+    
     pub icon_url: Option<String>,
     /// no description provided
+    
     pub is_document_mature: Option<bool>,
     /// Resource type.
+    
     pub kind: Option<String>,
     /// no description provided
     #[serde(rename="notificationGroup")]
+    
     pub notification_group: Option<String>,
     /// no description provided
+    
     pub notification_type: Option<String>,
     /// no description provided
+    
     pub pcampaign_id: Option<String>,
     /// no description provided
+    
     pub reason: Option<String>,
     /// no description provided
+    
     pub show_notification_settings_action: Option<bool>,
     /// no description provided
     #[serde(rename="targetUrl")]
+    
     pub target_url: Option<String>,
     /// no description provided
     #[serde(rename="timeToExpireMs")]
-    pub time_to_expire_ms: Option<String>,
+    
+    #[serde_as(as = "Option<::client::serde_with::DisplayFromStr>")]
+    pub time_to_expire_ms: Option<i64>,
     /// no description provided
+    
     pub title: Option<String>,
 }
 
@@ -918,11 +1085,14 @@ impl client::ResponseResult for Notification {}
 /// 
 /// * [get promooffer](PromoofferGetCall) (response)
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Offers {
     /// A list of offers.
+    
     pub items: Option<Vec<OffersItems>>,
     /// Resource type.
+    
     pub kind: Option<String>,
 }
 
@@ -938,26 +1108,34 @@ impl client::ResponseResult for Offers {}
 /// 
 /// * [readingpositions get mylibrary](MylibraryReadingpositionGetCall) (response)
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ReadingPosition {
     /// Position in an EPUB as a CFI.
     #[serde(rename="epubCfiPosition")]
+    
     pub epub_cfi_position: Option<String>,
     /// Position in a volume for image-based content.
     #[serde(rename="gbImagePosition")]
+    
     pub gb_image_position: Option<String>,
     /// Position in a volume for text-based content.
     #[serde(rename="gbTextPosition")]
+    
     pub gb_text_position: Option<String>,
     /// Resource type for a reading position.
+    
     pub kind: Option<String>,
     /// Position in a PDF file.
     #[serde(rename="pdfPosition")]
+    
     pub pdf_position: Option<String>,
     /// Timestamp when this reading position was last updated (formatted UTC timestamp with millisecond resolution).
+    
     pub updated: Option<String>,
     /// Volume id associated with this reading position.
     #[serde(rename="volumeId")]
+    
     pub volume_id: Option<String>,
 }
 
@@ -973,15 +1151,19 @@ impl client::ResponseResult for ReadingPosition {}
 /// 
 /// * [request access myconfig](MyconfigRequestAccesCall) (response)
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct RequestAccessData {
     /// A concurrent access response.
     #[serde(rename="concurrentAccess")]
+    
     pub concurrent_access: Option<ConcurrentAccessRestriction>,
     /// A download access response.
     #[serde(rename="downloadAccess")]
+    
     pub download_access: Option<DownloadAccessRestriction>,
     /// Resource type.
+    
     pub kind: Option<String>,
 }
 
@@ -992,30 +1174,41 @@ impl client::ResponseResult for RequestAccessData {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Review {
     /// Author of this review.
+    
     pub author: Option<ReviewAuthor>,
     /// Review text.
+    
     pub content: Option<String>,
     /// Date of this review.
+    
     pub date: Option<String>,
     /// URL for the full review text, for reviews gathered from the web.
     #[serde(rename="fullTextUrl")]
+    
     pub full_text_url: Option<String>,
     /// Resource type for a review.
+    
     pub kind: Option<String>,
     /// Star rating for this review. Possible values are ONE, TWO, THREE, FOUR, FIVE or NOT_RATED.
+    
     pub rating: Option<String>,
     /// Information regarding the source of this review, when the review is not from a Google Books user.
+    
     pub source: Option<ReviewSource>,
     /// Title for this review.
+    
     pub title: Option<String>,
     /// Source type for this review. Possible values are EDITORIAL, WEB_USER or GOOGLE_USER.
     #[serde(rename="type")]
+    
     pub type_: Option<String>,
     /// Volume that this review is for.
     #[serde(rename="volumeId")]
+    
     pub volume_id: Option<String>,
 }
 
@@ -1029,13 +1222,16 @@ impl client::Part for Review {}
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [get series](SeryGetCall) (response)
+/// * [get series](SeriesGetCall) (response)
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Series {
     /// Resource type.
+    
     pub kind: Option<String>,
     /// no description provided
+    
     pub series: Option<Vec<SeriesSeries>>,
 }
 
@@ -1049,16 +1245,20 @@ impl client::ResponseResult for Series {}
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [membership get series](SeryMembershipGetCall) (response)
+/// * [membership get series](SeriesMembershipGetCall) (response)
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Seriesmembership {
     /// Resorce type.
+    
     pub kind: Option<String>,
     /// no description provided
+    
     pub member: Option<Vec<Volume>>,
     /// no description provided
     #[serde(rename="nextPageToken")]
+    
     pub next_page_token: Option<String>,
 }
 
@@ -1075,14 +1275,18 @@ impl client::ResponseResult for Seriesmembership {}
 /// * [get user settings myconfig](MyconfigGetUserSettingCall) (response)
 /// * [update user settings myconfig](MyconfigUpdateUserSettingCall) (request|response)
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Usersettings {
     /// Resource type.
+    
     pub kind: Option<String>,
     /// User settings in sub-objects, each for different purposes.
     #[serde(rename="notesExport")]
+    
     pub notes_export: Option<UsersettingsNotesExport>,
     /// no description provided
+    
     pub notification: Option<UsersettingsNotification>,
 }
 
@@ -1105,37 +1309,49 @@ impl client::ResponseResult for Usersettings {}
 /// * [get volumes](VolumeGetCall) (response)
 /// * [list volumes](VolumeListCall) (none)
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Volume {
     /// Any information about a volume related to reading or obtaining that volume text. This information can depend on country (books may be public domain in one country but not in another, e.g.).
     #[serde(rename="accessInfo")]
+    
     pub access_info: Option<VolumeAccessInfo>,
     /// Opaque identifier for a specific version of a volume resource. (In LITE projection)
+    
     pub etag: Option<String>,
     /// Unique identifier for a volume. (In LITE projection.)
+    
     pub id: Option<String>,
     /// Resource type for a volume. (In LITE projection.)
+    
     pub kind: Option<String>,
     /// What layers exist in this volume and high level information about them.
     #[serde(rename="layerInfo")]
+    
     pub layer_info: Option<VolumeLayerInfo>,
     /// Recommendation related information for this volume.
     #[serde(rename="recommendedInfo")]
+    
     pub recommended_info: Option<VolumeRecommendedInfo>,
     /// Any information about a volume related to the eBookstore and/or purchaseability. This information can depend on the country where the request originates from (i.e. books may not be for sale in certain countries).
     #[serde(rename="saleInfo")]
+    
     pub sale_info: Option<VolumeSaleInfo>,
     /// Search result information related to this volume.
     #[serde(rename="searchInfo")]
+    
     pub search_info: Option<VolumeSearchInfo>,
     /// URL to this resource. (In LITE projection.)
     #[serde(rename="selfLink")]
+    
     pub self_link: Option<String>,
     /// User specific information related to this volume. (e.g. page this user last read or whether they purchased this book)
     #[serde(rename="userInfo")]
+    
     pub user_info: Option<VolumeUserInfo>,
     /// General volume information.
     #[serde(rename="volumeInfo")]
+    
     pub volume_info: Option<VolumeVolumeInfo>,
 }
 
@@ -1152,14 +1368,18 @@ impl client::ResponseResult for Volume {}
 /// 
 /// * [list category volumes onboarding](OnboardingListCategoryVolumeCall) (response)
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Volume2 {
     /// A list of volumes.
+    
     pub items: Option<Vec<Volume>>,
     /// Resource type.
+    
     pub kind: Option<String>,
     /// no description provided
     #[serde(rename="nextPageToken")]
+    
     pub next_page_token: Option<String>,
 }
 
@@ -1175,44 +1395,59 @@ impl client::ResponseResult for Volume2 {}
 /// 
 /// * [volume annotations get layers](LayerVolumeAnnotationGetCall) (response)
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Volumeannotation {
     /// The annotation data id for this volume annotation.
     #[serde(rename="annotationDataId")]
+    
     pub annotation_data_id: Option<String>,
     /// Link to get data for this annotation.
     #[serde(rename="annotationDataLink")]
+    
     pub annotation_data_link: Option<String>,
     /// The type of annotation this is.
     #[serde(rename="annotationType")]
+    
     pub annotation_type: Option<String>,
     /// The content ranges to identify the selected text.
     #[serde(rename="contentRanges")]
+    
     pub content_ranges: Option<VolumeannotationContentRanges>,
     /// Data for this annotation.
+    
     pub data: Option<String>,
     /// Indicates that this annotation is deleted.
+    
     pub deleted: Option<bool>,
     /// Unique id of this volume annotation.
+    
     pub id: Option<String>,
     /// Resource Type
+    
     pub kind: Option<String>,
     /// The Layer this annotation is for.
     #[serde(rename="layerId")]
+    
     pub layer_id: Option<String>,
     /// Pages the annotation spans.
     #[serde(rename="pageIds")]
+    
     pub page_ids: Option<Vec<String>>,
     /// Excerpt from the volume.
     #[serde(rename="selectedText")]
+    
     pub selected_text: Option<String>,
     /// URL to this resource.
     #[serde(rename="selfLink")]
+    
     pub self_link: Option<String>,
     /// Timestamp for the last time this anntoation was updated. (RFC 3339 UTC date-time format).
+    
     pub updated: Option<String>,
     /// The Volume this annotation is for.
     #[serde(rename="volumeId")]
+    
     pub volume_id: Option<String>,
 }
 
@@ -1228,19 +1463,25 @@ impl client::ResponseResult for Volumeannotation {}
 /// 
 /// * [volume annotations list layers](LayerVolumeAnnotationListCall) (response)
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Volumeannotations {
     /// A list of volume annotations.
+    
     pub items: Option<Vec<Volumeannotation>>,
     /// Resource type
+    
     pub kind: Option<String>,
     /// Token to pass in for pagination for the next page. This will not be present if this request does not have more results.
     #[serde(rename="nextPageToken")]
+    
     pub next_page_token: Option<String>,
     /// The total number of volume annotations found.
     #[serde(rename="totalItems")]
+    
     pub total_items: Option<i32>,
     /// The version string for all of the volume annotations in this layer (not just the ones in this response). Note: the version string doesn't apply to the annotation data, just the information in this response (e.g. the location of annotations in the book).
+    
     pub version: Option<String>,
 }
 
@@ -1254,23 +1495,27 @@ impl client::ResponseResult for Volumeannotations {}
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [volumes list bookshelves](BookshelveVolumeListCall) (response)
+/// * [volumes list bookshelves](BookshelfVolumeListCall) (response)
 /// * [sync volume licenses myconfig](MyconfigSyncVolumeLicenseCall) (response)
-/// * [bookshelves volumes list mylibrary](MylibraryBookshelveVolumeListCall) (response)
+/// * [bookshelves volumes list mylibrary](MylibraryBookshelfVolumeListCall) (response)
 /// * [associated list volumes](VolumeAssociatedListCall) (response)
 /// * [mybooks list volumes](VolumeMybookListCall) (response)
 /// * [recommended list volumes](VolumeRecommendedListCall) (response)
 /// * [useruploaded list volumes](VolumeUseruploadedListCall) (response)
 /// * [list volumes](VolumeListCall) (response)
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Volumes {
     /// A list of volumes.
+    
     pub items: Option<Vec<Volume>>,
     /// Resource type.
+    
     pub kind: Option<String>,
     /// Total number of volumes found. This might be greater than the number of volumes returned in this response if results have been paginated.
     #[serde(rename="totalItems")]
+    
     pub total_items: Option<i32>,
 }
 
@@ -1281,18 +1526,23 @@ impl client::ResponseResult for Volumes {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Volumeseriesinfo {
     /// The display number string. This should be used only for display purposes and the actual sequence should be inferred from the below orderNumber.
     #[serde(rename="bookDisplayNumber")]
+    
     pub book_display_number: Option<String>,
     /// Resource type.
+    
     pub kind: Option<String>,
     /// Short book title in the context of the series.
     #[serde(rename="shortSeriesBookTitle")]
+    
     pub short_series_book_title: Option<String>,
     /// no description provided
     #[serde(rename="volumeSeries")]
+    
     pub volume_series: Option<Vec<VolumeseriesinfoVolumeSeries>>,
 }
 
@@ -1303,22 +1553,28 @@ impl client::Part for Volumeseriesinfo {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AnnotationClientVersionRanges {
     /// Range in CFI format for this annotation sent by client.
     #[serde(rename="cfiRange")]
+    
     pub cfi_range: Option<BooksAnnotationsRange>,
     /// Content version the client sent in.
     #[serde(rename="contentVersion")]
+    
     pub content_version: Option<String>,
     /// Range in GB image format for this annotation sent by client.
     #[serde(rename="gbImageRange")]
+    
     pub gb_image_range: Option<BooksAnnotationsRange>,
     /// Range in GB text format for this annotation sent by client.
     #[serde(rename="gbTextRange")]
+    
     pub gb_text_range: Option<BooksAnnotationsRange>,
     /// Range in image CFI format for this annotation sent by client.
     #[serde(rename="imageCfiRange")]
+    
     pub image_cfi_range: Option<BooksAnnotationsRange>,
 }
 
@@ -1330,22 +1586,28 @@ impl client::Part for AnnotationClientVersionRanges {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AnnotationCurrentVersionRanges {
     /// Range in CFI format for this annotation for version above.
     #[serde(rename="cfiRange")]
+    
     pub cfi_range: Option<BooksAnnotationsRange>,
     /// Content version applicable to ranges below.
     #[serde(rename="contentVersion")]
+    
     pub content_version: Option<String>,
     /// Range in GB image format for this annotation for version above.
     #[serde(rename="gbImageRange")]
+    
     pub gb_image_range: Option<BooksAnnotationsRange>,
     /// Range in GB text format for this annotation for version above.
     #[serde(rename="gbTextRange")]
+    
     pub gb_text_range: Option<BooksAnnotationsRange>,
     /// Range in image CFI format for this annotation for version above.
     #[serde(rename="imageCfiRange")]
+    
     pub image_cfi_range: Option<BooksAnnotationsRange>,
 }
 
@@ -1357,16 +1619,20 @@ impl client::Part for AnnotationCurrentVersionRanges {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AnnotationLayerSummary {
     /// Maximum allowed characters on this layer, especially for the "copy" layer.
     #[serde(rename="allowedCharacterCount")]
+    
     pub allowed_character_count: Option<i32>,
     /// Type of limitation on this layer. "limited" or "unlimited" for the "copy" layer.
     #[serde(rename="limitType")]
+    
     pub limit_type: Option<String>,
     /// Remaining allowed characters on this layer, especially for the "copy" layer.
     #[serde(rename="remainingCharacterCount")]
+    
     pub remaining_character_count: Option<i32>,
 }
 
@@ -1378,21 +1644,27 @@ impl client::Part for AnnotationLayerSummary {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AnnotationsSummaryLayers {
     /// no description provided
     #[serde(rename="allowedCharacterCount")]
+    
     pub allowed_character_count: Option<i32>,
     /// no description provided
     #[serde(rename="layerId")]
+    
     pub layer_id: Option<String>,
     /// no description provided
     #[serde(rename="limitType")]
+    
     pub limit_type: Option<String>,
     /// no description provided
     #[serde(rename="remainingCharacterCount")]
+    
     pub remaining_character_count: Option<i32>,
     /// no description provided
+    
     pub updated: Option<String>,
 }
 
@@ -1404,15 +1676,19 @@ impl client::Part for AnnotationsSummaryLayers {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct CategoryItems {
     /// no description provided
     #[serde(rename="badgeUrl")]
+    
     pub badge_url: Option<String>,
     /// no description provided
     #[serde(rename="categoryId")]
+    
     pub category_id: Option<String>,
     /// no description provided
+    
     pub name: Option<String>,
 }
 
@@ -1424,9 +1700,11 @@ impl client::Part for CategoryItems {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct DictlayerdataCommon {
     /// The display title and localized canonical name to use when searching for this entity on Google search.
+    
     pub title: Option<String>,
 }
 
@@ -1438,11 +1716,14 @@ impl client::Part for DictlayerdataCommon {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct DictlayerdataDict {
     /// The source, url and attribution for this dictionary data.
+    
     pub source: Option<DictlayerdataDictSource>,
     /// no description provided
+    
     pub words: Option<Vec<DictlayerdataDictWords>>,
 }
 
@@ -1454,11 +1735,14 @@ impl client::Part for DictlayerdataDict {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct DictlayerdataDictSource {
     /// no description provided
+    
     pub attribution: Option<String>,
     /// no description provided
+    
     pub url: Option<String>,
 }
 
@@ -1470,15 +1754,20 @@ impl client::Part for DictlayerdataDictSource {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct DictlayerdataDictWords {
     /// no description provided
+    
     pub derivatives: Option<Vec<DictlayerdataDictWordsDerivatives>>,
     /// no description provided
+    
     pub examples: Option<Vec<DictlayerdataDictWordsExamples>>,
     /// no description provided
+    
     pub senses: Option<Vec<DictlayerdataDictWordsSenses>>,
     /// The words with different meanings but not related words, e.g. "go" (game) and "go" (verb).
+    
     pub source: Option<DictlayerdataDictWordsSource>,
 }
 
@@ -1490,11 +1779,14 @@ impl client::Part for DictlayerdataDictWords {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct DictlayerdataDictWordsDerivatives {
     /// no description provided
+    
     pub source: Option<DictlayerdataDictWordsDerivativesSource>,
     /// no description provided
+    
     pub text: Option<String>,
 }
 
@@ -1506,11 +1798,14 @@ impl client::Part for DictlayerdataDictWordsDerivatives {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct DictlayerdataDictWordsDerivativesSource {
     /// no description provided
+    
     pub attribution: Option<String>,
     /// no description provided
+    
     pub url: Option<String>,
 }
 
@@ -1522,11 +1817,14 @@ impl client::Part for DictlayerdataDictWordsDerivativesSource {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct DictlayerdataDictWordsExamples {
     /// no description provided
+    
     pub source: Option<DictlayerdataDictWordsExamplesSource>,
     /// no description provided
+    
     pub text: Option<String>,
 }
 
@@ -1538,11 +1836,14 @@ impl client::Part for DictlayerdataDictWordsExamples {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct DictlayerdataDictWordsExamplesSource {
     /// no description provided
+    
     pub attribution: Option<String>,
     /// no description provided
+    
     pub url: Option<String>,
 }
 
@@ -1554,25 +1855,34 @@ impl client::Part for DictlayerdataDictWordsExamplesSource {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct DictlayerdataDictWordsSenses {
     /// no description provided
+    
     pub conjugations: Option<Vec<DictlayerdataDictWordsSensesConjugations>>,
     /// no description provided
+    
     pub definitions: Option<Vec<DictlayerdataDictWordsSensesDefinitions>>,
     /// no description provided
     #[serde(rename="partOfSpeech")]
+    
     pub part_of_speech: Option<String>,
     /// no description provided
+    
     pub pronunciation: Option<String>,
     /// no description provided
     #[serde(rename="pronunciationUrl")]
+    
     pub pronunciation_url: Option<String>,
     /// no description provided
+    
     pub source: Option<DictlayerdataDictWordsSensesSource>,
     /// no description provided
+    
     pub syllabification: Option<String>,
     /// no description provided
+    
     pub synonyms: Option<Vec<DictlayerdataDictWordsSensesSynonyms>>,
 }
 
@@ -1584,12 +1894,15 @@ impl client::Part for DictlayerdataDictWordsSenses {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct DictlayerdataDictWordsSensesConjugations {
     /// no description provided
     #[serde(rename="type")]
+    
     pub type_: Option<String>,
     /// no description provided
+    
     pub value: Option<String>,
 }
 
@@ -1601,11 +1914,14 @@ impl client::Part for DictlayerdataDictWordsSensesConjugations {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct DictlayerdataDictWordsSensesDefinitions {
     /// no description provided
+    
     pub definition: Option<String>,
     /// no description provided
+    
     pub examples: Option<Vec<DictlayerdataDictWordsSensesDefinitionsExamples>>,
 }
 
@@ -1617,11 +1933,14 @@ impl client::Part for DictlayerdataDictWordsSensesDefinitions {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct DictlayerdataDictWordsSensesDefinitionsExamples {
     /// no description provided
+    
     pub source: Option<DictlayerdataDictWordsSensesDefinitionsExamplesSource>,
     /// no description provided
+    
     pub text: Option<String>,
 }
 
@@ -1633,11 +1952,14 @@ impl client::Part for DictlayerdataDictWordsSensesDefinitionsExamples {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct DictlayerdataDictWordsSensesDefinitionsExamplesSource {
     /// no description provided
+    
     pub attribution: Option<String>,
     /// no description provided
+    
     pub url: Option<String>,
 }
 
@@ -1649,11 +1971,14 @@ impl client::Part for DictlayerdataDictWordsSensesDefinitionsExamplesSource {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct DictlayerdataDictWordsSensesSource {
     /// no description provided
+    
     pub attribution: Option<String>,
     /// no description provided
+    
     pub url: Option<String>,
 }
 
@@ -1665,11 +1990,14 @@ impl client::Part for DictlayerdataDictWordsSensesSource {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct DictlayerdataDictWordsSensesSynonyms {
     /// no description provided
+    
     pub source: Option<DictlayerdataDictWordsSensesSynonymsSource>,
     /// no description provided
+    
     pub text: Option<String>,
 }
 
@@ -1681,11 +2009,14 @@ impl client::Part for DictlayerdataDictWordsSensesSynonyms {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct DictlayerdataDictWordsSensesSynonymsSource {
     /// no description provided
+    
     pub attribution: Option<String>,
     /// no description provided
+    
     pub url: Option<String>,
 }
 
@@ -1697,11 +2028,14 @@ impl client::Part for DictlayerdataDictWordsSensesSynonymsSource {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct DictlayerdataDictWordsSource {
     /// no description provided
+    
     pub attribution: Option<String>,
     /// no description provided
+    
     pub url: Option<String>,
 }
 
@@ -1713,21 +2047,28 @@ impl client::Part for DictlayerdataDictWordsSource {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct DiscoveryclustersClusters {
     /// no description provided
+    
     pub banner_with_content_container: Option<DiscoveryclustersClustersBannerWithContentContainer>,
     /// no description provided
     #[serde(rename="subTitle")]
+    
     pub sub_title: Option<String>,
     /// no description provided
+    
     pub title: Option<String>,
     /// no description provided
     #[serde(rename="totalVolumes")]
+    
     pub total_volumes: Option<i32>,
     /// no description provided
+    
     pub uid: Option<String>,
     /// no description provided
+    
     pub volumes: Option<Vec<Volume>>,
 }
 
@@ -1739,25 +2080,32 @@ impl client::Part for DiscoveryclustersClusters {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct DiscoveryclustersClustersBannerWithContentContainer {
     /// no description provided
     #[serde(rename="fillColorArgb")]
+    
     pub fill_color_argb: Option<String>,
     /// no description provided
     #[serde(rename="imageUrl")]
+    
     pub image_url: Option<String>,
     /// no description provided
     #[serde(rename="maskColorArgb")]
+    
     pub mask_color_argb: Option<String>,
     /// no description provided
     #[serde(rename="moreButtonText")]
+    
     pub more_button_text: Option<String>,
     /// no description provided
     #[serde(rename="moreButtonUrl")]
+    
     pub more_button_url: Option<String>,
     /// no description provided
     #[serde(rename="textColorArgb")]
+    
     pub text_color_argb: Option<String>,
 }
 
@@ -1769,21 +2117,27 @@ impl client::Part for DiscoveryclustersClustersBannerWithContentContainer {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct FamilyInfoMembership {
     /// Restrictions on user buying and acquiring content.
     #[serde(rename="acquirePermission")]
+    
     pub acquire_permission: Option<String>,
     /// The age group of the user.
     #[serde(rename="ageGroup")]
+    
     pub age_group: Option<String>,
     /// The maximum allowed maturity rating for the user.
     #[serde(rename="allowedMaturityRating")]
+    
     pub allowed_maturity_rating: Option<String>,
     /// no description provided
     #[serde(rename="isInFamily")]
+    
     pub is_in_family: Option<bool>,
     /// The role of the user in the family.
+    
     pub role: Option<String>,
 }
 
@@ -1795,19 +2149,25 @@ impl client::Part for FamilyInfoMembership {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GeolayerdataCommon {
     /// The language of the information url and description.
+    
     pub lang: Option<String>,
     /// The URL for the preview image information.
     #[serde(rename="previewImageUrl")]
+    
     pub preview_image_url: Option<String>,
     /// The description for this location.
+    
     pub snippet: Option<String>,
     /// The URL for information for this location. Ex: wikipedia link.
     #[serde(rename="snippetUrl")]
+    
     pub snippet_url: Option<String>,
     /// The display title and localized canonical name to use when searching for this entity on Google search.
+    
     pub title: Option<String>,
 }
 
@@ -1819,26 +2179,35 @@ impl client::Part for GeolayerdataCommon {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GeolayerdataGeo {
     /// The boundary of the location as a set of loops containing pairs of latitude, longitude coordinates.
+    
     pub boundary: Option<Vec<String>>,
     /// The cache policy active for this data. EX: UNRESTRICTED, RESTRICTED, NEVER
     #[serde(rename="cachePolicy")]
+    
     pub cache_policy: Option<String>,
     /// The country code of the location.
     #[serde(rename="countryCode")]
+    
     pub country_code: Option<String>,
     /// The latitude of the location.
+    
     pub latitude: Option<f64>,
     /// The longitude of the location.
+    
     pub longitude: Option<f64>,
     /// The type of map that should be used for this location. EX: HYBRID, ROADMAP, SATELLITE, TERRAIN
     #[serde(rename="mapType")]
+    
     pub map_type: Option<String>,
     /// The viewport for showing this location. This is a latitude, longitude rectangle.
+    
     pub viewport: Option<GeolayerdataGeoViewport>,
     /// The Zoom level to use for the map. Zoom levels between 0 (the lowest zoom level, in which the entire world can be seen on one map) to 21+ (down to individual buildings). See: https: //developers.google.com/maps/documentation/staticmaps/#Zoomlevels
+    
     pub zoom: Option<i32>,
 }
 
@@ -1850,11 +2219,14 @@ impl client::Part for GeolayerdataGeo {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GeolayerdataGeoViewport {
     /// no description provided
+    
     pub hi: Option<GeolayerdataGeoViewportHi>,
     /// no description provided
+    
     pub lo: Option<GeolayerdataGeoViewportLo>,
 }
 
@@ -1866,11 +2238,14 @@ impl client::Part for GeolayerdataGeoViewport {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GeolayerdataGeoViewportHi {
     /// no description provided
+    
     pub latitude: Option<f64>,
     /// no description provided
+    
     pub longitude: Option<f64>,
 }
 
@@ -1882,11 +2257,14 @@ impl client::Part for GeolayerdataGeoViewportHi {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GeolayerdataGeoViewportLo {
     /// no description provided
+    
     pub latitude: Option<f64>,
     /// no description provided
+    
     pub longitude: Option<f64>,
 }
 
@@ -1898,18 +2276,26 @@ impl client::Part for GeolayerdataGeoViewportLo {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct MetadataItems {
     /// no description provided
+    
     pub download_url: Option<String>,
     /// no description provided
+    
     pub encrypted_key: Option<String>,
     /// no description provided
+    
     pub language: Option<String>,
     /// no description provided
-    pub size: Option<String>,
+    
+    #[serde_as(as = "Option<::client::serde_with::DisplayFromStr>")]
+    pub size: Option<i64>,
     /// no description provided
-    pub version: Option<String>,
+    
+    #[serde_as(as = "Option<::client::serde_with::DisplayFromStr>")]
+    pub version: Option<i64>,
 }
 
 impl client::NestedType for MetadataItems {}
@@ -1920,17 +2306,22 @@ impl client::Part for MetadataItems {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct OffersItems {
     /// no description provided
     #[serde(rename="artUrl")]
+    
     pub art_url: Option<String>,
     /// no description provided
     #[serde(rename="gservicesKey")]
+    
     pub gservices_key: Option<String>,
     /// no description provided
+    
     pub id: Option<String>,
     /// no description provided
+    
     pub items: Option<Vec<OffersItemsItems>>,
 }
 
@@ -1942,22 +2333,29 @@ impl client::Part for OffersItems {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct OffersItemsItems {
     /// no description provided
+    
     pub author: Option<String>,
     /// no description provided
     #[serde(rename="canonicalVolumeLink")]
+    
     pub canonical_volume_link: Option<String>,
     /// no description provided
     #[serde(rename="coverUrl")]
+    
     pub cover_url: Option<String>,
     /// no description provided
+    
     pub description: Option<String>,
     /// no description provided
+    
     pub title: Option<String>,
     /// no description provided
     #[serde(rename="volumeId")]
+    
     pub volume_id: Option<String>,
 }
 
@@ -1969,10 +2367,12 @@ impl client::Part for OffersItemsItems {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ReviewAuthor {
     /// Name of this person.
     #[serde(rename="displayName")]
+    
     pub display_name: Option<String>,
 }
 
@@ -1984,14 +2384,18 @@ impl client::Part for ReviewAuthor {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ReviewSource {
     /// Name of the source.
+    
     pub description: Option<String>,
     /// Extra text about the source of the review.
     #[serde(rename="extraDescription")]
+    
     pub extra_description: Option<String>,
     /// URL of the source of the review.
+    
     pub url: Option<String>,
 }
 
@@ -2003,36 +2407,47 @@ impl client::Part for ReviewSource {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct SeriesSeries {
     /// no description provided
     #[serde(rename="bannerImageUrl")]
+    
     pub banner_image_url: Option<String>,
     /// no description provided
     #[serde(rename="eligibleForSubscription")]
+    
     pub eligible_for_subscription: Option<bool>,
     /// no description provided
     #[serde(rename="imageUrl")]
+    
     pub image_url: Option<String>,
     /// no description provided
     #[serde(rename="isComplete")]
+    
     pub is_complete: Option<bool>,
     /// no description provided
     #[serde(rename="seriesFormatType")]
+    
     pub series_format_type: Option<String>,
     /// no description provided
     #[serde(rename="seriesId")]
+    
     pub series_id: Option<String>,
     /// no description provided
     #[serde(rename="seriesSubscriptionReleaseInfo")]
+    
     pub series_subscription_release_info: Option<SeriesSeriesSeriesSubscriptionReleaseInfo>,
     /// no description provided
     #[serde(rename="seriesType")]
+    
     pub series_type: Option<String>,
     /// no description provided
     #[serde(rename="subscriptionId")]
+    
     pub subscription_id: Option<String>,
     /// no description provided
+    
     pub title: Option<String>,
 }
 
@@ -2044,19 +2459,24 @@ impl client::Part for SeriesSeries {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct SeriesSeriesSeriesSubscriptionReleaseInfo {
     /// no description provided
     #[serde(rename="cancelTime")]
+    
     pub cancel_time: Option<String>,
     /// no description provided
     #[serde(rename="currentReleaseInfo")]
+    
     pub current_release_info: Option<SeriesSeriesSeriesSubscriptionReleaseInfoCurrentReleaseInfo>,
     /// no description provided
     #[serde(rename="nextReleaseInfo")]
+    
     pub next_release_info: Option<SeriesSeriesSeriesSubscriptionReleaseInfoNextReleaseInfo>,
     /// no description provided
     #[serde(rename="seriesSubscriptionType")]
+    
     pub series_subscription_type: Option<String>,
 }
 
@@ -2068,19 +2488,24 @@ impl client::Part for SeriesSeriesSeriesSubscriptionReleaseInfo {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct SeriesSeriesSeriesSubscriptionReleaseInfoCurrentReleaseInfo {
     /// no description provided
     #[serde(rename="amountInMicros")]
+    
     pub amount_in_micros: Option<f64>,
     /// no description provided
     #[serde(rename="currencyCode")]
+    
     pub currency_code: Option<String>,
     /// no description provided
     #[serde(rename="releaseNumber")]
+    
     pub release_number: Option<String>,
     /// no description provided
     #[serde(rename="releaseTime")]
+    
     pub release_time: Option<String>,
 }
 
@@ -2092,19 +2517,24 @@ impl client::Part for SeriesSeriesSeriesSubscriptionReleaseInfoCurrentReleaseInf
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct SeriesSeriesSeriesSubscriptionReleaseInfoNextReleaseInfo {
     /// no description provided
     #[serde(rename="amountInMicros")]
+    
     pub amount_in_micros: Option<f64>,
     /// no description provided
     #[serde(rename="currencyCode")]
+    
     pub currency_code: Option<String>,
     /// no description provided
     #[serde(rename="releaseNumber")]
+    
     pub release_number: Option<String>,
     /// no description provided
     #[serde(rename="releaseTime")]
+    
     pub release_time: Option<String>,
 }
 
@@ -2116,13 +2546,16 @@ impl client::Part for SeriesSeriesSeriesSubscriptionReleaseInfoNextReleaseInfo {
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct UsersettingsNotesExport {
     /// no description provided
     #[serde(rename="folderName")]
+    
     pub folder_name: Option<String>,
     /// no description provided
     #[serde(rename="isEnabled")]
+    
     pub is_enabled: Option<bool>,
 }
 
@@ -2134,22 +2567,28 @@ impl client::Part for UsersettingsNotesExport {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct UsersettingsNotification {
     /// no description provided
     #[serde(rename="matchMyInterests")]
+    
     pub match_my_interests: Option<UsersettingsNotificationMatchMyInterests>,
     /// no description provided
     #[serde(rename="moreFromAuthors")]
+    
     pub more_from_authors: Option<UsersettingsNotificationMoreFromAuthors>,
     /// no description provided
     #[serde(rename="moreFromSeries")]
+    
     pub more_from_series: Option<UsersettingsNotificationMoreFromSeries>,
     /// no description provided
     #[serde(rename="priceDrop")]
+    
     pub price_drop: Option<UsersettingsNotificationPriceDrop>,
     /// no description provided
     #[serde(rename="rewardExpirations")]
+    
     pub reward_expirations: Option<UsersettingsNotificationRewardExpirations>,
 }
 
@@ -2161,9 +2600,11 @@ impl client::Part for UsersettingsNotification {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct UsersettingsNotificationMatchMyInterests {
     /// no description provided
+    
     pub opted_state: Option<String>,
 }
 
@@ -2175,9 +2616,11 @@ impl client::Part for UsersettingsNotificationMatchMyInterests {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct UsersettingsNotificationMoreFromAuthors {
     /// no description provided
+    
     pub opted_state: Option<String>,
 }
 
@@ -2189,9 +2632,11 @@ impl client::Part for UsersettingsNotificationMoreFromAuthors {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct UsersettingsNotificationMoreFromSeries {
     /// no description provided
+    
     pub opted_state: Option<String>,
 }
 
@@ -2203,9 +2648,11 @@ impl client::Part for UsersettingsNotificationMoreFromSeries {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct UsersettingsNotificationPriceDrop {
     /// no description provided
+    
     pub opted_state: Option<String>,
 }
 
@@ -2217,9 +2664,11 @@ impl client::Part for UsersettingsNotificationPriceDrop {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct UsersettingsNotificationRewardExpirations {
     /// no description provided
+    
     pub opted_state: Option<String>,
 }
 
@@ -2231,44 +2680,59 @@ impl client::Part for UsersettingsNotificationRewardExpirations {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct VolumeAccessInfo {
     /// Combines the access and viewability of this volume into a single status field for this user. Values can be FULL_PURCHASED, FULL_PUBLIC_DOMAIN, SAMPLE or NONE. (In LITE projection.)
     #[serde(rename="accessViewStatus")]
+    
     pub access_view_status: Option<String>,
     /// The two-letter ISO_3166-1 country code for which this access information is valid. (In LITE projection.)
+    
     pub country: Option<String>,
     /// Information about a volume's download license access restrictions.
     #[serde(rename="downloadAccess")]
+    
     pub download_access: Option<DownloadAccessRestriction>,
     /// URL to the Google Drive viewer if this volume is uploaded by the user by selecting the file from Google Drive.
     #[serde(rename="driveImportedContentLink")]
+    
     pub drive_imported_content_link: Option<String>,
     /// Whether this volume can be embedded in a viewport using the Embedded Viewer API.
+    
     pub embeddable: Option<bool>,
     /// Information about epub content. (In LITE projection.)
+    
     pub epub: Option<VolumeAccessInfoEpub>,
     /// Whether this volume requires that the client explicitly request offline download license rather than have it done automatically when loading the content, if the client supports it.
     #[serde(rename="explicitOfflineLicenseManagement")]
+    
     pub explicit_offline_license_management: Option<bool>,
     /// Information about pdf content. (In LITE projection.)
+    
     pub pdf: Option<VolumeAccessInfoPdf>,
     /// Whether or not this book is public domain in the country listed above.
     #[serde(rename="publicDomain")]
+    
     pub public_domain: Option<bool>,
     /// Whether quote sharing is allowed for this volume.
     #[serde(rename="quoteSharingAllowed")]
+    
     pub quote_sharing_allowed: Option<bool>,
     /// Whether text-to-speech is permitted for this volume. Values can be ALLOWED, ALLOWED_FOR_ACCESSIBILITY, or NOT_ALLOWED.
     #[serde(rename="textToSpeechPermission")]
+    
     pub text_to_speech_permission: Option<String>,
     /// For ordered but not yet processed orders, we give a URL that can be used to go to the appropriate Google Wallet page.
     #[serde(rename="viewOrderUrl")]
+    
     pub view_order_url: Option<String>,
     /// The read access of a volume. Possible values are PARTIAL, ALL_PAGES, NO_PAGES or UNKNOWN. This value depends on the country listed above. A value of PARTIAL means that the publisher has allowed some portion of the volume to be viewed publicly, without purchase. This can apply to eBooks as well as non-eBooks. Public domain books will always have a value of ALL_PAGES.
+    
     pub viewability: Option<String>,
     /// URL to read this volume on the Google Books site. Link will not allow users to read non-viewable volumes.
     #[serde(rename="webReaderLink")]
+    
     pub web_reader_link: Option<String>,
 }
 
@@ -2280,16 +2744,20 @@ impl client::Part for VolumeAccessInfo {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct VolumeAccessInfoEpub {
     /// URL to retrieve ACS token for epub download. (In LITE projection.)
     #[serde(rename="acsTokenLink")]
+    
     pub acs_token_link: Option<String>,
     /// URL to download epub. (In LITE projection.)
     #[serde(rename="downloadLink")]
+    
     pub download_link: Option<String>,
     /// Is a flowing text epub available either as public domain or for purchase. (In LITE projection.)
     #[serde(rename="isAvailable")]
+    
     pub is_available: Option<bool>,
 }
 
@@ -2301,16 +2769,20 @@ impl client::Part for VolumeAccessInfoEpub {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct VolumeAccessInfoPdf {
     /// URL to retrieve ACS token for pdf download. (In LITE projection.)
     #[serde(rename="acsTokenLink")]
+    
     pub acs_token_link: Option<String>,
     /// URL to download pdf. (In LITE projection.)
     #[serde(rename="downloadLink")]
+    
     pub download_link: Option<String>,
     /// Is a scanned image pdf available either as public domain or for purchase. (In LITE projection.)
     #[serde(rename="isAvailable")]
+    
     pub is_available: Option<bool>,
 }
 
@@ -2322,9 +2794,11 @@ impl client::Part for VolumeAccessInfoPdf {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct VolumeLayerInfo {
     /// A layer should appear here if and only if the layer exists for this book.
+    
     pub layers: Option<Vec<VolumeLayerInfoLayers>>,
 }
 
@@ -2336,13 +2810,16 @@ impl client::Part for VolumeLayerInfo {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct VolumeLayerInfoLayers {
     /// The layer id of this layer (e.g. "geo").
     #[serde(rename="layerId")]
+    
     pub layer_id: Option<String>,
     /// The current version of this layer's volume annotations. Note that this version applies only to the data in the books.layers.volumeAnnotations.* responses. The actual annotation data is versioned separately.
     #[serde(rename="volumeAnnotationsVersion")]
+    
     pub volume_annotations_version: Option<String>,
 }
 
@@ -2354,9 +2831,11 @@ impl client::Part for VolumeLayerInfoLayers {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct VolumeRecommendedInfo {
     /// A text explaining why this volume is recommended.
+    
     pub explanation: Option<String>,
 }
 
@@ -2368,28 +2847,37 @@ impl client::Part for VolumeRecommendedInfo {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct VolumeSaleInfo {
     /// URL to purchase this volume on the Google Books site. (In LITE projection)
     #[serde(rename="buyLink")]
+    
     pub buy_link: Option<String>,
     /// The two-letter ISO_3166-1 country code for which this sale information is valid. (In LITE projection.)
+    
     pub country: Option<String>,
     /// Whether or not this volume is an eBook (can be added to the My eBooks shelf).
     #[serde(rename="isEbook")]
+    
     pub is_ebook: Option<bool>,
     /// Suggested retail price. (In LITE projection.)
     #[serde(rename="listPrice")]
+    
     pub list_price: Option<VolumeSaleInfoListPrice>,
     /// Offers available for this volume (sales and rentals).
+    
     pub offers: Option<Vec<VolumeSaleInfoOffers>>,
     /// The date on which this book is available for sale.
     #[serde(rename="onSaleDate")]
+    
     pub on_sale_date: Option<String>,
     /// The actual selling price of the book. This is the same as the suggested retail or list price unless there are offers or discounts on this volume. (In LITE projection.)
     #[serde(rename="retailPrice")]
+    
     pub retail_price: Option<VolumeSaleInfoRetailPrice>,
     /// Whether or not this book is available for sale or offered for free in the Google eBookstore for the country listed above. Possible values are FOR_SALE, FOR_RENTAL_ONLY, FOR_SALE_AND_RENTAL, FREE, NOT_FOR_SALE, or FOR_PREORDER.
+    
     pub saleability: Option<String>,
 }
 
@@ -2401,12 +2889,15 @@ impl client::Part for VolumeSaleInfo {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct VolumeSaleInfoListPrice {
     /// Amount in the currency listed below. (In LITE projection.)
+    
     pub amount: Option<f64>,
     /// An ISO 4217, three-letter currency code. (In LITE projection.)
     #[serde(rename="currencyCode")]
+    
     pub currency_code: Option<String>,
 }
 
@@ -2418,21 +2909,27 @@ impl client::Part for VolumeSaleInfoListPrice {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct VolumeSaleInfoOffers {
     /// The finsky offer type (e.g., PURCHASE=0 RENTAL=3)
     #[serde(rename="finskyOfferType")]
+    
     pub finsky_offer_type: Option<i32>,
     /// Indicates whether the offer is giftable.
+    
     pub giftable: Option<bool>,
     /// Offer list (=undiscounted) price in Micros.
     #[serde(rename="listPrice")]
+    
     pub list_price: Option<VolumeSaleInfoOffersListPrice>,
     /// The rental duration (for rental offers only).
     #[serde(rename="rentalDuration")]
+    
     pub rental_duration: Option<VolumeSaleInfoOffersRentalDuration>,
     /// Offer retail (=discounted) price in Micros
     #[serde(rename="retailPrice")]
+    
     pub retail_price: Option<VolumeSaleInfoOffersRetailPrice>,
 }
 
@@ -2444,13 +2941,16 @@ impl client::Part for VolumeSaleInfoOffers {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct VolumeSaleInfoOffersListPrice {
     /// no description provided
     #[serde(rename="amountInMicros")]
+    
     pub amount_in_micros: Option<f64>,
     /// no description provided
     #[serde(rename="currencyCode")]
+    
     pub currency_code: Option<String>,
 }
 
@@ -2462,11 +2962,14 @@ impl client::Part for VolumeSaleInfoOffersListPrice {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct VolumeSaleInfoOffersRentalDuration {
     /// no description provided
+    
     pub count: Option<f64>,
     /// no description provided
+    
     pub unit: Option<String>,
 }
 
@@ -2478,13 +2981,16 @@ impl client::Part for VolumeSaleInfoOffersRentalDuration {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct VolumeSaleInfoOffersRetailPrice {
     /// no description provided
     #[serde(rename="amountInMicros")]
+    
     pub amount_in_micros: Option<f64>,
     /// no description provided
     #[serde(rename="currencyCode")]
+    
     pub currency_code: Option<String>,
 }
 
@@ -2496,12 +3002,15 @@ impl client::Part for VolumeSaleInfoOffersRetailPrice {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct VolumeSaleInfoRetailPrice {
     /// Amount in the currency listed below. (In LITE projection.)
+    
     pub amount: Option<f64>,
     /// An ISO 4217, three-letter currency code. (In LITE projection.)
     #[serde(rename="currencyCode")]
+    
     pub currency_code: Option<String>,
 }
 
@@ -2513,10 +3022,12 @@ impl client::Part for VolumeSaleInfoRetailPrice {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct VolumeSearchInfo {
     /// A text snippet containing the search query.
     #[serde(rename="textSnippet")]
+    
     pub text_snippet: Option<String>,
 }
 
@@ -2528,61 +3039,81 @@ impl client::Part for VolumeSearchInfo {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct VolumeUserInfo {
     /// Timestamp when this volume was acquired by the user. (RFC 3339 UTC date-time format) Acquiring includes purchase, user upload, receiving family sharing, etc.
     #[serde(rename="acquiredTime")]
+    
     pub acquired_time: Option<String>,
     /// How this volume was acquired.
     #[serde(rename="acquisitionType")]
+    
     pub acquisition_type: Option<i32>,
     /// Copy/Paste accounting information.
+    
     pub copy: Option<VolumeUserInfoCopy>,
     /// Whether this volume is purchased, sample, pd download etc.
     #[serde(rename="entitlementType")]
+    
     pub entitlement_type: Option<i32>,
     /// Information on the ability to share with the family.
     #[serde(rename="familySharing")]
+    
     pub family_sharing: Option<VolumeUserInfoFamilySharing>,
     /// Whether or not the user shared this volume with the family.
     #[serde(rename="isFamilySharedFromUser")]
+    
     pub is_family_shared_from_user: Option<bool>,
     /// Whether or not the user received this volume through family sharing.
     #[serde(rename="isFamilySharedToUser")]
+    
     pub is_family_shared_to_user: Option<bool>,
     /// Deprecated: Replaced by familySharing.
     #[serde(rename="isFamilySharingAllowed")]
+    
     pub is_family_sharing_allowed: Option<bool>,
     /// Deprecated: Replaced by familySharing.
     #[serde(rename="isFamilySharingDisabledByFop")]
+    
     pub is_family_sharing_disabled_by_fop: Option<bool>,
     /// Whether or not this volume is currently in "my books."
     #[serde(rename="isInMyBooks")]
+    
     pub is_in_my_books: Option<bool>,
     /// Whether or not this volume was pre-ordered by the authenticated user making the request. (In LITE projection.)
     #[serde(rename="isPreordered")]
+    
     pub is_preordered: Option<bool>,
     /// Whether or not this volume was purchased by the authenticated user making the request. (In LITE projection.)
     #[serde(rename="isPurchased")]
+    
     pub is_purchased: Option<bool>,
     /// Whether or not this volume was user uploaded.
     #[serde(rename="isUploaded")]
+    
     pub is_uploaded: Option<bool>,
     /// The user's current reading position in the volume, if one is available. (In LITE projection.)
     #[serde(rename="readingPosition")]
+    
     pub reading_position: Option<ReadingPosition>,
     /// Period during this book is/was a valid rental.
     #[serde(rename="rentalPeriod")]
+    
     pub rental_period: Option<VolumeUserInfoRentalPeriod>,
     /// Whether this book is an active or an expired rental.
     #[serde(rename="rentalState")]
+    
     pub rental_state: Option<String>,
     /// This user's review of this volume, if one exists.
+    
     pub review: Option<Review>,
     /// Timestamp when this volume was last modified by a user action, such as a reading position update, volume purchase or writing a review. (RFC 3339 UTC date-time format).
+    
     pub updated: Option<String>,
     /// no description provided
     #[serde(rename="userUploadedVolumeInfo")]
+    
     pub user_uploaded_volume_info: Option<VolumeUserInfoUserUploadedVolumeInfo>,
 }
 
@@ -2594,18 +3125,23 @@ impl client::Part for VolumeUserInfo {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct VolumeUserInfoCopy {
     /// no description provided
     #[serde(rename="allowedCharacterCount")]
+    
     pub allowed_character_count: Option<i32>,
     /// no description provided
     #[serde(rename="limitType")]
+    
     pub limit_type: Option<String>,
     /// no description provided
     #[serde(rename="remainingCharacterCount")]
+    
     pub remaining_character_count: Option<i32>,
     /// no description provided
+    
     pub updated: Option<String>,
 }
 
@@ -2617,16 +3153,20 @@ impl client::Part for VolumeUserInfoCopy {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct VolumeUserInfoFamilySharing {
     /// The role of the user in the family.
     #[serde(rename="familyRole")]
+    
     pub family_role: Option<String>,
     /// Whether or not this volume can be shared with the family by the user. This includes sharing eligibility of both the volume and the user. If the value is true, the user can initiate a family sharing action.
     #[serde(rename="isSharingAllowed")]
+    
     pub is_sharing_allowed: Option<bool>,
     /// Whether or not sharing this volume is temporarily disabled due to issues with the Family Wallet.
     #[serde(rename="isSharingDisabledByFop")]
+    
     pub is_sharing_disabled_by_fop: Option<bool>,
 }
 
@@ -2638,14 +3178,19 @@ impl client::Part for VolumeUserInfoFamilySharing {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct VolumeUserInfoRentalPeriod {
     /// no description provided
     #[serde(rename="endUtcSec")]
-    pub end_utc_sec: Option<String>,
+    
+    #[serde_as(as = "Option<::client::serde_with::DisplayFromStr>")]
+    pub end_utc_sec: Option<i64>,
     /// no description provided
     #[serde(rename="startUtcSec")]
-    pub start_utc_sec: Option<String>,
+    
+    #[serde_as(as = "Option<::client::serde_with::DisplayFromStr>")]
+    pub start_utc_sec: Option<i64>,
 }
 
 impl client::NestedType for VolumeUserInfoRentalPeriod {}
@@ -2656,10 +3201,12 @@ impl client::Part for VolumeUserInfoRentalPeriod {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct VolumeUserInfoUserUploadedVolumeInfo {
     /// no description provided
     #[serde(rename="processingState")]
+    
     pub processing_state: Option<String>,
 }
 
@@ -2671,83 +3218,112 @@ impl client::Part for VolumeUserInfoUserUploadedVolumeInfo {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct VolumeVolumeInfo {
     /// Whether anonymous logging should be allowed.
     #[serde(rename="allowAnonLogging")]
+    
     pub allow_anon_logging: Option<bool>,
     /// The names of the authors and/or editors for this volume. (In LITE projection)
+    
     pub authors: Option<Vec<String>>,
     /// The mean review rating for this volume. (min = 1.0, max = 5.0)
     #[serde(rename="averageRating")]
+    
     pub average_rating: Option<f64>,
     /// Canonical URL for a volume. (In LITE projection.)
     #[serde(rename="canonicalVolumeLink")]
+    
     pub canonical_volume_link: Option<String>,
     /// A list of subject categories, such as "Fiction", "Suspense", etc.
+    
     pub categories: Option<Vec<String>>,
     /// Whether the volume has comics content.
     #[serde(rename="comicsContent")]
+    
     pub comics_content: Option<bool>,
     /// An identifier for the version of the volume content (text & images). (In LITE projection)
     #[serde(rename="contentVersion")]
+    
     pub content_version: Option<String>,
     /// A synopsis of the volume. The text of the description is formatted in HTML and includes simple formatting elements, such as b, i, and br tags. (In LITE projection.)
+    
     pub description: Option<String>,
     /// Physical dimensions of this volume.
+    
     pub dimensions: Option<VolumeVolumeInfoDimensions>,
     /// A list of image links for all the sizes that are available. (In LITE projection.)
     #[serde(rename="imageLinks")]
+    
     pub image_links: Option<VolumeVolumeInfoImageLinks>,
     /// Industry standard identifiers for this volume.
     #[serde(rename="industryIdentifiers")]
+    
     pub industry_identifiers: Option<Vec<VolumeVolumeInfoIndustryIdentifiers>>,
     /// URL to view information about this volume on the Google Books site. (In LITE projection)
     #[serde(rename="infoLink")]
+    
     pub info_link: Option<String>,
     /// Best language for this volume (based on content). It is the two-letter ISO 639-1 code such as 'fr', 'en', etc.
+    
     pub language: Option<String>,
     /// The main category to which this volume belongs. It will be the category from the categories list returned below that has the highest weight.
     #[serde(rename="mainCategory")]
+    
     pub main_category: Option<String>,
     /// no description provided
     #[serde(rename="maturityRating")]
+    
     pub maturity_rating: Option<String>,
     /// Total number of pages as per publisher metadata.
     #[serde(rename="pageCount")]
+    
     pub page_count: Option<i32>,
     /// A top-level summary of the panelization info in this volume.
     #[serde(rename="panelizationSummary")]
+    
     pub panelization_summary: Option<VolumeVolumeInfoPanelizationSummary>,
     /// URL to preview this volume on the Google Books site.
     #[serde(rename="previewLink")]
+    
     pub preview_link: Option<String>,
     /// Type of publication of this volume. Possible values are BOOK or MAGAZINE.
     #[serde(rename="printType")]
+    
     pub print_type: Option<String>,
     /// Total number of printed pages in generated pdf representation.
     #[serde(rename="printedPageCount")]
+    
     pub printed_page_count: Option<i32>,
     /// Date of publication. (In LITE projection.)
     #[serde(rename="publishedDate")]
+    
     pub published_date: Option<String>,
     /// Publisher of this volume. (In LITE projection.)
+    
     pub publisher: Option<String>,
     /// The number of review ratings for this volume.
     #[serde(rename="ratingsCount")]
+    
     pub ratings_count: Option<i32>,
     /// The reading modes available for this volume.
     #[serde(rename="readingModes")]
+    
     pub reading_modes: Option<VolumeVolumeInfoReadingModes>,
     /// Total number of sample pages as per publisher metadata.
     #[serde(rename="samplePageCount")]
+    
     pub sample_page_count: Option<i32>,
     /// no description provided
     #[serde(rename="seriesInfo")]
+    
     pub series_info: Option<Volumeseriesinfo>,
     /// Volume subtitle. (In LITE projection.)
+    
     pub subtitle: Option<String>,
     /// Volume title. (In LITE projection.)
+    
     pub title: Option<String>,
 }
 
@@ -2759,13 +3335,17 @@ impl client::Part for VolumeVolumeInfo {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct VolumeVolumeInfoDimensions {
     /// Height or length of this volume (in cm).
+    
     pub height: Option<String>,
     /// Thickness of this volume (in cm).
+    
     pub thickness: Option<String>,
     /// Width of this volume (in cm).
+    
     pub width: Option<String>,
 }
 
@@ -2777,21 +3357,28 @@ impl client::Part for VolumeVolumeInfoDimensions {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct VolumeVolumeInfoImageLinks {
     /// Image link for extra large size (width of ~1280 pixels). (In LITE projection)
     #[serde(rename="extraLarge")]
+    
     pub extra_large: Option<String>,
     /// Image link for large size (width of ~800 pixels). (In LITE projection)
+    
     pub large: Option<String>,
     /// Image link for medium size (width of ~575 pixels). (In LITE projection)
+    
     pub medium: Option<String>,
     /// Image link for small size (width of ~300 pixels). (In LITE projection)
+    
     pub small: Option<String>,
     /// Image link for small thumbnail size (width of ~80 pixels). (In LITE projection)
     #[serde(rename="smallThumbnail")]
+    
     pub small_thumbnail: Option<String>,
     /// Image link for thumbnail size (width of ~128 pixels). (In LITE projection)
+    
     pub thumbnail: Option<String>,
 }
 
@@ -2803,12 +3390,15 @@ impl client::Part for VolumeVolumeInfoImageLinks {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct VolumeVolumeInfoIndustryIdentifiers {
     /// Industry specific volume identifier.
+    
     pub identifier: Option<String>,
     /// Identifier type. Possible values are ISBN_10, ISBN_13, ISSN and OTHER.
     #[serde(rename="type")]
+    
     pub type_: Option<String>,
 }
 
@@ -2820,19 +3410,24 @@ impl client::Part for VolumeVolumeInfoIndustryIdentifiers {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct VolumeVolumeInfoPanelizationSummary {
     /// no description provided
     #[serde(rename="containsEpubBubbles")]
+    
     pub contains_epub_bubbles: Option<bool>,
     /// no description provided
     #[serde(rename="containsImageBubbles")]
+    
     pub contains_image_bubbles: Option<bool>,
     /// no description provided
     #[serde(rename="epubBubbleVersion")]
+    
     pub epub_bubble_version: Option<String>,
     /// no description provided
     #[serde(rename="imageBubbleVersion")]
+    
     pub image_bubble_version: Option<String>,
 }
 
@@ -2844,11 +3439,14 @@ impl client::Part for VolumeVolumeInfoPanelizationSummary {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct VolumeVolumeInfoReadingModes {
     /// no description provided
+    
     pub image: Option<bool>,
     /// no description provided
+    
     pub text: Option<bool>,
 }
 
@@ -2860,19 +3458,24 @@ impl client::Part for VolumeVolumeInfoReadingModes {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct VolumeannotationContentRanges {
     /// Range in CFI format for this annotation for version above.
     #[serde(rename="cfiRange")]
+    
     pub cfi_range: Option<BooksAnnotationsRange>,
     /// Content version applicable to ranges below.
     #[serde(rename="contentVersion")]
+    
     pub content_version: Option<String>,
     /// Range in GB image format for this annotation for version above.
     #[serde(rename="gbImageRange")]
+    
     pub gb_image_range: Option<BooksAnnotationsRange>,
     /// Range in GB text format for this annotation for version above.
     #[serde(rename="gbTextRange")]
+    
     pub gb_text_range: Option<BooksAnnotationsRange>,
 }
 
@@ -2884,18 +3487,23 @@ impl client::Part for VolumeannotationContentRanges {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct VolumeseriesinfoVolumeSeries {
     /// List of issues. Applicable only for Collection Edition and Omnibus.
+    
     pub issue: Option<Vec<VolumeseriesinfoVolumeSeriesIssue>>,
     /// The book order number in the series.
     #[serde(rename="orderNumber")]
+    
     pub order_number: Option<i32>,
     /// The book type in the context of series. Examples - Single Issue, Collection Edition, etc.
     #[serde(rename="seriesBookType")]
+    
     pub series_book_type: Option<String>,
     /// The series id.
     #[serde(rename="seriesId")]
+    
     pub series_id: Option<String>,
 }
 
@@ -2907,13 +3515,16 @@ impl client::Part for VolumeseriesinfoVolumeSeries {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct VolumeseriesinfoVolumeSeriesIssue {
     /// no description provided
     #[serde(rename="issueDisplayNumber")]
+    
     pub issue_display_number: Option<String>,
     /// no description provided
     #[serde(rename="issueOrderNumber")]
+    
     pub issue_order_number: Option<i32>,
 }
 
@@ -2926,8 +3537,8 @@ impl client::Part for VolumeseriesinfoVolumeSeriesIssue {}
 // MethodBuilders ###
 // #################
 
-/// A builder providing access to all methods supported on *bookshelve* resources.
-/// It is not used directly, but through the `Books` hub.
+/// A builder providing access to all methods supported on *bookshelf* resources.
+/// It is not used directly, but through the [`Books`] hub.
 ///
 /// # Example
 ///
@@ -2940,7 +3551,7 @@ impl client::Part for VolumeseriesinfoVolumeSeriesIssue {}
 /// 
 /// # async fn dox() {
 /// use std::default::Default;
-/// use books1::{Books, oauth2, hyper, hyper_rustls};
+/// use books1::{Books, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// let secret: oauth2::ApplicationSecret = Default::default();
 /// let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -2954,15 +3565,15 @@ impl client::Part for VolumeseriesinfoVolumeSeriesIssue {}
 /// let rb = hub.bookshelves();
 /// # }
 /// ```
-pub struct BookshelveMethods<'a, S>
+pub struct BookshelfMethods<'a, S>
     where S: 'a {
 
     hub: &'a Books<S>,
 }
 
-impl<'a, S> client::MethodsBuilder for BookshelveMethods<'a, S> {}
+impl<'a, S> client::MethodsBuilder for BookshelfMethods<'a, S> {}
 
-impl<'a, S> BookshelveMethods<'a, S> {
+impl<'a, S> BookshelfMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -2972,8 +3583,8 @@ impl<'a, S> BookshelveMethods<'a, S> {
     ///
     /// * `userId` - ID of user for whom to retrieve bookshelf volumes.
     /// * `shelf` - ID of bookshelf to retrieve volumes.
-    pub fn volumes_list(&self, user_id: &str, shelf: &str) -> BookshelveVolumeListCall<'a, S> {
-        BookshelveVolumeListCall {
+    pub fn volumes_list(&self, user_id: &str, shelf: &str) -> BookshelfVolumeListCall<'a, S> {
+        BookshelfVolumeListCall {
             hub: self.hub,
             _user_id: user_id.to_string(),
             _shelf: shelf.to_string(),
@@ -2995,8 +3606,8 @@ impl<'a, S> BookshelveMethods<'a, S> {
     ///
     /// * `userId` - ID of user for whom to retrieve bookshelves.
     /// * `shelf` - ID of bookshelf to retrieve.
-    pub fn get(&self, user_id: &str, shelf: &str) -> BookshelveGetCall<'a, S> {
-        BookshelveGetCall {
+    pub fn get(&self, user_id: &str, shelf: &str) -> BookshelfGetCall<'a, S> {
+        BookshelfGetCall {
             hub: self.hub,
             _user_id: user_id.to_string(),
             _shelf: shelf.to_string(),
@@ -3014,8 +3625,8 @@ impl<'a, S> BookshelveMethods<'a, S> {
     /// # Arguments
     ///
     /// * `userId` - ID of user for whom to retrieve bookshelves.
-    pub fn list(&self, user_id: &str) -> BookshelveListCall<'a, S> {
-        BookshelveListCall {
+    pub fn list(&self, user_id: &str) -> BookshelfListCall<'a, S> {
+        BookshelfListCall {
             hub: self.hub,
             _user_id: user_id.to_string(),
             _source: Default::default(),
@@ -3029,7 +3640,7 @@ impl<'a, S> BookshelveMethods<'a, S> {
 
 
 /// A builder providing access to all methods supported on *cloudloading* resources.
-/// It is not used directly, but through the `Books` hub.
+/// It is not used directly, but through the [`Books`] hub.
 ///
 /// # Example
 ///
@@ -3042,7 +3653,7 @@ impl<'a, S> BookshelveMethods<'a, S> {
 /// 
 /// # async fn dox() {
 /// use std::default::Default;
-/// use books1::{Books, oauth2, hyper, hyper_rustls};
+/// use books1::{Books, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// let secret: oauth2::ApplicationSecret = Default::default();
 /// let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -3120,7 +3731,7 @@ impl<'a, S> CloudloadingMethods<'a, S> {
 
 
 /// A builder providing access to all methods supported on *dictionary* resources.
-/// It is not used directly, but through the `Books` hub.
+/// It is not used directly, but through the [`Books`] hub.
 ///
 /// # Example
 ///
@@ -3133,7 +3744,7 @@ impl<'a, S> CloudloadingMethods<'a, S> {
 /// 
 /// # async fn dox() {
 /// use std::default::Default;
-/// use books1::{Books, oauth2, hyper, hyper_rustls};
+/// use books1::{Books, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// let secret: oauth2::ApplicationSecret = Default::default();
 /// let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -3178,7 +3789,7 @@ impl<'a, S> DictionaryMethods<'a, S> {
 
 
 /// A builder providing access to all methods supported on *familysharing* resources.
-/// It is not used directly, but through the `Books` hub.
+/// It is not used directly, but through the [`Books`] hub.
 ///
 /// # Example
 ///
@@ -3191,7 +3802,7 @@ impl<'a, S> DictionaryMethods<'a, S> {
 /// 
 /// # async fn dox() {
 /// use std::default::Default;
-/// use books1::{Books, oauth2, hyper, hyper_rustls};
+/// use books1::{Books, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// let secret: oauth2::ApplicationSecret = Default::default();
 /// let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -3262,7 +3873,7 @@ impl<'a, S> FamilysharingMethods<'a, S> {
 
 
 /// A builder providing access to all methods supported on *layer* resources.
-/// It is not used directly, but through the `Books` hub.
+/// It is not used directly, but through the [`Books`] hub.
 ///
 /// # Example
 ///
@@ -3275,7 +3886,7 @@ impl<'a, S> FamilysharingMethods<'a, S> {
 /// 
 /// # async fn dox() {
 /// use std::default::Default;
-/// use books1::{Books, oauth2, hyper, hyper_rustls};
+/// use books1::{Books, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// let secret: oauth2::ApplicationSecret = Default::default();
 /// let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -3461,7 +4072,7 @@ impl<'a, S> LayerMethods<'a, S> {
 
 
 /// A builder providing access to all methods supported on *myconfig* resources.
-/// It is not used directly, but through the `Books` hub.
+/// It is not used directly, but through the [`Books`] hub.
 ///
 /// # Example
 ///
@@ -3474,7 +4085,7 @@ impl<'a, S> LayerMethods<'a, S> {
 /// 
 /// # async fn dox() {
 /// use std::default::Default;
-/// use books1::{Books, oauth2, hyper, hyper_rustls};
+/// use books1::{Books, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// let secret: oauth2::ApplicationSecret = Default::default();
 /// let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -3604,7 +4215,7 @@ impl<'a, S> MyconfigMethods<'a, S> {
 
 
 /// A builder providing access to all methods supported on *mylibrary* resources.
-/// It is not used directly, but through the `Books` hub.
+/// It is not used directly, but through the [`Books`] hub.
 ///
 /// # Example
 ///
@@ -3617,7 +4228,7 @@ impl<'a, S> MyconfigMethods<'a, S> {
 /// 
 /// # async fn dox() {
 /// use std::default::Default;
-/// use books1::{Books, oauth2, hyper, hyper_rustls};
+/// use books1::{Books, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// let secret: oauth2::ApplicationSecret = Default::default();
 /// let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -3748,8 +4359,8 @@ impl<'a, S> MylibraryMethods<'a, S> {
     /// # Arguments
     ///
     /// * `shelf` - The bookshelf ID or name retrieve volumes for.
-    pub fn bookshelves_volumes_list(&self, shelf: &str) -> MylibraryBookshelveVolumeListCall<'a, S> {
-        MylibraryBookshelveVolumeListCall {
+    pub fn bookshelves_volumes_list(&self, shelf: &str) -> MylibraryBookshelfVolumeListCall<'a, S> {
+        MylibraryBookshelfVolumeListCall {
             hub: self.hub,
             _shelf: shelf.to_string(),
             _start_index: Default::default(),
@@ -3773,8 +4384,8 @@ impl<'a, S> MylibraryMethods<'a, S> {
     ///
     /// * `shelf` - ID of bookshelf to which to add a volume.
     /// * `volumeId` - ID of volume to add.
-    pub fn bookshelves_add_volume(&self, shelf: &str, volume_id: &str) -> MylibraryBookshelveAddVolumeCall<'a, S> {
-        MylibraryBookshelveAddVolumeCall {
+    pub fn bookshelves_add_volume(&self, shelf: &str, volume_id: &str) -> MylibraryBookshelfAddVolumeCall<'a, S> {
+        MylibraryBookshelfAddVolumeCall {
             hub: self.hub,
             _shelf: shelf.to_string(),
             _volume_id: volume_id.to_string(),
@@ -3793,8 +4404,8 @@ impl<'a, S> MylibraryMethods<'a, S> {
     /// # Arguments
     ///
     /// * `shelf` - ID of bookshelf from which to remove a volume.
-    pub fn bookshelves_clear_volumes(&self, shelf: &str) -> MylibraryBookshelveClearVolumeCall<'a, S> {
-        MylibraryBookshelveClearVolumeCall {
+    pub fn bookshelves_clear_volumes(&self, shelf: &str) -> MylibraryBookshelfClearVolumeCall<'a, S> {
+        MylibraryBookshelfClearVolumeCall {
             hub: self.hub,
             _shelf: shelf.to_string(),
             _source: Default::default(),
@@ -3811,8 +4422,8 @@ impl<'a, S> MylibraryMethods<'a, S> {
     /// # Arguments
     ///
     /// * `shelf` - ID of bookshelf to retrieve.
-    pub fn bookshelves_get(&self, shelf: &str) -> MylibraryBookshelveGetCall<'a, S> {
-        MylibraryBookshelveGetCall {
+    pub fn bookshelves_get(&self, shelf: &str) -> MylibraryBookshelfGetCall<'a, S> {
+        MylibraryBookshelfGetCall {
             hub: self.hub,
             _shelf: shelf.to_string(),
             _source: Default::default(),
@@ -3825,8 +4436,8 @@ impl<'a, S> MylibraryMethods<'a, S> {
     /// Create a builder to help you perform the following task:
     ///
     /// Retrieves a list of bookshelves belonging to the authenticated user.
-    pub fn bookshelves_list(&self) -> MylibraryBookshelveListCall<'a, S> {
-        MylibraryBookshelveListCall {
+    pub fn bookshelves_list(&self) -> MylibraryBookshelfListCall<'a, S> {
+        MylibraryBookshelfListCall {
             hub: self.hub,
             _source: Default::default(),
             _delegate: Default::default(),
@@ -3844,8 +4455,8 @@ impl<'a, S> MylibraryMethods<'a, S> {
     /// * `shelf` - ID of bookshelf with the volume.
     /// * `volumeId` - ID of volume to move.
     /// * `volumePosition` - Position on shelf to move the item (0 puts the item before the current first item, 1 puts it between the first and the second and so on.)
-    pub fn bookshelves_move_volume(&self, shelf: &str, volume_id: &str, volume_position: i32) -> MylibraryBookshelveMoveVolumeCall<'a, S> {
-        MylibraryBookshelveMoveVolumeCall {
+    pub fn bookshelves_move_volume(&self, shelf: &str, volume_id: &str, volume_position: i32) -> MylibraryBookshelfMoveVolumeCall<'a, S> {
+        MylibraryBookshelfMoveVolumeCall {
             hub: self.hub,
             _shelf: shelf.to_string(),
             _volume_id: volume_id.to_string(),
@@ -3865,8 +4476,8 @@ impl<'a, S> MylibraryMethods<'a, S> {
     ///
     /// * `shelf` - ID of bookshelf from which to remove a volume.
     /// * `volumeId` - ID of volume to remove.
-    pub fn bookshelves_remove_volume(&self, shelf: &str, volume_id: &str) -> MylibraryBookshelveRemoveVolumeCall<'a, S> {
-        MylibraryBookshelveRemoveVolumeCall {
+    pub fn bookshelves_remove_volume(&self, shelf: &str, volume_id: &str) -> MylibraryBookshelfRemoveVolumeCall<'a, S> {
+        MylibraryBookshelfRemoveVolumeCall {
             hub: self.hub,
             _shelf: shelf.to_string(),
             _volume_id: volume_id.to_string(),
@@ -3926,7 +4537,7 @@ impl<'a, S> MylibraryMethods<'a, S> {
 
 
 /// A builder providing access to all methods supported on *notification* resources.
-/// It is not used directly, but through the `Books` hub.
+/// It is not used directly, but through the [`Books`] hub.
 ///
 /// # Example
 ///
@@ -3939,7 +4550,7 @@ impl<'a, S> MylibraryMethods<'a, S> {
 /// 
 /// # async fn dox() {
 /// use std::default::Default;
-/// use books1::{Books, oauth2, hyper, hyper_rustls};
+/// use books1::{Books, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// let secret: oauth2::ApplicationSecret = Default::default();
 /// let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -3986,7 +4597,7 @@ impl<'a, S> NotificationMethods<'a, S> {
 
 
 /// A builder providing access to all methods supported on *onboarding* resources.
-/// It is not used directly, but through the `Books` hub.
+/// It is not used directly, but through the [`Books`] hub.
 ///
 /// # Example
 ///
@@ -3999,7 +4610,7 @@ impl<'a, S> NotificationMethods<'a, S> {
 /// 
 /// # async fn dox() {
 /// use std::default::Default;
-/// use books1::{Books, oauth2, hyper, hyper_rustls};
+/// use books1::{Books, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// let secret: oauth2::ApplicationSecret = Default::default();
 /// let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -4057,7 +4668,7 @@ impl<'a, S> OnboardingMethods<'a, S> {
 
 
 /// A builder providing access to all methods supported on *personalizedstream* resources.
-/// It is not used directly, but through the `Books` hub.
+/// It is not used directly, but through the [`Books`] hub.
 ///
 /// # Example
 ///
@@ -4070,7 +4681,7 @@ impl<'a, S> OnboardingMethods<'a, S> {
 /// 
 /// # async fn dox() {
 /// use std::default::Default;
-/// use books1::{Books, oauth2, hyper, hyper_rustls};
+/// use books1::{Books, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// let secret: oauth2::ApplicationSecret = Default::default();
 /// let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -4113,7 +4724,7 @@ impl<'a, S> PersonalizedstreamMethods<'a, S> {
 
 
 /// A builder providing access to all methods supported on *promooffer* resources.
-/// It is not used directly, but through the `Books` hub.
+/// It is not used directly, but through the [`Books`] hub.
 ///
 /// # Example
 ///
@@ -4126,7 +4737,7 @@ impl<'a, S> PersonalizedstreamMethods<'a, S> {
 /// 
 /// # async fn dox() {
 /// use std::default::Default;
-/// use books1::{Books, oauth2, hyper, hyper_rustls};
+/// use books1::{Books, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// let secret: oauth2::ApplicationSecret = Default::default();
 /// let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -4210,8 +4821,8 @@ impl<'a, S> PromoofferMethods<'a, S> {
 
 
 
-/// A builder providing access to all methods supported on *sery* resources.
-/// It is not used directly, but through the `Books` hub.
+/// A builder providing access to all methods supported on *series* resources.
+/// It is not used directly, but through the [`Books`] hub.
 ///
 /// # Example
 ///
@@ -4224,7 +4835,7 @@ impl<'a, S> PromoofferMethods<'a, S> {
 /// 
 /// # async fn dox() {
 /// use std::default::Default;
-/// use books1::{Books, oauth2, hyper, hyper_rustls};
+/// use books1::{Books, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// let secret: oauth2::ApplicationSecret = Default::default();
 /// let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -4238,15 +4849,15 @@ impl<'a, S> PromoofferMethods<'a, S> {
 /// let rb = hub.series();
 /// # }
 /// ```
-pub struct SeryMethods<'a, S>
+pub struct SeriesMethods<'a, S>
     where S: 'a {
 
     hub: &'a Books<S>,
 }
 
-impl<'a, S> client::MethodsBuilder for SeryMethods<'a, S> {}
+impl<'a, S> client::MethodsBuilder for SeriesMethods<'a, S> {}
 
-impl<'a, S> SeryMethods<'a, S> {
+impl<'a, S> SeriesMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -4255,8 +4866,8 @@ impl<'a, S> SeryMethods<'a, S> {
     /// # Arguments
     ///
     /// * `series_id` - String that identifies the series
-    pub fn membership_get(&self, series_id: &str) -> SeryMembershipGetCall<'a, S> {
-        SeryMembershipGetCall {
+    pub fn membership_get(&self, series_id: &str) -> SeriesMembershipGetCall<'a, S> {
+        SeriesMembershipGetCall {
             hub: self.hub,
             _series_id: series_id.to_string(),
             _page_token: Default::default(),
@@ -4274,8 +4885,8 @@ impl<'a, S> SeryMethods<'a, S> {
     /// # Arguments
     ///
     /// * `series_id` - String that identifies the series
-    pub fn get(&self, series_id: &Vec<String>) -> SeryGetCall<'a, S> {
-        SeryGetCall {
+    pub fn get(&self, series_id: &Vec<String>) -> SeriesGetCall<'a, S> {
+        SeriesGetCall {
             hub: self.hub,
             _series_id: series_id.clone(),
             _delegate: Default::default(),
@@ -4288,7 +4899,7 @@ impl<'a, S> SeryMethods<'a, S> {
 
 
 /// A builder providing access to all methods supported on *volume* resources.
-/// It is not used directly, but through the `Books` hub.
+/// It is not used directly, but through the [`Books`] hub.
 ///
 /// # Example
 ///
@@ -4301,7 +4912,7 @@ impl<'a, S> SeryMethods<'a, S> {
 /// 
 /// # async fn dox() {
 /// use std::default::Default;
-/// use books1::{Books, oauth2, hyper, hyper_rustls};
+/// use books1::{Books, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// let secret: oauth2::ApplicationSecret = Default::default();
 /// let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -4483,8 +5094,8 @@ impl<'a, S> VolumeMethods<'a, S> {
 
 /// Retrieves volumes in a specific bookshelf for the specified user.
 ///
-/// A builder for the *volumes.list* method supported by a *bookshelve* resource.
-/// It is not used directly, but through a `BookshelveMethods` instance.
+/// A builder for the *volumes.list* method supported by a *bookshelf* resource.
+/// It is not used directly, but through a [`BookshelfMethods`] instance.
 ///
 /// # Example
 ///
@@ -4496,7 +5107,7 @@ impl<'a, S> VolumeMethods<'a, S> {
 /// # extern crate google_books1 as books1;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use books1::{Books, oauth2, hyper, hyper_rustls};
+/// # use books1::{Books, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
 /// # let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -4515,7 +5126,7 @@ impl<'a, S> VolumeMethods<'a, S> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct BookshelveVolumeListCall<'a, S>
+pub struct BookshelfVolumeListCall<'a, S>
     where S: 'a {
 
     hub: &'a Books<S>,
@@ -4527,14 +5138,14 @@ pub struct BookshelveVolumeListCall<'a, S>
     _max_results: Option<u32>,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
+    _scopes: BTreeSet<String>
 }
 
-impl<'a, S> client::CallBuilder for BookshelveVolumeListCall<'a, S> {}
+impl<'a, S> client::CallBuilder for BookshelfVolumeListCall<'a, S> {}
 
-impl<'a, S> BookshelveVolumeListCall<'a, S>
+impl<'a, S> BookshelfVolumeListCall<'a, S>
 where
-    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
     S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
     S::Future: Send + Unpin + 'static,
     S::Error: Into<Box<dyn StdError + Send + Sync>>,
@@ -4545,81 +5156,66 @@ where
     pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, Volumes)> {
         use std::io::{Read, Seek};
         use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::ToParts;
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
         let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
         dlg.begin(client::MethodInfo { id: "books.bookshelves.volumes.list",
                                http_method: hyper::Method::GET });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(8 + self._additional_params.len());
-        params.push(("userId", self._user_id.to_string()));
-        params.push(("shelf", self._shelf.to_string()));
-        if let Some(value) = self._start_index {
-            params.push(("startIndex", value.to_string()));
-        }
-        if let Some(value) = self._source {
-            params.push(("source", value.to_string()));
-        }
-        if let Some(value) = self._show_preorders {
-            params.push(("showPreorders", value.to_string()));
-        }
-        if let Some(value) = self._max_results {
-            params.push(("maxResults", value.to_string()));
-        }
+
         for &field in ["alt", "userId", "shelf", "startIndex", "source", "showPreorders", "maxResults"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(client::Error::FieldClash(field));
             }
         }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
+
+        let mut params = Params::with_capacity(8 + self._additional_params.len());
+        params.push("userId", self._user_id);
+        params.push("shelf", self._shelf);
+        if let Some(value) = self._start_index.as_ref() {
+            params.push("startIndex", value.to_string());
+        }
+        if let Some(value) = self._source.as_ref() {
+            params.push("source", value);
+        }
+        if let Some(value) = self._show_preorders.as_ref() {
+            params.push("showPreorders", value.to_string());
+        }
+        if let Some(value) = self._max_results.as_ref() {
+            params.push("maxResults", value.to_string());
         }
 
-        params.push(("alt", "json".to_string()));
+        params.extend(self._additional_params.iter());
 
+        params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "books/v1/users/{userId}/bookshelves/{shelf}/volumes";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::Full.as_ref().to_string());
         }
 
         for &(find_this, param_name) in [("{userId}", "userId"), ("{shelf}", "shelf")].iter() {
-            let mut replace_with: Option<&str> = None;
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = Some(value);
-                    break;
-                }
-            }
-            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+            url = params.uri_replacement(url, param_name, find_this, false);
         }
         {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(2);
-            for param_name in ["shelf", "userId"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
+            let to_remove = ["shelf", "userId"];
+            params.remove_params(&to_remove);
         }
 
-        let url = url::Url::parse_with_params(&url, params).unwrap();
+        let url = params.parse_with_url(&url);
 
 
 
         loop {
-            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
-                Ok(token) => token.clone(),
-                Err(err) => {
-                    match  dlg.token(&err) {
-                        Some(token) => token,
-                        None => {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
                             dlg.finished(false);
-                            return Err(client::Error::MissingToken(err))
+                            return Err(client::Error::MissingToken(e));
                         }
                     }
                 }
@@ -4627,21 +5223,27 @@ where
             let mut req_result = {
                 let client = &self.hub.client;
                 dlg.pre_request();
-                let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
-                        .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::GET)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
 
 
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
-                
+
             };
 
             match req_result {
                 Err(err) => {
                     if let client::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep(d).await;
                         continue;
                     }
                     dlg.finished(false);
@@ -4657,7 +5259,7 @@ where
                         let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
                         if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
-                            sleep(d);
+                            sleep(d).await;
                             continue;
                         }
 
@@ -4694,7 +5296,7 @@ where
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn user_id(mut self, new_value: &str) -> BookshelveVolumeListCall<'a, S> {
+    pub fn user_id(mut self, new_value: &str) -> BookshelfVolumeListCall<'a, S> {
         self._user_id = new_value.to_string();
         self
     }
@@ -4704,45 +5306,46 @@ where
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn shelf(mut self, new_value: &str) -> BookshelveVolumeListCall<'a, S> {
+    pub fn shelf(mut self, new_value: &str) -> BookshelfVolumeListCall<'a, S> {
         self._shelf = new_value.to_string();
         self
     }
     /// Index of the first element to return (starts at 0)
     ///
     /// Sets the *start index* query property to the given value.
-    pub fn start_index(mut self, new_value: u32) -> BookshelveVolumeListCall<'a, S> {
+    pub fn start_index(mut self, new_value: u32) -> BookshelfVolumeListCall<'a, S> {
         self._start_index = Some(new_value);
         self
     }
     /// String to identify the originator of this request.
     ///
     /// Sets the *source* query property to the given value.
-    pub fn source(mut self, new_value: &str) -> BookshelveVolumeListCall<'a, S> {
+    pub fn source(mut self, new_value: &str) -> BookshelfVolumeListCall<'a, S> {
         self._source = Some(new_value.to_string());
         self
     }
     /// Set to true to show pre-ordered books. Defaults to false.
     ///
     /// Sets the *show preorders* query property to the given value.
-    pub fn show_preorders(mut self, new_value: bool) -> BookshelveVolumeListCall<'a, S> {
+    pub fn show_preorders(mut self, new_value: bool) -> BookshelfVolumeListCall<'a, S> {
         self._show_preorders = Some(new_value);
         self
     }
     /// Maximum number of results to return
     ///
     /// Sets the *max results* query property to the given value.
-    pub fn max_results(mut self, new_value: u32) -> BookshelveVolumeListCall<'a, S> {
+    pub fn max_results(mut self, new_value: u32) -> BookshelfVolumeListCall<'a, S> {
         self._max_results = Some(new_value);
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.````
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BookshelveVolumeListCall<'a, S> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BookshelfVolumeListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -4767,7 +5370,7 @@ where
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> BookshelveVolumeListCall<'a, S>
+    pub fn param<T>(mut self, name: T, value: T) -> BookshelfVolumeListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4775,25 +5378,36 @@ where
 
     /// Identifies the authorization scope for the method you are building.
     ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::Full`.
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::Full`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
     ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, St>(mut self, scope: T) -> BookshelveVolumeListCall<'a, S>
-                                                        where T: Into<Option<St>>,
-                                                              St: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
+    pub fn add_scope<St>(mut self, scope: St) -> BookshelfVolumeListCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> BookshelfVolumeListCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> BookshelfVolumeListCall<'a, S> {
+        self._scopes.clear();
         self
     }
 }
@@ -4801,8 +5415,8 @@ where
 
 /// Retrieves metadata for a specific bookshelf for the specified user.
 ///
-/// A builder for the *get* method supported by a *bookshelve* resource.
-/// It is not used directly, but through a `BookshelveMethods` instance.
+/// A builder for the *get* method supported by a *bookshelf* resource.
+/// It is not used directly, but through a [`BookshelfMethods`] instance.
 ///
 /// # Example
 ///
@@ -4814,7 +5428,7 @@ where
 /// # extern crate google_books1 as books1;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use books1::{Books, oauth2, hyper, hyper_rustls};
+/// # use books1::{Books, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
 /// # let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -4830,7 +5444,7 @@ where
 ///              .doit().await;
 /// # }
 /// ```
-pub struct BookshelveGetCall<'a, S>
+pub struct BookshelfGetCall<'a, S>
     where S: 'a {
 
     hub: &'a Books<S>,
@@ -4839,14 +5453,14 @@ pub struct BookshelveGetCall<'a, S>
     _source: Option<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
+    _scopes: BTreeSet<String>
 }
 
-impl<'a, S> client::CallBuilder for BookshelveGetCall<'a, S> {}
+impl<'a, S> client::CallBuilder for BookshelfGetCall<'a, S> {}
 
-impl<'a, S> BookshelveGetCall<'a, S>
+impl<'a, S> BookshelfGetCall<'a, S>
 where
-    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
     S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
     S::Future: Send + Unpin + 'static,
     S::Error: Into<Box<dyn StdError + Send + Sync>>,
@@ -4857,72 +5471,57 @@ where
     pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, Bookshelf)> {
         use std::io::{Read, Seek};
         use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::ToParts;
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
         let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
         dlg.begin(client::MethodInfo { id: "books.bookshelves.get",
                                http_method: hyper::Method::GET });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
-        params.push(("userId", self._user_id.to_string()));
-        params.push(("shelf", self._shelf.to_string()));
-        if let Some(value) = self._source {
-            params.push(("source", value.to_string()));
-        }
+
         for &field in ["alt", "userId", "shelf", "source"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(client::Error::FieldClash(field));
             }
         }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
+
+        let mut params = Params::with_capacity(5 + self._additional_params.len());
+        params.push("userId", self._user_id);
+        params.push("shelf", self._shelf);
+        if let Some(value) = self._source.as_ref() {
+            params.push("source", value);
         }
 
-        params.push(("alt", "json".to_string()));
+        params.extend(self._additional_params.iter());
 
+        params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "books/v1/users/{userId}/bookshelves/{shelf}";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::Full.as_ref().to_string());
         }
 
         for &(find_this, param_name) in [("{userId}", "userId"), ("{shelf}", "shelf")].iter() {
-            let mut replace_with: Option<&str> = None;
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = Some(value);
-                    break;
-                }
-            }
-            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+            url = params.uri_replacement(url, param_name, find_this, false);
         }
         {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(2);
-            for param_name in ["shelf", "userId"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
+            let to_remove = ["shelf", "userId"];
+            params.remove_params(&to_remove);
         }
 
-        let url = url::Url::parse_with_params(&url, params).unwrap();
+        let url = params.parse_with_url(&url);
 
 
 
         loop {
-            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
-                Ok(token) => token.clone(),
-                Err(err) => {
-                    match  dlg.token(&err) {
-                        Some(token) => token,
-                        None => {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
                             dlg.finished(false);
-                            return Err(client::Error::MissingToken(err))
+                            return Err(client::Error::MissingToken(e));
                         }
                     }
                 }
@@ -4930,21 +5529,27 @@ where
             let mut req_result = {
                 let client = &self.hub.client;
                 dlg.pre_request();
-                let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
-                        .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::GET)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
 
 
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
-                
+
             };
 
             match req_result {
                 Err(err) => {
                     if let client::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep(d).await;
                         continue;
                     }
                     dlg.finished(false);
@@ -4960,7 +5565,7 @@ where
                         let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
                         if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
-                            sleep(d);
+                            sleep(d).await;
                             continue;
                         }
 
@@ -4997,7 +5602,7 @@ where
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn user_id(mut self, new_value: &str) -> BookshelveGetCall<'a, S> {
+    pub fn user_id(mut self, new_value: &str) -> BookshelfGetCall<'a, S> {
         self._user_id = new_value.to_string();
         self
     }
@@ -5007,24 +5612,25 @@ where
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn shelf(mut self, new_value: &str) -> BookshelveGetCall<'a, S> {
+    pub fn shelf(mut self, new_value: &str) -> BookshelfGetCall<'a, S> {
         self._shelf = new_value.to_string();
         self
     }
     /// String to identify the originator of this request.
     ///
     /// Sets the *source* query property to the given value.
-    pub fn source(mut self, new_value: &str) -> BookshelveGetCall<'a, S> {
+    pub fn source(mut self, new_value: &str) -> BookshelfGetCall<'a, S> {
         self._source = Some(new_value.to_string());
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.````
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BookshelveGetCall<'a, S> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BookshelfGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -5049,7 +5655,7 @@ where
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> BookshelveGetCall<'a, S>
+    pub fn param<T>(mut self, name: T, value: T) -> BookshelfGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5057,25 +5663,36 @@ where
 
     /// Identifies the authorization scope for the method you are building.
     ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::Full`.
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::Full`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
     ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, St>(mut self, scope: T) -> BookshelveGetCall<'a, S>
-                                                        where T: Into<Option<St>>,
-                                                              St: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
+    pub fn add_scope<St>(mut self, scope: St) -> BookshelfGetCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> BookshelfGetCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> BookshelfGetCall<'a, S> {
+        self._scopes.clear();
         self
     }
 }
@@ -5083,8 +5700,8 @@ where
 
 /// Retrieves a list of public bookshelves for the specified user.
 ///
-/// A builder for the *list* method supported by a *bookshelve* resource.
-/// It is not used directly, but through a `BookshelveMethods` instance.
+/// A builder for the *list* method supported by a *bookshelf* resource.
+/// It is not used directly, but through a [`BookshelfMethods`] instance.
 ///
 /// # Example
 ///
@@ -5096,7 +5713,7 @@ where
 /// # extern crate google_books1 as books1;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use books1::{Books, oauth2, hyper, hyper_rustls};
+/// # use books1::{Books, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
 /// # let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -5112,7 +5729,7 @@ where
 ///              .doit().await;
 /// # }
 /// ```
-pub struct BookshelveListCall<'a, S>
+pub struct BookshelfListCall<'a, S>
     where S: 'a {
 
     hub: &'a Books<S>,
@@ -5120,14 +5737,14 @@ pub struct BookshelveListCall<'a, S>
     _source: Option<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
+    _scopes: BTreeSet<String>
 }
 
-impl<'a, S> client::CallBuilder for BookshelveListCall<'a, S> {}
+impl<'a, S> client::CallBuilder for BookshelfListCall<'a, S> {}
 
-impl<'a, S> BookshelveListCall<'a, S>
+impl<'a, S> BookshelfListCall<'a, S>
 where
-    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
     S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
     S::Future: Send + Unpin + 'static,
     S::Error: Into<Box<dyn StdError + Send + Sync>>,
@@ -5138,71 +5755,56 @@ where
     pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, Bookshelves)> {
         use std::io::{Read, Seek};
         use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::ToParts;
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
         let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
         dlg.begin(client::MethodInfo { id: "books.bookshelves.list",
                                http_method: hyper::Method::GET });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
-        params.push(("userId", self._user_id.to_string()));
-        if let Some(value) = self._source {
-            params.push(("source", value.to_string()));
-        }
+
         for &field in ["alt", "userId", "source"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(client::Error::FieldClash(field));
             }
         }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
+
+        let mut params = Params::with_capacity(4 + self._additional_params.len());
+        params.push("userId", self._user_id);
+        if let Some(value) = self._source.as_ref() {
+            params.push("source", value);
         }
 
-        params.push(("alt", "json".to_string()));
+        params.extend(self._additional_params.iter());
 
+        params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "books/v1/users/{userId}/bookshelves";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::Full.as_ref().to_string());
         }
 
         for &(find_this, param_name) in [("{userId}", "userId")].iter() {
-            let mut replace_with: Option<&str> = None;
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = Some(value);
-                    break;
-                }
-            }
-            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+            url = params.uri_replacement(url, param_name, find_this, false);
         }
         {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
-            for param_name in ["userId"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
+            let to_remove = ["userId"];
+            params.remove_params(&to_remove);
         }
 
-        let url = url::Url::parse_with_params(&url, params).unwrap();
+        let url = params.parse_with_url(&url);
 
 
 
         loop {
-            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
-                Ok(token) => token.clone(),
-                Err(err) => {
-                    match  dlg.token(&err) {
-                        Some(token) => token,
-                        None => {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
                             dlg.finished(false);
-                            return Err(client::Error::MissingToken(err))
+                            return Err(client::Error::MissingToken(e));
                         }
                     }
                 }
@@ -5210,21 +5812,27 @@ where
             let mut req_result = {
                 let client = &self.hub.client;
                 dlg.pre_request();
-                let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
-                        .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::GET)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
 
 
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
-                
+
             };
 
             match req_result {
                 Err(err) => {
                     if let client::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep(d).await;
                         continue;
                     }
                     dlg.finished(false);
@@ -5240,7 +5848,7 @@ where
                         let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
                         if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
-                            sleep(d);
+                            sleep(d).await;
                             continue;
                         }
 
@@ -5277,24 +5885,25 @@ where
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn user_id(mut self, new_value: &str) -> BookshelveListCall<'a, S> {
+    pub fn user_id(mut self, new_value: &str) -> BookshelfListCall<'a, S> {
         self._user_id = new_value.to_string();
         self
     }
     /// String to identify the originator of this request.
     ///
     /// Sets the *source* query property to the given value.
-    pub fn source(mut self, new_value: &str) -> BookshelveListCall<'a, S> {
+    pub fn source(mut self, new_value: &str) -> BookshelfListCall<'a, S> {
         self._source = Some(new_value.to_string());
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.````
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BookshelveListCall<'a, S> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BookshelfListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -5319,7 +5928,7 @@ where
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> BookshelveListCall<'a, S>
+    pub fn param<T>(mut self, name: T, value: T) -> BookshelfListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5327,25 +5936,36 @@ where
 
     /// Identifies the authorization scope for the method you are building.
     ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::Full`.
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::Full`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
     ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, St>(mut self, scope: T) -> BookshelveListCall<'a, S>
-                                                        where T: Into<Option<St>>,
-                                                              St: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
+    pub fn add_scope<St>(mut self, scope: St) -> BookshelfListCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> BookshelfListCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> BookshelfListCall<'a, S> {
+        self._scopes.clear();
         self
     }
 }
@@ -5354,7 +5974,7 @@ where
 /// Add a user-upload volume and triggers processing.
 ///
 /// A builder for the *addBook* method supported by a *cloudloading* resource.
-/// It is not used directly, but through a `CloudloadingMethods` instance.
+/// It is not used directly, but through a [`CloudloadingMethods`] instance.
 ///
 /// # Example
 ///
@@ -5366,7 +5986,7 @@ where
 /// # extern crate google_books1 as books1;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use books1::{Books, oauth2, hyper, hyper_rustls};
+/// # use books1::{Books, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
 /// # let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -5395,14 +6015,14 @@ pub struct CloudloadingAddBookCall<'a, S>
     _drive_document_id: Option<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
+    _scopes: BTreeSet<String>
 }
 
 impl<'a, S> client::CallBuilder for CloudloadingAddBookCall<'a, S> {}
 
 impl<'a, S> CloudloadingAddBookCall<'a, S>
 where
-    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
     S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
     S::Future: Send + Unpin + 'static,
     S::Error: Into<Box<dyn StdError + Send + Sync>>,
@@ -5413,58 +6033,57 @@ where
     pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, BooksCloudloadingResource)> {
         use std::io::{Read, Seek};
         use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::ToParts;
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
         let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
         dlg.begin(client::MethodInfo { id: "books.cloudloading.addBook",
                                http_method: hyper::Method::POST });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(6 + self._additional_params.len());
-        if let Some(value) = self._upload_client_token {
-            params.push(("upload_client_token", value.to_string()));
-        }
-        if let Some(value) = self._name {
-            params.push(("name", value.to_string()));
-        }
-        if let Some(value) = self._mime_type {
-            params.push(("mime_type", value.to_string()));
-        }
-        if let Some(value) = self._drive_document_id {
-            params.push(("drive_document_id", value.to_string()));
-        }
+
         for &field in ["alt", "upload_client_token", "name", "mime_type", "drive_document_id"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(client::Error::FieldClash(field));
             }
         }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
+
+        let mut params = Params::with_capacity(6 + self._additional_params.len());
+        if let Some(value) = self._upload_client_token.as_ref() {
+            params.push("upload_client_token", value);
+        }
+        if let Some(value) = self._name.as_ref() {
+            params.push("name", value);
+        }
+        if let Some(value) = self._mime_type.as_ref() {
+            params.push("mime_type", value);
+        }
+        if let Some(value) = self._drive_document_id.as_ref() {
+            params.push("drive_document_id", value);
         }
 
-        params.push(("alt", "json".to_string()));
+        params.extend(self._additional_params.iter());
 
+        params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "books/v1/cloudloading/addBook";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::Full.as_ref().to_string());
         }
 
 
-        let url = url::Url::parse_with_params(&url, params).unwrap();
+        let url = params.parse_with_url(&url);
 
 
 
         loop {
-            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
-                Ok(token) => token.clone(),
-                Err(err) => {
-                    match  dlg.token(&err) {
-                        Some(token) => token,
-                        None => {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
                             dlg.finished(false);
-                            return Err(client::Error::MissingToken(err))
+                            return Err(client::Error::MissingToken(e));
                         }
                     }
                 }
@@ -5472,21 +6091,27 @@ where
             let mut req_result = {
                 let client = &self.hub.client;
                 dlg.pre_request();
-                let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
-                        .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::POST)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
 
 
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
-                
+
             };
 
             match req_result {
                 Err(err) => {
                     if let client::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep(d).await;
                         continue;
                     }
                     dlg.finished(false);
@@ -5502,7 +6127,7 @@ where
                         let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
                         if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
-                            sleep(d);
+                            sleep(d).await;
                             continue;
                         }
 
@@ -5564,7 +6189,8 @@ where
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.````
     ///
     /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CloudloadingAddBookCall<'a, S> {
@@ -5600,25 +6226,36 @@ where
 
     /// Identifies the authorization scope for the method you are building.
     ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::Full`.
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::Full`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
     ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, St>(mut self, scope: T) -> CloudloadingAddBookCall<'a, S>
-                                                        where T: Into<Option<St>>,
-                                                              St: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
+    pub fn add_scope<St>(mut self, scope: St) -> CloudloadingAddBookCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> CloudloadingAddBookCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> CloudloadingAddBookCall<'a, S> {
+        self._scopes.clear();
         self
     }
 }
@@ -5627,7 +6264,7 @@ where
 /// Remove the book and its contents
 ///
 /// A builder for the *deleteBook* method supported by a *cloudloading* resource.
-/// It is not used directly, but through a `CloudloadingMethods` instance.
+/// It is not used directly, but through a [`CloudloadingMethods`] instance.
 ///
 /// # Example
 ///
@@ -5639,7 +6276,7 @@ where
 /// # extern crate google_books1 as books1;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use books1::{Books, oauth2, hyper, hyper_rustls};
+/// # use books1::{Books, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
 /// # let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -5661,14 +6298,14 @@ pub struct CloudloadingDeleteBookCall<'a, S>
     _volume_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
+    _scopes: BTreeSet<String>
 }
 
 impl<'a, S> client::CallBuilder for CloudloadingDeleteBookCall<'a, S> {}
 
 impl<'a, S> CloudloadingDeleteBookCall<'a, S>
 where
-    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
     S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
     S::Future: Send + Unpin + 'static,
     S::Error: Into<Box<dyn StdError + Send + Sync>>,
@@ -5679,47 +6316,46 @@ where
     pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, Empty)> {
         use std::io::{Read, Seek};
         use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::ToParts;
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
         let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
         dlg.begin(client::MethodInfo { id: "books.cloudloading.deleteBook",
                                http_method: hyper::Method::POST });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
-        params.push(("volumeId", self._volume_id.to_string()));
+
         for &field in ["alt", "volumeId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(client::Error::FieldClash(field));
             }
         }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
 
-        params.push(("alt", "json".to_string()));
+        let mut params = Params::with_capacity(3 + self._additional_params.len());
+        params.push("volumeId", self._volume_id);
 
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "books/v1/cloudloading/deleteBook";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::Full.as_ref().to_string());
         }
 
 
-        let url = url::Url::parse_with_params(&url, params).unwrap();
+        let url = params.parse_with_url(&url);
 
 
 
         loop {
-            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
-                Ok(token) => token.clone(),
-                Err(err) => {
-                    match  dlg.token(&err) {
-                        Some(token) => token,
-                        None => {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
                             dlg.finished(false);
-                            return Err(client::Error::MissingToken(err))
+                            return Err(client::Error::MissingToken(e));
                         }
                     }
                 }
@@ -5727,21 +6363,27 @@ where
             let mut req_result = {
                 let client = &self.hub.client;
                 dlg.pre_request();
-                let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
-                        .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::POST)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
 
 
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
-                
+
             };
 
             match req_result {
                 Err(err) => {
                     if let client::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep(d).await;
                         continue;
                     }
                     dlg.finished(false);
@@ -5757,7 +6399,7 @@ where
                         let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
                         if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
-                            sleep(d);
+                            sleep(d).await;
                             continue;
                         }
 
@@ -5801,7 +6443,8 @@ where
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.````
     ///
     /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CloudloadingDeleteBookCall<'a, S> {
@@ -5837,25 +6480,36 @@ where
 
     /// Identifies the authorization scope for the method you are building.
     ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::Full`.
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::Full`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
     ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, St>(mut self, scope: T) -> CloudloadingDeleteBookCall<'a, S>
-                                                        where T: Into<Option<St>>,
-                                                              St: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
+    pub fn add_scope<St>(mut self, scope: St) -> CloudloadingDeleteBookCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> CloudloadingDeleteBookCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> CloudloadingDeleteBookCall<'a, S> {
+        self._scopes.clear();
         self
     }
 }
@@ -5864,7 +6518,7 @@ where
 /// Updates a user-upload volume.
 ///
 /// A builder for the *updateBook* method supported by a *cloudloading* resource.
-/// It is not used directly, but through a `CloudloadingMethods` instance.
+/// It is not used directly, but through a [`CloudloadingMethods`] instance.
 ///
 /// # Example
 ///
@@ -5877,7 +6531,7 @@ where
 /// use books1::api::BooksCloudloadingResource;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use books1::{Books, oauth2, hyper, hyper_rustls};
+/// # use books1::{Books, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
 /// # let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -5904,14 +6558,14 @@ pub struct CloudloadingUpdateBookCall<'a, S>
     _request: BooksCloudloadingResource,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
+    _scopes: BTreeSet<String>
 }
 
 impl<'a, S> client::CallBuilder for CloudloadingUpdateBookCall<'a, S> {}
 
 impl<'a, S> CloudloadingUpdateBookCall<'a, S>
 where
-    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
     S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
     S::Future: Send + Unpin + 'static,
     S::Error: Into<Box<dyn StdError + Send + Sync>>,
@@ -5922,36 +6576,35 @@ where
     pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, BooksCloudloadingResource)> {
         use std::io::{Read, Seek};
         use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::ToParts;
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
         let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
         dlg.begin(client::MethodInfo { id: "books.cloudloading.updateBook",
                                http_method: hyper::Method::POST });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
+
         for &field in ["alt"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(client::Error::FieldClash(field));
             }
         }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
 
-        params.push(("alt", "json".to_string()));
+        let mut params = Params::with_capacity(3 + self._additional_params.len());
 
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "books/v1/cloudloading/updateBook";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::Full.as_ref().to_string());
         }
 
 
-        let url = url::Url::parse_with_params(&url, params).unwrap();
+        let url = params.parse_with_url(&url);
 
-        let mut json_mime_type: mime::Mime = "application/json".parse().unwrap();
+        let mut json_mime_type = mime::APPLICATION_JSON;
         let mut request_value_reader =
             {
                 let mut value = json::value::to_value(&self._request).expect("serde to work");
@@ -5965,14 +6618,14 @@ where
 
 
         loop {
-            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
-                Ok(token) => token.clone(),
-                Err(err) => {
-                    match  dlg.token(&err) {
-                        Some(token) => token,
-                        None => {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
                             dlg.finished(false);
-                            return Err(client::Error::MissingToken(err))
+                            return Err(client::Error::MissingToken(e));
                         }
                     }
                 }
@@ -5981,23 +6634,29 @@ where
             let mut req_result = {
                 let client = &self.hub.client;
                 dlg.pre_request();
-                let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
-                        .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::POST)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
 
 
                         let request = req_builder
-                        .header(CONTENT_TYPE, format!("{}", json_mime_type.to_string()))
+                        .header(CONTENT_TYPE, json_mime_type.to_string())
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
                 client.request(request.unwrap()).await
-                
+
             };
 
             match req_result {
                 Err(err) => {
                     if let client::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep(d).await;
                         continue;
                     }
                     dlg.finished(false);
@@ -6013,7 +6672,7 @@ where
                         let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
                         if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
-                            sleep(d);
+                            sleep(d).await;
                             continue;
                         }
 
@@ -6056,7 +6715,8 @@ where
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.````
     ///
     /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CloudloadingUpdateBookCall<'a, S> {
@@ -6092,25 +6752,36 @@ where
 
     /// Identifies the authorization scope for the method you are building.
     ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::Full`.
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::Full`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
     ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, St>(mut self, scope: T) -> CloudloadingUpdateBookCall<'a, S>
-                                                        where T: Into<Option<St>>,
-                                                              St: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
+    pub fn add_scope<St>(mut self, scope: St) -> CloudloadingUpdateBookCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> CloudloadingUpdateBookCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> CloudloadingUpdateBookCall<'a, S> {
+        self._scopes.clear();
         self
     }
 }
@@ -6119,7 +6790,7 @@ where
 /// Returns a list of offline dictionary metadata available
 ///
 /// A builder for the *listOfflineMetadata* method supported by a *dictionary* resource.
-/// It is not used directly, but through a `DictionaryMethods` instance.
+/// It is not used directly, but through a [`DictionaryMethods`] instance.
 ///
 /// # Example
 ///
@@ -6131,7 +6802,7 @@ where
 /// # extern crate google_books1 as books1;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use books1::{Books, oauth2, hyper, hyper_rustls};
+/// # use books1::{Books, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
 /// # let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -6153,14 +6824,14 @@ pub struct DictionaryListOfflineMetadataCall<'a, S>
     _cpksver: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
+    _scopes: BTreeSet<String>
 }
 
 impl<'a, S> client::CallBuilder for DictionaryListOfflineMetadataCall<'a, S> {}
 
 impl<'a, S> DictionaryListOfflineMetadataCall<'a, S>
 where
-    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
     S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
     S::Future: Send + Unpin + 'static,
     S::Error: Into<Box<dyn StdError + Send + Sync>>,
@@ -6171,47 +6842,46 @@ where
     pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, Metadata)> {
         use std::io::{Read, Seek};
         use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::ToParts;
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
         let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
         dlg.begin(client::MethodInfo { id: "books.dictionary.listOfflineMetadata",
                                http_method: hyper::Method::GET });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
-        params.push(("cpksver", self._cpksver.to_string()));
+
         for &field in ["alt", "cpksver"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(client::Error::FieldClash(field));
             }
         }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
 
-        params.push(("alt", "json".to_string()));
+        let mut params = Params::with_capacity(3 + self._additional_params.len());
+        params.push("cpksver", self._cpksver);
 
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "books/v1/dictionary/listOfflineMetadata";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::Full.as_ref().to_string());
         }
 
 
-        let url = url::Url::parse_with_params(&url, params).unwrap();
+        let url = params.parse_with_url(&url);
 
 
 
         loop {
-            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
-                Ok(token) => token.clone(),
-                Err(err) => {
-                    match  dlg.token(&err) {
-                        Some(token) => token,
-                        None => {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
                             dlg.finished(false);
-                            return Err(client::Error::MissingToken(err))
+                            return Err(client::Error::MissingToken(e));
                         }
                     }
                 }
@@ -6219,21 +6889,27 @@ where
             let mut req_result = {
                 let client = &self.hub.client;
                 dlg.pre_request();
-                let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
-                        .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::GET)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
 
 
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
-                
+
             };
 
             match req_result {
                 Err(err) => {
                     if let client::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep(d).await;
                         continue;
                     }
                     dlg.finished(false);
@@ -6249,7 +6925,7 @@ where
                         let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
                         if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
-                            sleep(d);
+                            sleep(d).await;
                             continue;
                         }
 
@@ -6293,7 +6969,8 @@ where
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.````
     ///
     /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> DictionaryListOfflineMetadataCall<'a, S> {
@@ -6329,25 +7006,36 @@ where
 
     /// Identifies the authorization scope for the method you are building.
     ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::Full`.
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::Full`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
     ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, St>(mut self, scope: T) -> DictionaryListOfflineMetadataCall<'a, S>
-                                                        where T: Into<Option<St>>,
-                                                              St: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
+    pub fn add_scope<St>(mut self, scope: St) -> DictionaryListOfflineMetadataCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> DictionaryListOfflineMetadataCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> DictionaryListOfflineMetadataCall<'a, S> {
+        self._scopes.clear();
         self
     }
 }
@@ -6356,7 +7044,7 @@ where
 /// Gets information regarding the family that the user is part of.
 ///
 /// A builder for the *getFamilyInfo* method supported by a *familysharing* resource.
-/// It is not used directly, but through a `FamilysharingMethods` instance.
+/// It is not used directly, but through a [`FamilysharingMethods`] instance.
 ///
 /// # Example
 ///
@@ -6368,7 +7056,7 @@ where
 /// # extern crate google_books1 as books1;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use books1::{Books, oauth2, hyper, hyper_rustls};
+/// # use books1::{Books, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
 /// # let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -6391,14 +7079,14 @@ pub struct FamilysharingGetFamilyInfoCall<'a, S>
     _source: Option<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
+    _scopes: BTreeSet<String>
 }
 
 impl<'a, S> client::CallBuilder for FamilysharingGetFamilyInfoCall<'a, S> {}
 
 impl<'a, S> FamilysharingGetFamilyInfoCall<'a, S>
 where
-    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
     S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
     S::Future: Send + Unpin + 'static,
     S::Error: Into<Box<dyn StdError + Send + Sync>>,
@@ -6409,49 +7097,48 @@ where
     pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, FamilyInfo)> {
         use std::io::{Read, Seek};
         use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::ToParts;
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
         let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
         dlg.begin(client::MethodInfo { id: "books.familysharing.getFamilyInfo",
                                http_method: hyper::Method::GET });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
-        if let Some(value) = self._source {
-            params.push(("source", value.to_string()));
-        }
+
         for &field in ["alt", "source"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(client::Error::FieldClash(field));
             }
         }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
+
+        let mut params = Params::with_capacity(3 + self._additional_params.len());
+        if let Some(value) = self._source.as_ref() {
+            params.push("source", value);
         }
 
-        params.push(("alt", "json".to_string()));
+        params.extend(self._additional_params.iter());
 
+        params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "books/v1/familysharing/getFamilyInfo";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::Full.as_ref().to_string());
         }
 
 
-        let url = url::Url::parse_with_params(&url, params).unwrap();
+        let url = params.parse_with_url(&url);
 
 
 
         loop {
-            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
-                Ok(token) => token.clone(),
-                Err(err) => {
-                    match  dlg.token(&err) {
-                        Some(token) => token,
-                        None => {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
                             dlg.finished(false);
-                            return Err(client::Error::MissingToken(err))
+                            return Err(client::Error::MissingToken(e));
                         }
                     }
                 }
@@ -6459,21 +7146,27 @@ where
             let mut req_result = {
                 let client = &self.hub.client;
                 dlg.pre_request();
-                let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
-                        .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::GET)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
 
 
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
-                
+
             };
 
             match req_result {
                 Err(err) => {
                     if let client::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep(d).await;
                         continue;
                     }
                     dlg.finished(false);
@@ -6489,7 +7182,7 @@ where
                         let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
                         if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
-                            sleep(d);
+                            sleep(d).await;
                             continue;
                         }
 
@@ -6530,7 +7223,8 @@ where
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.````
     ///
     /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> FamilysharingGetFamilyInfoCall<'a, S> {
@@ -6566,25 +7260,36 @@ where
 
     /// Identifies the authorization scope for the method you are building.
     ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::Full`.
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::Full`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
     ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, St>(mut self, scope: T) -> FamilysharingGetFamilyInfoCall<'a, S>
-                                                        where T: Into<Option<St>>,
-                                                              St: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
+    pub fn add_scope<St>(mut self, scope: St) -> FamilysharingGetFamilyInfoCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> FamilysharingGetFamilyInfoCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> FamilysharingGetFamilyInfoCall<'a, S> {
+        self._scopes.clear();
         self
     }
 }
@@ -6593,7 +7298,7 @@ where
 /// Initiates sharing of the content with the user's family. Empty response indicates success.
 ///
 /// A builder for the *share* method supported by a *familysharing* resource.
-/// It is not used directly, but through a `FamilysharingMethods` instance.
+/// It is not used directly, but through a [`FamilysharingMethods`] instance.
 ///
 /// # Example
 ///
@@ -6605,7 +7310,7 @@ where
 /// # extern crate google_books1 as books1;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use books1::{Books, oauth2, hyper, hyper_rustls};
+/// # use books1::{Books, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
 /// # let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -6632,14 +7337,14 @@ pub struct FamilysharingShareCall<'a, S>
     _doc_id: Option<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
+    _scopes: BTreeSet<String>
 }
 
 impl<'a, S> client::CallBuilder for FamilysharingShareCall<'a, S> {}
 
 impl<'a, S> FamilysharingShareCall<'a, S>
 where
-    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
     S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
     S::Future: Send + Unpin + 'static,
     S::Error: Into<Box<dyn StdError + Send + Sync>>,
@@ -6650,55 +7355,54 @@ where
     pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, Empty)> {
         use std::io::{Read, Seek};
         use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::ToParts;
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
         let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
         dlg.begin(client::MethodInfo { id: "books.familysharing.share",
                                http_method: hyper::Method::POST });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
-        if let Some(value) = self._volume_id {
-            params.push(("volumeId", value.to_string()));
-        }
-        if let Some(value) = self._source {
-            params.push(("source", value.to_string()));
-        }
-        if let Some(value) = self._doc_id {
-            params.push(("docId", value.to_string()));
-        }
+
         for &field in ["alt", "volumeId", "source", "docId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(client::Error::FieldClash(field));
             }
         }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
+
+        let mut params = Params::with_capacity(5 + self._additional_params.len());
+        if let Some(value) = self._volume_id.as_ref() {
+            params.push("volumeId", value);
+        }
+        if let Some(value) = self._source.as_ref() {
+            params.push("source", value);
+        }
+        if let Some(value) = self._doc_id.as_ref() {
+            params.push("docId", value);
         }
 
-        params.push(("alt", "json".to_string()));
+        params.extend(self._additional_params.iter());
 
+        params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "books/v1/familysharing/share";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::Full.as_ref().to_string());
         }
 
 
-        let url = url::Url::parse_with_params(&url, params).unwrap();
+        let url = params.parse_with_url(&url);
 
 
 
         loop {
-            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
-                Ok(token) => token.clone(),
-                Err(err) => {
-                    match  dlg.token(&err) {
-                        Some(token) => token,
-                        None => {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
                             dlg.finished(false);
-                            return Err(client::Error::MissingToken(err))
+                            return Err(client::Error::MissingToken(e));
                         }
                     }
                 }
@@ -6706,21 +7410,27 @@ where
             let mut req_result = {
                 let client = &self.hub.client;
                 dlg.pre_request();
-                let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
-                        .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::POST)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
 
 
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
-                
+
             };
 
             match req_result {
                 Err(err) => {
                     if let client::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep(d).await;
                         continue;
                     }
                     dlg.finished(false);
@@ -6736,7 +7446,7 @@ where
                         let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
                         if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
-                            sleep(d);
+                            sleep(d).await;
                             continue;
                         }
 
@@ -6791,7 +7501,8 @@ where
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.````
     ///
     /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> FamilysharingShareCall<'a, S> {
@@ -6827,25 +7538,36 @@ where
 
     /// Identifies the authorization scope for the method you are building.
     ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::Full`.
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::Full`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
     ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, St>(mut self, scope: T) -> FamilysharingShareCall<'a, S>
-                                                        where T: Into<Option<St>>,
-                                                              St: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
+    pub fn add_scope<St>(mut self, scope: St) -> FamilysharingShareCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> FamilysharingShareCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> FamilysharingShareCall<'a, S> {
+        self._scopes.clear();
         self
     }
 }
@@ -6854,7 +7576,7 @@ where
 /// Initiates revoking content that has already been shared with the user's family. Empty response indicates success.
 ///
 /// A builder for the *unshare* method supported by a *familysharing* resource.
-/// It is not used directly, but through a `FamilysharingMethods` instance.
+/// It is not used directly, but through a [`FamilysharingMethods`] instance.
 ///
 /// # Example
 ///
@@ -6866,7 +7588,7 @@ where
 /// # extern crate google_books1 as books1;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use books1::{Books, oauth2, hyper, hyper_rustls};
+/// # use books1::{Books, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
 /// # let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -6893,14 +7615,14 @@ pub struct FamilysharingUnshareCall<'a, S>
     _doc_id: Option<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
+    _scopes: BTreeSet<String>
 }
 
 impl<'a, S> client::CallBuilder for FamilysharingUnshareCall<'a, S> {}
 
 impl<'a, S> FamilysharingUnshareCall<'a, S>
 where
-    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
     S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
     S::Future: Send + Unpin + 'static,
     S::Error: Into<Box<dyn StdError + Send + Sync>>,
@@ -6911,55 +7633,54 @@ where
     pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, Empty)> {
         use std::io::{Read, Seek};
         use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::ToParts;
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
         let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
         dlg.begin(client::MethodInfo { id: "books.familysharing.unshare",
                                http_method: hyper::Method::POST });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
-        if let Some(value) = self._volume_id {
-            params.push(("volumeId", value.to_string()));
-        }
-        if let Some(value) = self._source {
-            params.push(("source", value.to_string()));
-        }
-        if let Some(value) = self._doc_id {
-            params.push(("docId", value.to_string()));
-        }
+
         for &field in ["alt", "volumeId", "source", "docId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(client::Error::FieldClash(field));
             }
         }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
+
+        let mut params = Params::with_capacity(5 + self._additional_params.len());
+        if let Some(value) = self._volume_id.as_ref() {
+            params.push("volumeId", value);
+        }
+        if let Some(value) = self._source.as_ref() {
+            params.push("source", value);
+        }
+        if let Some(value) = self._doc_id.as_ref() {
+            params.push("docId", value);
         }
 
-        params.push(("alt", "json".to_string()));
+        params.extend(self._additional_params.iter());
 
+        params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "books/v1/familysharing/unshare";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::Full.as_ref().to_string());
         }
 
 
-        let url = url::Url::parse_with_params(&url, params).unwrap();
+        let url = params.parse_with_url(&url);
 
 
 
         loop {
-            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
-                Ok(token) => token.clone(),
-                Err(err) => {
-                    match  dlg.token(&err) {
-                        Some(token) => token,
-                        None => {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
                             dlg.finished(false);
-                            return Err(client::Error::MissingToken(err))
+                            return Err(client::Error::MissingToken(e));
                         }
                     }
                 }
@@ -6967,21 +7688,27 @@ where
             let mut req_result = {
                 let client = &self.hub.client;
                 dlg.pre_request();
-                let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
-                        .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::POST)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
 
 
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
-                
+
             };
 
             match req_result {
                 Err(err) => {
                     if let client::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep(d).await;
                         continue;
                     }
                     dlg.finished(false);
@@ -6997,7 +7724,7 @@ where
                         let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
                         if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
-                            sleep(d);
+                            sleep(d).await;
                             continue;
                         }
 
@@ -7052,7 +7779,8 @@ where
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.````
     ///
     /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> FamilysharingUnshareCall<'a, S> {
@@ -7088,25 +7816,36 @@ where
 
     /// Identifies the authorization scope for the method you are building.
     ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::Full`.
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::Full`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
     ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, St>(mut self, scope: T) -> FamilysharingUnshareCall<'a, S>
-                                                        where T: Into<Option<St>>,
-                                                              St: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
+    pub fn add_scope<St>(mut self, scope: St) -> FamilysharingUnshareCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> FamilysharingUnshareCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> FamilysharingUnshareCall<'a, S> {
+        self._scopes.clear();
         self
     }
 }
@@ -7115,7 +7854,7 @@ where
 /// Gets the annotation data.
 ///
 /// A builder for the *annotationData.get* method supported by a *layer* resource.
-/// It is not used directly, but through a `LayerMethods` instance.
+/// It is not used directly, but through a [`LayerMethods`] instance.
 ///
 /// # Example
 ///
@@ -7127,7 +7866,7 @@ where
 /// # extern crate google_books1 as books1;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use books1::{Books, oauth2, hyper, hyper_rustls};
+/// # use books1::{Books, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
 /// # let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -7164,14 +7903,14 @@ pub struct LayerAnnotationDataGetCall<'a, S>
     _allow_web_definitions: Option<bool>,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
+    _scopes: BTreeSet<String>
 }
 
 impl<'a, S> client::CallBuilder for LayerAnnotationDataGetCall<'a, S> {}
 
 impl<'a, S> LayerAnnotationDataGetCall<'a, S>
 where
-    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
     S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
     S::Future: Send + Unpin + 'static,
     S::Error: Into<Box<dyn StdError + Send + Sync>>,
@@ -7182,89 +7921,74 @@ where
     pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, DictionaryAnnotationdata)> {
         use std::io::{Read, Seek};
         use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::ToParts;
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
         let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
         dlg.begin(client::MethodInfo { id: "books.layers.annotationData.get",
                                http_method: hyper::Method::GET });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(12 + self._additional_params.len());
-        params.push(("volumeId", self._volume_id.to_string()));
-        params.push(("layerId", self._layer_id.to_string()));
-        params.push(("annotationDataId", self._annotation_data_id.to_string()));
-        params.push(("contentVersion", self._content_version.to_string()));
-        if let Some(value) = self._w {
-            params.push(("w", value.to_string()));
-        }
-        if let Some(value) = self._source {
-            params.push(("source", value.to_string()));
-        }
-        if let Some(value) = self._scale {
-            params.push(("scale", value.to_string()));
-        }
-        if let Some(value) = self._locale {
-            params.push(("locale", value.to_string()));
-        }
-        if let Some(value) = self._h {
-            params.push(("h", value.to_string()));
-        }
-        if let Some(value) = self._allow_web_definitions {
-            params.push(("allowWebDefinitions", value.to_string()));
-        }
+
         for &field in ["alt", "volumeId", "layerId", "annotationDataId", "contentVersion", "w", "source", "scale", "locale", "h", "allowWebDefinitions"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(client::Error::FieldClash(field));
             }
         }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
+
+        let mut params = Params::with_capacity(12 + self._additional_params.len());
+        params.push("volumeId", self._volume_id);
+        params.push("layerId", self._layer_id);
+        params.push("annotationDataId", self._annotation_data_id);
+        params.push("contentVersion", self._content_version);
+        if let Some(value) = self._w.as_ref() {
+            params.push("w", value.to_string());
+        }
+        if let Some(value) = self._source.as_ref() {
+            params.push("source", value);
+        }
+        if let Some(value) = self._scale.as_ref() {
+            params.push("scale", value.to_string());
+        }
+        if let Some(value) = self._locale.as_ref() {
+            params.push("locale", value);
+        }
+        if let Some(value) = self._h.as_ref() {
+            params.push("h", value.to_string());
+        }
+        if let Some(value) = self._allow_web_definitions.as_ref() {
+            params.push("allowWebDefinitions", value.to_string());
         }
 
-        params.push(("alt", "json".to_string()));
+        params.extend(self._additional_params.iter());
 
+        params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "books/v1/volumes/{volumeId}/layers/{layerId}/data/{annotationDataId}";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::Full.as_ref().to_string());
         }
 
         for &(find_this, param_name) in [("{volumeId}", "volumeId"), ("{layerId}", "layerId"), ("{annotationDataId}", "annotationDataId")].iter() {
-            let mut replace_with: Option<&str> = None;
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = Some(value);
-                    break;
-                }
-            }
-            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+            url = params.uri_replacement(url, param_name, find_this, false);
         }
         {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(3);
-            for param_name in ["annotationDataId", "layerId", "volumeId"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
+            let to_remove = ["annotationDataId", "layerId", "volumeId"];
+            params.remove_params(&to_remove);
         }
 
-        let url = url::Url::parse_with_params(&url, params).unwrap();
+        let url = params.parse_with_url(&url);
 
 
 
         loop {
-            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
-                Ok(token) => token.clone(),
-                Err(err) => {
-                    match  dlg.token(&err) {
-                        Some(token) => token,
-                        None => {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
                             dlg.finished(false);
-                            return Err(client::Error::MissingToken(err))
+                            return Err(client::Error::MissingToken(e));
                         }
                     }
                 }
@@ -7272,21 +7996,27 @@ where
             let mut req_result = {
                 let client = &self.hub.client;
                 dlg.pre_request();
-                let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
-                        .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::GET)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
 
 
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
-                
+
             };
 
             match req_result {
                 Err(err) => {
                     if let client::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep(d).await;
                         continue;
                     }
                     dlg.finished(false);
@@ -7302,7 +8032,7 @@ where
                         let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
                         if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
-                            sleep(d);
+                            sleep(d).await;
                             continue;
                         }
 
@@ -7418,7 +8148,8 @@ where
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.````
     ///
     /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> LayerAnnotationDataGetCall<'a, S> {
@@ -7454,25 +8185,36 @@ where
 
     /// Identifies the authorization scope for the method you are building.
     ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::Full`.
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::Full`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
     ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, St>(mut self, scope: T) -> LayerAnnotationDataGetCall<'a, S>
-                                                        where T: Into<Option<St>>,
-                                                              St: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
+    pub fn add_scope<St>(mut self, scope: St) -> LayerAnnotationDataGetCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> LayerAnnotationDataGetCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> LayerAnnotationDataGetCall<'a, S> {
+        self._scopes.clear();
         self
     }
 }
@@ -7481,7 +8223,7 @@ where
 /// Gets the annotation data for a volume and layer.
 ///
 /// A builder for the *annotationData.list* method supported by a *layer* resource.
-/// It is not used directly, but through a `LayerMethods` instance.
+/// It is not used directly, but through a [`LayerMethods`] instance.
 ///
 /// # Example
 ///
@@ -7493,7 +8235,7 @@ where
 /// # extern crate google_books1 as books1;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use books1::{Books, oauth2, hyper, hyper_rustls};
+/// # use books1::{Books, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
 /// # let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -7537,14 +8279,14 @@ pub struct LayerAnnotationDataListCall<'a, S>
     _annotation_data_id: Vec<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
+    _scopes: BTreeSet<String>
 }
 
 impl<'a, S> client::CallBuilder for LayerAnnotationDataListCall<'a, S> {}
 
 impl<'a, S> LayerAnnotationDataListCall<'a, S>
 where
-    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
     S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
     S::Future: Send + Unpin + 'static,
     S::Error: Into<Box<dyn StdError + Send + Sync>>,
@@ -7555,102 +8297,87 @@ where
     pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, Annotationsdata)> {
         use std::io::{Read, Seek};
         use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::ToParts;
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
         let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
         dlg.begin(client::MethodInfo { id: "books.layers.annotationData.list",
                                http_method: hyper::Method::GET });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(15 + self._additional_params.len());
-        params.push(("volumeId", self._volume_id.to_string()));
-        params.push(("layerId", self._layer_id.to_string()));
-        params.push(("contentVersion", self._content_version.to_string()));
-        if let Some(value) = self._w {
-            params.push(("w", value.to_string()));
-        }
-        if let Some(value) = self._updated_min {
-            params.push(("updatedMin", value.to_string()));
-        }
-        if let Some(value) = self._updated_max {
-            params.push(("updatedMax", value.to_string()));
-        }
-        if let Some(value) = self._source {
-            params.push(("source", value.to_string()));
-        }
-        if let Some(value) = self._scale {
-            params.push(("scale", value.to_string()));
-        }
-        if let Some(value) = self._page_token {
-            params.push(("pageToken", value.to_string()));
-        }
-        if let Some(value) = self._max_results {
-            params.push(("maxResults", value.to_string()));
-        }
-        if let Some(value) = self._locale {
-            params.push(("locale", value.to_string()));
-        }
-        if let Some(value) = self._h {
-            params.push(("h", value.to_string()));
-        }
-        if self._annotation_data_id.len() > 0 {
-            for f in self._annotation_data_id.iter() {
-                params.push(("annotationDataId", f.to_string()));
-            }
-        }
+
         for &field in ["alt", "volumeId", "layerId", "contentVersion", "w", "updatedMin", "updatedMax", "source", "scale", "pageToken", "maxResults", "locale", "h", "annotationDataId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(client::Error::FieldClash(field));
             }
         }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
+
+        let mut params = Params::with_capacity(15 + self._additional_params.len());
+        params.push("volumeId", self._volume_id);
+        params.push("layerId", self._layer_id);
+        params.push("contentVersion", self._content_version);
+        if let Some(value) = self._w.as_ref() {
+            params.push("w", value.to_string());
+        }
+        if let Some(value) = self._updated_min.as_ref() {
+            params.push("updatedMin", value);
+        }
+        if let Some(value) = self._updated_max.as_ref() {
+            params.push("updatedMax", value);
+        }
+        if let Some(value) = self._source.as_ref() {
+            params.push("source", value);
+        }
+        if let Some(value) = self._scale.as_ref() {
+            params.push("scale", value.to_string());
+        }
+        if let Some(value) = self._page_token.as_ref() {
+            params.push("pageToken", value);
+        }
+        if let Some(value) = self._max_results.as_ref() {
+            params.push("maxResults", value.to_string());
+        }
+        if let Some(value) = self._locale.as_ref() {
+            params.push("locale", value);
+        }
+        if let Some(value) = self._h.as_ref() {
+            params.push("h", value.to_string());
+        }
+        if self._annotation_data_id.len() > 0 {
+            for f in self._annotation_data_id.iter() {
+                params.push("annotationDataId", f);
+            }
         }
 
-        params.push(("alt", "json".to_string()));
+        params.extend(self._additional_params.iter());
 
+        params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "books/v1/volumes/{volumeId}/layers/{layerId}/data";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::Full.as_ref().to_string());
         }
 
         for &(find_this, param_name) in [("{volumeId}", "volumeId"), ("{layerId}", "layerId")].iter() {
-            let mut replace_with: Option<&str> = None;
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = Some(value);
-                    break;
-                }
-            }
-            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+            url = params.uri_replacement(url, param_name, find_this, false);
         }
         {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(2);
-            for param_name in ["layerId", "volumeId"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
+            let to_remove = ["layerId", "volumeId"];
+            params.remove_params(&to_remove);
         }
 
-        let url = url::Url::parse_with_params(&url, params).unwrap();
+        let url = params.parse_with_url(&url);
 
 
 
         loop {
-            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
-                Ok(token) => token.clone(),
-                Err(err) => {
-                    match  dlg.token(&err) {
-                        Some(token) => token,
-                        None => {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
                             dlg.finished(false);
-                            return Err(client::Error::MissingToken(err))
+                            return Err(client::Error::MissingToken(e));
                         }
                     }
                 }
@@ -7658,21 +8385,27 @@ where
             let mut req_result = {
                 let client = &self.hub.client;
                 dlg.pre_request();
-                let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
-                        .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::GET)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
 
 
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
-                
+
             };
 
             match req_result {
                 Err(err) => {
                     if let client::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep(d).await;
                         continue;
                     }
                     dlg.finished(false);
@@ -7688,7 +8421,7 @@ where
                         let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
                         if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
-                            sleep(d);
+                            sleep(d).await;
                             continue;
                         }
 
@@ -7823,7 +8556,8 @@ where
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.````
     ///
     /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> LayerAnnotationDataListCall<'a, S> {
@@ -7859,25 +8593,36 @@ where
 
     /// Identifies the authorization scope for the method you are building.
     ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::Full`.
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::Full`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
     ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, St>(mut self, scope: T) -> LayerAnnotationDataListCall<'a, S>
-                                                        where T: Into<Option<St>>,
-                                                              St: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
+    pub fn add_scope<St>(mut self, scope: St) -> LayerAnnotationDataListCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> LayerAnnotationDataListCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> LayerAnnotationDataListCall<'a, S> {
+        self._scopes.clear();
         self
     }
 }
@@ -7886,7 +8631,7 @@ where
 /// Gets the volume annotation.
 ///
 /// A builder for the *volumeAnnotations.get* method supported by a *layer* resource.
-/// It is not used directly, but through a `LayerMethods` instance.
+/// It is not used directly, but through a [`LayerMethods`] instance.
 ///
 /// # Example
 ///
@@ -7898,7 +8643,7 @@ where
 /// # extern crate google_books1 as books1;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use books1::{Books, oauth2, hyper, hyper_rustls};
+/// # use books1::{Books, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
 /// # let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -7926,14 +8671,14 @@ pub struct LayerVolumeAnnotationGetCall<'a, S>
     _locale: Option<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
+    _scopes: BTreeSet<String>
 }
 
 impl<'a, S> client::CallBuilder for LayerVolumeAnnotationGetCall<'a, S> {}
 
 impl<'a, S> LayerVolumeAnnotationGetCall<'a, S>
 where
-    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
     S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
     S::Future: Send + Unpin + 'static,
     S::Error: Into<Box<dyn StdError + Send + Sync>>,
@@ -7944,76 +8689,61 @@ where
     pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, Volumeannotation)> {
         use std::io::{Read, Seek};
         use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::ToParts;
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
         let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
         dlg.begin(client::MethodInfo { id: "books.layers.volumeAnnotations.get",
                                http_method: hyper::Method::GET });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(7 + self._additional_params.len());
-        params.push(("volumeId", self._volume_id.to_string()));
-        params.push(("layerId", self._layer_id.to_string()));
-        params.push(("annotationId", self._annotation_id.to_string()));
-        if let Some(value) = self._source {
-            params.push(("source", value.to_string()));
-        }
-        if let Some(value) = self._locale {
-            params.push(("locale", value.to_string()));
-        }
+
         for &field in ["alt", "volumeId", "layerId", "annotationId", "source", "locale"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(client::Error::FieldClash(field));
             }
         }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
+
+        let mut params = Params::with_capacity(7 + self._additional_params.len());
+        params.push("volumeId", self._volume_id);
+        params.push("layerId", self._layer_id);
+        params.push("annotationId", self._annotation_id);
+        if let Some(value) = self._source.as_ref() {
+            params.push("source", value);
+        }
+        if let Some(value) = self._locale.as_ref() {
+            params.push("locale", value);
         }
 
-        params.push(("alt", "json".to_string()));
+        params.extend(self._additional_params.iter());
 
+        params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "books/v1/volumes/{volumeId}/layers/{layerId}/annotations/{annotationId}";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::Full.as_ref().to_string());
         }
 
         for &(find_this, param_name) in [("{volumeId}", "volumeId"), ("{layerId}", "layerId"), ("{annotationId}", "annotationId")].iter() {
-            let mut replace_with: Option<&str> = None;
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = Some(value);
-                    break;
-                }
-            }
-            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+            url = params.uri_replacement(url, param_name, find_this, false);
         }
         {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(3);
-            for param_name in ["annotationId", "layerId", "volumeId"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
+            let to_remove = ["annotationId", "layerId", "volumeId"];
+            params.remove_params(&to_remove);
         }
 
-        let url = url::Url::parse_with_params(&url, params).unwrap();
+        let url = params.parse_with_url(&url);
 
 
 
         loop {
-            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
-                Ok(token) => token.clone(),
-                Err(err) => {
-                    match  dlg.token(&err) {
-                        Some(token) => token,
-                        None => {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
                             dlg.finished(false);
-                            return Err(client::Error::MissingToken(err))
+                            return Err(client::Error::MissingToken(e));
                         }
                     }
                 }
@@ -8021,21 +8751,27 @@ where
             let mut req_result = {
                 let client = &self.hub.client;
                 dlg.pre_request();
-                let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
-                        .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::GET)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
 
 
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
-                
+
             };
 
             match req_result {
                 Err(err) => {
                     if let client::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep(d).await;
                         continue;
                     }
                     dlg.finished(false);
@@ -8051,7 +8787,7 @@ where
                         let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
                         if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
-                            sleep(d);
+                            sleep(d).await;
                             continue;
                         }
 
@@ -8129,7 +8865,8 @@ where
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.````
     ///
     /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> LayerVolumeAnnotationGetCall<'a, S> {
@@ -8165,25 +8902,36 @@ where
 
     /// Identifies the authorization scope for the method you are building.
     ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::Full`.
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::Full`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
     ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, St>(mut self, scope: T) -> LayerVolumeAnnotationGetCall<'a, S>
-                                                        where T: Into<Option<St>>,
-                                                              St: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
+    pub fn add_scope<St>(mut self, scope: St) -> LayerVolumeAnnotationGetCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> LayerVolumeAnnotationGetCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> LayerVolumeAnnotationGetCall<'a, S> {
+        self._scopes.clear();
         self
     }
 }
@@ -8192,7 +8940,7 @@ where
 /// Gets the volume annotations for a volume and layer.
 ///
 /// A builder for the *volumeAnnotations.list* method supported by a *layer* resource.
-/// It is not used directly, but through a `LayerMethods` instance.
+/// It is not used directly, but through a [`LayerMethods`] instance.
 ///
 /// # Example
 ///
@@ -8204,7 +8952,7 @@ where
 /// # extern crate google_books1 as books1;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use books1::{Books, oauth2, hyper, hyper_rustls};
+/// # use books1::{Books, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
 /// # let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -8252,14 +9000,14 @@ pub struct LayerVolumeAnnotationListCall<'a, S>
     _end_offset: Option<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
+    _scopes: BTreeSet<String>
 }
 
 impl<'a, S> client::CallBuilder for LayerVolumeAnnotationListCall<'a, S> {}
 
 impl<'a, S> LayerVolumeAnnotationListCall<'a, S>
 where
-    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
     S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
     S::Future: Send + Unpin + 'static,
     S::Error: Into<Box<dyn StdError + Send + Sync>>,
@@ -8270,106 +9018,91 @@ where
     pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, Volumeannotations)> {
         use std::io::{Read, Seek};
         use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::ToParts;
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
         let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
         dlg.begin(client::MethodInfo { id: "books.layers.volumeAnnotations.list",
                                http_method: hyper::Method::GET });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(17 + self._additional_params.len());
-        params.push(("volumeId", self._volume_id.to_string()));
-        params.push(("layerId", self._layer_id.to_string()));
-        params.push(("contentVersion", self._content_version.to_string()));
-        if let Some(value) = self._volume_annotations_version {
-            params.push(("volumeAnnotationsVersion", value.to_string()));
-        }
-        if let Some(value) = self._updated_min {
-            params.push(("updatedMin", value.to_string()));
-        }
-        if let Some(value) = self._updated_max {
-            params.push(("updatedMax", value.to_string()));
-        }
-        if let Some(value) = self._start_position {
-            params.push(("startPosition", value.to_string()));
-        }
-        if let Some(value) = self._start_offset {
-            params.push(("startOffset", value.to_string()));
-        }
-        if let Some(value) = self._source {
-            params.push(("source", value.to_string()));
-        }
-        if let Some(value) = self._show_deleted {
-            params.push(("showDeleted", value.to_string()));
-        }
-        if let Some(value) = self._page_token {
-            params.push(("pageToken", value.to_string()));
-        }
-        if let Some(value) = self._max_results {
-            params.push(("maxResults", value.to_string()));
-        }
-        if let Some(value) = self._locale {
-            params.push(("locale", value.to_string()));
-        }
-        if let Some(value) = self._end_position {
-            params.push(("endPosition", value.to_string()));
-        }
-        if let Some(value) = self._end_offset {
-            params.push(("endOffset", value.to_string()));
-        }
+
         for &field in ["alt", "volumeId", "layerId", "contentVersion", "volumeAnnotationsVersion", "updatedMin", "updatedMax", "startPosition", "startOffset", "source", "showDeleted", "pageToken", "maxResults", "locale", "endPosition", "endOffset"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(client::Error::FieldClash(field));
             }
         }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
+
+        let mut params = Params::with_capacity(17 + self._additional_params.len());
+        params.push("volumeId", self._volume_id);
+        params.push("layerId", self._layer_id);
+        params.push("contentVersion", self._content_version);
+        if let Some(value) = self._volume_annotations_version.as_ref() {
+            params.push("volumeAnnotationsVersion", value);
+        }
+        if let Some(value) = self._updated_min.as_ref() {
+            params.push("updatedMin", value);
+        }
+        if let Some(value) = self._updated_max.as_ref() {
+            params.push("updatedMax", value);
+        }
+        if let Some(value) = self._start_position.as_ref() {
+            params.push("startPosition", value);
+        }
+        if let Some(value) = self._start_offset.as_ref() {
+            params.push("startOffset", value);
+        }
+        if let Some(value) = self._source.as_ref() {
+            params.push("source", value);
+        }
+        if let Some(value) = self._show_deleted.as_ref() {
+            params.push("showDeleted", value.to_string());
+        }
+        if let Some(value) = self._page_token.as_ref() {
+            params.push("pageToken", value);
+        }
+        if let Some(value) = self._max_results.as_ref() {
+            params.push("maxResults", value.to_string());
+        }
+        if let Some(value) = self._locale.as_ref() {
+            params.push("locale", value);
+        }
+        if let Some(value) = self._end_position.as_ref() {
+            params.push("endPosition", value);
+        }
+        if let Some(value) = self._end_offset.as_ref() {
+            params.push("endOffset", value);
         }
 
-        params.push(("alt", "json".to_string()));
+        params.extend(self._additional_params.iter());
 
+        params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "books/v1/volumes/{volumeId}/layers/{layerId}";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::Full.as_ref().to_string());
         }
 
         for &(find_this, param_name) in [("{volumeId}", "volumeId"), ("{layerId}", "layerId")].iter() {
-            let mut replace_with: Option<&str> = None;
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = Some(value);
-                    break;
-                }
-            }
-            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+            url = params.uri_replacement(url, param_name, find_this, false);
         }
         {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(2);
-            for param_name in ["layerId", "volumeId"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
+            let to_remove = ["layerId", "volumeId"];
+            params.remove_params(&to_remove);
         }
 
-        let url = url::Url::parse_with_params(&url, params).unwrap();
+        let url = params.parse_with_url(&url);
 
 
 
         loop {
-            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
-                Ok(token) => token.clone(),
-                Err(err) => {
-                    match  dlg.token(&err) {
-                        Some(token) => token,
-                        None => {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
                             dlg.finished(false);
-                            return Err(client::Error::MissingToken(err))
+                            return Err(client::Error::MissingToken(e));
                         }
                     }
                 }
@@ -8377,21 +9110,27 @@ where
             let mut req_result = {
                 let client = &self.hub.client;
                 dlg.pre_request();
-                let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
-                        .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::GET)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
 
 
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
-                
+
             };
 
             match req_result {
                 Err(err) => {
                     if let client::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep(d).await;
                         continue;
                     }
                     dlg.finished(false);
@@ -8407,7 +9146,7 @@ where
                         let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
                         if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
-                            sleep(d);
+                            sleep(d).await;
                             continue;
                         }
 
@@ -8555,7 +9294,8 @@ where
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.````
     ///
     /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> LayerVolumeAnnotationListCall<'a, S> {
@@ -8591,25 +9331,36 @@ where
 
     /// Identifies the authorization scope for the method you are building.
     ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::Full`.
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::Full`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
     ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, St>(mut self, scope: T) -> LayerVolumeAnnotationListCall<'a, S>
-                                                        where T: Into<Option<St>>,
-                                                              St: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
+    pub fn add_scope<St>(mut self, scope: St) -> LayerVolumeAnnotationListCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> LayerVolumeAnnotationListCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> LayerVolumeAnnotationListCall<'a, S> {
+        self._scopes.clear();
         self
     }
 }
@@ -8618,7 +9369,7 @@ where
 /// Gets the layer summary for a volume.
 ///
 /// A builder for the *get* method supported by a *layer* resource.
-/// It is not used directly, but through a `LayerMethods` instance.
+/// It is not used directly, but through a [`LayerMethods`] instance.
 ///
 /// # Example
 ///
@@ -8630,7 +9381,7 @@ where
 /// # extern crate google_books1 as books1;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use books1::{Books, oauth2, hyper, hyper_rustls};
+/// # use books1::{Books, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
 /// # let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -8657,14 +9408,14 @@ pub struct LayerGetCall<'a, S>
     _content_version: Option<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
+    _scopes: BTreeSet<String>
 }
 
 impl<'a, S> client::CallBuilder for LayerGetCall<'a, S> {}
 
 impl<'a, S> LayerGetCall<'a, S>
 where
-    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
     S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
     S::Future: Send + Unpin + 'static,
     S::Error: Into<Box<dyn StdError + Send + Sync>>,
@@ -8675,75 +9426,60 @@ where
     pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, Layersummary)> {
         use std::io::{Read, Seek};
         use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::ToParts;
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
         let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
         dlg.begin(client::MethodInfo { id: "books.layers.get",
                                http_method: hyper::Method::GET });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(6 + self._additional_params.len());
-        params.push(("volumeId", self._volume_id.to_string()));
-        params.push(("summaryId", self._summary_id.to_string()));
-        if let Some(value) = self._source {
-            params.push(("source", value.to_string()));
-        }
-        if let Some(value) = self._content_version {
-            params.push(("contentVersion", value.to_string()));
-        }
+
         for &field in ["alt", "volumeId", "summaryId", "source", "contentVersion"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(client::Error::FieldClash(field));
             }
         }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
+
+        let mut params = Params::with_capacity(6 + self._additional_params.len());
+        params.push("volumeId", self._volume_id);
+        params.push("summaryId", self._summary_id);
+        if let Some(value) = self._source.as_ref() {
+            params.push("source", value);
+        }
+        if let Some(value) = self._content_version.as_ref() {
+            params.push("contentVersion", value);
         }
 
-        params.push(("alt", "json".to_string()));
+        params.extend(self._additional_params.iter());
 
+        params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "books/v1/volumes/{volumeId}/layersummary/{summaryId}";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::Full.as_ref().to_string());
         }
 
         for &(find_this, param_name) in [("{volumeId}", "volumeId"), ("{summaryId}", "summaryId")].iter() {
-            let mut replace_with: Option<&str> = None;
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = Some(value);
-                    break;
-                }
-            }
-            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+            url = params.uri_replacement(url, param_name, find_this, false);
         }
         {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(2);
-            for param_name in ["summaryId", "volumeId"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
+            let to_remove = ["summaryId", "volumeId"];
+            params.remove_params(&to_remove);
         }
 
-        let url = url::Url::parse_with_params(&url, params).unwrap();
+        let url = params.parse_with_url(&url);
 
 
 
         loop {
-            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
-                Ok(token) => token.clone(),
-                Err(err) => {
-                    match  dlg.token(&err) {
-                        Some(token) => token,
-                        None => {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
                             dlg.finished(false);
-                            return Err(client::Error::MissingToken(err))
+                            return Err(client::Error::MissingToken(e));
                         }
                     }
                 }
@@ -8751,21 +9487,27 @@ where
             let mut req_result = {
                 let client = &self.hub.client;
                 dlg.pre_request();
-                let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
-                        .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::GET)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
 
 
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
-                
+
             };
 
             match req_result {
                 Err(err) => {
                     if let client::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep(d).await;
                         continue;
                     }
                     dlg.finished(false);
@@ -8781,7 +9523,7 @@ where
                         let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
                         if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
-                            sleep(d);
+                            sleep(d).await;
                             continue;
                         }
 
@@ -8849,7 +9591,8 @@ where
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.````
     ///
     /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> LayerGetCall<'a, S> {
@@ -8885,25 +9628,36 @@ where
 
     /// Identifies the authorization scope for the method you are building.
     ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::Full`.
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::Full`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
     ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, St>(mut self, scope: T) -> LayerGetCall<'a, S>
-                                                        where T: Into<Option<St>>,
-                                                              St: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
+    pub fn add_scope<St>(mut self, scope: St) -> LayerGetCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> LayerGetCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> LayerGetCall<'a, S> {
+        self._scopes.clear();
         self
     }
 }
@@ -8912,7 +9666,7 @@ where
 /// List the layer summaries for a volume.
 ///
 /// A builder for the *list* method supported by a *layer* resource.
-/// It is not used directly, but through a `LayerMethods` instance.
+/// It is not used directly, but through a [`LayerMethods`] instance.
 ///
 /// # Example
 ///
@@ -8924,7 +9678,7 @@ where
 /// # extern crate google_books1 as books1;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use books1::{Books, oauth2, hyper, hyper_rustls};
+/// # use books1::{Books, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
 /// # let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -8954,14 +9708,14 @@ pub struct LayerListCall<'a, S>
     _content_version: Option<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
+    _scopes: BTreeSet<String>
 }
 
 impl<'a, S> client::CallBuilder for LayerListCall<'a, S> {}
 
 impl<'a, S> LayerListCall<'a, S>
 where
-    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
     S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
     S::Future: Send + Unpin + 'static,
     S::Error: Into<Box<dyn StdError + Send + Sync>>,
@@ -8972,80 +9726,65 @@ where
     pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, Layersummaries)> {
         use std::io::{Read, Seek};
         use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::ToParts;
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
         let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
         dlg.begin(client::MethodInfo { id: "books.layers.list",
                                http_method: hyper::Method::GET });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(7 + self._additional_params.len());
-        params.push(("volumeId", self._volume_id.to_string()));
-        if let Some(value) = self._source {
-            params.push(("source", value.to_string()));
-        }
-        if let Some(value) = self._page_token {
-            params.push(("pageToken", value.to_string()));
-        }
-        if let Some(value) = self._max_results {
-            params.push(("maxResults", value.to_string()));
-        }
-        if let Some(value) = self._content_version {
-            params.push(("contentVersion", value.to_string()));
-        }
+
         for &field in ["alt", "volumeId", "source", "pageToken", "maxResults", "contentVersion"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(client::Error::FieldClash(field));
             }
         }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
+
+        let mut params = Params::with_capacity(7 + self._additional_params.len());
+        params.push("volumeId", self._volume_id);
+        if let Some(value) = self._source.as_ref() {
+            params.push("source", value);
+        }
+        if let Some(value) = self._page_token.as_ref() {
+            params.push("pageToken", value);
+        }
+        if let Some(value) = self._max_results.as_ref() {
+            params.push("maxResults", value.to_string());
+        }
+        if let Some(value) = self._content_version.as_ref() {
+            params.push("contentVersion", value);
         }
 
-        params.push(("alt", "json".to_string()));
+        params.extend(self._additional_params.iter());
 
+        params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "books/v1/volumes/{volumeId}/layersummary";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::Full.as_ref().to_string());
         }
 
         for &(find_this, param_name) in [("{volumeId}", "volumeId")].iter() {
-            let mut replace_with: Option<&str> = None;
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = Some(value);
-                    break;
-                }
-            }
-            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+            url = params.uri_replacement(url, param_name, find_this, false);
         }
         {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
-            for param_name in ["volumeId"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
+            let to_remove = ["volumeId"];
+            params.remove_params(&to_remove);
         }
 
-        let url = url::Url::parse_with_params(&url, params).unwrap();
+        let url = params.parse_with_url(&url);
 
 
 
         loop {
-            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
-                Ok(token) => token.clone(),
-                Err(err) => {
-                    match  dlg.token(&err) {
-                        Some(token) => token,
-                        None => {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
                             dlg.finished(false);
-                            return Err(client::Error::MissingToken(err))
+                            return Err(client::Error::MissingToken(e));
                         }
                     }
                 }
@@ -9053,21 +9792,27 @@ where
             let mut req_result = {
                 let client = &self.hub.client;
                 dlg.pre_request();
-                let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
-                        .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::GET)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
 
 
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
-                
+
             };
 
             match req_result {
                 Err(err) => {
                     if let client::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep(d).await;
                         continue;
                     }
                     dlg.finished(false);
@@ -9083,7 +9828,7 @@ where
                         let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
                         if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
-                            sleep(d);
+                            sleep(d).await;
                             continue;
                         }
 
@@ -9155,7 +9900,8 @@ where
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.````
     ///
     /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> LayerListCall<'a, S> {
@@ -9191,25 +9937,36 @@ where
 
     /// Identifies the authorization scope for the method you are building.
     ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::Full`.
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::Full`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
     ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, St>(mut self, scope: T) -> LayerListCall<'a, S>
-                                                        where T: Into<Option<St>>,
-                                                              St: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
+    pub fn add_scope<St>(mut self, scope: St) -> LayerListCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> LayerListCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> LayerListCall<'a, S> {
+        self._scopes.clear();
         self
     }
 }
@@ -9218,7 +9975,7 @@ where
 /// Gets the current settings for the user.
 ///
 /// A builder for the *getUserSettings* method supported by a *myconfig* resource.
-/// It is not used directly, but through a `MyconfigMethods` instance.
+/// It is not used directly, but through a [`MyconfigMethods`] instance.
 ///
 /// # Example
 ///
@@ -9230,7 +9987,7 @@ where
 /// # extern crate google_books1 as books1;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use books1::{Books, oauth2, hyper, hyper_rustls};
+/// # use books1::{Books, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
 /// # let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -9253,14 +10010,14 @@ pub struct MyconfigGetUserSettingCall<'a, S>
     _country: Option<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
+    _scopes: BTreeSet<String>
 }
 
 impl<'a, S> client::CallBuilder for MyconfigGetUserSettingCall<'a, S> {}
 
 impl<'a, S> MyconfigGetUserSettingCall<'a, S>
 where
-    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
     S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
     S::Future: Send + Unpin + 'static,
     S::Error: Into<Box<dyn StdError + Send + Sync>>,
@@ -9271,49 +10028,48 @@ where
     pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, Usersettings)> {
         use std::io::{Read, Seek};
         use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::ToParts;
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
         let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
         dlg.begin(client::MethodInfo { id: "books.myconfig.getUserSettings",
                                http_method: hyper::Method::GET });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
-        if let Some(value) = self._country {
-            params.push(("country", value.to_string()));
-        }
+
         for &field in ["alt", "country"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(client::Error::FieldClash(field));
             }
         }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
+
+        let mut params = Params::with_capacity(3 + self._additional_params.len());
+        if let Some(value) = self._country.as_ref() {
+            params.push("country", value);
         }
 
-        params.push(("alt", "json".to_string()));
+        params.extend(self._additional_params.iter());
 
+        params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "books/v1/myconfig/getUserSettings";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::Full.as_ref().to_string());
         }
 
 
-        let url = url::Url::parse_with_params(&url, params).unwrap();
+        let url = params.parse_with_url(&url);
 
 
 
         loop {
-            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
-                Ok(token) => token.clone(),
-                Err(err) => {
-                    match  dlg.token(&err) {
-                        Some(token) => token,
-                        None => {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
                             dlg.finished(false);
-                            return Err(client::Error::MissingToken(err))
+                            return Err(client::Error::MissingToken(e));
                         }
                     }
                 }
@@ -9321,21 +10077,27 @@ where
             let mut req_result = {
                 let client = &self.hub.client;
                 dlg.pre_request();
-                let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
-                        .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::GET)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
 
 
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
-                
+
             };
 
             match req_result {
                 Err(err) => {
                     if let client::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep(d).await;
                         continue;
                     }
                     dlg.finished(false);
@@ -9351,7 +10113,7 @@ where
                         let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
                         if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
-                            sleep(d);
+                            sleep(d).await;
                             continue;
                         }
 
@@ -9392,7 +10154,8 @@ where
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.````
     ///
     /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MyconfigGetUserSettingCall<'a, S> {
@@ -9428,25 +10191,36 @@ where
 
     /// Identifies the authorization scope for the method you are building.
     ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::Full`.
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::Full`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
     ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, St>(mut self, scope: T) -> MyconfigGetUserSettingCall<'a, S>
-                                                        where T: Into<Option<St>>,
-                                                              St: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
+    pub fn add_scope<St>(mut self, scope: St) -> MyconfigGetUserSettingCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> MyconfigGetUserSettingCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> MyconfigGetUserSettingCall<'a, S> {
+        self._scopes.clear();
         self
     }
 }
@@ -9455,7 +10229,7 @@ where
 /// Release downloaded content access restriction.
 ///
 /// A builder for the *releaseDownloadAccess* method supported by a *myconfig* resource.
-/// It is not used directly, but through a `MyconfigMethods` instance.
+/// It is not used directly, but through a [`MyconfigMethods`] instance.
 ///
 /// # Example
 ///
@@ -9467,7 +10241,7 @@ where
 /// # extern crate google_books1 as books1;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use books1::{Books, oauth2, hyper, hyper_rustls};
+/// # use books1::{Books, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
 /// # let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -9494,14 +10268,14 @@ pub struct MyconfigReleaseDownloadAccesCall<'a, S>
     _locale: Option<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
+    _scopes: BTreeSet<String>
 }
 
 impl<'a, S> client::CallBuilder for MyconfigReleaseDownloadAccesCall<'a, S> {}
 
 impl<'a, S> MyconfigReleaseDownloadAccesCall<'a, S>
 where
-    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
     S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
     S::Future: Send + Unpin + 'static,
     S::Error: Into<Box<dyn StdError + Send + Sync>>,
@@ -9512,58 +10286,57 @@ where
     pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, DownloadAccesses)> {
         use std::io::{Read, Seek};
         use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::ToParts;
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
         let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
         dlg.begin(client::MethodInfo { id: "books.myconfig.releaseDownloadAccess",
                                http_method: hyper::Method::POST });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(6 + self._additional_params.len());
-        params.push(("cpksver", self._cpksver.to_string()));
-        if self._volume_ids.len() > 0 {
-            for f in self._volume_ids.iter() {
-                params.push(("volumeIds", f.to_string()));
-            }
-        }
-        if let Some(value) = self._source {
-            params.push(("source", value.to_string()));
-        }
-        if let Some(value) = self._locale {
-            params.push(("locale", value.to_string()));
-        }
+
         for &field in ["alt", "cpksver", "volumeIds", "source", "locale"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(client::Error::FieldClash(field));
             }
         }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
+
+        let mut params = Params::with_capacity(6 + self._additional_params.len());
+        params.push("cpksver", self._cpksver);
+        if self._volume_ids.len() > 0 {
+            for f in self._volume_ids.iter() {
+                params.push("volumeIds", f);
+            }
+        }
+        if let Some(value) = self._source.as_ref() {
+            params.push("source", value);
+        }
+        if let Some(value) = self._locale.as_ref() {
+            params.push("locale", value);
         }
 
-        params.push(("alt", "json".to_string()));
+        params.extend(self._additional_params.iter());
 
+        params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "books/v1/myconfig/releaseDownloadAccess";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::Full.as_ref().to_string());
         }
 
 
-        let url = url::Url::parse_with_params(&url, params).unwrap();
+        let url = params.parse_with_url(&url);
 
 
 
         loop {
-            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
-                Ok(token) => token.clone(),
-                Err(err) => {
-                    match  dlg.token(&err) {
-                        Some(token) => token,
-                        None => {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
                             dlg.finished(false);
-                            return Err(client::Error::MissingToken(err))
+                            return Err(client::Error::MissingToken(e));
                         }
                     }
                 }
@@ -9571,21 +10344,27 @@ where
             let mut req_result = {
                 let client = &self.hub.client;
                 dlg.pre_request();
-                let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
-                        .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::POST)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
 
 
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
-                
+
             };
 
             match req_result {
                 Err(err) => {
                     if let client::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep(d).await;
                         continue;
                     }
                     dlg.finished(false);
@@ -9601,7 +10380,7 @@ where
                         let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
                         if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
-                            sleep(d);
+                            sleep(d).await;
                             continue;
                         }
 
@@ -9670,7 +10449,8 @@ where
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.````
     ///
     /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MyconfigReleaseDownloadAccesCall<'a, S> {
@@ -9706,25 +10486,36 @@ where
 
     /// Identifies the authorization scope for the method you are building.
     ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::Full`.
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::Full`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
     ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, St>(mut self, scope: T) -> MyconfigReleaseDownloadAccesCall<'a, S>
-                                                        where T: Into<Option<St>>,
-                                                              St: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
+    pub fn add_scope<St>(mut self, scope: St) -> MyconfigReleaseDownloadAccesCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> MyconfigReleaseDownloadAccesCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> MyconfigReleaseDownloadAccesCall<'a, S> {
+        self._scopes.clear();
         self
     }
 }
@@ -9733,7 +10524,7 @@ where
 /// Request concurrent and download access restrictions.
 ///
 /// A builder for the *requestAccess* method supported by a *myconfig* resource.
-/// It is not used directly, but through a `MyconfigMethods` instance.
+/// It is not used directly, but through a [`MyconfigMethods`] instance.
 ///
 /// # Example
 ///
@@ -9745,7 +10536,7 @@ where
 /// # extern crate google_books1 as books1;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use books1::{Books, oauth2, hyper, hyper_rustls};
+/// # use books1::{Books, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
 /// # let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -9774,14 +10565,14 @@ pub struct MyconfigRequestAccesCall<'a, S>
     _license_types: Option<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
+    _scopes: BTreeSet<String>
 }
 
 impl<'a, S> client::CallBuilder for MyconfigRequestAccesCall<'a, S> {}
 
 impl<'a, S> MyconfigRequestAccesCall<'a, S>
 where
-    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
     S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
     S::Future: Send + Unpin + 'static,
     S::Error: Into<Box<dyn StdError + Send + Sync>>,
@@ -9792,56 +10583,55 @@ where
     pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, RequestAccessData)> {
         use std::io::{Read, Seek};
         use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::ToParts;
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
         let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
         dlg.begin(client::MethodInfo { id: "books.myconfig.requestAccess",
                                http_method: hyper::Method::POST });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(8 + self._additional_params.len());
-        params.push(("cpksver", self._cpksver.to_string()));
-        params.push(("nonce", self._nonce.to_string()));
-        params.push(("source", self._source.to_string()));
-        params.push(("volumeId", self._volume_id.to_string()));
-        if let Some(value) = self._locale {
-            params.push(("locale", value.to_string()));
-        }
-        if let Some(value) = self._license_types {
-            params.push(("licenseTypes", value.to_string()));
-        }
+
         for &field in ["alt", "cpksver", "nonce", "source", "volumeId", "locale", "licenseTypes"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(client::Error::FieldClash(field));
             }
         }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
+
+        let mut params = Params::with_capacity(8 + self._additional_params.len());
+        params.push("cpksver", self._cpksver);
+        params.push("nonce", self._nonce);
+        params.push("source", self._source);
+        params.push("volumeId", self._volume_id);
+        if let Some(value) = self._locale.as_ref() {
+            params.push("locale", value);
+        }
+        if let Some(value) = self._license_types.as_ref() {
+            params.push("licenseTypes", value);
         }
 
-        params.push(("alt", "json".to_string()));
+        params.extend(self._additional_params.iter());
 
+        params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "books/v1/myconfig/requestAccess";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::Full.as_ref().to_string());
         }
 
 
-        let url = url::Url::parse_with_params(&url, params).unwrap();
+        let url = params.parse_with_url(&url);
 
 
 
         loop {
-            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
-                Ok(token) => token.clone(),
-                Err(err) => {
-                    match  dlg.token(&err) {
-                        Some(token) => token,
-                        None => {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
                             dlg.finished(false);
-                            return Err(client::Error::MissingToken(err))
+                            return Err(client::Error::MissingToken(e));
                         }
                     }
                 }
@@ -9849,21 +10639,27 @@ where
             let mut req_result = {
                 let client = &self.hub.client;
                 dlg.pre_request();
-                let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
-                        .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::POST)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
 
 
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
-                
+
             };
 
             match req_result {
                 Err(err) => {
                     if let client::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep(d).await;
                         continue;
                     }
                     dlg.finished(false);
@@ -9879,7 +10675,7 @@ where
                         let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
                         if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
-                            sleep(d);
+                            sleep(d).await;
                             continue;
                         }
 
@@ -9967,7 +10763,8 @@ where
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.````
     ///
     /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MyconfigRequestAccesCall<'a, S> {
@@ -10003,25 +10800,36 @@ where
 
     /// Identifies the authorization scope for the method you are building.
     ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::Full`.
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::Full`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
     ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, St>(mut self, scope: T) -> MyconfigRequestAccesCall<'a, S>
-                                                        where T: Into<Option<St>>,
-                                                              St: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
+    pub fn add_scope<St>(mut self, scope: St) -> MyconfigRequestAccesCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> MyconfigRequestAccesCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> MyconfigRequestAccesCall<'a, S> {
+        self._scopes.clear();
         self
     }
 }
@@ -10030,7 +10838,7 @@ where
 /// Request downloaded content access for specified volumes on the My eBooks shelf.
 ///
 /// A builder for the *syncVolumeLicenses* method supported by a *myconfig* resource.
-/// It is not used directly, but through a `MyconfigMethods` instance.
+/// It is not used directly, but through a [`MyconfigMethods`] instance.
 ///
 /// # Example
 ///
@@ -10042,7 +10850,7 @@ where
 /// # extern crate google_books1 as books1;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use books1::{Books, oauth2, hyper, hyper_rustls};
+/// # use books1::{Books, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
 /// # let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -10076,14 +10884,14 @@ pub struct MyconfigSyncVolumeLicenseCall<'a, S>
     _features: Vec<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
+    _scopes: BTreeSet<String>
 }
 
 impl<'a, S> client::CallBuilder for MyconfigSyncVolumeLicenseCall<'a, S> {}
 
 impl<'a, S> MyconfigSyncVolumeLicenseCall<'a, S>
 where
-    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
     S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
     S::Future: Send + Unpin + 'static,
     S::Error: Into<Box<dyn StdError + Send + Sync>>,
@@ -10094,68 +10902,67 @@ where
     pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, Volumes)> {
         use std::io::{Read, Seek};
         use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::ToParts;
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
         let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
         dlg.begin(client::MethodInfo { id: "books.myconfig.syncVolumeLicenses",
                                http_method: hyper::Method::POST });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(10 + self._additional_params.len());
-        params.push(("cpksver", self._cpksver.to_string()));
-        params.push(("nonce", self._nonce.to_string()));
-        params.push(("source", self._source.to_string()));
-        if self._volume_ids.len() > 0 {
-            for f in self._volume_ids.iter() {
-                params.push(("volumeIds", f.to_string()));
-            }
-        }
-        if let Some(value) = self._show_preorders {
-            params.push(("showPreorders", value.to_string()));
-        }
-        if let Some(value) = self._locale {
-            params.push(("locale", value.to_string()));
-        }
-        if let Some(value) = self._include_non_comics_series {
-            params.push(("includeNonComicsSeries", value.to_string()));
-        }
-        if self._features.len() > 0 {
-            for f in self._features.iter() {
-                params.push(("features", f.to_string()));
-            }
-        }
+
         for &field in ["alt", "cpksver", "nonce", "source", "volumeIds", "showPreorders", "locale", "includeNonComicsSeries", "features"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(client::Error::FieldClash(field));
             }
         }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
+
+        let mut params = Params::with_capacity(10 + self._additional_params.len());
+        params.push("cpksver", self._cpksver);
+        params.push("nonce", self._nonce);
+        params.push("source", self._source);
+        if self._volume_ids.len() > 0 {
+            for f in self._volume_ids.iter() {
+                params.push("volumeIds", f);
+            }
+        }
+        if let Some(value) = self._show_preorders.as_ref() {
+            params.push("showPreorders", value.to_string());
+        }
+        if let Some(value) = self._locale.as_ref() {
+            params.push("locale", value);
+        }
+        if let Some(value) = self._include_non_comics_series.as_ref() {
+            params.push("includeNonComicsSeries", value.to_string());
+        }
+        if self._features.len() > 0 {
+            for f in self._features.iter() {
+                params.push("features", f);
+            }
         }
 
-        params.push(("alt", "json".to_string()));
+        params.extend(self._additional_params.iter());
 
+        params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "books/v1/myconfig/syncVolumeLicenses";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::Full.as_ref().to_string());
         }
 
 
-        let url = url::Url::parse_with_params(&url, params).unwrap();
+        let url = params.parse_with_url(&url);
 
 
 
         loop {
-            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
-                Ok(token) => token.clone(),
-                Err(err) => {
-                    match  dlg.token(&err) {
-                        Some(token) => token,
-                        None => {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
                             dlg.finished(false);
-                            return Err(client::Error::MissingToken(err))
+                            return Err(client::Error::MissingToken(e));
                         }
                     }
                 }
@@ -10163,21 +10970,27 @@ where
             let mut req_result = {
                 let client = &self.hub.client;
                 dlg.pre_request();
-                let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
-                        .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::POST)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
 
 
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
-                
+
             };
 
             match req_result {
                 Err(err) => {
                     if let client::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep(d).await;
                         continue;
                     }
                     dlg.finished(false);
@@ -10193,7 +11006,7 @@ where
                         let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
                         if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
-                            sleep(d);
+                            sleep(d).await;
                             continue;
                         }
 
@@ -10294,7 +11107,8 @@ where
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.````
     ///
     /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MyconfigSyncVolumeLicenseCall<'a, S> {
@@ -10330,25 +11144,36 @@ where
 
     /// Identifies the authorization scope for the method you are building.
     ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::Full`.
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::Full`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
     ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, St>(mut self, scope: T) -> MyconfigSyncVolumeLicenseCall<'a, S>
-                                                        where T: Into<Option<St>>,
-                                                              St: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
+    pub fn add_scope<St>(mut self, scope: St) -> MyconfigSyncVolumeLicenseCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> MyconfigSyncVolumeLicenseCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> MyconfigSyncVolumeLicenseCall<'a, S> {
+        self._scopes.clear();
         self
     }
 }
@@ -10357,7 +11182,7 @@ where
 /// Sets the settings for the user. If a sub-object is specified, it will overwrite the existing sub-object stored in the server. Unspecified sub-objects will retain the existing value.
 ///
 /// A builder for the *updateUserSettings* method supported by a *myconfig* resource.
-/// It is not used directly, but through a `MyconfigMethods` instance.
+/// It is not used directly, but through a [`MyconfigMethods`] instance.
 ///
 /// # Example
 ///
@@ -10370,7 +11195,7 @@ where
 /// use books1::api::Usersettings;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use books1::{Books, oauth2, hyper, hyper_rustls};
+/// # use books1::{Books, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
 /// # let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -10397,14 +11222,14 @@ pub struct MyconfigUpdateUserSettingCall<'a, S>
     _request: Usersettings,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
+    _scopes: BTreeSet<String>
 }
 
 impl<'a, S> client::CallBuilder for MyconfigUpdateUserSettingCall<'a, S> {}
 
 impl<'a, S> MyconfigUpdateUserSettingCall<'a, S>
 where
-    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
     S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
     S::Future: Send + Unpin + 'static,
     S::Error: Into<Box<dyn StdError + Send + Sync>>,
@@ -10415,36 +11240,35 @@ where
     pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, Usersettings)> {
         use std::io::{Read, Seek};
         use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::ToParts;
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
         let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
         dlg.begin(client::MethodInfo { id: "books.myconfig.updateUserSettings",
                                http_method: hyper::Method::POST });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
+
         for &field in ["alt"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(client::Error::FieldClash(field));
             }
         }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
 
-        params.push(("alt", "json".to_string()));
+        let mut params = Params::with_capacity(3 + self._additional_params.len());
 
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "books/v1/myconfig/updateUserSettings";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::Full.as_ref().to_string());
         }
 
 
-        let url = url::Url::parse_with_params(&url, params).unwrap();
+        let url = params.parse_with_url(&url);
 
-        let mut json_mime_type: mime::Mime = "application/json".parse().unwrap();
+        let mut json_mime_type = mime::APPLICATION_JSON;
         let mut request_value_reader =
             {
                 let mut value = json::value::to_value(&self._request).expect("serde to work");
@@ -10458,14 +11282,14 @@ where
 
 
         loop {
-            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
-                Ok(token) => token.clone(),
-                Err(err) => {
-                    match  dlg.token(&err) {
-                        Some(token) => token,
-                        None => {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
                             dlg.finished(false);
-                            return Err(client::Error::MissingToken(err))
+                            return Err(client::Error::MissingToken(e));
                         }
                     }
                 }
@@ -10474,23 +11298,29 @@ where
             let mut req_result = {
                 let client = &self.hub.client;
                 dlg.pre_request();
-                let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
-                        .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::POST)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
 
 
                         let request = req_builder
-                        .header(CONTENT_TYPE, format!("{}", json_mime_type.to_string()))
+                        .header(CONTENT_TYPE, json_mime_type.to_string())
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
                 client.request(request.unwrap()).await
-                
+
             };
 
             match req_result {
                 Err(err) => {
                     if let client::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep(d).await;
                         continue;
                     }
                     dlg.finished(false);
@@ -10506,7 +11336,7 @@ where
                         let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
                         if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
-                            sleep(d);
+                            sleep(d).await;
                             continue;
                         }
 
@@ -10549,7 +11379,8 @@ where
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.````
     ///
     /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MyconfigUpdateUserSettingCall<'a, S> {
@@ -10585,25 +11416,36 @@ where
 
     /// Identifies the authorization scope for the method you are building.
     ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::Full`.
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::Full`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
     ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, St>(mut self, scope: T) -> MyconfigUpdateUserSettingCall<'a, S>
-                                                        where T: Into<Option<St>>,
-                                                              St: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
+    pub fn add_scope<St>(mut self, scope: St) -> MyconfigUpdateUserSettingCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> MyconfigUpdateUserSettingCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> MyconfigUpdateUserSettingCall<'a, S> {
+        self._scopes.clear();
         self
     }
 }
@@ -10612,7 +11454,7 @@ where
 /// Deletes an annotation.
 ///
 /// A builder for the *annotations.delete* method supported by a *mylibrary* resource.
-/// It is not used directly, but through a `MylibraryMethods` instance.
+/// It is not used directly, but through a [`MylibraryMethods`] instance.
 ///
 /// # Example
 ///
@@ -10624,7 +11466,7 @@ where
 /// # extern crate google_books1 as books1;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use books1::{Books, oauth2, hyper, hyper_rustls};
+/// # use books1::{Books, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
 /// # let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -10648,14 +11490,14 @@ pub struct MylibraryAnnotationDeleteCall<'a, S>
     _source: Option<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
+    _scopes: BTreeSet<String>
 }
 
 impl<'a, S> client::CallBuilder for MylibraryAnnotationDeleteCall<'a, S> {}
 
 impl<'a, S> MylibraryAnnotationDeleteCall<'a, S>
 where
-    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
     S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
     S::Future: Send + Unpin + 'static,
     S::Error: Into<Box<dyn StdError + Send + Sync>>,
@@ -10666,71 +11508,56 @@ where
     pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, Empty)> {
         use std::io::{Read, Seek};
         use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::ToParts;
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
         let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
         dlg.begin(client::MethodInfo { id: "books.mylibrary.annotations.delete",
                                http_method: hyper::Method::DELETE });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
-        params.push(("annotationId", self._annotation_id.to_string()));
-        if let Some(value) = self._source {
-            params.push(("source", value.to_string()));
-        }
+
         for &field in ["alt", "annotationId", "source"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(client::Error::FieldClash(field));
             }
         }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
+
+        let mut params = Params::with_capacity(4 + self._additional_params.len());
+        params.push("annotationId", self._annotation_id);
+        if let Some(value) = self._source.as_ref() {
+            params.push("source", value);
         }
 
-        params.push(("alt", "json".to_string()));
+        params.extend(self._additional_params.iter());
 
+        params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "books/v1/mylibrary/annotations/{annotationId}";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::Full.as_ref().to_string());
         }
 
         for &(find_this, param_name) in [("{annotationId}", "annotationId")].iter() {
-            let mut replace_with: Option<&str> = None;
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = Some(value);
-                    break;
-                }
-            }
-            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+            url = params.uri_replacement(url, param_name, find_this, false);
         }
         {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
-            for param_name in ["annotationId"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
+            let to_remove = ["annotationId"];
+            params.remove_params(&to_remove);
         }
 
-        let url = url::Url::parse_with_params(&url, params).unwrap();
+        let url = params.parse_with_url(&url);
 
 
 
         loop {
-            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
-                Ok(token) => token.clone(),
-                Err(err) => {
-                    match  dlg.token(&err) {
-                        Some(token) => token,
-                        None => {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
                             dlg.finished(false);
-                            return Err(client::Error::MissingToken(err))
+                            return Err(client::Error::MissingToken(e));
                         }
                     }
                 }
@@ -10738,21 +11565,27 @@ where
             let mut req_result = {
                 let client = &self.hub.client;
                 dlg.pre_request();
-                let mut req_builder = hyper::Request::builder().method(hyper::Method::DELETE).uri(url.clone().into_string())
-                        .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::DELETE)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
 
 
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
-                
+
             };
 
             match req_result {
                 Err(err) => {
                     if let client::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep(d).await;
                         continue;
                     }
                     dlg.finished(false);
@@ -10768,7 +11601,7 @@ where
                         let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
                         if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
-                            sleep(d);
+                            sleep(d).await;
                             continue;
                         }
 
@@ -10819,7 +11652,8 @@ where
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.````
     ///
     /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MylibraryAnnotationDeleteCall<'a, S> {
@@ -10855,25 +11689,36 @@ where
 
     /// Identifies the authorization scope for the method you are building.
     ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::Full`.
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::Full`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
     ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, St>(mut self, scope: T) -> MylibraryAnnotationDeleteCall<'a, S>
-                                                        where T: Into<Option<St>>,
-                                                              St: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
+    pub fn add_scope<St>(mut self, scope: St) -> MylibraryAnnotationDeleteCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> MylibraryAnnotationDeleteCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> MylibraryAnnotationDeleteCall<'a, S> {
+        self._scopes.clear();
         self
     }
 }
@@ -10882,7 +11727,7 @@ where
 /// Inserts a new annotation.
 ///
 /// A builder for the *annotations.insert* method supported by a *mylibrary* resource.
-/// It is not used directly, but through a `MylibraryMethods` instance.
+/// It is not used directly, but through a [`MylibraryMethods`] instance.
 ///
 /// # Example
 ///
@@ -10895,7 +11740,7 @@ where
 /// use books1::api::Annotation;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use books1::{Books, oauth2, hyper, hyper_rustls};
+/// # use books1::{Books, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
 /// # let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -10930,14 +11775,14 @@ pub struct MylibraryAnnotationInsertCall<'a, S>
     _annotation_id: Option<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
+    _scopes: BTreeSet<String>
 }
 
 impl<'a, S> client::CallBuilder for MylibraryAnnotationInsertCall<'a, S> {}
 
 impl<'a, S> MylibraryAnnotationInsertCall<'a, S>
 where
-    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
     S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
     S::Future: Send + Unpin + 'static,
     S::Error: Into<Box<dyn StdError + Send + Sync>>,
@@ -10948,48 +11793,47 @@ where
     pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, Annotation)> {
         use std::io::{Read, Seek};
         use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::ToParts;
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
         let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
         dlg.begin(client::MethodInfo { id: "books.mylibrary.annotations.insert",
                                http_method: hyper::Method::POST });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(7 + self._additional_params.len());
-        if let Some(value) = self._source {
-            params.push(("source", value.to_string()));
-        }
-        if let Some(value) = self._show_only_summary_in_response {
-            params.push(("showOnlySummaryInResponse", value.to_string()));
-        }
-        if let Some(value) = self._country {
-            params.push(("country", value.to_string()));
-        }
-        if let Some(value) = self._annotation_id {
-            params.push(("annotationId", value.to_string()));
-        }
+
         for &field in ["alt", "source", "showOnlySummaryInResponse", "country", "annotationId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(client::Error::FieldClash(field));
             }
         }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
+
+        let mut params = Params::with_capacity(7 + self._additional_params.len());
+        if let Some(value) = self._source.as_ref() {
+            params.push("source", value);
+        }
+        if let Some(value) = self._show_only_summary_in_response.as_ref() {
+            params.push("showOnlySummaryInResponse", value.to_string());
+        }
+        if let Some(value) = self._country.as_ref() {
+            params.push("country", value);
+        }
+        if let Some(value) = self._annotation_id.as_ref() {
+            params.push("annotationId", value);
         }
 
-        params.push(("alt", "json".to_string()));
+        params.extend(self._additional_params.iter());
 
+        params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "books/v1/mylibrary/annotations";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::Full.as_ref().to_string());
         }
 
 
-        let url = url::Url::parse_with_params(&url, params).unwrap();
+        let url = params.parse_with_url(&url);
 
-        let mut json_mime_type: mime::Mime = "application/json".parse().unwrap();
+        let mut json_mime_type = mime::APPLICATION_JSON;
         let mut request_value_reader =
             {
                 let mut value = json::value::to_value(&self._request).expect("serde to work");
@@ -11003,14 +11847,14 @@ where
 
 
         loop {
-            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
-                Ok(token) => token.clone(),
-                Err(err) => {
-                    match  dlg.token(&err) {
-                        Some(token) => token,
-                        None => {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
                             dlg.finished(false);
-                            return Err(client::Error::MissingToken(err))
+                            return Err(client::Error::MissingToken(e));
                         }
                     }
                 }
@@ -11019,23 +11863,29 @@ where
             let mut req_result = {
                 let client = &self.hub.client;
                 dlg.pre_request();
-                let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
-                        .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::POST)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
 
 
                         let request = req_builder
-                        .header(CONTENT_TYPE, format!("{}", json_mime_type.to_string()))
+                        .header(CONTENT_TYPE, json_mime_type.to_string())
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
                 client.request(request.unwrap()).await
-                
+
             };
 
             match req_result {
                 Err(err) => {
                     if let client::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep(d).await;
                         continue;
                     }
                     dlg.finished(false);
@@ -11051,7 +11901,7 @@ where
                         let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
                         if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
-                            sleep(d);
+                            sleep(d).await;
                             continue;
                         }
 
@@ -11122,7 +11972,8 @@ where
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.````
     ///
     /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MylibraryAnnotationInsertCall<'a, S> {
@@ -11158,25 +12009,36 @@ where
 
     /// Identifies the authorization scope for the method you are building.
     ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::Full`.
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::Full`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
     ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, St>(mut self, scope: T) -> MylibraryAnnotationInsertCall<'a, S>
-                                                        where T: Into<Option<St>>,
-                                                              St: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
+    pub fn add_scope<St>(mut self, scope: St) -> MylibraryAnnotationInsertCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> MylibraryAnnotationInsertCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> MylibraryAnnotationInsertCall<'a, S> {
+        self._scopes.clear();
         self
     }
 }
@@ -11185,7 +12047,7 @@ where
 /// Retrieves a list of annotations, possibly filtered.
 ///
 /// A builder for the *annotations.list* method supported by a *mylibrary* resource.
-/// It is not used directly, but through a `MylibraryMethods` instance.
+/// It is not used directly, but through a [`MylibraryMethods`] instance.
 ///
 /// # Example
 ///
@@ -11197,7 +12059,7 @@ where
 /// # extern crate google_books1 as books1;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use books1::{Books, oauth2, hyper, hyper_rustls};
+/// # use books1::{Books, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
 /// # let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -11238,14 +12100,14 @@ pub struct MylibraryAnnotationListCall<'a, S>
     _content_version: Option<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
+    _scopes: BTreeSet<String>
 }
 
 impl<'a, S> client::CallBuilder for MylibraryAnnotationListCall<'a, S> {}
 
 impl<'a, S> MylibraryAnnotationListCall<'a, S>
 where
-    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
     S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
     S::Future: Send + Unpin + 'static,
     S::Error: Into<Box<dyn StdError + Send + Sync>>,
@@ -11256,78 +12118,77 @@ where
     pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, Annotations)> {
         use std::io::{Read, Seek};
         use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::ToParts;
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
         let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
         dlg.begin(client::MethodInfo { id: "books.mylibrary.annotations.list",
                                http_method: hyper::Method::GET });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(12 + self._additional_params.len());
-        if let Some(value) = self._volume_id {
-            params.push(("volumeId", value.to_string()));
-        }
-        if let Some(value) = self._updated_min {
-            params.push(("updatedMin", value.to_string()));
-        }
-        if let Some(value) = self._updated_max {
-            params.push(("updatedMax", value.to_string()));
-        }
-        if let Some(value) = self._source {
-            params.push(("source", value.to_string()));
-        }
-        if let Some(value) = self._show_deleted {
-            params.push(("showDeleted", value.to_string()));
-        }
-        if let Some(value) = self._page_token {
-            params.push(("pageToken", value.to_string()));
-        }
-        if let Some(value) = self._max_results {
-            params.push(("maxResults", value.to_string()));
-        }
-        if self._layer_ids.len() > 0 {
-            for f in self._layer_ids.iter() {
-                params.push(("layerIds", f.to_string()));
-            }
-        }
-        if let Some(value) = self._layer_id {
-            params.push(("layerId", value.to_string()));
-        }
-        if let Some(value) = self._content_version {
-            params.push(("contentVersion", value.to_string()));
-        }
+
         for &field in ["alt", "volumeId", "updatedMin", "updatedMax", "source", "showDeleted", "pageToken", "maxResults", "layerIds", "layerId", "contentVersion"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(client::Error::FieldClash(field));
             }
         }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
+
+        let mut params = Params::with_capacity(12 + self._additional_params.len());
+        if let Some(value) = self._volume_id.as_ref() {
+            params.push("volumeId", value);
+        }
+        if let Some(value) = self._updated_min.as_ref() {
+            params.push("updatedMin", value);
+        }
+        if let Some(value) = self._updated_max.as_ref() {
+            params.push("updatedMax", value);
+        }
+        if let Some(value) = self._source.as_ref() {
+            params.push("source", value);
+        }
+        if let Some(value) = self._show_deleted.as_ref() {
+            params.push("showDeleted", value.to_string());
+        }
+        if let Some(value) = self._page_token.as_ref() {
+            params.push("pageToken", value);
+        }
+        if let Some(value) = self._max_results.as_ref() {
+            params.push("maxResults", value.to_string());
+        }
+        if self._layer_ids.len() > 0 {
+            for f in self._layer_ids.iter() {
+                params.push("layerIds", f);
+            }
+        }
+        if let Some(value) = self._layer_id.as_ref() {
+            params.push("layerId", value);
+        }
+        if let Some(value) = self._content_version.as_ref() {
+            params.push("contentVersion", value);
         }
 
-        params.push(("alt", "json".to_string()));
+        params.extend(self._additional_params.iter());
 
+        params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "books/v1/mylibrary/annotations";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::Full.as_ref().to_string());
         }
 
 
-        let url = url::Url::parse_with_params(&url, params).unwrap();
+        let url = params.parse_with_url(&url);
 
 
 
         loop {
-            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
-                Ok(token) => token.clone(),
-                Err(err) => {
-                    match  dlg.token(&err) {
-                        Some(token) => token,
-                        None => {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
                             dlg.finished(false);
-                            return Err(client::Error::MissingToken(err))
+                            return Err(client::Error::MissingToken(e));
                         }
                     }
                 }
@@ -11335,21 +12196,27 @@ where
             let mut req_result = {
                 let client = &self.hub.client;
                 dlg.pre_request();
-                let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
-                        .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::GET)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
 
 
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
-                
+
             };
 
             match req_result {
                 Err(err) => {
                     if let client::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep(d).await;
                         continue;
                     }
                     dlg.finished(false);
@@ -11365,7 +12232,7 @@ where
                         let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
                         if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
-                            sleep(d);
+                            sleep(d).await;
                             continue;
                         }
 
@@ -11470,7 +12337,8 @@ where
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.````
     ///
     /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MylibraryAnnotationListCall<'a, S> {
@@ -11506,25 +12374,36 @@ where
 
     /// Identifies the authorization scope for the method you are building.
     ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::Full`.
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::Full`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
     ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, St>(mut self, scope: T) -> MylibraryAnnotationListCall<'a, S>
-                                                        where T: Into<Option<St>>,
-                                                              St: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
+    pub fn add_scope<St>(mut self, scope: St) -> MylibraryAnnotationListCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> MylibraryAnnotationListCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> MylibraryAnnotationListCall<'a, S> {
+        self._scopes.clear();
         self
     }
 }
@@ -11533,7 +12412,7 @@ where
 /// Gets the summary of specified layers.
 ///
 /// A builder for the *annotations.summary* method supported by a *mylibrary* resource.
-/// It is not used directly, but through a `MylibraryMethods` instance.
+/// It is not used directly, but through a [`MylibraryMethods`] instance.
 ///
 /// # Example
 ///
@@ -11545,7 +12424,7 @@ where
 /// # extern crate google_books1 as books1;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use books1::{Books, oauth2, hyper, hyper_rustls};
+/// # use books1::{Books, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
 /// # let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -11568,14 +12447,14 @@ pub struct MylibraryAnnotationSummaryCall<'a, S>
     _volume_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
+    _scopes: BTreeSet<String>
 }
 
 impl<'a, S> client::CallBuilder for MylibraryAnnotationSummaryCall<'a, S> {}
 
 impl<'a, S> MylibraryAnnotationSummaryCall<'a, S>
 where
-    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
     S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
     S::Future: Send + Unpin + 'static,
     S::Error: Into<Box<dyn StdError + Send + Sync>>,
@@ -11586,52 +12465,51 @@ where
     pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, AnnotationsSummary)> {
         use std::io::{Read, Seek};
         use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::ToParts;
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
         let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
         dlg.begin(client::MethodInfo { id: "books.mylibrary.annotations.summary",
                                http_method: hyper::Method::POST });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
-        if self._layer_ids.len() > 0 {
-            for f in self._layer_ids.iter() {
-                params.push(("layerIds", f.to_string()));
-            }
-        }
-        params.push(("volumeId", self._volume_id.to_string()));
+
         for &field in ["alt", "layerIds", "volumeId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(client::Error::FieldClash(field));
             }
         }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
+
+        let mut params = Params::with_capacity(4 + self._additional_params.len());
+        if self._layer_ids.len() > 0 {
+            for f in self._layer_ids.iter() {
+                params.push("layerIds", f);
+            }
         }
+        params.push("volumeId", self._volume_id);
 
-        params.push(("alt", "json".to_string()));
+        params.extend(self._additional_params.iter());
 
+        params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "books/v1/mylibrary/annotations/summary";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::Full.as_ref().to_string());
         }
 
 
-        let url = url::Url::parse_with_params(&url, params).unwrap();
+        let url = params.parse_with_url(&url);
 
 
 
         loop {
-            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
-                Ok(token) => token.clone(),
-                Err(err) => {
-                    match  dlg.token(&err) {
-                        Some(token) => token,
-                        None => {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
                             dlg.finished(false);
-                            return Err(client::Error::MissingToken(err))
+                            return Err(client::Error::MissingToken(e));
                         }
                     }
                 }
@@ -11639,21 +12517,27 @@ where
             let mut req_result = {
                 let client = &self.hub.client;
                 dlg.pre_request();
-                let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
-                        .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::POST)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
 
 
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
-                
+
             };
 
             match req_result {
                 Err(err) => {
                     if let client::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep(d).await;
                         continue;
                     }
                     dlg.finished(false);
@@ -11669,7 +12553,7 @@ where
                         let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
                         if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
-                            sleep(d);
+                            sleep(d).await;
                             continue;
                         }
 
@@ -11724,7 +12608,8 @@ where
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.````
     ///
     /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MylibraryAnnotationSummaryCall<'a, S> {
@@ -11760,25 +12645,36 @@ where
 
     /// Identifies the authorization scope for the method you are building.
     ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::Full`.
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::Full`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
     ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, St>(mut self, scope: T) -> MylibraryAnnotationSummaryCall<'a, S>
-                                                        where T: Into<Option<St>>,
-                                                              St: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
+    pub fn add_scope<St>(mut self, scope: St) -> MylibraryAnnotationSummaryCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> MylibraryAnnotationSummaryCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> MylibraryAnnotationSummaryCall<'a, S> {
+        self._scopes.clear();
         self
     }
 }
@@ -11787,7 +12683,7 @@ where
 /// Updates an existing annotation.
 ///
 /// A builder for the *annotations.update* method supported by a *mylibrary* resource.
-/// It is not used directly, but through a `MylibraryMethods` instance.
+/// It is not used directly, but through a [`MylibraryMethods`] instance.
 ///
 /// # Example
 ///
@@ -11800,7 +12696,7 @@ where
 /// use books1::api::Annotation;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use books1::{Books, oauth2, hyper, hyper_rustls};
+/// # use books1::{Books, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
 /// # let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -11830,14 +12726,14 @@ pub struct MylibraryAnnotationUpdateCall<'a, S>
     _source: Option<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
+    _scopes: BTreeSet<String>
 }
 
 impl<'a, S> client::CallBuilder for MylibraryAnnotationUpdateCall<'a, S> {}
 
 impl<'a, S> MylibraryAnnotationUpdateCall<'a, S>
 where
-    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
     S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
     S::Future: Send + Unpin + 'static,
     S::Error: Into<Box<dyn StdError + Send + Sync>>,
@@ -11848,61 +12744,46 @@ where
     pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, Annotation)> {
         use std::io::{Read, Seek};
         use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::ToParts;
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
         let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
         dlg.begin(client::MethodInfo { id: "books.mylibrary.annotations.update",
                                http_method: hyper::Method::PUT });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
-        params.push(("annotationId", self._annotation_id.to_string()));
-        if let Some(value) = self._source {
-            params.push(("source", value.to_string()));
-        }
+
         for &field in ["alt", "annotationId", "source"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(client::Error::FieldClash(field));
             }
         }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
+
+        let mut params = Params::with_capacity(5 + self._additional_params.len());
+        params.push("annotationId", self._annotation_id);
+        if let Some(value) = self._source.as_ref() {
+            params.push("source", value);
         }
 
-        params.push(("alt", "json".to_string()));
+        params.extend(self._additional_params.iter());
 
+        params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "books/v1/mylibrary/annotations/{annotationId}";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::Full.as_ref().to_string());
         }
 
         for &(find_this, param_name) in [("{annotationId}", "annotationId")].iter() {
-            let mut replace_with: Option<&str> = None;
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = Some(value);
-                    break;
-                }
-            }
-            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+            url = params.uri_replacement(url, param_name, find_this, false);
         }
         {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
-            for param_name in ["annotationId"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
+            let to_remove = ["annotationId"];
+            params.remove_params(&to_remove);
         }
 
-        let url = url::Url::parse_with_params(&url, params).unwrap();
+        let url = params.parse_with_url(&url);
 
-        let mut json_mime_type: mime::Mime = "application/json".parse().unwrap();
+        let mut json_mime_type = mime::APPLICATION_JSON;
         let mut request_value_reader =
             {
                 let mut value = json::value::to_value(&self._request).expect("serde to work");
@@ -11916,14 +12797,14 @@ where
 
 
         loop {
-            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
-                Ok(token) => token.clone(),
-                Err(err) => {
-                    match  dlg.token(&err) {
-                        Some(token) => token,
-                        None => {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
                             dlg.finished(false);
-                            return Err(client::Error::MissingToken(err))
+                            return Err(client::Error::MissingToken(e));
                         }
                     }
                 }
@@ -11932,23 +12813,29 @@ where
             let mut req_result = {
                 let client = &self.hub.client;
                 dlg.pre_request();
-                let mut req_builder = hyper::Request::builder().method(hyper::Method::PUT).uri(url.clone().into_string())
-                        .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::PUT)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
 
 
                         let request = req_builder
-                        .header(CONTENT_TYPE, format!("{}", json_mime_type.to_string()))
+                        .header(CONTENT_TYPE, json_mime_type.to_string())
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
                 client.request(request.unwrap()).await
-                
+
             };
 
             match req_result {
                 Err(err) => {
                     if let client::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep(d).await;
                         continue;
                     }
                     dlg.finished(false);
@@ -11964,7 +12851,7 @@ where
                         let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
                         if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
-                            sleep(d);
+                            sleep(d).await;
                             continue;
                         }
 
@@ -12024,7 +12911,8 @@ where
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.````
     ///
     /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MylibraryAnnotationUpdateCall<'a, S> {
@@ -12060,25 +12948,36 @@ where
 
     /// Identifies the authorization scope for the method you are building.
     ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::Full`.
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::Full`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
     ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, St>(mut self, scope: T) -> MylibraryAnnotationUpdateCall<'a, S>
-                                                        where T: Into<Option<St>>,
-                                                              St: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
+    pub fn add_scope<St>(mut self, scope: St) -> MylibraryAnnotationUpdateCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> MylibraryAnnotationUpdateCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> MylibraryAnnotationUpdateCall<'a, S> {
+        self._scopes.clear();
         self
     }
 }
@@ -12087,7 +12986,7 @@ where
 /// Gets volume information for volumes on a bookshelf.
 ///
 /// A builder for the *bookshelves.volumes.list* method supported by a *mylibrary* resource.
-/// It is not used directly, but through a `MylibraryMethods` instance.
+/// It is not used directly, but through a [`MylibraryMethods`] instance.
 ///
 /// # Example
 ///
@@ -12099,7 +12998,7 @@ where
 /// # extern crate google_books1 as books1;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use books1::{Books, oauth2, hyper, hyper_rustls};
+/// # use books1::{Books, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
 /// # let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -12121,7 +13020,7 @@ where
 ///              .doit().await;
 /// # }
 /// ```
-pub struct MylibraryBookshelveVolumeListCall<'a, S>
+pub struct MylibraryBookshelfVolumeListCall<'a, S>
     where S: 'a {
 
     hub: &'a Books<S>,
@@ -12135,14 +13034,14 @@ pub struct MylibraryBookshelveVolumeListCall<'a, S>
     _country: Option<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
+    _scopes: BTreeSet<String>
 }
 
-impl<'a, S> client::CallBuilder for MylibraryBookshelveVolumeListCall<'a, S> {}
+impl<'a, S> client::CallBuilder for MylibraryBookshelfVolumeListCall<'a, S> {}
 
-impl<'a, S> MylibraryBookshelveVolumeListCall<'a, S>
+impl<'a, S> MylibraryBookshelfVolumeListCall<'a, S>
 where
-    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
     S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
     S::Future: Send + Unpin + 'static,
     S::Error: Into<Box<dyn StdError + Send + Sync>>,
@@ -12153,89 +13052,74 @@ where
     pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, Volumes)> {
         use std::io::{Read, Seek};
         use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::ToParts;
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
         let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
         dlg.begin(client::MethodInfo { id: "books.mylibrary.bookshelves.volumes.list",
                                http_method: hyper::Method::GET });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(10 + self._additional_params.len());
-        params.push(("shelf", self._shelf.to_string()));
-        if let Some(value) = self._start_index {
-            params.push(("startIndex", value.to_string()));
-        }
-        if let Some(value) = self._source {
-            params.push(("source", value.to_string()));
-        }
-        if let Some(value) = self._show_preorders {
-            params.push(("showPreorders", value.to_string()));
-        }
-        if let Some(value) = self._q {
-            params.push(("q", value.to_string()));
-        }
-        if let Some(value) = self._projection {
-            params.push(("projection", value.to_string()));
-        }
-        if let Some(value) = self._max_results {
-            params.push(("maxResults", value.to_string()));
-        }
-        if let Some(value) = self._country {
-            params.push(("country", value.to_string()));
-        }
+
         for &field in ["alt", "shelf", "startIndex", "source", "showPreorders", "q", "projection", "maxResults", "country"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(client::Error::FieldClash(field));
             }
         }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
+
+        let mut params = Params::with_capacity(10 + self._additional_params.len());
+        params.push("shelf", self._shelf);
+        if let Some(value) = self._start_index.as_ref() {
+            params.push("startIndex", value.to_string());
+        }
+        if let Some(value) = self._source.as_ref() {
+            params.push("source", value);
+        }
+        if let Some(value) = self._show_preorders.as_ref() {
+            params.push("showPreorders", value.to_string());
+        }
+        if let Some(value) = self._q.as_ref() {
+            params.push("q", value);
+        }
+        if let Some(value) = self._projection.as_ref() {
+            params.push("projection", value);
+        }
+        if let Some(value) = self._max_results.as_ref() {
+            params.push("maxResults", value.to_string());
+        }
+        if let Some(value) = self._country.as_ref() {
+            params.push("country", value);
         }
 
-        params.push(("alt", "json".to_string()));
+        params.extend(self._additional_params.iter());
 
+        params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "books/v1/mylibrary/bookshelves/{shelf}/volumes";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::Full.as_ref().to_string());
         }
 
         for &(find_this, param_name) in [("{shelf}", "shelf")].iter() {
-            let mut replace_with: Option<&str> = None;
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = Some(value);
-                    break;
-                }
-            }
-            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+            url = params.uri_replacement(url, param_name, find_this, false);
         }
         {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
-            for param_name in ["shelf"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
+            let to_remove = ["shelf"];
+            params.remove_params(&to_remove);
         }
 
-        let url = url::Url::parse_with_params(&url, params).unwrap();
+        let url = params.parse_with_url(&url);
 
 
 
         loop {
-            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
-                Ok(token) => token.clone(),
-                Err(err) => {
-                    match  dlg.token(&err) {
-                        Some(token) => token,
-                        None => {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
                             dlg.finished(false);
-                            return Err(client::Error::MissingToken(err))
+                            return Err(client::Error::MissingToken(e));
                         }
                     }
                 }
@@ -12243,21 +13127,27 @@ where
             let mut req_result = {
                 let client = &self.hub.client;
                 dlg.pre_request();
-                let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
-                        .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::GET)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
 
 
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
-                
+
             };
 
             match req_result {
                 Err(err) => {
                     if let client::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep(d).await;
                         continue;
                     }
                     dlg.finished(false);
@@ -12273,7 +13163,7 @@ where
                         let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
                         if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
-                            sleep(d);
+                            sleep(d).await;
                             continue;
                         }
 
@@ -12310,66 +13200,67 @@ where
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn shelf(mut self, new_value: &str) -> MylibraryBookshelveVolumeListCall<'a, S> {
+    pub fn shelf(mut self, new_value: &str) -> MylibraryBookshelfVolumeListCall<'a, S> {
         self._shelf = new_value.to_string();
         self
     }
     /// Index of the first element to return (starts at 0)
     ///
     /// Sets the *start index* query property to the given value.
-    pub fn start_index(mut self, new_value: u32) -> MylibraryBookshelveVolumeListCall<'a, S> {
+    pub fn start_index(mut self, new_value: u32) -> MylibraryBookshelfVolumeListCall<'a, S> {
         self._start_index = Some(new_value);
         self
     }
     /// String to identify the originator of this request.
     ///
     /// Sets the *source* query property to the given value.
-    pub fn source(mut self, new_value: &str) -> MylibraryBookshelveVolumeListCall<'a, S> {
+    pub fn source(mut self, new_value: &str) -> MylibraryBookshelfVolumeListCall<'a, S> {
         self._source = Some(new_value.to_string());
         self
     }
     /// Set to true to show pre-ordered books. Defaults to false.
     ///
     /// Sets the *show preorders* query property to the given value.
-    pub fn show_preorders(mut self, new_value: bool) -> MylibraryBookshelveVolumeListCall<'a, S> {
+    pub fn show_preorders(mut self, new_value: bool) -> MylibraryBookshelfVolumeListCall<'a, S> {
         self._show_preorders = Some(new_value);
         self
     }
     /// Full-text search query string in this bookshelf.
     ///
     /// Sets the *q* query property to the given value.
-    pub fn q(mut self, new_value: &str) -> MylibraryBookshelveVolumeListCall<'a, S> {
+    pub fn q(mut self, new_value: &str) -> MylibraryBookshelfVolumeListCall<'a, S> {
         self._q = Some(new_value.to_string());
         self
     }
     /// Restrict information returned to a set of selected fields.
     ///
     /// Sets the *projection* query property to the given value.
-    pub fn projection(mut self, new_value: &str) -> MylibraryBookshelveVolumeListCall<'a, S> {
+    pub fn projection(mut self, new_value: &str) -> MylibraryBookshelfVolumeListCall<'a, S> {
         self._projection = Some(new_value.to_string());
         self
     }
     /// Maximum number of results to return
     ///
     /// Sets the *max results* query property to the given value.
-    pub fn max_results(mut self, new_value: u32) -> MylibraryBookshelveVolumeListCall<'a, S> {
+    pub fn max_results(mut self, new_value: u32) -> MylibraryBookshelfVolumeListCall<'a, S> {
         self._max_results = Some(new_value);
         self
     }
     /// ISO-3166-1 code to override the IP-based location.
     ///
     /// Sets the *country* query property to the given value.
-    pub fn country(mut self, new_value: &str) -> MylibraryBookshelveVolumeListCall<'a, S> {
+    pub fn country(mut self, new_value: &str) -> MylibraryBookshelfVolumeListCall<'a, S> {
         self._country = Some(new_value.to_string());
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.````
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MylibraryBookshelveVolumeListCall<'a, S> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MylibraryBookshelfVolumeListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -12394,7 +13285,7 @@ where
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> MylibraryBookshelveVolumeListCall<'a, S>
+    pub fn param<T>(mut self, name: T, value: T) -> MylibraryBookshelfVolumeListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -12402,25 +13293,36 @@ where
 
     /// Identifies the authorization scope for the method you are building.
     ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::Full`.
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::Full`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
     ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, St>(mut self, scope: T) -> MylibraryBookshelveVolumeListCall<'a, S>
-                                                        where T: Into<Option<St>>,
-                                                              St: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
+    pub fn add_scope<St>(mut self, scope: St) -> MylibraryBookshelfVolumeListCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> MylibraryBookshelfVolumeListCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> MylibraryBookshelfVolumeListCall<'a, S> {
+        self._scopes.clear();
         self
     }
 }
@@ -12429,7 +13331,7 @@ where
 /// Adds a volume to a bookshelf.
 ///
 /// A builder for the *bookshelves.addVolume* method supported by a *mylibrary* resource.
-/// It is not used directly, but through a `MylibraryMethods` instance.
+/// It is not used directly, but through a [`MylibraryMethods`] instance.
 ///
 /// # Example
 ///
@@ -12441,7 +13343,7 @@ where
 /// # extern crate google_books1 as books1;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use books1::{Books, oauth2, hyper, hyper_rustls};
+/// # use books1::{Books, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
 /// # let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -12458,7 +13360,7 @@ where
 ///              .doit().await;
 /// # }
 /// ```
-pub struct MylibraryBookshelveAddVolumeCall<'a, S>
+pub struct MylibraryBookshelfAddVolumeCall<'a, S>
     where S: 'a {
 
     hub: &'a Books<S>,
@@ -12468,14 +13370,14 @@ pub struct MylibraryBookshelveAddVolumeCall<'a, S>
     _reason: Option<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
+    _scopes: BTreeSet<String>
 }
 
-impl<'a, S> client::CallBuilder for MylibraryBookshelveAddVolumeCall<'a, S> {}
+impl<'a, S> client::CallBuilder for MylibraryBookshelfAddVolumeCall<'a, S> {}
 
-impl<'a, S> MylibraryBookshelveAddVolumeCall<'a, S>
+impl<'a, S> MylibraryBookshelfAddVolumeCall<'a, S>
 where
-    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
     S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
     S::Future: Send + Unpin + 'static,
     S::Error: Into<Box<dyn StdError + Send + Sync>>,
@@ -12486,75 +13388,60 @@ where
     pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, Empty)> {
         use std::io::{Read, Seek};
         use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::ToParts;
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
         let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
         dlg.begin(client::MethodInfo { id: "books.mylibrary.bookshelves.addVolume",
                                http_method: hyper::Method::POST });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(6 + self._additional_params.len());
-        params.push(("shelf", self._shelf.to_string()));
-        params.push(("volumeId", self._volume_id.to_string()));
-        if let Some(value) = self._source {
-            params.push(("source", value.to_string()));
-        }
-        if let Some(value) = self._reason {
-            params.push(("reason", value.to_string()));
-        }
+
         for &field in ["alt", "shelf", "volumeId", "source", "reason"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(client::Error::FieldClash(field));
             }
         }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
+
+        let mut params = Params::with_capacity(6 + self._additional_params.len());
+        params.push("shelf", self._shelf);
+        params.push("volumeId", self._volume_id);
+        if let Some(value) = self._source.as_ref() {
+            params.push("source", value);
+        }
+        if let Some(value) = self._reason.as_ref() {
+            params.push("reason", value);
         }
 
-        params.push(("alt", "json".to_string()));
+        params.extend(self._additional_params.iter());
 
+        params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "books/v1/mylibrary/bookshelves/{shelf}/addVolume";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::Full.as_ref().to_string());
         }
 
         for &(find_this, param_name) in [("{shelf}", "shelf")].iter() {
-            let mut replace_with: Option<&str> = None;
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = Some(value);
-                    break;
-                }
-            }
-            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+            url = params.uri_replacement(url, param_name, find_this, false);
         }
         {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
-            for param_name in ["shelf"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
+            let to_remove = ["shelf"];
+            params.remove_params(&to_remove);
         }
 
-        let url = url::Url::parse_with_params(&url, params).unwrap();
+        let url = params.parse_with_url(&url);
 
 
 
         loop {
-            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
-                Ok(token) => token.clone(),
-                Err(err) => {
-                    match  dlg.token(&err) {
-                        Some(token) => token,
-                        None => {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
                             dlg.finished(false);
-                            return Err(client::Error::MissingToken(err))
+                            return Err(client::Error::MissingToken(e));
                         }
                     }
                 }
@@ -12562,21 +13449,27 @@ where
             let mut req_result = {
                 let client = &self.hub.client;
                 dlg.pre_request();
-                let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
-                        .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::POST)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
 
 
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
-                
+
             };
 
             match req_result {
                 Err(err) => {
                     if let client::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep(d).await;
                         continue;
                     }
                     dlg.finished(false);
@@ -12592,7 +13485,7 @@ where
                         let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
                         if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
-                            sleep(d);
+                            sleep(d).await;
                             continue;
                         }
 
@@ -12629,7 +13522,7 @@ where
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn shelf(mut self, new_value: &str) -> MylibraryBookshelveAddVolumeCall<'a, S> {
+    pub fn shelf(mut self, new_value: &str) -> MylibraryBookshelfAddVolumeCall<'a, S> {
         self._shelf = new_value.to_string();
         self
     }
@@ -12639,31 +13532,32 @@ where
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn volume_id(mut self, new_value: &str) -> MylibraryBookshelveAddVolumeCall<'a, S> {
+    pub fn volume_id(mut self, new_value: &str) -> MylibraryBookshelfAddVolumeCall<'a, S> {
         self._volume_id = new_value.to_string();
         self
     }
     /// String to identify the originator of this request.
     ///
     /// Sets the *source* query property to the given value.
-    pub fn source(mut self, new_value: &str) -> MylibraryBookshelveAddVolumeCall<'a, S> {
+    pub fn source(mut self, new_value: &str) -> MylibraryBookshelfAddVolumeCall<'a, S> {
         self._source = Some(new_value.to_string());
         self
     }
     /// The reason for which the book is added to the library.
     ///
     /// Sets the *reason* query property to the given value.
-    pub fn reason(mut self, new_value: &str) -> MylibraryBookshelveAddVolumeCall<'a, S> {
+    pub fn reason(mut self, new_value: &str) -> MylibraryBookshelfAddVolumeCall<'a, S> {
         self._reason = Some(new_value.to_string());
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.````
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MylibraryBookshelveAddVolumeCall<'a, S> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MylibraryBookshelfAddVolumeCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -12688,7 +13582,7 @@ where
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> MylibraryBookshelveAddVolumeCall<'a, S>
+    pub fn param<T>(mut self, name: T, value: T) -> MylibraryBookshelfAddVolumeCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -12696,25 +13590,36 @@ where
 
     /// Identifies the authorization scope for the method you are building.
     ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::Full`.
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::Full`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
     ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, St>(mut self, scope: T) -> MylibraryBookshelveAddVolumeCall<'a, S>
-                                                        where T: Into<Option<St>>,
-                                                              St: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
+    pub fn add_scope<St>(mut self, scope: St) -> MylibraryBookshelfAddVolumeCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> MylibraryBookshelfAddVolumeCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> MylibraryBookshelfAddVolumeCall<'a, S> {
+        self._scopes.clear();
         self
     }
 }
@@ -12723,7 +13628,7 @@ where
 /// Clears all volumes from a bookshelf.
 ///
 /// A builder for the *bookshelves.clearVolumes* method supported by a *mylibrary* resource.
-/// It is not used directly, but through a `MylibraryMethods` instance.
+/// It is not used directly, but through a [`MylibraryMethods`] instance.
 ///
 /// # Example
 ///
@@ -12735,7 +13640,7 @@ where
 /// # extern crate google_books1 as books1;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use books1::{Books, oauth2, hyper, hyper_rustls};
+/// # use books1::{Books, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
 /// # let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -12751,7 +13656,7 @@ where
 ///              .doit().await;
 /// # }
 /// ```
-pub struct MylibraryBookshelveClearVolumeCall<'a, S>
+pub struct MylibraryBookshelfClearVolumeCall<'a, S>
     where S: 'a {
 
     hub: &'a Books<S>,
@@ -12759,14 +13664,14 @@ pub struct MylibraryBookshelveClearVolumeCall<'a, S>
     _source: Option<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
+    _scopes: BTreeSet<String>
 }
 
-impl<'a, S> client::CallBuilder for MylibraryBookshelveClearVolumeCall<'a, S> {}
+impl<'a, S> client::CallBuilder for MylibraryBookshelfClearVolumeCall<'a, S> {}
 
-impl<'a, S> MylibraryBookshelveClearVolumeCall<'a, S>
+impl<'a, S> MylibraryBookshelfClearVolumeCall<'a, S>
 where
-    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
     S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
     S::Future: Send + Unpin + 'static,
     S::Error: Into<Box<dyn StdError + Send + Sync>>,
@@ -12777,71 +13682,56 @@ where
     pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, Empty)> {
         use std::io::{Read, Seek};
         use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::ToParts;
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
         let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
         dlg.begin(client::MethodInfo { id: "books.mylibrary.bookshelves.clearVolumes",
                                http_method: hyper::Method::POST });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
-        params.push(("shelf", self._shelf.to_string()));
-        if let Some(value) = self._source {
-            params.push(("source", value.to_string()));
-        }
+
         for &field in ["alt", "shelf", "source"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(client::Error::FieldClash(field));
             }
         }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
+
+        let mut params = Params::with_capacity(4 + self._additional_params.len());
+        params.push("shelf", self._shelf);
+        if let Some(value) = self._source.as_ref() {
+            params.push("source", value);
         }
 
-        params.push(("alt", "json".to_string()));
+        params.extend(self._additional_params.iter());
 
+        params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "books/v1/mylibrary/bookshelves/{shelf}/clearVolumes";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::Full.as_ref().to_string());
         }
 
         for &(find_this, param_name) in [("{shelf}", "shelf")].iter() {
-            let mut replace_with: Option<&str> = None;
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = Some(value);
-                    break;
-                }
-            }
-            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+            url = params.uri_replacement(url, param_name, find_this, false);
         }
         {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
-            for param_name in ["shelf"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
+            let to_remove = ["shelf"];
+            params.remove_params(&to_remove);
         }
 
-        let url = url::Url::parse_with_params(&url, params).unwrap();
+        let url = params.parse_with_url(&url);
 
 
 
         loop {
-            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
-                Ok(token) => token.clone(),
-                Err(err) => {
-                    match  dlg.token(&err) {
-                        Some(token) => token,
-                        None => {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
                             dlg.finished(false);
-                            return Err(client::Error::MissingToken(err))
+                            return Err(client::Error::MissingToken(e));
                         }
                     }
                 }
@@ -12849,21 +13739,27 @@ where
             let mut req_result = {
                 let client = &self.hub.client;
                 dlg.pre_request();
-                let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
-                        .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::POST)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
 
 
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
-                
+
             };
 
             match req_result {
                 Err(err) => {
                     if let client::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep(d).await;
                         continue;
                     }
                     dlg.finished(false);
@@ -12879,7 +13775,7 @@ where
                         let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
                         if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
-                            sleep(d);
+                            sleep(d).await;
                             continue;
                         }
 
@@ -12916,24 +13812,25 @@ where
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn shelf(mut self, new_value: &str) -> MylibraryBookshelveClearVolumeCall<'a, S> {
+    pub fn shelf(mut self, new_value: &str) -> MylibraryBookshelfClearVolumeCall<'a, S> {
         self._shelf = new_value.to_string();
         self
     }
     /// String to identify the originator of this request.
     ///
     /// Sets the *source* query property to the given value.
-    pub fn source(mut self, new_value: &str) -> MylibraryBookshelveClearVolumeCall<'a, S> {
+    pub fn source(mut self, new_value: &str) -> MylibraryBookshelfClearVolumeCall<'a, S> {
         self._source = Some(new_value.to_string());
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.````
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MylibraryBookshelveClearVolumeCall<'a, S> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MylibraryBookshelfClearVolumeCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -12958,7 +13855,7 @@ where
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> MylibraryBookshelveClearVolumeCall<'a, S>
+    pub fn param<T>(mut self, name: T, value: T) -> MylibraryBookshelfClearVolumeCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -12966,25 +13863,36 @@ where
 
     /// Identifies the authorization scope for the method you are building.
     ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::Full`.
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::Full`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
     ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, St>(mut self, scope: T) -> MylibraryBookshelveClearVolumeCall<'a, S>
-                                                        where T: Into<Option<St>>,
-                                                              St: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
+    pub fn add_scope<St>(mut self, scope: St) -> MylibraryBookshelfClearVolumeCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> MylibraryBookshelfClearVolumeCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> MylibraryBookshelfClearVolumeCall<'a, S> {
+        self._scopes.clear();
         self
     }
 }
@@ -12993,7 +13901,7 @@ where
 /// Retrieves metadata for a specific bookshelf belonging to the authenticated user.
 ///
 /// A builder for the *bookshelves.get* method supported by a *mylibrary* resource.
-/// It is not used directly, but through a `MylibraryMethods` instance.
+/// It is not used directly, but through a [`MylibraryMethods`] instance.
 ///
 /// # Example
 ///
@@ -13005,7 +13913,7 @@ where
 /// # extern crate google_books1 as books1;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use books1::{Books, oauth2, hyper, hyper_rustls};
+/// # use books1::{Books, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
 /// # let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -13021,7 +13929,7 @@ where
 ///              .doit().await;
 /// # }
 /// ```
-pub struct MylibraryBookshelveGetCall<'a, S>
+pub struct MylibraryBookshelfGetCall<'a, S>
     where S: 'a {
 
     hub: &'a Books<S>,
@@ -13029,14 +13937,14 @@ pub struct MylibraryBookshelveGetCall<'a, S>
     _source: Option<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
+    _scopes: BTreeSet<String>
 }
 
-impl<'a, S> client::CallBuilder for MylibraryBookshelveGetCall<'a, S> {}
+impl<'a, S> client::CallBuilder for MylibraryBookshelfGetCall<'a, S> {}
 
-impl<'a, S> MylibraryBookshelveGetCall<'a, S>
+impl<'a, S> MylibraryBookshelfGetCall<'a, S>
 where
-    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
     S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
     S::Future: Send + Unpin + 'static,
     S::Error: Into<Box<dyn StdError + Send + Sync>>,
@@ -13047,71 +13955,56 @@ where
     pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, Bookshelf)> {
         use std::io::{Read, Seek};
         use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::ToParts;
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
         let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
         dlg.begin(client::MethodInfo { id: "books.mylibrary.bookshelves.get",
                                http_method: hyper::Method::GET });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
-        params.push(("shelf", self._shelf.to_string()));
-        if let Some(value) = self._source {
-            params.push(("source", value.to_string()));
-        }
+
         for &field in ["alt", "shelf", "source"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(client::Error::FieldClash(field));
             }
         }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
+
+        let mut params = Params::with_capacity(4 + self._additional_params.len());
+        params.push("shelf", self._shelf);
+        if let Some(value) = self._source.as_ref() {
+            params.push("source", value);
         }
 
-        params.push(("alt", "json".to_string()));
+        params.extend(self._additional_params.iter());
 
+        params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "books/v1/mylibrary/bookshelves/{shelf}";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::Full.as_ref().to_string());
         }
 
         for &(find_this, param_name) in [("{shelf}", "shelf")].iter() {
-            let mut replace_with: Option<&str> = None;
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = Some(value);
-                    break;
-                }
-            }
-            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+            url = params.uri_replacement(url, param_name, find_this, false);
         }
         {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
-            for param_name in ["shelf"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
+            let to_remove = ["shelf"];
+            params.remove_params(&to_remove);
         }
 
-        let url = url::Url::parse_with_params(&url, params).unwrap();
+        let url = params.parse_with_url(&url);
 
 
 
         loop {
-            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
-                Ok(token) => token.clone(),
-                Err(err) => {
-                    match  dlg.token(&err) {
-                        Some(token) => token,
-                        None => {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
                             dlg.finished(false);
-                            return Err(client::Error::MissingToken(err))
+                            return Err(client::Error::MissingToken(e));
                         }
                     }
                 }
@@ -13119,21 +14012,27 @@ where
             let mut req_result = {
                 let client = &self.hub.client;
                 dlg.pre_request();
-                let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
-                        .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::GET)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
 
 
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
-                
+
             };
 
             match req_result {
                 Err(err) => {
                     if let client::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep(d).await;
                         continue;
                     }
                     dlg.finished(false);
@@ -13149,7 +14048,7 @@ where
                         let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
                         if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
-                            sleep(d);
+                            sleep(d).await;
                             continue;
                         }
 
@@ -13186,24 +14085,25 @@ where
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn shelf(mut self, new_value: &str) -> MylibraryBookshelveGetCall<'a, S> {
+    pub fn shelf(mut self, new_value: &str) -> MylibraryBookshelfGetCall<'a, S> {
         self._shelf = new_value.to_string();
         self
     }
     /// String to identify the originator of this request.
     ///
     /// Sets the *source* query property to the given value.
-    pub fn source(mut self, new_value: &str) -> MylibraryBookshelveGetCall<'a, S> {
+    pub fn source(mut self, new_value: &str) -> MylibraryBookshelfGetCall<'a, S> {
         self._source = Some(new_value.to_string());
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.````
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MylibraryBookshelveGetCall<'a, S> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MylibraryBookshelfGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -13228,7 +14128,7 @@ where
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> MylibraryBookshelveGetCall<'a, S>
+    pub fn param<T>(mut self, name: T, value: T) -> MylibraryBookshelfGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -13236,25 +14136,36 @@ where
 
     /// Identifies the authorization scope for the method you are building.
     ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::Full`.
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::Full`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
     ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, St>(mut self, scope: T) -> MylibraryBookshelveGetCall<'a, S>
-                                                        where T: Into<Option<St>>,
-                                                              St: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
+    pub fn add_scope<St>(mut self, scope: St) -> MylibraryBookshelfGetCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> MylibraryBookshelfGetCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> MylibraryBookshelfGetCall<'a, S> {
+        self._scopes.clear();
         self
     }
 }
@@ -13263,7 +14174,7 @@ where
 /// Retrieves a list of bookshelves belonging to the authenticated user.
 ///
 /// A builder for the *bookshelves.list* method supported by a *mylibrary* resource.
-/// It is not used directly, but through a `MylibraryMethods` instance.
+/// It is not used directly, but through a [`MylibraryMethods`] instance.
 ///
 /// # Example
 ///
@@ -13275,7 +14186,7 @@ where
 /// # extern crate google_books1 as books1;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use books1::{Books, oauth2, hyper, hyper_rustls};
+/// # use books1::{Books, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
 /// # let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -13291,21 +14202,21 @@ where
 ///              .doit().await;
 /// # }
 /// ```
-pub struct MylibraryBookshelveListCall<'a, S>
+pub struct MylibraryBookshelfListCall<'a, S>
     where S: 'a {
 
     hub: &'a Books<S>,
     _source: Option<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
+    _scopes: BTreeSet<String>
 }
 
-impl<'a, S> client::CallBuilder for MylibraryBookshelveListCall<'a, S> {}
+impl<'a, S> client::CallBuilder for MylibraryBookshelfListCall<'a, S> {}
 
-impl<'a, S> MylibraryBookshelveListCall<'a, S>
+impl<'a, S> MylibraryBookshelfListCall<'a, S>
 where
-    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
     S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
     S::Future: Send + Unpin + 'static,
     S::Error: Into<Box<dyn StdError + Send + Sync>>,
@@ -13316,49 +14227,48 @@ where
     pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, Bookshelves)> {
         use std::io::{Read, Seek};
         use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::ToParts;
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
         let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
         dlg.begin(client::MethodInfo { id: "books.mylibrary.bookshelves.list",
                                http_method: hyper::Method::GET });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
-        if let Some(value) = self._source {
-            params.push(("source", value.to_string()));
-        }
+
         for &field in ["alt", "source"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(client::Error::FieldClash(field));
             }
         }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
+
+        let mut params = Params::with_capacity(3 + self._additional_params.len());
+        if let Some(value) = self._source.as_ref() {
+            params.push("source", value);
         }
 
-        params.push(("alt", "json".to_string()));
+        params.extend(self._additional_params.iter());
 
+        params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "books/v1/mylibrary/bookshelves";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::Full.as_ref().to_string());
         }
 
 
-        let url = url::Url::parse_with_params(&url, params).unwrap();
+        let url = params.parse_with_url(&url);
 
 
 
         loop {
-            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
-                Ok(token) => token.clone(),
-                Err(err) => {
-                    match  dlg.token(&err) {
-                        Some(token) => token,
-                        None => {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
                             dlg.finished(false);
-                            return Err(client::Error::MissingToken(err))
+                            return Err(client::Error::MissingToken(e));
                         }
                     }
                 }
@@ -13366,21 +14276,27 @@ where
             let mut req_result = {
                 let client = &self.hub.client;
                 dlg.pre_request();
-                let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
-                        .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::GET)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
 
 
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
-                
+
             };
 
             match req_result {
                 Err(err) => {
                     if let client::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep(d).await;
                         continue;
                     }
                     dlg.finished(false);
@@ -13396,7 +14312,7 @@ where
                         let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
                         if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
-                            sleep(d);
+                            sleep(d).await;
                             continue;
                         }
 
@@ -13430,17 +14346,18 @@ where
     /// String to identify the originator of this request.
     ///
     /// Sets the *source* query property to the given value.
-    pub fn source(mut self, new_value: &str) -> MylibraryBookshelveListCall<'a, S> {
+    pub fn source(mut self, new_value: &str) -> MylibraryBookshelfListCall<'a, S> {
         self._source = Some(new_value.to_string());
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.````
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MylibraryBookshelveListCall<'a, S> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MylibraryBookshelfListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -13465,7 +14382,7 @@ where
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> MylibraryBookshelveListCall<'a, S>
+    pub fn param<T>(mut self, name: T, value: T) -> MylibraryBookshelfListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -13473,25 +14390,36 @@ where
 
     /// Identifies the authorization scope for the method you are building.
     ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::Full`.
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::Full`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
     ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, St>(mut self, scope: T) -> MylibraryBookshelveListCall<'a, S>
-                                                        where T: Into<Option<St>>,
-                                                              St: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
+    pub fn add_scope<St>(mut self, scope: St) -> MylibraryBookshelfListCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> MylibraryBookshelfListCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> MylibraryBookshelfListCall<'a, S> {
+        self._scopes.clear();
         self
     }
 }
@@ -13500,7 +14428,7 @@ where
 /// Moves a volume within a bookshelf.
 ///
 /// A builder for the *bookshelves.moveVolume* method supported by a *mylibrary* resource.
-/// It is not used directly, but through a `MylibraryMethods` instance.
+/// It is not used directly, but through a [`MylibraryMethods`] instance.
 ///
 /// # Example
 ///
@@ -13512,7 +14440,7 @@ where
 /// # extern crate google_books1 as books1;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use books1::{Books, oauth2, hyper, hyper_rustls};
+/// # use books1::{Books, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
 /// # let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -13528,7 +14456,7 @@ where
 ///              .doit().await;
 /// # }
 /// ```
-pub struct MylibraryBookshelveMoveVolumeCall<'a, S>
+pub struct MylibraryBookshelfMoveVolumeCall<'a, S>
     where S: 'a {
 
     hub: &'a Books<S>,
@@ -13538,14 +14466,14 @@ pub struct MylibraryBookshelveMoveVolumeCall<'a, S>
     _source: Option<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
+    _scopes: BTreeSet<String>
 }
 
-impl<'a, S> client::CallBuilder for MylibraryBookshelveMoveVolumeCall<'a, S> {}
+impl<'a, S> client::CallBuilder for MylibraryBookshelfMoveVolumeCall<'a, S> {}
 
-impl<'a, S> MylibraryBookshelveMoveVolumeCall<'a, S>
+impl<'a, S> MylibraryBookshelfMoveVolumeCall<'a, S>
 where
-    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
     S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
     S::Future: Send + Unpin + 'static,
     S::Error: Into<Box<dyn StdError + Send + Sync>>,
@@ -13556,73 +14484,58 @@ where
     pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, Empty)> {
         use std::io::{Read, Seek};
         use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::ToParts;
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
         let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
         dlg.begin(client::MethodInfo { id: "books.mylibrary.bookshelves.moveVolume",
                                http_method: hyper::Method::POST });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(6 + self._additional_params.len());
-        params.push(("shelf", self._shelf.to_string()));
-        params.push(("volumeId", self._volume_id.to_string()));
-        params.push(("volumePosition", self._volume_position.to_string()));
-        if let Some(value) = self._source {
-            params.push(("source", value.to_string()));
-        }
+
         for &field in ["alt", "shelf", "volumeId", "volumePosition", "source"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(client::Error::FieldClash(field));
             }
         }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
+
+        let mut params = Params::with_capacity(6 + self._additional_params.len());
+        params.push("shelf", self._shelf);
+        params.push("volumeId", self._volume_id);
+        params.push("volumePosition", self._volume_position.to_string());
+        if let Some(value) = self._source.as_ref() {
+            params.push("source", value);
         }
 
-        params.push(("alt", "json".to_string()));
+        params.extend(self._additional_params.iter());
 
+        params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "books/v1/mylibrary/bookshelves/{shelf}/moveVolume";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::Full.as_ref().to_string());
         }
 
         for &(find_this, param_name) in [("{shelf}", "shelf")].iter() {
-            let mut replace_with: Option<&str> = None;
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = Some(value);
-                    break;
-                }
-            }
-            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+            url = params.uri_replacement(url, param_name, find_this, false);
         }
         {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
-            for param_name in ["shelf"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
+            let to_remove = ["shelf"];
+            params.remove_params(&to_remove);
         }
 
-        let url = url::Url::parse_with_params(&url, params).unwrap();
+        let url = params.parse_with_url(&url);
 
 
 
         loop {
-            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
-                Ok(token) => token.clone(),
-                Err(err) => {
-                    match  dlg.token(&err) {
-                        Some(token) => token,
-                        None => {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
                             dlg.finished(false);
-                            return Err(client::Error::MissingToken(err))
+                            return Err(client::Error::MissingToken(e));
                         }
                     }
                 }
@@ -13630,21 +14543,27 @@ where
             let mut req_result = {
                 let client = &self.hub.client;
                 dlg.pre_request();
-                let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
-                        .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::POST)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
 
 
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
-                
+
             };
 
             match req_result {
                 Err(err) => {
                     if let client::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep(d).await;
                         continue;
                     }
                     dlg.finished(false);
@@ -13660,7 +14579,7 @@ where
                         let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
                         if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
-                            sleep(d);
+                            sleep(d).await;
                             continue;
                         }
 
@@ -13697,7 +14616,7 @@ where
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn shelf(mut self, new_value: &str) -> MylibraryBookshelveMoveVolumeCall<'a, S> {
+    pub fn shelf(mut self, new_value: &str) -> MylibraryBookshelfMoveVolumeCall<'a, S> {
         self._shelf = new_value.to_string();
         self
     }
@@ -13707,7 +14626,7 @@ where
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn volume_id(mut self, new_value: &str) -> MylibraryBookshelveMoveVolumeCall<'a, S> {
+    pub fn volume_id(mut self, new_value: &str) -> MylibraryBookshelfMoveVolumeCall<'a, S> {
         self._volume_id = new_value.to_string();
         self
     }
@@ -13717,24 +14636,25 @@ where
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn volume_position(mut self, new_value: i32) -> MylibraryBookshelveMoveVolumeCall<'a, S> {
+    pub fn volume_position(mut self, new_value: i32) -> MylibraryBookshelfMoveVolumeCall<'a, S> {
         self._volume_position = new_value;
         self
     }
     /// String to identify the originator of this request.
     ///
     /// Sets the *source* query property to the given value.
-    pub fn source(mut self, new_value: &str) -> MylibraryBookshelveMoveVolumeCall<'a, S> {
+    pub fn source(mut self, new_value: &str) -> MylibraryBookshelfMoveVolumeCall<'a, S> {
         self._source = Some(new_value.to_string());
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.````
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MylibraryBookshelveMoveVolumeCall<'a, S> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MylibraryBookshelfMoveVolumeCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -13759,7 +14679,7 @@ where
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> MylibraryBookshelveMoveVolumeCall<'a, S>
+    pub fn param<T>(mut self, name: T, value: T) -> MylibraryBookshelfMoveVolumeCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -13767,25 +14687,36 @@ where
 
     /// Identifies the authorization scope for the method you are building.
     ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::Full`.
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::Full`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
     ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, St>(mut self, scope: T) -> MylibraryBookshelveMoveVolumeCall<'a, S>
-                                                        where T: Into<Option<St>>,
-                                                              St: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
+    pub fn add_scope<St>(mut self, scope: St) -> MylibraryBookshelfMoveVolumeCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> MylibraryBookshelfMoveVolumeCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> MylibraryBookshelfMoveVolumeCall<'a, S> {
+        self._scopes.clear();
         self
     }
 }
@@ -13794,7 +14725,7 @@ where
 /// Removes a volume from a bookshelf.
 ///
 /// A builder for the *bookshelves.removeVolume* method supported by a *mylibrary* resource.
-/// It is not used directly, but through a `MylibraryMethods` instance.
+/// It is not used directly, but through a [`MylibraryMethods`] instance.
 ///
 /// # Example
 ///
@@ -13806,7 +14737,7 @@ where
 /// # extern crate google_books1 as books1;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use books1::{Books, oauth2, hyper, hyper_rustls};
+/// # use books1::{Books, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
 /// # let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -13823,7 +14754,7 @@ where
 ///              .doit().await;
 /// # }
 /// ```
-pub struct MylibraryBookshelveRemoveVolumeCall<'a, S>
+pub struct MylibraryBookshelfRemoveVolumeCall<'a, S>
     where S: 'a {
 
     hub: &'a Books<S>,
@@ -13833,14 +14764,14 @@ pub struct MylibraryBookshelveRemoveVolumeCall<'a, S>
     _reason: Option<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
+    _scopes: BTreeSet<String>
 }
 
-impl<'a, S> client::CallBuilder for MylibraryBookshelveRemoveVolumeCall<'a, S> {}
+impl<'a, S> client::CallBuilder for MylibraryBookshelfRemoveVolumeCall<'a, S> {}
 
-impl<'a, S> MylibraryBookshelveRemoveVolumeCall<'a, S>
+impl<'a, S> MylibraryBookshelfRemoveVolumeCall<'a, S>
 where
-    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
     S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
     S::Future: Send + Unpin + 'static,
     S::Error: Into<Box<dyn StdError + Send + Sync>>,
@@ -13851,75 +14782,60 @@ where
     pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, Empty)> {
         use std::io::{Read, Seek};
         use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::ToParts;
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
         let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
         dlg.begin(client::MethodInfo { id: "books.mylibrary.bookshelves.removeVolume",
                                http_method: hyper::Method::POST });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(6 + self._additional_params.len());
-        params.push(("shelf", self._shelf.to_string()));
-        params.push(("volumeId", self._volume_id.to_string()));
-        if let Some(value) = self._source {
-            params.push(("source", value.to_string()));
-        }
-        if let Some(value) = self._reason {
-            params.push(("reason", value.to_string()));
-        }
+
         for &field in ["alt", "shelf", "volumeId", "source", "reason"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(client::Error::FieldClash(field));
             }
         }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
+
+        let mut params = Params::with_capacity(6 + self._additional_params.len());
+        params.push("shelf", self._shelf);
+        params.push("volumeId", self._volume_id);
+        if let Some(value) = self._source.as_ref() {
+            params.push("source", value);
+        }
+        if let Some(value) = self._reason.as_ref() {
+            params.push("reason", value);
         }
 
-        params.push(("alt", "json".to_string()));
+        params.extend(self._additional_params.iter());
 
+        params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "books/v1/mylibrary/bookshelves/{shelf}/removeVolume";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::Full.as_ref().to_string());
         }
 
         for &(find_this, param_name) in [("{shelf}", "shelf")].iter() {
-            let mut replace_with: Option<&str> = None;
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = Some(value);
-                    break;
-                }
-            }
-            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+            url = params.uri_replacement(url, param_name, find_this, false);
         }
         {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
-            for param_name in ["shelf"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
+            let to_remove = ["shelf"];
+            params.remove_params(&to_remove);
         }
 
-        let url = url::Url::parse_with_params(&url, params).unwrap();
+        let url = params.parse_with_url(&url);
 
 
 
         loop {
-            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
-                Ok(token) => token.clone(),
-                Err(err) => {
-                    match  dlg.token(&err) {
-                        Some(token) => token,
-                        None => {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
                             dlg.finished(false);
-                            return Err(client::Error::MissingToken(err))
+                            return Err(client::Error::MissingToken(e));
                         }
                     }
                 }
@@ -13927,21 +14843,27 @@ where
             let mut req_result = {
                 let client = &self.hub.client;
                 dlg.pre_request();
-                let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
-                        .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::POST)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
 
 
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
-                
+
             };
 
             match req_result {
                 Err(err) => {
                     if let client::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep(d).await;
                         continue;
                     }
                     dlg.finished(false);
@@ -13957,7 +14879,7 @@ where
                         let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
                         if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
-                            sleep(d);
+                            sleep(d).await;
                             continue;
                         }
 
@@ -13994,7 +14916,7 @@ where
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn shelf(mut self, new_value: &str) -> MylibraryBookshelveRemoveVolumeCall<'a, S> {
+    pub fn shelf(mut self, new_value: &str) -> MylibraryBookshelfRemoveVolumeCall<'a, S> {
         self._shelf = new_value.to_string();
         self
     }
@@ -14004,31 +14926,32 @@ where
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn volume_id(mut self, new_value: &str) -> MylibraryBookshelveRemoveVolumeCall<'a, S> {
+    pub fn volume_id(mut self, new_value: &str) -> MylibraryBookshelfRemoveVolumeCall<'a, S> {
         self._volume_id = new_value.to_string();
         self
     }
     /// String to identify the originator of this request.
     ///
     /// Sets the *source* query property to the given value.
-    pub fn source(mut self, new_value: &str) -> MylibraryBookshelveRemoveVolumeCall<'a, S> {
+    pub fn source(mut self, new_value: &str) -> MylibraryBookshelfRemoveVolumeCall<'a, S> {
         self._source = Some(new_value.to_string());
         self
     }
     /// The reason for which the book is removed from the library.
     ///
     /// Sets the *reason* query property to the given value.
-    pub fn reason(mut self, new_value: &str) -> MylibraryBookshelveRemoveVolumeCall<'a, S> {
+    pub fn reason(mut self, new_value: &str) -> MylibraryBookshelfRemoveVolumeCall<'a, S> {
         self._reason = Some(new_value.to_string());
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.````
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MylibraryBookshelveRemoveVolumeCall<'a, S> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MylibraryBookshelfRemoveVolumeCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -14053,7 +14976,7 @@ where
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> MylibraryBookshelveRemoveVolumeCall<'a, S>
+    pub fn param<T>(mut self, name: T, value: T) -> MylibraryBookshelfRemoveVolumeCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -14061,25 +14984,36 @@ where
 
     /// Identifies the authorization scope for the method you are building.
     ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::Full`.
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::Full`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
     ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, St>(mut self, scope: T) -> MylibraryBookshelveRemoveVolumeCall<'a, S>
-                                                        where T: Into<Option<St>>,
-                                                              St: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
+    pub fn add_scope<St>(mut self, scope: St) -> MylibraryBookshelfRemoveVolumeCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> MylibraryBookshelfRemoveVolumeCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> MylibraryBookshelfRemoveVolumeCall<'a, S> {
+        self._scopes.clear();
         self
     }
 }
@@ -14088,7 +15022,7 @@ where
 /// Retrieves my reading position information for a volume.
 ///
 /// A builder for the *readingpositions.get* method supported by a *mylibrary* resource.
-/// It is not used directly, but through a `MylibraryMethods` instance.
+/// It is not used directly, but through a [`MylibraryMethods`] instance.
 ///
 /// # Example
 ///
@@ -14100,7 +15034,7 @@ where
 /// # extern crate google_books1 as books1;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use books1::{Books, oauth2, hyper, hyper_rustls};
+/// # use books1::{Books, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
 /// # let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -14126,14 +15060,14 @@ pub struct MylibraryReadingpositionGetCall<'a, S>
     _content_version: Option<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
+    _scopes: BTreeSet<String>
 }
 
 impl<'a, S> client::CallBuilder for MylibraryReadingpositionGetCall<'a, S> {}
 
 impl<'a, S> MylibraryReadingpositionGetCall<'a, S>
 where
-    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
     S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
     S::Future: Send + Unpin + 'static,
     S::Error: Into<Box<dyn StdError + Send + Sync>>,
@@ -14144,74 +15078,59 @@ where
     pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, ReadingPosition)> {
         use std::io::{Read, Seek};
         use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::ToParts;
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
         let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
         dlg.begin(client::MethodInfo { id: "books.mylibrary.readingpositions.get",
                                http_method: hyper::Method::GET });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
-        params.push(("volumeId", self._volume_id.to_string()));
-        if let Some(value) = self._source {
-            params.push(("source", value.to_string()));
-        }
-        if let Some(value) = self._content_version {
-            params.push(("contentVersion", value.to_string()));
-        }
+
         for &field in ["alt", "volumeId", "source", "contentVersion"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(client::Error::FieldClash(field));
             }
         }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
+
+        let mut params = Params::with_capacity(5 + self._additional_params.len());
+        params.push("volumeId", self._volume_id);
+        if let Some(value) = self._source.as_ref() {
+            params.push("source", value);
+        }
+        if let Some(value) = self._content_version.as_ref() {
+            params.push("contentVersion", value);
         }
 
-        params.push(("alt", "json".to_string()));
+        params.extend(self._additional_params.iter());
 
+        params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "books/v1/mylibrary/readingpositions/{volumeId}";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::Full.as_ref().to_string());
         }
 
         for &(find_this, param_name) in [("{volumeId}", "volumeId")].iter() {
-            let mut replace_with: Option<&str> = None;
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = Some(value);
-                    break;
-                }
-            }
-            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+            url = params.uri_replacement(url, param_name, find_this, false);
         }
         {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
-            for param_name in ["volumeId"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
+            let to_remove = ["volumeId"];
+            params.remove_params(&to_remove);
         }
 
-        let url = url::Url::parse_with_params(&url, params).unwrap();
+        let url = params.parse_with_url(&url);
 
 
 
         loop {
-            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
-                Ok(token) => token.clone(),
-                Err(err) => {
-                    match  dlg.token(&err) {
-                        Some(token) => token,
-                        None => {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
                             dlg.finished(false);
-                            return Err(client::Error::MissingToken(err))
+                            return Err(client::Error::MissingToken(e));
                         }
                     }
                 }
@@ -14219,21 +15138,27 @@ where
             let mut req_result = {
                 let client = &self.hub.client;
                 dlg.pre_request();
-                let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
-                        .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::GET)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
 
 
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
-                
+
             };
 
             match req_result {
                 Err(err) => {
                     if let client::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep(d).await;
                         continue;
                     }
                     dlg.finished(false);
@@ -14249,7 +15174,7 @@ where
                         let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
                         if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
-                            sleep(d);
+                            sleep(d).await;
                             continue;
                         }
 
@@ -14307,7 +15232,8 @@ where
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.````
     ///
     /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MylibraryReadingpositionGetCall<'a, S> {
@@ -14343,25 +15269,36 @@ where
 
     /// Identifies the authorization scope for the method you are building.
     ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::Full`.
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::Full`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
     ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, St>(mut self, scope: T) -> MylibraryReadingpositionGetCall<'a, S>
-                                                        where T: Into<Option<St>>,
-                                                              St: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
+    pub fn add_scope<St>(mut self, scope: St) -> MylibraryReadingpositionGetCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> MylibraryReadingpositionGetCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> MylibraryReadingpositionGetCall<'a, S> {
+        self._scopes.clear();
         self
     }
 }
@@ -14370,7 +15307,7 @@ where
 /// Sets my reading position information for a volume.
 ///
 /// A builder for the *readingpositions.setPosition* method supported by a *mylibrary* resource.
-/// It is not used directly, but through a `MylibraryMethods` instance.
+/// It is not used directly, but through a [`MylibraryMethods`] instance.
 ///
 /// # Example
 ///
@@ -14382,7 +15319,7 @@ where
 /// # extern crate google_books1 as books1;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use books1::{Books, oauth2, hyper, hyper_rustls};
+/// # use books1::{Books, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
 /// # let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -14414,14 +15351,14 @@ pub struct MylibraryReadingpositionSetPositionCall<'a, S>
     _action: Option<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
+    _scopes: BTreeSet<String>
 }
 
 impl<'a, S> client::CallBuilder for MylibraryReadingpositionSetPositionCall<'a, S> {}
 
 impl<'a, S> MylibraryReadingpositionSetPositionCall<'a, S>
 where
-    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
     S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
     S::Future: Send + Unpin + 'static,
     S::Error: Into<Box<dyn StdError + Send + Sync>>,
@@ -14432,82 +15369,67 @@ where
     pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, Empty)> {
         use std::io::{Read, Seek};
         use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::ToParts;
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
         let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
         dlg.begin(client::MethodInfo { id: "books.mylibrary.readingpositions.setPosition",
                                http_method: hyper::Method::POST });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(9 + self._additional_params.len());
-        params.push(("volumeId", self._volume_id.to_string()));
-        params.push(("position", self._position.to_string()));
-        params.push(("timestamp", self._timestamp.to_string()));
-        if let Some(value) = self._source {
-            params.push(("source", value.to_string()));
-        }
-        if let Some(value) = self._device_cookie {
-            params.push(("deviceCookie", value.to_string()));
-        }
-        if let Some(value) = self._content_version {
-            params.push(("contentVersion", value.to_string()));
-        }
-        if let Some(value) = self._action {
-            params.push(("action", value.to_string()));
-        }
+
         for &field in ["alt", "volumeId", "position", "timestamp", "source", "deviceCookie", "contentVersion", "action"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(client::Error::FieldClash(field));
             }
         }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
+
+        let mut params = Params::with_capacity(9 + self._additional_params.len());
+        params.push("volumeId", self._volume_id);
+        params.push("position", self._position);
+        params.push("timestamp", self._timestamp);
+        if let Some(value) = self._source.as_ref() {
+            params.push("source", value);
+        }
+        if let Some(value) = self._device_cookie.as_ref() {
+            params.push("deviceCookie", value);
+        }
+        if let Some(value) = self._content_version.as_ref() {
+            params.push("contentVersion", value);
+        }
+        if let Some(value) = self._action.as_ref() {
+            params.push("action", value);
         }
 
-        params.push(("alt", "json".to_string()));
+        params.extend(self._additional_params.iter());
 
+        params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "books/v1/mylibrary/readingpositions/{volumeId}/setPosition";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::Full.as_ref().to_string());
         }
 
         for &(find_this, param_name) in [("{volumeId}", "volumeId")].iter() {
-            let mut replace_with: Option<&str> = None;
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = Some(value);
-                    break;
-                }
-            }
-            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+            url = params.uri_replacement(url, param_name, find_this, false);
         }
         {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
-            for param_name in ["volumeId"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
+            let to_remove = ["volumeId"];
+            params.remove_params(&to_remove);
         }
 
-        let url = url::Url::parse_with_params(&url, params).unwrap();
+        let url = params.parse_with_url(&url);
 
 
 
         loop {
-            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
-                Ok(token) => token.clone(),
-                Err(err) => {
-                    match  dlg.token(&err) {
-                        Some(token) => token,
-                        None => {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
                             dlg.finished(false);
-                            return Err(client::Error::MissingToken(err))
+                            return Err(client::Error::MissingToken(e));
                         }
                     }
                 }
@@ -14515,21 +15437,27 @@ where
             let mut req_result = {
                 let client = &self.hub.client;
                 dlg.pre_request();
-                let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
-                        .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::POST)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
 
 
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
-                
+
             };
 
             match req_result {
                 Err(err) => {
                     if let client::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep(d).await;
                         continue;
                     }
                     dlg.finished(false);
@@ -14545,7 +15473,7 @@ where
                         let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
                         if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
-                            sleep(d);
+                            sleep(d).await;
                             continue;
                         }
 
@@ -14637,7 +15565,8 @@ where
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.````
     ///
     /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MylibraryReadingpositionSetPositionCall<'a, S> {
@@ -14673,25 +15602,36 @@ where
 
     /// Identifies the authorization scope for the method you are building.
     ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::Full`.
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::Full`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
     ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, St>(mut self, scope: T) -> MylibraryReadingpositionSetPositionCall<'a, S>
-                                                        where T: Into<Option<St>>,
-                                                              St: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
+    pub fn add_scope<St>(mut self, scope: St) -> MylibraryReadingpositionSetPositionCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> MylibraryReadingpositionSetPositionCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> MylibraryReadingpositionSetPositionCall<'a, S> {
+        self._scopes.clear();
         self
     }
 }
@@ -14700,7 +15640,7 @@ where
 /// Returns notification details for a given notification id.
 ///
 /// A builder for the *get* method supported by a *notification* resource.
-/// It is not used directly, but through a `NotificationMethods` instance.
+/// It is not used directly, but through a [`NotificationMethods`] instance.
 ///
 /// # Example
 ///
@@ -14712,7 +15652,7 @@ where
 /// # extern crate google_books1 as books1;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use books1::{Books, oauth2, hyper, hyper_rustls};
+/// # use books1::{Books, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
 /// # let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -14738,14 +15678,14 @@ pub struct NotificationGetCall<'a, S>
     _locale: Option<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
+    _scopes: BTreeSet<String>
 }
 
 impl<'a, S> client::CallBuilder for NotificationGetCall<'a, S> {}
 
 impl<'a, S> NotificationGetCall<'a, S>
 where
-    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
     S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
     S::Future: Send + Unpin + 'static,
     S::Error: Into<Box<dyn StdError + Send + Sync>>,
@@ -14756,53 +15696,52 @@ where
     pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, Notification)> {
         use std::io::{Read, Seek};
         use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::ToParts;
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
         let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
         dlg.begin(client::MethodInfo { id: "books.notification.get",
                                http_method: hyper::Method::GET });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
-        params.push(("notification_id", self._notification_id.to_string()));
-        if let Some(value) = self._source {
-            params.push(("source", value.to_string()));
-        }
-        if let Some(value) = self._locale {
-            params.push(("locale", value.to_string()));
-        }
+
         for &field in ["alt", "notification_id", "source", "locale"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(client::Error::FieldClash(field));
             }
         }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
+
+        let mut params = Params::with_capacity(5 + self._additional_params.len());
+        params.push("notification_id", self._notification_id);
+        if let Some(value) = self._source.as_ref() {
+            params.push("source", value);
+        }
+        if let Some(value) = self._locale.as_ref() {
+            params.push("locale", value);
         }
 
-        params.push(("alt", "json".to_string()));
+        params.extend(self._additional_params.iter());
 
+        params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "books/v1/notification/get";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::Full.as_ref().to_string());
         }
 
 
-        let url = url::Url::parse_with_params(&url, params).unwrap();
+        let url = params.parse_with_url(&url);
 
 
 
         loop {
-            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
-                Ok(token) => token.clone(),
-                Err(err) => {
-                    match  dlg.token(&err) {
-                        Some(token) => token,
-                        None => {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
                             dlg.finished(false);
-                            return Err(client::Error::MissingToken(err))
+                            return Err(client::Error::MissingToken(e));
                         }
                     }
                 }
@@ -14810,21 +15749,27 @@ where
             let mut req_result = {
                 let client = &self.hub.client;
                 dlg.pre_request();
-                let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
-                        .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::GET)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
 
 
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
-                
+
             };
 
             match req_result {
                 Err(err) => {
                     if let client::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep(d).await;
                         continue;
                     }
                     dlg.finished(false);
@@ -14840,7 +15785,7 @@ where
                         let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
                         if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
-                            sleep(d);
+                            sleep(d).await;
                             continue;
                         }
 
@@ -14898,7 +15843,8 @@ where
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.````
     ///
     /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> NotificationGetCall<'a, S> {
@@ -14934,25 +15880,36 @@ where
 
     /// Identifies the authorization scope for the method you are building.
     ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::Full`.
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::Full`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
     ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, St>(mut self, scope: T) -> NotificationGetCall<'a, S>
-                                                        where T: Into<Option<St>>,
-                                                              St: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
+    pub fn add_scope<St>(mut self, scope: St) -> NotificationGetCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> NotificationGetCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> NotificationGetCall<'a, S> {
+        self._scopes.clear();
         self
     }
 }
@@ -14961,7 +15918,7 @@ where
 /// List categories for onboarding experience.
 ///
 /// A builder for the *listCategories* method supported by a *onboarding* resource.
-/// It is not used directly, but through a `OnboardingMethods` instance.
+/// It is not used directly, but through a [`OnboardingMethods`] instance.
 ///
 /// # Example
 ///
@@ -14973,7 +15930,7 @@ where
 /// # extern crate google_books1 as books1;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use books1::{Books, oauth2, hyper, hyper_rustls};
+/// # use books1::{Books, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
 /// # let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -14996,14 +15953,14 @@ pub struct OnboardingListCategoryCall<'a, S>
     _locale: Option<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
+    _scopes: BTreeSet<String>
 }
 
 impl<'a, S> client::CallBuilder for OnboardingListCategoryCall<'a, S> {}
 
 impl<'a, S> OnboardingListCategoryCall<'a, S>
 where
-    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
     S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
     S::Future: Send + Unpin + 'static,
     S::Error: Into<Box<dyn StdError + Send + Sync>>,
@@ -15014,49 +15971,48 @@ where
     pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, Category)> {
         use std::io::{Read, Seek};
         use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::ToParts;
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
         let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
         dlg.begin(client::MethodInfo { id: "books.onboarding.listCategories",
                                http_method: hyper::Method::GET });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
-        if let Some(value) = self._locale {
-            params.push(("locale", value.to_string()));
-        }
+
         for &field in ["alt", "locale"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(client::Error::FieldClash(field));
             }
         }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
+
+        let mut params = Params::with_capacity(3 + self._additional_params.len());
+        if let Some(value) = self._locale.as_ref() {
+            params.push("locale", value);
         }
 
-        params.push(("alt", "json".to_string()));
+        params.extend(self._additional_params.iter());
 
+        params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "books/v1/onboarding/listCategories";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::Full.as_ref().to_string());
         }
 
 
-        let url = url::Url::parse_with_params(&url, params).unwrap();
+        let url = params.parse_with_url(&url);
 
 
 
         loop {
-            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
-                Ok(token) => token.clone(),
-                Err(err) => {
-                    match  dlg.token(&err) {
-                        Some(token) => token,
-                        None => {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
                             dlg.finished(false);
-                            return Err(client::Error::MissingToken(err))
+                            return Err(client::Error::MissingToken(e));
                         }
                     }
                 }
@@ -15064,21 +16020,27 @@ where
             let mut req_result = {
                 let client = &self.hub.client;
                 dlg.pre_request();
-                let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
-                        .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::GET)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
 
 
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
-                
+
             };
 
             match req_result {
                 Err(err) => {
                     if let client::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep(d).await;
                         continue;
                     }
                     dlg.finished(false);
@@ -15094,7 +16056,7 @@ where
                         let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
                         if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
-                            sleep(d);
+                            sleep(d).await;
                             continue;
                         }
 
@@ -15135,7 +16097,8 @@ where
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.````
     ///
     /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OnboardingListCategoryCall<'a, S> {
@@ -15171,25 +16134,36 @@ where
 
     /// Identifies the authorization scope for the method you are building.
     ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::Full`.
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::Full`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
     ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, St>(mut self, scope: T) -> OnboardingListCategoryCall<'a, S>
-                                                        where T: Into<Option<St>>,
-                                                              St: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
+    pub fn add_scope<St>(mut self, scope: St) -> OnboardingListCategoryCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> OnboardingListCategoryCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> OnboardingListCategoryCall<'a, S> {
+        self._scopes.clear();
         self
     }
 }
@@ -15198,7 +16172,7 @@ where
 /// List available volumes under categories for onboarding experience.
 ///
 /// A builder for the *listCategoryVolumes* method supported by a *onboarding* resource.
-/// It is not used directly, but through a `OnboardingMethods` instance.
+/// It is not used directly, but through a [`OnboardingMethods`] instance.
 ///
 /// # Example
 ///
@@ -15210,7 +16184,7 @@ where
 /// # extern crate google_books1 as books1;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use books1::{Books, oauth2, hyper, hyper_rustls};
+/// # use books1::{Books, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
 /// # let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -15241,14 +16215,14 @@ pub struct OnboardingListCategoryVolumeCall<'a, S>
     _category_id: Vec<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
+    _scopes: BTreeSet<String>
 }
 
 impl<'a, S> client::CallBuilder for OnboardingListCategoryVolumeCall<'a, S> {}
 
 impl<'a, S> OnboardingListCategoryVolumeCall<'a, S>
 where
-    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
     S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
     S::Future: Send + Unpin + 'static,
     S::Error: Into<Box<dyn StdError + Send + Sync>>,
@@ -15259,63 +16233,62 @@ where
     pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, Volume2)> {
         use std::io::{Read, Seek};
         use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::ToParts;
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
         let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
         dlg.begin(client::MethodInfo { id: "books.onboarding.listCategoryVolumes",
                                http_method: hyper::Method::GET });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(7 + self._additional_params.len());
-        if let Some(value) = self._page_token {
-            params.push(("pageToken", value.to_string()));
-        }
-        if let Some(value) = self._page_size {
-            params.push(("pageSize", value.to_string()));
-        }
-        if let Some(value) = self._max_allowed_maturity_rating {
-            params.push(("maxAllowedMaturityRating", value.to_string()));
-        }
-        if let Some(value) = self._locale {
-            params.push(("locale", value.to_string()));
-        }
-        if self._category_id.len() > 0 {
-            for f in self._category_id.iter() {
-                params.push(("categoryId", f.to_string()));
-            }
-        }
+
         for &field in ["alt", "pageToken", "pageSize", "maxAllowedMaturityRating", "locale", "categoryId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(client::Error::FieldClash(field));
             }
         }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
+
+        let mut params = Params::with_capacity(7 + self._additional_params.len());
+        if let Some(value) = self._page_token.as_ref() {
+            params.push("pageToken", value);
+        }
+        if let Some(value) = self._page_size.as_ref() {
+            params.push("pageSize", value.to_string());
+        }
+        if let Some(value) = self._max_allowed_maturity_rating.as_ref() {
+            params.push("maxAllowedMaturityRating", value);
+        }
+        if let Some(value) = self._locale.as_ref() {
+            params.push("locale", value);
+        }
+        if self._category_id.len() > 0 {
+            for f in self._category_id.iter() {
+                params.push("categoryId", f);
+            }
         }
 
-        params.push(("alt", "json".to_string()));
+        params.extend(self._additional_params.iter());
 
+        params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "books/v1/onboarding/listCategoryVolumes";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::Full.as_ref().to_string());
         }
 
 
-        let url = url::Url::parse_with_params(&url, params).unwrap();
+        let url = params.parse_with_url(&url);
 
 
 
         loop {
-            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
-                Ok(token) => token.clone(),
-                Err(err) => {
-                    match  dlg.token(&err) {
-                        Some(token) => token,
-                        None => {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
                             dlg.finished(false);
-                            return Err(client::Error::MissingToken(err))
+                            return Err(client::Error::MissingToken(e));
                         }
                     }
                 }
@@ -15323,21 +16296,27 @@ where
             let mut req_result = {
                 let client = &self.hub.client;
                 dlg.pre_request();
-                let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
-                        .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::GET)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
 
 
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
-                
+
             };
 
             match req_result {
                 Err(err) => {
                     if let client::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep(d).await;
                         continue;
                     }
                     dlg.finished(false);
@@ -15353,7 +16332,7 @@ where
                         let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
                         if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
-                            sleep(d);
+                            sleep(d).await;
                             continue;
                         }
 
@@ -15423,7 +16402,8 @@ where
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.````
     ///
     /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OnboardingListCategoryVolumeCall<'a, S> {
@@ -15459,25 +16439,36 @@ where
 
     /// Identifies the authorization scope for the method you are building.
     ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::Full`.
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::Full`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
     ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, St>(mut self, scope: T) -> OnboardingListCategoryVolumeCall<'a, S>
-                                                        where T: Into<Option<St>>,
-                                                              St: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
+    pub fn add_scope<St>(mut self, scope: St) -> OnboardingListCategoryVolumeCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> OnboardingListCategoryVolumeCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> OnboardingListCategoryVolumeCall<'a, S> {
+        self._scopes.clear();
         self
     }
 }
@@ -15486,7 +16477,7 @@ where
 /// Returns a stream of personalized book clusters
 ///
 /// A builder for the *get* method supported by a *personalizedstream* resource.
-/// It is not used directly, but through a `PersonalizedstreamMethods` instance.
+/// It is not used directly, but through a [`PersonalizedstreamMethods`] instance.
 ///
 /// # Example
 ///
@@ -15498,7 +16489,7 @@ where
 /// # extern crate google_books1 as books1;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use books1::{Books, oauth2, hyper, hyper_rustls};
+/// # use books1::{Books, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
 /// # let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -15525,14 +16516,14 @@ pub struct PersonalizedstreamGetCall<'a, S>
     _locale: Option<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
+    _scopes: BTreeSet<String>
 }
 
 impl<'a, S> client::CallBuilder for PersonalizedstreamGetCall<'a, S> {}
 
 impl<'a, S> PersonalizedstreamGetCall<'a, S>
 where
-    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
     S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
     S::Future: Send + Unpin + 'static,
     S::Error: Into<Box<dyn StdError + Send + Sync>>,
@@ -15543,55 +16534,54 @@ where
     pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, Discoveryclusters)> {
         use std::io::{Read, Seek};
         use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::ToParts;
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
         let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
         dlg.begin(client::MethodInfo { id: "books.personalizedstream.get",
                                http_method: hyper::Method::GET });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
-        if let Some(value) = self._source {
-            params.push(("source", value.to_string()));
-        }
-        if let Some(value) = self._max_allowed_maturity_rating {
-            params.push(("maxAllowedMaturityRating", value.to_string()));
-        }
-        if let Some(value) = self._locale {
-            params.push(("locale", value.to_string()));
-        }
+
         for &field in ["alt", "source", "maxAllowedMaturityRating", "locale"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(client::Error::FieldClash(field));
             }
         }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
+
+        let mut params = Params::with_capacity(5 + self._additional_params.len());
+        if let Some(value) = self._source.as_ref() {
+            params.push("source", value);
+        }
+        if let Some(value) = self._max_allowed_maturity_rating.as_ref() {
+            params.push("maxAllowedMaturityRating", value);
+        }
+        if let Some(value) = self._locale.as_ref() {
+            params.push("locale", value);
         }
 
-        params.push(("alt", "json".to_string()));
+        params.extend(self._additional_params.iter());
 
+        params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "books/v1/personalizedstream/get";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::Full.as_ref().to_string());
         }
 
 
-        let url = url::Url::parse_with_params(&url, params).unwrap();
+        let url = params.parse_with_url(&url);
 
 
 
         loop {
-            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
-                Ok(token) => token.clone(),
-                Err(err) => {
-                    match  dlg.token(&err) {
-                        Some(token) => token,
-                        None => {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
                             dlg.finished(false);
-                            return Err(client::Error::MissingToken(err))
+                            return Err(client::Error::MissingToken(e));
                         }
                     }
                 }
@@ -15599,21 +16589,27 @@ where
             let mut req_result = {
                 let client = &self.hub.client;
                 dlg.pre_request();
-                let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
-                        .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::GET)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
 
 
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
-                
+
             };
 
             match req_result {
                 Err(err) => {
                     if let client::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep(d).await;
                         continue;
                     }
                     dlg.finished(false);
@@ -15629,7 +16625,7 @@ where
                         let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
                         if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
-                            sleep(d);
+                            sleep(d).await;
                             continue;
                         }
 
@@ -15684,7 +16680,8 @@ where
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.````
     ///
     /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PersonalizedstreamGetCall<'a, S> {
@@ -15720,25 +16717,36 @@ where
 
     /// Identifies the authorization scope for the method you are building.
     ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::Full`.
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::Full`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
     ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, St>(mut self, scope: T) -> PersonalizedstreamGetCall<'a, S>
-                                                        where T: Into<Option<St>>,
-                                                              St: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
+    pub fn add_scope<St>(mut self, scope: St) -> PersonalizedstreamGetCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> PersonalizedstreamGetCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> PersonalizedstreamGetCall<'a, S> {
+        self._scopes.clear();
         self
     }
 }
@@ -15747,7 +16755,7 @@ where
 /// Accepts the promo offer.
 ///
 /// A builder for the *accept* method supported by a *promooffer* resource.
-/// It is not used directly, but through a `PromoofferMethods` instance.
+/// It is not used directly, but through a [`PromoofferMethods`] instance.
 ///
 /// # Example
 ///
@@ -15759,7 +16767,7 @@ where
 /// # extern crate google_books1 as books1;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use books1::{Books, oauth2, hyper, hyper_rustls};
+/// # use books1::{Books, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
 /// # let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -15796,14 +16804,14 @@ pub struct PromoofferAcceptCall<'a, S>
     _android_id: Option<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
+    _scopes: BTreeSet<String>
 }
 
 impl<'a, S> client::CallBuilder for PromoofferAcceptCall<'a, S> {}
 
 impl<'a, S> PromoofferAcceptCall<'a, S>
 where
-    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
     S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
     S::Future: Send + Unpin + 'static,
     S::Error: Into<Box<dyn StdError + Send + Sync>>,
@@ -15814,70 +16822,69 @@ where
     pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, Empty)> {
         use std::io::{Read, Seek};
         use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::ToParts;
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
         let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
         dlg.begin(client::MethodInfo { id: "books.promooffer.accept",
                                http_method: hyper::Method::POST });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(10 + self._additional_params.len());
-        if let Some(value) = self._volume_id {
-            params.push(("volumeId", value.to_string()));
-        }
-        if let Some(value) = self._serial {
-            params.push(("serial", value.to_string()));
-        }
-        if let Some(value) = self._product {
-            params.push(("product", value.to_string()));
-        }
-        if let Some(value) = self._offer_id {
-            params.push(("offerId", value.to_string()));
-        }
-        if let Some(value) = self._model {
-            params.push(("model", value.to_string()));
-        }
-        if let Some(value) = self._manufacturer {
-            params.push(("manufacturer", value.to_string()));
-        }
-        if let Some(value) = self._device {
-            params.push(("device", value.to_string()));
-        }
-        if let Some(value) = self._android_id {
-            params.push(("androidId", value.to_string()));
-        }
+
         for &field in ["alt", "volumeId", "serial", "product", "offerId", "model", "manufacturer", "device", "androidId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(client::Error::FieldClash(field));
             }
         }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
+
+        let mut params = Params::with_capacity(10 + self._additional_params.len());
+        if let Some(value) = self._volume_id.as_ref() {
+            params.push("volumeId", value);
+        }
+        if let Some(value) = self._serial.as_ref() {
+            params.push("serial", value);
+        }
+        if let Some(value) = self._product.as_ref() {
+            params.push("product", value);
+        }
+        if let Some(value) = self._offer_id.as_ref() {
+            params.push("offerId", value);
+        }
+        if let Some(value) = self._model.as_ref() {
+            params.push("model", value);
+        }
+        if let Some(value) = self._manufacturer.as_ref() {
+            params.push("manufacturer", value);
+        }
+        if let Some(value) = self._device.as_ref() {
+            params.push("device", value);
+        }
+        if let Some(value) = self._android_id.as_ref() {
+            params.push("androidId", value);
         }
 
-        params.push(("alt", "json".to_string()));
+        params.extend(self._additional_params.iter());
 
+        params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "books/v1/promooffer/accept";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::Full.as_ref().to_string());
         }
 
 
-        let url = url::Url::parse_with_params(&url, params).unwrap();
+        let url = params.parse_with_url(&url);
 
 
 
         loop {
-            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
-                Ok(token) => token.clone(),
-                Err(err) => {
-                    match  dlg.token(&err) {
-                        Some(token) => token,
-                        None => {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
                             dlg.finished(false);
-                            return Err(client::Error::MissingToken(err))
+                            return Err(client::Error::MissingToken(e));
                         }
                     }
                 }
@@ -15885,21 +16892,27 @@ where
             let mut req_result = {
                 let client = &self.hub.client;
                 dlg.pre_request();
-                let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
-                        .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::POST)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
 
 
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
-                
+
             };
 
             match req_result {
                 Err(err) => {
                     if let client::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep(d).await;
                         continue;
                     }
                     dlg.finished(false);
@@ -15915,7 +16928,7 @@ where
                         let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
                         if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
-                            sleep(d);
+                            sleep(d).await;
                             continue;
                         }
 
@@ -16004,7 +17017,8 @@ where
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.````
     ///
     /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PromoofferAcceptCall<'a, S> {
@@ -16040,25 +17054,36 @@ where
 
     /// Identifies the authorization scope for the method you are building.
     ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::Full`.
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::Full`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
     ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, St>(mut self, scope: T) -> PromoofferAcceptCall<'a, S>
-                                                        where T: Into<Option<St>>,
-                                                              St: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
+    pub fn add_scope<St>(mut self, scope: St) -> PromoofferAcceptCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> PromoofferAcceptCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> PromoofferAcceptCall<'a, S> {
+        self._scopes.clear();
         self
     }
 }
@@ -16067,7 +17092,7 @@ where
 /// Marks the promo offer as dismissed.
 ///
 /// A builder for the *dismiss* method supported by a *promooffer* resource.
-/// It is not used directly, but through a `PromoofferMethods` instance.
+/// It is not used directly, but through a [`PromoofferMethods`] instance.
 ///
 /// # Example
 ///
@@ -16079,7 +17104,7 @@ where
 /// # extern crate google_books1 as books1;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use books1::{Books, oauth2, hyper, hyper_rustls};
+/// # use books1::{Books, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
 /// # let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -16114,14 +17139,14 @@ pub struct PromoofferDismisCall<'a, S>
     _android_id: Option<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
+    _scopes: BTreeSet<String>
 }
 
 impl<'a, S> client::CallBuilder for PromoofferDismisCall<'a, S> {}
 
 impl<'a, S> PromoofferDismisCall<'a, S>
 where
-    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
     S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
     S::Future: Send + Unpin + 'static,
     S::Error: Into<Box<dyn StdError + Send + Sync>>,
@@ -16132,67 +17157,66 @@ where
     pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, Empty)> {
         use std::io::{Read, Seek};
         use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::ToParts;
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
         let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
         dlg.begin(client::MethodInfo { id: "books.promooffer.dismiss",
                                http_method: hyper::Method::POST });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(9 + self._additional_params.len());
-        if let Some(value) = self._serial {
-            params.push(("serial", value.to_string()));
-        }
-        if let Some(value) = self._product {
-            params.push(("product", value.to_string()));
-        }
-        if let Some(value) = self._offer_id {
-            params.push(("offerId", value.to_string()));
-        }
-        if let Some(value) = self._model {
-            params.push(("model", value.to_string()));
-        }
-        if let Some(value) = self._manufacturer {
-            params.push(("manufacturer", value.to_string()));
-        }
-        if let Some(value) = self._device {
-            params.push(("device", value.to_string()));
-        }
-        if let Some(value) = self._android_id {
-            params.push(("androidId", value.to_string()));
-        }
+
         for &field in ["alt", "serial", "product", "offerId", "model", "manufacturer", "device", "androidId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(client::Error::FieldClash(field));
             }
         }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
+
+        let mut params = Params::with_capacity(9 + self._additional_params.len());
+        if let Some(value) = self._serial.as_ref() {
+            params.push("serial", value);
+        }
+        if let Some(value) = self._product.as_ref() {
+            params.push("product", value);
+        }
+        if let Some(value) = self._offer_id.as_ref() {
+            params.push("offerId", value);
+        }
+        if let Some(value) = self._model.as_ref() {
+            params.push("model", value);
+        }
+        if let Some(value) = self._manufacturer.as_ref() {
+            params.push("manufacturer", value);
+        }
+        if let Some(value) = self._device.as_ref() {
+            params.push("device", value);
+        }
+        if let Some(value) = self._android_id.as_ref() {
+            params.push("androidId", value);
         }
 
-        params.push(("alt", "json".to_string()));
+        params.extend(self._additional_params.iter());
 
+        params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "books/v1/promooffer/dismiss";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::Full.as_ref().to_string());
         }
 
 
-        let url = url::Url::parse_with_params(&url, params).unwrap();
+        let url = params.parse_with_url(&url);
 
 
 
         loop {
-            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
-                Ok(token) => token.clone(),
-                Err(err) => {
-                    match  dlg.token(&err) {
-                        Some(token) => token,
-                        None => {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
                             dlg.finished(false);
-                            return Err(client::Error::MissingToken(err))
+                            return Err(client::Error::MissingToken(e));
                         }
                     }
                 }
@@ -16200,21 +17224,27 @@ where
             let mut req_result = {
                 let client = &self.hub.client;
                 dlg.pre_request();
-                let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
-                        .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::POST)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
 
 
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
-                
+
             };
 
             match req_result {
                 Err(err) => {
                     if let client::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep(d).await;
                         continue;
                     }
                     dlg.finished(false);
@@ -16230,7 +17260,7 @@ where
                         let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
                         if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
-                            sleep(d);
+                            sleep(d).await;
                             continue;
                         }
 
@@ -16313,7 +17343,8 @@ where
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.````
     ///
     /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PromoofferDismisCall<'a, S> {
@@ -16349,25 +17380,36 @@ where
 
     /// Identifies the authorization scope for the method you are building.
     ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::Full`.
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::Full`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
     ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, St>(mut self, scope: T) -> PromoofferDismisCall<'a, S>
-                                                        where T: Into<Option<St>>,
-                                                              St: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
+    pub fn add_scope<St>(mut self, scope: St) -> PromoofferDismisCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> PromoofferDismisCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> PromoofferDismisCall<'a, S> {
+        self._scopes.clear();
         self
     }
 }
@@ -16376,7 +17418,7 @@ where
 /// Returns a list of promo offers available to the user
 ///
 /// A builder for the *get* method supported by a *promooffer* resource.
-/// It is not used directly, but through a `PromoofferMethods` instance.
+/// It is not used directly, but through a [`PromoofferMethods`] instance.
 ///
 /// # Example
 ///
@@ -16388,7 +17430,7 @@ where
 /// # extern crate google_books1 as books1;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use books1::{Books, oauth2, hyper, hyper_rustls};
+/// # use books1::{Books, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
 /// # let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -16421,14 +17463,14 @@ pub struct PromoofferGetCall<'a, S>
     _android_id: Option<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
+    _scopes: BTreeSet<String>
 }
 
 impl<'a, S> client::CallBuilder for PromoofferGetCall<'a, S> {}
 
 impl<'a, S> PromoofferGetCall<'a, S>
 where
-    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
     S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
     S::Future: Send + Unpin + 'static,
     S::Error: Into<Box<dyn StdError + Send + Sync>>,
@@ -16439,64 +17481,63 @@ where
     pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, Offers)> {
         use std::io::{Read, Seek};
         use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::ToParts;
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
         let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
         dlg.begin(client::MethodInfo { id: "books.promooffer.get",
                                http_method: hyper::Method::GET });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(8 + self._additional_params.len());
-        if let Some(value) = self._serial {
-            params.push(("serial", value.to_string()));
-        }
-        if let Some(value) = self._product {
-            params.push(("product", value.to_string()));
-        }
-        if let Some(value) = self._model {
-            params.push(("model", value.to_string()));
-        }
-        if let Some(value) = self._manufacturer {
-            params.push(("manufacturer", value.to_string()));
-        }
-        if let Some(value) = self._device {
-            params.push(("device", value.to_string()));
-        }
-        if let Some(value) = self._android_id {
-            params.push(("androidId", value.to_string()));
-        }
+
         for &field in ["alt", "serial", "product", "model", "manufacturer", "device", "androidId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(client::Error::FieldClash(field));
             }
         }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
+
+        let mut params = Params::with_capacity(8 + self._additional_params.len());
+        if let Some(value) = self._serial.as_ref() {
+            params.push("serial", value);
+        }
+        if let Some(value) = self._product.as_ref() {
+            params.push("product", value);
+        }
+        if let Some(value) = self._model.as_ref() {
+            params.push("model", value);
+        }
+        if let Some(value) = self._manufacturer.as_ref() {
+            params.push("manufacturer", value);
+        }
+        if let Some(value) = self._device.as_ref() {
+            params.push("device", value);
+        }
+        if let Some(value) = self._android_id.as_ref() {
+            params.push("androidId", value);
         }
 
-        params.push(("alt", "json".to_string()));
+        params.extend(self._additional_params.iter());
 
+        params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "books/v1/promooffer/get";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::Full.as_ref().to_string());
         }
 
 
-        let url = url::Url::parse_with_params(&url, params).unwrap();
+        let url = params.parse_with_url(&url);
 
 
 
         loop {
-            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
-                Ok(token) => token.clone(),
-                Err(err) => {
-                    match  dlg.token(&err) {
-                        Some(token) => token,
-                        None => {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
                             dlg.finished(false);
-                            return Err(client::Error::MissingToken(err))
+                            return Err(client::Error::MissingToken(e));
                         }
                     }
                 }
@@ -16504,21 +17545,27 @@ where
             let mut req_result = {
                 let client = &self.hub.client;
                 dlg.pre_request();
-                let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
-                        .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::GET)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
 
 
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
-                
+
             };
 
             match req_result {
                 Err(err) => {
                     if let client::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep(d).await;
                         continue;
                     }
                     dlg.finished(false);
@@ -16534,7 +17581,7 @@ where
                         let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
                         if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
-                            sleep(d);
+                            sleep(d).await;
                             continue;
                         }
 
@@ -16610,7 +17657,8 @@ where
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.````
     ///
     /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PromoofferGetCall<'a, S> {
@@ -16646,25 +17694,36 @@ where
 
     /// Identifies the authorization scope for the method you are building.
     ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::Full`.
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::Full`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
     ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, St>(mut self, scope: T) -> PromoofferGetCall<'a, S>
-                                                        where T: Into<Option<St>>,
-                                                              St: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
+    pub fn add_scope<St>(mut self, scope: St) -> PromoofferGetCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> PromoofferGetCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> PromoofferGetCall<'a, S> {
+        self._scopes.clear();
         self
     }
 }
@@ -16672,8 +17731,8 @@ where
 
 /// Returns Series membership data given the series id.
 ///
-/// A builder for the *membership.get* method supported by a *sery* resource.
-/// It is not used directly, but through a `SeryMethods` instance.
+/// A builder for the *membership.get* method supported by a *series* resource.
+/// It is not used directly, but through a [`SeriesMethods`] instance.
 ///
 /// # Example
 ///
@@ -16685,7 +17744,7 @@ where
 /// # extern crate google_books1 as books1;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use books1::{Books, oauth2, hyper, hyper_rustls};
+/// # use books1::{Books, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
 /// # let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -16702,7 +17761,7 @@ where
 ///              .doit().await;
 /// # }
 /// ```
-pub struct SeryMembershipGetCall<'a, S>
+pub struct SeriesMembershipGetCall<'a, S>
     where S: 'a {
 
     hub: &'a Books<S>,
@@ -16711,14 +17770,14 @@ pub struct SeryMembershipGetCall<'a, S>
     _page_size: Option<u32>,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
+    _scopes: BTreeSet<String>
 }
 
-impl<'a, S> client::CallBuilder for SeryMembershipGetCall<'a, S> {}
+impl<'a, S> client::CallBuilder for SeriesMembershipGetCall<'a, S> {}
 
-impl<'a, S> SeryMembershipGetCall<'a, S>
+impl<'a, S> SeriesMembershipGetCall<'a, S>
 where
-    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
     S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
     S::Future: Send + Unpin + 'static,
     S::Error: Into<Box<dyn StdError + Send + Sync>>,
@@ -16729,53 +17788,52 @@ where
     pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, Seriesmembership)> {
         use std::io::{Read, Seek};
         use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::ToParts;
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
         let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
         dlg.begin(client::MethodInfo { id: "books.series.membership.get",
                                http_method: hyper::Method::GET });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
-        params.push(("series_id", self._series_id.to_string()));
-        if let Some(value) = self._page_token {
-            params.push(("page_token", value.to_string()));
-        }
-        if let Some(value) = self._page_size {
-            params.push(("page_size", value.to_string()));
-        }
+
         for &field in ["alt", "series_id", "page_token", "page_size"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(client::Error::FieldClash(field));
             }
         }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
+
+        let mut params = Params::with_capacity(5 + self._additional_params.len());
+        params.push("series_id", self._series_id);
+        if let Some(value) = self._page_token.as_ref() {
+            params.push("page_token", value);
+        }
+        if let Some(value) = self._page_size.as_ref() {
+            params.push("page_size", value.to_string());
         }
 
-        params.push(("alt", "json".to_string()));
+        params.extend(self._additional_params.iter());
 
+        params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "books/v1/series/membership/get";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::Full.as_ref().to_string());
         }
 
 
-        let url = url::Url::parse_with_params(&url, params).unwrap();
+        let url = params.parse_with_url(&url);
 
 
 
         loop {
-            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
-                Ok(token) => token.clone(),
-                Err(err) => {
-                    match  dlg.token(&err) {
-                        Some(token) => token,
-                        None => {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
                             dlg.finished(false);
-                            return Err(client::Error::MissingToken(err))
+                            return Err(client::Error::MissingToken(e));
                         }
                     }
                 }
@@ -16783,21 +17841,27 @@ where
             let mut req_result = {
                 let client = &self.hub.client;
                 dlg.pre_request();
-                let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
-                        .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::GET)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
 
 
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
-                
+
             };
 
             match req_result {
                 Err(err) => {
                     if let client::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep(d).await;
                         continue;
                     }
                     dlg.finished(false);
@@ -16813,7 +17877,7 @@ where
                         let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
                         if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
-                            sleep(d);
+                            sleep(d).await;
                             continue;
                         }
 
@@ -16850,31 +17914,32 @@ where
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn series_id(mut self, new_value: &str) -> SeryMembershipGetCall<'a, S> {
+    pub fn series_id(mut self, new_value: &str) -> SeriesMembershipGetCall<'a, S> {
         self._series_id = new_value.to_string();
         self
     }
     /// The value of the nextToken from the previous page.
     ///
     /// Sets the *page_token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> SeryMembershipGetCall<'a, S> {
+    pub fn page_token(mut self, new_value: &str) -> SeriesMembershipGetCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Number of maximum results per page to be included in the response.
     ///
     /// Sets the *page_size* query property to the given value.
-    pub fn page_size(mut self, new_value: u32) -> SeryMembershipGetCall<'a, S> {
+    pub fn page_size(mut self, new_value: u32) -> SeriesMembershipGetCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.````
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SeryMembershipGetCall<'a, S> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SeriesMembershipGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -16899,7 +17964,7 @@ where
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> SeryMembershipGetCall<'a, S>
+    pub fn param<T>(mut self, name: T, value: T) -> SeriesMembershipGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -16907,25 +17972,36 @@ where
 
     /// Identifies the authorization scope for the method you are building.
     ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::Full`.
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::Full`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
     ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, St>(mut self, scope: T) -> SeryMembershipGetCall<'a, S>
-                                                        where T: Into<Option<St>>,
-                                                              St: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
+    pub fn add_scope<St>(mut self, scope: St) -> SeriesMembershipGetCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> SeriesMembershipGetCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> SeriesMembershipGetCall<'a, S> {
+        self._scopes.clear();
         self
     }
 }
@@ -16933,8 +18009,8 @@ where
 
 /// Returns Series metadata for the given series ids.
 ///
-/// A builder for the *get* method supported by a *sery* resource.
-/// It is not used directly, but through a `SeryMethods` instance.
+/// A builder for the *get* method supported by a *series* resource.
+/// It is not used directly, but through a [`SeriesMethods`] instance.
 ///
 /// # Example
 ///
@@ -16946,7 +18022,7 @@ where
 /// # extern crate google_books1 as books1;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use books1::{Books, oauth2, hyper, hyper_rustls};
+/// # use books1::{Books, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
 /// # let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -16961,21 +18037,21 @@ where
 ///              .doit().await;
 /// # }
 /// ```
-pub struct SeryGetCall<'a, S>
+pub struct SeriesGetCall<'a, S>
     where S: 'a {
 
     hub: &'a Books<S>,
     _series_id: Vec<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
+    _scopes: BTreeSet<String>
 }
 
-impl<'a, S> client::CallBuilder for SeryGetCall<'a, S> {}
+impl<'a, S> client::CallBuilder for SeriesGetCall<'a, S> {}
 
-impl<'a, S> SeryGetCall<'a, S>
+impl<'a, S> SeriesGetCall<'a, S>
 where
-    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
     S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
     S::Future: Send + Unpin + 'static,
     S::Error: Into<Box<dyn StdError + Send + Sync>>,
@@ -16986,51 +18062,50 @@ where
     pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, Series)> {
         use std::io::{Read, Seek};
         use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::ToParts;
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
         let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
         dlg.begin(client::MethodInfo { id: "books.series.get",
                                http_method: hyper::Method::GET });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
-        if self._series_id.len() > 0 {
-            for f in self._series_id.iter() {
-                params.push(("series_id", f.to_string()));
-            }
-        }
+
         for &field in ["alt", "series_id"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(client::Error::FieldClash(field));
             }
         }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
+
+        let mut params = Params::with_capacity(3 + self._additional_params.len());
+        if self._series_id.len() > 0 {
+            for f in self._series_id.iter() {
+                params.push("series_id", f);
+            }
         }
 
-        params.push(("alt", "json".to_string()));
+        params.extend(self._additional_params.iter());
 
+        params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "books/v1/series/get";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::Full.as_ref().to_string());
         }
 
 
-        let url = url::Url::parse_with_params(&url, params).unwrap();
+        let url = params.parse_with_url(&url);
 
 
 
         loop {
-            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
-                Ok(token) => token.clone(),
-                Err(err) => {
-                    match  dlg.token(&err) {
-                        Some(token) => token,
-                        None => {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
                             dlg.finished(false);
-                            return Err(client::Error::MissingToken(err))
+                            return Err(client::Error::MissingToken(e));
                         }
                     }
                 }
@@ -17038,21 +18113,27 @@ where
             let mut req_result = {
                 let client = &self.hub.client;
                 dlg.pre_request();
-                let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
-                        .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::GET)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
 
 
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
-                
+
             };
 
             match req_result {
                 Err(err) => {
                     if let client::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep(d).await;
                         continue;
                     }
                     dlg.finished(false);
@@ -17068,7 +18149,7 @@ where
                         let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
                         if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
-                            sleep(d);
+                            sleep(d).await;
                             continue;
                         }
 
@@ -17106,17 +18187,18 @@ where
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn add_series_id(mut self, new_value: &str) -> SeryGetCall<'a, S> {
+    pub fn add_series_id(mut self, new_value: &str) -> SeriesGetCall<'a, S> {
         self._series_id.push(new_value.to_string());
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.````
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SeryGetCall<'a, S> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SeriesGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -17141,7 +18223,7 @@ where
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> SeryGetCall<'a, S>
+    pub fn param<T>(mut self, name: T, value: T) -> SeriesGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -17149,25 +18231,36 @@ where
 
     /// Identifies the authorization scope for the method you are building.
     ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::Full`.
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::Full`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
     ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, St>(mut self, scope: T) -> SeryGetCall<'a, S>
-                                                        where T: Into<Option<St>>,
-                                                              St: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
+    pub fn add_scope<St>(mut self, scope: St) -> SeriesGetCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> SeriesGetCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> SeriesGetCall<'a, S> {
+        self._scopes.clear();
         self
     }
 }
@@ -17176,7 +18269,7 @@ where
 /// Return a list of associated books.
 ///
 /// A builder for the *associated.list* method supported by a *volume* resource.
-/// It is not used directly, but through a `VolumeMethods` instance.
+/// It is not used directly, but through a [`VolumeMethods`] instance.
 ///
 /// # Example
 ///
@@ -17188,7 +18281,7 @@ where
 /// # extern crate google_books1 as books1;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use books1::{Books, oauth2, hyper, hyper_rustls};
+/// # use books1::{Books, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
 /// # let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -17218,14 +18311,14 @@ pub struct VolumeAssociatedListCall<'a, S>
     _association: Option<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
+    _scopes: BTreeSet<String>
 }
 
 impl<'a, S> client::CallBuilder for VolumeAssociatedListCall<'a, S> {}
 
 impl<'a, S> VolumeAssociatedListCall<'a, S>
 where
-    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
     S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
     S::Future: Send + Unpin + 'static,
     S::Error: Into<Box<dyn StdError + Send + Sync>>,
@@ -17236,80 +18329,65 @@ where
     pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, Volumes)> {
         use std::io::{Read, Seek};
         use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::ToParts;
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
         let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
         dlg.begin(client::MethodInfo { id: "books.volumes.associated.list",
                                http_method: hyper::Method::GET });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(7 + self._additional_params.len());
-        params.push(("volumeId", self._volume_id.to_string()));
-        if let Some(value) = self._source {
-            params.push(("source", value.to_string()));
-        }
-        if let Some(value) = self._max_allowed_maturity_rating {
-            params.push(("maxAllowedMaturityRating", value.to_string()));
-        }
-        if let Some(value) = self._locale {
-            params.push(("locale", value.to_string()));
-        }
-        if let Some(value) = self._association {
-            params.push(("association", value.to_string()));
-        }
+
         for &field in ["alt", "volumeId", "source", "maxAllowedMaturityRating", "locale", "association"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(client::Error::FieldClash(field));
             }
         }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
+
+        let mut params = Params::with_capacity(7 + self._additional_params.len());
+        params.push("volumeId", self._volume_id);
+        if let Some(value) = self._source.as_ref() {
+            params.push("source", value);
+        }
+        if let Some(value) = self._max_allowed_maturity_rating.as_ref() {
+            params.push("maxAllowedMaturityRating", value);
+        }
+        if let Some(value) = self._locale.as_ref() {
+            params.push("locale", value);
+        }
+        if let Some(value) = self._association.as_ref() {
+            params.push("association", value);
         }
 
-        params.push(("alt", "json".to_string()));
+        params.extend(self._additional_params.iter());
 
+        params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "books/v1/volumes/{volumeId}/associated";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::Full.as_ref().to_string());
         }
 
         for &(find_this, param_name) in [("{volumeId}", "volumeId")].iter() {
-            let mut replace_with: Option<&str> = None;
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = Some(value);
-                    break;
-                }
-            }
-            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+            url = params.uri_replacement(url, param_name, find_this, false);
         }
         {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
-            for param_name in ["volumeId"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
+            let to_remove = ["volumeId"];
+            params.remove_params(&to_remove);
         }
 
-        let url = url::Url::parse_with_params(&url, params).unwrap();
+        let url = params.parse_with_url(&url);
 
 
 
         loop {
-            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
-                Ok(token) => token.clone(),
-                Err(err) => {
-                    match  dlg.token(&err) {
-                        Some(token) => token,
-                        None => {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
                             dlg.finished(false);
-                            return Err(client::Error::MissingToken(err))
+                            return Err(client::Error::MissingToken(e));
                         }
                     }
                 }
@@ -17317,21 +18395,27 @@ where
             let mut req_result = {
                 let client = &self.hub.client;
                 dlg.pre_request();
-                let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
-                        .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::GET)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
 
 
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
-                
+
             };
 
             match req_result {
                 Err(err) => {
                     if let client::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep(d).await;
                         continue;
                     }
                     dlg.finished(false);
@@ -17347,7 +18431,7 @@ where
                         let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
                         if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
-                            sleep(d);
+                            sleep(d).await;
                             continue;
                         }
 
@@ -17419,7 +18503,8 @@ where
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.````
     ///
     /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> VolumeAssociatedListCall<'a, S> {
@@ -17455,25 +18540,36 @@ where
 
     /// Identifies the authorization scope for the method you are building.
     ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::Full`.
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::Full`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
     ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, St>(mut self, scope: T) -> VolumeAssociatedListCall<'a, S>
-                                                        where T: Into<Option<St>>,
-                                                              St: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
+    pub fn add_scope<St>(mut self, scope: St) -> VolumeAssociatedListCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> VolumeAssociatedListCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> VolumeAssociatedListCall<'a, S> {
+        self._scopes.clear();
         self
     }
 }
@@ -17482,7 +18578,7 @@ where
 /// Return a list of books in My Library.
 ///
 /// A builder for the *mybooks.list* method supported by a *volume* resource.
-/// It is not used directly, but through a `VolumeMethods` instance.
+/// It is not used directly, but through a [`VolumeMethods`] instance.
 ///
 /// # Example
 ///
@@ -17494,7 +18590,7 @@ where
 /// # extern crate google_books1 as books1;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use books1::{Books, oauth2, hyper, hyper_rustls};
+/// # use books1::{Books, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
 /// # let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -17529,14 +18625,14 @@ pub struct VolumeMybookListCall<'a, S>
     _acquire_method: Vec<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
+    _scopes: BTreeSet<String>
 }
 
 impl<'a, S> client::CallBuilder for VolumeMybookListCall<'a, S> {}
 
 impl<'a, S> VolumeMybookListCall<'a, S>
 where
-    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
     S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
     S::Future: Send + Unpin + 'static,
     S::Error: Into<Box<dyn StdError + Send + Sync>>,
@@ -17547,71 +18643,70 @@ where
     pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, Volumes)> {
         use std::io::{Read, Seek};
         use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::ToParts;
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
         let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
         dlg.begin(client::MethodInfo { id: "books.volumes.mybooks.list",
                                http_method: hyper::Method::GET });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(9 + self._additional_params.len());
-        if let Some(value) = self._start_index {
-            params.push(("startIndex", value.to_string()));
-        }
-        if let Some(value) = self._source {
-            params.push(("source", value.to_string()));
-        }
-        if self._processing_state.len() > 0 {
-            for f in self._processing_state.iter() {
-                params.push(("processingState", f.to_string()));
-            }
-        }
-        if let Some(value) = self._max_results {
-            params.push(("maxResults", value.to_string()));
-        }
-        if let Some(value) = self._locale {
-            params.push(("locale", value.to_string()));
-        }
-        if let Some(value) = self._country {
-            params.push(("country", value.to_string()));
-        }
-        if self._acquire_method.len() > 0 {
-            for f in self._acquire_method.iter() {
-                params.push(("acquireMethod", f.to_string()));
-            }
-        }
+
         for &field in ["alt", "startIndex", "source", "processingState", "maxResults", "locale", "country", "acquireMethod"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(client::Error::FieldClash(field));
             }
         }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
+
+        let mut params = Params::with_capacity(9 + self._additional_params.len());
+        if let Some(value) = self._start_index.as_ref() {
+            params.push("startIndex", value.to_string());
+        }
+        if let Some(value) = self._source.as_ref() {
+            params.push("source", value);
+        }
+        if self._processing_state.len() > 0 {
+            for f in self._processing_state.iter() {
+                params.push("processingState", f);
+            }
+        }
+        if let Some(value) = self._max_results.as_ref() {
+            params.push("maxResults", value.to_string());
+        }
+        if let Some(value) = self._locale.as_ref() {
+            params.push("locale", value);
+        }
+        if let Some(value) = self._country.as_ref() {
+            params.push("country", value);
+        }
+        if self._acquire_method.len() > 0 {
+            for f in self._acquire_method.iter() {
+                params.push("acquireMethod", f);
+            }
         }
 
-        params.push(("alt", "json".to_string()));
+        params.extend(self._additional_params.iter());
 
+        params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "books/v1/volumes/mybooks";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::Full.as_ref().to_string());
         }
 
 
-        let url = url::Url::parse_with_params(&url, params).unwrap();
+        let url = params.parse_with_url(&url);
 
 
 
         loop {
-            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
-                Ok(token) => token.clone(),
-                Err(err) => {
-                    match  dlg.token(&err) {
-                        Some(token) => token,
-                        None => {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
                             dlg.finished(false);
-                            return Err(client::Error::MissingToken(err))
+                            return Err(client::Error::MissingToken(e));
                         }
                     }
                 }
@@ -17619,21 +18714,27 @@ where
             let mut req_result = {
                 let client = &self.hub.client;
                 dlg.pre_request();
-                let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
-                        .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::GET)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
 
 
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
-                
+
             };
 
             match req_result {
                 Err(err) => {
                     if let client::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep(d).await;
                         continue;
                     }
                     dlg.finished(false);
@@ -17649,7 +18750,7 @@ where
                         let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
                         if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
-                            sleep(d);
+                            sleep(d).await;
                             continue;
                         }
 
@@ -17734,7 +18835,8 @@ where
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.````
     ///
     /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> VolumeMybookListCall<'a, S> {
@@ -17770,25 +18872,36 @@ where
 
     /// Identifies the authorization scope for the method you are building.
     ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::Full`.
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::Full`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
     ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, St>(mut self, scope: T) -> VolumeMybookListCall<'a, S>
-                                                        where T: Into<Option<St>>,
-                                                              St: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
+    pub fn add_scope<St>(mut self, scope: St) -> VolumeMybookListCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> VolumeMybookListCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> VolumeMybookListCall<'a, S> {
+        self._scopes.clear();
         self
     }
 }
@@ -17797,7 +18910,7 @@ where
 /// Return a list of recommended books for the current user.
 ///
 /// A builder for the *recommended.list* method supported by a *volume* resource.
-/// It is not used directly, but through a `VolumeMethods` instance.
+/// It is not used directly, but through a [`VolumeMethods`] instance.
 ///
 /// # Example
 ///
@@ -17809,7 +18922,7 @@ where
 /// # extern crate google_books1 as books1;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use books1::{Books, oauth2, hyper, hyper_rustls};
+/// # use books1::{Books, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
 /// # let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -17836,14 +18949,14 @@ pub struct VolumeRecommendedListCall<'a, S>
     _locale: Option<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
+    _scopes: BTreeSet<String>
 }
 
 impl<'a, S> client::CallBuilder for VolumeRecommendedListCall<'a, S> {}
 
 impl<'a, S> VolumeRecommendedListCall<'a, S>
 where
-    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
     S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
     S::Future: Send + Unpin + 'static,
     S::Error: Into<Box<dyn StdError + Send + Sync>>,
@@ -17854,55 +18967,54 @@ where
     pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, Volumes)> {
         use std::io::{Read, Seek};
         use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::ToParts;
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
         let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
         dlg.begin(client::MethodInfo { id: "books.volumes.recommended.list",
                                http_method: hyper::Method::GET });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
-        if let Some(value) = self._source {
-            params.push(("source", value.to_string()));
-        }
-        if let Some(value) = self._max_allowed_maturity_rating {
-            params.push(("maxAllowedMaturityRating", value.to_string()));
-        }
-        if let Some(value) = self._locale {
-            params.push(("locale", value.to_string()));
-        }
+
         for &field in ["alt", "source", "maxAllowedMaturityRating", "locale"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(client::Error::FieldClash(field));
             }
         }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
+
+        let mut params = Params::with_capacity(5 + self._additional_params.len());
+        if let Some(value) = self._source.as_ref() {
+            params.push("source", value);
+        }
+        if let Some(value) = self._max_allowed_maturity_rating.as_ref() {
+            params.push("maxAllowedMaturityRating", value);
+        }
+        if let Some(value) = self._locale.as_ref() {
+            params.push("locale", value);
         }
 
-        params.push(("alt", "json".to_string()));
+        params.extend(self._additional_params.iter());
 
+        params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "books/v1/volumes/recommended";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::Full.as_ref().to_string());
         }
 
 
-        let url = url::Url::parse_with_params(&url, params).unwrap();
+        let url = params.parse_with_url(&url);
 
 
 
         loop {
-            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
-                Ok(token) => token.clone(),
-                Err(err) => {
-                    match  dlg.token(&err) {
-                        Some(token) => token,
-                        None => {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
                             dlg.finished(false);
-                            return Err(client::Error::MissingToken(err))
+                            return Err(client::Error::MissingToken(e));
                         }
                     }
                 }
@@ -17910,21 +19022,27 @@ where
             let mut req_result = {
                 let client = &self.hub.client;
                 dlg.pre_request();
-                let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
-                        .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::GET)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
 
 
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
-                
+
             };
 
             match req_result {
                 Err(err) => {
                     if let client::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep(d).await;
                         continue;
                     }
                     dlg.finished(false);
@@ -17940,7 +19058,7 @@ where
                         let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
                         if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
-                            sleep(d);
+                            sleep(d).await;
                             continue;
                         }
 
@@ -17995,7 +19113,8 @@ where
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.````
     ///
     /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> VolumeRecommendedListCall<'a, S> {
@@ -18031,25 +19150,36 @@ where
 
     /// Identifies the authorization scope for the method you are building.
     ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::Full`.
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::Full`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
     ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, St>(mut self, scope: T) -> VolumeRecommendedListCall<'a, S>
-                                                        where T: Into<Option<St>>,
-                                                              St: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
+    pub fn add_scope<St>(mut self, scope: St) -> VolumeRecommendedListCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> VolumeRecommendedListCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> VolumeRecommendedListCall<'a, S> {
+        self._scopes.clear();
         self
     }
 }
@@ -18058,7 +19188,7 @@ where
 /// Rate a recommended book for the current user.
 ///
 /// A builder for the *recommended.rate* method supported by a *volume* resource.
-/// It is not used directly, but through a `VolumeMethods` instance.
+/// It is not used directly, but through a [`VolumeMethods`] instance.
 ///
 /// # Example
 ///
@@ -18070,7 +19200,7 @@ where
 /// # extern crate google_books1 as books1;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use books1::{Books, oauth2, hyper, hyper_rustls};
+/// # use books1::{Books, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
 /// # let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -18097,14 +19227,14 @@ pub struct VolumeRecommendedRateCall<'a, S>
     _locale: Option<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
+    _scopes: BTreeSet<String>
 }
 
 impl<'a, S> client::CallBuilder for VolumeRecommendedRateCall<'a, S> {}
 
 impl<'a, S> VolumeRecommendedRateCall<'a, S>
 where
-    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
     S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
     S::Future: Send + Unpin + 'static,
     S::Error: Into<Box<dyn StdError + Send + Sync>>,
@@ -18115,54 +19245,53 @@ where
     pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, BooksVolumesRecommendedRateResponse)> {
         use std::io::{Read, Seek};
         use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::ToParts;
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
         let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
         dlg.begin(client::MethodInfo { id: "books.volumes.recommended.rate",
                                http_method: hyper::Method::POST });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(6 + self._additional_params.len());
-        params.push(("rating", self._rating.to_string()));
-        params.push(("volumeId", self._volume_id.to_string()));
-        if let Some(value) = self._source {
-            params.push(("source", value.to_string()));
-        }
-        if let Some(value) = self._locale {
-            params.push(("locale", value.to_string()));
-        }
+
         for &field in ["alt", "rating", "volumeId", "source", "locale"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(client::Error::FieldClash(field));
             }
         }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
+
+        let mut params = Params::with_capacity(6 + self._additional_params.len());
+        params.push("rating", self._rating);
+        params.push("volumeId", self._volume_id);
+        if let Some(value) = self._source.as_ref() {
+            params.push("source", value);
+        }
+        if let Some(value) = self._locale.as_ref() {
+            params.push("locale", value);
         }
 
-        params.push(("alt", "json".to_string()));
+        params.extend(self._additional_params.iter());
 
+        params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "books/v1/volumes/recommended/rate";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::Full.as_ref().to_string());
         }
 
 
-        let url = url::Url::parse_with_params(&url, params).unwrap();
+        let url = params.parse_with_url(&url);
 
 
 
         loop {
-            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
-                Ok(token) => token.clone(),
-                Err(err) => {
-                    match  dlg.token(&err) {
-                        Some(token) => token,
-                        None => {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
                             dlg.finished(false);
-                            return Err(client::Error::MissingToken(err))
+                            return Err(client::Error::MissingToken(e));
                         }
                     }
                 }
@@ -18170,21 +19299,27 @@ where
             let mut req_result = {
                 let client = &self.hub.client;
                 dlg.pre_request();
-                let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
-                        .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::POST)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
 
 
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
-                
+
             };
 
             match req_result {
                 Err(err) => {
                     if let client::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep(d).await;
                         continue;
                     }
                     dlg.finished(false);
@@ -18200,7 +19335,7 @@ where
                         let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
                         if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
-                            sleep(d);
+                            sleep(d).await;
                             continue;
                         }
 
@@ -18268,7 +19403,8 @@ where
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.````
     ///
     /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> VolumeRecommendedRateCall<'a, S> {
@@ -18304,25 +19440,36 @@ where
 
     /// Identifies the authorization scope for the method you are building.
     ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::Full`.
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::Full`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
     ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, St>(mut self, scope: T) -> VolumeRecommendedRateCall<'a, S>
-                                                        where T: Into<Option<St>>,
-                                                              St: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
+    pub fn add_scope<St>(mut self, scope: St) -> VolumeRecommendedRateCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> VolumeRecommendedRateCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> VolumeRecommendedRateCall<'a, S> {
+        self._scopes.clear();
         self
     }
 }
@@ -18331,7 +19478,7 @@ where
 /// Return a list of books uploaded by the current user.
 ///
 /// A builder for the *useruploaded.list* method supported by a *volume* resource.
-/// It is not used directly, but through a `VolumeMethods` instance.
+/// It is not used directly, but through a [`VolumeMethods`] instance.
 ///
 /// # Example
 ///
@@ -18343,7 +19490,7 @@ where
 /// # extern crate google_books1 as books1;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use books1::{Books, oauth2, hyper, hyper_rustls};
+/// # use books1::{Books, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
 /// # let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -18376,14 +19523,14 @@ pub struct VolumeUseruploadedListCall<'a, S>
     _locale: Option<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
+    _scopes: BTreeSet<String>
 }
 
 impl<'a, S> client::CallBuilder for VolumeUseruploadedListCall<'a, S> {}
 
 impl<'a, S> VolumeUseruploadedListCall<'a, S>
 where
-    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
     S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
     S::Future: Send + Unpin + 'static,
     S::Error: Into<Box<dyn StdError + Send + Sync>>,
@@ -18394,68 +19541,67 @@ where
     pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, Volumes)> {
         use std::io::{Read, Seek};
         use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::ToParts;
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
         let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
         dlg.begin(client::MethodInfo { id: "books.volumes.useruploaded.list",
                                http_method: hyper::Method::GET });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(8 + self._additional_params.len());
-        if self._volume_id.len() > 0 {
-            for f in self._volume_id.iter() {
-                params.push(("volumeId", f.to_string()));
-            }
-        }
-        if let Some(value) = self._start_index {
-            params.push(("startIndex", value.to_string()));
-        }
-        if let Some(value) = self._source {
-            params.push(("source", value.to_string()));
-        }
-        if self._processing_state.len() > 0 {
-            for f in self._processing_state.iter() {
-                params.push(("processingState", f.to_string()));
-            }
-        }
-        if let Some(value) = self._max_results {
-            params.push(("maxResults", value.to_string()));
-        }
-        if let Some(value) = self._locale {
-            params.push(("locale", value.to_string()));
-        }
+
         for &field in ["alt", "volumeId", "startIndex", "source", "processingState", "maxResults", "locale"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(client::Error::FieldClash(field));
             }
         }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
+
+        let mut params = Params::with_capacity(8 + self._additional_params.len());
+        if self._volume_id.len() > 0 {
+            for f in self._volume_id.iter() {
+                params.push("volumeId", f);
+            }
+        }
+        if let Some(value) = self._start_index.as_ref() {
+            params.push("startIndex", value.to_string());
+        }
+        if let Some(value) = self._source.as_ref() {
+            params.push("source", value);
+        }
+        if self._processing_state.len() > 0 {
+            for f in self._processing_state.iter() {
+                params.push("processingState", f);
+            }
+        }
+        if let Some(value) = self._max_results.as_ref() {
+            params.push("maxResults", value.to_string());
+        }
+        if let Some(value) = self._locale.as_ref() {
+            params.push("locale", value);
         }
 
-        params.push(("alt", "json".to_string()));
+        params.extend(self._additional_params.iter());
 
+        params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "books/v1/volumes/useruploaded";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::Full.as_ref().to_string());
         }
 
 
-        let url = url::Url::parse_with_params(&url, params).unwrap();
+        let url = params.parse_with_url(&url);
 
 
 
         loop {
-            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
-                Ok(token) => token.clone(),
-                Err(err) => {
-                    match  dlg.token(&err) {
-                        Some(token) => token,
-                        None => {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
                             dlg.finished(false);
-                            return Err(client::Error::MissingToken(err))
+                            return Err(client::Error::MissingToken(e));
                         }
                     }
                 }
@@ -18463,21 +19609,27 @@ where
             let mut req_result = {
                 let client = &self.hub.client;
                 dlg.pre_request();
-                let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
-                        .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::GET)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
 
 
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
-                
+
             };
 
             match req_result {
                 Err(err) => {
                     if let client::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep(d).await;
                         continue;
                     }
                     dlg.finished(false);
@@ -18493,7 +19645,7 @@ where
                         let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
                         if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
-                            sleep(d);
+                            sleep(d).await;
                             continue;
                         }
 
@@ -18571,7 +19723,8 @@ where
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.````
     ///
     /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> VolumeUseruploadedListCall<'a, S> {
@@ -18607,25 +19760,36 @@ where
 
     /// Identifies the authorization scope for the method you are building.
     ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::Full`.
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::Full`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
     ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, St>(mut self, scope: T) -> VolumeUseruploadedListCall<'a, S>
-                                                        where T: Into<Option<St>>,
-                                                              St: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
+    pub fn add_scope<St>(mut self, scope: St) -> VolumeUseruploadedListCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> VolumeUseruploadedListCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> VolumeUseruploadedListCall<'a, S> {
+        self._scopes.clear();
         self
     }
 }
@@ -18634,7 +19798,7 @@ where
 /// Gets volume information for a single volume.
 ///
 /// A builder for the *get* method supported by a *volume* resource.
-/// It is not used directly, but through a `VolumeMethods` instance.
+/// It is not used directly, but through a [`VolumeMethods`] instance.
 ///
 /// # Example
 ///
@@ -18646,7 +19810,7 @@ where
 /// # extern crate google_books1 as books1;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use books1::{Books, oauth2, hyper, hyper_rustls};
+/// # use books1::{Books, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
 /// # let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -18680,14 +19844,14 @@ pub struct VolumeGetCall<'a, S>
     _country: Option<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
+    _scopes: BTreeSet<String>
 }
 
 impl<'a, S> client::CallBuilder for VolumeGetCall<'a, S> {}
 
 impl<'a, S> VolumeGetCall<'a, S>
 where
-    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
     S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
     S::Future: Send + Unpin + 'static,
     S::Error: Into<Box<dyn StdError + Send + Sync>>,
@@ -18698,86 +19862,71 @@ where
     pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, Volume)> {
         use std::io::{Read, Seek};
         use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::ToParts;
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
         let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
         dlg.begin(client::MethodInfo { id: "books.volumes.get",
                                http_method: hyper::Method::GET });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(9 + self._additional_params.len());
-        params.push(("volumeId", self._volume_id.to_string()));
-        if let Some(value) = self._user_library_consistent_read {
-            params.push(("user_library_consistent_read", value.to_string()));
-        }
-        if let Some(value) = self._source {
-            params.push(("source", value.to_string()));
-        }
-        if let Some(value) = self._projection {
-            params.push(("projection", value.to_string()));
-        }
-        if let Some(value) = self._partner {
-            params.push(("partner", value.to_string()));
-        }
-        if let Some(value) = self._include_non_comics_series {
-            params.push(("includeNonComicsSeries", value.to_string()));
-        }
-        if let Some(value) = self._country {
-            params.push(("country", value.to_string()));
-        }
+
         for &field in ["alt", "volumeId", "user_library_consistent_read", "source", "projection", "partner", "includeNonComicsSeries", "country"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(client::Error::FieldClash(field));
             }
         }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
+
+        let mut params = Params::with_capacity(9 + self._additional_params.len());
+        params.push("volumeId", self._volume_id);
+        if let Some(value) = self._user_library_consistent_read.as_ref() {
+            params.push("user_library_consistent_read", value.to_string());
+        }
+        if let Some(value) = self._source.as_ref() {
+            params.push("source", value);
+        }
+        if let Some(value) = self._projection.as_ref() {
+            params.push("projection", value);
+        }
+        if let Some(value) = self._partner.as_ref() {
+            params.push("partner", value);
+        }
+        if let Some(value) = self._include_non_comics_series.as_ref() {
+            params.push("includeNonComicsSeries", value.to_string());
+        }
+        if let Some(value) = self._country.as_ref() {
+            params.push("country", value);
         }
 
-        params.push(("alt", "json".to_string()));
+        params.extend(self._additional_params.iter());
 
+        params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "books/v1/volumes/{volumeId}";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::Full.as_ref().to_string());
         }
 
         for &(find_this, param_name) in [("{volumeId}", "volumeId")].iter() {
-            let mut replace_with: Option<&str> = None;
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = Some(value);
-                    break;
-                }
-            }
-            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+            url = params.uri_replacement(url, param_name, find_this, false);
         }
         {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
-            for param_name in ["volumeId"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
+            let to_remove = ["volumeId"];
+            params.remove_params(&to_remove);
         }
 
-        let url = url::Url::parse_with_params(&url, params).unwrap();
+        let url = params.parse_with_url(&url);
 
 
 
         loop {
-            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
-                Ok(token) => token.clone(),
-                Err(err) => {
-                    match  dlg.token(&err) {
-                        Some(token) => token,
-                        None => {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
                             dlg.finished(false);
-                            return Err(client::Error::MissingToken(err))
+                            return Err(client::Error::MissingToken(e));
                         }
                     }
                 }
@@ -18785,21 +19934,27 @@ where
             let mut req_result = {
                 let client = &self.hub.client;
                 dlg.pre_request();
-                let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
-                        .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::GET)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
 
 
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
-                
+
             };
 
             match req_result {
                 Err(err) => {
                     if let client::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep(d).await;
                         continue;
                     }
                     dlg.finished(false);
@@ -18815,7 +19970,7 @@ where
                         let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
                         if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
-                            sleep(d);
+                            sleep(d).await;
                             continue;
                         }
 
@@ -18900,7 +20055,8 @@ where
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.````
     ///
     /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> VolumeGetCall<'a, S> {
@@ -18936,25 +20092,36 @@ where
 
     /// Identifies the authorization scope for the method you are building.
     ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::Full`.
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::Full`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
     ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, St>(mut self, scope: T) -> VolumeGetCall<'a, S>
-                                                        where T: Into<Option<St>>,
-                                                              St: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
+    pub fn add_scope<St>(mut self, scope: St) -> VolumeGetCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> VolumeGetCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> VolumeGetCall<'a, S> {
+        self._scopes.clear();
         self
     }
 }
@@ -18963,7 +20130,7 @@ where
 /// Performs a book search.
 ///
 /// A builder for the *list* method supported by a *volume* resource.
-/// It is not used directly, but through a `VolumeMethods` instance.
+/// It is not used directly, but through a [`VolumeMethods`] instance.
 ///
 /// # Example
 ///
@@ -18975,7 +20142,7 @@ where
 /// # extern crate google_books1 as books1;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use books1::{Books, oauth2, hyper, hyper_rustls};
+/// # use books1::{Books, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
 /// # let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -19023,14 +20190,14 @@ pub struct VolumeListCall<'a, S>
     _download: Option<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
+    _scopes: BTreeSet<String>
 }
 
 impl<'a, S> client::CallBuilder for VolumeListCall<'a, S> {}
 
 impl<'a, S> VolumeListCall<'a, S>
 where
-    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
     S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
     S::Future: Send + Unpin + 'static,
     S::Error: Into<Box<dyn StdError + Send + Sync>>,
@@ -19041,86 +20208,85 @@ where
     pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, Volumes)> {
         use std::io::{Read, Seek};
         use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::ToParts;
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
         let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
         dlg.begin(client::MethodInfo { id: "books.volumes.list",
                                http_method: hyper::Method::GET });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(16 + self._additional_params.len());
-        params.push(("q", self._q.to_string()));
-        if let Some(value) = self._start_index {
-            params.push(("startIndex", value.to_string()));
-        }
-        if let Some(value) = self._source {
-            params.push(("source", value.to_string()));
-        }
-        if let Some(value) = self._show_preorders {
-            params.push(("showPreorders", value.to_string()));
-        }
-        if let Some(value) = self._projection {
-            params.push(("projection", value.to_string()));
-        }
-        if let Some(value) = self._print_type {
-            params.push(("printType", value.to_string()));
-        }
-        if let Some(value) = self._partner {
-            params.push(("partner", value.to_string()));
-        }
-        if let Some(value) = self._order_by {
-            params.push(("orderBy", value.to_string()));
-        }
-        if let Some(value) = self._max_results {
-            params.push(("maxResults", value.to_string()));
-        }
-        if let Some(value) = self._max_allowed_maturity_rating {
-            params.push(("maxAllowedMaturityRating", value.to_string()));
-        }
-        if let Some(value) = self._library_restrict {
-            params.push(("libraryRestrict", value.to_string()));
-        }
-        if let Some(value) = self._lang_restrict {
-            params.push(("langRestrict", value.to_string()));
-        }
-        if let Some(value) = self._filter {
-            params.push(("filter", value.to_string()));
-        }
-        if let Some(value) = self._download {
-            params.push(("download", value.to_string()));
-        }
+
         for &field in ["alt", "q", "startIndex", "source", "showPreorders", "projection", "printType", "partner", "orderBy", "maxResults", "maxAllowedMaturityRating", "libraryRestrict", "langRestrict", "filter", "download"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(client::Error::FieldClash(field));
             }
         }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
+
+        let mut params = Params::with_capacity(16 + self._additional_params.len());
+        params.push("q", self._q);
+        if let Some(value) = self._start_index.as_ref() {
+            params.push("startIndex", value.to_string());
+        }
+        if let Some(value) = self._source.as_ref() {
+            params.push("source", value);
+        }
+        if let Some(value) = self._show_preorders.as_ref() {
+            params.push("showPreorders", value.to_string());
+        }
+        if let Some(value) = self._projection.as_ref() {
+            params.push("projection", value);
+        }
+        if let Some(value) = self._print_type.as_ref() {
+            params.push("printType", value);
+        }
+        if let Some(value) = self._partner.as_ref() {
+            params.push("partner", value);
+        }
+        if let Some(value) = self._order_by.as_ref() {
+            params.push("orderBy", value);
+        }
+        if let Some(value) = self._max_results.as_ref() {
+            params.push("maxResults", value.to_string());
+        }
+        if let Some(value) = self._max_allowed_maturity_rating.as_ref() {
+            params.push("maxAllowedMaturityRating", value);
+        }
+        if let Some(value) = self._library_restrict.as_ref() {
+            params.push("libraryRestrict", value);
+        }
+        if let Some(value) = self._lang_restrict.as_ref() {
+            params.push("langRestrict", value);
+        }
+        if let Some(value) = self._filter.as_ref() {
+            params.push("filter", value);
+        }
+        if let Some(value) = self._download.as_ref() {
+            params.push("download", value);
         }
 
-        params.push(("alt", "json".to_string()));
+        params.extend(self._additional_params.iter());
 
+        params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "books/v1/volumes";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::Full.as_ref().to_string());
         }
 
 
-        let url = url::Url::parse_with_params(&url, params).unwrap();
+        let url = params.parse_with_url(&url);
 
 
 
         loop {
-            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
-                Ok(token) => token.clone(),
-                Err(err) => {
-                    match  dlg.token(&err) {
-                        Some(token) => token,
-                        None => {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
                             dlg.finished(false);
-                            return Err(client::Error::MissingToken(err))
+                            return Err(client::Error::MissingToken(e));
                         }
                     }
                 }
@@ -19128,21 +20294,27 @@ where
             let mut req_result = {
                 let client = &self.hub.client;
                 dlg.pre_request();
-                let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
-                        .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::GET)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
 
 
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
-                
+
             };
 
             match req_result {
                 Err(err) => {
                     if let client::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep(d).await;
                         continue;
                     }
                     dlg.finished(false);
@@ -19158,7 +20330,7 @@ where
                         let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
                         if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
-                            sleep(d);
+                            sleep(d).await;
                             continue;
                         }
 
@@ -19293,7 +20465,8 @@ where
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.````
     ///
     /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> VolumeListCall<'a, S> {
@@ -19329,25 +20502,36 @@ where
 
     /// Identifies the authorization scope for the method you are building.
     ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::Full`.
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::Full`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
     ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, St>(mut self, scope: T) -> VolumeListCall<'a, S>
-                                                        where T: Into<Option<St>>,
-                                                              St: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
+    pub fn add_scope<St>(mut self, scope: St) -> VolumeListCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> VolumeListCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> VolumeListCall<'a, S> {
+        self._scopes.clear();
         self
     }
 }

@@ -1,19 +1,20 @@
 use std::collections::HashMap;
 use std::cell::RefCell;
 use std::default::Default;
-use std::collections::BTreeMap;
+use std::collections::BTreeSet;
 use std::error::Error as StdError;
 use serde_json as json;
 use std::io;
 use std::fs;
 use std::mem;
-use std::thread::sleep;
 
-use http::Uri;
 use hyper::client::connect;
 use tokio::io::{AsyncRead, AsyncWrite};
+use tokio::time::sleep;
 use tower_service;
-use crate::client;
+use serde::{Serialize, Deserialize};
+
+use crate::{client, client::GetToken, client::serde_with};
 
 // ##############
 // UTILITIES ###
@@ -39,7 +40,7 @@ use crate::client;
 /// use vectortile1::{Result, Error};
 /// # async fn dox() {
 /// use std::default::Default;
-/// use vectortile1::{SemanticTile, oauth2, hyper, hyper_rustls};
+/// use vectortile1::{SemanticTile, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// // Get an ApplicationSecret instance by some means. It contains the `client_id` and 
 /// // `client_secret`, among other things.
@@ -99,7 +100,7 @@ use crate::client;
 #[derive(Clone)]
 pub struct SemanticTile<S> {
     pub client: hyper::Client<S, hyper::body::Body>,
-    pub auth: oauth2::authenticator::Authenticator<S>,
+    pub auth: Box<dyn client::GetToken>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
@@ -109,11 +110,11 @@ impl<'a, S> client::Hub for SemanticTile<S> {}
 
 impl<'a, S> SemanticTile<S> {
 
-    pub fn new(client: hyper::Client<S, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<S>) -> SemanticTile<S> {
+    pub fn new<A: 'static + client::GetToken>(client: hyper::Client<S, hyper::body::Body>, auth: A) -> SemanticTile<S> {
         SemanticTile {
             client,
-            auth: authenticator,
-            _user_agent: "google-api-rust-client/4.0.1".to_string(),
+            auth: Box::new(auth),
+            _user_agent: "google-api-rust-client/5.0.2-beta-1".to_string(),
             _base_url: "https://vectortile.googleapis.com/".to_string(),
             _root_url: "https://vectortile.googleapis.com/".to_string(),
         }
@@ -127,7 +128,7 @@ impl<'a, S> SemanticTile<S> {
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/4.0.1`.
+    /// It defaults to `google-api-rust-client/5.0.2-beta-1`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -159,31 +160,40 @@ impl<'a, S> SemanticTile<S> {
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Area {
     /// The z-order of this geometry when rendered on a flat basemap. Geometry with a lower z-order should be rendered beneath geometry with a higher z-order. This z-ordering does not imply anything about the altitude of the area relative to the ground, but it can be used to prevent z-fighting. Unlike Area.z_order this can be used to compare with Line.basemap_z_order, and in fact may yield more accurate rendering (where a line may be rendered beneath an area).
     #[serde(rename="basemapZOrder")]
+    
     pub basemap_z_order: Option<BasemapZOrder>,
     /// True if the polygon is not entirely internal to the feature that it belongs to: that is, some of the edges are bordering another feature.
     #[serde(rename="hasExternalEdges")]
+    
     pub has_external_edges: Option<bool>,
     /// When has_external_edges is true, the polygon has some edges that border another feature. This field indicates the internal edges that do not border another feature. Each value is an index into the vertices array, and denotes the start vertex of the internal edge (the next vertex in the boundary loop is the end of the edge). If the selected vertex is the last vertex in the boundary loop, then the edge between that vertex and the starting vertex of the loop is internal. This field may be used for styling. For example, building parapets could be placed only on the external edges of a building polygon, or water could be lighter colored near the external edges of a body of water. If has_external_edges is false, all edges are internal and this field will be empty.
     #[serde(rename="internalEdges")]
+    
     pub internal_edges: Option<Vec<i32>>,
     /// Identifies the boundary loops of the polygon. Only set for INDEXED_TRIANGLE polygons. Each value is an index into the vertices array indicating the beginning of a loop. For instance, values of [2, 5] would indicate loop_data contained 3 loops with indices 0-1, 2-4, and 5-end. This may be used in conjunction with the internal_edges field for styling polygon boundaries. Note that an edge may be on a polygon boundary but still internal to the feature. For example, a feature split across multiple tiles will have an internal polygon boundary edge along the edge of the tile.
     #[serde(rename="loopBreaks")]
+    
     pub loop_breaks: Option<Vec<i32>>,
     /// When the polygon encoding is of type INDEXED_TRIANGLES, this contains the indices of the triangle vertices in the vertex_offsets field. There are 3 vertex indices per triangle.
     #[serde(rename="triangleIndices")]
+    
     pub triangle_indices: Option<Vec<i32>>,
     /// The polygon encoding type used for this area.
     #[serde(rename="type")]
+    
     pub type_: Option<String>,
     /// The vertices present in the polygon defining the area.
     #[serde(rename="vertexOffsets")]
+    
     pub vertex_offsets: Option<Vertex2DList>,
     /// The z-ordering of this area. Areas with a lower z-order should be rendered beneath areas with a higher z-order. This z-ordering does not imply anything about the altitude of the line relative to the ground, but it can be used to prevent z-fighting during rendering on the client. This z-ordering can only be used to compare areas, and cannot be compared with the z_order field in the Line message. The z-order may be negative or zero. Prefer Area.basemap_z_order.
     #[serde(rename="zOrder")]
+    
     pub z_order: Option<i32>,
 }
 
@@ -194,16 +204,20 @@ impl client::Part for Area {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct BasemapZOrder {
     /// The second most significant component of the ordering of a component to be rendered onto the basemap.
     #[serde(rename="zGrade")]
+    
     pub z_grade: Option<i32>,
     /// The most significant component of the ordering of a component to be rendered onto the basemap.
     #[serde(rename="zPlane")]
+    
     pub z_plane: Option<i32>,
     /// The least significant component of the ordering of a component to be rendered onto the basemap.
     #[serde(rename="zWithinGrade")]
+    
     pub z_within_grade: Option<i32>,
 }
 
@@ -214,15 +228,19 @@ impl client::Part for BasemapZOrder {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ExtrudedArea {
     /// The area representing the footprint of the extruded area.
+    
     pub area: Option<Area>,
     /// The z-value in local tile coordinates where the extruded area ends.
     #[serde(rename="maxZ")]
+    
     pub max_z: Option<i32>,
     /// The z-value in local tile coordinates where the extruded area begins. This is non-zero for extruded areas that begin off the ground. For example, a building with a skybridge may have an extruded area component with a non-zero min_z.
     #[serde(rename="minZ")]
+    
     pub min_z: Option<i32>,
 }
 
@@ -233,23 +251,30 @@ impl client::Part for ExtrudedArea {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Feature {
     /// The localized name of this feature. Currently only returned for roads.
     #[serde(rename="displayName")]
+    
     pub display_name: Option<String>,
     /// The geometry of this feature, representing the space that it occupies in the world.
+    
     pub geometry: Option<Geometry>,
     /// Place ID of this feature, suitable for use in Places API details requests.
     #[serde(rename="placeId")]
+    
     pub place_id: Option<String>,
     /// Relations to other features.
+    
     pub relations: Option<Vec<Relation>>,
     /// Metadata for features with the SEGMENT FeatureType.
     #[serde(rename="segmentInfo")]
+    
     pub segment_info: Option<SegmentInfo>,
     /// The type of this feature.
     #[serde(rename="type")]
+    
     pub type_: Option<String>,
 }
 
@@ -265,20 +290,27 @@ impl client::Part for Feature {}
 /// 
 /// * [get featuretiles](FeaturetileGetCall) (response)
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct FeatureTile {
     /// The global tile coordinates that uniquely identify this tile.
+    
     pub coordinates: Option<TileCoordinates>,
     /// Features present on this map tile.
+    
     pub features: Option<Vec<Feature>>,
     /// Resource name of the tile. The tile resource name is prefixed by its collection ID `tiles/` followed by the resource ID, which encodes the tile's global x and y coordinates and zoom level as `@,,z`. For example, `tiles/@1,2,3z`.
+    
     pub name: Option<String>,
     /// Data providers for the data contained in this tile.
+    
     pub providers: Option<Vec<ProviderInfo>>,
     /// Tile response status code to support tile caching.
+    
     pub status: Option<String>,
     /// An opaque value, usually less than 30 characters, that contains version info about this tile and the data that was used to generate it. The client should store this value in its tile cache and pass it back to the API in the client_tile_version_id field of subsequent tile requests in order to enable the API to detect when the new tile would be the same as the one the client already has in its cache. Also see STATUS_OK_DATA_UNCHANGED.
     #[serde(rename="versionId")]
+    
     pub version_id: Option<String>,
 }
 
@@ -290,12 +322,15 @@ impl client::ResponseResult for FeatureTile {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct FirstDerivativeElevationGrid {
     /// A multiplier applied to the altitude fields below to extract the actual altitudes in meters from the elevation grid.
     #[serde(rename="altitudeMultiplier")]
+    
     pub altitude_multiplier: Option<f32>,
     /// Rows of points containing altitude data making up the elevation grid. Each row is the same length. Rows are ordered from north to south. E.g: rows[0] is the north-most row, and rows[n] is the south-most row.
+    
     pub rows: Option<Vec<Row>>,
 }
 
@@ -306,17 +341,22 @@ impl client::Part for FirstDerivativeElevationGrid {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Geometry {
     /// The areas present in this geometry.
+    
     pub areas: Option<Vec<Area>>,
     /// The extruded areas present in this geometry. Not populated if modeled_volumes are included in this geometry unless always_include_building_footprints is set in GetFeatureTileRequest, in which case the client should decide which (extruded areas or modeled volumes) should be used (they should not be rendered together).
     #[serde(rename="extrudedAreas")]
+    
     pub extruded_areas: Option<Vec<ExtrudedArea>>,
     /// The lines present in this geometry.
+    
     pub lines: Option<Vec<Line>>,
     /// The modeled volumes present in this geometry. Not populated unless enable_modeled_volumes has been set in GetFeatureTileRequest.
     #[serde(rename="modeledVolumes")]
+    
     pub modeled_volumes: Option<Vec<ModeledVolume>>,
 }
 
@@ -327,16 +367,20 @@ impl client::Part for Geometry {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Line {
     /// The z-order of this geometry when rendered on a flat basemap. Geometry with a lower z-order should be rendered beneath geometry with a higher z-order. This z-ordering does not imply anything about the altitude of the area relative to the ground, but it can be used to prevent z-fighting. Unlike Line.z_order this can be used to compare with Area.basemap_z_order, and in fact may yield more accurate rendering (where a line may be rendered beneath an area).
     #[serde(rename="basemapZOrder")]
+    
     pub basemap_z_order: Option<BasemapZOrder>,
     /// The vertices present in the polyline.
     #[serde(rename="vertexOffsets")]
+    
     pub vertex_offsets: Option<Vertex2DList>,
     /// The z-order of the line. Lines with a lower z-order should be rendered beneath lines with a higher z-order. This z-ordering does not imply anything about the altitude of the area relative to the ground, but it can be used to prevent z-fighting during rendering on the client. In general, larger and more important road features will have a higher z-order line associated with them. This z-ordering can only be used to compare lines, and cannot be compared with the z_order field in the Area message. The z-order may be negative or zero. Prefer Line.basemap_z_order.
     #[serde(rename="zOrder")]
+    
     pub z_order: Option<i32>,
 }
 
@@ -347,12 +391,15 @@ impl client::Part for Line {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ModeledVolume {
     /// The triangle strips present in this mesh.
+    
     pub strips: Option<Vec<TriangleStrip>>,
     /// The vertices present in the mesh defining the modeled volume.
     #[serde(rename="vertexOffsets")]
+    
     pub vertex_offsets: Option<Vertex3DList>,
 }
 
@@ -363,9 +410,11 @@ impl client::Part for ModeledVolume {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ProviderInfo {
     /// Attribution string for this provider. This string is not localized.
+    
     pub description: Option<String>,
 }
 
@@ -376,13 +425,16 @@ impl client::Part for ProviderInfo {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Relation {
     /// Zero-based index to look up the related feature from the list of features in the tile.
     #[serde(rename="relatedFeatureIndex")]
+    
     pub related_feature_index: Option<i32>,
     /// Relation type between the origin feature to the related feature.
     #[serde(rename="relationType")]
+    
     pub relation_type: Option<String>,
 }
 
@@ -393,10 +445,12 @@ impl client::Part for Relation {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct RoadInfo {
     /// Road has signage discouraging or prohibiting use by the general public. E.g., roads with signs that say "Private", or "No trespassing."
     #[serde(rename="isPrivate")]
+    
     pub is_private: Option<bool>,
 }
 
@@ -407,10 +461,12 @@ impl client::Part for RoadInfo {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Row {
     /// The difference between each successive pair of altitudes, from west to east. The first, westmost point, is just the altitude rather than a diff. The units are specified by the altitude_multiplier parameter above; the value in meters is given by altitude_multiplier * altitude_diffs[n]. The altitude row (in metres above sea level) can be reconstructed with: a[0] = altitude_diffs[0] * altitude_multiplier when n > 0, a[n] = a[n-1] + altitude_diffs[n-1] * altitude_multiplier.
     #[serde(rename="altitudeDiffs")]
+    
     pub altitude_diffs: Option<Vec<i32>>,
 }
 
@@ -421,19 +477,25 @@ impl client::Part for Row {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct SecondDerivativeElevationGrid {
     /// A multiplier applied to the elements in the encoded data to extract the actual altitudes in meters.
     #[serde(rename="altitudeMultiplier")]
+    
     pub altitude_multiplier: Option<f32>,
     /// The number of columns included in the encoded elevation data (i.e. the horizontal resolution of the grid).
     #[serde(rename="columnCount")]
+    
     pub column_count: Option<i32>,
     /// A stream of elements each representing a point on the tile running across each row from left to right, top to bottom. There will be precisely horizontal_resolution * vertical_resolution elements in the stream. The elements are not the heights, rather the second order derivative of the values one would expect in a stream of height data. Each element is a varint with the following encoding: ------------------------------------------------------------------------| | Head Nibble | ------------------------------------------------------------------------| | Bit 0 | Bit 1 | Bits 2-3 | | Terminator| Sign (1=neg) | Least significant 2 bits of absolute error | ------------------------------------------------------------------------| | Tail Nibble #1 | ------------------------------------------------------------------------| | Bit 0 | Bit 1-3 | | Terminator| Least significant 3 bits of absolute error | ------------------------------------------------------------------------| | ... | Tail Nibble #n | ------------------------------------------------------------------------| | Bit 0 | Bit 1-3 | | Terminator| Least significant 3 bits of absolute error | ------------------------------------------------------------------------|
     #[serde(rename="encodedData")]
-    pub encoded_data: Option<String>,
+    
+    #[serde_as(as = "Option<::client::serde::urlsafe_base64::Wrapper>")]
+    pub encoded_data: Option<Vec<u8>>,
     /// The number of rows included in the encoded elevation data (i.e. the vertical resolution of the grid).
     #[serde(rename="rowCount")]
+    
     pub row_count: Option<i32>,
 }
 
@@ -444,10 +506,12 @@ impl client::Part for SecondDerivativeElevationGrid {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct SegmentInfo {
     /// Metadata for features with the ROAD FeatureType.
     #[serde(rename="roadInfo")]
+    
     pub road_info: Option<RoadInfo>,
 }
 
@@ -463,17 +527,22 @@ impl client::Part for SegmentInfo {}
 /// 
 /// * [get terraintiles](TerraintileGetCall) (response)
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct TerrainTile {
     /// The global tile coordinates that uniquely identify this tile.
+    
     pub coordinates: Option<TileCoordinates>,
     /// Terrain elevation data encoded as a FirstDerivativeElevationGrid.
     #[serde(rename="firstDerivative")]
+    
     pub first_derivative: Option<FirstDerivativeElevationGrid>,
     /// Resource name of the tile. The tile resource name is prefixed by its collection ID `terrain/` followed by the resource ID, which encodes the tile's global x and y coordinates and zoom level as `@,,z`. For example, `terrain/@1,2,3z`.
+    
     pub name: Option<String>,
     /// Terrain elevation data encoded as a SecondDerivativeElevationGrid. .
     #[serde(rename="secondDerivative")]
+    
     pub second_derivative: Option<SecondDerivativeElevationGrid>,
 }
 
@@ -485,13 +554,17 @@ impl client::ResponseResult for TerrainTile {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct TileCoordinates {
     /// Required. The x coordinate.
+    
     pub x: Option<i32>,
     /// Required. The y coordinate.
+    
     pub y: Option<i32>,
     /// Required. The Google Maps API zoom level.
+    
     pub zoom: Option<i32>,
 }
 
@@ -502,10 +575,12 @@ impl client::Part for TileCoordinates {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct TriangleStrip {
     /// Index into the vertex_offset array representing the next vertex in the triangle strip.
     #[serde(rename="vertexIndices")]
+    
     pub vertex_indices: Option<Vec<i32>>,
 }
 
@@ -516,13 +591,16 @@ impl client::Part for TriangleStrip {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Vertex2DList {
     /// List of x-offsets in local tile coordinates.
     #[serde(rename="xOffsets")]
+    
     pub x_offsets: Option<Vec<i32>>,
     /// List of y-offsets in local tile coordinates.
     #[serde(rename="yOffsets")]
+    
     pub y_offsets: Option<Vec<i32>>,
 }
 
@@ -533,16 +611,20 @@ impl client::Part for Vertex2DList {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Vertex3DList {
     /// List of x-offsets in local tile coordinates.
     #[serde(rename="xOffsets")]
+    
     pub x_offsets: Option<Vec<i32>>,
     /// List of y-offsets in local tile coordinates.
     #[serde(rename="yOffsets")]
+    
     pub y_offsets: Option<Vec<i32>>,
     /// List of z-offsets in local tile coordinates.
     #[serde(rename="zOffsets")]
+    
     pub z_offsets: Option<Vec<i32>>,
 }
 
@@ -555,7 +637,7 @@ impl client::Part for Vertex3DList {}
 // #################
 
 /// A builder providing access to all methods supported on *featuretile* resources.
-/// It is not used directly, but through the `SemanticTile` hub.
+/// It is not used directly, but through the [`SemanticTile`] hub.
 ///
 /// # Example
 ///
@@ -568,7 +650,7 @@ impl client::Part for Vertex3DList {}
 /// 
 /// # async fn dox() {
 /// use std::default::Default;
-/// use vectortile1::{SemanticTile, oauth2, hyper, hyper_rustls};
+/// use vectortile1::{SemanticTile, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// let secret: oauth2::ApplicationSecret = Default::default();
 /// let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -629,7 +711,7 @@ impl<'a, S> FeaturetileMethods<'a, S> {
 
 
 /// A builder providing access to all methods supported on *terraintile* resources.
-/// It is not used directly, but through the `SemanticTile` hub.
+/// It is not used directly, but through the [`SemanticTile`] hub.
 ///
 /// # Example
 ///
@@ -642,7 +724,7 @@ impl<'a, S> FeaturetileMethods<'a, S> {
 /// 
 /// # async fn dox() {
 /// use std::default::Default;
-/// use vectortile1::{SemanticTile, oauth2, hyper, hyper_rustls};
+/// use vectortile1::{SemanticTile, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// let secret: oauth2::ApplicationSecret = Default::default();
 /// let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -705,7 +787,7 @@ impl<'a, S> TerraintileMethods<'a, S> {
 /// Gets a feature tile by its tile resource name.
 ///
 /// A builder for the *get* method supported by a *featuretile* resource.
-/// It is not used directly, but through a `FeaturetileMethods` instance.
+/// It is not used directly, but through a [`FeaturetileMethods`] instance.
 ///
 /// # Example
 ///
@@ -717,7 +799,7 @@ impl<'a, S> TerraintileMethods<'a, S> {
 /// # extern crate google_vectortile1 as vectortile1;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use vectortile1::{SemanticTile, oauth2, hyper, hyper_rustls};
+/// # use vectortile1::{SemanticTile, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
 /// # let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -779,7 +861,7 @@ impl<'a, S> client::CallBuilder for FeaturetileGetCall<'a, S> {}
 
 impl<'a, S> FeaturetileGetCall<'a, S>
 where
-    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
     S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
     S::Future: Send + Unpin + 'static,
     S::Error: Into<Box<dyn StdError + Send + Sync>>,
@@ -788,87 +870,84 @@ where
 
     /// Perform the operation you have build so far.
     pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, FeatureTile)> {
-        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
         use std::io::{Read, Seek};
         use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::ToParts;
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
         let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
         dlg.begin(client::MethodInfo { id: "vectortile.featuretiles.get",
                                http_method: hyper::Method::GET });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(20 + self._additional_params.len());
-        params.push(("name", self._name.to_string()));
-        if let Some(value) = self._region_code {
-            params.push(("regionCode", value.to_string()));
-        }
-        if let Some(value) = self._language_code {
-            params.push(("languageCode", value.to_string()));
-        }
-        if let Some(value) = self._enable_unclipped_buildings {
-            params.push(("enableUnclippedBuildings", value.to_string()));
-        }
-        if let Some(value) = self._enable_private_roads {
-            params.push(("enablePrivateRoads", value.to_string()));
-        }
-        if let Some(value) = self._enable_political_features {
-            params.push(("enablePoliticalFeatures", value.to_string()));
-        }
-        if let Some(value) = self._enable_modeled_volumes {
-            params.push(("enableModeledVolumes", value.to_string()));
-        }
-        if let Some(value) = self._enable_feature_names {
-            params.push(("enableFeatureNames", value.to_string()));
-        }
-        if let Some(value) = self._enable_detailed_highway_types {
-            params.push(("enableDetailedHighwayTypes", value.to_string()));
-        }
-        if let Some(value) = self._client_tile_version_id {
-            params.push(("clientTileVersionId", value.to_string()));
-        }
-        if let Some(value) = self._client_info_user_id {
-            params.push(("clientInfo.userId", value.to_string()));
-        }
-        if let Some(value) = self._client_info_platform {
-            params.push(("clientInfo.platform", value.to_string()));
-        }
-        if let Some(value) = self._client_info_operating_system {
-            params.push(("clientInfo.operatingSystem", value.to_string()));
-        }
-        if let Some(value) = self._client_info_device_model {
-            params.push(("clientInfo.deviceModel", value.to_string()));
-        }
-        if let Some(value) = self._client_info_application_version {
-            params.push(("clientInfo.applicationVersion", value.to_string()));
-        }
-        if let Some(value) = self._client_info_application_id {
-            params.push(("clientInfo.applicationId", value.to_string()));
-        }
-        if let Some(value) = self._client_info_api_client {
-            params.push(("clientInfo.apiClient", value.to_string()));
-        }
-        if let Some(value) = self._always_include_building_footprints {
-            params.push(("alwaysIncludeBuildingFootprints", value.to_string()));
-        }
+
         for &field in ["alt", "name", "regionCode", "languageCode", "enableUnclippedBuildings", "enablePrivateRoads", "enablePoliticalFeatures", "enableModeledVolumes", "enableFeatureNames", "enableDetailedHighwayTypes", "clientTileVersionId", "clientInfo.userId", "clientInfo.platform", "clientInfo.operatingSystem", "clientInfo.deviceModel", "clientInfo.applicationVersion", "clientInfo.applicationId", "clientInfo.apiClient", "alwaysIncludeBuildingFootprints"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(client::Error::FieldClash(field));
             }
         }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
+
+        let mut params = Params::with_capacity(20 + self._additional_params.len());
+        params.push("name", self._name);
+        if let Some(value) = self._region_code.as_ref() {
+            params.push("regionCode", value);
+        }
+        if let Some(value) = self._language_code.as_ref() {
+            params.push("languageCode", value);
+        }
+        if let Some(value) = self._enable_unclipped_buildings.as_ref() {
+            params.push("enableUnclippedBuildings", value.to_string());
+        }
+        if let Some(value) = self._enable_private_roads.as_ref() {
+            params.push("enablePrivateRoads", value.to_string());
+        }
+        if let Some(value) = self._enable_political_features.as_ref() {
+            params.push("enablePoliticalFeatures", value.to_string());
+        }
+        if let Some(value) = self._enable_modeled_volumes.as_ref() {
+            params.push("enableModeledVolumes", value.to_string());
+        }
+        if let Some(value) = self._enable_feature_names.as_ref() {
+            params.push("enableFeatureNames", value.to_string());
+        }
+        if let Some(value) = self._enable_detailed_highway_types.as_ref() {
+            params.push("enableDetailedHighwayTypes", value.to_string());
+        }
+        if let Some(value) = self._client_tile_version_id.as_ref() {
+            params.push("clientTileVersionId", value);
+        }
+        if let Some(value) = self._client_info_user_id.as_ref() {
+            params.push("clientInfo.userId", value);
+        }
+        if let Some(value) = self._client_info_platform.as_ref() {
+            params.push("clientInfo.platform", value);
+        }
+        if let Some(value) = self._client_info_operating_system.as_ref() {
+            params.push("clientInfo.operatingSystem", value);
+        }
+        if let Some(value) = self._client_info_device_model.as_ref() {
+            params.push("clientInfo.deviceModel", value);
+        }
+        if let Some(value) = self._client_info_application_version.as_ref() {
+            params.push("clientInfo.applicationVersion", value);
+        }
+        if let Some(value) = self._client_info_application_id.as_ref() {
+            params.push("clientInfo.applicationId", value);
+        }
+        if let Some(value) = self._client_info_api_client.as_ref() {
+            params.push("clientInfo.apiClient", value);
+        }
+        if let Some(value) = self._always_include_building_footprints.as_ref() {
+            params.push("alwaysIncludeBuildingFootprints", value.to_string());
         }
 
-        params.push(("alt", "json".to_string()));
+        params.extend(self._additional_params.iter());
 
+        params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "v1/{+name}";
         
-        let key = dlg.api_key();
-        match key {
-            Some(value) => params.push(("key", value)),
+        match dlg.api_key() {
+            Some(value) => params.push("key", value),
             None => {
                 dlg.finished(false);
                 return Err(client::Error::MissingAPIKey)
@@ -876,31 +955,14 @@ where
         }
 
         for &(find_this, param_name) in [("{+name}", "name")].iter() {
-            let mut replace_with = String::new();
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = value.to_string();
-                    break;
-                }
-            }
-            if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
-            }
-            url = url.replace(find_this, &replace_with);
+            url = params.uri_replacement(url, param_name, find_this, true);
         }
         {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
-            for param_name in ["name"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
+            let to_remove = ["name"];
+            params.remove_params(&to_remove);
         }
 
-        let url = url::Url::parse_with_params(&url, params).unwrap();
+        let url = params.parse_with_url(&url);
 
 
 
@@ -908,21 +970,24 @@ where
             let mut req_result = {
                 let client = &self.hub.client;
                 dlg.pre_request();
-                let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
-                        .header(USER_AGENT, self.hub._user_agent.clone());
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::GET)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
 
 
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
-                
+
             };
 
             match req_result {
                 Err(err) => {
                     if let client::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep(d).await;
                         continue;
                     }
                     dlg.finished(false);
@@ -938,7 +1003,7 @@ where
                         let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
                         if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
-                            sleep(d);
+                            sleep(d).await;
                             continue;
                         }
 
@@ -1101,7 +1166,8 @@ where
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.````
     ///
     /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> FeaturetileGetCall<'a, S> {
@@ -1141,7 +1207,7 @@ where
 /// Gets a terrain tile by its tile resource name.
 ///
 /// A builder for the *get* method supported by a *terraintile* resource.
-/// It is not used directly, but through a `TerraintileMethods` instance.
+/// It is not used directly, but through a [`TerraintileMethods`] instance.
 ///
 /// # Example
 ///
@@ -1153,7 +1219,7 @@ where
 /// # extern crate google_vectortile1 as vectortile1;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use vectortile1::{SemanticTile, oauth2, hyper, hyper_rustls};
+/// # use vectortile1::{SemanticTile, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
 /// # let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -1203,7 +1269,7 @@ impl<'a, S> client::CallBuilder for TerraintileGetCall<'a, S> {}
 
 impl<'a, S> TerraintileGetCall<'a, S>
 where
-    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
     S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
     S::Future: Send + Unpin + 'static,
     S::Error: Into<Box<dyn StdError + Send + Sync>>,
@@ -1212,71 +1278,68 @@ where
 
     /// Perform the operation you have build so far.
     pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, TerrainTile)> {
-        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
         use std::io::{Read, Seek};
         use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::ToParts;
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
         let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
         dlg.begin(client::MethodInfo { id: "vectortile.terraintiles.get",
                                http_method: hyper::Method::GET });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(14 + self._additional_params.len());
-        params.push(("name", self._name.to_string()));
-        if self._terrain_formats.len() > 0 {
-            for f in self._terrain_formats.iter() {
-                params.push(("terrainFormats", f.to_string()));
-            }
-        }
-        if let Some(value) = self._min_elevation_resolution_cells {
-            params.push(("minElevationResolutionCells", value.to_string()));
-        }
-        if let Some(value) = self._max_elevation_resolution_cells {
-            params.push(("maxElevationResolutionCells", value.to_string()));
-        }
-        if let Some(value) = self._client_info_user_id {
-            params.push(("clientInfo.userId", value.to_string()));
-        }
-        if let Some(value) = self._client_info_platform {
-            params.push(("clientInfo.platform", value.to_string()));
-        }
-        if let Some(value) = self._client_info_operating_system {
-            params.push(("clientInfo.operatingSystem", value.to_string()));
-        }
-        if let Some(value) = self._client_info_device_model {
-            params.push(("clientInfo.deviceModel", value.to_string()));
-        }
-        if let Some(value) = self._client_info_application_version {
-            params.push(("clientInfo.applicationVersion", value.to_string()));
-        }
-        if let Some(value) = self._client_info_application_id {
-            params.push(("clientInfo.applicationId", value.to_string()));
-        }
-        if let Some(value) = self._client_info_api_client {
-            params.push(("clientInfo.apiClient", value.to_string()));
-        }
-        if let Some(value) = self._altitude_precision_centimeters {
-            params.push(("altitudePrecisionCentimeters", value.to_string()));
-        }
+
         for &field in ["alt", "name", "terrainFormats", "minElevationResolutionCells", "maxElevationResolutionCells", "clientInfo.userId", "clientInfo.platform", "clientInfo.operatingSystem", "clientInfo.deviceModel", "clientInfo.applicationVersion", "clientInfo.applicationId", "clientInfo.apiClient", "altitudePrecisionCentimeters"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(client::Error::FieldClash(field));
             }
         }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
+
+        let mut params = Params::with_capacity(14 + self._additional_params.len());
+        params.push("name", self._name);
+        if self._terrain_formats.len() > 0 {
+            for f in self._terrain_formats.iter() {
+                params.push("terrainFormats", f);
+            }
+        }
+        if let Some(value) = self._min_elevation_resolution_cells.as_ref() {
+            params.push("minElevationResolutionCells", value.to_string());
+        }
+        if let Some(value) = self._max_elevation_resolution_cells.as_ref() {
+            params.push("maxElevationResolutionCells", value.to_string());
+        }
+        if let Some(value) = self._client_info_user_id.as_ref() {
+            params.push("clientInfo.userId", value);
+        }
+        if let Some(value) = self._client_info_platform.as_ref() {
+            params.push("clientInfo.platform", value);
+        }
+        if let Some(value) = self._client_info_operating_system.as_ref() {
+            params.push("clientInfo.operatingSystem", value);
+        }
+        if let Some(value) = self._client_info_device_model.as_ref() {
+            params.push("clientInfo.deviceModel", value);
+        }
+        if let Some(value) = self._client_info_application_version.as_ref() {
+            params.push("clientInfo.applicationVersion", value);
+        }
+        if let Some(value) = self._client_info_application_id.as_ref() {
+            params.push("clientInfo.applicationId", value);
+        }
+        if let Some(value) = self._client_info_api_client.as_ref() {
+            params.push("clientInfo.apiClient", value);
+        }
+        if let Some(value) = self._altitude_precision_centimeters.as_ref() {
+            params.push("altitudePrecisionCentimeters", value.to_string());
         }
 
-        params.push(("alt", "json".to_string()));
+        params.extend(self._additional_params.iter());
 
+        params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "v1/{+name}";
         
-        let key = dlg.api_key();
-        match key {
-            Some(value) => params.push(("key", value)),
+        match dlg.api_key() {
+            Some(value) => params.push("key", value),
             None => {
                 dlg.finished(false);
                 return Err(client::Error::MissingAPIKey)
@@ -1284,31 +1347,14 @@ where
         }
 
         for &(find_this, param_name) in [("{+name}", "name")].iter() {
-            let mut replace_with = String::new();
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = value.to_string();
-                    break;
-                }
-            }
-            if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
-            }
-            url = url.replace(find_this, &replace_with);
+            url = params.uri_replacement(url, param_name, find_this, true);
         }
         {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
-            for param_name in ["name"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
+            let to_remove = ["name"];
+            params.remove_params(&to_remove);
         }
 
-        let url = url::Url::parse_with_params(&url, params).unwrap();
+        let url = params.parse_with_url(&url);
 
 
 
@@ -1316,21 +1362,24 @@ where
             let mut req_result = {
                 let client = &self.hub.client;
                 dlg.pre_request();
-                let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
-                        .header(USER_AGENT, self.hub._user_agent.clone());
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::GET)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
 
 
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
-                
+
             };
 
             match req_result {
                 Err(err) => {
                     if let client::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep(d).await;
                         continue;
                     }
                     dlg.finished(false);
@@ -1346,7 +1395,7 @@ where
                         let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
                         if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
-                            sleep(d);
+                            sleep(d).await;
                             continue;
                         }
 
@@ -1468,7 +1517,8 @@ where
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.````
     ///
     /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TerraintileGetCall<'a, S> {

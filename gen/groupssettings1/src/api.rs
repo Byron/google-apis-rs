@@ -1,19 +1,20 @@
 use std::collections::HashMap;
 use std::cell::RefCell;
 use std::default::Default;
-use std::collections::BTreeMap;
+use std::collections::BTreeSet;
 use std::error::Error as StdError;
 use serde_json as json;
 use std::io;
 use std::fs;
 use std::mem;
-use std::thread::sleep;
 
-use http::Uri;
 use hyper::client::connect;
 use tokio::io::{AsyncRead, AsyncWrite};
+use tokio::time::sleep;
 use tower_service;
-use crate::client;
+use serde::{Serialize, Deserialize};
+
+use crate::{client, client::GetToken, client::serde_with};
 
 // ##############
 // UTILITIES ###
@@ -62,7 +63,7 @@ impl Default for Scope {
 /// use groupssettings1::{Result, Error};
 /// # async fn dox() {
 /// use std::default::Default;
-/// use groupssettings1::{Groupssettings, oauth2, hyper, hyper_rustls};
+/// use groupssettings1::{Groupssettings, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// // Get an ApplicationSecret instance by some means. It contains the `client_id` and 
 /// // `client_secret`, among other things.
@@ -110,7 +111,7 @@ impl Default for Scope {
 #[derive(Clone)]
 pub struct Groupssettings<S> {
     pub client: hyper::Client<S, hyper::body::Body>,
-    pub auth: oauth2::authenticator::Authenticator<S>,
+    pub auth: Box<dyn client::GetToken>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
@@ -120,11 +121,11 @@ impl<'a, S> client::Hub for Groupssettings<S> {}
 
 impl<'a, S> Groupssettings<S> {
 
-    pub fn new(client: hyper::Client<S, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<S>) -> Groupssettings<S> {
+    pub fn new<A: 'static + client::GetToken>(client: hyper::Client<S, hyper::body::Body>, auth: A) -> Groupssettings<S> {
         Groupssettings {
             client,
-            auth: authenticator,
-            _user_agent: "google-api-rust-client/4.0.1".to_string(),
+            auth: Box::new(auth),
+            _user_agent: "google-api-rust-client/5.0.2-beta-1".to_string(),
             _base_url: "https://www.googleapis.com/groups/v1/groups/".to_string(),
             _root_url: "https://www.googleapis.com/".to_string(),
         }
@@ -135,7 +136,7 @@ impl<'a, S> Groupssettings<S> {
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/4.0.1`.
+    /// It defaults to `google-api-rust-client/5.0.2-beta-1`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -174,22 +175,26 @@ impl<'a, S> Groupssettings<S> {
 /// * [patch groups](GroupPatchCall) (request|response)
 /// * [update groups](GroupUpdateCall) (request|response)
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Groups {
     /// Identifies whether members external to your organization can join the group. Possible values are:  
     /// - true: G Suite users external to your organization can become members of this group. 
     /// - false: Users not belonging to the organization are not allowed to become members of this group.
     #[serde(rename="allowExternalMembers")]
+    
     pub allow_external_members: Option<String>,
     /// Deprecated. Allows Google to contact administrator of the group.  
     /// - true: Allow Google to contact managers of this group. Occasionally Google may send updates on the latest features, ask for input on new features, or ask for permission to highlight your group. 
     /// - false: Google can not contact managers of this group.
     #[serde(rename="allowGoogleCommunication")]
+    
     pub allow_google_communication: Option<String>,
     /// Allows posting from web. Possible values are:  
     /// - true: Allows any member to post to the group forum. 
     /// - false: Members only use Gmail to communicate with the group.
     #[serde(rename="allowWebPosting")]
+    
     pub allow_web_posting: Option<String>,
     /// Allows the group to be archived only. Possible values are:  
     /// - true: Group is archived and the group is inactive. New messages to this group are rejected. The older archived messages are browseable and searchable.  
@@ -198,67 +203,84 @@ pub struct Groups {
     /// - false: The group is active and can receive messages.  
     /// - When false, updating whoCanPostMessage to NONE_CAN_POST, results in an error.
     #[serde(rename="archiveOnly")]
+    
     pub archive_only: Option<String>,
     /// Set the content of custom footer text. The maximum number of characters is 1,000.
     #[serde(rename="customFooterText")]
+    
     pub custom_footer_text: Option<String>,
     /// An email address used when replying to a message if the replyTo property is set to REPLY_TO_CUSTOM. This address is defined by an account administrator.  
     /// - When the group's ReplyTo property is set to REPLY_TO_CUSTOM, the customReplyTo property holds a custom email address used when replying to a message. 
     /// - If the group's ReplyTo property is set to REPLY_TO_CUSTOM, the customReplyTo property must have a text value or an error is returned.
     #[serde(rename="customReplyTo")]
+    
     pub custom_reply_to: Option<String>,
     /// Specifies whether the group has a custom role that's included in one of the settings being merged. This field is read-only and update/patch requests to it are ignored. Possible values are:  
     /// - true 
     /// - false
     #[serde(rename="customRolesEnabledForSettingsToBeMerged")]
+    
     pub custom_roles_enabled_for_settings_to_be_merged: Option<String>,
     /// When a message is rejected, this is text for the rejection notification sent to the message's author. By default, this property is empty and has no value in the API's response body. The maximum notification text size is 10,000 characters. Note: Requires sendMessageDenyNotification property to be true.
     #[serde(rename="defaultMessageDenyNotificationText")]
+    
     pub default_message_deny_notification_text: Option<String>,
     /// Default sender for members who can post messages as the group. Possible values are: - `DEFAULT_SELF`: By default messages will be sent from the user - `GROUP`: By default messages will be sent from the group
+    
     pub default_sender: Option<String>,
     /// Description of the group. This property value may be an empty string if no group description has been entered. If entered, the maximum group description is no more than 300 characters.
+    
     pub description: Option<String>,
     /// The group's email address. This property can be updated using the Directory API. Note: Only a group owner can change a group's email address. A group manager can't do this.
     /// When you change your group's address using the Directory API or the control panel, you are changing the address your subscribers use to send email and the web address people use to access your group. People can't reach your group by visiting the old address.
+    
     pub email: Option<String>,
     /// Specifies whether a collaborative inbox will remain turned on for the group. Possible values are:  
     /// - true 
     /// - false
     #[serde(rename="enableCollaborativeInbox")]
+    
     pub enable_collaborative_inbox: Option<String>,
     /// Indicates if favorite replies should be displayed above other replies.  
     /// - true: Favorite replies will be displayed above other replies. 
     /// - false: Favorite replies will not be displayed above other replies.
     #[serde(rename="favoriteRepliesOnTop")]
+    
     pub favorite_replies_on_top: Option<String>,
     /// Whether to include custom footer. Possible values are:  
     /// - true 
     /// - false
     #[serde(rename="includeCustomFooter")]
+    
     pub include_custom_footer: Option<String>,
     /// Enables the group to be included in the Global Address List. For more information, see the help center. Possible values are:  
     /// - true: Group is included in the Global Address List. 
     /// - false: Group is not included in the Global Address List.
     #[serde(rename="includeInGlobalAddressList")]
+    
     pub include_in_global_address_list: Option<String>,
     /// Allows the Group contents to be archived. Possible values are:  
     /// - true: Archive messages sent to the group. 
     /// - false: Do not keep an archive of messages sent to this group. If false, previously archived messages remain in the archive.
     #[serde(rename="isArchived")]
+    
     pub is_archived: Option<String>,
     /// The type of the resource. It is always groupsSettings#groups.
+    
     pub kind: Option<String>,
     /// Deprecated. The maximum size of a message is 25Mb.
     #[serde(rename="maxMessageBytes")]
+    
     pub max_message_bytes: Option<i32>,
     /// Enables members to post messages as the group. Possible values are:  
     /// - true: Group member can post messages using the group's email address instead of their own email address. Message appear to originate from the group itself. Note: When true, any message moderation settings on individual users or new members do not apply to posts made on behalf of the group. 
     /// - false: Members can not post in behalf of the group's email address.
     #[serde(rename="membersCanPostAsTheGroup")]
+    
     pub members_can_post_as_the_group: Option<String>,
     /// Deprecated. The default message display font always has a value of "DEFAULT_FONT".
     #[serde(rename="messageDisplayFont")]
+    
     pub message_display_font: Option<String>,
     /// Moderation level of incoming messages. Possible values are:  
     /// - MODERATE_ALL_MESSAGES: All messages are sent to the group owner's email address for approval. If approved, the message is sent to the group. 
@@ -267,11 +289,14 @@ pub struct Groups {
     /// - MODERATE_NONE: No moderator approval is required. Messages are delivered directly to the group. Note: When the whoCanPostMessage is set to ANYONE_CAN_POST, we recommend the messageModerationLevel be set to MODERATE_NON_MEMBERS to protect the group from possible spam.
     /// When memberCanPostAsTheGroup is true, any message moderation settings on individual users or new members will not apply to posts made on behalf of the group.
     #[serde(rename="messageModerationLevel")]
+    
     pub message_moderation_level: Option<String>,
     /// Name of the group, which has a maximum size of 75 characters.
+    
     pub name: Option<String>,
     /// The primary language for group. For a group's primary language use the language tags from the G Suite languages found at G Suite Email Settings API Email Language Tags.
     #[serde(rename="primaryLanguage")]
+    
     pub primary_language: Option<String>,
     /// Specifies who receives the default reply. Possible values are:  
     /// - REPLY_TO_CUSTOM: For replies to messages, use the group's custom email address.
@@ -283,6 +308,7 @@ pub struct Groups {
     /// - REPLY_TO_IGNORE: Group users individually decide where the message reply is sent. 
     /// - REPLY_TO_MANAGERS: This reply message is sent to the group's managers, which includes all managers and the group owner.
     #[serde(rename="replyTo")]
+    
     pub reply_to: Option<String>,
     /// Allows a member to be notified if the member's message to the group is denied by the group owner. Possible values are:  
     /// - true: When a message is rejected, send the deny message notification to the message author.
@@ -290,11 +316,13 @@ pub struct Groups {
     ///  
     /// - false: When a message is rejected, no notification is sent.
     #[serde(rename="sendMessageDenyNotification")]
+    
     pub send_message_deny_notification: Option<String>,
     /// Deprecated. This is merged into the new whoCanDiscoverGroup setting. Allows the group to be visible in the Groups Directory. Possible values are:  
     /// - true: All groups in the account are listed in the Groups directory. 
     /// - false: All groups in the account are not listed in the directory.
     #[serde(rename="showInGroupDirectory")]
+    
     pub show_in_group_directory: Option<String>,
     /// Specifies moderation levels for messages detected as spam. Possible values are:  
     /// - ALLOW: Post the message to the group. 
@@ -302,6 +330,7 @@ pub struct Groups {
     /// - SILENTLY_MODERATE: Send the message to the moderation queue, but do not send notification to moderators. 
     /// - REJECT: Immediately reject the message.
     #[serde(rename="spamModerationLevel")]
+    
     pub spam_moderation_level: Option<String>,
     /// Deprecated. This is merged into the new whoCanModerateMembers setting. Permissions to add members. Possible values are:  
     /// - ALL_MEMBERS_CAN_ADD: Managers and members can directly add new members. 
@@ -309,9 +338,11 @@ pub struct Groups {
     /// - ALL_OWNERS_CAN_ADD: Only owners can directly add new members. 
     /// - NONE_CAN_ADD: No one can directly add new members.
     #[serde(rename="whoCanAdd")]
+    
     pub who_can_add: Option<String>,
     /// Deprecated. This functionality is no longer supported in the Google Groups UI. The value is always "NONE".
     #[serde(rename="whoCanAddReferences")]
+    
     pub who_can_add_references: Option<String>,
     /// Specifies who can approve members who ask to join groups. This permission will be deprecated once it is merged into the new whoCanModerateMembers setting. Possible values are:  
     /// - ALL_MEMBERS_CAN_APPROVE 
@@ -319,6 +350,7 @@ pub struct Groups {
     /// - ALL_OWNERS_CAN_APPROVE 
     /// - NONE_CAN_APPROVE
     #[serde(rename="whoCanApproveMembers")]
+    
     pub who_can_approve_members: Option<String>,
     /// Deprecated. This is merged into the new whoCanModerateContent setting. Specifies who can approve pending messages in the moderation queue. Possible values are:  
     /// - ALL_MEMBERS 
@@ -326,6 +358,7 @@ pub struct Groups {
     /// - OWNERS_ONLY 
     /// - NONE
     #[serde(rename="whoCanApproveMessages")]
+    
     pub who_can_approve_messages: Option<String>,
     /// Deprecated. This is merged into the new whoCanAssistContent setting. Permission to assign topics in a forum to another user. Possible values are:  
     /// - ALL_MEMBERS 
@@ -334,6 +367,7 @@ pub struct Groups {
     /// - OWNERS_ONLY 
     /// - NONE
     #[serde(rename="whoCanAssignTopics")]
+    
     pub who_can_assign_topics: Option<String>,
     /// Specifies who can moderate metadata. Possible values are:  
     /// - ALL_MEMBERS 
@@ -342,6 +376,7 @@ pub struct Groups {
     /// - OWNERS_ONLY 
     /// - NONE
     #[serde(rename="whoCanAssistContent")]
+    
     pub who_can_assist_content: Option<String>,
     /// Specifies who can deny membership to users. This permission will be deprecated once it is merged into the new whoCanModerateMembers setting. Possible values are:  
     /// - ALL_MEMBERS 
@@ -349,6 +384,7 @@ pub struct Groups {
     /// - OWNERS_ONLY 
     /// - NONE
     #[serde(rename="whoCanBanUsers")]
+    
     pub who_can_ban_users: Option<String>,
     /// Permission to contact owner of the group via web UI. Possible values are:  
     /// - ALL_IN_DOMAIN_CAN_CONTACT 
@@ -357,6 +393,7 @@ pub struct Groups {
     /// - ANYONE_CAN_CONTACT 
     /// - ALL_OWNERS_CAN_CONTACT
     #[serde(rename="whoCanContactOwner")]
+    
     pub who_can_contact_owner: Option<String>,
     /// Deprecated. This is merged into the new whoCanModerateContent setting. Specifies who can delete replies to topics. (Authors can always delete their own posts). Possible values are:  
     /// - ALL_MEMBERS 
@@ -364,6 +401,7 @@ pub struct Groups {
     /// - OWNERS_ONLY 
     /// - NONE
     #[serde(rename="whoCanDeleteAnyPost")]
+    
     pub who_can_delete_any_post: Option<String>,
     /// Deprecated. This is merged into the new whoCanModerateContent setting. Specifies who can delete topics. Possible values are:  
     /// - ALL_MEMBERS 
@@ -371,12 +409,14 @@ pub struct Groups {
     /// - OWNERS_ONLY 
     /// - NONE
     #[serde(rename="whoCanDeleteTopics")]
+    
     pub who_can_delete_topics: Option<String>,
     /// Specifies the set of users for whom this group is discoverable. Possible values are:  
     /// - ANYONE_CAN_DISCOVER 
     /// - ALL_IN_DOMAIN_CAN_DISCOVER 
     /// - ALL_MEMBERS_CAN_DISCOVER
     #[serde(rename="whoCanDiscoverGroup")]
+    
     pub who_can_discover_group: Option<String>,
     /// Deprecated. This is merged into the new whoCanAssistContent setting. Permission to enter free form tags for topics in a forum. Possible values are:  
     /// - ALL_MEMBERS 
@@ -385,6 +425,7 @@ pub struct Groups {
     /// - OWNERS_ONLY 
     /// - NONE
     #[serde(rename="whoCanEnterFreeFormTags")]
+    
     pub who_can_enter_free_form_tags: Option<String>,
     /// Deprecated. This is merged into the new whoCanModerateContent setting. Specifies who can hide posts by reporting them as abuse. Possible values are:  
     /// - ALL_MEMBERS 
@@ -392,6 +433,7 @@ pub struct Groups {
     /// - OWNERS_ONLY 
     /// - NONE
     #[serde(rename="whoCanHideAbuse")]
+    
     pub who_can_hide_abuse: Option<String>,
     /// Deprecated. This is merged into the new whoCanModerateMembers setting. Permissions to invite new members. Possible values are:  
     /// - ALL_MEMBERS_CAN_INVITE: Managers and members can invite a new member candidate. 
@@ -399,6 +441,7 @@ pub struct Groups {
     /// - ALL_OWNERS_CAN_INVITE: Only owners can invite a new member. 
     /// - NONE_CAN_INVITE: No one can invite a new member candidate.
     #[serde(rename="whoCanInvite")]
+    
     pub who_can_invite: Option<String>,
     /// Permission to join group. Possible values are:  
     /// - ANYONE_CAN_JOIN: Anyone in the account domain can join. This includes accounts with multiple domains. 
@@ -406,12 +449,14 @@ pub struct Groups {
     /// - INVITED_CAN_JOIN: Candidates for membership can be invited to join.  
     /// - CAN_REQUEST_TO_JOIN: Non members can request an invitation to join.
     #[serde(rename="whoCanJoin")]
+    
     pub who_can_join: Option<String>,
     /// Permission to leave the group. Possible values are:  
     /// - ALL_MANAGERS_CAN_LEAVE 
     /// - ALL_MEMBERS_CAN_LEAVE 
     /// - NONE_CAN_LEAVE
     #[serde(rename="whoCanLeaveGroup")]
+    
     pub who_can_leave_group: Option<String>,
     /// Deprecated. This is merged into the new whoCanModerateContent setting. Specifies who can prevent users from posting replies to topics. Possible values are:  
     /// - ALL_MEMBERS 
@@ -419,6 +464,7 @@ pub struct Groups {
     /// - OWNERS_ONLY 
     /// - NONE
     #[serde(rename="whoCanLockTopics")]
+    
     pub who_can_lock_topics: Option<String>,
     /// Deprecated. This is merged into the new whoCanModerateContent setting. Specifies who can make topics appear at the top of the topic list. Possible values are:  
     /// - ALL_MEMBERS 
@@ -426,6 +472,7 @@ pub struct Groups {
     /// - OWNERS_ONLY 
     /// - NONE
     #[serde(rename="whoCanMakeTopicsSticky")]
+    
     pub who_can_make_topics_sticky: Option<String>,
     /// Deprecated. This is merged into the new whoCanAssistContent setting. Permission to mark a topic as a duplicate of another topic. Possible values are:  
     /// - ALL_MEMBERS 
@@ -434,6 +481,7 @@ pub struct Groups {
     /// - OWNERS_ONLY 
     /// - NONE
     #[serde(rename="whoCanMarkDuplicate")]
+    
     pub who_can_mark_duplicate: Option<String>,
     /// Deprecated. This is merged into the new whoCanAssistContent setting. Permission to mark any other user's post as a favorite reply. Possible values are:  
     /// - ALL_MEMBERS 
@@ -442,6 +490,7 @@ pub struct Groups {
     /// - OWNERS_ONLY 
     /// - NONE
     #[serde(rename="whoCanMarkFavoriteReplyOnAnyTopic")]
+    
     pub who_can_mark_favorite_reply_on_any_topic: Option<String>,
     /// Deprecated. This is merged into the new whoCanAssistContent setting. Permission to mark a post for a topic they started as a favorite reply. Possible values are:  
     /// - ALL_MEMBERS 
@@ -450,6 +499,7 @@ pub struct Groups {
     /// - OWNERS_ONLY 
     /// - NONE
     #[serde(rename="whoCanMarkFavoriteReplyOnOwnTopic")]
+    
     pub who_can_mark_favorite_reply_on_own_topic: Option<String>,
     /// Deprecated. This is merged into the new whoCanAssistContent setting. Permission to mark a topic as not needing a response. Possible values are:  
     /// - ALL_MEMBERS 
@@ -458,6 +508,7 @@ pub struct Groups {
     /// - OWNERS_ONLY 
     /// - NONE
     #[serde(rename="whoCanMarkNoResponseNeeded")]
+    
     pub who_can_mark_no_response_needed: Option<String>,
     /// Specifies who can moderate content. Possible values are:  
     /// - ALL_MEMBERS 
@@ -465,6 +516,7 @@ pub struct Groups {
     /// - OWNERS_ONLY 
     /// - NONE
     #[serde(rename="whoCanModerateContent")]
+    
     pub who_can_moderate_content: Option<String>,
     /// Specifies who can manage members. Possible values are:  
     /// - ALL_MEMBERS 
@@ -472,6 +524,7 @@ pub struct Groups {
     /// - OWNERS_ONLY 
     /// - NONE
     #[serde(rename="whoCanModerateMembers")]
+    
     pub who_can_moderate_members: Option<String>,
     /// Deprecated. This is merged into the new whoCanModerateMembers setting. Specifies who can change group members' roles. Possible values are:  
     /// - ALL_MEMBERS 
@@ -479,6 +532,7 @@ pub struct Groups {
     /// - OWNERS_ONLY 
     /// - NONE
     #[serde(rename="whoCanModifyMembers")]
+    
     pub who_can_modify_members: Option<String>,
     /// Deprecated. This is merged into the new whoCanAssistContent setting. Permission to change tags and categories. Possible values are:  
     /// - ALL_MEMBERS 
@@ -487,6 +541,7 @@ pub struct Groups {
     /// - OWNERS_ONLY 
     /// - NONE
     #[serde(rename="whoCanModifyTagsAndCategories")]
+    
     pub who_can_modify_tags_and_categories: Option<String>,
     /// Deprecated. This is merged into the new whoCanModerateContent setting. Specifies who can move topics into the group or forum. Possible values are:  
     /// - ALL_MEMBERS 
@@ -494,6 +549,7 @@ pub struct Groups {
     /// - OWNERS_ONLY 
     /// - NONE
     #[serde(rename="whoCanMoveTopicsIn")]
+    
     pub who_can_move_topics_in: Option<String>,
     /// Deprecated. This is merged into the new whoCanModerateContent setting. Specifies who can move topics out of the group or forum. Possible values are:  
     /// - ALL_MEMBERS 
@@ -501,6 +557,7 @@ pub struct Groups {
     /// - OWNERS_ONLY 
     /// - NONE
     #[serde(rename="whoCanMoveTopicsOut")]
+    
     pub who_can_move_topics_out: Option<String>,
     /// Deprecated. This is merged into the new whoCanModerateContent setting. Specifies who can post announcements, a special topic type. Possible values are:  
     /// - ALL_MEMBERS 
@@ -508,6 +565,7 @@ pub struct Groups {
     /// - OWNERS_ONLY 
     /// - NONE
     #[serde(rename="whoCanPostAnnouncements")]
+    
     pub who_can_post_announcements: Option<String>,
     /// Permissions to post messages. Possible values are:  
     /// - NONE_CAN_POST: The group is disabled and archived. No one can post a message to this group.  
@@ -519,6 +577,7 @@ pub struct Groups {
     /// - ALL_IN_DOMAIN_CAN_POST: Anyone in the account can post a message.  
     /// - ANYONE_CAN_POST: Any Internet user who outside your account can access your Google Groups service and post a message. Note: When whoCanPostMessage is set to ANYONE_CAN_POST, we recommend the messageModerationLevel be set to MODERATE_NON_MEMBERS to protect the group from possible spam.
     #[serde(rename="whoCanPostMessage")]
+    
     pub who_can_post_message: Option<String>,
     /// Deprecated. This is merged into the new whoCanAssistContent setting. Permission to take topics in a forum. Possible values are:  
     /// - ALL_MEMBERS 
@@ -527,6 +586,7 @@ pub struct Groups {
     /// - OWNERS_ONLY 
     /// - NONE
     #[serde(rename="whoCanTakeTopics")]
+    
     pub who_can_take_topics: Option<String>,
     /// Deprecated. This is merged into the new whoCanAssistContent setting. Permission to unassign any topic in a forum. Possible values are:  
     /// - ALL_MEMBERS 
@@ -535,6 +595,7 @@ pub struct Groups {
     /// - OWNERS_ONLY 
     /// - NONE
     #[serde(rename="whoCanUnassignTopic")]
+    
     pub who_can_unassign_topic: Option<String>,
     /// Deprecated. This is merged into the new whoCanAssistContent setting. Permission to unmark any post from a favorite reply. Possible values are:  
     /// - ALL_MEMBERS 
@@ -543,6 +604,7 @@ pub struct Groups {
     /// - OWNERS_ONLY 
     /// - NONE
     #[serde(rename="whoCanUnmarkFavoriteReplyOnAnyTopic")]
+    
     pub who_can_unmark_favorite_reply_on_any_topic: Option<String>,
     /// Permissions to view group messages. Possible values are:  
     /// - ANYONE_CAN_VIEW: Any Internet user can view the group's messages.  
@@ -550,6 +612,7 @@ pub struct Groups {
     /// - ALL_MEMBERS_CAN_VIEW: All group members can view the group's messages. 
     /// - ALL_MANAGERS_CAN_VIEW: Any group manager can view this group's messages.
     #[serde(rename="whoCanViewGroup")]
+    
     pub who_can_view_group: Option<String>,
     /// Permissions to view membership. Possible values are:  
     /// - ALL_IN_DOMAIN_CAN_VIEW: Anyone in the account can view the group members list.
@@ -558,6 +621,7 @@ pub struct Groups {
     /// - ALL_MEMBERS_CAN_VIEW: The group members can view the group members list. 
     /// - ALL_MANAGERS_CAN_VIEW: The group managers can view group members list.
     #[serde(rename="whoCanViewMembership")]
+    
     pub who_can_view_membership: Option<String>,
 }
 
@@ -571,7 +635,7 @@ impl client::ResponseResult for Groups {}
 // #################
 
 /// A builder providing access to all methods supported on *group* resources.
-/// It is not used directly, but through the `Groupssettings` hub.
+/// It is not used directly, but through the [`Groupssettings`] hub.
 ///
 /// # Example
 ///
@@ -584,7 +648,7 @@ impl client::ResponseResult for Groups {}
 /// 
 /// # async fn dox() {
 /// use std::default::Default;
-/// use groupssettings1::{Groupssettings, oauth2, hyper, hyper_rustls};
+/// use groupssettings1::{Groupssettings, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// let secret: oauth2::ApplicationSecret = Default::default();
 /// let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -675,7 +739,7 @@ impl<'a, S> GroupMethods<'a, S> {
 /// Gets one resource by id.
 ///
 /// A builder for the *get* method supported by a *group* resource.
-/// It is not used directly, but through a `GroupMethods` instance.
+/// It is not used directly, but through a [`GroupMethods`] instance.
 ///
 /// # Example
 ///
@@ -687,7 +751,7 @@ impl<'a, S> GroupMethods<'a, S> {
 /// # extern crate google_groupssettings1 as groupssettings1;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use groupssettings1::{Groupssettings, oauth2, hyper, hyper_rustls};
+/// # use groupssettings1::{Groupssettings, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
 /// # let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -709,14 +773,14 @@ pub struct GroupGetCall<'a, S>
     _group_unique_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
+    _scopes: BTreeSet<String>
 }
 
 impl<'a, S> client::CallBuilder for GroupGetCall<'a, S> {}
 
 impl<'a, S> GroupGetCall<'a, S>
 where
-    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
     S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
     S::Future: Send + Unpin + 'static,
     S::Error: Into<Box<dyn StdError + Send + Sync>>,
@@ -727,68 +791,53 @@ where
     pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, Groups)> {
         use std::io::{Read, Seek};
         use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::ToParts;
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
         let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
         dlg.begin(client::MethodInfo { id: "groupsSettings.groups.get",
                                http_method: hyper::Method::GET });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
-        params.push(("groupUniqueId", self._group_unique_id.to_string()));
+
         for &field in ["alt", "groupUniqueId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(client::Error::FieldClash(field));
             }
         }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
 
-        params.push(("alt", "json".to_string()));
+        let mut params = Params::with_capacity(3 + self._additional_params.len());
+        params.push("groupUniqueId", self._group_unique_id);
 
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "{groupUniqueId}";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::AppGroupSetting.as_ref().to_string(), ());
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::AppGroupSetting.as_ref().to_string());
         }
 
         for &(find_this, param_name) in [("{groupUniqueId}", "groupUniqueId")].iter() {
-            let mut replace_with: Option<&str> = None;
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = Some(value);
-                    break;
-                }
-            }
-            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+            url = params.uri_replacement(url, param_name, find_this, false);
         }
         {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
-            for param_name in ["groupUniqueId"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
+            let to_remove = ["groupUniqueId"];
+            params.remove_params(&to_remove);
         }
 
-        let url = url::Url::parse_with_params(&url, params).unwrap();
+        let url = params.parse_with_url(&url);
 
 
 
         loop {
-            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
-                Ok(token) => token.clone(),
-                Err(err) => {
-                    match  dlg.token(&err) {
-                        Some(token) => token,
-                        None => {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
                             dlg.finished(false);
-                            return Err(client::Error::MissingToken(err))
+                            return Err(client::Error::MissingToken(e));
                         }
                     }
                 }
@@ -796,21 +845,27 @@ where
             let mut req_result = {
                 let client = &self.hub.client;
                 dlg.pre_request();
-                let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
-                        .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::GET)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
 
 
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
-                
+
             };
 
             match req_result {
                 Err(err) => {
                     if let client::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep(d).await;
                         continue;
                     }
                     dlg.finished(false);
@@ -826,7 +881,7 @@ where
                         let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
                         if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
-                            sleep(d);
+                            sleep(d).await;
                             continue;
                         }
 
@@ -870,7 +925,8 @@ where
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.````
     ///
     /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> GroupGetCall<'a, S> {
@@ -902,25 +958,36 @@ where
 
     /// Identifies the authorization scope for the method you are building.
     ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::AppGroupSetting`.
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::AppGroupSetting`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
     ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, St>(mut self, scope: T) -> GroupGetCall<'a, S>
-                                                        where T: Into<Option<St>>,
-                                                              St: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
+    pub fn add_scope<St>(mut self, scope: St) -> GroupGetCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> GroupGetCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> GroupGetCall<'a, S> {
+        self._scopes.clear();
         self
     }
 }
@@ -929,7 +996,7 @@ where
 /// Updates an existing resource. This method supports patch semantics.
 ///
 /// A builder for the *patch* method supported by a *group* resource.
-/// It is not used directly, but through a `GroupMethods` instance.
+/// It is not used directly, but through a [`GroupMethods`] instance.
 ///
 /// # Example
 ///
@@ -942,7 +1009,7 @@ where
 /// use groupssettings1::api::Groups;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use groupssettings1::{Groupssettings, oauth2, hyper, hyper_rustls};
+/// # use groupssettings1::{Groupssettings, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
 /// # let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -970,14 +1037,14 @@ pub struct GroupPatchCall<'a, S>
     _group_unique_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
+    _scopes: BTreeSet<String>
 }
 
 impl<'a, S> client::CallBuilder for GroupPatchCall<'a, S> {}
 
 impl<'a, S> GroupPatchCall<'a, S>
 where
-    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
     S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
     S::Future: Send + Unpin + 'static,
     S::Error: Into<Box<dyn StdError + Send + Sync>>,
@@ -988,58 +1055,43 @@ where
     pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, Groups)> {
         use std::io::{Read, Seek};
         use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::ToParts;
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
         let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
         dlg.begin(client::MethodInfo { id: "groupsSettings.groups.patch",
                                http_method: hyper::Method::PATCH });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
-        params.push(("groupUniqueId", self._group_unique_id.to_string()));
+
         for &field in ["alt", "groupUniqueId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(client::Error::FieldClash(field));
             }
         }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
 
-        params.push(("alt", "json".to_string()));
+        let mut params = Params::with_capacity(4 + self._additional_params.len());
+        params.push("groupUniqueId", self._group_unique_id);
 
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "{groupUniqueId}";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::AppGroupSetting.as_ref().to_string(), ());
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::AppGroupSetting.as_ref().to_string());
         }
 
         for &(find_this, param_name) in [("{groupUniqueId}", "groupUniqueId")].iter() {
-            let mut replace_with: Option<&str> = None;
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = Some(value);
-                    break;
-                }
-            }
-            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+            url = params.uri_replacement(url, param_name, find_this, false);
         }
         {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
-            for param_name in ["groupUniqueId"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
+            let to_remove = ["groupUniqueId"];
+            params.remove_params(&to_remove);
         }
 
-        let url = url::Url::parse_with_params(&url, params).unwrap();
+        let url = params.parse_with_url(&url);
 
-        let mut json_mime_type: mime::Mime = "application/json".parse().unwrap();
+        let mut json_mime_type = mime::APPLICATION_JSON;
         let mut request_value_reader =
             {
                 let mut value = json::value::to_value(&self._request).expect("serde to work");
@@ -1053,14 +1105,14 @@ where
 
 
         loop {
-            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
-                Ok(token) => token.clone(),
-                Err(err) => {
-                    match  dlg.token(&err) {
-                        Some(token) => token,
-                        None => {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
                             dlg.finished(false);
-                            return Err(client::Error::MissingToken(err))
+                            return Err(client::Error::MissingToken(e));
                         }
                     }
                 }
@@ -1069,23 +1121,29 @@ where
             let mut req_result = {
                 let client = &self.hub.client;
                 dlg.pre_request();
-                let mut req_builder = hyper::Request::builder().method(hyper::Method::PATCH).uri(url.clone().into_string())
-                        .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::PATCH)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
 
 
                         let request = req_builder
-                        .header(CONTENT_TYPE, format!("{}", json_mime_type.to_string()))
+                        .header(CONTENT_TYPE, json_mime_type.to_string())
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
                 client.request(request.unwrap()).await
-                
+
             };
 
             match req_result {
                 Err(err) => {
                     if let client::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep(d).await;
                         continue;
                     }
                     dlg.finished(false);
@@ -1101,7 +1159,7 @@ where
                         let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
                         if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
-                            sleep(d);
+                            sleep(d).await;
                             continue;
                         }
 
@@ -1154,7 +1212,8 @@ where
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.````
     ///
     /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> GroupPatchCall<'a, S> {
@@ -1186,25 +1245,36 @@ where
 
     /// Identifies the authorization scope for the method you are building.
     ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::AppGroupSetting`.
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::AppGroupSetting`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
     ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, St>(mut self, scope: T) -> GroupPatchCall<'a, S>
-                                                        where T: Into<Option<St>>,
-                                                              St: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
+    pub fn add_scope<St>(mut self, scope: St) -> GroupPatchCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> GroupPatchCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> GroupPatchCall<'a, S> {
+        self._scopes.clear();
         self
     }
 }
@@ -1213,7 +1283,7 @@ where
 /// Updates an existing resource.
 ///
 /// A builder for the *update* method supported by a *group* resource.
-/// It is not used directly, but through a `GroupMethods` instance.
+/// It is not used directly, but through a [`GroupMethods`] instance.
 ///
 /// # Example
 ///
@@ -1226,7 +1296,7 @@ where
 /// use groupssettings1::api::Groups;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use groupssettings1::{Groupssettings, oauth2, hyper, hyper_rustls};
+/// # use groupssettings1::{Groupssettings, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
 /// # let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -1254,14 +1324,14 @@ pub struct GroupUpdateCall<'a, S>
     _group_unique_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
+    _scopes: BTreeSet<String>
 }
 
 impl<'a, S> client::CallBuilder for GroupUpdateCall<'a, S> {}
 
 impl<'a, S> GroupUpdateCall<'a, S>
 where
-    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
     S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
     S::Future: Send + Unpin + 'static,
     S::Error: Into<Box<dyn StdError + Send + Sync>>,
@@ -1272,58 +1342,43 @@ where
     pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, Groups)> {
         use std::io::{Read, Seek};
         use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::ToParts;
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
         let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
         dlg.begin(client::MethodInfo { id: "groupsSettings.groups.update",
                                http_method: hyper::Method::PUT });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
-        params.push(("groupUniqueId", self._group_unique_id.to_string()));
+
         for &field in ["alt", "groupUniqueId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(client::Error::FieldClash(field));
             }
         }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
 
-        params.push(("alt", "json".to_string()));
+        let mut params = Params::with_capacity(4 + self._additional_params.len());
+        params.push("groupUniqueId", self._group_unique_id);
 
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "{groupUniqueId}";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::AppGroupSetting.as_ref().to_string(), ());
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::AppGroupSetting.as_ref().to_string());
         }
 
         for &(find_this, param_name) in [("{groupUniqueId}", "groupUniqueId")].iter() {
-            let mut replace_with: Option<&str> = None;
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = Some(value);
-                    break;
-                }
-            }
-            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+            url = params.uri_replacement(url, param_name, find_this, false);
         }
         {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
-            for param_name in ["groupUniqueId"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
+            let to_remove = ["groupUniqueId"];
+            params.remove_params(&to_remove);
         }
 
-        let url = url::Url::parse_with_params(&url, params).unwrap();
+        let url = params.parse_with_url(&url);
 
-        let mut json_mime_type: mime::Mime = "application/json".parse().unwrap();
+        let mut json_mime_type = mime::APPLICATION_JSON;
         let mut request_value_reader =
             {
                 let mut value = json::value::to_value(&self._request).expect("serde to work");
@@ -1337,14 +1392,14 @@ where
 
 
         loop {
-            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
-                Ok(token) => token.clone(),
-                Err(err) => {
-                    match  dlg.token(&err) {
-                        Some(token) => token,
-                        None => {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
                             dlg.finished(false);
-                            return Err(client::Error::MissingToken(err))
+                            return Err(client::Error::MissingToken(e));
                         }
                     }
                 }
@@ -1353,23 +1408,29 @@ where
             let mut req_result = {
                 let client = &self.hub.client;
                 dlg.pre_request();
-                let mut req_builder = hyper::Request::builder().method(hyper::Method::PUT).uri(url.clone().into_string())
-                        .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::PUT)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
 
 
                         let request = req_builder
-                        .header(CONTENT_TYPE, format!("{}", json_mime_type.to_string()))
+                        .header(CONTENT_TYPE, json_mime_type.to_string())
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
                 client.request(request.unwrap()).await
-                
+
             };
 
             match req_result {
                 Err(err) => {
                     if let client::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep(d).await;
                         continue;
                     }
                     dlg.finished(false);
@@ -1385,7 +1446,7 @@ where
                         let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
                         if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
-                            sleep(d);
+                            sleep(d).await;
                             continue;
                         }
 
@@ -1438,7 +1499,8 @@ where
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.````
     ///
     /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> GroupUpdateCall<'a, S> {
@@ -1470,25 +1532,36 @@ where
 
     /// Identifies the authorization scope for the method you are building.
     ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::AppGroupSetting`.
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::AppGroupSetting`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
     ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, St>(mut self, scope: T) -> GroupUpdateCall<'a, S>
-                                                        where T: Into<Option<St>>,
-                                                              St: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
+    pub fn add_scope<St>(mut self, scope: St) -> GroupUpdateCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> GroupUpdateCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> GroupUpdateCall<'a, S> {
+        self._scopes.clear();
         self
     }
 }

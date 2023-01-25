@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/generator/templates/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Certificate Manager* crate version *4.0.1+20220214*, where *20220214* is the exact revision of the *certificatemanager:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v4.0.1*.
+//! This documentation was generated from *Certificate Manager* crate version *5.0.2-beta-1+20230104*, where *20230104* is the exact revision of the *certificatemanager:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.2-beta-1*.
 //! 
 //! Everything else about the *Certificate Manager* *v1* API can be found at the
 //! [official documentation site](https://cloud.google.com/certificate-manager).
@@ -12,7 +12,7 @@
 //! Handle the following *Resources* with ease from the central [hub](CertificateManager) ... 
 //! 
 //! * projects
-//!  * [*locations certificate maps certificate map entries create*](api::ProjectLocationCertificateMapCertificateMapEntryCreateCall), [*locations certificate maps certificate map entries delete*](api::ProjectLocationCertificateMapCertificateMapEntryDeleteCall), [*locations certificate maps certificate map entries get*](api::ProjectLocationCertificateMapCertificateMapEntryGetCall), [*locations certificate maps certificate map entries list*](api::ProjectLocationCertificateMapCertificateMapEntryListCall), [*locations certificate maps certificate map entries patch*](api::ProjectLocationCertificateMapCertificateMapEntryPatchCall), [*locations certificate maps create*](api::ProjectLocationCertificateMapCreateCall), [*locations certificate maps delete*](api::ProjectLocationCertificateMapDeleteCall), [*locations certificate maps get*](api::ProjectLocationCertificateMapGetCall), [*locations certificate maps list*](api::ProjectLocationCertificateMapListCall), [*locations certificate maps patch*](api::ProjectLocationCertificateMapPatchCall), [*locations certificates create*](api::ProjectLocationCertificateCreateCall), [*locations certificates delete*](api::ProjectLocationCertificateDeleteCall), [*locations certificates get*](api::ProjectLocationCertificateGetCall), [*locations certificates list*](api::ProjectLocationCertificateListCall), [*locations certificates patch*](api::ProjectLocationCertificatePatchCall), [*locations dns authorizations create*](api::ProjectLocationDnsAuthorizationCreateCall), [*locations dns authorizations delete*](api::ProjectLocationDnsAuthorizationDeleteCall), [*locations dns authorizations get*](api::ProjectLocationDnsAuthorizationGetCall), [*locations dns authorizations list*](api::ProjectLocationDnsAuthorizationListCall), [*locations dns authorizations patch*](api::ProjectLocationDnsAuthorizationPatchCall), [*locations get*](api::ProjectLocationGetCall), [*locations list*](api::ProjectLocationListCall), [*locations operations cancel*](api::ProjectLocationOperationCancelCall), [*locations operations delete*](api::ProjectLocationOperationDeleteCall), [*locations operations get*](api::ProjectLocationOperationGetCall) and [*locations operations list*](api::ProjectLocationOperationListCall)
+//!  * [*locations certificate issuance configs create*](api::ProjectLocationCertificateIssuanceConfigCreateCall), [*locations certificate issuance configs delete*](api::ProjectLocationCertificateIssuanceConfigDeleteCall), [*locations certificate issuance configs get*](api::ProjectLocationCertificateIssuanceConfigGetCall), [*locations certificate issuance configs list*](api::ProjectLocationCertificateIssuanceConfigListCall), [*locations certificate maps certificate map entries create*](api::ProjectLocationCertificateMapCertificateMapEntryCreateCall), [*locations certificate maps certificate map entries delete*](api::ProjectLocationCertificateMapCertificateMapEntryDeleteCall), [*locations certificate maps certificate map entries get*](api::ProjectLocationCertificateMapCertificateMapEntryGetCall), [*locations certificate maps certificate map entries list*](api::ProjectLocationCertificateMapCertificateMapEntryListCall), [*locations certificate maps certificate map entries patch*](api::ProjectLocationCertificateMapCertificateMapEntryPatchCall), [*locations certificate maps create*](api::ProjectLocationCertificateMapCreateCall), [*locations certificate maps delete*](api::ProjectLocationCertificateMapDeleteCall), [*locations certificate maps get*](api::ProjectLocationCertificateMapGetCall), [*locations certificate maps list*](api::ProjectLocationCertificateMapListCall), [*locations certificate maps patch*](api::ProjectLocationCertificateMapPatchCall), [*locations certificates create*](api::ProjectLocationCertificateCreateCall), [*locations certificates delete*](api::ProjectLocationCertificateDeleteCall), [*locations certificates get*](api::ProjectLocationCertificateGetCall), [*locations certificates list*](api::ProjectLocationCertificateListCall), [*locations certificates patch*](api::ProjectLocationCertificatePatchCall), [*locations dns authorizations create*](api::ProjectLocationDnsAuthorizationCreateCall), [*locations dns authorizations delete*](api::ProjectLocationDnsAuthorizationDeleteCall), [*locations dns authorizations get*](api::ProjectLocationDnsAuthorizationGetCall), [*locations dns authorizations list*](api::ProjectLocationDnsAuthorizationListCall), [*locations dns authorizations patch*](api::ProjectLocationDnsAuthorizationPatchCall), [*locations get*](api::ProjectLocationGetCall), [*locations list*](api::ProjectLocationListCall), [*locations operations cancel*](api::ProjectLocationOperationCancelCall), [*locations operations delete*](api::ProjectLocationOperationDeleteCall), [*locations operations get*](api::ProjectLocationOperationGetCall) and [*locations operations list*](api::ProjectLocationOperationListCall)
 //! 
 //! 
 //! 
@@ -47,6 +47,8 @@
 //! Or specifically ...
 //! 
 //! ```ignore
+//! let r = hub.projects().locations_certificate_issuance_configs_create(...).doit().await
+//! let r = hub.projects().locations_certificate_issuance_configs_delete(...).doit().await
 //! let r = hub.projects().locations_certificate_maps_certificate_map_entries_create(...).doit().await
 //! let r = hub.projects().locations_certificate_maps_certificate_map_entries_delete(...).doit().await
 //! let r = hub.projects().locations_certificate_maps_certificate_map_entries_patch(...).doit().await
@@ -86,11 +88,11 @@
 //! extern crate hyper;
 //! extern crate hyper_rustls;
 //! extern crate google_certificatemanager1 as certificatemanager1;
-//! use certificatemanager1::api::CertificateMapEntry;
+//! use certificatemanager1::api::CertificateIssuanceConfig;
 //! use certificatemanager1::{Result, Error};
 //! # async fn dox() {
 //! use std::default::Default;
-//! use certificatemanager1::{CertificateManager, oauth2, hyper, hyper_rustls};
+//! use certificatemanager1::{CertificateManager, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 //! 
 //! // Get an ApplicationSecret instance by some means. It contains the `client_id` and 
 //! // `client_secret`, among other things.
@@ -108,13 +110,13 @@
 //! // As the method needs a request, you would usually fill it with the desired information
 //! // into the respective structure. Some of the parts shown here might not be applicable !
 //! // Values shown here are possibly random and not representative !
-//! let mut req = CertificateMapEntry::default();
+//! let mut req = CertificateIssuanceConfig::default();
 //! 
 //! // You can configure optional parameters by calling the respective setters at will, and
 //! // execute the final call using `doit()`.
 //! // Values shown here are possibly random and not representative !
-//! let result = hub.projects().locations_certificate_maps_certificate_map_entries_create(req, "parent")
-//!              .certificate_map_entry_id("ipsum")
+//! let result = hub.projects().locations_certificate_issuance_configs_create(req, "parent")
+//!              .certificate_issuance_config_id("ipsum")
 //!              .doit().await;
 //! 
 //! match result {
@@ -200,22 +202,17 @@
 // This file was generated automatically from 'src/generator/templates/api/lib.rs.mako'
 // DO NOT EDIT !
 
-#[macro_use]
-extern crate serde_derive;
-
 // Re-export the hyper and hyper_rustls crate, they are required to build the hub
-pub extern crate hyper;
-pub extern crate hyper_rustls;
-extern crate serde;
-extern crate serde_json;
-// Re-export the yup_oauth2 crate, that is required to call some methods of the hub and the client
-pub extern crate yup_oauth2 as oauth2;
-extern crate mime;
-extern crate url;
-
+pub use hyper;
+pub use hyper_rustls;
+pub extern crate google_apis_common as client;
+pub use client::chrono;
 pub mod api;
-pub mod client;
 
 // Re-export the hub type and some basic client structs
 pub use api::CertificateManager;
-pub use client::{Result, Error, Delegate};
+pub use client::{Result, Error, Delegate, FieldMask};
+
+// Re-export the yup_oauth2 crate, that is required to call some methods of the hub and the client
+#[cfg(feature = "yup-oauth2")]
+pub use client::oauth2;

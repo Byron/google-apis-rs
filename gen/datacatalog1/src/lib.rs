@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/generator/templates/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Data Catalog* crate version *4.0.1+20220224*, where *20220224* is the exact revision of the *datacatalog:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v4.0.1*.
+//! This documentation was generated from *Data Catalog* crate version *5.0.2-beta-1+20230117*, where *20230117* is the exact revision of the *datacatalog:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.2-beta-1*.
 //! 
 //! Everything else about the *Data Catalog* *v1* API can be found at the
 //! [official documentation site](https://cloud.google.com/data-catalog/docs/).
@@ -16,7 +16,7 @@
 //! * entries
 //!  * [*lookup*](api::EntryLookupCall)
 //! * projects
-//!  * [*locations entry groups create*](api::ProjectLocationEntryGroupCreateCall), [*locations entry groups delete*](api::ProjectLocationEntryGroupDeleteCall), [*locations entry groups entries create*](api::ProjectLocationEntryGroupEntryCreateCall), [*locations entry groups entries delete*](api::ProjectLocationEntryGroupEntryDeleteCall), [*locations entry groups entries get*](api::ProjectLocationEntryGroupEntryGetCall), [*locations entry groups entries get iam policy*](api::ProjectLocationEntryGroupEntryGetIamPolicyCall), [*locations entry groups entries list*](api::ProjectLocationEntryGroupEntryListCall), [*locations entry groups entries modify entry contacts*](api::ProjectLocationEntryGroupEntryModifyEntryContactCall), [*locations entry groups entries modify entry overview*](api::ProjectLocationEntryGroupEntryModifyEntryOverviewCall), [*locations entry groups entries patch*](api::ProjectLocationEntryGroupEntryPatchCall), [*locations entry groups entries star*](api::ProjectLocationEntryGroupEntryStarCall), [*locations entry groups entries tags create*](api::ProjectLocationEntryGroupEntryTagCreateCall), [*locations entry groups entries tags delete*](api::ProjectLocationEntryGroupEntryTagDeleteCall), [*locations entry groups entries tags list*](api::ProjectLocationEntryGroupEntryTagListCall), [*locations entry groups entries tags patch*](api::ProjectLocationEntryGroupEntryTagPatchCall), [*locations entry groups entries test iam permissions*](api::ProjectLocationEntryGroupEntryTestIamPermissionCall), [*locations entry groups entries unstar*](api::ProjectLocationEntryGroupEntryUnstarCall), [*locations entry groups get*](api::ProjectLocationEntryGroupGetCall), [*locations entry groups get iam policy*](api::ProjectLocationEntryGroupGetIamPolicyCall), [*locations entry groups list*](api::ProjectLocationEntryGroupListCall), [*locations entry groups patch*](api::ProjectLocationEntryGroupPatchCall), [*locations entry groups set iam policy*](api::ProjectLocationEntryGroupSetIamPolicyCall), [*locations entry groups tags create*](api::ProjectLocationEntryGroupTagCreateCall), [*locations entry groups tags delete*](api::ProjectLocationEntryGroupTagDeleteCall), [*locations entry groups tags list*](api::ProjectLocationEntryGroupTagListCall), [*locations entry groups tags patch*](api::ProjectLocationEntryGroupTagPatchCall), [*locations entry groups test iam permissions*](api::ProjectLocationEntryGroupTestIamPermissionCall), [*locations tag templates create*](api::ProjectLocationTagTemplateCreateCall), [*locations tag templates delete*](api::ProjectLocationTagTemplateDeleteCall), [*locations tag templates fields create*](api::ProjectLocationTagTemplateFieldCreateCall), [*locations tag templates fields delete*](api::ProjectLocationTagTemplateFieldDeleteCall), [*locations tag templates fields enum values rename*](api::ProjectLocationTagTemplateFieldEnumValueRenameCall), [*locations tag templates fields patch*](api::ProjectLocationTagTemplateFieldPatchCall), [*locations tag templates fields rename*](api::ProjectLocationTagTemplateFieldRenameCall), [*locations tag templates get*](api::ProjectLocationTagTemplateGetCall), [*locations tag templates get iam policy*](api::ProjectLocationTagTemplateGetIamPolicyCall), [*locations tag templates patch*](api::ProjectLocationTagTemplatePatchCall), [*locations tag templates set iam policy*](api::ProjectLocationTagTemplateSetIamPolicyCall), [*locations tag templates test iam permissions*](api::ProjectLocationTagTemplateTestIamPermissionCall), [*locations taxonomies create*](api::ProjectLocationTaxonomyCreateCall), [*locations taxonomies delete*](api::ProjectLocationTaxonomyDeleteCall), [*locations taxonomies export*](api::ProjectLocationTaxonomyExportCall), [*locations taxonomies get*](api::ProjectLocationTaxonomyGetCall), [*locations taxonomies get iam policy*](api::ProjectLocationTaxonomyGetIamPolicyCall), [*locations taxonomies import*](api::ProjectLocationTaxonomyImportCall), [*locations taxonomies list*](api::ProjectLocationTaxonomyListCall), [*locations taxonomies patch*](api::ProjectLocationTaxonomyPatchCall), [*locations taxonomies policy tags create*](api::ProjectLocationTaxonomyPolicyTagCreateCall), [*locations taxonomies policy tags delete*](api::ProjectLocationTaxonomyPolicyTagDeleteCall), [*locations taxonomies policy tags get*](api::ProjectLocationTaxonomyPolicyTagGetCall), [*locations taxonomies policy tags get iam policy*](api::ProjectLocationTaxonomyPolicyTagGetIamPolicyCall), [*locations taxonomies policy tags list*](api::ProjectLocationTaxonomyPolicyTagListCall), [*locations taxonomies policy tags patch*](api::ProjectLocationTaxonomyPolicyTagPatchCall), [*locations taxonomies policy tags set iam policy*](api::ProjectLocationTaxonomyPolicyTagSetIamPolicyCall), [*locations taxonomies policy tags test iam permissions*](api::ProjectLocationTaxonomyPolicyTagTestIamPermissionCall), [*locations taxonomies replace*](api::ProjectLocationTaxonomyReplaceCall), [*locations taxonomies set iam policy*](api::ProjectLocationTaxonomySetIamPolicyCall) and [*locations taxonomies test iam permissions*](api::ProjectLocationTaxonomyTestIamPermissionCall)
+//!  * [*locations entry groups create*](api::ProjectLocationEntryGroupCreateCall), [*locations entry groups delete*](api::ProjectLocationEntryGroupDeleteCall), [*locations entry groups entries create*](api::ProjectLocationEntryGroupEntryCreateCall), [*locations entry groups entries delete*](api::ProjectLocationEntryGroupEntryDeleteCall), [*locations entry groups entries get*](api::ProjectLocationEntryGroupEntryGetCall), [*locations entry groups entries get iam policy*](api::ProjectLocationEntryGroupEntryGetIamPolicyCall), [*locations entry groups entries import*](api::ProjectLocationEntryGroupEntryImportCall), [*locations entry groups entries list*](api::ProjectLocationEntryGroupEntryListCall), [*locations entry groups entries modify entry contacts*](api::ProjectLocationEntryGroupEntryModifyEntryContactCall), [*locations entry groups entries modify entry overview*](api::ProjectLocationEntryGroupEntryModifyEntryOverviewCall), [*locations entry groups entries patch*](api::ProjectLocationEntryGroupEntryPatchCall), [*locations entry groups entries star*](api::ProjectLocationEntryGroupEntryStarCall), [*locations entry groups entries tags create*](api::ProjectLocationEntryGroupEntryTagCreateCall), [*locations entry groups entries tags delete*](api::ProjectLocationEntryGroupEntryTagDeleteCall), [*locations entry groups entries tags list*](api::ProjectLocationEntryGroupEntryTagListCall), [*locations entry groups entries tags patch*](api::ProjectLocationEntryGroupEntryTagPatchCall), [*locations entry groups entries test iam permissions*](api::ProjectLocationEntryGroupEntryTestIamPermissionCall), [*locations entry groups entries unstar*](api::ProjectLocationEntryGroupEntryUnstarCall), [*locations entry groups get*](api::ProjectLocationEntryGroupGetCall), [*locations entry groups get iam policy*](api::ProjectLocationEntryGroupGetIamPolicyCall), [*locations entry groups list*](api::ProjectLocationEntryGroupListCall), [*locations entry groups patch*](api::ProjectLocationEntryGroupPatchCall), [*locations entry groups set iam policy*](api::ProjectLocationEntryGroupSetIamPolicyCall), [*locations entry groups tags create*](api::ProjectLocationEntryGroupTagCreateCall), [*locations entry groups tags delete*](api::ProjectLocationEntryGroupTagDeleteCall), [*locations entry groups tags list*](api::ProjectLocationEntryGroupTagListCall), [*locations entry groups tags patch*](api::ProjectLocationEntryGroupTagPatchCall), [*locations entry groups test iam permissions*](api::ProjectLocationEntryGroupTestIamPermissionCall), [*locations operations cancel*](api::ProjectLocationOperationCancelCall), [*locations operations delete*](api::ProjectLocationOperationDeleteCall), [*locations operations get*](api::ProjectLocationOperationGetCall), [*locations operations list*](api::ProjectLocationOperationListCall), [*locations tag templates create*](api::ProjectLocationTagTemplateCreateCall), [*locations tag templates delete*](api::ProjectLocationTagTemplateDeleteCall), [*locations tag templates fields create*](api::ProjectLocationTagTemplateFieldCreateCall), [*locations tag templates fields delete*](api::ProjectLocationTagTemplateFieldDeleteCall), [*locations tag templates fields enum values rename*](api::ProjectLocationTagTemplateFieldEnumValueRenameCall), [*locations tag templates fields patch*](api::ProjectLocationTagTemplateFieldPatchCall), [*locations tag templates fields rename*](api::ProjectLocationTagTemplateFieldRenameCall), [*locations tag templates get*](api::ProjectLocationTagTemplateGetCall), [*locations tag templates get iam policy*](api::ProjectLocationTagTemplateGetIamPolicyCall), [*locations tag templates patch*](api::ProjectLocationTagTemplatePatchCall), [*locations tag templates set iam policy*](api::ProjectLocationTagTemplateSetIamPolicyCall), [*locations tag templates test iam permissions*](api::ProjectLocationTagTemplateTestIamPermissionCall), [*locations taxonomies create*](api::ProjectLocationTaxonomyCreateCall), [*locations taxonomies delete*](api::ProjectLocationTaxonomyDeleteCall), [*locations taxonomies export*](api::ProjectLocationTaxonomyExportCall), [*locations taxonomies get*](api::ProjectLocationTaxonomyGetCall), [*locations taxonomies get iam policy*](api::ProjectLocationTaxonomyGetIamPolicyCall), [*locations taxonomies import*](api::ProjectLocationTaxonomyImportCall), [*locations taxonomies list*](api::ProjectLocationTaxonomyListCall), [*locations taxonomies patch*](api::ProjectLocationTaxonomyPatchCall), [*locations taxonomies policy tags create*](api::ProjectLocationTaxonomyPolicyTagCreateCall), [*locations taxonomies policy tags delete*](api::ProjectLocationTaxonomyPolicyTagDeleteCall), [*locations taxonomies policy tags get*](api::ProjectLocationTaxonomyPolicyTagGetCall), [*locations taxonomies policy tags get iam policy*](api::ProjectLocationTaxonomyPolicyTagGetIamPolicyCall), [*locations taxonomies policy tags list*](api::ProjectLocationTaxonomyPolicyTagListCall), [*locations taxonomies policy tags patch*](api::ProjectLocationTaxonomyPolicyTagPatchCall), [*locations taxonomies policy tags set iam policy*](api::ProjectLocationTaxonomyPolicyTagSetIamPolicyCall), [*locations taxonomies policy tags test iam permissions*](api::ProjectLocationTaxonomyPolicyTagTestIamPermissionCall), [*locations taxonomies replace*](api::ProjectLocationTaxonomyReplaceCall), [*locations taxonomies set iam policy*](api::ProjectLocationTaxonomySetIamPolicyCall) and [*locations taxonomies test iam permissions*](api::ProjectLocationTaxonomyTestIamPermissionCall)
 //! 
 //! 
 //! 
@@ -51,15 +51,16 @@
 //! Or specifically ...
 //! 
 //! ```ignore
-//! let r = hub.projects().locations_entry_groups_entries_get_iam_policy(...).doit().await
-//! let r = hub.projects().locations_entry_groups_get_iam_policy(...).doit().await
-//! let r = hub.projects().locations_entry_groups_set_iam_policy(...).doit().await
-//! let r = hub.projects().locations_tag_templates_get_iam_policy(...).doit().await
-//! let r = hub.projects().locations_tag_templates_set_iam_policy(...).doit().await
-//! let r = hub.projects().locations_taxonomies_policy_tags_get_iam_policy(...).doit().await
-//! let r = hub.projects().locations_taxonomies_policy_tags_set_iam_policy(...).doit().await
-//! let r = hub.projects().locations_taxonomies_get_iam_policy(...).doit().await
-//! let r = hub.projects().locations_taxonomies_set_iam_policy(...).doit().await
+//! let r = hub.projects().locations_entry_groups_entries_tags_delete(...).doit().await
+//! let r = hub.projects().locations_entry_groups_entries_delete(...).doit().await
+//! let r = hub.projects().locations_entry_groups_tags_delete(...).doit().await
+//! let r = hub.projects().locations_entry_groups_delete(...).doit().await
+//! let r = hub.projects().locations_operations_cancel(...).doit().await
+//! let r = hub.projects().locations_operations_delete(...).doit().await
+//! let r = hub.projects().locations_tag_templates_fields_delete(...).doit().await
+//! let r = hub.projects().locations_tag_templates_delete(...).doit().await
+//! let r = hub.projects().locations_taxonomies_policy_tags_delete(...).doit().await
+//! let r = hub.projects().locations_taxonomies_delete(...).doit().await
 //! ```
 //! 
 //! The `resource()` and `activity(...)` calls create [builders][builder-pattern]. The second one dealing with `Activities` 
@@ -86,11 +87,10 @@
 //! extern crate hyper;
 //! extern crate hyper_rustls;
 //! extern crate google_datacatalog1 as datacatalog1;
-//! use datacatalog1::api::GetIamPolicyRequest;
 //! use datacatalog1::{Result, Error};
 //! # async fn dox() {
 //! use std::default::Default;
-//! use datacatalog1::{DataCatalog, oauth2, hyper, hyper_rustls};
+//! use datacatalog1::{DataCatalog, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 //! 
 //! // Get an ApplicationSecret instance by some means. It contains the `client_id` and 
 //! // `client_secret`, among other things.
@@ -105,15 +105,11 @@
 //!         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 //!     ).build().await.unwrap();
 //! let mut hub = DataCatalog::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
-//! // As the method needs a request, you would usually fill it with the desired information
-//! // into the respective structure. Some of the parts shown here might not be applicable !
-//! // Values shown here are possibly random and not representative !
-//! let mut req = GetIamPolicyRequest::default();
-//! 
 //! // You can configure optional parameters by calling the respective setters at will, and
 //! // execute the final call using `doit()`.
 //! // Values shown here are possibly random and not representative !
-//! let result = hub.projects().locations_entry_groups_entries_get_iam_policy(req, "resource")
+//! let result = hub.projects().locations_entry_groups_delete("name")
+//!              .force(false)
 //!              .doit().await;
 //! 
 //! match result {
@@ -199,22 +195,17 @@
 // This file was generated automatically from 'src/generator/templates/api/lib.rs.mako'
 // DO NOT EDIT !
 
-#[macro_use]
-extern crate serde_derive;
-
 // Re-export the hyper and hyper_rustls crate, they are required to build the hub
-pub extern crate hyper;
-pub extern crate hyper_rustls;
-extern crate serde;
-extern crate serde_json;
-// Re-export the yup_oauth2 crate, that is required to call some methods of the hub and the client
-pub extern crate yup_oauth2 as oauth2;
-extern crate mime;
-extern crate url;
-
+pub use hyper;
+pub use hyper_rustls;
+pub extern crate google_apis_common as client;
+pub use client::chrono;
 pub mod api;
-pub mod client;
 
 // Re-export the hub type and some basic client structs
 pub use api::DataCatalog;
-pub use client::{Result, Error, Delegate};
+pub use client::{Result, Error, Delegate, FieldMask};
+
+// Re-export the yup_oauth2 crate, that is required to call some methods of the hub and the client
+#[cfg(feature = "yup-oauth2")]
+pub use client::oauth2;

@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/generator/templates/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Translate* crate version *4.0.1+20220121*, where *20220121* is the exact revision of the *translate:v3* schema built by the [mako](http://www.makotemplates.org/) code generator *v4.0.1*.
+//! This documentation was generated from *Translate* crate version *5.0.2-beta-1+20230106*, where *20230106* is the exact revision of the *translate:v3* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.2-beta-1*.
 //! 
 //! Everything else about the *Translate* *v3* API can be found at the
 //! [official documentation site](https://cloud.google.com/translate/docs/quickstarts).
@@ -12,7 +12,7 @@
 //! Handle the following *Resources* with ease from the central [hub](Translate) ... 
 //! 
 //! * projects
-//!  * [*detect language*](api::ProjectDetectLanguageCall), [*get supported languages*](api::ProjectGetSupportedLanguageCall), [*locations batch translate document*](api::ProjectLocationBatchTranslateDocumentCall), [*locations batch translate text*](api::ProjectLocationBatchTranslateTextCall), [*locations detect language*](api::ProjectLocationDetectLanguageCall), [*locations get*](api::ProjectLocationGetCall), [*locations get supported languages*](api::ProjectLocationGetSupportedLanguageCall), [*locations glossaries create*](api::ProjectLocationGlossaryCreateCall), [*locations glossaries delete*](api::ProjectLocationGlossaryDeleteCall), [*locations glossaries get*](api::ProjectLocationGlossaryGetCall), [*locations glossaries list*](api::ProjectLocationGlossaryListCall), [*locations list*](api::ProjectLocationListCall), [*locations operations cancel*](api::ProjectLocationOperationCancelCall), [*locations operations delete*](api::ProjectLocationOperationDeleteCall), [*locations operations get*](api::ProjectLocationOperationGetCall), [*locations operations list*](api::ProjectLocationOperationListCall), [*locations operations wait*](api::ProjectLocationOperationWaitCall), [*locations translate document*](api::ProjectLocationTranslateDocumentCall), [*locations translate text*](api::ProjectLocationTranslateTextCall) and [*translate text*](api::ProjectTranslateTextCall)
+//!  * [*detect language*](api::ProjectDetectLanguageCall), [*get supported languages*](api::ProjectGetSupportedLanguageCall), [*locations batch translate document*](api::ProjectLocationBatchTranslateDocumentCall), [*locations batch translate text*](api::ProjectLocationBatchTranslateTextCall), [*locations datasets create*](api::ProjectLocationDatasetCreateCall), [*locations datasets delete*](api::ProjectLocationDatasetDeleteCall), [*locations datasets examples list*](api::ProjectLocationDatasetExampleListCall), [*locations datasets export data*](api::ProjectLocationDatasetExportDataCall), [*locations datasets get*](api::ProjectLocationDatasetGetCall), [*locations datasets import data*](api::ProjectLocationDatasetImportDataCall), [*locations datasets list*](api::ProjectLocationDatasetListCall), [*locations detect language*](api::ProjectLocationDetectLanguageCall), [*locations get*](api::ProjectLocationGetCall), [*locations get supported languages*](api::ProjectLocationGetSupportedLanguageCall), [*locations glossaries create*](api::ProjectLocationGlossaryCreateCall), [*locations glossaries delete*](api::ProjectLocationGlossaryDeleteCall), [*locations glossaries get*](api::ProjectLocationGlossaryGetCall), [*locations glossaries glossary entries create*](api::ProjectLocationGlossaryGlossaryEntryCreateCall), [*locations glossaries glossary entries delete*](api::ProjectLocationGlossaryGlossaryEntryDeleteCall), [*locations glossaries glossary entries get*](api::ProjectLocationGlossaryGlossaryEntryGetCall), [*locations glossaries glossary entries list*](api::ProjectLocationGlossaryGlossaryEntryListCall), [*locations glossaries glossary entries patch*](api::ProjectLocationGlossaryGlossaryEntryPatchCall), [*locations glossaries list*](api::ProjectLocationGlossaryListCall), [*locations glossaries patch*](api::ProjectLocationGlossaryPatchCall), [*locations list*](api::ProjectLocationListCall), [*locations models create*](api::ProjectLocationModelCreateCall), [*locations models delete*](api::ProjectLocationModelDeleteCall), [*locations models get*](api::ProjectLocationModelGetCall), [*locations models list*](api::ProjectLocationModelListCall), [*locations operations cancel*](api::ProjectLocationOperationCancelCall), [*locations operations delete*](api::ProjectLocationOperationDeleteCall), [*locations operations get*](api::ProjectLocationOperationGetCall), [*locations operations list*](api::ProjectLocationOperationListCall), [*locations operations wait*](api::ProjectLocationOperationWaitCall), [*locations translate document*](api::ProjectLocationTranslateDocumentCall), [*locations translate text*](api::ProjectLocationTranslateTextCall) and [*translate text*](api::ProjectTranslateTextCall)
 //! 
 //! 
 //! 
@@ -47,8 +47,15 @@
 //! Or specifically ...
 //! 
 //! ```ignore
+//! let r = hub.projects().locations_datasets_create(...).doit().await
+//! let r = hub.projects().locations_datasets_delete(...).doit().await
+//! let r = hub.projects().locations_datasets_export_data(...).doit().await
+//! let r = hub.projects().locations_datasets_import_data(...).doit().await
 //! let r = hub.projects().locations_glossaries_create(...).doit().await
 //! let r = hub.projects().locations_glossaries_delete(...).doit().await
+//! let r = hub.projects().locations_glossaries_patch(...).doit().await
+//! let r = hub.projects().locations_models_create(...).doit().await
+//! let r = hub.projects().locations_models_delete(...).doit().await
 //! let r = hub.projects().locations_operations_get(...).doit().await
 //! let r = hub.projects().locations_operations_wait(...).doit().await
 //! let r = hub.projects().locations_batch_translate_document(...).doit().await
@@ -83,7 +90,7 @@
 //! use translate3::{Result, Error};
 //! # async fn dox() {
 //! use std::default::Default;
-//! use translate3::{Translate, oauth2, hyper, hyper_rustls};
+//! use translate3::{Translate, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 //! 
 //! // Get an ApplicationSecret instance by some means. It contains the `client_id` and 
 //! // `client_secret`, among other things.
@@ -106,7 +113,8 @@
 //! // You can configure optional parameters by calling the respective setters at will, and
 //! // execute the final call using `doit()`.
 //! // Values shown here are possibly random and not representative !
-//! let result = hub.projects().locations_glossaries_create(req, "parent")
+//! let result = hub.projects().locations_glossaries_patch(req, "name")
+//!              .update_mask(&Default::default())
 //!              .doit().await;
 //! 
 //! match result {
@@ -192,22 +200,17 @@
 // This file was generated automatically from 'src/generator/templates/api/lib.rs.mako'
 // DO NOT EDIT !
 
-#[macro_use]
-extern crate serde_derive;
-
 // Re-export the hyper and hyper_rustls crate, they are required to build the hub
-pub extern crate hyper;
-pub extern crate hyper_rustls;
-extern crate serde;
-extern crate serde_json;
-// Re-export the yup_oauth2 crate, that is required to call some methods of the hub and the client
-pub extern crate yup_oauth2 as oauth2;
-extern crate mime;
-extern crate url;
-
+pub use hyper;
+pub use hyper_rustls;
+pub extern crate google_apis_common as client;
+pub use client::chrono;
 pub mod api;
-pub mod client;
 
 // Re-export the hub type and some basic client structs
 pub use api::Translate;
-pub use client::{Result, Error, Delegate};
+pub use client::{Result, Error, Delegate, FieldMask};
+
+// Re-export the yup_oauth2 crate, that is required to call some methods of the hub and the client
+#[cfg(feature = "yup-oauth2")]
+pub use client::oauth2;

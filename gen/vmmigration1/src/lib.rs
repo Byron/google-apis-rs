@@ -2,17 +2,17 @@
 // This file was generated automatically from 'src/generator/templates/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *VM Migration Service* crate version *4.0.1+20220225*, where *20220225* is the exact revision of the *vmmigration:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v4.0.1*.
+//! This documentation was generated from *VM Migration Service* crate version *5.0.2-beta-1+20230119*, where *20230119* is the exact revision of the *vmmigration:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.2-beta-1*.
 //! 
 //! Everything else about the *VM Migration Service* *v1* API can be found at the
-//! [official documentation site](https://cloud.google.com/migrate/compute-engine).
+//! [official documentation site](https://cloud.google.com/migrate/virtual-machines).
 //! The original source code is [on github](https://github.com/Byron/google-apis-rs/tree/main/gen/vmmigration1).
 //! # Features
 //! 
 //! Handle the following *Resources* with ease from the central [hub](VMMigrationService) ... 
 //! 
 //! * projects
-//!  * [*locations get*](api::ProjectLocationGetCall), [*locations groups add group migration*](api::ProjectLocationGroupAddGroupMigrationCall), [*locations groups create*](api::ProjectLocationGroupCreateCall), [*locations groups delete*](api::ProjectLocationGroupDeleteCall), [*locations groups get*](api::ProjectLocationGroupGetCall), [*locations groups list*](api::ProjectLocationGroupListCall), [*locations groups patch*](api::ProjectLocationGroupPatchCall), [*locations groups remove group migration*](api::ProjectLocationGroupRemoveGroupMigrationCall), [*locations list*](api::ProjectLocationListCall), [*locations operations cancel*](api::ProjectLocationOperationCancelCall), [*locations operations delete*](api::ProjectLocationOperationDeleteCall), [*locations operations get*](api::ProjectLocationOperationGetCall), [*locations operations list*](api::ProjectLocationOperationListCall), [*locations sources create*](api::ProjectLocationSourceCreateCall), [*locations sources datacenter connectors create*](api::ProjectLocationSourceDatacenterConnectorCreateCall), [*locations sources datacenter connectors delete*](api::ProjectLocationSourceDatacenterConnectorDeleteCall), [*locations sources datacenter connectors get*](api::ProjectLocationSourceDatacenterConnectorGetCall), [*locations sources datacenter connectors list*](api::ProjectLocationSourceDatacenterConnectorListCall), [*locations sources datacenter connectors upgrade appliance*](api::ProjectLocationSourceDatacenterConnectorUpgradeApplianceCall), [*locations sources delete*](api::ProjectLocationSourceDeleteCall), [*locations sources fetch inventory*](api::ProjectLocationSourceFetchInventoryCall), [*locations sources get*](api::ProjectLocationSourceGetCall), [*locations sources list*](api::ProjectLocationSourceListCall), [*locations sources migrating vms clone jobs cancel*](api::ProjectLocationSourceMigratingVmCloneJobCancelCall), [*locations sources migrating vms clone jobs create*](api::ProjectLocationSourceMigratingVmCloneJobCreateCall), [*locations sources migrating vms clone jobs get*](api::ProjectLocationSourceMigratingVmCloneJobGetCall), [*locations sources migrating vms clone jobs list*](api::ProjectLocationSourceMigratingVmCloneJobListCall), [*locations sources migrating vms create*](api::ProjectLocationSourceMigratingVmCreateCall), [*locations sources migrating vms cutover jobs cancel*](api::ProjectLocationSourceMigratingVmCutoverJobCancelCall), [*locations sources migrating vms cutover jobs create*](api::ProjectLocationSourceMigratingVmCutoverJobCreateCall), [*locations sources migrating vms cutover jobs get*](api::ProjectLocationSourceMigratingVmCutoverJobGetCall), [*locations sources migrating vms cutover jobs list*](api::ProjectLocationSourceMigratingVmCutoverJobListCall), [*locations sources migrating vms delete*](api::ProjectLocationSourceMigratingVmDeleteCall), [*locations sources migrating vms finalize migration*](api::ProjectLocationSourceMigratingVmFinalizeMigrationCall), [*locations sources migrating vms get*](api::ProjectLocationSourceMigratingVmGetCall), [*locations sources migrating vms list*](api::ProjectLocationSourceMigratingVmListCall), [*locations sources migrating vms patch*](api::ProjectLocationSourceMigratingVmPatchCall), [*locations sources migrating vms pause migration*](api::ProjectLocationSourceMigratingVmPauseMigrationCall), [*locations sources migrating vms resume migration*](api::ProjectLocationSourceMigratingVmResumeMigrationCall), [*locations sources migrating vms start migration*](api::ProjectLocationSourceMigratingVmStartMigrationCall), [*locations sources patch*](api::ProjectLocationSourcePatchCall), [*locations sources utilization reports create*](api::ProjectLocationSourceUtilizationReportCreateCall), [*locations sources utilization reports delete*](api::ProjectLocationSourceUtilizationReportDeleteCall), [*locations sources utilization reports get*](api::ProjectLocationSourceUtilizationReportGetCall), [*locations sources utilization reports list*](api::ProjectLocationSourceUtilizationReportListCall), [*locations target projects create*](api::ProjectLocationTargetProjectCreateCall), [*locations target projects delete*](api::ProjectLocationTargetProjectDeleteCall), [*locations target projects get*](api::ProjectLocationTargetProjectGetCall), [*locations target projects list*](api::ProjectLocationTargetProjectListCall) and [*locations target projects patch*](api::ProjectLocationTargetProjectPatchCall)
+//!  * [*locations get*](api::ProjectLocationGetCall), [*locations groups add group migration*](api::ProjectLocationGroupAddGroupMigrationCall), [*locations groups create*](api::ProjectLocationGroupCreateCall), [*locations groups delete*](api::ProjectLocationGroupDeleteCall), [*locations groups get*](api::ProjectLocationGroupGetCall), [*locations groups list*](api::ProjectLocationGroupListCall), [*locations groups patch*](api::ProjectLocationGroupPatchCall), [*locations groups remove group migration*](api::ProjectLocationGroupRemoveGroupMigrationCall), [*locations list*](api::ProjectLocationListCall), [*locations operations cancel*](api::ProjectLocationOperationCancelCall), [*locations operations delete*](api::ProjectLocationOperationDeleteCall), [*locations operations get*](api::ProjectLocationOperationGetCall), [*locations operations list*](api::ProjectLocationOperationListCall), [*locations sources create*](api::ProjectLocationSourceCreateCall), [*locations sources datacenter connectors create*](api::ProjectLocationSourceDatacenterConnectorCreateCall), [*locations sources datacenter connectors delete*](api::ProjectLocationSourceDatacenterConnectorDeleteCall), [*locations sources datacenter connectors get*](api::ProjectLocationSourceDatacenterConnectorGetCall), [*locations sources datacenter connectors list*](api::ProjectLocationSourceDatacenterConnectorListCall), [*locations sources datacenter connectors upgrade appliance*](api::ProjectLocationSourceDatacenterConnectorUpgradeApplianceCall), [*locations sources delete*](api::ProjectLocationSourceDeleteCall), [*locations sources fetch inventory*](api::ProjectLocationSourceFetchInventoryCall), [*locations sources get*](api::ProjectLocationSourceGetCall), [*locations sources list*](api::ProjectLocationSourceListCall), [*locations sources migrating vms clone jobs cancel*](api::ProjectLocationSourceMigratingVmCloneJobCancelCall), [*locations sources migrating vms clone jobs create*](api::ProjectLocationSourceMigratingVmCloneJobCreateCall), [*locations sources migrating vms clone jobs get*](api::ProjectLocationSourceMigratingVmCloneJobGetCall), [*locations sources migrating vms clone jobs list*](api::ProjectLocationSourceMigratingVmCloneJobListCall), [*locations sources migrating vms create*](api::ProjectLocationSourceMigratingVmCreateCall), [*locations sources migrating vms cutover jobs cancel*](api::ProjectLocationSourceMigratingVmCutoverJobCancelCall), [*locations sources migrating vms cutover jobs create*](api::ProjectLocationSourceMigratingVmCutoverJobCreateCall), [*locations sources migrating vms cutover jobs get*](api::ProjectLocationSourceMigratingVmCutoverJobGetCall), [*locations sources migrating vms cutover jobs list*](api::ProjectLocationSourceMigratingVmCutoverJobListCall), [*locations sources migrating vms delete*](api::ProjectLocationSourceMigratingVmDeleteCall), [*locations sources migrating vms finalize migration*](api::ProjectLocationSourceMigratingVmFinalizeMigrationCall), [*locations sources migrating vms get*](api::ProjectLocationSourceMigratingVmGetCall), [*locations sources migrating vms list*](api::ProjectLocationSourceMigratingVmListCall), [*locations sources migrating vms patch*](api::ProjectLocationSourceMigratingVmPatchCall), [*locations sources migrating vms pause migration*](api::ProjectLocationSourceMigratingVmPauseMigrationCall), [*locations sources migrating vms replication cycles get*](api::ProjectLocationSourceMigratingVmReplicationCycleGetCall), [*locations sources migrating vms replication cycles list*](api::ProjectLocationSourceMigratingVmReplicationCycleListCall), [*locations sources migrating vms resume migration*](api::ProjectLocationSourceMigratingVmResumeMigrationCall), [*locations sources migrating vms start migration*](api::ProjectLocationSourceMigratingVmStartMigrationCall), [*locations sources patch*](api::ProjectLocationSourcePatchCall), [*locations sources utilization reports create*](api::ProjectLocationSourceUtilizationReportCreateCall), [*locations sources utilization reports delete*](api::ProjectLocationSourceUtilizationReportDeleteCall), [*locations sources utilization reports get*](api::ProjectLocationSourceUtilizationReportGetCall), [*locations sources utilization reports list*](api::ProjectLocationSourceUtilizationReportListCall), [*locations target projects create*](api::ProjectLocationTargetProjectCreateCall), [*locations target projects delete*](api::ProjectLocationTargetProjectDeleteCall), [*locations target projects get*](api::ProjectLocationTargetProjectGetCall), [*locations target projects list*](api::ProjectLocationTargetProjectListCall) and [*locations target projects patch*](api::ProjectLocationTargetProjectPatchCall)
 //! 
 //! 
 //! 
@@ -105,7 +105,7 @@
 //! use vmmigration1::{Result, Error};
 //! # async fn dox() {
 //! use std::default::Default;
-//! use vmmigration1::{VMMigrationService, oauth2, hyper, hyper_rustls};
+//! use vmmigration1::{VMMigrationService, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 //! 
 //! // Get an ApplicationSecret instance by some means. It contains the `client_id` and 
 //! // `client_secret`, among other things.
@@ -216,22 +216,17 @@
 // This file was generated automatically from 'src/generator/templates/api/lib.rs.mako'
 // DO NOT EDIT !
 
-#[macro_use]
-extern crate serde_derive;
-
 // Re-export the hyper and hyper_rustls crate, they are required to build the hub
-pub extern crate hyper;
-pub extern crate hyper_rustls;
-extern crate serde;
-extern crate serde_json;
-// Re-export the yup_oauth2 crate, that is required to call some methods of the hub and the client
-pub extern crate yup_oauth2 as oauth2;
-extern crate mime;
-extern crate url;
-
+pub use hyper;
+pub use hyper_rustls;
+pub extern crate google_apis_common as client;
+pub use client::chrono;
 pub mod api;
-pub mod client;
 
 // Re-export the hub type and some basic client structs
 pub use api::VMMigrationService;
-pub use client::{Result, Error, Delegate};
+pub use client::{Result, Error, Delegate, FieldMask};
+
+// Re-export the yup_oauth2 crate, that is required to call some methods of the hub and the client
+#[cfg(feature = "yup-oauth2")]
+pub use client::oauth2;

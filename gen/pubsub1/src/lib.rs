@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/generator/templates/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Pubsub* crate version *4.0.1+20220221*, where *20220221* is the exact revision of the *pubsub:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v4.0.1*.
+//! This documentation was generated from *Pubsub* crate version *5.0.2-beta-1+20230119*, where *20230119* is the exact revision of the *pubsub:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.2-beta-1*.
 //! 
 //! Everything else about the *Pubsub* *v1* API can be found at the
 //! [official documentation site](https://cloud.google.com/pubsub/docs).
@@ -12,7 +12,7 @@
 //! Handle the following *Resources* with ease from the central [hub](Pubsub) ... 
 //! 
 //! * projects
-//!  * [*schemas create*](api::ProjectSchemaCreateCall), [*schemas delete*](api::ProjectSchemaDeleteCall), [*schemas get*](api::ProjectSchemaGetCall), [*schemas get iam policy*](api::ProjectSchemaGetIamPolicyCall), [*schemas list*](api::ProjectSchemaListCall), [*schemas set iam policy*](api::ProjectSchemaSetIamPolicyCall), [*schemas test iam permissions*](api::ProjectSchemaTestIamPermissionCall), [*schemas validate*](api::ProjectSchemaValidateCall), [*schemas validate message*](api::ProjectSchemaValidateMessageCall), [*snapshots create*](api::ProjectSnapshotCreateCall), [*snapshots delete*](api::ProjectSnapshotDeleteCall), [*snapshots get*](api::ProjectSnapshotGetCall), [*snapshots get iam policy*](api::ProjectSnapshotGetIamPolicyCall), [*snapshots list*](api::ProjectSnapshotListCall), [*snapshots patch*](api::ProjectSnapshotPatchCall), [*snapshots set iam policy*](api::ProjectSnapshotSetIamPolicyCall), [*snapshots test iam permissions*](api::ProjectSnapshotTestIamPermissionCall), [*subscriptions acknowledge*](api::ProjectSubscriptionAcknowledgeCall), [*subscriptions create*](api::ProjectSubscriptionCreateCall), [*subscriptions delete*](api::ProjectSubscriptionDeleteCall), [*subscriptions detach*](api::ProjectSubscriptionDetachCall), [*subscriptions get*](api::ProjectSubscriptionGetCall), [*subscriptions get iam policy*](api::ProjectSubscriptionGetIamPolicyCall), [*subscriptions list*](api::ProjectSubscriptionListCall), [*subscriptions modify ack deadline*](api::ProjectSubscriptionModifyAckDeadlineCall), [*subscriptions modify push config*](api::ProjectSubscriptionModifyPushConfigCall), [*subscriptions patch*](api::ProjectSubscriptionPatchCall), [*subscriptions pull*](api::ProjectSubscriptionPullCall), [*subscriptions seek*](api::ProjectSubscriptionSeekCall), [*subscriptions set iam policy*](api::ProjectSubscriptionSetIamPolicyCall), [*subscriptions test iam permissions*](api::ProjectSubscriptionTestIamPermissionCall), [*topics create*](api::ProjectTopicCreateCall), [*topics delete*](api::ProjectTopicDeleteCall), [*topics get*](api::ProjectTopicGetCall), [*topics get iam policy*](api::ProjectTopicGetIamPolicyCall), [*topics list*](api::ProjectTopicListCall), [*topics patch*](api::ProjectTopicPatchCall), [*topics publish*](api::ProjectTopicPublishCall), [*topics set iam policy*](api::ProjectTopicSetIamPolicyCall), [*topics snapshots list*](api::ProjectTopicSnapshotListCall), [*topics subscriptions list*](api::ProjectTopicSubscriptionListCall) and [*topics test iam permissions*](api::ProjectTopicTestIamPermissionCall)
+//!  * [*schemas commit*](api::ProjectSchemaCommitCall), [*schemas create*](api::ProjectSchemaCreateCall), [*schemas delete*](api::ProjectSchemaDeleteCall), [*schemas delete revision*](api::ProjectSchemaDeleteRevisionCall), [*schemas get*](api::ProjectSchemaGetCall), [*schemas get iam policy*](api::ProjectSchemaGetIamPolicyCall), [*schemas list*](api::ProjectSchemaListCall), [*schemas list revisions*](api::ProjectSchemaListRevisionCall), [*schemas rollback*](api::ProjectSchemaRollbackCall), [*schemas set iam policy*](api::ProjectSchemaSetIamPolicyCall), [*schemas test iam permissions*](api::ProjectSchemaTestIamPermissionCall), [*schemas validate*](api::ProjectSchemaValidateCall), [*schemas validate message*](api::ProjectSchemaValidateMessageCall), [*snapshots create*](api::ProjectSnapshotCreateCall), [*snapshots delete*](api::ProjectSnapshotDeleteCall), [*snapshots get*](api::ProjectSnapshotGetCall), [*snapshots get iam policy*](api::ProjectSnapshotGetIamPolicyCall), [*snapshots list*](api::ProjectSnapshotListCall), [*snapshots patch*](api::ProjectSnapshotPatchCall), [*snapshots set iam policy*](api::ProjectSnapshotSetIamPolicyCall), [*snapshots test iam permissions*](api::ProjectSnapshotTestIamPermissionCall), [*subscriptions acknowledge*](api::ProjectSubscriptionAcknowledgeCall), [*subscriptions create*](api::ProjectSubscriptionCreateCall), [*subscriptions delete*](api::ProjectSubscriptionDeleteCall), [*subscriptions detach*](api::ProjectSubscriptionDetachCall), [*subscriptions get*](api::ProjectSubscriptionGetCall), [*subscriptions get iam policy*](api::ProjectSubscriptionGetIamPolicyCall), [*subscriptions list*](api::ProjectSubscriptionListCall), [*subscriptions modify ack deadline*](api::ProjectSubscriptionModifyAckDeadlineCall), [*subscriptions modify push config*](api::ProjectSubscriptionModifyPushConfigCall), [*subscriptions patch*](api::ProjectSubscriptionPatchCall), [*subscriptions pull*](api::ProjectSubscriptionPullCall), [*subscriptions seek*](api::ProjectSubscriptionSeekCall), [*subscriptions set iam policy*](api::ProjectSubscriptionSetIamPolicyCall), [*subscriptions test iam permissions*](api::ProjectSubscriptionTestIamPermissionCall), [*topics create*](api::ProjectTopicCreateCall), [*topics delete*](api::ProjectTopicDeleteCall), [*topics get*](api::ProjectTopicGetCall), [*topics get iam policy*](api::ProjectTopicGetIamPolicyCall), [*topics list*](api::ProjectTopicListCall), [*topics patch*](api::ProjectTopicPatchCall), [*topics publish*](api::ProjectTopicPublishCall), [*topics set iam policy*](api::ProjectTopicSetIamPolicyCall), [*topics snapshots list*](api::ProjectTopicSnapshotListCall), [*topics subscriptions list*](api::ProjectTopicSubscriptionListCall) and [*topics test iam permissions*](api::ProjectTopicTestIamPermissionCall)
 //! 
 //! 
 //! 
@@ -84,7 +84,7 @@
 //! use pubsub1::{Result, Error};
 //! # async fn dox() {
 //! use std::default::Default;
-//! use pubsub1::{Pubsub, oauth2, hyper, hyper_rustls};
+//! use pubsub1::{Pubsub, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 //! 
 //! // Get an ApplicationSecret instance by some means. It contains the `client_id` and 
 //! // `client_secret`, among other things.
@@ -189,22 +189,17 @@
 // This file was generated automatically from 'src/generator/templates/api/lib.rs.mako'
 // DO NOT EDIT !
 
-#[macro_use]
-extern crate serde_derive;
-
 // Re-export the hyper and hyper_rustls crate, they are required to build the hub
-pub extern crate hyper;
-pub extern crate hyper_rustls;
-extern crate serde;
-extern crate serde_json;
-// Re-export the yup_oauth2 crate, that is required to call some methods of the hub and the client
-pub extern crate yup_oauth2 as oauth2;
-extern crate mime;
-extern crate url;
-
+pub use hyper;
+pub use hyper_rustls;
+pub extern crate google_apis_common as client;
+pub use client::chrono;
 pub mod api;
-pub mod client;
 
 // Re-export the hub type and some basic client structs
 pub use api::Pubsub;
-pub use client::{Result, Error, Delegate};
+pub use client::{Result, Error, Delegate, FieldMask};
+
+// Re-export the yup_oauth2 crate, that is required to call some methods of the hub and the client
+#[cfg(feature = "yup-oauth2")]
+pub use client::oauth2;

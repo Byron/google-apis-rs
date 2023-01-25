@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/generator/templates/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *AI Platform Notebooks* crate version *4.0.1+20220224*, where *20220224* is the exact revision of the *notebooks:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v4.0.1*.
+//! This documentation was generated from *AI Platform Notebooks* crate version *5.0.2-beta-1+20221213*, where *20221213* is the exact revision of the *notebooks:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.2-beta-1*.
 //! 
 //! Everything else about the *AI Platform Notebooks* *v1* API can be found at the
 //! [official documentation site](https://cloud.google.com/notebooks/docs/).
@@ -12,7 +12,7 @@
 //! Handle the following *Resources* with ease from the central [hub](AIPlatformNotebooks) ... 
 //! 
 //! * projects
-//!  * [*locations environments create*](api::ProjectLocationEnvironmentCreateCall), [*locations environments delete*](api::ProjectLocationEnvironmentDeleteCall), [*locations environments get*](api::ProjectLocationEnvironmentGetCall), [*locations environments list*](api::ProjectLocationEnvironmentListCall), [*locations executions create*](api::ProjectLocationExecutionCreateCall), [*locations executions delete*](api::ProjectLocationExecutionDeleteCall), [*locations executions get*](api::ProjectLocationExecutionGetCall), [*locations executions list*](api::ProjectLocationExecutionListCall), [*locations get*](api::ProjectLocationGetCall), [*locations instances create*](api::ProjectLocationInstanceCreateCall), [*locations instances delete*](api::ProjectLocationInstanceDeleteCall), [*locations instances get*](api::ProjectLocationInstanceGetCall), [*locations instances get iam policy*](api::ProjectLocationInstanceGetIamPolicyCall), [*locations instances get instance health*](api::ProjectLocationInstanceGetInstanceHealthCall), [*locations instances is upgradeable*](api::ProjectLocationInstanceIsUpgradeableCall), [*locations instances list*](api::ProjectLocationInstanceListCall), [*locations instances register*](api::ProjectLocationInstanceRegisterCall), [*locations instances report*](api::ProjectLocationInstanceReportCall), [*locations instances reset*](api::ProjectLocationInstanceResetCall), [*locations instances rollback*](api::ProjectLocationInstanceRollbackCall), [*locations instances set accelerator*](api::ProjectLocationInstanceSetAcceleratorCall), [*locations instances set iam policy*](api::ProjectLocationInstanceSetIamPolicyCall), [*locations instances set labels*](api::ProjectLocationInstanceSetLabelCall), [*locations instances set machine type*](api::ProjectLocationInstanceSetMachineTypeCall), [*locations instances start*](api::ProjectLocationInstanceStartCall), [*locations instances stop*](api::ProjectLocationInstanceStopCall), [*locations instances test iam permissions*](api::ProjectLocationInstanceTestIamPermissionCall), [*locations instances update config*](api::ProjectLocationInstanceUpdateConfigCall), [*locations instances update metadata items*](api::ProjectLocationInstanceUpdateMetadataItemCall), [*locations instances update shielded instance config*](api::ProjectLocationInstanceUpdateShieldedInstanceConfigCall), [*locations instances upgrade*](api::ProjectLocationInstanceUpgradeCall), [*locations instances upgrade internal*](api::ProjectLocationInstanceUpgradeInternalCall), [*locations list*](api::ProjectLocationListCall), [*locations operations cancel*](api::ProjectLocationOperationCancelCall), [*locations operations delete*](api::ProjectLocationOperationDeleteCall), [*locations operations get*](api::ProjectLocationOperationGetCall), [*locations operations list*](api::ProjectLocationOperationListCall), [*locations runtimes create*](api::ProjectLocationRuntimeCreateCall), [*locations runtimes delete*](api::ProjectLocationRuntimeDeleteCall), [*locations runtimes get*](api::ProjectLocationRuntimeGetCall), [*locations runtimes get iam policy*](api::ProjectLocationRuntimeGetIamPolicyCall), [*locations runtimes list*](api::ProjectLocationRuntimeListCall), [*locations runtimes report event*](api::ProjectLocationRuntimeReportEventCall), [*locations runtimes reset*](api::ProjectLocationRuntimeResetCall), [*locations runtimes set iam policy*](api::ProjectLocationRuntimeSetIamPolicyCall), [*locations runtimes start*](api::ProjectLocationRuntimeStartCall), [*locations runtimes stop*](api::ProjectLocationRuntimeStopCall), [*locations runtimes switch*](api::ProjectLocationRuntimeSwitchCall), [*locations runtimes test iam permissions*](api::ProjectLocationRuntimeTestIamPermissionCall), [*locations schedules create*](api::ProjectLocationScheduleCreateCall), [*locations schedules delete*](api::ProjectLocationScheduleDeleteCall), [*locations schedules get*](api::ProjectLocationScheduleGetCall), [*locations schedules list*](api::ProjectLocationScheduleListCall) and [*locations schedules trigger*](api::ProjectLocationScheduleTriggerCall)
+//!  * [*locations environments create*](api::ProjectLocationEnvironmentCreateCall), [*locations environments delete*](api::ProjectLocationEnvironmentDeleteCall), [*locations environments get*](api::ProjectLocationEnvironmentGetCall), [*locations environments list*](api::ProjectLocationEnvironmentListCall), [*locations executions create*](api::ProjectLocationExecutionCreateCall), [*locations executions delete*](api::ProjectLocationExecutionDeleteCall), [*locations executions get*](api::ProjectLocationExecutionGetCall), [*locations executions list*](api::ProjectLocationExecutionListCall), [*locations get*](api::ProjectLocationGetCall), [*locations instances create*](api::ProjectLocationInstanceCreateCall), [*locations instances delete*](api::ProjectLocationInstanceDeleteCall), [*locations instances diagnose*](api::ProjectLocationInstanceDiagnoseCall), [*locations instances get*](api::ProjectLocationInstanceGetCall), [*locations instances get iam policy*](api::ProjectLocationInstanceGetIamPolicyCall), [*locations instances get instance health*](api::ProjectLocationInstanceGetInstanceHealthCall), [*locations instances is upgradeable*](api::ProjectLocationInstanceIsUpgradeableCall), [*locations instances list*](api::ProjectLocationInstanceListCall), [*locations instances register*](api::ProjectLocationInstanceRegisterCall), [*locations instances report*](api::ProjectLocationInstanceReportCall), [*locations instances reset*](api::ProjectLocationInstanceResetCall), [*locations instances rollback*](api::ProjectLocationInstanceRollbackCall), [*locations instances set accelerator*](api::ProjectLocationInstanceSetAcceleratorCall), [*locations instances set iam policy*](api::ProjectLocationInstanceSetIamPolicyCall), [*locations instances set labels*](api::ProjectLocationInstanceSetLabelCall), [*locations instances set machine type*](api::ProjectLocationInstanceSetMachineTypeCall), [*locations instances start*](api::ProjectLocationInstanceStartCall), [*locations instances stop*](api::ProjectLocationInstanceStopCall), [*locations instances test iam permissions*](api::ProjectLocationInstanceTestIamPermissionCall), [*locations instances update config*](api::ProjectLocationInstanceUpdateConfigCall), [*locations instances update metadata items*](api::ProjectLocationInstanceUpdateMetadataItemCall), [*locations instances update shielded instance config*](api::ProjectLocationInstanceUpdateShieldedInstanceConfigCall), [*locations instances upgrade*](api::ProjectLocationInstanceUpgradeCall), [*locations instances upgrade internal*](api::ProjectLocationInstanceUpgradeInternalCall), [*locations list*](api::ProjectLocationListCall), [*locations operations cancel*](api::ProjectLocationOperationCancelCall), [*locations operations delete*](api::ProjectLocationOperationDeleteCall), [*locations operations get*](api::ProjectLocationOperationGetCall), [*locations operations list*](api::ProjectLocationOperationListCall), [*locations runtimes create*](api::ProjectLocationRuntimeCreateCall), [*locations runtimes delete*](api::ProjectLocationRuntimeDeleteCall), [*locations runtimes diagnose*](api::ProjectLocationRuntimeDiagnoseCall), [*locations runtimes get*](api::ProjectLocationRuntimeGetCall), [*locations runtimes get iam policy*](api::ProjectLocationRuntimeGetIamPolicyCall), [*locations runtimes list*](api::ProjectLocationRuntimeListCall), [*locations runtimes patch*](api::ProjectLocationRuntimePatchCall), [*locations runtimes refresh runtime token internal*](api::ProjectLocationRuntimeRefreshRuntimeTokenInternalCall), [*locations runtimes report event*](api::ProjectLocationRuntimeReportEventCall), [*locations runtimes reset*](api::ProjectLocationRuntimeResetCall), [*locations runtimes set iam policy*](api::ProjectLocationRuntimeSetIamPolicyCall), [*locations runtimes start*](api::ProjectLocationRuntimeStartCall), [*locations runtimes stop*](api::ProjectLocationRuntimeStopCall), [*locations runtimes switch*](api::ProjectLocationRuntimeSwitchCall), [*locations runtimes test iam permissions*](api::ProjectLocationRuntimeTestIamPermissionCall), [*locations runtimes upgrade*](api::ProjectLocationRuntimeUpgradeCall), [*locations schedules create*](api::ProjectLocationScheduleCreateCall), [*locations schedules delete*](api::ProjectLocationScheduleDeleteCall), [*locations schedules get*](api::ProjectLocationScheduleGetCall), [*locations schedules list*](api::ProjectLocationScheduleListCall) and [*locations schedules trigger*](api::ProjectLocationScheduleTriggerCall)
 //! 
 //! 
 //! 
@@ -53,6 +53,7 @@
 //! let r = hub.projects().locations_executions_delete(...).doit().await
 //! let r = hub.projects().locations_instances_create(...).doit().await
 //! let r = hub.projects().locations_instances_delete(...).doit().await
+//! let r = hub.projects().locations_instances_diagnose(...).doit().await
 //! let r = hub.projects().locations_instances_register(...).doit().await
 //! let r = hub.projects().locations_instances_report(...).doit().await
 //! let r = hub.projects().locations_instances_reset(...).doit().await
@@ -69,11 +70,14 @@
 //! let r = hub.projects().locations_operations_get(...).doit().await
 //! let r = hub.projects().locations_runtimes_create(...).doit().await
 //! let r = hub.projects().locations_runtimes_delete(...).doit().await
+//! let r = hub.projects().locations_runtimes_diagnose(...).doit().await
+//! let r = hub.projects().locations_runtimes_patch(...).doit().await
 //! let r = hub.projects().locations_runtimes_report_event(...).doit().await
 //! let r = hub.projects().locations_runtimes_reset(...).doit().await
 //! let r = hub.projects().locations_runtimes_start(...).doit().await
 //! let r = hub.projects().locations_runtimes_stop(...).doit().await
 //! let r = hub.projects().locations_runtimes_switch(...).doit().await
+//! let r = hub.projects().locations_runtimes_upgrade(...).doit().await
 //! let r = hub.projects().locations_schedules_create(...).doit().await
 //! let r = hub.projects().locations_schedules_delete(...).doit().await
 //! let r = hub.projects().locations_schedules_trigger(...).doit().await
@@ -103,11 +107,11 @@
 //! extern crate hyper;
 //! extern crate hyper_rustls;
 //! extern crate google_notebooks1 as notebooks1;
-//! use notebooks1::api::Environment;
+//! use notebooks1::api::Runtime;
 //! use notebooks1::{Result, Error};
 //! # async fn dox() {
 //! use std::default::Default;
-//! use notebooks1::{AIPlatformNotebooks, oauth2, hyper, hyper_rustls};
+//! use notebooks1::{AIPlatformNotebooks, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 //! 
 //! // Get an ApplicationSecret instance by some means. It contains the `client_id` and 
 //! // `client_secret`, among other things.
@@ -125,13 +129,14 @@
 //! // As the method needs a request, you would usually fill it with the desired information
 //! // into the respective structure. Some of the parts shown here might not be applicable !
 //! // Values shown here are possibly random and not representative !
-//! let mut req = Environment::default();
+//! let mut req = Runtime::default();
 //! 
 //! // You can configure optional parameters by calling the respective setters at will, and
 //! // execute the final call using `doit()`.
 //! // Values shown here are possibly random and not representative !
-//! let result = hub.projects().locations_environments_create(req, "parent")
-//!              .environment_id("ipsum")
+//! let result = hub.projects().locations_runtimes_create(req, "parent")
+//!              .runtime_id("voluptua.")
+//!              .request_id("At")
 //!              .doit().await;
 //! 
 //! match result {
@@ -217,22 +222,17 @@
 // This file was generated automatically from 'src/generator/templates/api/lib.rs.mako'
 // DO NOT EDIT !
 
-#[macro_use]
-extern crate serde_derive;
-
 // Re-export the hyper and hyper_rustls crate, they are required to build the hub
-pub extern crate hyper;
-pub extern crate hyper_rustls;
-extern crate serde;
-extern crate serde_json;
-// Re-export the yup_oauth2 crate, that is required to call some methods of the hub and the client
-pub extern crate yup_oauth2 as oauth2;
-extern crate mime;
-extern crate url;
-
+pub use hyper;
+pub use hyper_rustls;
+pub extern crate google_apis_common as client;
+pub use client::chrono;
 pub mod api;
-pub mod client;
 
 // Re-export the hub type and some basic client structs
 pub use api::AIPlatformNotebooks;
-pub use client::{Result, Error, Delegate};
+pub use client::{Result, Error, Delegate, FieldMask};
+
+// Re-export the yup_oauth2 crate, that is required to call some methods of the hub and the client
+#[cfg(feature = "yup-oauth2")]
+pub use client::oauth2;

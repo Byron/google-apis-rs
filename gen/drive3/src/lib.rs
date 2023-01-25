@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/generator/templates/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *drive* crate version *5.0.2-beta-1+20220225*, where *20220225* is the exact revision of the *drive:v3* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.2-beta-1*.
+//! This documentation was generated from *drive* crate version *5.0.2-beta-1+20230115*, where *20230115* is the exact revision of the *drive:v3* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.2-beta-1*.
 //! 
 //! Everything else about the *drive* *v3* API can be found at the
 //! [official documentation site](https://developers.google.com/drive/).
@@ -22,7 +22,7 @@
 //! * [drives](api::Drive)
 //!  * [*create*](api::DriveCreateCall), [*delete*](api::DriveDeleteCall), [*get*](api::DriveGetCall), [*hide*](api::DriveHideCall), [*list*](api::DriveListCall), [*unhide*](api::DriveUnhideCall) and [*update*](api::DriveUpdateCall)
 //! * [files](api::File)
-//!  * [*copy*](api::FileCopyCall), [*create*](api::FileCreateCall), [*delete*](api::FileDeleteCall), [*empty trash*](api::FileEmptyTrashCall), [*export*](api::FileExportCall), [*generate ids*](api::FileGenerateIdCall), [*get*](api::FileGetCall), [*list*](api::FileListCall), [*update*](api::FileUpdateCall) and [*watch*](api::FileWatchCall)
+//!  * [*copy*](api::FileCopyCall), [*create*](api::FileCreateCall), [*delete*](api::FileDeleteCall), [*empty trash*](api::FileEmptyTrashCall), [*export*](api::FileExportCall), [*generate ids*](api::FileGenerateIdCall), [*get*](api::FileGetCall), [*list*](api::FileListCall), [*list labels*](api::FileListLabelCall), [*modify labels*](api::FileModifyLabelCall), [*update*](api::FileUpdateCall) and [*watch*](api::FileWatchCall)
 //! * [permissions](api::Permission)
 //!  * [*create*](api::PermissionCreateCall), [*delete*](api::PermissionDeleteCall), [*get*](api::PermissionGetCall), [*list*](api::PermissionListCall) and [*update*](api::PermissionUpdateCall)
 //! * [replies](api::Reply)
@@ -93,6 +93,8 @@
 //! let r = hub.files().generate_ids(...).doit().await
 //! let r = hub.files().get(...).doit().await
 //! let r = hub.files().list(...).doit().await
+//! let r = hub.files().list_labels(...).doit().await
+//! let r = hub.files().modify_labels(...).doit().await
 //! let r = hub.files().update(...).doit().await
 //! let r = hub.files().watch(...).doit().await
 //! ```
@@ -153,6 +155,7 @@
 //!              .order_by("est")
 //!              .include_team_drive_items(true)
 //!              .include_permissions_for_view("ipsum")
+//!              .include_labels("est")
 //!              .include_items_from_all_drives(true)
 //!              .drive_id("ea")
 //!              .corpus("dolor")

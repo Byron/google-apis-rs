@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/generator/templates/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Cloud Run* crate version *4.0.1+20220225*, where *20220225* is the exact revision of the *run:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v4.0.1*.
+//! This documentation was generated from *Cloud Run* crate version *5.0.2-beta-1+20230113*, where *20230113* is the exact revision of the *run:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.2-beta-1*.
 //! 
 //! Everything else about the *Cloud Run* *v2* API can be found at the
 //! [official documentation site](https://cloud.google.com/run/).
@@ -12,7 +12,7 @@
 //! Handle the following *Resources* with ease from the central [hub](CloudRun) ... 
 //! 
 //! * projects
-//!  * [*locations operations delete*](api::ProjectLocationOperationDeleteCall), [*locations operations get*](api::ProjectLocationOperationGetCall), [*locations operations list*](api::ProjectLocationOperationListCall), [*locations services create*](api::ProjectLocationServiceCreateCall), [*locations services delete*](api::ProjectLocationServiceDeleteCall), [*locations services get*](api::ProjectLocationServiceGetCall), [*locations services get iam policy*](api::ProjectLocationServiceGetIamPolicyCall), [*locations services list*](api::ProjectLocationServiceListCall), [*locations services patch*](api::ProjectLocationServicePatchCall), [*locations services revisions delete*](api::ProjectLocationServiceRevisionDeleteCall), [*locations services revisions get*](api::ProjectLocationServiceRevisionGetCall), [*locations services revisions list*](api::ProjectLocationServiceRevisionListCall), [*locations services set iam policy*](api::ProjectLocationServiceSetIamPolicyCall) and [*locations services test iam permissions*](api::ProjectLocationServiceTestIamPermissionCall)
+//!  * [*locations jobs create*](api::ProjectLocationJobCreateCall), [*locations jobs delete*](api::ProjectLocationJobDeleteCall), [*locations jobs executions delete*](api::ProjectLocationJobExecutionDeleteCall), [*locations jobs executions get*](api::ProjectLocationJobExecutionGetCall), [*locations jobs executions list*](api::ProjectLocationJobExecutionListCall), [*locations jobs executions tasks get*](api::ProjectLocationJobExecutionTaskGetCall), [*locations jobs executions tasks list*](api::ProjectLocationJobExecutionTaskListCall), [*locations jobs get*](api::ProjectLocationJobGetCall), [*locations jobs get iam policy*](api::ProjectLocationJobGetIamPolicyCall), [*locations jobs list*](api::ProjectLocationJobListCall), [*locations jobs patch*](api::ProjectLocationJobPatchCall), [*locations jobs run*](api::ProjectLocationJobRunCall), [*locations jobs set iam policy*](api::ProjectLocationJobSetIamPolicyCall), [*locations jobs test iam permissions*](api::ProjectLocationJobTestIamPermissionCall), [*locations operations delete*](api::ProjectLocationOperationDeleteCall), [*locations operations get*](api::ProjectLocationOperationGetCall), [*locations operations list*](api::ProjectLocationOperationListCall), [*locations operations wait*](api::ProjectLocationOperationWaitCall), [*locations services create*](api::ProjectLocationServiceCreateCall), [*locations services delete*](api::ProjectLocationServiceDeleteCall), [*locations services get*](api::ProjectLocationServiceGetCall), [*locations services get iam policy*](api::ProjectLocationServiceGetIamPolicyCall), [*locations services list*](api::ProjectLocationServiceListCall), [*locations services patch*](api::ProjectLocationServicePatchCall), [*locations services revisions delete*](api::ProjectLocationServiceRevisionDeleteCall), [*locations services revisions get*](api::ProjectLocationServiceRevisionGetCall), [*locations services revisions list*](api::ProjectLocationServiceRevisionListCall), [*locations services set iam policy*](api::ProjectLocationServiceSetIamPolicyCall) and [*locations services test iam permissions*](api::ProjectLocationServiceTestIamPermissionCall)
 //! 
 //! 
 //! 
@@ -47,7 +47,13 @@
 //! Or specifically ...
 //! 
 //! ```ignore
+//! let r = hub.projects().locations_jobs_executions_delete(...).doit().await
+//! let r = hub.projects().locations_jobs_create(...).doit().await
+//! let r = hub.projects().locations_jobs_delete(...).doit().await
+//! let r = hub.projects().locations_jobs_patch(...).doit().await
+//! let r = hub.projects().locations_jobs_run(...).doit().await
 //! let r = hub.projects().locations_operations_get(...).doit().await
+//! let r = hub.projects().locations_operations_wait(...).doit().await
 //! let r = hub.projects().locations_services_revisions_delete(...).doit().await
 //! let r = hub.projects().locations_services_create(...).doit().await
 //! let r = hub.projects().locations_services_delete(...).doit().await
@@ -78,11 +84,11 @@
 //! extern crate hyper;
 //! extern crate hyper_rustls;
 //! extern crate google_run2 as run2;
-//! use run2::api::GoogleCloudRunOpV2Service;
+//! use run2::api::GoogleCloudRunV2Job;
 //! use run2::{Result, Error};
 //! # async fn dox() {
 //! use std::default::Default;
-//! use run2::{CloudRun, oauth2, hyper, hyper_rustls};
+//! use run2::{CloudRun, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 //! 
 //! // Get an ApplicationSecret instance by some means. It contains the `client_id` and 
 //! // `client_secret`, among other things.
@@ -100,15 +106,14 @@
 //! // As the method needs a request, you would usually fill it with the desired information
 //! // into the respective structure. Some of the parts shown here might not be applicable !
 //! // Values shown here are possibly random and not representative !
-//! let mut req = GoogleCloudRunOpV2Service::default();
+//! let mut req = GoogleCloudRunV2Job::default();
 //! 
 //! // You can configure optional parameters by calling the respective setters at will, and
 //! // execute the final call using `doit()`.
 //! // Values shown here are possibly random and not representative !
-//! let result = hub.projects().locations_services_patch(req, "name")
-//!              .validate_only(true)
-//!              .update_mask("amet.")
-//!              .allow_missing(true)
+//! let result = hub.projects().locations_jobs_create(req, "parent")
+//!              .validate_only(false)
+//!              .job_id("amet.")
 //!              .doit().await;
 //! 
 //! match result {
@@ -194,22 +199,17 @@
 // This file was generated automatically from 'src/generator/templates/api/lib.rs.mako'
 // DO NOT EDIT !
 
-#[macro_use]
-extern crate serde_derive;
-
 // Re-export the hyper and hyper_rustls crate, they are required to build the hub
-pub extern crate hyper;
-pub extern crate hyper_rustls;
-extern crate serde;
-extern crate serde_json;
-// Re-export the yup_oauth2 crate, that is required to call some methods of the hub and the client
-pub extern crate yup_oauth2 as oauth2;
-extern crate mime;
-extern crate url;
-
+pub use hyper;
+pub use hyper_rustls;
+pub extern crate google_apis_common as client;
+pub use client::chrono;
 pub mod api;
-pub mod client;
 
 // Re-export the hub type and some basic client structs
 pub use api::CloudRun;
-pub use client::{Result, Error, Delegate};
+pub use client::{Result, Error, Delegate, FieldMask};
+
+// Re-export the yup_oauth2 crate, that is required to call some methods of the hub and the client
+#[cfg(feature = "yup-oauth2")]
+pub use client::oauth2;

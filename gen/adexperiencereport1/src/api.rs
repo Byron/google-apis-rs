@@ -1,19 +1,20 @@
 use std::collections::HashMap;
 use std::cell::RefCell;
 use std::default::Default;
-use std::collections::BTreeMap;
+use std::collections::BTreeSet;
 use std::error::Error as StdError;
 use serde_json as json;
 use std::io;
 use std::fs;
 use std::mem;
-use std::thread::sleep;
 
-use http::Uri;
 use hyper::client::connect;
 use tokio::io::{AsyncRead, AsyncWrite};
+use tokio::time::sleep;
 use tower_service;
-use crate::client;
+use serde::{Serialize, Deserialize};
+
+use crate::{client, client::GetToken, client::serde_with};
 
 // ##############
 // UTILITIES ###
@@ -39,7 +40,7 @@ use crate::client;
 /// use adexperiencereport1::{Result, Error};
 /// # async fn dox() {
 /// use std::default::Default;
-/// use adexperiencereport1::{AdExperienceReport, oauth2, hyper, hyper_rustls};
+/// use adexperiencereport1::{AdExperienceReport, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// // Get an ApplicationSecret instance by some means. It contains the `client_id` and 
 /// // `client_secret`, among other things.
@@ -82,7 +83,7 @@ use crate::client;
 #[derive(Clone)]
 pub struct AdExperienceReport<S> {
     pub client: hyper::Client<S, hyper::body::Body>,
-    pub auth: oauth2::authenticator::Authenticator<S>,
+    pub auth: Box<dyn client::GetToken>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
@@ -92,11 +93,11 @@ impl<'a, S> client::Hub for AdExperienceReport<S> {}
 
 impl<'a, S> AdExperienceReport<S> {
 
-    pub fn new(client: hyper::Client<S, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<S>) -> AdExperienceReport<S> {
+    pub fn new<A: 'static + client::GetToken>(client: hyper::Client<S, hyper::body::Body>, auth: A) -> AdExperienceReport<S> {
         AdExperienceReport {
             client,
-            auth: authenticator,
-            _user_agent: "google-api-rust-client/4.0.1".to_string(),
+            auth: Box::new(auth),
+            _user_agent: "google-api-rust-client/5.0.2-beta-1".to_string(),
             _base_url: "https://adexperiencereport.googleapis.com/".to_string(),
             _root_url: "https://adexperiencereport.googleapis.com/".to_string(),
         }
@@ -110,7 +111,7 @@ impl<'a, S> AdExperienceReport<S> {
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/4.0.1`.
+    /// It defaults to `google-api-rust-client/5.0.2-beta-1`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -142,27 +143,35 @@ impl<'a, S> AdExperienceReport<S> {
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PlatformSummary {
     /// The site's Ad Experience Report status on this platform.
     #[serde(rename="betterAdsStatus")]
+    
     pub better_ads_status: Option<String>,
     /// The time at which [enforcement](https://support.google.com/webtools/answer/7308033) against the site began or will begin on this platform. Not set when the filter_status is OFF.
     #[serde(rename="enforcementTime")]
-    pub enforcement_time: Option<String>,
+    
+    pub enforcement_time: Option<client::chrono::DateTime<client::chrono::offset::Utc>>,
     /// The site's [enforcement status](https://support.google.com/webtools/answer/7308033) on this platform.
     #[serde(rename="filterStatus")]
+    
     pub filter_status: Option<String>,
     /// The time at which the site's status last changed on this platform.
     #[serde(rename="lastChangeTime")]
-    pub last_change_time: Option<String>,
+    
+    pub last_change_time: Option<client::chrono::DateTime<client::chrono::offset::Utc>>,
     /// The site's regions on this platform. No longer populated, because there is no longer any semantic difference between sites in different regions.
+    
     pub region: Option<Vec<String>>,
     /// A link to the full Ad Experience Report for the site on this platform.. Not set in ViolatingSitesResponse. Note that you must complete the [Search Console verification process](https://support.google.com/webmasters/answer/9008080) for the site before you can access the full report.
     #[serde(rename="reportUrl")]
+    
     pub report_url: Option<String>,
     /// Whether the site is currently under review on this platform.
     #[serde(rename="underReview")]
+    
     pub under_review: Option<bool>,
 }
 
@@ -178,16 +187,20 @@ impl client::Part for PlatformSummary {}
 /// 
 /// * [get sites](SiteGetCall) (response)
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct SiteSummaryResponse {
     /// The site's Ad Experience Report summary on desktop.
     #[serde(rename="desktopSummary")]
+    
     pub desktop_summary: Option<PlatformSummary>,
     /// The site's Ad Experience Report summary on mobile.
     #[serde(rename="mobileSummary")]
+    
     pub mobile_summary: Option<PlatformSummary>,
     /// The name of the reviewed site, e.g. `google.com`.
     #[serde(rename="reviewedSite")]
+    
     pub reviewed_site: Option<String>,
 }
 
@@ -203,10 +216,12 @@ impl client::ResponseResult for SiteSummaryResponse {}
 /// 
 /// * [list violating sites](ViolatingSiteListCall) (response)
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ViolatingSitesResponse {
     /// The list of violating sites.
     #[serde(rename="violatingSites")]
+    
     pub violating_sites: Option<Vec<SiteSummaryResponse>>,
 }
 
@@ -219,7 +234,7 @@ impl client::ResponseResult for ViolatingSitesResponse {}
 // #################
 
 /// A builder providing access to all methods supported on *site* resources.
-/// It is not used directly, but through the `AdExperienceReport` hub.
+/// It is not used directly, but through the [`AdExperienceReport`] hub.
 ///
 /// # Example
 ///
@@ -232,7 +247,7 @@ impl client::ResponseResult for ViolatingSitesResponse {}
 /// 
 /// # async fn dox() {
 /// use std::default::Default;
-/// use adexperiencereport1::{AdExperienceReport, oauth2, hyper, hyper_rustls};
+/// use adexperiencereport1::{AdExperienceReport, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// let secret: oauth2::ApplicationSecret = Default::default();
 /// let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -276,7 +291,7 @@ impl<'a, S> SiteMethods<'a, S> {
 
 
 /// A builder providing access to all methods supported on *violatingSite* resources.
-/// It is not used directly, but through the `AdExperienceReport` hub.
+/// It is not used directly, but through the [`AdExperienceReport`] hub.
 ///
 /// # Example
 ///
@@ -289,7 +304,7 @@ impl<'a, S> SiteMethods<'a, S> {
 /// 
 /// # async fn dox() {
 /// use std::default::Default;
-/// use adexperiencereport1::{AdExperienceReport, oauth2, hyper, hyper_rustls};
+/// use adexperiencereport1::{AdExperienceReport, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// let secret: oauth2::ApplicationSecret = Default::default();
 /// let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -336,7 +351,7 @@ impl<'a, S> ViolatingSiteMethods<'a, S> {
 /// Gets a site's Ad Experience Report summary.
 ///
 /// A builder for the *get* method supported by a *site* resource.
-/// It is not used directly, but through a `SiteMethods` instance.
+/// It is not used directly, but through a [`SiteMethods`] instance.
 ///
 /// # Example
 ///
@@ -348,7 +363,7 @@ impl<'a, S> ViolatingSiteMethods<'a, S> {
 /// # extern crate google_adexperiencereport1 as adexperiencereport1;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use adexperiencereport1::{AdExperienceReport, oauth2, hyper, hyper_rustls};
+/// # use adexperiencereport1::{AdExperienceReport, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
 /// # let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -376,7 +391,7 @@ impl<'a, S> client::CallBuilder for SiteGetCall<'a, S> {}
 
 impl<'a, S> SiteGetCall<'a, S>
 where
-    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
     S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
     S::Future: Send + Unpin + 'static,
     S::Error: Into<Box<dyn StdError + Send + Sync>>,
@@ -385,36 +400,33 @@ where
 
     /// Perform the operation you have build so far.
     pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, SiteSummaryResponse)> {
-        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
         use std::io::{Read, Seek};
         use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::ToParts;
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
         let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
         dlg.begin(client::MethodInfo { id: "adexperiencereport.sites.get",
                                http_method: hyper::Method::GET });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
-        params.push(("name", self._name.to_string()));
+
         for &field in ["alt", "name"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(client::Error::FieldClash(field));
             }
         }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
 
-        params.push(("alt", "json".to_string()));
+        let mut params = Params::with_capacity(3 + self._additional_params.len());
+        params.push("name", self._name);
 
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "v1/{+name}";
         
-        let key = dlg.api_key();
-        match key {
-            Some(value) => params.push(("key", value)),
+        match dlg.api_key() {
+            Some(value) => params.push("key", value),
             None => {
                 dlg.finished(false);
                 return Err(client::Error::MissingAPIKey)
@@ -422,31 +434,14 @@ where
         }
 
         for &(find_this, param_name) in [("{+name}", "name")].iter() {
-            let mut replace_with = String::new();
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = value.to_string();
-                    break;
-                }
-            }
-            if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
-            }
-            url = url.replace(find_this, &replace_with);
+            url = params.uri_replacement(url, param_name, find_this, true);
         }
         {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
-            for param_name in ["name"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
+            let to_remove = ["name"];
+            params.remove_params(&to_remove);
         }
 
-        let url = url::Url::parse_with_params(&url, params).unwrap();
+        let url = params.parse_with_url(&url);
 
 
 
@@ -454,21 +449,24 @@ where
             let mut req_result = {
                 let client = &self.hub.client;
                 dlg.pre_request();
-                let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
-                        .header(USER_AGENT, self.hub._user_agent.clone());
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::GET)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
 
 
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
-                
+
             };
 
             match req_result {
                 Err(err) => {
                     if let client::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep(d).await;
                         continue;
                     }
                     dlg.finished(false);
@@ -484,7 +482,7 @@ where
                         let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
                         if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
-                            sleep(d);
+                            sleep(d).await;
                             continue;
                         }
 
@@ -528,7 +526,8 @@ where
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.````
     ///
     /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SiteGetCall<'a, S> {
@@ -568,7 +567,7 @@ where
 /// Lists sites that are failing in the Ad Experience Report on at least one platform.
 ///
 /// A builder for the *list* method supported by a *violatingSite* resource.
-/// It is not used directly, but through a `ViolatingSiteMethods` instance.
+/// It is not used directly, but through a [`ViolatingSiteMethods`] instance.
 ///
 /// # Example
 ///
@@ -580,7 +579,7 @@ where
 /// # extern crate google_adexperiencereport1 as adexperiencereport1;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use adexperiencereport1::{AdExperienceReport, oauth2, hyper, hyper_rustls};
+/// # use adexperiencereport1::{AdExperienceReport, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
 /// # let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -607,7 +606,7 @@ impl<'a, S> client::CallBuilder for ViolatingSiteListCall<'a, S> {}
 
 impl<'a, S> ViolatingSiteListCall<'a, S>
 where
-    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
     S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
     S::Future: Send + Unpin + 'static,
     S::Error: Into<Box<dyn StdError + Send + Sync>>,
@@ -618,32 +617,30 @@ where
     pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, ViolatingSitesResponse)> {
         use std::io::{Read, Seek};
         use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::ToParts;
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
         let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
         dlg.begin(client::MethodInfo { id: "adexperiencereport.violatingSites.list",
                                http_method: hyper::Method::GET });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(2 + self._additional_params.len());
+
         for &field in ["alt"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(client::Error::FieldClash(field));
             }
         }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
 
-        params.push(("alt", "json".to_string()));
+        let mut params = Params::with_capacity(2 + self._additional_params.len());
 
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "v1/violatingSites";
         
-        let key = dlg.api_key();
-        match key {
-            Some(value) => params.push(("key", value)),
+        match dlg.api_key() {
+            Some(value) => params.push("key", value),
             None => {
                 dlg.finished(false);
                 return Err(client::Error::MissingAPIKey)
@@ -651,7 +648,7 @@ where
         }
 
 
-        let url = url::Url::parse_with_params(&url, params).unwrap();
+        let url = params.parse_with_url(&url);
 
 
 
@@ -659,21 +656,24 @@ where
             let mut req_result = {
                 let client = &self.hub.client;
                 dlg.pre_request();
-                let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
-                        .header(USER_AGENT, self.hub._user_agent.clone());
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::GET)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
 
 
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
-                
+
             };
 
             match req_result {
                 Err(err) => {
                     if let client::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep(d).await;
                         continue;
                     }
                     dlg.finished(false);
@@ -689,7 +689,7 @@ where
                         let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
                         if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
-                            sleep(d);
+                            sleep(d).await;
                             continue;
                         }
 
@@ -723,7 +723,8 @@ where
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.````
     ///
     /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ViolatingSiteListCall<'a, S> {

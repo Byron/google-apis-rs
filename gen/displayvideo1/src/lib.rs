@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/generator/templates/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Display Video* crate version *4.0.1+20220303*, where *20220303* is the exact revision of the *displayvideo:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v4.0.1*.
+//! This documentation was generated from *Display Video* crate version *5.0.2-beta-1+20230119*, where *20230119* is the exact revision of the *displayvideo:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.2-beta-1*.
 //! 
 //! Everything else about the *Display Video* *v1* API can be found at the
 //! [official documentation site](https://developers.google.com/display-video/).
@@ -25,10 +25,12 @@
 //!  * [*get*](api::FloodlightGroupGetCall) and [*patch*](api::FloodlightGroupPatchCall)
 //! * [google audiences](api::GoogleAudience)
 //!  * [*get*](api::GoogleAudienceGetCall) and [*list*](api::GoogleAudienceListCall)
+//! * [guaranteed orders](api::GuaranteedOrder)
+//!  * [*create*](api::GuaranteedOrderCreateCall), [*edit guaranteed order read accessors*](api::GuaranteedOrderEditGuaranteedOrderReadAccessorCall), [*get*](api::GuaranteedOrderGetCall), [*list*](api::GuaranteedOrderListCall) and [*patch*](api::GuaranteedOrderPatchCall)
 //! * [inventory source groups](api::InventorySourceGroup)
 //!  * [*assigned inventory sources bulk edit*](api::InventorySourceGroupAssignedInventorySourceBulkEditCall), [*assigned inventory sources create*](api::InventorySourceGroupAssignedInventorySourceCreateCall), [*assigned inventory sources delete*](api::InventorySourceGroupAssignedInventorySourceDeleteCall), [*assigned inventory sources list*](api::InventorySourceGroupAssignedInventorySourceListCall), [*create*](api::InventorySourceGroupCreateCall), [*delete*](api::InventorySourceGroupDeleteCall), [*get*](api::InventorySourceGroupGetCall), [*list*](api::InventorySourceGroupListCall) and [*patch*](api::InventorySourceGroupPatchCall)
 //! * [inventory sources](api::InventorySource)
-//!  * [*get*](api::InventorySourceGetCall) and [*list*](api::InventorySourceListCall)
+//!  * [*create*](api::InventorySourceCreateCall), [*edit inventory source read write accessors*](api::InventorySourceEditInventorySourceReadWriteAccessorCall), [*get*](api::InventorySourceGetCall), [*list*](api::InventorySourceListCall) and [*patch*](api::InventorySourcePatchCall)
 //! * media
 //!  * [*download*](api::MediaDownloadCall) and [*upload*](api::MediaUploadCall)
 //! * [partners](api::Partner)
@@ -192,7 +194,7 @@
 //! use displayvideo1::{Result, Error};
 //! # async fn dox() {
 //! use std::default::Default;
-//! use displayvideo1::{DisplayVideo, oauth2, hyper, hyper_rustls};
+//! use displayvideo1::{DisplayVideo, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 //! 
 //! // Get an ApplicationSecret instance by some means. It contains the `client_id` and 
 //! // `client_secret`, among other things.
@@ -210,7 +212,7 @@
 //! // You can configure optional parameters by calling the respective setters at will, and
 //! // execute the final call using `doit()`.
 //! // Values shown here are possibly random and not representative !
-//! let result = hub.advertisers().campaigns_targeting_types_assigned_targeting_options_list("advertiserId", "campaignId", "targetingType")
+//! let result = hub.advertisers().campaigns_targeting_types_assigned_targeting_options_list(-80, -2, "targetingType")
 //!              .page_token("amet.")
 //!              .page_size(-20)
 //!              .order_by("ipsum")
@@ -300,22 +302,17 @@
 // This file was generated automatically from 'src/generator/templates/api/lib.rs.mako'
 // DO NOT EDIT !
 
-#[macro_use]
-extern crate serde_derive;
-
 // Re-export the hyper and hyper_rustls crate, they are required to build the hub
-pub extern crate hyper;
-pub extern crate hyper_rustls;
-extern crate serde;
-extern crate serde_json;
-// Re-export the yup_oauth2 crate, that is required to call some methods of the hub and the client
-pub extern crate yup_oauth2 as oauth2;
-extern crate mime;
-extern crate url;
-
+pub use hyper;
+pub use hyper_rustls;
+pub extern crate google_apis_common as client;
+pub use client::chrono;
 pub mod api;
-pub mod client;
 
 // Re-export the hub type and some basic client structs
 pub use api::DisplayVideo;
-pub use client::{Result, Error, Delegate};
+pub use client::{Result, Error, Delegate, FieldMask};
+
+// Re-export the yup_oauth2 crate, that is required to call some methods of the hub and the client
+#[cfg(feature = "yup-oauth2")]
+pub use client::oauth2;

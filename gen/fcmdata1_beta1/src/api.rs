@@ -1,19 +1,20 @@
 use std::collections::HashMap;
 use std::cell::RefCell;
 use std::default::Default;
-use std::collections::BTreeMap;
+use std::collections::BTreeSet;
 use std::error::Error as StdError;
 use serde_json as json;
 use std::io;
 use std::fs;
 use std::mem;
-use std::thread::sleep;
 
-use http::Uri;
 use hyper::client::connect;
 use tokio::io::{AsyncRead, AsyncWrite};
+use tokio::time::sleep;
 use tower_service;
-use crate::client;
+use serde::{Serialize, Deserialize};
+
+use crate::{client, client::GetToken, client::serde_with};
 
 // ##############
 // UTILITIES ###
@@ -61,7 +62,7 @@ impl Default for Scope {
 /// use fcmdata1_beta1::{Result, Error};
 /// # async fn dox() {
 /// use std::default::Default;
-/// use fcmdata1_beta1::{Fcmdata, oauth2, hyper, hyper_rustls};
+/// use fcmdata1_beta1::{Fcmdata, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// // Get an ApplicationSecret instance by some means. It contains the `client_id` and 
 /// // `client_secret`, among other things.
@@ -106,7 +107,7 @@ impl Default for Scope {
 #[derive(Clone)]
 pub struct Fcmdata<S> {
     pub client: hyper::Client<S, hyper::body::Body>,
-    pub auth: oauth2::authenticator::Authenticator<S>,
+    pub auth: Box<dyn client::GetToken>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
@@ -116,11 +117,11 @@ impl<'a, S> client::Hub for Fcmdata<S> {}
 
 impl<'a, S> Fcmdata<S> {
 
-    pub fn new(client: hyper::Client<S, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<S>) -> Fcmdata<S> {
+    pub fn new<A: 'static + client::GetToken>(client: hyper::Client<S, hyper::body::Body>, auth: A) -> Fcmdata<S> {
         Fcmdata {
             client,
-            auth: authenticator,
-            _user_agent: "google-api-rust-client/4.0.1".to_string(),
+            auth: Box::new(auth),
+            _user_agent: "google-api-rust-client/5.0.2-beta-1".to_string(),
             _base_url: "https://fcmdata.googleapis.com/".to_string(),
             _root_url: "https://fcmdata.googleapis.com/".to_string(),
         }
@@ -131,7 +132,7 @@ impl<'a, S> Fcmdata<S> {
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/4.0.1`.
+    /// It defaults to `google-api-rust-client/5.0.2-beta-1`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -163,17 +164,22 @@ impl<'a, S> Fcmdata<S> {
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleFirebaseFcmDataV1beta1AndroidDeliveryData {
     /// The analytics label associated with the messages sent. All messages sent without an analytics label will be grouped together in a single entry.
     #[serde(rename="analyticsLabel")]
+    
     pub analytics_label: Option<String>,
     /// The app ID to which the messages were sent.
     #[serde(rename="appId")]
+    
     pub app_id: Option<String>,
     /// The data for the specified appId, date, and analyticsLabel.
+    
     pub data: Option<GoogleFirebaseFcmDataV1beta1Data>,
     /// The date represented by this entry.
+    
     pub date: Option<GoogleTypeDate>,
 }
 
@@ -184,19 +190,25 @@ impl client::Part for GoogleFirebaseFcmDataV1beta1AndroidDeliveryData {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleFirebaseFcmDataV1beta1Data {
     /// Count of messages accepted by FCM intended to Android devices. The targeted device must have opted in to the collection of usage and diagnostic information.
     #[serde(rename="countMessagesAccepted")]
-    pub count_messages_accepted: Option<String>,
+    
+    #[serde_as(as = "Option<::client::serde_with::DisplayFromStr>")]
+    pub count_messages_accepted: Option<i64>,
     /// Additional information about delivery performance for messages that were successfully delivered.
     #[serde(rename="deliveryPerformancePercents")]
+    
     pub delivery_performance_percents: Option<GoogleFirebaseFcmDataV1beta1DeliveryPerformancePercents>,
     /// Additional general insights about message delivery.
     #[serde(rename="messageInsightPercents")]
+    
     pub message_insight_percents: Option<GoogleFirebaseFcmDataV1beta1MessageInsightPercents>,
     /// Mutually exclusive breakdown of message delivery outcomes.
     #[serde(rename="messageOutcomePercents")]
+    
     pub message_outcome_percents: Option<GoogleFirebaseFcmDataV1beta1MessageOutcomePercents>,
 }
 
@@ -207,22 +219,28 @@ impl client::Part for GoogleFirebaseFcmDataV1beta1Data {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleFirebaseFcmDataV1beta1DeliveryPerformancePercents {
     /// The percentage of accepted messages that were delayed because the device was in doze mode. Only [normal priority messages](https://firebase.google.com/docs/cloud-messaging/concept-options#setting-the-priority-of-a-message) should be delayed due to doze mode.
     #[serde(rename="delayedDeviceDoze")]
+    
     pub delayed_device_doze: Option<f32>,
     /// The percentage of accepted messages that were delayed because the target device was not connected at the time of sending. These messages were eventually delivered when the device reconnected.
     #[serde(rename="delayedDeviceOffline")]
+    
     pub delayed_device_offline: Option<f32>,
     /// The percentage of accepted messages that were delayed due to message throttling, such as [collapsible message throttling](https://firebase.google.com/docs/cloud-messaging/concept-options#collapsible_throttling) or [maximum message rate throttling](https://firebase.google.com/docs/cloud-messaging/concept-options#device_throttling).
     #[serde(rename="delayedMessageThrottled")]
+    
     pub delayed_message_throttled: Option<f32>,
     /// The percentage of accepted messages that were delayed because the intended device user-profile was [stopped](https://firebase.google.com/docs/cloud-messaging/android/receive#handling_messages) on the target device at the time of the send. The messages were eventually delivered when the user-profile was started again.
     #[serde(rename="delayedUserStopped")]
+    
     pub delayed_user_stopped: Option<f32>,
     /// The percentage of accepted messages that were delivered to the device without delay from the FCM system.
     #[serde(rename="deliveredNoDelay")]
+    
     pub delivered_no_delay: Option<f32>,
 }
 
@@ -238,13 +256,16 @@ impl client::Part for GoogleFirebaseFcmDataV1beta1DeliveryPerformancePercents {}
 /// 
 /// * [android apps delivery data list projects](ProjectAndroidAppDeliveryDataListCall) (response)
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleFirebaseFcmDataV1beta1ListAndroidDeliveryDataResponse {
     /// The delivery data for the provided app. There will be one entry per combination of app, date, and analytics label.
     #[serde(rename="androidDeliveryData")]
+    
     pub android_delivery_data: Option<Vec<GoogleFirebaseFcmDataV1beta1AndroidDeliveryData>>,
     /// A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
     #[serde(rename="nextPageToken")]
+    
     pub next_page_token: Option<String>,
 }
 
@@ -255,10 +276,12 @@ impl client::ResponseResult for GoogleFirebaseFcmDataV1beta1ListAndroidDeliveryD
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleFirebaseFcmDataV1beta1MessageInsightPercents {
-    /// The percentage of accepted messages that had their priority lowered from high to normal due to [app standby buckets](https://firebase.google.com/docs/cloud-messaging/concept-options#setting-the-priority-of-a-message).
+    /// The percentage of accepted messages that had their priority lowered from high to normal. See [documentation for setting message priority](https://firebase.google.com/docs/cloud-messaging/android/message-priority).
     #[serde(rename="priorityLowered")]
+    
     pub priority_lowered: Option<f32>,
 }
 
@@ -269,20 +292,26 @@ impl client::Part for GoogleFirebaseFcmDataV1beta1MessageInsightPercents {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleFirebaseFcmDataV1beta1MessageOutcomePercents {
     /// The percentage of all accepted messages that were successfully delivered to the device.
+    
     pub delivered: Option<f32>,
     /// The percentage of accepted messages that were dropped because the application was force stopped on the device at the time of delivery and retries were unsuccessful.
     #[serde(rename="droppedAppForceStopped")]
+    
     pub dropped_app_force_stopped: Option<f32>,
     /// The percentage of accepted messages that were dropped because the target device is inactive. FCM will drop messages if the target device is deemed inactive by our servers. If a device does reconnect, we call [OnDeletedMessages()](https://firebase.google.com/docs/cloud-messaging/android/receive#override-ondeletedmessages) in our SDK instead of delivering the messages.
     #[serde(rename="droppedDeviceInactive")]
+    
     pub dropped_device_inactive: Option<f32>,
     /// The percentage of accepted messages that were dropped due to [too many undelivered non-collapsible messages](https://firebase.google.com/docs/cloud-messaging/concept-options#collapsible_and_non-collapsible_messages). Specifically, each app instance can only have 100 pending messages stored on our servers for a device which is disconnected. When that device reconnects, those messages are delivered. When there are more than the maximum pending messages, we call [OnDeletedMessages()](https://firebase.google.com/docs/cloud-messaging/android/receive#override-ondeletedmessages) in our SDK instead of delivering the messages.
     #[serde(rename="droppedTooManyPendingMessages")]
+    
     pub dropped_too_many_pending_messages: Option<f32>,
     /// The percentage of messages accepted on this day that were not dropped and not delivered, due to the device being disconnected (as of the end of the America/Los_Angeles day when the message was sent to FCM). A portion of these messages will be delivered the next day when the device connects but others may be destined to devices that ultimately never reconnect.
+    
     pub pending: Option<f32>,
 }
 
@@ -293,13 +322,17 @@ impl client::Part for GoogleFirebaseFcmDataV1beta1MessageOutcomePercents {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleTypeDate {
     /// Day of a month. Must be from 1 to 31 and valid for the year and month, or 0 to specify a year by itself or a year and month where the day isn't significant.
+    
     pub day: Option<i32>,
     /// Month of a year. Must be from 1 to 12, or 0 to specify a year without a month and day.
+    
     pub month: Option<i32>,
     /// Year of the date. Must be from 1 to 9999, or 0 to specify a date without a year.
+    
     pub year: Option<i32>,
 }
 
@@ -312,7 +345,7 @@ impl client::Part for GoogleTypeDate {}
 // #################
 
 /// A builder providing access to all methods supported on *project* resources.
-/// It is not used directly, but through the `Fcmdata` hub.
+/// It is not used directly, but through the [`Fcmdata`] hub.
 ///
 /// # Example
 ///
@@ -325,7 +358,7 @@ impl client::Part for GoogleTypeDate {}
 /// 
 /// # async fn dox() {
 /// use std::default::Default;
-/// use fcmdata1_beta1::{Fcmdata, oauth2, hyper, hyper_rustls};
+/// use fcmdata1_beta1::{Fcmdata, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// let secret: oauth2::ApplicationSecret = Default::default();
 /// let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -380,7 +413,7 @@ impl<'a, S> ProjectMethods<'a, S> {
 /// List aggregate delivery data for the given Android application.
 ///
 /// A builder for the *androidApps.deliveryData.list* method supported by a *project* resource.
-/// It is not used directly, but through a `ProjectMethods` instance.
+/// It is not used directly, but through a [`ProjectMethods`] instance.
 ///
 /// # Example
 ///
@@ -392,7 +425,7 @@ impl<'a, S> ProjectMethods<'a, S> {
 /// # extern crate google_fcmdata1_beta1 as fcmdata1_beta1;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use fcmdata1_beta1::{Fcmdata, oauth2, hyper, hyper_rustls};
+/// # use fcmdata1_beta1::{Fcmdata, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
 /// # let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -418,14 +451,14 @@ pub struct ProjectAndroidAppDeliveryDataListCall<'a, S>
     _page_size: Option<i32>,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
+    _scopes: BTreeSet<String>
 }
 
 impl<'a, S> client::CallBuilder for ProjectAndroidAppDeliveryDataListCall<'a, S> {}
 
 impl<'a, S> ProjectAndroidAppDeliveryDataListCall<'a, S>
 where
-    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
     S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
     S::Future: Send + Unpin + 'static,
     S::Error: Into<Box<dyn StdError + Send + Sync>>,
@@ -434,80 +467,61 @@ where
 
     /// Perform the operation you have build so far.
     pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, GoogleFirebaseFcmDataV1beta1ListAndroidDeliveryDataResponse)> {
-        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
         use std::io::{Read, Seek};
         use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::ToParts;
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
         let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
         dlg.begin(client::MethodInfo { id: "fcmdata.projects.androidApps.deliveryData.list",
                                http_method: hyper::Method::GET });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
-        params.push(("parent", self._parent.to_string()));
-        if let Some(value) = self._page_token {
-            params.push(("pageToken", value.to_string()));
-        }
-        if let Some(value) = self._page_size {
-            params.push(("pageSize", value.to_string()));
-        }
+
         for &field in ["alt", "parent", "pageToken", "pageSize"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(client::Error::FieldClash(field));
             }
         }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
+
+        let mut params = Params::with_capacity(5 + self._additional_params.len());
+        params.push("parent", self._parent);
+        if let Some(value) = self._page_token.as_ref() {
+            params.push("pageToken", value);
+        }
+        if let Some(value) = self._page_size.as_ref() {
+            params.push("pageSize", value.to_string());
         }
 
-        params.push(("alt", "json".to_string()));
+        params.extend(self._additional_params.iter());
 
+        params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "v1beta1/{+parent}/deliveryData";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string());
         }
 
         for &(find_this, param_name) in [("{+parent}", "parent")].iter() {
-            let mut replace_with = String::new();
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = value.to_string();
-                    break;
-                }
-            }
-            if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
-            }
-            url = url.replace(find_this, &replace_with);
+            url = params.uri_replacement(url, param_name, find_this, true);
         }
         {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
-            for param_name in ["parent"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
+            let to_remove = ["parent"];
+            params.remove_params(&to_remove);
         }
 
-        let url = url::Url::parse_with_params(&url, params).unwrap();
+        let url = params.parse_with_url(&url);
 
 
 
         loop {
-            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
-                Ok(token) => token.clone(),
-                Err(err) => {
-                    match  dlg.token(&err) {
-                        Some(token) => token,
-                        None => {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
                             dlg.finished(false);
-                            return Err(client::Error::MissingToken(err))
+                            return Err(client::Error::MissingToken(e));
                         }
                     }
                 }
@@ -515,21 +529,27 @@ where
             let mut req_result = {
                 let client = &self.hub.client;
                 dlg.pre_request();
-                let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
-                        .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::GET)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
 
 
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
-                
+
             };
 
             match req_result {
                 Err(err) => {
                     if let client::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep(d).await;
                         continue;
                     }
                     dlg.finished(false);
@@ -545,7 +565,7 @@ where
                         let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
                         if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
-                            sleep(d);
+                            sleep(d).await;
                             continue;
                         }
 
@@ -603,7 +623,8 @@ where
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.````
     ///
     /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectAndroidAppDeliveryDataListCall<'a, S> {
@@ -639,25 +660,36 @@ where
 
     /// Identifies the authorization scope for the method you are building.
     ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::CloudPlatform`.
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::CloudPlatform`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
     ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectAndroidAppDeliveryDataListCall<'a, S>
-                                                        where T: Into<Option<St>>,
-                                                              St: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
+    pub fn add_scope<St>(mut self, scope: St) -> ProjectAndroidAppDeliveryDataListCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> ProjectAndroidAppDeliveryDataListCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> ProjectAndroidAppDeliveryDataListCall<'a, S> {
+        self._scopes.clear();
         self
     }
 }

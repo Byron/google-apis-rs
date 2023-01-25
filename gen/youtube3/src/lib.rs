@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/generator/templates/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *YouTube* crate version *5.0.2-beta-1+20220303*, where *20220303* is the exact revision of the *youtube:v3* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.2-beta-1*.
+//! This documentation was generated from *YouTube* crate version *5.0.2-beta-1+20230123*, where *20230123* is the exact revision of the *youtube:v3* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.2-beta-1*.
 //! 
 //! Everything else about the *YouTube* *v3* API can be found at the
 //! [official documentation site](https://developers.google.com/youtube/).
@@ -32,7 +32,7 @@
 //! * [i18n regions](api::I18nRegion)
 //!  * [*list*](api::I18nRegionListCall)
 //! * [live broadcasts](api::LiveBroadcast)
-//!  * [*bind*](api::LiveBroadcastBindCall), [*delete*](api::LiveBroadcastDeleteCall), [*insert*](api::LiveBroadcastInsertCall), [*list*](api::LiveBroadcastListCall), [*transition*](api::LiveBroadcastTransitionCall) and [*update*](api::LiveBroadcastUpdateCall)
+//!  * [*bind*](api::LiveBroadcastBindCall), [*delete*](api::LiveBroadcastDeleteCall), [*insert*](api::LiveBroadcastInsertCall), [*insert cuepoint*](api::LiveBroadcastInsertCuepointCall), [*list*](api::LiveBroadcastListCall), [*transition*](api::LiveBroadcastTransitionCall) and [*update*](api::LiveBroadcastUpdateCall)
 //! * [live chat bans](api::LiveChatBan)
 //!  * [*delete*](api::LiveChatBanDeleteCall) and [*insert*](api::LiveChatBanInsertCall)
 //! * [live chat messages](api::LiveChatMessage)

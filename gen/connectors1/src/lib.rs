@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/generator/templates/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Connectors* crate version *4.0.1+20220214*, where *20220214* is the exact revision of the *connectors:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v4.0.1*.
+//! This documentation was generated from *Connectors* crate version *5.0.2-beta-1+20230103*, where *20230103* is the exact revision of the *connectors:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.2-beta-1*.
 //! 
 //! Everything else about the *Connectors* *v1* API can be found at the
 //! [official documentation site](https://cloud.google.com/apigee/docs/api-platform/connectors/about-connectors).
@@ -12,7 +12,7 @@
 //! Handle the following *Resources* with ease from the central [hub](Connectors) ... 
 //! 
 //! * projects
-//!  * [*locations connections create*](api::ProjectLocationConnectionCreateCall), [*locations connections delete*](api::ProjectLocationConnectionDeleteCall), [*locations connections get*](api::ProjectLocationConnectionGetCall), [*locations connections get connection schema metadata*](api::ProjectLocationConnectionGetConnectionSchemaMetadataCall), [*locations connections get iam policy*](api::ProjectLocationConnectionGetIamPolicyCall), [*locations connections list*](api::ProjectLocationConnectionListCall), [*locations connections patch*](api::ProjectLocationConnectionPatchCall), [*locations connections runtime action schemas list*](api::ProjectLocationConnectionRuntimeActionSchemaListCall), [*locations connections runtime entity schemas list*](api::ProjectLocationConnectionRuntimeEntitySchemaListCall), [*locations connections set iam policy*](api::ProjectLocationConnectionSetIamPolicyCall), [*locations connections test iam permissions*](api::ProjectLocationConnectionTestIamPermissionCall), [*locations get*](api::ProjectLocationGetCall), [*locations get runtime config*](api::ProjectLocationGetRuntimeConfigCall), [*locations global providers connectors get*](api::ProjectLocationGlobalProviderConnectorGetCall), [*locations global providers connectors list*](api::ProjectLocationGlobalProviderConnectorListCall), [*locations global providers connectors versions get*](api::ProjectLocationGlobalProviderConnectorVersionGetCall), [*locations global providers connectors versions list*](api::ProjectLocationGlobalProviderConnectorVersionListCall), [*locations global providers get*](api::ProjectLocationGlobalProviderGetCall), [*locations global providers list*](api::ProjectLocationGlobalProviderListCall), [*locations list*](api::ProjectLocationListCall), [*locations operations cancel*](api::ProjectLocationOperationCancelCall), [*locations operations delete*](api::ProjectLocationOperationDeleteCall), [*locations operations get*](api::ProjectLocationOperationGetCall), [*locations operations list*](api::ProjectLocationOperationListCall), [*locations providers get iam policy*](api::ProjectLocationProviderGetIamPolicyCall), [*locations providers set iam policy*](api::ProjectLocationProviderSetIamPolicyCall) and [*locations providers test iam permissions*](api::ProjectLocationProviderTestIamPermissionCall)
+//!  * [*locations connections connection schema metadata refresh*](api::ProjectLocationConnectionConnectionSchemaMetadataRefreshCall), [*locations connections create*](api::ProjectLocationConnectionCreateCall), [*locations connections delete*](api::ProjectLocationConnectionDeleteCall), [*locations connections get*](api::ProjectLocationConnectionGetCall), [*locations connections get connection schema metadata*](api::ProjectLocationConnectionGetConnectionSchemaMetadataCall), [*locations connections get iam policy*](api::ProjectLocationConnectionGetIamPolicyCall), [*locations connections list*](api::ProjectLocationConnectionListCall), [*locations connections patch*](api::ProjectLocationConnectionPatchCall), [*locations connections runtime action schemas list*](api::ProjectLocationConnectionRuntimeActionSchemaListCall), [*locations connections runtime entity schemas list*](api::ProjectLocationConnectionRuntimeEntitySchemaListCall), [*locations connections set iam policy*](api::ProjectLocationConnectionSetIamPolicyCall), [*locations connections test iam permissions*](api::ProjectLocationConnectionTestIamPermissionCall), [*locations get*](api::ProjectLocationGetCall), [*locations get runtime config*](api::ProjectLocationGetRuntimeConfigCall), [*locations list*](api::ProjectLocationListCall), [*locations operations cancel*](api::ProjectLocationOperationCancelCall), [*locations operations delete*](api::ProjectLocationOperationDeleteCall), [*locations operations get*](api::ProjectLocationOperationGetCall), [*locations operations list*](api::ProjectLocationOperationListCall), [*locations providers connectors get*](api::ProjectLocationProviderConnectorGetCall), [*locations providers connectors list*](api::ProjectLocationProviderConnectorListCall), [*locations providers connectors versions get*](api::ProjectLocationProviderConnectorVersionGetCall), [*locations providers connectors versions list*](api::ProjectLocationProviderConnectorVersionListCall), [*locations providers get*](api::ProjectLocationProviderGetCall), [*locations providers get iam policy*](api::ProjectLocationProviderGetIamPolicyCall), [*locations providers list*](api::ProjectLocationProviderListCall), [*locations providers set iam policy*](api::ProjectLocationProviderSetIamPolicyCall) and [*locations providers test iam permissions*](api::ProjectLocationProviderTestIamPermissionCall)
 //! 
 //! 
 //! 
@@ -47,6 +47,7 @@
 //! Or specifically ...
 //! 
 //! ```ignore
+//! let r = hub.projects().locations_connections_connection_schema_metadata_refresh(...).doit().await
 //! let r = hub.projects().locations_connections_create(...).doit().await
 //! let r = hub.projects().locations_connections_delete(...).doit().await
 //! let r = hub.projects().locations_connections_patch(...).doit().await
@@ -81,7 +82,7 @@
 //! use connectors1::{Result, Error};
 //! # async fn dox() {
 //! use std::default::Default;
-//! use connectors1::{Connectors, oauth2, hyper, hyper_rustls};
+//! use connectors1::{Connectors, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 //! 
 //! // Get an ApplicationSecret instance by some means. It contains the `client_id` and 
 //! // `client_secret`, among other things.
@@ -191,22 +192,17 @@
 // This file was generated automatically from 'src/generator/templates/api/lib.rs.mako'
 // DO NOT EDIT !
 
-#[macro_use]
-extern crate serde_derive;
-
 // Re-export the hyper and hyper_rustls crate, they are required to build the hub
-pub extern crate hyper;
-pub extern crate hyper_rustls;
-extern crate serde;
-extern crate serde_json;
-// Re-export the yup_oauth2 crate, that is required to call some methods of the hub and the client
-pub extern crate yup_oauth2 as oauth2;
-extern crate mime;
-extern crate url;
-
+pub use hyper;
+pub use hyper_rustls;
+pub extern crate google_apis_common as client;
+pub use client::chrono;
 pub mod api;
-pub mod client;
 
 // Re-export the hub type and some basic client structs
 pub use api::Connectors;
-pub use client::{Result, Error, Delegate};
+pub use client::{Result, Error, Delegate, FieldMask};
+
+// Re-export the yup_oauth2 crate, that is required to call some methods of the hub and the client
+#[cfg(feature = "yup-oauth2")]
+pub use client::oauth2;

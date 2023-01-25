@@ -5,16 +5,16 @@ DO NOT EDIT !
 -->
 The `google-networkservices1` library allows access to all features of the *Google NetworkServices* service.
 
-This documentation was generated from *NetworkServices* crate version *4.0.1+20220222*, where *20220222* is the exact revision of the *networkservices:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v4.0.1*.
+This documentation was generated from *NetworkServices* crate version *5.0.2-beta-1+20230105*, where *20230105* is the exact revision of the *networkservices:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.2-beta-1*.
 
 Everything else about the *NetworkServices* *v1* API can be found at the
 [official documentation site](https://cloud.google.com/networking).
 # Features
 
-Handle the following *Resources* with ease from the central [hub](https://docs.rs/google-networkservices1/4.0.1+20220222/google_networkservices1/NetworkServices) ... 
+Handle the following *Resources* with ease from the central [hub](https://docs.rs/google-networkservices1/5.0.2-beta-1+20230105/google_networkservices1/NetworkServices) ... 
 
 * projects
- * [*locations edge cache keysets get iam policy*](https://docs.rs/google-networkservices1/4.0.1+20220222/google_networkservices1/api::ProjectLocationEdgeCacheKeysetGetIamPolicyCall), [*locations edge cache keysets set iam policy*](https://docs.rs/google-networkservices1/4.0.1+20220222/google_networkservices1/api::ProjectLocationEdgeCacheKeysetSetIamPolicyCall), [*locations edge cache keysets test iam permissions*](https://docs.rs/google-networkservices1/4.0.1+20220222/google_networkservices1/api::ProjectLocationEdgeCacheKeysetTestIamPermissionCall), [*locations edge cache origins get iam policy*](https://docs.rs/google-networkservices1/4.0.1+20220222/google_networkservices1/api::ProjectLocationEdgeCacheOriginGetIamPolicyCall), [*locations edge cache origins set iam policy*](https://docs.rs/google-networkservices1/4.0.1+20220222/google_networkservices1/api::ProjectLocationEdgeCacheOriginSetIamPolicyCall), [*locations edge cache origins test iam permissions*](https://docs.rs/google-networkservices1/4.0.1+20220222/google_networkservices1/api::ProjectLocationEdgeCacheOriginTestIamPermissionCall), [*locations edge cache services get iam policy*](https://docs.rs/google-networkservices1/4.0.1+20220222/google_networkservices1/api::ProjectLocationEdgeCacheServiceGetIamPolicyCall), [*locations edge cache services set iam policy*](https://docs.rs/google-networkservices1/4.0.1+20220222/google_networkservices1/api::ProjectLocationEdgeCacheServiceSetIamPolicyCall), [*locations edge cache services test iam permissions*](https://docs.rs/google-networkservices1/4.0.1+20220222/google_networkservices1/api::ProjectLocationEdgeCacheServiceTestIamPermissionCall), [*locations endpoint policies create*](https://docs.rs/google-networkservices1/4.0.1+20220222/google_networkservices1/api::ProjectLocationEndpointPolicyCreateCall), [*locations endpoint policies delete*](https://docs.rs/google-networkservices1/4.0.1+20220222/google_networkservices1/api::ProjectLocationEndpointPolicyDeleteCall), [*locations endpoint policies get*](https://docs.rs/google-networkservices1/4.0.1+20220222/google_networkservices1/api::ProjectLocationEndpointPolicyGetCall), [*locations endpoint policies get iam policy*](https://docs.rs/google-networkservices1/4.0.1+20220222/google_networkservices1/api::ProjectLocationEndpointPolicyGetIamPolicyCall), [*locations endpoint policies list*](https://docs.rs/google-networkservices1/4.0.1+20220222/google_networkservices1/api::ProjectLocationEndpointPolicyListCall), [*locations endpoint policies patch*](https://docs.rs/google-networkservices1/4.0.1+20220222/google_networkservices1/api::ProjectLocationEndpointPolicyPatchCall), [*locations endpoint policies set iam policy*](https://docs.rs/google-networkservices1/4.0.1+20220222/google_networkservices1/api::ProjectLocationEndpointPolicySetIamPolicyCall), [*locations endpoint policies test iam permissions*](https://docs.rs/google-networkservices1/4.0.1+20220222/google_networkservices1/api::ProjectLocationEndpointPolicyTestIamPermissionCall), [*locations get*](https://docs.rs/google-networkservices1/4.0.1+20220222/google_networkservices1/api::ProjectLocationGetCall), [*locations list*](https://docs.rs/google-networkservices1/4.0.1+20220222/google_networkservices1/api::ProjectLocationListCall), [*locations operations cancel*](https://docs.rs/google-networkservices1/4.0.1+20220222/google_networkservices1/api::ProjectLocationOperationCancelCall), [*locations operations delete*](https://docs.rs/google-networkservices1/4.0.1+20220222/google_networkservices1/api::ProjectLocationOperationDeleteCall), [*locations operations get*](https://docs.rs/google-networkservices1/4.0.1+20220222/google_networkservices1/api::ProjectLocationOperationGetCall) and [*locations operations list*](https://docs.rs/google-networkservices1/4.0.1+20220222/google_networkservices1/api::ProjectLocationOperationListCall)
+ * [*locations edge cache keysets get iam policy*](https://docs.rs/google-networkservices1/5.0.2-beta-1+20230105/google_networkservices1/api::ProjectLocationEdgeCacheKeysetGetIamPolicyCall), [*locations edge cache keysets set iam policy*](https://docs.rs/google-networkservices1/5.0.2-beta-1+20230105/google_networkservices1/api::ProjectLocationEdgeCacheKeysetSetIamPolicyCall), [*locations edge cache keysets test iam permissions*](https://docs.rs/google-networkservices1/5.0.2-beta-1+20230105/google_networkservices1/api::ProjectLocationEdgeCacheKeysetTestIamPermissionCall), [*locations edge cache origins get iam policy*](https://docs.rs/google-networkservices1/5.0.2-beta-1+20230105/google_networkservices1/api::ProjectLocationEdgeCacheOriginGetIamPolicyCall), [*locations edge cache origins set iam policy*](https://docs.rs/google-networkservices1/5.0.2-beta-1+20230105/google_networkservices1/api::ProjectLocationEdgeCacheOriginSetIamPolicyCall), [*locations edge cache origins test iam permissions*](https://docs.rs/google-networkservices1/5.0.2-beta-1+20230105/google_networkservices1/api::ProjectLocationEdgeCacheOriginTestIamPermissionCall), [*locations edge cache services get iam policy*](https://docs.rs/google-networkservices1/5.0.2-beta-1+20230105/google_networkservices1/api::ProjectLocationEdgeCacheServiceGetIamPolicyCall), [*locations edge cache services set iam policy*](https://docs.rs/google-networkservices1/5.0.2-beta-1+20230105/google_networkservices1/api::ProjectLocationEdgeCacheServiceSetIamPolicyCall), [*locations edge cache services test iam permissions*](https://docs.rs/google-networkservices1/5.0.2-beta-1+20230105/google_networkservices1/api::ProjectLocationEdgeCacheServiceTestIamPermissionCall), [*locations endpoint policies create*](https://docs.rs/google-networkservices1/5.0.2-beta-1+20230105/google_networkservices1/api::ProjectLocationEndpointPolicyCreateCall), [*locations endpoint policies delete*](https://docs.rs/google-networkservices1/5.0.2-beta-1+20230105/google_networkservices1/api::ProjectLocationEndpointPolicyDeleteCall), [*locations endpoint policies get*](https://docs.rs/google-networkservices1/5.0.2-beta-1+20230105/google_networkservices1/api::ProjectLocationEndpointPolicyGetCall), [*locations endpoint policies get iam policy*](https://docs.rs/google-networkservices1/5.0.2-beta-1+20230105/google_networkservices1/api::ProjectLocationEndpointPolicyGetIamPolicyCall), [*locations endpoint policies list*](https://docs.rs/google-networkservices1/5.0.2-beta-1+20230105/google_networkservices1/api::ProjectLocationEndpointPolicyListCall), [*locations endpoint policies patch*](https://docs.rs/google-networkservices1/5.0.2-beta-1+20230105/google_networkservices1/api::ProjectLocationEndpointPolicyPatchCall), [*locations endpoint policies set iam policy*](https://docs.rs/google-networkservices1/5.0.2-beta-1+20230105/google_networkservices1/api::ProjectLocationEndpointPolicySetIamPolicyCall), [*locations endpoint policies test iam permissions*](https://docs.rs/google-networkservices1/5.0.2-beta-1+20230105/google_networkservices1/api::ProjectLocationEndpointPolicyTestIamPermissionCall), [*locations gateways create*](https://docs.rs/google-networkservices1/5.0.2-beta-1+20230105/google_networkservices1/api::ProjectLocationGatewayCreateCall), [*locations gateways delete*](https://docs.rs/google-networkservices1/5.0.2-beta-1+20230105/google_networkservices1/api::ProjectLocationGatewayDeleteCall), [*locations gateways get*](https://docs.rs/google-networkservices1/5.0.2-beta-1+20230105/google_networkservices1/api::ProjectLocationGatewayGetCall), [*locations gateways get iam policy*](https://docs.rs/google-networkservices1/5.0.2-beta-1+20230105/google_networkservices1/api::ProjectLocationGatewayGetIamPolicyCall), [*locations gateways list*](https://docs.rs/google-networkservices1/5.0.2-beta-1+20230105/google_networkservices1/api::ProjectLocationGatewayListCall), [*locations gateways patch*](https://docs.rs/google-networkservices1/5.0.2-beta-1+20230105/google_networkservices1/api::ProjectLocationGatewayPatchCall), [*locations gateways set iam policy*](https://docs.rs/google-networkservices1/5.0.2-beta-1+20230105/google_networkservices1/api::ProjectLocationGatewaySetIamPolicyCall), [*locations gateways test iam permissions*](https://docs.rs/google-networkservices1/5.0.2-beta-1+20230105/google_networkservices1/api::ProjectLocationGatewayTestIamPermissionCall), [*locations get*](https://docs.rs/google-networkservices1/5.0.2-beta-1+20230105/google_networkservices1/api::ProjectLocationGetCall), [*locations grpc routes create*](https://docs.rs/google-networkservices1/5.0.2-beta-1+20230105/google_networkservices1/api::ProjectLocationGrpcRouteCreateCall), [*locations grpc routes delete*](https://docs.rs/google-networkservices1/5.0.2-beta-1+20230105/google_networkservices1/api::ProjectLocationGrpcRouteDeleteCall), [*locations grpc routes get*](https://docs.rs/google-networkservices1/5.0.2-beta-1+20230105/google_networkservices1/api::ProjectLocationGrpcRouteGetCall), [*locations grpc routes list*](https://docs.rs/google-networkservices1/5.0.2-beta-1+20230105/google_networkservices1/api::ProjectLocationGrpcRouteListCall), [*locations grpc routes patch*](https://docs.rs/google-networkservices1/5.0.2-beta-1+20230105/google_networkservices1/api::ProjectLocationGrpcRoutePatchCall), [*locations http routes create*](https://docs.rs/google-networkservices1/5.0.2-beta-1+20230105/google_networkservices1/api::ProjectLocationHttpRouteCreateCall), [*locations http routes delete*](https://docs.rs/google-networkservices1/5.0.2-beta-1+20230105/google_networkservices1/api::ProjectLocationHttpRouteDeleteCall), [*locations http routes get*](https://docs.rs/google-networkservices1/5.0.2-beta-1+20230105/google_networkservices1/api::ProjectLocationHttpRouteGetCall), [*locations http routes list*](https://docs.rs/google-networkservices1/5.0.2-beta-1+20230105/google_networkservices1/api::ProjectLocationHttpRouteListCall), [*locations http routes patch*](https://docs.rs/google-networkservices1/5.0.2-beta-1+20230105/google_networkservices1/api::ProjectLocationHttpRoutePatchCall), [*locations list*](https://docs.rs/google-networkservices1/5.0.2-beta-1+20230105/google_networkservices1/api::ProjectLocationListCall), [*locations meshes create*](https://docs.rs/google-networkservices1/5.0.2-beta-1+20230105/google_networkservices1/api::ProjectLocationMeshCreateCall), [*locations meshes delete*](https://docs.rs/google-networkservices1/5.0.2-beta-1+20230105/google_networkservices1/api::ProjectLocationMeshDeleteCall), [*locations meshes get*](https://docs.rs/google-networkservices1/5.0.2-beta-1+20230105/google_networkservices1/api::ProjectLocationMeshGetCall), [*locations meshes get iam policy*](https://docs.rs/google-networkservices1/5.0.2-beta-1+20230105/google_networkservices1/api::ProjectLocationMeshGetIamPolicyCall), [*locations meshes list*](https://docs.rs/google-networkservices1/5.0.2-beta-1+20230105/google_networkservices1/api::ProjectLocationMeshListCall), [*locations meshes patch*](https://docs.rs/google-networkservices1/5.0.2-beta-1+20230105/google_networkservices1/api::ProjectLocationMeshPatchCall), [*locations meshes set iam policy*](https://docs.rs/google-networkservices1/5.0.2-beta-1+20230105/google_networkservices1/api::ProjectLocationMeshSetIamPolicyCall), [*locations meshes test iam permissions*](https://docs.rs/google-networkservices1/5.0.2-beta-1+20230105/google_networkservices1/api::ProjectLocationMeshTestIamPermissionCall), [*locations operations cancel*](https://docs.rs/google-networkservices1/5.0.2-beta-1+20230105/google_networkservices1/api::ProjectLocationOperationCancelCall), [*locations operations delete*](https://docs.rs/google-networkservices1/5.0.2-beta-1+20230105/google_networkservices1/api::ProjectLocationOperationDeleteCall), [*locations operations get*](https://docs.rs/google-networkservices1/5.0.2-beta-1+20230105/google_networkservices1/api::ProjectLocationOperationGetCall), [*locations operations list*](https://docs.rs/google-networkservices1/5.0.2-beta-1+20230105/google_networkservices1/api::ProjectLocationOperationListCall), [*locations service bindings create*](https://docs.rs/google-networkservices1/5.0.2-beta-1+20230105/google_networkservices1/api::ProjectLocationServiceBindingCreateCall), [*locations service bindings delete*](https://docs.rs/google-networkservices1/5.0.2-beta-1+20230105/google_networkservices1/api::ProjectLocationServiceBindingDeleteCall), [*locations service bindings get*](https://docs.rs/google-networkservices1/5.0.2-beta-1+20230105/google_networkservices1/api::ProjectLocationServiceBindingGetCall), [*locations service bindings get iam policy*](https://docs.rs/google-networkservices1/5.0.2-beta-1+20230105/google_networkservices1/api::ProjectLocationServiceBindingGetIamPolicyCall), [*locations service bindings list*](https://docs.rs/google-networkservices1/5.0.2-beta-1+20230105/google_networkservices1/api::ProjectLocationServiceBindingListCall), [*locations service bindings set iam policy*](https://docs.rs/google-networkservices1/5.0.2-beta-1+20230105/google_networkservices1/api::ProjectLocationServiceBindingSetIamPolicyCall), [*locations service bindings test iam permissions*](https://docs.rs/google-networkservices1/5.0.2-beta-1+20230105/google_networkservices1/api::ProjectLocationServiceBindingTestIamPermissionCall), [*locations tcp routes create*](https://docs.rs/google-networkservices1/5.0.2-beta-1+20230105/google_networkservices1/api::ProjectLocationTcpRouteCreateCall), [*locations tcp routes delete*](https://docs.rs/google-networkservices1/5.0.2-beta-1+20230105/google_networkservices1/api::ProjectLocationTcpRouteDeleteCall), [*locations tcp routes get*](https://docs.rs/google-networkservices1/5.0.2-beta-1+20230105/google_networkservices1/api::ProjectLocationTcpRouteGetCall), [*locations tcp routes list*](https://docs.rs/google-networkservices1/5.0.2-beta-1+20230105/google_networkservices1/api::ProjectLocationTcpRouteListCall), [*locations tcp routes patch*](https://docs.rs/google-networkservices1/5.0.2-beta-1+20230105/google_networkservices1/api::ProjectLocationTcpRoutePatchCall), [*locations tls routes create*](https://docs.rs/google-networkservices1/5.0.2-beta-1+20230105/google_networkservices1/api::ProjectLocationTlsRouteCreateCall), [*locations tls routes delete*](https://docs.rs/google-networkservices1/5.0.2-beta-1+20230105/google_networkservices1/api::ProjectLocationTlsRouteDeleteCall), [*locations tls routes get*](https://docs.rs/google-networkservices1/5.0.2-beta-1+20230105/google_networkservices1/api::ProjectLocationTlsRouteGetCall), [*locations tls routes list*](https://docs.rs/google-networkservices1/5.0.2-beta-1+20230105/google_networkservices1/api::ProjectLocationTlsRouteListCall) and [*locations tls routes patch*](https://docs.rs/google-networkservices1/5.0.2-beta-1+20230105/google_networkservices1/api::ProjectLocationTlsRoutePatchCall)
 
 
 
@@ -23,17 +23,17 @@ Handle the following *Resources* with ease from the central [hub](https://docs.r
 
 The API is structured into the following primary items:
 
-* **[Hub](https://docs.rs/google-networkservices1/4.0.1+20220222/google_networkservices1/NetworkServices)**
+* **[Hub](https://docs.rs/google-networkservices1/5.0.2-beta-1+20230105/google_networkservices1/NetworkServices)**
     * a central object to maintain state and allow accessing all *Activities*
-    * creates [*Method Builders*](https://docs.rs/google-networkservices1/4.0.1+20220222/google_networkservices1/client::MethodsBuilder) which in turn
-      allow access to individual [*Call Builders*](https://docs.rs/google-networkservices1/4.0.1+20220222/google_networkservices1/client::CallBuilder)
-* **[Resources](https://docs.rs/google-networkservices1/4.0.1+20220222/google_networkservices1/client::Resource)**
+    * creates [*Method Builders*](https://docs.rs/google-networkservices1/5.0.2-beta-1+20230105/google_networkservices1/client::MethodsBuilder) which in turn
+      allow access to individual [*Call Builders*](https://docs.rs/google-networkservices1/5.0.2-beta-1+20230105/google_networkservices1/client::CallBuilder)
+* **[Resources](https://docs.rs/google-networkservices1/5.0.2-beta-1+20230105/google_networkservices1/client::Resource)**
     * primary types that you can apply *Activities* to
     * a collection of properties and *Parts*
-    * **[Parts](https://docs.rs/google-networkservices1/4.0.1+20220222/google_networkservices1/client::Part)**
+    * **[Parts](https://docs.rs/google-networkservices1/5.0.2-beta-1+20230105/google_networkservices1/client::Part)**
         * a collection of properties
         * never directly used in *Activities*
-* **[Activities](https://docs.rs/google-networkservices1/4.0.1+20220222/google_networkservices1/client::CallBuilder)**
+* **[Activities](https://docs.rs/google-networkservices1/5.0.2-beta-1+20230105/google_networkservices1/client::CallBuilder)**
     * operations to apply to *Resources*
 
 All *structures* are marked with applicable traits to further categorize them and ease browsing.
@@ -47,14 +47,30 @@ let r = hub.resource().activity(...).doit().await
 Or specifically ...
 
 ```ignore
-let r = hub.projects().locations_edge_cache_keysets_get_iam_policy(...).doit().await
-let r = hub.projects().locations_edge_cache_keysets_set_iam_policy(...).doit().await
-let r = hub.projects().locations_edge_cache_origins_get_iam_policy(...).doit().await
-let r = hub.projects().locations_edge_cache_origins_set_iam_policy(...).doit().await
-let r = hub.projects().locations_edge_cache_services_get_iam_policy(...).doit().await
-let r = hub.projects().locations_edge_cache_services_set_iam_policy(...).doit().await
-let r = hub.projects().locations_endpoint_policies_get_iam_policy(...).doit().await
-let r = hub.projects().locations_endpoint_policies_set_iam_policy(...).doit().await
+let r = hub.projects().locations_endpoint_policies_create(...).doit().await
+let r = hub.projects().locations_endpoint_policies_delete(...).doit().await
+let r = hub.projects().locations_endpoint_policies_patch(...).doit().await
+let r = hub.projects().locations_gateways_create(...).doit().await
+let r = hub.projects().locations_gateways_delete(...).doit().await
+let r = hub.projects().locations_gateways_patch(...).doit().await
+let r = hub.projects().locations_grpc_routes_create(...).doit().await
+let r = hub.projects().locations_grpc_routes_delete(...).doit().await
+let r = hub.projects().locations_grpc_routes_patch(...).doit().await
+let r = hub.projects().locations_http_routes_create(...).doit().await
+let r = hub.projects().locations_http_routes_delete(...).doit().await
+let r = hub.projects().locations_http_routes_patch(...).doit().await
+let r = hub.projects().locations_meshes_create(...).doit().await
+let r = hub.projects().locations_meshes_delete(...).doit().await
+let r = hub.projects().locations_meshes_patch(...).doit().await
+let r = hub.projects().locations_operations_get(...).doit().await
+let r = hub.projects().locations_service_bindings_create(...).doit().await
+let r = hub.projects().locations_service_bindings_delete(...).doit().await
+let r = hub.projects().locations_tcp_routes_create(...).doit().await
+let r = hub.projects().locations_tcp_routes_delete(...).doit().await
+let r = hub.projects().locations_tcp_routes_patch(...).doit().await
+let r = hub.projects().locations_tls_routes_create(...).doit().await
+let r = hub.projects().locations_tls_routes_delete(...).doit().await
+let r = hub.projects().locations_tls_routes_patch(...).doit().await
 ```
 
 The `resource()` and `activity(...)` calls create [builders][builder-pattern]. The second one dealing with `Activities` 
@@ -81,9 +97,10 @@ serde_json = "^1.0"
 extern crate hyper;
 extern crate hyper_rustls;
 extern crate google_networkservices1 as networkservices1;
+use networkservices1::api::EndpointPolicy;
 use networkservices1::{Result, Error};
 use std::default::Default;
-use networkservices1::{NetworkServices, oauth2, hyper, hyper_rustls};
+use networkservices1::{NetworkServices, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 
 // Get an ApplicationSecret instance by some means. It contains the `client_id` and 
 // `client_secret`, among other things.
@@ -98,11 +115,16 @@ let auth = oauth2::InstalledFlowAuthenticator::builder(
         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
     ).build().await.unwrap();
 let mut hub = NetworkServices::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+// As the method needs a request, you would usually fill it with the desired information
+// into the respective structure. Some of the parts shown here might not be applicable !
+// Values shown here are possibly random and not representative !
+let mut req = EndpointPolicy::default();
+
 // You can configure optional parameters by calling the respective setters at will, and
 // execute the final call using `doit()`.
 // Values shown here are possibly random and not representative !
-let result = hub.projects().locations_edge_cache_keysets_get_iam_policy("resource")
-             .options_requested_policy_version(-33)
+let result = hub.projects().locations_endpoint_policies_create(req, "parent")
+             .endpoint_policy_id("magna")
              .doit().await;
 
 match result {
@@ -126,17 +148,17 @@ match result {
 ```
 ## Handling Errors
 
-All errors produced by the system are provided either as [Result](https://docs.rs/google-networkservices1/4.0.1+20220222/google_networkservices1/client::Result) enumeration as return value of
+All errors produced by the system are provided either as [Result](https://docs.rs/google-networkservices1/5.0.2-beta-1+20230105/google_networkservices1/client::Result) enumeration as return value of
 the doit() methods, or handed as possibly intermediate results to either the 
-[Hub Delegate](https://docs.rs/google-networkservices1/4.0.1+20220222/google_networkservices1/client::Delegate), or the [Authenticator Delegate](https://docs.rs/yup-oauth2/*/yup_oauth2/trait.AuthenticatorDelegate.html).
+[Hub Delegate](https://docs.rs/google-networkservices1/5.0.2-beta-1+20230105/google_networkservices1/client::Delegate), or the [Authenticator Delegate](https://docs.rs/yup-oauth2/*/yup_oauth2/trait.AuthenticatorDelegate.html).
 
 When delegates handle errors or intermediate values, they may have a chance to instruct the system to retry. This 
 makes the system potentially resilient to all kinds of errors.
 
 ## Uploads and Downloads
-If a method supports downloads, the response body, which is part of the [Result](https://docs.rs/google-networkservices1/4.0.1+20220222/google_networkservices1/client::Result), should be
+If a method supports downloads, the response body, which is part of the [Result](https://docs.rs/google-networkservices1/5.0.2-beta-1+20230105/google_networkservices1/client::Result), should be
 read by you to obtain the media.
-If such a method also supports a [Response Result](https://docs.rs/google-networkservices1/4.0.1+20220222/google_networkservices1/client::ResponseResult), it will return that by default.
+If such a method also supports a [Response Result](https://docs.rs/google-networkservices1/5.0.2-beta-1+20230105/google_networkservices1/client::ResponseResult), it will return that by default.
 You can see it as meta-data for the actual media. To trigger a media download, you will have to set up the builder by making
 this call: `.param("alt", "media")`.
 
@@ -146,29 +168,29 @@ Methods supporting uploads can do so using up to 2 different protocols:
 
 ## Customization and Callbacks
 
-You may alter the way an `doit()` method is called by providing a [delegate](https://docs.rs/google-networkservices1/4.0.1+20220222/google_networkservices1/client::Delegate) to the 
-[Method Builder](https://docs.rs/google-networkservices1/4.0.1+20220222/google_networkservices1/client::CallBuilder) before making the final `doit()` call. 
+You may alter the way an `doit()` method is called by providing a [delegate](https://docs.rs/google-networkservices1/5.0.2-beta-1+20230105/google_networkservices1/client::Delegate) to the 
+[Method Builder](https://docs.rs/google-networkservices1/5.0.2-beta-1+20230105/google_networkservices1/client::CallBuilder) before making the final `doit()` call. 
 Respective methods will be called to provide progress information, as well as determine whether the system should 
 retry on failure.
 
-The [delegate trait](https://docs.rs/google-networkservices1/4.0.1+20220222/google_networkservices1/client::Delegate) is default-implemented, allowing you to customize it with minimal effort.
+The [delegate trait](https://docs.rs/google-networkservices1/5.0.2-beta-1+20230105/google_networkservices1/client::Delegate) is default-implemented, allowing you to customize it with minimal effort.
 
 ## Optional Parts in Server-Requests
 
-All structures provided by this library are made to be [encodable](https://docs.rs/google-networkservices1/4.0.1+20220222/google_networkservices1/client::RequestValue) and 
-[decodable](https://docs.rs/google-networkservices1/4.0.1+20220222/google_networkservices1/client::ResponseResult) via *json*. Optionals are used to indicate that partial requests are responses 
+All structures provided by this library are made to be [encodable](https://docs.rs/google-networkservices1/5.0.2-beta-1+20230105/google_networkservices1/client::RequestValue) and 
+[decodable](https://docs.rs/google-networkservices1/5.0.2-beta-1+20230105/google_networkservices1/client::ResponseResult) via *json*. Optionals are used to indicate that partial requests are responses 
 are valid.
-Most optionals are are considered [Parts](https://docs.rs/google-networkservices1/4.0.1+20220222/google_networkservices1/client::Part) which are identifiable by name, which will be sent to 
+Most optionals are are considered [Parts](https://docs.rs/google-networkservices1/5.0.2-beta-1+20230105/google_networkservices1/client::Part) which are identifiable by name, which will be sent to 
 the server to indicate either the set parts of the request or the desired parts in the response.
 
 ## Builder Arguments
 
-Using [method builders](https://docs.rs/google-networkservices1/4.0.1+20220222/google_networkservices1/client::CallBuilder), you are able to prepare an action call by repeatedly calling it's methods.
+Using [method builders](https://docs.rs/google-networkservices1/5.0.2-beta-1+20230105/google_networkservices1/client::CallBuilder), you are able to prepare an action call by repeatedly calling it's methods.
 These will always take a single argument, for which the following statements are true.
 
 * [PODs][wiki-pod] are handed by copy
 * strings are passed as `&str`
-* [request values](https://docs.rs/google-networkservices1/4.0.1+20220222/google_networkservices1/client::RequestValue) are moved
+* [request values](https://docs.rs/google-networkservices1/5.0.2-beta-1+20230105/google_networkservices1/client::RequestValue) are moved
 
 Arguments will always be copied or cloned into the builder, to make them independent of their original life times.
 

@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/generator/templates/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *drive* crate version *4.0.1+20220225*, where *20220225* is the exact revision of the *drive:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v4.0.1*.
+//! This documentation was generated from *drive* crate version *5.0.2-beta-1+20230115*, where *20230115* is the exact revision of the *drive:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.2-beta-1*.
 //! 
 //! Everything else about the *drive* *v2* API can be found at the
 //! [official documentation site](https://developers.google.com/drive/).
@@ -20,13 +20,13 @@
 //! * [channels](api::Channel)
 //!  * [*stop*](api::ChannelStopCall)
 //! * children
-//!  * [*delete*](api::ChildrenDeleteCall), [*get*](api::ChildrenGetCall), [*insert*](api::ChildrenInsertCall) and [*list*](api::ChildrenListCall)
+//!  * [*delete*](api::ChildDeleteCall), [*get*](api::ChildGetCall), [*insert*](api::ChildInsertCall) and [*list*](api::ChildListCall)
 //! * [comments](api::Comment)
 //!  * [*delete*](api::CommentDeleteCall), [*get*](api::CommentGetCall), [*insert*](api::CommentInsertCall), [*list*](api::CommentListCall), [*patch*](api::CommentPatchCall) and [*update*](api::CommentUpdateCall)
 //! * [drives](api::Drive)
 //!  * [*delete*](api::DriveDeleteCall), [*get*](api::DriveGetCall), [*hide*](api::DriveHideCall), [*insert*](api::DriveInsertCall), [*list*](api::DriveListCall), [*unhide*](api::DriveUnhideCall) and [*update*](api::DriveUpdateCall)
 //! * [files](api::File)
-//!  * [*copy*](api::FileCopyCall), [*delete*](api::FileDeleteCall), [*empty trash*](api::FileEmptyTrashCall), [*export*](api::FileExportCall), [*generate ids*](api::FileGenerateIdCall), [*get*](api::FileGetCall), [*insert*](api::FileInsertCall), [*list*](api::FileListCall), [*patch*](api::FilePatchCall), [*touch*](api::FileTouchCall), [*trash*](api::FileTrashCall), [*untrash*](api::FileUntrashCall), [*update*](api::FileUpdateCall) and [*watch*](api::FileWatchCall)
+//!  * [*copy*](api::FileCopyCall), [*delete*](api::FileDeleteCall), [*empty trash*](api::FileEmptyTrashCall), [*export*](api::FileExportCall), [*generate ids*](api::FileGenerateIdCall), [*get*](api::FileGetCall), [*insert*](api::FileInsertCall), [*list*](api::FileListCall), [*list labels*](api::FileListLabelCall), [*modify labels*](api::FileModifyLabelCall), [*patch*](api::FilePatchCall), [*touch*](api::FileTouchCall), [*trash*](api::FileTrashCall), [*untrash*](api::FileUntrashCall), [*update*](api::FileUpdateCall) and [*watch*](api::FileWatchCall)
 //! * parents
 //!  * [*delete*](api::ParentDeleteCall), [*get*](api::ParentGetCall), [*insert*](api::ParentInsertCall) and [*list*](api::ParentListCall)
 //! * [permissions](api::Permission)
@@ -100,6 +100,8 @@
 //! let r = hub.files().get(...).doit().await
 //! let r = hub.files().insert(...).doit().await
 //! let r = hub.files().list(...).doit().await
+//! let r = hub.files().list_labels(...).doit().await
+//! let r = hub.files().modify_labels(...).doit().await
 //! let r = hub.files().patch(...).doit().await
 //! let r = hub.files().touch(...).doit().await
 //! let r = hub.files().trash(...).doit().await
@@ -136,7 +138,7 @@
 //! use drive2::{Result, Error};
 //! # async fn dox() {
 //! use std::default::Default;
-//! use drive2::{DriveHub, oauth2, hyper, hyper_rustls};
+//! use drive2::{DriveHub, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 //! 
 //! // Get an ApplicationSecret instance by some means. It contains the `client_id` and 
 //! // `client_secret`, among other things.
@@ -161,22 +163,23 @@
 //! // Values shown here are possibly random and not representative !
 //! let result = hub.files().patch(req, "fileId")
 //!              .use_content_as_indexable_text(true)
-//!              .update_viewed_date(true)
-//!              .timed_text_track_name("ipsum")
-//!              .timed_text_language("est")
-//!              .supports_team_drives(true)
-//!              .supports_all_drives(false)
-//!              .set_modified_date(true)
-//!              .remove_parents("eos")
-//!              .pinned(false)
-//!              .ocr_language("sed")
-//!              .ocr(false)
-//!              .new_revision(false)
-//!              .modified_date_behavior("no")
-//!              .include_permissions_for_view("Stet")
-//!              .enforce_single_parent(true)
-//!              .convert(true)
-//!              .add_parents("vero")
+//!              .update_viewed_date(false)
+//!              .timed_text_track_name("Lorem")
+//!              .timed_text_language("eos")
+//!              .supports_team_drives(false)
+//!              .supports_all_drives(true)
+//!              .set_modified_date(false)
+//!              .remove_parents("sed")
+//!              .pinned(true)
+//!              .ocr_language("Stet")
+//!              .ocr(true)
+//!              .new_revision(true)
+//!              .modified_date_behavior("vero")
+//!              .include_permissions_for_view("erat")
+//!              .include_labels("sed")
+//!              .enforce_single_parent(false)
+//!              .convert(false)
+//!              .add_parents("dolor")
 //!              .doit().await;
 //! 
 //! match result {
@@ -262,22 +265,17 @@
 // This file was generated automatically from 'src/generator/templates/api/lib.rs.mako'
 // DO NOT EDIT !
 
-#[macro_use]
-extern crate serde_derive;
-
 // Re-export the hyper and hyper_rustls crate, they are required to build the hub
-pub extern crate hyper;
-pub extern crate hyper_rustls;
-extern crate serde;
-extern crate serde_json;
-// Re-export the yup_oauth2 crate, that is required to call some methods of the hub and the client
-pub extern crate yup_oauth2 as oauth2;
-extern crate mime;
-extern crate url;
-
+pub use hyper;
+pub use hyper_rustls;
+pub extern crate google_apis_common as client;
+pub use client::chrono;
 pub mod api;
-pub mod client;
 
 // Re-export the hub type and some basic client structs
 pub use api::DriveHub;
-pub use client::{Result, Error, Delegate};
+pub use client::{Result, Error, Delegate, FieldMask};
+
+// Re-export the yup_oauth2 crate, that is required to call some methods of the hub and the client
+#[cfg(feature = "yup-oauth2")]
+pub use client::oauth2;

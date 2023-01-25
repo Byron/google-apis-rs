@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/generator/templates/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Android Publisher* crate version *4.0.1+20220307*, where *20220307* is the exact revision of the *androidpublisher:v3* schema built by the [mako](http://www.makotemplates.org/) code generator *v4.0.1*.
+//! This documentation was generated from *Android Publisher* crate version *5.0.2-beta-1+20230124*, where *20230124* is the exact revision of the *androidpublisher:v3* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.2-beta-1*.
 //! 
 //! Everything else about the *Android Publisher* *v3* API can be found at the
 //! [official documentation site](https://developers.google.com/android-publisher).
@@ -11,6 +11,8 @@
 //! 
 //! Handle the following *Resources* with ease from the central [hub](AndroidPublisher) ... 
 //! 
+//! * applications
+//!  * [*device tier configs create*](api::ApplicationDeviceTierConfigCreateCall), [*device tier configs get*](api::ApplicationDeviceTierConfigGetCall) and [*device tier configs list*](api::ApplicationDeviceTierConfigListCall)
 //! * edits
 //!  * [*apks addexternallyhosted*](api::EditApkAddexternallyhostedCall), [*apks list*](api::EditApkListCall), [*apks upload*](api::EditApkUploadCall), [*bundles list*](api::EditBundleListCall), [*bundles upload*](api::EditBundleUploadCall), [*commit*](api::EditCommitCall), [*countryavailability get*](api::EditCountryavailabilityGetCall), [*delete*](api::EditDeleteCall), [*deobfuscationfiles upload*](api::EditDeobfuscationfileUploadCall), [*details get*](api::EditDetailGetCall), [*details patch*](api::EditDetailPatchCall), [*details update*](api::EditDetailUpdateCall), [*expansionfiles get*](api::EditExpansionfileGetCall), [*expansionfiles patch*](api::EditExpansionfilePatchCall), [*expansionfiles update*](api::EditExpansionfileUpdateCall), [*expansionfiles upload*](api::EditExpansionfileUploadCall), [*get*](api::EditGetCall), [*images delete*](api::EditImageDeleteCall), [*images deleteall*](api::EditImageDeleteallCall), [*images list*](api::EditImageListCall), [*images upload*](api::EditImageUploadCall), [*insert*](api::EditInsertCall), [*listings delete*](api::EditListingDeleteCall), [*listings deleteall*](api::EditListingDeleteallCall), [*listings get*](api::EditListingGetCall), [*listings list*](api::EditListingListCall), [*listings patch*](api::EditListingPatchCall), [*listings update*](api::EditListingUpdateCall), [*testers get*](api::EditTesterGetCall), [*testers patch*](api::EditTesterPatchCall), [*testers update*](api::EditTesterUpdateCall), [*tracks get*](api::EditTrackGetCall), [*tracks list*](api::EditTrackListCall), [*tracks patch*](api::EditTrackPatchCall), [*tracks update*](api::EditTrackUpdateCall) and [*validate*](api::EditValidateCall)
 //! * generatedapks
@@ -22,11 +24,11 @@
 //! * internalappsharingartifacts
 //!  * [*uploadapk*](api::InternalappsharingartifactUploadapkCall) and [*uploadbundle*](api::InternalappsharingartifactUploadbundleCall)
 //! * monetization
-//!  * [*convert region prices*](api::MonetizationConvertRegionPriceCall)
+//!  * [*convert region prices*](api::MonetizationConvertRegionPriceCall), [*subscriptions archive*](api::MonetizationSubscriptionArchiveCall), [*subscriptions base plans activate*](api::MonetizationSubscriptionBasePlanActivateCall), [*subscriptions base plans deactivate*](api::MonetizationSubscriptionBasePlanDeactivateCall), [*subscriptions base plans delete*](api::MonetizationSubscriptionBasePlanDeleteCall), [*subscriptions base plans migrate prices*](api::MonetizationSubscriptionBasePlanMigratePriceCall), [*subscriptions base plans offers activate*](api::MonetizationSubscriptionBasePlanOfferActivateCall), [*subscriptions base plans offers create*](api::MonetizationSubscriptionBasePlanOfferCreateCall), [*subscriptions base plans offers deactivate*](api::MonetizationSubscriptionBasePlanOfferDeactivateCall), [*subscriptions base plans offers delete*](api::MonetizationSubscriptionBasePlanOfferDeleteCall), [*subscriptions base plans offers get*](api::MonetizationSubscriptionBasePlanOfferGetCall), [*subscriptions base plans offers list*](api::MonetizationSubscriptionBasePlanOfferListCall), [*subscriptions base plans offers patch*](api::MonetizationSubscriptionBasePlanOfferPatchCall), [*subscriptions create*](api::MonetizationSubscriptionCreateCall), [*subscriptions delete*](api::MonetizationSubscriptionDeleteCall), [*subscriptions get*](api::MonetizationSubscriptionGetCall), [*subscriptions list*](api::MonetizationSubscriptionListCall) and [*subscriptions patch*](api::MonetizationSubscriptionPatchCall)
 //! * orders
 //!  * [*refund*](api::OrderRefundCall)
 //! * purchases
-//!  * [*products acknowledge*](api::PurchaseProductAcknowledgeCall), [*products get*](api::PurchaseProductGetCall), [*subscriptions acknowledge*](api::PurchaseSubscriptionAcknowledgeCall), [*subscriptions cancel*](api::PurchaseSubscriptionCancelCall), [*subscriptions defer*](api::PurchaseSubscriptionDeferCall), [*subscriptions get*](api::PurchaseSubscriptionGetCall), [*subscriptions refund*](api::PurchaseSubscriptionRefundCall), [*subscriptions revoke*](api::PurchaseSubscriptionRevokeCall) and [*voidedpurchases list*](api::PurchaseVoidedpurchaseListCall)
+//!  * [*products acknowledge*](api::PurchaseProductAcknowledgeCall), [*products get*](api::PurchaseProductGetCall), [*subscriptions acknowledge*](api::PurchaseSubscriptionAcknowledgeCall), [*subscriptions cancel*](api::PurchaseSubscriptionCancelCall), [*subscriptions defer*](api::PurchaseSubscriptionDeferCall), [*subscriptions get*](api::PurchaseSubscriptionGetCall), [*subscriptions refund*](api::PurchaseSubscriptionRefundCall), [*subscriptions revoke*](api::PurchaseSubscriptionRevokeCall), [*subscriptionsv2 get*](api::PurchaseSubscriptionsv2GetCall) and [*voidedpurchases list*](api::PurchaseVoidedpurchaseListCall)
 //! * [reviews](api::Review)
 //!  * [*get*](api::ReviewGetCall), [*list*](api::ReviewListCall) and [*reply*](api::ReviewReplyCall)
 //! * systemapks
@@ -82,10 +84,12 @@
 //! Or specifically ...
 //! 
 //! ```ignore
-//! let r = hub.inappproducts().get(...).doit().await
-//! let r = hub.inappproducts().insert(...).doit().await
-//! let r = hub.inappproducts().patch(...).doit().await
-//! let r = hub.inappproducts().update(...).doit().await
+//! let r = hub.monetization().subscriptions_base_plans_activate(...).doit().await
+//! let r = hub.monetization().subscriptions_base_plans_deactivate(...).doit().await
+//! let r = hub.monetization().subscriptions_archive(...).doit().await
+//! let r = hub.monetization().subscriptions_create(...).doit().await
+//! let r = hub.monetization().subscriptions_get(...).doit().await
+//! let r = hub.monetization().subscriptions_patch(...).doit().await
 //! ```
 //! 
 //! The `resource()` and `activity(...)` calls create [builders][builder-pattern]. The second one dealing with `Activities` 
@@ -112,11 +116,11 @@
 //! extern crate hyper;
 //! extern crate hyper_rustls;
 //! extern crate google_androidpublisher3 as androidpublisher3;
-//! use androidpublisher3::api::InAppProduct;
+//! use androidpublisher3::api::Subscription;
 //! use androidpublisher3::{Result, Error};
 //! # async fn dox() {
 //! use std::default::Default;
-//! use androidpublisher3::{AndroidPublisher, oauth2, hyper, hyper_rustls};
+//! use androidpublisher3::{AndroidPublisher, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 //! 
 //! // Get an ApplicationSecret instance by some means. It contains the `client_id` and 
 //! // `client_secret`, among other things.
@@ -134,14 +138,14 @@
 //! // As the method needs a request, you would usually fill it with the desired information
 //! // into the respective structure. Some of the parts shown here might not be applicable !
 //! // Values shown here are possibly random and not representative !
-//! let mut req = InAppProduct::default();
+//! let mut req = Subscription::default();
 //! 
 //! // You can configure optional parameters by calling the respective setters at will, and
 //! // execute the final call using `doit()`.
 //! // Values shown here are possibly random and not representative !
-//! let result = hub.inappproducts().update(req, "packageName", "sku")
-//!              .auto_convert_missing_prices(true)
-//!              .allow_missing(true)
+//! let result = hub.monetization().subscriptions_patch(req, "packageName", "productId")
+//!              .update_mask(&Default::default())
+//!              .regions_version_version("At")
 //!              .doit().await;
 //! 
 //! match result {
@@ -227,22 +231,17 @@
 // This file was generated automatically from 'src/generator/templates/api/lib.rs.mako'
 // DO NOT EDIT !
 
-#[macro_use]
-extern crate serde_derive;
-
 // Re-export the hyper and hyper_rustls crate, they are required to build the hub
-pub extern crate hyper;
-pub extern crate hyper_rustls;
-extern crate serde;
-extern crate serde_json;
-// Re-export the yup_oauth2 crate, that is required to call some methods of the hub and the client
-pub extern crate yup_oauth2 as oauth2;
-extern crate mime;
-extern crate url;
-
+pub use hyper;
+pub use hyper_rustls;
+pub extern crate google_apis_common as client;
+pub use client::chrono;
 pub mod api;
-pub mod client;
 
 // Re-export the hub type and some basic client structs
 pub use api::AndroidPublisher;
-pub use client::{Result, Error, Delegate};
+pub use client::{Result, Error, Delegate, FieldMask};
+
+// Re-export the yup_oauth2 crate, that is required to call some methods of the hub and the client
+#[cfg(feature = "yup-oauth2")]
+pub use client::oauth2;

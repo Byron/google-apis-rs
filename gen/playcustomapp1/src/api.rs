@@ -1,19 +1,20 @@
 use std::collections::HashMap;
 use std::cell::RefCell;
 use std::default::Default;
-use std::collections::BTreeMap;
+use std::collections::BTreeSet;
 use std::error::Error as StdError;
 use serde_json as json;
 use std::io;
 use std::fs;
 use std::mem;
-use std::thread::sleep;
 
-use http::Uri;
 use hyper::client::connect;
 use tokio::io::{AsyncRead, AsyncWrite};
+use tokio::time::sleep;
 use tower_service;
-use crate::client;
+use serde::{Serialize, Deserialize};
+
+use crate::{client, client::GetToken, client::serde_with};
 
 // ##############
 // UTILITIES ###
@@ -63,7 +64,7 @@ impl Default for Scope {
 /// use std::fs;
 /// # async fn dox() {
 /// use std::default::Default;
-/// use playcustomapp1::{Playcustomapp, oauth2, hyper, hyper_rustls};
+/// use playcustomapp1::{Playcustomapp, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// // Get an ApplicationSecret instance by some means. It contains the `client_id` and 
 /// // `client_secret`, among other things.
@@ -86,7 +87,7 @@ impl Default for Scope {
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `upload(...)`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.accounts().custom_apps_create(req, "account")
+/// let result = hub.accounts().custom_apps_create(req, -11)
 ///              .upload(fs::File::open("file.ext").unwrap(), "application/octet-stream".parse().unwrap()).await;
 /// 
 /// match result {
@@ -111,7 +112,7 @@ impl Default for Scope {
 #[derive(Clone)]
 pub struct Playcustomapp<S> {
     pub client: hyper::Client<S, hyper::body::Body>,
-    pub auth: oauth2::authenticator::Authenticator<S>,
+    pub auth: Box<dyn client::GetToken>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
@@ -121,11 +122,11 @@ impl<'a, S> client::Hub for Playcustomapp<S> {}
 
 impl<'a, S> Playcustomapp<S> {
 
-    pub fn new(client: hyper::Client<S, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<S>) -> Playcustomapp<S> {
+    pub fn new<A: 'static + client::GetToken>(client: hyper::Client<S, hyper::body::Body>, auth: A) -> Playcustomapp<S> {
         Playcustomapp {
             client,
-            auth: authenticator,
-            _user_agent: "google-api-rust-client/4.0.1".to_string(),
+            auth: Box::new(auth),
+            _user_agent: "google-api-rust-client/5.0.2-beta-1".to_string(),
             _base_url: "https://playcustomapp.googleapis.com/".to_string(),
             _root_url: "https://playcustomapp.googleapis.com/".to_string(),
         }
@@ -136,7 +137,7 @@ impl<'a, S> Playcustomapp<S> {
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/4.0.1`.
+    /// It defaults to `google-api-rust-client/5.0.2-beta-1`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -173,17 +174,22 @@ impl<'a, S> Playcustomapp<S> {
 /// 
 /// * [custom apps create accounts](AccountCustomAppCreateCall) (request|response)
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct CustomApp {
     /// Default listing language in BCP 47 format.
     #[serde(rename="languageCode")]
+    
     pub language_code: Option<String>,
     /// Organizations to which the custom app should be made available. If the request contains any organizations, then the app will be restricted to only these organizations. To support the organization linked to the developer account, the organization ID should be provided explicitly together with other organizations. If no organizations are provided, then the app is only available to the organization linked to the developer account.
+    
     pub organizations: Option<Vec<Organization>>,
     /// Output only. Package name of the created Android app. Only present in the API response.
     #[serde(rename="packageName")]
+    
     pub package_name: Option<String>,
     /// Title for the Android app.
+    
     pub title: Option<String>,
 }
 
@@ -195,13 +201,16 @@ impl client::ResponseResult for CustomApp {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Organization {
     /// Required. ID of the organization.
     #[serde(rename="organizationId")]
+    
     pub organization_id: Option<String>,
     /// Optional. A human-readable name of the organization, to help recognize the organization.
     #[serde(rename="organizationName")]
+    
     pub organization_name: Option<String>,
 }
 
@@ -214,7 +223,7 @@ impl client::Part for Organization {}
 // #################
 
 /// A builder providing access to all methods supported on *account* resources.
-/// It is not used directly, but through the `Playcustomapp` hub.
+/// It is not used directly, but through the [`Playcustomapp`] hub.
 ///
 /// # Example
 ///
@@ -227,7 +236,7 @@ impl client::Part for Organization {}
 /// 
 /// # async fn dox() {
 /// use std::default::Default;
-/// use playcustomapp1::{Playcustomapp, oauth2, hyper, hyper_rustls};
+/// use playcustomapp1::{Playcustomapp, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// let secret: oauth2::ApplicationSecret = Default::default();
 /// let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -259,11 +268,11 @@ impl<'a, S> AccountMethods<'a, S> {
     ///
     /// * `request` - No description provided.
     /// * `account` - Developer account ID.
-    pub fn custom_apps_create(&self, request: CustomApp, account: &str) -> AccountCustomAppCreateCall<'a, S> {
+    pub fn custom_apps_create(&self, request: CustomApp, account: i64) -> AccountCustomAppCreateCall<'a, S> {
         AccountCustomAppCreateCall {
             hub: self.hub,
             _request: request,
-            _account: account.to_string(),
+            _account: account,
             _delegate: Default::default(),
             _additional_params: Default::default(),
             _scopes: Default::default(),
@@ -282,7 +291,7 @@ impl<'a, S> AccountMethods<'a, S> {
 /// Creates a new custom app.
 ///
 /// A builder for the *customApps.create* method supported by a *account* resource.
-/// It is not used directly, but through a `AccountMethods` instance.
+/// It is not used directly, but through a [`AccountMethods`] instance.
 ///
 /// # Example
 ///
@@ -296,7 +305,7 @@ impl<'a, S> AccountMethods<'a, S> {
 /// use std::fs;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use playcustomapp1::{Playcustomapp, oauth2, hyper, hyper_rustls};
+/// # use playcustomapp1::{Playcustomapp, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
 /// # let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -312,7 +321,7 @@ impl<'a, S> AccountMethods<'a, S> {
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `upload(...)`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.accounts().custom_apps_create(req, "account")
+/// let result = hub.accounts().custom_apps_create(req, -55)
 ///              .upload(fs::File::open("file.ext").unwrap(), "application/octet-stream".parse().unwrap()).await;
 /// # }
 /// ```
@@ -321,17 +330,17 @@ pub struct AccountCustomAppCreateCall<'a, S>
 
     hub: &'a Playcustomapp<S>,
     _request: CustomApp,
-    _account: String,
+    _account: i64,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
+    _scopes: BTreeSet<String>
 }
 
 impl<'a, S> client::CallBuilder for AccountCustomAppCreateCall<'a, S> {}
 
 impl<'a, S> AccountCustomAppCreateCall<'a, S>
 where
-    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
     S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
     S::Future: Send + Unpin + 'static,
     S::Error: Into<Box<dyn StdError + Send + Sync>>,
@@ -339,70 +348,55 @@ where
 
 
     /// Perform the operation you have build so far.
-    async fn doit<RS>(mut self, mut reader: RS, reader_mime_type: mime::Mime, protocol: &'static str) -> client::Result<(hyper::Response<hyper::body::Body>, CustomApp)>
+    async fn doit<RS>(mut self, mut reader: RS, reader_mime_type: mime::Mime, protocol: client::UploadProtocol) -> client::Result<(hyper::Response<hyper::body::Body>, CustomApp)>
 		where RS: client::ReadSeek {
         use std::io::{Read, Seek};
         use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::ToParts;
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
         let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
         dlg.begin(client::MethodInfo { id: "playcustomapp.accounts.customApps.create",
                                http_method: hyper::Method::POST });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
-        params.push(("account", self._account.to_string()));
+
         for &field in ["alt", "account"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(client::Error::FieldClash(field));
             }
         }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
 
-        params.push(("alt", "json".to_string()));
+        let mut params = Params::with_capacity(4 + self._additional_params.len());
+        params.push("account", self._account.to_string());
 
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
         let (mut url, upload_type) =
-            if protocol == "resumable" {
+            if protocol == client::UploadProtocol::Resumable {
                 (self.hub._root_url.clone() + "resumable/upload/playcustomapp/v1/accounts/{account}/customApps", "resumable")
-            } else if protocol == "simple" {
+            } else if protocol == client::UploadProtocol::Simple {
                 (self.hub._root_url.clone() + "upload/playcustomapp/v1/accounts/{account}/customApps", "multipart")
             } else {
                 unreachable!()
             };
-        params.push(("uploadType", upload_type.to_string()));
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Androidpublisher.as_ref().to_string(), ());
+        params.push("uploadType", upload_type);
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::Androidpublisher.as_ref().to_string());
         }
 
         for &(find_this, param_name) in [("{account}", "account")].iter() {
-            let mut replace_with: Option<&str> = None;
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = Some(value);
-                    break;
-                }
-            }
-            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+            url = params.uri_replacement(url, param_name, find_this, false);
         }
         {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
-            for param_name in ["account"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
+            let to_remove = ["account"];
+            params.remove_params(&to_remove);
         }
 
-        let url = url::Url::parse_with_params(&url, params).unwrap();
+        let url = params.parse_with_url(&url);
 
-        let mut json_mime_type: mime::Mime = "application/json".parse().unwrap();
+        let mut json_mime_type = mime::APPLICATION_JSON;
         let mut request_value_reader =
             {
                 let mut value = json::value::to_value(&self._request).expect("serde to work");
@@ -419,14 +413,14 @@ where
         let mut upload_url: Option<String> = None;
 
         loop {
-            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
-                Ok(token) => token.clone(),
-                Err(err) => {
-                    match  dlg.token(&err) {
-                        Some(token) => token,
-                        None => {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
                             dlg.finished(false);
-                            return Err(client::Error::MissingToken(err))
+                            return Err(client::Error::MissingToken(e));
                         }
                     }
                 }
@@ -444,7 +438,7 @@ where
                 } else {
                     let mut mp_reader: client::MultiPartReader = Default::default();
                     let (mut body_reader, content_type) = match protocol {
-                        "simple" => {
+                        client::UploadProtocol::Simple => {
                             mp_reader.reserve_exact(2);
                             let size = reader.seek(io::SeekFrom::End(0)).unwrap();
                         reader.seek(io::SeekFrom::Start(0)).unwrap();
@@ -453,36 +447,41 @@ where
                         }
                             mp_reader.add_part(&mut request_value_reader, request_size, json_mime_type.clone())
                                      .add_part(&mut reader, size, reader_mime_type.clone());
-                            let mime_type = mp_reader.mime_type();
-                            (&mut mp_reader as &mut (dyn io::Read + Send), (CONTENT_TYPE, mime_type.to_string()))
+                            (&mut mp_reader as &mut (dyn io::Read + Send), client::MultiPartReader::mime_type())
                         },
-                        _ => (&mut request_value_reader as &mut (dyn io::Read + Send), (CONTENT_TYPE, json_mime_type.to_string())),
+                        _ => (&mut request_value_reader as &mut (dyn io::Read + Send), json_mime_type.clone()),
                     };
                     let client = &self.hub.client;
                     dlg.pre_request();
-                    let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
-                            .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
+                    let mut req_builder = hyper::Request::builder()
+                        .method(hyper::Method::POST)
+                        .uri(url.as_str())
+                        .header(USER_AGENT, self.hub._user_agent.clone());
+    
+                    if let Some(token) = token.as_ref() {
+                        req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                    }
     
                     upload_url_from_server = true;
-                    if protocol == "resumable" {
+                    if protocol == client::UploadProtocol::Resumable {
                         req_builder = req_builder.header("X-Upload-Content-Type", format!("{}", reader_mime_type));
                     }
     
                             let mut body_reader_bytes = vec![];
                             body_reader.read_to_end(&mut body_reader_bytes).unwrap();
                             let request = req_builder
-                            .header(content_type.0, content_type.1.to_string())
-                            .body(hyper::body::Body::from(body_reader_bytes));
+                                .header(CONTENT_TYPE, content_type.to_string())
+                                .body(hyper::body::Body::from(body_reader_bytes));
     
                     client.request(request.unwrap()).await
-                    
+    
                 }
             };
 
             match req_result {
                 Err(err) => {
                     if let client::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep(d).await;
                         continue;
                     }
                     dlg.finished(false);
@@ -498,7 +497,7 @@ where
                         let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
                         if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
-                            sleep(d);
+                            sleep(d).await;
                             continue;
                         }
 
@@ -509,7 +508,7 @@ where
                             None => Err(client::Error::Failure(restored_response)),
                         }
                     }
-                    if protocol == "resumable" {
+                    if protocol == client::UploadProtocol::Resumable {
                         let size = reader.seek(io::SeekFrom::End(0)).unwrap();
                         reader.seek(io::SeekFrom::Start(0)).unwrap();
                         if size > 10737418240 {
@@ -527,7 +526,8 @@ where
                                 start_at: if upload_url_from_server { Some(0) } else { None },
                                 auth: &self.hub.auth,
                                 user_agent: &self.hub._user_agent,
-                                auth_header: format!("Bearer {}", token.as_str()),
+                                // TODO: Check this assumption
+                                auth_header: format!("Bearer {}", token.ok_or_else(|| client::Error::MissingToken("resumable upload requires token".into()))?.as_str()),
                                 url: url_str,
                                 reader: &mut reader,
                                 media_type: reader_mime_type.clone(),
@@ -586,7 +586,7 @@ where
     /// * *valid mime types*: '*/*'
     pub async fn upload_resumable<RS>(self, resumeable_stream: RS, mime_type: mime::Mime) -> client::Result<(hyper::Response<hyper::body::Body>, CustomApp)>
                 where RS: client::ReadSeek {
-        self.doit(resumeable_stream, mime_type, "resumable").await
+        self.doit(resumeable_stream, mime_type, client::UploadProtocol::Resumable).await
     }
     /// Upload media all at once.
     /// If the upload fails for whichever reason, all progress is lost.
@@ -596,7 +596,7 @@ where
     /// * *valid mime types*: '*/*'
     pub async fn upload<RS>(self, stream: RS, mime_type: mime::Mime) -> client::Result<(hyper::Response<hyper::body::Body>, CustomApp)>
                 where RS: client::ReadSeek {
-        self.doit(stream, mime_type, "simple").await
+        self.doit(stream, mime_type, client::UploadProtocol::Simple).await
     }
 
     ///
@@ -614,14 +614,15 @@ where
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn account(mut self, new_value: &str) -> AccountCustomAppCreateCall<'a, S> {
-        self._account = new_value.to_string();
+    pub fn account(mut self, new_value: i64) -> AccountCustomAppCreateCall<'a, S> {
+        self._account = new_value;
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.````
     ///
     /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountCustomAppCreateCall<'a, S> {
@@ -657,25 +658,36 @@ where
 
     /// Identifies the authorization scope for the method you are building.
     ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::Androidpublisher`.
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::Androidpublisher`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
     ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, St>(mut self, scope: T) -> AccountCustomAppCreateCall<'a, S>
-                                                        where T: Into<Option<St>>,
-                                                              St: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
+    pub fn add_scope<St>(mut self, scope: St) -> AccountCustomAppCreateCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> AccountCustomAppCreateCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> AccountCustomAppCreateCall<'a, S> {
+        self._scopes.clear();
         self
     }
 }

@@ -1,19 +1,20 @@
 use std::collections::HashMap;
 use std::cell::RefCell;
 use std::default::Default;
-use std::collections::BTreeMap;
+use std::collections::BTreeSet;
 use std::error::Error as StdError;
 use serde_json as json;
 use std::io;
 use std::fs;
 use std::mem;
-use std::thread::sleep;
 
-use http::Uri;
 use hyper::client::connect;
 use tokio::io::{AsyncRead, AsyncWrite};
+use tokio::time::sleep;
 use tower_service;
-use crate::client;
+use serde::{Serialize, Deserialize};
+
+use crate::{client, client::GetToken, client::serde_with};
 
 // ##############
 // UTILITIES ###
@@ -40,7 +41,7 @@ use crate::client;
 /// use paymentsresellersubscription1::{Result, Error};
 /// # async fn dox() {
 /// use std::default::Default;
-/// use paymentsresellersubscription1::{PaymentsResellerSubscription, oauth2, hyper, hyper_rustls};
+/// use paymentsresellersubscription1::{PaymentsResellerSubscription, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// // Get an ApplicationSecret instance by some means. It contains the `client_id` and 
 /// // `client_secret`, among other things.
@@ -89,7 +90,7 @@ use crate::client;
 #[derive(Clone)]
 pub struct PaymentsResellerSubscription<S> {
     pub client: hyper::Client<S, hyper::body::Body>,
-    pub auth: oauth2::authenticator::Authenticator<S>,
+    pub auth: Box<dyn client::GetToken>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
@@ -99,11 +100,11 @@ impl<'a, S> client::Hub for PaymentsResellerSubscription<S> {}
 
 impl<'a, S> PaymentsResellerSubscription<S> {
 
-    pub fn new(client: hyper::Client<S, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<S>) -> PaymentsResellerSubscription<S> {
+    pub fn new<A: 'static + client::GetToken>(client: hyper::Client<S, hyper::body::Body>, auth: A) -> PaymentsResellerSubscription<S> {
         PaymentsResellerSubscription {
             client,
-            auth: authenticator,
-            _user_agent: "google-api-rust-client/4.0.1".to_string(),
+            auth: Box::new(auth),
+            _user_agent: "google-api-rust-client/5.0.2-beta-1".to_string(),
             _base_url: "https://paymentsresellersubscription.googleapis.com/".to_string(),
             _root_url: "https://paymentsresellersubscription.googleapis.com/".to_string(),
         }
@@ -114,7 +115,7 @@ impl<'a, S> PaymentsResellerSubscription<S> {
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/4.0.1`.
+    /// It defaults to `google-api-rust-client/5.0.2-beta-1`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -142,6 +143,27 @@ impl<'a, S> PaymentsResellerSubscription<S> {
 // ############
 // SCHEMAS ###
 // ##########
+/// Describes the amount unit including the currency code.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleCloudPaymentsResellerSubscriptionV1Amount {
+    /// Required. Amount in micros (1_000_000 micros = 1 currency unit)
+    #[serde(rename="amountMicros")]
+    
+    #[serde_as(as = "Option<::client::serde_with::DisplayFromStr>")]
+    pub amount_micros: Option<i64>,
+    /// Required. Currency codes in accordance with [ISO-4217 Currency Codes] (https://en.wikipedia.org/wiki/ISO_4217). For example, USD.
+    #[serde(rename="currencyCode")]
+    
+    pub currency_code: Option<String>,
+}
+
+impl client::Part for GoogleCloudPaymentsResellerSubscriptionV1Amount {}
+
+
 /// There is no detailed description.
 /// 
 /// # Activities
@@ -151,13 +173,16 @@ impl<'a, S> PaymentsResellerSubscription<S> {
 /// 
 /// * [subscriptions cancel partners](PartnerSubscriptionCancelCall) (request)
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudPaymentsResellerSubscriptionV1CancelSubscriptionRequest {
-    /// Optional. If true, the subscription will be cancelled immediately. Otherwise, the subscription will be cancelled at renewal_time, and therefore no prorated refund will be issued for the rest of the cycle.
+    /// Optional. If true, Google will cancel the subscription immediately, and issue a prorated refund for the remainder of the billing cycle. Otherwise, Google defers the cancelation at renewal_time, and therefore, will not issue a refund.
     #[serde(rename="cancelImmediately")]
+    
     pub cancel_immediately: Option<bool>,
     /// Specifies the reason for the cancellation.
     #[serde(rename="cancellationReason")]
+    
     pub cancellation_reason: Option<String>,
 }
 
@@ -173,9 +198,11 @@ impl client::RequestValue for GoogleCloudPaymentsResellerSubscriptionV1CancelSub
 /// 
 /// * [subscriptions cancel partners](PartnerSubscriptionCancelCall) (response)
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudPaymentsResellerSubscriptionV1CancelSubscriptionResponse {
     /// The cancelled subscription resource.
+    
     pub subscription: Option<GoogleCloudPaymentsResellerSubscriptionV1Subscription>,
 }
 
@@ -186,11 +213,14 @@ impl client::ResponseResult for GoogleCloudPaymentsResellerSubscriptionV1CancelS
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudPaymentsResellerSubscriptionV1Duration {
     /// number of duration units to be included.
+    
     pub count: Option<i32>,
     /// The unit used for the duration
+    
     pub unit: Option<String>,
 }
 
@@ -206,6 +236,7 @@ impl client::Part for GoogleCloudPaymentsResellerSubscriptionV1Duration {}
 /// 
 /// * [subscriptions entitle partners](PartnerSubscriptionEntitleCall) (request)
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudPaymentsResellerSubscriptionV1EntitleSubscriptionRequest { _never_set: Option<bool> }
 
@@ -221,9 +252,11 @@ impl client::RequestValue for GoogleCloudPaymentsResellerSubscriptionV1EntitleSu
 /// 
 /// * [subscriptions entitle partners](PartnerSubscriptionEntitleCall) (response)
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudPaymentsResellerSubscriptionV1EntitleSubscriptionResponse {
     /// The subscription that has user linked to it.
+    
     pub subscription: Option<GoogleCloudPaymentsResellerSubscriptionV1Subscription>,
 }
 
@@ -239,12 +272,15 @@ impl client::ResponseResult for GoogleCloudPaymentsResellerSubscriptionV1Entitle
 /// 
 /// * [subscriptions extend partners](PartnerSubscriptionExtendCall) (request)
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudPaymentsResellerSubscriptionV1ExtendSubscriptionRequest {
     /// Required. Specifies details of the extension. Currently, the duration of the extension must be exactly one billing cycle of the original subscription.
+    
     pub extension: Option<GoogleCloudPaymentsResellerSubscriptionV1Extension>,
     /// Required. Restricted to 36 ASCII characters. A random UUID is recommended. The idempotency key for the request. The ID generation logic is controlled by the partner. request_id should be the same as on retries of the same request. A different request_id must be used for a extension of a different cycle. A random UUID is recommended.
     #[serde(rename="requestId")]
+    
     pub request_id: Option<String>,
 }
 
@@ -260,17 +296,21 @@ impl client::RequestValue for GoogleCloudPaymentsResellerSubscriptionV1ExtendSub
 /// 
 /// * [subscriptions extend partners](PartnerSubscriptionExtendCall) (response)
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudPaymentsResellerSubscriptionV1ExtendSubscriptionResponse {
     /// The time at which the subscription is expected to be extended, in ISO 8061 format. UTC timezone. Example, "cycleEndTime":"2019-08-31T17:28:54.564Z"
     #[serde(rename="cycleEndTime")]
-    pub cycle_end_time: Option<String>,
+    
+    pub cycle_end_time: Option<client::chrono::DateTime<client::chrono::offset::Utc>>,
     /// End of the free trial period, in ISO 8061 format. UTC timezone. Example, "freeTrialEndTime":"2019-08-31T17:28:54.564Z" This time will be set the same as initial subscription creation time if no free trial period is offered to the partner.
     #[serde(rename="freeTrialEndTime")]
-    pub free_trial_end_time: Option<String>,
+    
+    pub free_trial_end_time: Option<client::chrono::DateTime<client::chrono::offset::Utc>>,
     /// Output only. The time at which the subscription is expected to be renewed by Google - a new charge will be incurred and the service entitlement will be renewed. A non-immediate cancellation will take place at this time too, before which, the service entitlement for the end user will remain valid. UTC timezone in ISO 8061 format. For example: "2019-08-31T17:28:54.564Z"
     #[serde(rename="renewalTime")]
-    pub renewal_time: Option<String>,
+    
+    pub renewal_time: Option<client::chrono::DateTime<client::chrono::offset::Utc>>,
 }
 
 impl client::ResponseResult for GoogleCloudPaymentsResellerSubscriptionV1ExtendSubscriptionResponse {}
@@ -280,12 +320,15 @@ impl client::ResponseResult for GoogleCloudPaymentsResellerSubscriptionV1ExtendS
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudPaymentsResellerSubscriptionV1Extension {
     /// Specifies the period of access the subscription should grant.
+    
     pub duration: Option<GoogleCloudPaymentsResellerSubscriptionV1Duration>,
     /// Required. Identifier of the end-user in partner’s system.
     #[serde(rename="partnerUserToken")]
+    
     pub partner_user_token: Option<String>,
 }
 
@@ -299,14 +342,95 @@ impl client::Part for GoogleCloudPaymentsResellerSubscriptionV1Extension {}
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
+/// * [promotions find eligible partners](PartnerPromotionFindEligibleCall) (request)
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleCloudPaymentsResellerSubscriptionV1FindEligiblePromotionsRequest {
+    /// Optional. Specifies the filters for the promotion results. The syntax is defined in https://google.aip.dev/160 with the following caveats: - Only the following features are supported: - Logical operator `AND` - Comparison operator `=` (no wildcards `*`) - Traversal operator `.` - Has operator `:` (no wildcards `*`) - Only the following fields are supported: - `applicableProducts` - `regionCodes` - `youtubePayload.partnerEligibilityId` - `youtubePayload.postalCode` - Unless explicitly mentioned above, other features are not supported. Example: `applicableProducts:partners/partner1/products/product1 AND regionCodes:US AND youtubePayload.postalCode=94043 AND youtubePayload.partnerEligibilityId=eligibility-id`
+    
+    pub filter: Option<String>,
+    /// Optional. The maximum number of promotions to return. The service may return fewer than this value. If unspecified, at most 50 products will be returned. The maximum value is 1000; values above 1000 will be coerced to 1000.
+    #[serde(rename="pageSize")]
+    
+    pub page_size: Option<i32>,
+    /// Optional. A page token, received from a previous `ListPromotions` call. Provide this to retrieve the subsequent page. When paginating, all other parameters provided to `ListPromotions` must match the call that provided the page token.
+    #[serde(rename="pageToken")]
+    
+    pub page_token: Option<String>,
+}
+
+impl client::RequestValue for GoogleCloudPaymentsResellerSubscriptionV1FindEligiblePromotionsRequest {}
+
+
+/// Response containing the found promotions for the current user.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [promotions find eligible partners](PartnerPromotionFindEligibleCall) (response)
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleCloudPaymentsResellerSubscriptionV1FindEligiblePromotionsResponse {
+    /// A token, which can be sent as `page_token` to retrieve the next page. If this field is empty, there are no subsequent pages.
+    #[serde(rename="nextPageToken")]
+    
+    pub next_page_token: Option<String>,
+    /// The promotions for the current user.
+    
+    pub promotions: Option<Vec<GoogleCloudPaymentsResellerSubscriptionV1Promotion>>,
+}
+
+impl client::ResponseResult for GoogleCloudPaymentsResellerSubscriptionV1FindEligiblePromotionsResponse {}
+
+
+/// Payload specific to Google One products.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleCloudPaymentsResellerSubscriptionV1GoogleOnePayload {
+    /// Campaign attributed to sales of this subscription.
+    
+    pub campaigns: Option<Vec<String>>,
+    /// The type of offering the subscription was sold by the partner. e.g. VAS.
+    
+    pub offering: Option<String>,
+    /// The type of sales channel through which the subscription was sold.
+    #[serde(rename="salesChannel")]
+    
+    pub sales_channel: Option<String>,
+    /// The identifier for the partner store where the subscription was sold.
+    #[serde(rename="storeId")]
+    
+    pub store_id: Option<String>,
+}
+
+impl client::Part for GoogleCloudPaymentsResellerSubscriptionV1GoogleOnePayload {}
+
+
+/// There is no detailed description.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
 /// * [products list partners](PartnerProductListCall) (response)
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudPaymentsResellerSubscriptionV1ListProductsResponse {
     /// A token, which can be sent as `page_token` to retrieve the next page. If this field is empty, there are no subsequent pages.
     #[serde(rename="nextPageToken")]
+    
     pub next_page_token: Option<String>,
     /// The products for the specified partner.
+    
     pub products: Option<Vec<GoogleCloudPaymentsResellerSubscriptionV1Product>>,
 }
 
@@ -322,12 +446,15 @@ impl client::ResponseResult for GoogleCloudPaymentsResellerSubscriptionV1ListPro
 /// 
 /// * [promotions list partners](PartnerPromotionListCall) (response)
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudPaymentsResellerSubscriptionV1ListPromotionsResponse {
     /// A token, which can be sent as `page_token` to retrieve the next page. If this field is empty, there are no subsequent pages.
     #[serde(rename="nextPageToken")]
+    
     pub next_page_token: Option<String>,
     /// The promotions for the specified partner.
+    
     pub promotions: Option<Vec<GoogleCloudPaymentsResellerSubscriptionV1Promotion>>,
 }
 
@@ -338,13 +465,16 @@ impl client::ResponseResult for GoogleCloudPaymentsResellerSubscriptionV1ListPro
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudPaymentsResellerSubscriptionV1Location {
     /// The postal code this location refers to. Ex. "94043"
     #[serde(rename="postalCode")]
+    
     pub postal_code: Option<String>,
     /// 2-letter ISO region code for current content region. Ex. “US” Please refers to: https://en.wikipedia.org/wiki/ISO_3166-1
     #[serde(rename="regionCode")]
+    
     pub region_code: Option<String>,
 }
 
@@ -355,53 +485,111 @@ impl client::Part for GoogleCloudPaymentsResellerSubscriptionV1Location {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudPaymentsResellerSubscriptionV1Product {
-    /// Output only. Response only. Resource name of the subscription. It will have the format of "partners/{partner_id}/products/{product_id}"
+    /// Output only. Response only. Resource name of the product. It will have the format of "partners/{partner_id}/products/{product_id}"
+    
     pub name: Option<String>,
+    /// Output only. Price configs for the product in the available regions.
+    #[serde(rename="priceConfigs")]
+    
+    pub price_configs: Option<Vec<GoogleCloudPaymentsResellerSubscriptionV1ProductPriceConfig>>,
     /// Output only. 2-letter ISO region code where the product is available in. Ex. "US" Please refers to: https://en.wikipedia.org/wiki/ISO_3166-1
     #[serde(rename="regionCodes")]
+    
     pub region_codes: Option<Vec<String>>,
     /// Output only. Specifies the length of the billing cycle of the subscription.
     #[serde(rename="subscriptionBillingCycleDuration")]
+    
     pub subscription_billing_cycle_duration: Option<GoogleCloudPaymentsResellerSubscriptionV1Duration>,
     /// Output only. Localized human readable name of the product.
+    
     pub titles: Option<Vec<GoogleTypeLocalizedText>>,
 }
 
 impl client::Part for GoogleCloudPaymentsResellerSubscriptionV1Product {}
 
 
+/// Specifies product specific payload.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleCloudPaymentsResellerSubscriptionV1ProductPayload {
+    /// Payload specific to Google One products.
+    #[serde(rename="googleOnePayload")]
+    
+    pub google_one_payload: Option<GoogleCloudPaymentsResellerSubscriptionV1GoogleOnePayload>,
+    /// Payload specific to Youtube products.
+    #[serde(rename="youtubePayload")]
+    
+    pub youtube_payload: Option<GoogleCloudPaymentsResellerSubscriptionV1YoutubePayload>,
+}
+
+impl client::Part for GoogleCloudPaymentsResellerSubscriptionV1ProductPayload {}
+
+
+/// Configs the prices in an available region.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleCloudPaymentsResellerSubscriptionV1ProductPriceConfig {
+    /// Output only. The price in the region.
+    
+    pub amount: Option<GoogleCloudPaymentsResellerSubscriptionV1Amount>,
+    /// Output only. 2-letter ISO region code where the product is available in. Ex. "US".
+    #[serde(rename="regionCode")]
+    
+    pub region_code: Option<String>,
+}
+
+impl client::Part for GoogleCloudPaymentsResellerSubscriptionV1ProductPriceConfig {}
+
+
 /// A Promotion resource that defines a promotion for a subscription that can be resold.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudPaymentsResellerSubscriptionV1Promotion {
     /// Output only. The product ids this promotion can be applied to.
     #[serde(rename="applicableProducts")]
+    
     pub applicable_products: Option<Vec<String>>,
     /// Optional. Specifies the end time (exclusive) of the period that the promotion is available in. If unset, the promotion is available indefinitely.
     #[serde(rename="endTime")]
-    pub end_time: Option<String>,
+    
+    pub end_time: Option<client::chrono::DateTime<client::chrono::offset::Utc>>,
     /// Optional. Specifies the duration of the free trial of the subscription when promotion_type is PROMOTION_TYPE_FREE_TRIAL
     #[serde(rename="freeTrialDuration")]
+    
     pub free_trial_duration: Option<GoogleCloudPaymentsResellerSubscriptionV1Duration>,
     /// Optional. Specifies the introductory pricing details when the promotion_type is PROMOTION_TYPE_INTRODUCTORY_PRICING.
     #[serde(rename="introductoryPricingDetails")]
+    
     pub introductory_pricing_details: Option<GoogleCloudPaymentsResellerSubscriptionV1PromotionIntroductoryPricingDetails>,
     /// Output only. Response only. Resource name of the subscription promotion. It will have the format of "partners/{partner_id}/promotion/{promotion_id}"
+    
     pub name: Option<String>,
     /// Output only. Output Only. Specifies the type of the promotion.
     #[serde(rename="promotionType")]
+    
     pub promotion_type: Option<String>,
     /// Output only. 2-letter ISO region code where the promotion is available in. Ex. "US" Please refers to: https://en.wikipedia.org/wiki/ISO_3166-1
     #[serde(rename="regionCodes")]
+    
     pub region_codes: Option<Vec<String>>,
     /// Optional. Specifies the start time (inclusive) of the period that the promotion is available in.
     #[serde(rename="startTime")]
-    pub start_time: Option<String>,
+    
+    pub start_time: Option<client::chrono::DateTime<client::chrono::offset::Utc>>,
     /// Output only. Localized human readable name of the promotion.
+    
     pub titles: Option<Vec<GoogleTypeLocalizedText>>,
 }
 
@@ -412,10 +600,12 @@ impl client::Part for GoogleCloudPaymentsResellerSubscriptionV1Promotion {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudPaymentsResellerSubscriptionV1PromotionIntroductoryPricingDetails {
     /// Specifies the introductory pricing periods.
     #[serde(rename="introductoryPricingSpecs")]
+    
     pub introductory_pricing_specs: Option<Vec<GoogleCloudPaymentsResellerSubscriptionV1PromotionIntroductoryPricingDetailsIntroductoryPricingSpec>>,
 }
 
@@ -426,14 +616,49 @@ impl client::Part for GoogleCloudPaymentsResellerSubscriptionV1PromotionIntroduc
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudPaymentsResellerSubscriptionV1PromotionIntroductoryPricingDetailsIntroductoryPricingSpec {
+    /// Output only. The discount amount. The value is positive.
+    #[serde(rename="discountAmount")]
+    
+    pub discount_amount: Option<GoogleCloudPaymentsResellerSubscriptionV1Amount>,
+    /// Output only. The discount percentage in micros. For example, 50,000 represents 5%.
+    #[serde(rename="discountRatioMicros")]
+    
+    #[serde_as(as = "Option<::client::serde_with::DisplayFromStr>")]
+    pub discount_ratio_micros: Option<i64>,
     /// Output only. Output Only. The duration of an introductory offer in billing cycles.
     #[serde(rename="recurrenceCount")]
+    
     pub recurrence_count: Option<i32>,
+    /// Output only. 2-letter ISO region code where the product is available in. Ex. "US".
+    #[serde(rename="regionCode")]
+    
+    pub region_code: Option<String>,
 }
 
 impl client::Part for GoogleCloudPaymentsResellerSubscriptionV1PromotionIntroductoryPricingDetailsIntroductoryPricingSpec {}
+
+
+/// A description of what time period or moment in time the product or service is being delivered over.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleCloudPaymentsResellerSubscriptionV1ServicePeriod {
+    /// Optional. The end time of the service period. Time is exclusive.
+    #[serde(rename="endTime")]
+    
+    pub end_time: Option<client::chrono::DateTime<client::chrono::offset::Utc>>,
+    /// Required. The start time of the service period. Time is inclusive.
+    #[serde(rename="startTime")]
+    
+    pub start_time: Option<client::chrono::DateTime<client::chrono::offset::Utc>>,
+}
+
+impl client::Part for GoogleCloudPaymentsResellerSubscriptionV1ServicePeriod {}
 
 
 /// A Subscription resource managed by 3P Partners.
@@ -447,51 +672,76 @@ impl client::Part for GoogleCloudPaymentsResellerSubscriptionV1PromotionIntroduc
 /// * [subscriptions get partners](PartnerSubscriptionGetCall) (response)
 /// * [subscriptions provision partners](PartnerSubscriptionProvisionCall) (request|response)
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudPaymentsResellerSubscriptionV1Subscription {
     /// Output only. Describes the details of a cancelled subscription. Only applicable to subscription of state `STATE_CANCELLED`.
     #[serde(rename="cancellationDetails")]
+    
     pub cancellation_details: Option<GoogleCloudPaymentsResellerSubscriptionV1SubscriptionCancellationDetails>,
     /// Output only. System generated timestamp when the subscription is created. UTC timezone.
     #[serde(rename="createTime")]
-    pub create_time: Option<String>,
+    
+    pub create_time: Option<client::chrono::DateTime<client::chrono::offset::Utc>>,
     /// Output only. The time at which the subscription is expected to be extended, in ISO 8061 format. UTC timezone. For example: "2019-08-31T17:28:54.564Z"
     #[serde(rename="cycleEndTime")]
-    pub cycle_end_time: Option<String>,
+    
+    pub cycle_end_time: Option<client::chrono::DateTime<client::chrono::offset::Utc>>,
     /// Output only. Indicates if the subscription is entitled to the end user.
     #[serde(rename="endUserEntitled")]
+    
     pub end_user_entitled: Option<bool>,
     /// Output only. End of the free trial period, in ISO 8061 format. For example, "2019-08-31T17:28:54.564Z". It will be set the same as createTime if no free trial promotion is specified.
     #[serde(rename="freeTrialEndTime")]
-    pub free_trial_end_time: Option<String>,
-    /// Output only. Response only. Resource name of the subscription. It will have the format of "partners/{partner_id}/subscriptions/{subscription_id}"
+    
+    pub free_trial_end_time: Option<client::chrono::DateTime<client::chrono::offset::Utc>>,
+    /// Required. The line items of the subscription.
+    #[serde(rename="lineItems")]
+    
+    pub line_items: Option<Vec<GoogleCloudPaymentsResellerSubscriptionV1SubscriptionLineItem>>,
+    /// Optional. Resource name of the subscription. It will have the format of "partners/{partner_id}/subscriptions/{subscription_id}". This is available for authorizeAddon, but otherwise is response only.
+    
     pub name: Option<String>,
     /// Required. Identifier of the end-user in partner’s system. The value is restricted to 63 ASCII characters at the maximum.
     #[serde(rename="partnerUserToken")]
+    
     pub partner_user_token: Option<String>,
     /// Output only. Describes the processing state of the subscription. See more details at [the lifecycle of a subscription](/payments/reseller/subscription/reference/index/Receive.Notifications#payments-subscription-lifecycle).
     #[serde(rename="processingState")]
+    
     pub processing_state: Option<String>,
-    /// Required. Resource name that identifies one or more subscription products. The format will be 'partners/{partner_id}/products/{product_id}'.
+    /// Required. Deprecated: consider using `line_items` as the input. Required. Resource name that identifies the purchased products. The format will be 'partners/{partner_id}/products/{product_id}'.
+    
     pub products: Option<Vec<String>>,
-    /// Optional. Resource name that identifies one or more promotions that can be applied on the product. A typical promotion for a subscription is Free trial. The format will be 'partners/{partner_id}/promotions/{promotion_id}'.
+    /// Optional. Subscription-level promotions. Only free trial is supported on this level. It determines the first renewal time of the subscription to be the end of the free trial period. Specify the promotion resource name only when used as input.
+    #[serde(rename="promotionSpecs")]
+    
+    pub promotion_specs: Option<Vec<GoogleCloudPaymentsResellerSubscriptionV1SubscriptionPromotionSpec>>,
+    /// Optional. Deprecated: consider using the top-level `promotion_specs` as the input. Optional. Resource name that identifies one or more promotions that can be applied on the product. A typical promotion for a subscription is Free trial. The format will be 'partners/{partner_id}/promotions/{promotion_id}'.
+    
     pub promotions: Option<Vec<String>>,
     /// Output only. The place where partners should redirect the end-user to after creation. This field might also be populated when creation failed. However, Partners should always prepare a default URL to redirect the user in case this field is empty.
     #[serde(rename="redirectUri")]
+    
     pub redirect_uri: Option<String>,
     /// Output only. The time at which the subscription is expected to be renewed by Google - a new charge will be incurred and the service entitlement will be renewed. A non-immediate cancellation will take place at this time too, before which, the service entitlement for the end user will remain valid. UTC timezone in ISO 8061 format. For example: "2019-08-31T17:28:54.564Z"
     #[serde(rename="renewalTime")]
-    pub renewal_time: Option<String>,
+    
+    pub renewal_time: Option<client::chrono::DateTime<client::chrono::offset::Utc>>,
     /// Required. The location that the service is provided as indicated by the partner.
     #[serde(rename="serviceLocation")]
+    
     pub service_location: Option<GoogleCloudPaymentsResellerSubscriptionV1Location>,
     /// Output only. Describes the state of the subscription. See more details at [the lifecycle of a subscription](/payments/reseller/subscription/reference/index/Receive.Notifications#payments-subscription-lifecycle).
+    
     pub state: Option<String>,
     /// Output only. System generated timestamp when the subscription is most recently updated. UTC timezone.
     #[serde(rename="updateTime")]
-    pub update_time: Option<String>,
+    
+    pub update_time: Option<client::chrono::DateTime<client::chrono::offset::Utc>>,
     /// Optional. Details about the previous subscription that this new subscription upgrades/downgrades from. Only populated if this subscription is an upgrade/downgrade from another subscription.
     #[serde(rename="upgradeDowngradeDetails")]
+    
     pub upgrade_downgrade_details: Option<GoogleCloudPaymentsResellerSubscriptionV1SubscriptionUpgradeDowngradeDetails>,
 }
 
@@ -503,26 +753,115 @@ impl client::ResponseResult for GoogleCloudPaymentsResellerSubscriptionV1Subscri
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudPaymentsResellerSubscriptionV1SubscriptionCancellationDetails {
     /// The reason of the cancellation.
+    
     pub reason: Option<String>,
 }
 
 impl client::Part for GoogleCloudPaymentsResellerSubscriptionV1SubscriptionCancellationDetails {}
 
 
+/// Individual line item definition of a subscription.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleCloudPaymentsResellerSubscriptionV1SubscriptionLineItem {
+    /// Output only. Description of this line item.
+    
+    pub description: Option<String>,
+    /// Output only. It is set only if the line item has its own free trial applied. End time of the line item free trial period, in ISO 8061 format. For example, "2019-08-31T17:28:54.564Z". It will be set the same as createTime if no free trial promotion is specified.
+    #[serde(rename="lineItemFreeTrialEndTime")]
+    
+    pub line_item_free_trial_end_time: Option<client::chrono::DateTime<client::chrono::offset::Utc>>,
+    /// Optional. The promotions applied on the line item. It can be: - a free trial promotion, which overrides the subscription-level free trial promotion. - an introductory pricing promotion. When used as input in Create or Provision API, specify its resource name only.
+    #[serde(rename="lineItemPromotionSpecs")]
+    
+    pub line_item_promotion_specs: Option<Vec<GoogleCloudPaymentsResellerSubscriptionV1SubscriptionPromotionSpec>>,
+    /// Output only. Details only set for a ONE_TIME recurrence line item.
+    #[serde(rename="oneTimeRecurrenceDetails")]
+    
+    pub one_time_recurrence_details: Option<GoogleCloudPaymentsResellerSubscriptionV1SubscriptionLineItemOneTimeRecurrenceDetails>,
+    /// Required. Product resource name that identifies one the line item The format is 'partners/{partner_id}/products/{product_id}'.
+    
+    pub product: Option<String>,
+    /// Optional. Product specific payload for this line item.
+    #[serde(rename="productPayload")]
+    
+    pub product_payload: Option<GoogleCloudPaymentsResellerSubscriptionV1ProductPayload>,
+    /// Output only. The recurrence type of the line item.
+    #[serde(rename="recurrenceType")]
+    
+    pub recurrence_type: Option<String>,
+    /// Output only. The state of the line item.
+    
+    pub state: Option<String>,
+}
+
+impl client::Part for GoogleCloudPaymentsResellerSubscriptionV1SubscriptionLineItem {}
+
+
+/// Details for a ONE_TIME recurrence line item.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleCloudPaymentsResellerSubscriptionV1SubscriptionLineItemOneTimeRecurrenceDetails {
+    /// The service period of the ONE_TIME line item.
+    #[serde(rename="servicePeriod")]
+    
+    pub service_period: Option<GoogleCloudPaymentsResellerSubscriptionV1ServicePeriod>,
+}
+
+impl client::Part for GoogleCloudPaymentsResellerSubscriptionV1SubscriptionLineItemOneTimeRecurrenceDetails {}
+
+
+/// Describes the spec for one promotion.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleCloudPaymentsResellerSubscriptionV1SubscriptionPromotionSpec {
+    /// Output only. The duration of the free trial if the promotion is of type FREE_TRIAL.
+    #[serde(rename="freeTrialDuration")]
+    
+    pub free_trial_duration: Option<GoogleCloudPaymentsResellerSubscriptionV1Duration>,
+    /// Output only. The details of the introductory pricing spec if the promotion is of type INTRODUCTORY_PRICING.
+    #[serde(rename="introductoryPricingDetails")]
+    
+    pub introductory_pricing_details: Option<GoogleCloudPaymentsResellerSubscriptionV1PromotionIntroductoryPricingDetails>,
+    /// Required. Promotion resource name that identifies a promotion. The format is 'partners/{partner_id}/promotions/{promotion_id}'.
+    
+    pub promotion: Option<String>,
+    /// Output only. The type of the promotion for the spec.
+    #[serde(rename="type")]
+    
+    pub type_: Option<String>,
+}
+
+impl client::Part for GoogleCloudPaymentsResellerSubscriptionV1SubscriptionPromotionSpec {}
+
+
 /// Details about the previous subscription that this new subscription upgrades/downgrades from.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudPaymentsResellerSubscriptionV1SubscriptionUpgradeDowngradeDetails {
     /// Required. Specifies the billing cycle spec for the new upgraded/downgraded subscription.
     #[serde(rename="billingCycleSpec")]
+    
     pub billing_cycle_spec: Option<String>,
     /// Required. The previous subscription id to be replaced. This is not the full resource name, use the subscription_id segment only.
     #[serde(rename="previousSubscriptionId")]
+    
     pub previous_subscription_id: Option<String>,
 }
 
@@ -538,6 +877,7 @@ impl client::Part for GoogleCloudPaymentsResellerSubscriptionV1SubscriptionUpgra
 /// 
 /// * [subscriptions undo cancel partners](PartnerSubscriptionUndoCancelCall) (request)
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudPaymentsResellerSubscriptionV1UndoCancelSubscriptionRequest { _never_set: Option<bool> }
 
@@ -553,25 +893,46 @@ impl client::RequestValue for GoogleCloudPaymentsResellerSubscriptionV1UndoCance
 /// 
 /// * [subscriptions undo cancel partners](PartnerSubscriptionUndoCancelCall) (response)
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudPaymentsResellerSubscriptionV1UndoCancelSubscriptionResponse {
     /// The updated subscription resource.
+    
     pub subscription: Option<GoogleCloudPaymentsResellerSubscriptionV1Subscription>,
 }
 
 impl client::ResponseResult for GoogleCloudPaymentsResellerSubscriptionV1UndoCancelSubscriptionResponse {}
 
 
+/// Payload specific to Youtube products.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleCloudPaymentsResellerSubscriptionV1YoutubePayload {
+    /// The list of eligibility_ids which are applicable for the line item.
+    #[serde(rename="partnerEligibilityIds")]
+    
+    pub partner_eligibility_ids: Option<Vec<String>>,
+}
+
+impl client::Part for GoogleCloudPaymentsResellerSubscriptionV1YoutubePayload {}
+
+
 /// Localized variant of a text in a particular language.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleTypeLocalizedText {
     /// The text's BCP-47 language code, such as "en-US" or "sr-Latn". For more information, see http://www.unicode.org/reports/tr35/#Unicode_locale_identifier.
     #[serde(rename="languageCode")]
+    
     pub language_code: Option<String>,
     /// Localized string in the language corresponding to `language_code' below.
+    
     pub text: Option<String>,
 }
 
@@ -584,7 +945,7 @@ impl client::Part for GoogleTypeLocalizedText {}
 // #################
 
 /// A builder providing access to all methods supported on *partner* resources.
-/// It is not used directly, but through the `PaymentsResellerSubscription` hub.
+/// It is not used directly, but through the [`PaymentsResellerSubscription`] hub.
 ///
 /// # Example
 ///
@@ -597,7 +958,7 @@ impl client::Part for GoogleTypeLocalizedText {}
 /// 
 /// # async fn dox() {
 /// use std::default::Default;
-/// use paymentsresellersubscription1::{PaymentsResellerSubscription, oauth2, hyper, hyper_rustls};
+/// use paymentsresellersubscription1::{PaymentsResellerSubscription, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// let secret: oauth2::ApplicationSecret = Default::default();
 /// let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -606,7 +967,7 @@ impl client::Part for GoogleTypeLocalizedText {}
 ///     ).build().await.unwrap();
 /// let mut hub = PaymentsResellerSubscription::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
-/// // like `products_list(...)`, `promotions_list(...)`, `subscriptions_cancel(...)`, `subscriptions_create(...)`, `subscriptions_entitle(...)`, `subscriptions_extend(...)`, `subscriptions_get(...)`, `subscriptions_provision(...)` and `subscriptions_undo_cancel(...)`
+/// // like `products_list(...)`, `promotions_find_eligible(...)`, `promotions_list(...)`, `subscriptions_cancel(...)`, `subscriptions_create(...)`, `subscriptions_entitle(...)`, `subscriptions_extend(...)`, `subscriptions_get(...)`, `subscriptions_provision(...)` and `subscriptions_undo_cancel(...)`
 /// // to build up your call.
 /// let rb = hub.partners();
 /// # }
@@ -623,7 +984,7 @@ impl<'a, S> PartnerMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Used by partners to list products that can be resold to their customers. It should be called directly by the partner using service accounts.
+    /// To retrieve the products that can be resold by the partner. It should be autenticated with a service account.
     /// 
     /// # Arguments
     ///
@@ -634,6 +995,7 @@ impl<'a, S> PartnerMethods<'a, S> {
             _parent: parent.to_string(),
             _page_token: Default::default(),
             _page_size: Default::default(),
+            _filter: Default::default(),
             _delegate: Default::default(),
             _additional_params: Default::default(),
         }
@@ -641,7 +1003,25 @@ impl<'a, S> PartnerMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Used by partners to list promotions, such as free trial, that can be applied on subscriptions. It should be called directly by the partner using service accounts.
+    /// To find eligible promotions for the current user. The API requires user authorization via OAuth. The user is inferred from the authenticated OAuth credential.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `parent` - Required. The parent, the partner that can resell. Format: partners/{partner}
+    pub fn promotions_find_eligible(&self, request: GoogleCloudPaymentsResellerSubscriptionV1FindEligiblePromotionsRequest, parent: &str) -> PartnerPromotionFindEligibleCall<'a, S> {
+        PartnerPromotionFindEligibleCall {
+            hub: self.hub,
+            _request: request,
+            _parent: parent.to_string(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// To retrieve the promotions, such as free trial, that can be used by the partner. It should be autenticated with a service account.
     /// 
     /// # Arguments
     ///
@@ -715,7 +1095,7 @@ impl<'a, S> PartnerMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Used by partners to extend a subscription service for their customers on an ongoing basis for the subscription to remain active and renewable. It should be called directly by the partner using service accounts.
+    /// [Deprecated] New partners should be on auto-extend by default. Used by partners to extend a subscription service for their customers on an ongoing basis for the subscription to remain active and renewable. It should be called directly by the partner using service accounts.
     /// 
     /// # Arguments
     ///
@@ -793,10 +1173,10 @@ impl<'a, S> PartnerMethods<'a, S> {
 // CallBuilders   ###
 // #################
 
-/// Used by partners to list products that can be resold to their customers. It should be called directly by the partner using service accounts.
+/// To retrieve the products that can be resold by the partner. It should be autenticated with a service account.
 ///
 /// A builder for the *products.list* method supported by a *partner* resource.
-/// It is not used directly, but through a `PartnerMethods` instance.
+/// It is not used directly, but through a [`PartnerMethods`] instance.
 ///
 /// # Example
 ///
@@ -808,7 +1188,7 @@ impl<'a, S> PartnerMethods<'a, S> {
 /// # extern crate google_paymentsresellersubscription1 as paymentsresellersubscription1;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use paymentsresellersubscription1::{PaymentsResellerSubscription, oauth2, hyper, hyper_rustls};
+/// # use paymentsresellersubscription1::{PaymentsResellerSubscription, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
 /// # let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -822,6 +1202,7 @@ impl<'a, S> PartnerMethods<'a, S> {
 /// let result = hub.partners().products_list("parent")
 ///              .page_token("sed")
 ///              .page_size(-2)
+///              .filter("takimata")
 ///              .doit().await;
 /// # }
 /// ```
@@ -832,6 +1213,7 @@ pub struct PartnerProductListCall<'a, S>
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
+    _filter: Option<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
 }
@@ -840,7 +1222,7 @@ impl<'a, S> client::CallBuilder for PartnerProductListCall<'a, S> {}
 
 impl<'a, S> PartnerProductListCall<'a, S>
 where
-    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
     S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
     S::Future: Send + Unpin + 'static,
     S::Error: Into<Box<dyn StdError + Send + Sync>>,
@@ -849,42 +1231,42 @@ where
 
     /// Perform the operation you have build so far.
     pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, GoogleCloudPaymentsResellerSubscriptionV1ListProductsResponse)> {
-        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
         use std::io::{Read, Seek};
         use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::ToParts;
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
         let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
         dlg.begin(client::MethodInfo { id: "paymentsresellersubscription.partners.products.list",
                                http_method: hyper::Method::GET });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
-        params.push(("parent", self._parent.to_string()));
-        if let Some(value) = self._page_token {
-            params.push(("pageToken", value.to_string()));
-        }
-        if let Some(value) = self._page_size {
-            params.push(("pageSize", value.to_string()));
-        }
-        for &field in ["alt", "parent", "pageToken", "pageSize"].iter() {
+
+        for &field in ["alt", "parent", "pageToken", "pageSize", "filter"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(client::Error::FieldClash(field));
             }
         }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
+
+        let mut params = Params::with_capacity(6 + self._additional_params.len());
+        params.push("parent", self._parent);
+        if let Some(value) = self._page_token.as_ref() {
+            params.push("pageToken", value);
+        }
+        if let Some(value) = self._page_size.as_ref() {
+            params.push("pageSize", value.to_string());
+        }
+        if let Some(value) = self._filter.as_ref() {
+            params.push("filter", value);
         }
 
-        params.push(("alt", "json".to_string()));
+        params.extend(self._additional_params.iter());
 
+        params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "v1/{+parent}/products";
         
-        let key = dlg.api_key();
-        match key {
-            Some(value) => params.push(("key", value)),
+        match dlg.api_key() {
+            Some(value) => params.push("key", value),
             None => {
                 dlg.finished(false);
                 return Err(client::Error::MissingAPIKey)
@@ -892,31 +1274,14 @@ where
         }
 
         for &(find_this, param_name) in [("{+parent}", "parent")].iter() {
-            let mut replace_with = String::new();
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = value.to_string();
-                    break;
-                }
-            }
-            if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
-            }
-            url = url.replace(find_this, &replace_with);
+            url = params.uri_replacement(url, param_name, find_this, true);
         }
         {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
-            for param_name in ["parent"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
+            let to_remove = ["parent"];
+            params.remove_params(&to_remove);
         }
 
-        let url = url::Url::parse_with_params(&url, params).unwrap();
+        let url = params.parse_with_url(&url);
 
 
 
@@ -924,21 +1289,24 @@ where
             let mut req_result = {
                 let client = &self.hub.client;
                 dlg.pre_request();
-                let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
-                        .header(USER_AGENT, self.hub._user_agent.clone());
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::GET)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
 
 
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
-                
+
             };
 
             match req_result {
                 Err(err) => {
                     if let client::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep(d).await;
                         continue;
                     }
                     dlg.finished(false);
@@ -954,7 +1322,7 @@ where
                         let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
                         if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
-                            sleep(d);
+                            sleep(d).await;
                             continue;
                         }
 
@@ -1009,10 +1377,18 @@ where
         self._page_size = Some(new_value);
         self
     }
+    /// Optional. Specifies the filters for the product results. The syntax is defined in https://google.aip.dev/160 with the following caveats: - Only the following features are supported: - Logical operator `AND` - Comparison operator `=` (no wildcards `*`) - Traversal operator `.` - Has operator `:` (no wildcards `*`) - Only the following fields are supported: - `regionCodes` - `youtubePayload.partnerEligibilityId` - `youtubePayload.postalCode` - Unless explicitly mentioned above, other features are not supported. Example: `regionCodes:US AND youtubePayload.postalCode=94043 AND youtubePayload.partnerEligibilityId=eligibility-id`
+    ///
+    /// Sets the *filter* query property to the given value.
+    pub fn filter(mut self, new_value: &str) -> PartnerProductListCall<'a, S> {
+        self._filter = Some(new_value.to_string());
+        self
+    }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.````
     ///
     /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PartnerProductListCall<'a, S> {
@@ -1049,10 +1425,256 @@ where
 }
 
 
-/// Used by partners to list promotions, such as free trial, that can be applied on subscriptions. It should be called directly by the partner using service accounts.
+/// To find eligible promotions for the current user. The API requires user authorization via OAuth. The user is inferred from the authenticated OAuth credential.
+///
+/// A builder for the *promotions.findEligible* method supported by a *partner* resource.
+/// It is not used directly, but through a [`PartnerMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_paymentsresellersubscription1 as paymentsresellersubscription1;
+/// use paymentsresellersubscription1::api::GoogleCloudPaymentsResellerSubscriptionV1FindEligiblePromotionsRequest;
+/// # async fn dox() {
+/// # use std::default::Default;
+/// # use paymentsresellersubscription1::{PaymentsResellerSubscription, oauth2, hyper, hyper_rustls, chrono, FieldMask};
+/// 
+/// # let secret: oauth2::ApplicationSecret = Default::default();
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
+/// #         secret,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     ).build().await.unwrap();
+/// # let mut hub = PaymentsResellerSubscription::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = GoogleCloudPaymentsResellerSubscriptionV1FindEligiblePromotionsRequest::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.partners().promotions_find_eligible(req, "parent")
+///              .doit().await;
+/// # }
+/// ```
+pub struct PartnerPromotionFindEligibleCall<'a, S>
+    where S: 'a {
+
+    hub: &'a PaymentsResellerSubscription<S>,
+    _request: GoogleCloudPaymentsResellerSubscriptionV1FindEligiblePromotionsRequest,
+    _parent: String,
+    _delegate: Option<&'a mut dyn client::Delegate>,
+    _additional_params: HashMap<String, String>,
+}
+
+impl<'a, S> client::CallBuilder for PartnerPromotionFindEligibleCall<'a, S> {}
+
+impl<'a, S> PartnerPromotionFindEligibleCall<'a, S>
+where
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
+
+
+    /// Perform the operation you have build so far.
+    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, GoogleCloudPaymentsResellerSubscriptionV1FindEligiblePromotionsResponse)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
+        let mut dd = client::DefaultDelegate;
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(client::MethodInfo { id: "paymentsresellersubscription.partners.promotions.findEligible",
+                               http_method: hyper::Method::POST });
+
+        for &field in ["alt", "parent"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(client::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(4 + self._additional_params.len());
+        params.push("parent", self._parent);
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "v1/{+parent}/promotions:findEligible";
+        
+        match dlg.api_key() {
+            Some(value) => params.push("key", value),
+            None => {
+                dlg.finished(false);
+                return Err(client::Error::MissingAPIKey)
+            }
+        }
+
+        for &(find_this, param_name) in [("{+parent}", "parent")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, true);
+        }
+        {
+            let to_remove = ["parent"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+        let mut json_mime_type = mime::APPLICATION_JSON;
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                client::remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::POST)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+
+
+                        let request = req_builder
+                        .header(CONTENT_TYPE, json_mime_type.to_string())
+                        .header(CONTENT_LENGTH, request_size as u64)
+                        .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
+
+                client.request(request.unwrap()).await
+
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(client::Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
+
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
+
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
+                        }
+                    }
+                    let result_value = {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+
+                        match json::from_str(&res_body_string) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&res_body_string, &err);
+                                return Err(client::Error::JsonDecodeError(res_body_string, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: GoogleCloudPaymentsResellerSubscriptionV1FindEligiblePromotionsRequest) -> PartnerPromotionFindEligibleCall<'a, S> {
+        self._request = new_value;
+        self
+    }
+    /// Required. The parent, the partner that can resell. Format: partners/{partner}
+    ///
+    /// Sets the *parent* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn parent(mut self, new_value: &str) -> PartnerPromotionFindEligibleCall<'a, S> {
+        self._parent = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PartnerPromotionFindEligibleCall<'a, S> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(mut self, name: T, value: T) -> PartnerPromotionFindEligibleCall<'a, S>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+}
+
+
+/// To retrieve the promotions, such as free trial, that can be used by the partner. It should be autenticated with a service account.
 ///
 /// A builder for the *promotions.list* method supported by a *partner* resource.
-/// It is not used directly, but through a `PartnerMethods` instance.
+/// It is not used directly, but through a [`PartnerMethods`] instance.
 ///
 /// # Example
 ///
@@ -1064,7 +1686,7 @@ where
 /// # extern crate google_paymentsresellersubscription1 as paymentsresellersubscription1;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use paymentsresellersubscription1::{PaymentsResellerSubscription, oauth2, hyper, hyper_rustls};
+/// # use paymentsresellersubscription1::{PaymentsResellerSubscription, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
 /// # let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -1076,9 +1698,9 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.partners().promotions_list("parent")
-///              .page_token("amet.")
-///              .page_size(-20)
-///              .filter("ipsum")
+///              .page_token("ipsum")
+///              .page_size(-62)
+///              .filter("Lorem")
 ///              .doit().await;
 /// # }
 /// ```
@@ -1098,7 +1720,7 @@ impl<'a, S> client::CallBuilder for PartnerPromotionListCall<'a, S> {}
 
 impl<'a, S> PartnerPromotionListCall<'a, S>
 where
-    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
     S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
     S::Future: Send + Unpin + 'static,
     S::Error: Into<Box<dyn StdError + Send + Sync>>,
@@ -1107,45 +1729,42 @@ where
 
     /// Perform the operation you have build so far.
     pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, GoogleCloudPaymentsResellerSubscriptionV1ListPromotionsResponse)> {
-        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
         use std::io::{Read, Seek};
         use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::ToParts;
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
         let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
         dlg.begin(client::MethodInfo { id: "paymentsresellersubscription.partners.promotions.list",
                                http_method: hyper::Method::GET });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(6 + self._additional_params.len());
-        params.push(("parent", self._parent.to_string()));
-        if let Some(value) = self._page_token {
-            params.push(("pageToken", value.to_string()));
-        }
-        if let Some(value) = self._page_size {
-            params.push(("pageSize", value.to_string()));
-        }
-        if let Some(value) = self._filter {
-            params.push(("filter", value.to_string()));
-        }
+
         for &field in ["alt", "parent", "pageToken", "pageSize", "filter"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(client::Error::FieldClash(field));
             }
         }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
+
+        let mut params = Params::with_capacity(6 + self._additional_params.len());
+        params.push("parent", self._parent);
+        if let Some(value) = self._page_token.as_ref() {
+            params.push("pageToken", value);
+        }
+        if let Some(value) = self._page_size.as_ref() {
+            params.push("pageSize", value.to_string());
+        }
+        if let Some(value) = self._filter.as_ref() {
+            params.push("filter", value);
         }
 
-        params.push(("alt", "json".to_string()));
+        params.extend(self._additional_params.iter());
 
+        params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "v1/{+parent}/promotions";
         
-        let key = dlg.api_key();
-        match key {
-            Some(value) => params.push(("key", value)),
+        match dlg.api_key() {
+            Some(value) => params.push("key", value),
             None => {
                 dlg.finished(false);
                 return Err(client::Error::MissingAPIKey)
@@ -1153,31 +1772,14 @@ where
         }
 
         for &(find_this, param_name) in [("{+parent}", "parent")].iter() {
-            let mut replace_with = String::new();
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = value.to_string();
-                    break;
-                }
-            }
-            if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
-            }
-            url = url.replace(find_this, &replace_with);
+            url = params.uri_replacement(url, param_name, find_this, true);
         }
         {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
-            for param_name in ["parent"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
+            let to_remove = ["parent"];
+            params.remove_params(&to_remove);
         }
 
-        let url = url::Url::parse_with_params(&url, params).unwrap();
+        let url = params.parse_with_url(&url);
 
 
 
@@ -1185,21 +1787,24 @@ where
             let mut req_result = {
                 let client = &self.hub.client;
                 dlg.pre_request();
-                let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
-                        .header(USER_AGENT, self.hub._user_agent.clone());
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::GET)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
 
 
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
-                
+
             };
 
             match req_result {
                 Err(err) => {
                     if let client::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep(d).await;
                         continue;
                     }
                     dlg.finished(false);
@@ -1215,7 +1820,7 @@ where
                         let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
                         if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
-                            sleep(d);
+                            sleep(d).await;
                             continue;
                         }
 
@@ -1270,7 +1875,7 @@ where
         self._page_size = Some(new_value);
         self
     }
-    /// Optional. Specifies the filters for the promotion results. The syntax defined in the EBNF grammar: https://google.aip.dev/assets/misc/ebnf-filtering.txt. Examples: - applicable_products: "sku1" - region_codes: "US" - applicable_products: "sku1" AND region_codes: "US"
+    /// Optional. Specifies the filters for the promotion results. The syntax is defined in https://google.aip.dev/160 with the following caveats: - Only the following features are supported: - Logical operator `AND` - Comparison operator `=` (no wildcards `*`) - Traversal operator `.` - Has operator `:` (no wildcards `*`) - Only the following fields are supported: - `applicableProducts` - `regionCodes` - `youtubePayload.partnerEligibilityId` - `youtubePayload.postalCode` - Unless explicitly mentioned above, other features are not supported. Example: `applicableProducts:partners/partner1/products/product1 AND regionCodes:US AND youtubePayload.postalCode=94043 AND youtubePayload.partnerEligibilityId=eligibility-id`
     ///
     /// Sets the *filter* query property to the given value.
     pub fn filter(mut self, new_value: &str) -> PartnerPromotionListCall<'a, S> {
@@ -1280,7 +1885,8 @@ where
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.````
     ///
     /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PartnerPromotionListCall<'a, S> {
@@ -1320,7 +1926,7 @@ where
 /// Used by partners to cancel a subscription service either immediately or by the end of the current billing cycle for their customers. It should be called directly by the partner using service accounts.
 ///
 /// A builder for the *subscriptions.cancel* method supported by a *partner* resource.
-/// It is not used directly, but through a `PartnerMethods` instance.
+/// It is not used directly, but through a [`PartnerMethods`] instance.
 ///
 /// # Example
 ///
@@ -1333,7 +1939,7 @@ where
 /// use paymentsresellersubscription1::api::GoogleCloudPaymentsResellerSubscriptionV1CancelSubscriptionRequest;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use paymentsresellersubscription1::{PaymentsResellerSubscription, oauth2, hyper, hyper_rustls};
+/// # use paymentsresellersubscription1::{PaymentsResellerSubscription, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
 /// # let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -1367,7 +1973,7 @@ impl<'a, S> client::CallBuilder for PartnerSubscriptionCancelCall<'a, S> {}
 
 impl<'a, S> PartnerSubscriptionCancelCall<'a, S>
 where
-    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
     S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
     S::Future: Send + Unpin + 'static,
     S::Error: Into<Box<dyn StdError + Send + Sync>>,
@@ -1376,36 +1982,33 @@ where
 
     /// Perform the operation you have build so far.
     pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, GoogleCloudPaymentsResellerSubscriptionV1CancelSubscriptionResponse)> {
-        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
         use std::io::{Read, Seek};
         use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::ToParts;
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
         let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
         dlg.begin(client::MethodInfo { id: "paymentsresellersubscription.partners.subscriptions.cancel",
                                http_method: hyper::Method::POST });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
-        params.push(("name", self._name.to_string()));
+
         for &field in ["alt", "name"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(client::Error::FieldClash(field));
             }
         }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
 
-        params.push(("alt", "json".to_string()));
+        let mut params = Params::with_capacity(4 + self._additional_params.len());
+        params.push("name", self._name);
 
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "v1/{+name}:cancel";
         
-        let key = dlg.api_key();
-        match key {
-            Some(value) => params.push(("key", value)),
+        match dlg.api_key() {
+            Some(value) => params.push("key", value),
             None => {
                 dlg.finished(false);
                 return Err(client::Error::MissingAPIKey)
@@ -1413,33 +2016,16 @@ where
         }
 
         for &(find_this, param_name) in [("{+name}", "name")].iter() {
-            let mut replace_with = String::new();
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = value.to_string();
-                    break;
-                }
-            }
-            if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
-            }
-            url = url.replace(find_this, &replace_with);
+            url = params.uri_replacement(url, param_name, find_this, true);
         }
         {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
-            for param_name in ["name"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
+            let to_remove = ["name"];
+            params.remove_params(&to_remove);
         }
 
-        let url = url::Url::parse_with_params(&url, params).unwrap();
+        let url = params.parse_with_url(&url);
 
-        let mut json_mime_type: mime::Mime = "application/json".parse().unwrap();
+        let mut json_mime_type = mime::APPLICATION_JSON;
         let mut request_value_reader =
             {
                 let mut value = json::value::to_value(&self._request).expect("serde to work");
@@ -1457,23 +2043,26 @@ where
             let mut req_result = {
                 let client = &self.hub.client;
                 dlg.pre_request();
-                let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
-                        .header(USER_AGENT, self.hub._user_agent.clone());
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::POST)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
 
 
                         let request = req_builder
-                        .header(CONTENT_TYPE, format!("{}", json_mime_type.to_string()))
+                        .header(CONTENT_TYPE, json_mime_type.to_string())
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
                 client.request(request.unwrap()).await
-                
+
             };
 
             match req_result {
                 Err(err) => {
                     if let client::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep(d).await;
                         continue;
                     }
                     dlg.finished(false);
@@ -1489,7 +2078,7 @@ where
                         let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
                         if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
-                            sleep(d);
+                            sleep(d).await;
                             continue;
                         }
 
@@ -1542,7 +2131,8 @@ where
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.````
     ///
     /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PartnerSubscriptionCancelCall<'a, S> {
@@ -1582,7 +2172,7 @@ where
 /// Used by partners to create a subscription for their customers. The created subscription is associated with the end user inferred from the end user credentials. This API must be authorized by the end user using OAuth.
 ///
 /// A builder for the *subscriptions.create* method supported by a *partner* resource.
-/// It is not used directly, but through a `PartnerMethods` instance.
+/// It is not used directly, but through a [`PartnerMethods`] instance.
 ///
 /// # Example
 ///
@@ -1595,7 +2185,7 @@ where
 /// use paymentsresellersubscription1::api::GoogleCloudPaymentsResellerSubscriptionV1Subscription;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use paymentsresellersubscription1::{PaymentsResellerSubscription, oauth2, hyper, hyper_rustls};
+/// # use paymentsresellersubscription1::{PaymentsResellerSubscription, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
 /// # let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -1612,7 +2202,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.partners().subscriptions_create(req, "parent")
-///              .subscription_id("gubergren")
+///              .subscription_id("dolor")
 ///              .doit().await;
 /// # }
 /// ```
@@ -1631,7 +2221,7 @@ impl<'a, S> client::CallBuilder for PartnerSubscriptionCreateCall<'a, S> {}
 
 impl<'a, S> PartnerSubscriptionCreateCall<'a, S>
 where
-    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
     S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
     S::Future: Send + Unpin + 'static,
     S::Error: Into<Box<dyn StdError + Send + Sync>>,
@@ -1640,39 +2230,36 @@ where
 
     /// Perform the operation you have build so far.
     pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, GoogleCloudPaymentsResellerSubscriptionV1Subscription)> {
-        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
         use std::io::{Read, Seek};
         use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::ToParts;
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
         let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
         dlg.begin(client::MethodInfo { id: "paymentsresellersubscription.partners.subscriptions.create",
                                http_method: hyper::Method::POST });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
-        params.push(("parent", self._parent.to_string()));
-        if let Some(value) = self._subscription_id {
-            params.push(("subscriptionId", value.to_string()));
-        }
+
         for &field in ["alt", "parent", "subscriptionId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(client::Error::FieldClash(field));
             }
         }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
+
+        let mut params = Params::with_capacity(5 + self._additional_params.len());
+        params.push("parent", self._parent);
+        if let Some(value) = self._subscription_id.as_ref() {
+            params.push("subscriptionId", value);
         }
 
-        params.push(("alt", "json".to_string()));
+        params.extend(self._additional_params.iter());
 
+        params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "v1/{+parent}/subscriptions";
         
-        let key = dlg.api_key();
-        match key {
-            Some(value) => params.push(("key", value)),
+        match dlg.api_key() {
+            Some(value) => params.push("key", value),
             None => {
                 dlg.finished(false);
                 return Err(client::Error::MissingAPIKey)
@@ -1680,33 +2267,16 @@ where
         }
 
         for &(find_this, param_name) in [("{+parent}", "parent")].iter() {
-            let mut replace_with = String::new();
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = value.to_string();
-                    break;
-                }
-            }
-            if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
-            }
-            url = url.replace(find_this, &replace_with);
+            url = params.uri_replacement(url, param_name, find_this, true);
         }
         {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
-            for param_name in ["parent"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
+            let to_remove = ["parent"];
+            params.remove_params(&to_remove);
         }
 
-        let url = url::Url::parse_with_params(&url, params).unwrap();
+        let url = params.parse_with_url(&url);
 
-        let mut json_mime_type: mime::Mime = "application/json".parse().unwrap();
+        let mut json_mime_type = mime::APPLICATION_JSON;
         let mut request_value_reader =
             {
                 let mut value = json::value::to_value(&self._request).expect("serde to work");
@@ -1724,23 +2294,26 @@ where
             let mut req_result = {
                 let client = &self.hub.client;
                 dlg.pre_request();
-                let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
-                        .header(USER_AGENT, self.hub._user_agent.clone());
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::POST)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
 
 
                         let request = req_builder
-                        .header(CONTENT_TYPE, format!("{}", json_mime_type.to_string()))
+                        .header(CONTENT_TYPE, json_mime_type.to_string())
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
                 client.request(request.unwrap()).await
-                
+
             };
 
             match req_result {
                 Err(err) => {
                     if let client::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep(d).await;
                         continue;
                     }
                     dlg.finished(false);
@@ -1756,7 +2329,7 @@ where
                         let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
                         if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
-                            sleep(d);
+                            sleep(d).await;
                             continue;
                         }
 
@@ -1816,7 +2389,8 @@ where
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.````
     ///
     /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PartnerSubscriptionCreateCall<'a, S> {
@@ -1856,7 +2430,7 @@ where
 /// Used by partners to entitle a previously provisioned subscription to the current end user. The end user identity is inferred from the authorized credential of the request. This API must be authorized by the end user using OAuth.
 ///
 /// A builder for the *subscriptions.entitle* method supported by a *partner* resource.
-/// It is not used directly, but through a `PartnerMethods` instance.
+/// It is not used directly, but through a [`PartnerMethods`] instance.
 ///
 /// # Example
 ///
@@ -1869,7 +2443,7 @@ where
 /// use paymentsresellersubscription1::api::GoogleCloudPaymentsResellerSubscriptionV1EntitleSubscriptionRequest;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use paymentsresellersubscription1::{PaymentsResellerSubscription, oauth2, hyper, hyper_rustls};
+/// # use paymentsresellersubscription1::{PaymentsResellerSubscription, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
 /// # let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -1903,7 +2477,7 @@ impl<'a, S> client::CallBuilder for PartnerSubscriptionEntitleCall<'a, S> {}
 
 impl<'a, S> PartnerSubscriptionEntitleCall<'a, S>
 where
-    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
     S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
     S::Future: Send + Unpin + 'static,
     S::Error: Into<Box<dyn StdError + Send + Sync>>,
@@ -1912,36 +2486,33 @@ where
 
     /// Perform the operation you have build so far.
     pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, GoogleCloudPaymentsResellerSubscriptionV1EntitleSubscriptionResponse)> {
-        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
         use std::io::{Read, Seek};
         use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::ToParts;
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
         let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
         dlg.begin(client::MethodInfo { id: "paymentsresellersubscription.partners.subscriptions.entitle",
                                http_method: hyper::Method::POST });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
-        params.push(("name", self._name.to_string()));
+
         for &field in ["alt", "name"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(client::Error::FieldClash(field));
             }
         }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
 
-        params.push(("alt", "json".to_string()));
+        let mut params = Params::with_capacity(4 + self._additional_params.len());
+        params.push("name", self._name);
 
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "v1/{+name}:entitle";
         
-        let key = dlg.api_key();
-        match key {
-            Some(value) => params.push(("key", value)),
+        match dlg.api_key() {
+            Some(value) => params.push("key", value),
             None => {
                 dlg.finished(false);
                 return Err(client::Error::MissingAPIKey)
@@ -1949,33 +2520,16 @@ where
         }
 
         for &(find_this, param_name) in [("{+name}", "name")].iter() {
-            let mut replace_with = String::new();
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = value.to_string();
-                    break;
-                }
-            }
-            if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
-            }
-            url = url.replace(find_this, &replace_with);
+            url = params.uri_replacement(url, param_name, find_this, true);
         }
         {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
-            for param_name in ["name"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
+            let to_remove = ["name"];
+            params.remove_params(&to_remove);
         }
 
-        let url = url::Url::parse_with_params(&url, params).unwrap();
+        let url = params.parse_with_url(&url);
 
-        let mut json_mime_type: mime::Mime = "application/json".parse().unwrap();
+        let mut json_mime_type = mime::APPLICATION_JSON;
         let mut request_value_reader =
             {
                 let mut value = json::value::to_value(&self._request).expect("serde to work");
@@ -1993,23 +2547,26 @@ where
             let mut req_result = {
                 let client = &self.hub.client;
                 dlg.pre_request();
-                let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
-                        .header(USER_AGENT, self.hub._user_agent.clone());
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::POST)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
 
 
                         let request = req_builder
-                        .header(CONTENT_TYPE, format!("{}", json_mime_type.to_string()))
+                        .header(CONTENT_TYPE, json_mime_type.to_string())
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
                 client.request(request.unwrap()).await
-                
+
             };
 
             match req_result {
                 Err(err) => {
                     if let client::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep(d).await;
                         continue;
                     }
                     dlg.finished(false);
@@ -2025,7 +2582,7 @@ where
                         let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
                         if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
-                            sleep(d);
+                            sleep(d).await;
                             continue;
                         }
 
@@ -2078,7 +2635,8 @@ where
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.````
     ///
     /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PartnerSubscriptionEntitleCall<'a, S> {
@@ -2115,10 +2673,10 @@ where
 }
 
 
-/// Used by partners to extend a subscription service for their customers on an ongoing basis for the subscription to remain active and renewable. It should be called directly by the partner using service accounts.
+/// [Deprecated] New partners should be on auto-extend by default. Used by partners to extend a subscription service for their customers on an ongoing basis for the subscription to remain active and renewable. It should be called directly by the partner using service accounts.
 ///
 /// A builder for the *subscriptions.extend* method supported by a *partner* resource.
-/// It is not used directly, but through a `PartnerMethods` instance.
+/// It is not used directly, but through a [`PartnerMethods`] instance.
 ///
 /// # Example
 ///
@@ -2131,7 +2689,7 @@ where
 /// use paymentsresellersubscription1::api::GoogleCloudPaymentsResellerSubscriptionV1ExtendSubscriptionRequest;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use paymentsresellersubscription1::{PaymentsResellerSubscription, oauth2, hyper, hyper_rustls};
+/// # use paymentsresellersubscription1::{PaymentsResellerSubscription, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
 /// # let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -2165,7 +2723,7 @@ impl<'a, S> client::CallBuilder for PartnerSubscriptionExtendCall<'a, S> {}
 
 impl<'a, S> PartnerSubscriptionExtendCall<'a, S>
 where
-    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
     S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
     S::Future: Send + Unpin + 'static,
     S::Error: Into<Box<dyn StdError + Send + Sync>>,
@@ -2174,36 +2732,33 @@ where
 
     /// Perform the operation you have build so far.
     pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, GoogleCloudPaymentsResellerSubscriptionV1ExtendSubscriptionResponse)> {
-        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
         use std::io::{Read, Seek};
         use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::ToParts;
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
         let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
         dlg.begin(client::MethodInfo { id: "paymentsresellersubscription.partners.subscriptions.extend",
                                http_method: hyper::Method::POST });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
-        params.push(("name", self._name.to_string()));
+
         for &field in ["alt", "name"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(client::Error::FieldClash(field));
             }
         }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
 
-        params.push(("alt", "json".to_string()));
+        let mut params = Params::with_capacity(4 + self._additional_params.len());
+        params.push("name", self._name);
 
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "v1/{+name}:extend";
         
-        let key = dlg.api_key();
-        match key {
-            Some(value) => params.push(("key", value)),
+        match dlg.api_key() {
+            Some(value) => params.push("key", value),
             None => {
                 dlg.finished(false);
                 return Err(client::Error::MissingAPIKey)
@@ -2211,33 +2766,16 @@ where
         }
 
         for &(find_this, param_name) in [("{+name}", "name")].iter() {
-            let mut replace_with = String::new();
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = value.to_string();
-                    break;
-                }
-            }
-            if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
-            }
-            url = url.replace(find_this, &replace_with);
+            url = params.uri_replacement(url, param_name, find_this, true);
         }
         {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
-            for param_name in ["name"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
+            let to_remove = ["name"];
+            params.remove_params(&to_remove);
         }
 
-        let url = url::Url::parse_with_params(&url, params).unwrap();
+        let url = params.parse_with_url(&url);
 
-        let mut json_mime_type: mime::Mime = "application/json".parse().unwrap();
+        let mut json_mime_type = mime::APPLICATION_JSON;
         let mut request_value_reader =
             {
                 let mut value = json::value::to_value(&self._request).expect("serde to work");
@@ -2255,23 +2793,26 @@ where
             let mut req_result = {
                 let client = &self.hub.client;
                 dlg.pre_request();
-                let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
-                        .header(USER_AGENT, self.hub._user_agent.clone());
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::POST)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
 
 
                         let request = req_builder
-                        .header(CONTENT_TYPE, format!("{}", json_mime_type.to_string()))
+                        .header(CONTENT_TYPE, json_mime_type.to_string())
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
                 client.request(request.unwrap()).await
-                
+
             };
 
             match req_result {
                 Err(err) => {
                     if let client::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep(d).await;
                         continue;
                     }
                     dlg.finished(false);
@@ -2287,7 +2828,7 @@ where
                         let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
                         if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
-                            sleep(d);
+                            sleep(d).await;
                             continue;
                         }
 
@@ -2340,7 +2881,8 @@ where
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.````
     ///
     /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PartnerSubscriptionExtendCall<'a, S> {
@@ -2380,7 +2922,7 @@ where
 /// Used by partners to get a subscription by id. It should be called directly by the partner using service accounts.
 ///
 /// A builder for the *subscriptions.get* method supported by a *partner* resource.
-/// It is not used directly, but through a `PartnerMethods` instance.
+/// It is not used directly, but through a [`PartnerMethods`] instance.
 ///
 /// # Example
 ///
@@ -2392,7 +2934,7 @@ where
 /// # extern crate google_paymentsresellersubscription1 as paymentsresellersubscription1;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use paymentsresellersubscription1::{PaymentsResellerSubscription, oauth2, hyper, hyper_rustls};
+/// # use paymentsresellersubscription1::{PaymentsResellerSubscription, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
 /// # let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -2420,7 +2962,7 @@ impl<'a, S> client::CallBuilder for PartnerSubscriptionGetCall<'a, S> {}
 
 impl<'a, S> PartnerSubscriptionGetCall<'a, S>
 where
-    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
     S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
     S::Future: Send + Unpin + 'static,
     S::Error: Into<Box<dyn StdError + Send + Sync>>,
@@ -2429,36 +2971,33 @@ where
 
     /// Perform the operation you have build so far.
     pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, GoogleCloudPaymentsResellerSubscriptionV1Subscription)> {
-        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
         use std::io::{Read, Seek};
         use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::ToParts;
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
         let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
         dlg.begin(client::MethodInfo { id: "paymentsresellersubscription.partners.subscriptions.get",
                                http_method: hyper::Method::GET });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
-        params.push(("name", self._name.to_string()));
+
         for &field in ["alt", "name"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(client::Error::FieldClash(field));
             }
         }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
 
-        params.push(("alt", "json".to_string()));
+        let mut params = Params::with_capacity(3 + self._additional_params.len());
+        params.push("name", self._name);
 
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "v1/{+name}";
         
-        let key = dlg.api_key();
-        match key {
-            Some(value) => params.push(("key", value)),
+        match dlg.api_key() {
+            Some(value) => params.push("key", value),
             None => {
                 dlg.finished(false);
                 return Err(client::Error::MissingAPIKey)
@@ -2466,31 +3005,14 @@ where
         }
 
         for &(find_this, param_name) in [("{+name}", "name")].iter() {
-            let mut replace_with = String::new();
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = value.to_string();
-                    break;
-                }
-            }
-            if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
-            }
-            url = url.replace(find_this, &replace_with);
+            url = params.uri_replacement(url, param_name, find_this, true);
         }
         {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
-            for param_name in ["name"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
+            let to_remove = ["name"];
+            params.remove_params(&to_remove);
         }
 
-        let url = url::Url::parse_with_params(&url, params).unwrap();
+        let url = params.parse_with_url(&url);
 
 
 
@@ -2498,21 +3020,24 @@ where
             let mut req_result = {
                 let client = &self.hub.client;
                 dlg.pre_request();
-                let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
-                        .header(USER_AGENT, self.hub._user_agent.clone());
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::GET)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
 
 
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
-                
+
             };
 
             match req_result {
                 Err(err) => {
                     if let client::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep(d).await;
                         continue;
                     }
                     dlg.finished(false);
@@ -2528,7 +3053,7 @@ where
                         let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
                         if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
-                            sleep(d);
+                            sleep(d).await;
                             continue;
                         }
 
@@ -2572,7 +3097,8 @@ where
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.````
     ///
     /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PartnerSubscriptionGetCall<'a, S> {
@@ -2612,7 +3138,7 @@ where
 /// Used by partners to provision a subscription for their customers. This creates a subscription without associating it with the end user account. EntitleSubscription must be called separately using OAuth in order for the end user account to be associated with the subscription. It should be called directly by the partner using service accounts.
 ///
 /// A builder for the *subscriptions.provision* method supported by a *partner* resource.
-/// It is not used directly, but through a `PartnerMethods` instance.
+/// It is not used directly, but through a [`PartnerMethods`] instance.
 ///
 /// # Example
 ///
@@ -2625,7 +3151,7 @@ where
 /// use paymentsresellersubscription1::api::GoogleCloudPaymentsResellerSubscriptionV1Subscription;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use paymentsresellersubscription1::{PaymentsResellerSubscription, oauth2, hyper, hyper_rustls};
+/// # use paymentsresellersubscription1::{PaymentsResellerSubscription, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
 /// # let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -2642,7 +3168,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.partners().subscriptions_provision(req, "parent")
-///              .subscription_id("invidunt")
+///              .subscription_id("duo")
 ///              .doit().await;
 /// # }
 /// ```
@@ -2661,7 +3187,7 @@ impl<'a, S> client::CallBuilder for PartnerSubscriptionProvisionCall<'a, S> {}
 
 impl<'a, S> PartnerSubscriptionProvisionCall<'a, S>
 where
-    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
     S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
     S::Future: Send + Unpin + 'static,
     S::Error: Into<Box<dyn StdError + Send + Sync>>,
@@ -2670,39 +3196,36 @@ where
 
     /// Perform the operation you have build so far.
     pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, GoogleCloudPaymentsResellerSubscriptionV1Subscription)> {
-        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
         use std::io::{Read, Seek};
         use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::ToParts;
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
         let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
         dlg.begin(client::MethodInfo { id: "paymentsresellersubscription.partners.subscriptions.provision",
                                http_method: hyper::Method::POST });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
-        params.push(("parent", self._parent.to_string()));
-        if let Some(value) = self._subscription_id {
-            params.push(("subscriptionId", value.to_string()));
-        }
+
         for &field in ["alt", "parent", "subscriptionId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(client::Error::FieldClash(field));
             }
         }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
+
+        let mut params = Params::with_capacity(5 + self._additional_params.len());
+        params.push("parent", self._parent);
+        if let Some(value) = self._subscription_id.as_ref() {
+            params.push("subscriptionId", value);
         }
 
-        params.push(("alt", "json".to_string()));
+        params.extend(self._additional_params.iter());
 
+        params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "v1/{+parent}/subscriptions:provision";
         
-        let key = dlg.api_key();
-        match key {
-            Some(value) => params.push(("key", value)),
+        match dlg.api_key() {
+            Some(value) => params.push("key", value),
             None => {
                 dlg.finished(false);
                 return Err(client::Error::MissingAPIKey)
@@ -2710,33 +3233,16 @@ where
         }
 
         for &(find_this, param_name) in [("{+parent}", "parent")].iter() {
-            let mut replace_with = String::new();
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = value.to_string();
-                    break;
-                }
-            }
-            if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
-            }
-            url = url.replace(find_this, &replace_with);
+            url = params.uri_replacement(url, param_name, find_this, true);
         }
         {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
-            for param_name in ["parent"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
+            let to_remove = ["parent"];
+            params.remove_params(&to_remove);
         }
 
-        let url = url::Url::parse_with_params(&url, params).unwrap();
+        let url = params.parse_with_url(&url);
 
-        let mut json_mime_type: mime::Mime = "application/json".parse().unwrap();
+        let mut json_mime_type = mime::APPLICATION_JSON;
         let mut request_value_reader =
             {
                 let mut value = json::value::to_value(&self._request).expect("serde to work");
@@ -2754,23 +3260,26 @@ where
             let mut req_result = {
                 let client = &self.hub.client;
                 dlg.pre_request();
-                let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
-                        .header(USER_AGENT, self.hub._user_agent.clone());
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::POST)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
 
 
                         let request = req_builder
-                        .header(CONTENT_TYPE, format!("{}", json_mime_type.to_string()))
+                        .header(CONTENT_TYPE, json_mime_type.to_string())
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
                 client.request(request.unwrap()).await
-                
+
             };
 
             match req_result {
                 Err(err) => {
                     if let client::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep(d).await;
                         continue;
                     }
                     dlg.finished(false);
@@ -2786,7 +3295,7 @@ where
                         let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
                         if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
-                            sleep(d);
+                            sleep(d).await;
                             continue;
                         }
 
@@ -2846,7 +3355,8 @@ where
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.````
     ///
     /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PartnerSubscriptionProvisionCall<'a, S> {
@@ -2886,7 +3396,7 @@ where
 /// Used by partners to revoke the pending cancellation of a subscription, which is currently in `STATE_CANCEL_AT_END_OF_CYCLE` state. If the subscription is already cancelled, the request will fail. It should be called directly by the partner using service accounts.
 ///
 /// A builder for the *subscriptions.undoCancel* method supported by a *partner* resource.
-/// It is not used directly, but through a `PartnerMethods` instance.
+/// It is not used directly, but through a [`PartnerMethods`] instance.
 ///
 /// # Example
 ///
@@ -2899,7 +3409,7 @@ where
 /// use paymentsresellersubscription1::api::GoogleCloudPaymentsResellerSubscriptionV1UndoCancelSubscriptionRequest;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use paymentsresellersubscription1::{PaymentsResellerSubscription, oauth2, hyper, hyper_rustls};
+/// # use paymentsresellersubscription1::{PaymentsResellerSubscription, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
 /// # let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -2933,7 +3443,7 @@ impl<'a, S> client::CallBuilder for PartnerSubscriptionUndoCancelCall<'a, S> {}
 
 impl<'a, S> PartnerSubscriptionUndoCancelCall<'a, S>
 where
-    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
     S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
     S::Future: Send + Unpin + 'static,
     S::Error: Into<Box<dyn StdError + Send + Sync>>,
@@ -2942,36 +3452,33 @@ where
 
     /// Perform the operation you have build so far.
     pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, GoogleCloudPaymentsResellerSubscriptionV1UndoCancelSubscriptionResponse)> {
-        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
         use std::io::{Read, Seek};
         use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::ToParts;
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
         let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
         dlg.begin(client::MethodInfo { id: "paymentsresellersubscription.partners.subscriptions.undoCancel",
                                http_method: hyper::Method::POST });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
-        params.push(("name", self._name.to_string()));
+
         for &field in ["alt", "name"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(client::Error::FieldClash(field));
             }
         }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
 
-        params.push(("alt", "json".to_string()));
+        let mut params = Params::with_capacity(4 + self._additional_params.len());
+        params.push("name", self._name);
 
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "v1/{+name}:undoCancel";
         
-        let key = dlg.api_key();
-        match key {
-            Some(value) => params.push(("key", value)),
+        match dlg.api_key() {
+            Some(value) => params.push("key", value),
             None => {
                 dlg.finished(false);
                 return Err(client::Error::MissingAPIKey)
@@ -2979,33 +3486,16 @@ where
         }
 
         for &(find_this, param_name) in [("{+name}", "name")].iter() {
-            let mut replace_with = String::new();
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = value.to_string();
-                    break;
-                }
-            }
-            if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
-            }
-            url = url.replace(find_this, &replace_with);
+            url = params.uri_replacement(url, param_name, find_this, true);
         }
         {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
-            for param_name in ["name"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
+            let to_remove = ["name"];
+            params.remove_params(&to_remove);
         }
 
-        let url = url::Url::parse_with_params(&url, params).unwrap();
+        let url = params.parse_with_url(&url);
 
-        let mut json_mime_type: mime::Mime = "application/json".parse().unwrap();
+        let mut json_mime_type = mime::APPLICATION_JSON;
         let mut request_value_reader =
             {
                 let mut value = json::value::to_value(&self._request).expect("serde to work");
@@ -3023,23 +3513,26 @@ where
             let mut req_result = {
                 let client = &self.hub.client;
                 dlg.pre_request();
-                let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
-                        .header(USER_AGENT, self.hub._user_agent.clone());
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::POST)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
 
 
                         let request = req_builder
-                        .header(CONTENT_TYPE, format!("{}", json_mime_type.to_string()))
+                        .header(CONTENT_TYPE, json_mime_type.to_string())
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
                 client.request(request.unwrap()).await
-                
+
             };
 
             match req_result {
                 Err(err) => {
                     if let client::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep(d).await;
                         continue;
                     }
                     dlg.finished(false);
@@ -3055,7 +3548,7 @@ where
                         let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
                         if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
-                            sleep(d);
+                            sleep(d).await;
                             continue;
                         }
 
@@ -3108,7 +3601,8 @@ where
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.````
     ///
     /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PartnerSubscriptionUndoCancelCall<'a, S> {

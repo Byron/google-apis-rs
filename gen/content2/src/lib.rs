@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/generator/templates/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Shopping Content* crate version *4.0.1+20220303*, where *20220303* is the exact revision of the *content:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v4.0.1*.
+//! This documentation was generated from *Shopping Content* crate version *5.0.2-beta-1+20220303*, where *20220303* is the exact revision of the *content:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.2-beta-1*.
 //! 
 //! Everything else about the *Shopping Content* *v2* API can be found at the
 //! [official documentation site](https://developers.google.com/shopping-content/v2/).
@@ -14,13 +14,13 @@
 //! * [accounts](api::Account)
 //!  * [*authinfo*](api::AccountAuthinfoCall), [*claimwebsite*](api::AccountClaimwebsiteCall), [*custombatch*](api::AccountCustombatchCall), [*delete*](api::AccountDeleteCall), [*get*](api::AccountGetCall), [*insert*](api::AccountInsertCall), [*link*](api::AccountLinkCall), [*list*](api::AccountListCall) and [*update*](api::AccountUpdateCall)
 //! * accountstatuses
-//!  * [*custombatch*](api::AccountstatuseCustombatchCall), [*get*](api::AccountstatuseGetCall) and [*list*](api::AccountstatuseListCall)
+//!  * [*custombatch*](api::AccountstatusCustombatchCall), [*get*](api::AccountstatusGetCall) and [*list*](api::AccountstatusListCall)
 //! * accounttax
 //!  * [*custombatch*](api::AccounttaxCustombatchCall), [*get*](api::AccounttaxGetCall), [*list*](api::AccounttaxListCall) and [*update*](api::AccounttaxUpdateCall)
 //! * [datafeeds](api::Datafeed)
 //!  * [*custombatch*](api::DatafeedCustombatchCall), [*delete*](api::DatafeedDeleteCall), [*fetchnow*](api::DatafeedFetchnowCall), [*get*](api::DatafeedGetCall), [*insert*](api::DatafeedInsertCall), [*list*](api::DatafeedListCall) and [*update*](api::DatafeedUpdateCall)
 //! * datafeedstatuses
-//!  * [*custombatch*](api::DatafeedstatuseCustombatchCall), [*get*](api::DatafeedstatuseGetCall) and [*list*](api::DatafeedstatuseListCall)
+//!  * [*custombatch*](api::DatafeedstatusCustombatchCall), [*get*](api::DatafeedstatusGetCall) and [*list*](api::DatafeedstatusListCall)
 //! * [inventory](api::Inventory)
 //!  * [*custombatch*](api::InventoryCustombatchCall) and [*set*](api::InventorySetCall)
 //! * liasettings
@@ -38,7 +38,7 @@
 //! * [products](api::Product)
 //!  * [*custombatch*](api::ProductCustombatchCall), [*delete*](api::ProductDeleteCall), [*get*](api::ProductGetCall), [*insert*](api::ProductInsertCall) and [*list*](api::ProductListCall)
 //! * productstatuses
-//!  * [*custombatch*](api::ProductstatuseCustombatchCall), [*get*](api::ProductstatuseGetCall) and [*list*](api::ProductstatuseListCall)
+//!  * [*custombatch*](api::ProductstatusCustombatchCall), [*get*](api::ProductstatusGetCall) and [*list*](api::ProductstatusListCall)
 //! * shippingsettings
 //!  * [*custombatch*](api::ShippingsettingCustombatchCall), [*get*](api::ShippingsettingGetCall), [*getsupportedcarriers*](api::ShippingsettingGetsupportedcarrierCall), [*getsupportedholidays*](api::ShippingsettingGetsupportedholidayCall), [*getsupportedpickupservices*](api::ShippingsettingGetsupportedpickupserviceCall), [*list*](api::ShippingsettingListCall) and [*update*](api::ShippingsettingUpdateCall)
 //! 
@@ -126,7 +126,7 @@
 //! use content2::{Result, Error};
 //! # async fn dox() {
 //! use std::default::Default;
-//! use content2::{ShoppingContent, oauth2, hyper, hyper_rustls};
+//! use content2::{ShoppingContent, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 //! 
 //! // Get an ApplicationSecret instance by some means. It contains the `client_id` and 
 //! // `client_secret`, among other things.
@@ -144,7 +144,7 @@
 //! // You can configure optional parameters by calling the respective setters at will, and
 //! // execute the final call using `doit()`.
 //! // Values shown here are possibly random and not representative !
-//! let result = hub.orders().list("merchantId")
+//! let result = hub.orders().list(99)
 //!              .add_statuses("takimata")
 //!              .placed_date_start("amet.")
 //!              .placed_date_end("duo")
@@ -237,22 +237,17 @@
 // This file was generated automatically from 'src/generator/templates/api/lib.rs.mako'
 // DO NOT EDIT !
 
-#[macro_use]
-extern crate serde_derive;
-
 // Re-export the hyper and hyper_rustls crate, they are required to build the hub
-pub extern crate hyper;
-pub extern crate hyper_rustls;
-extern crate serde;
-extern crate serde_json;
-// Re-export the yup_oauth2 crate, that is required to call some methods of the hub and the client
-pub extern crate yup_oauth2 as oauth2;
-extern crate mime;
-extern crate url;
-
+pub use hyper;
+pub use hyper_rustls;
+pub extern crate google_apis_common as client;
+pub use client::chrono;
 pub mod api;
-pub mod client;
 
 // Re-export the hub type and some basic client structs
 pub use api::ShoppingContent;
-pub use client::{Result, Error, Delegate};
+pub use client::{Result, Error, Delegate, FieldMask};
+
+// Re-export the yup_oauth2 crate, that is required to call some methods of the hub and the client
+#[cfg(feature = "yup-oauth2")]
+pub use client::oauth2;

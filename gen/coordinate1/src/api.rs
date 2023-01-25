@@ -1,19 +1,20 @@
 use std::collections::HashMap;
 use std::cell::RefCell;
 use std::default::Default;
-use std::collections::BTreeMap;
+use std::collections::BTreeSet;
 use std::error::Error as StdError;
 use serde_json as json;
 use std::io;
 use std::fs;
 use std::mem;
-use std::thread::sleep;
 
-use http::Uri;
 use hyper::client::connect;
 use tokio::io::{AsyncRead, AsyncWrite};
+use tokio::time::sleep;
 use tower_service;
-use crate::client;
+use serde::{Serialize, Deserialize};
+
+use crate::{client, client::GetToken, client::serde_with};
 
 // ##############
 // UTILITIES ###
@@ -66,7 +67,7 @@ impl Default for Scope {
 /// use coordinate1::{Result, Error};
 /// # async fn dox() {
 /// use std::default::Default;
-/// use coordinate1::{Coordinate, oauth2, hyper, hyper_rustls};
+/// use coordinate1::{Coordinate, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// // Get an ApplicationSecret instance by some means. It contains the `client_id` and 
 /// // `client_secret`, among other things.
@@ -89,7 +90,7 @@ impl Default for Scope {
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.jobs().patch(req, "teamId", "jobId")
+/// let result = hub.jobs().patch(req, "teamId", 85)
 ///              .title("est")
 ///              .progress("ipsum")
 ///              .note("ipsum")
@@ -124,7 +125,7 @@ impl Default for Scope {
 #[derive(Clone)]
 pub struct Coordinate<S> {
     pub client: hyper::Client<S, hyper::body::Body>,
-    pub auth: oauth2::authenticator::Authenticator<S>,
+    pub auth: Box<dyn client::GetToken>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
@@ -134,11 +135,11 @@ impl<'a, S> client::Hub for Coordinate<S> {}
 
 impl<'a, S> Coordinate<S> {
 
-    pub fn new(client: hyper::Client<S, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<S>) -> Coordinate<S> {
+    pub fn new<A: 'static + client::GetToken>(client: hyper::Client<S, hyper::body::Body>, auth: A) -> Coordinate<S> {
         Coordinate {
             client,
-            auth: authenticator,
-            _user_agent: "google-api-rust-client/4.0.1".to_string(),
+            auth: Box::new(auth),
+            _user_agent: "google-api-rust-client/5.0.2-beta-1".to_string(),
             _base_url: "https://www.googleapis.com/coordinate/v1/".to_string(),
             _root_url: "https://www.googleapis.com/".to_string(),
         }
@@ -164,7 +165,7 @@ impl<'a, S> Coordinate<S> {
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/4.0.1`.
+    /// It defaults to `google-api-rust-client/5.0.2-beta-1`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -196,14 +197,19 @@ impl<'a, S> Coordinate<S> {
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct CustomField {
     /// Custom field id.
     #[serde(rename="customFieldId")]
-    pub custom_field_id: Option<String>,
+    
+    #[serde_as(as = "Option<::client::serde_with::DisplayFromStr>")]
+    pub custom_field_id: Option<i64>,
     /// Identifies this object as a custom field.
+    
     pub kind: Option<String>,
     /// Custom field value.
+    
     pub value: Option<String>,
 }
 
@@ -214,23 +220,32 @@ impl client::Part for CustomField {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct CustomFieldDef {
     /// Whether the field is enabled.
+    
     pub enabled: Option<bool>,
     /// List of enum items for this custom field. Populated only if the field type is enum. Enum fields appear as 'lists' in the Coordinate web and mobile UI.
+    
     pub enumitems: Option<Vec<EnumItemDef>>,
     /// Custom field id.
-    pub id: Option<String>,
+    
+    #[serde_as(as = "Option<::client::serde_with::DisplayFromStr>")]
+    pub id: Option<i64>,
     /// Identifies this object as a custom field definition.
+    
     pub kind: Option<String>,
     /// Custom field name.
+    
     pub name: Option<String>,
     /// Whether the field is required for checkout.
     #[serde(rename="requiredForCheckout")]
+    
     pub required_for_checkout: Option<bool>,
     /// Custom field type.
     #[serde(rename="type")]
+    
     pub type_: Option<String>,
 }
 
@@ -246,11 +261,14 @@ impl client::Part for CustomFieldDef {}
 /// 
 /// * [list custom field def](CustomFieldDefListCall) (response)
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct CustomFieldDefListResponse {
     /// Collection of custom field definitions in a team.
+    
     pub items: Option<Vec<CustomFieldDef>>,
     /// Identifies this object as a collection of custom field definitions in a team.
+    
     pub kind: Option<String>,
 }
 
@@ -261,12 +279,15 @@ impl client::ResponseResult for CustomFieldDefListResponse {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct CustomFields {
     /// Collection of custom fields.
     #[serde(rename="customField")]
+    
     pub custom_field: Option<Vec<CustomField>>,
     /// Identifies this object as a collection of custom fields.
+    
     pub kind: Option<String>,
 }
 
@@ -277,13 +298,17 @@ impl client::Part for CustomFields {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct EnumItemDef {
     /// Whether the enum item is active. Jobs may contain inactive enum values; however, setting an enum to an inactive value when creating or updating a job will result in a 500 error.
+    
     pub active: Option<bool>,
     /// Identifies this object as an enum item definition.
+    
     pub kind: Option<String>,
     /// Custom field value.
+    
     pub value: Option<String>,
 }
 
@@ -303,16 +328,22 @@ impl client::Part for EnumItemDef {}
 /// * [patch jobs](JobPatchCall) (request|response)
 /// * [update jobs](JobUpdateCall) (request|response)
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Job {
     /// Job id.
-    pub id: Option<String>,
+    
+    #[serde_as(as = "Option<::client::serde_with::DisplayFromStr>")]
+    pub id: Option<u64>,
     /// List of job changes since it was created. The first change corresponds to the state of the job when it was created.
     #[serde(rename="jobChange")]
+    
     pub job_change: Option<Vec<JobChange>>,
     /// Identifies this object as a job.
+    
     pub kind: Option<String>,
     /// Current job state.
+    
     pub state: Option<JobState>,
 }
 
@@ -325,14 +356,19 @@ impl client::ResponseResult for Job {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct JobChange {
     /// Identifies this object as a job change.
+    
     pub kind: Option<String>,
     /// Change applied to the job. Only the fields that were changed are set.
+    
     pub state: Option<JobState>,
     /// Time at which this change was applied.
-    pub timestamp: Option<String>,
+    
+    #[serde_as(as = "Option<::client::serde_with::DisplayFromStr>")]
+    pub timestamp: Option<u64>,
 }
 
 impl client::Part for JobChange {}
@@ -347,14 +383,18 @@ impl client::Part for JobChange {}
 /// 
 /// * [list jobs](JobListCall) (response)
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct JobListResponse {
     /// Jobs in the collection.
+    
     pub items: Option<Vec<Job>>,
     /// Identifies this object as a list of jobs.
+    
     pub kind: Option<String>,
     /// A token to provide to get the next page of results.
     #[serde(rename="nextPageToken")]
+    
     pub next_page_token: Option<String>,
 }
 
@@ -365,28 +405,38 @@ impl client::ResponseResult for JobListResponse {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct JobState {
     /// Email address of the assignee, or the string "DELETED_USER" if the account is no longer available.
+    
     pub assignee: Option<String>,
     /// Custom fields.
     #[serde(rename="customFields")]
+    
     pub custom_fields: Option<CustomFields>,
     /// Customer name.
     #[serde(rename="customerName")]
+    
     pub customer_name: Option<String>,
     /// Customer phone number.
     #[serde(rename="customerPhoneNumber")]
+    
     pub customer_phone_number: Option<String>,
     /// Identifies this object as a job state.
+    
     pub kind: Option<String>,
     /// Job location.
+    
     pub location: Option<Location>,
     /// Note added to the job.
+    
     pub note: Option<Vec<String>>,
     /// Job progress.
+    
     pub progress: Option<String>,
     /// Job title.
+    
     pub title: Option<String>,
 }
 
@@ -397,16 +447,21 @@ impl client::Part for JobState {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Location {
     /// Address.
     #[serde(rename="addressLine")]
+    
     pub address_line: Option<Vec<String>>,
     /// Identifies this object as a location.
+    
     pub kind: Option<String>,
     /// Latitude.
+    
     pub lat: Option<f64>,
     /// Longitude.
+    
     pub lng: Option<f64>,
 }
 
@@ -422,17 +477,22 @@ impl client::Part for Location {}
 /// 
 /// * [list location](LocationListCall) (response)
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct LocationListResponse {
     /// Locations in the collection.
+    
     pub items: Option<Vec<LocationRecord>>,
     /// Identifies this object as a list of locations.
+    
     pub kind: Option<String>,
     /// A token to provide to get the next page of results.
     #[serde(rename="nextPageToken")]
+    
     pub next_page_token: Option<String>,
     /// Pagination information for token pagination.
     #[serde(rename="tokenPagination")]
+    
     pub token_pagination: Option<TokenPagination>,
 }
 
@@ -443,19 +503,26 @@ impl client::ResponseResult for LocationListResponse {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct LocationRecord {
     /// The collection time in milliseconds since the epoch.
     #[serde(rename="collectionTime")]
-    pub collection_time: Option<String>,
+    
+    #[serde_as(as = "Option<::client::serde_with::DisplayFromStr>")]
+    pub collection_time: Option<i64>,
     /// The location accuracy in meters. This is the radius of a 95% confidence interval around the location measurement.
     #[serde(rename="confidenceRadius")]
+    
     pub confidence_radius: Option<f64>,
     /// Identifies this object as a location.
+    
     pub kind: Option<String>,
     /// Latitude.
+    
     pub latitude: Option<f64>,
     /// Longitude.
+    
     pub longitude: Option<f64>,
 }
 
@@ -473,21 +540,30 @@ impl client::Part for LocationRecord {}
 /// * [patch schedule](SchedulePatchCall) (request|response)
 /// * [update schedule](ScheduleUpdateCall) (request|response)
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Schedule {
     /// Whether the job is scheduled for the whole day. Time of day in start/end times is ignored if this is true.
     #[serde(rename="allDay")]
+    
     pub all_day: Option<bool>,
     /// Job duration in milliseconds.
-    pub duration: Option<String>,
+    
+    #[serde_as(as = "Option<::client::serde_with::DisplayFromStr>")]
+    pub duration: Option<u64>,
     /// Scheduled end time in milliseconds since epoch.
     #[serde(rename="endTime")]
-    pub end_time: Option<String>,
+    
+    #[serde_as(as = "Option<::client::serde_with::DisplayFromStr>")]
+    pub end_time: Option<u64>,
     /// Identifies this object as a job schedule.
+    
     pub kind: Option<String>,
     /// Scheduled start time in milliseconds since epoch.
     #[serde(rename="startTime")]
-    pub start_time: Option<String>,
+    
+    #[serde_as(as = "Option<::client::serde_with::DisplayFromStr>")]
+    pub start_time: Option<u64>,
 }
 
 impl client::RequestValue for Schedule {}
@@ -498,13 +574,17 @@ impl client::ResponseResult for Schedule {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Team {
     /// Team id, as found in a coordinate team url e.g. https://coordinate.google.com/f/xyz where "xyz" is the team id.
+    
     pub id: Option<String>,
     /// Identifies this object as a team.
+    
     pub kind: Option<String>,
     /// Team name
+    
     pub name: Option<String>,
 }
 
@@ -520,11 +600,14 @@ impl client::Part for Team {}
 /// 
 /// * [list team](TeamListCall) (response)
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct TeamListResponse {
     /// Teams in the collection.
+    
     pub items: Option<Vec<Team>>,
     /// Identifies this object as a list of teams.
+    
     pub kind: Option<String>,
 }
 
@@ -535,15 +618,19 @@ impl client::ResponseResult for TeamListResponse {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct TokenPagination {
     /// Identifies this object as pagination information.
+    
     pub kind: Option<String>,
     /// A token to provide to get the next page of results.
     #[serde(rename="nextPageToken")]
+    
     pub next_page_token: Option<String>,
     /// A token to provide to get the previous page of results.
     #[serde(rename="previousPageToken")]
+    
     pub previous_page_token: Option<String>,
 }
 
@@ -554,11 +641,14 @@ impl client::Part for TokenPagination {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Worker {
     /// Worker email address. If a worker has been deleted from your team, the email address will appear as DELETED_USER.
+    
     pub id: Option<String>,
     /// Identifies this object as a worker.
+    
     pub kind: Option<String>,
 }
 
@@ -574,11 +664,14 @@ impl client::Part for Worker {}
 /// 
 /// * [list worker](WorkerListCall) (response)
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct WorkerListResponse {
     /// Workers in the collection.
+    
     pub items: Option<Vec<Worker>>,
     /// Identifies this object as a list of workers.
+    
     pub kind: Option<String>,
 }
 
@@ -591,7 +684,7 @@ impl client::ResponseResult for WorkerListResponse {}
 // #################
 
 /// A builder providing access to all methods supported on *customFieldDef* resources.
-/// It is not used directly, but through the `Coordinate` hub.
+/// It is not used directly, but through the [`Coordinate`] hub.
 ///
 /// # Example
 ///
@@ -604,7 +697,7 @@ impl client::ResponseResult for WorkerListResponse {}
 /// 
 /// # async fn dox() {
 /// use std::default::Default;
-/// use coordinate1::{Coordinate, oauth2, hyper, hyper_rustls};
+/// use coordinate1::{Coordinate, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// let secret: oauth2::ApplicationSecret = Default::default();
 /// let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -649,7 +742,7 @@ impl<'a, S> CustomFieldDefMethods<'a, S> {
 
 
 /// A builder providing access to all methods supported on *job* resources.
-/// It is not used directly, but through the `Coordinate` hub.
+/// It is not used directly, but through the [`Coordinate`] hub.
 ///
 /// # Example
 ///
@@ -662,7 +755,7 @@ impl<'a, S> CustomFieldDefMethods<'a, S> {
 /// 
 /// # async fn dox() {
 /// use std::default::Default;
-/// use coordinate1::{Coordinate, oauth2, hyper, hyper_rustls};
+/// use coordinate1::{Coordinate, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// let secret: oauth2::ApplicationSecret = Default::default();
 /// let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -694,11 +787,11 @@ impl<'a, S> JobMethods<'a, S> {
     ///
     /// * `teamId` - Team ID
     /// * `jobId` - Job number
-    pub fn get(&self, team_id: &str, job_id: &str) -> JobGetCall<'a, S> {
+    pub fn get(&self, team_id: &str, job_id: u64) -> JobGetCall<'a, S> {
         JobGetCall {
             hub: self.hub,
             _team_id: team_id.to_string(),
-            _job_id: job_id.to_string(),
+            _job_id: job_id,
             _delegate: Default::default(),
             _additional_params: Default::default(),
             _scopes: Default::default(),
@@ -767,12 +860,12 @@ impl<'a, S> JobMethods<'a, S> {
     /// * `request` - No description provided.
     /// * `teamId` - Team ID
     /// * `jobId` - Job number
-    pub fn patch(&self, request: Job, team_id: &str, job_id: &str) -> JobPatchCall<'a, S> {
+    pub fn patch(&self, request: Job, team_id: &str, job_id: u64) -> JobPatchCall<'a, S> {
         JobPatchCall {
             hub: self.hub,
             _request: request,
             _team_id: team_id.to_string(),
-            _job_id: job_id.to_string(),
+            _job_id: job_id,
             _title: Default::default(),
             _progress: Default::default(),
             _note: Default::default(),
@@ -798,12 +891,12 @@ impl<'a, S> JobMethods<'a, S> {
     /// * `request` - No description provided.
     /// * `teamId` - Team ID
     /// * `jobId` - Job number
-    pub fn update(&self, request: Job, team_id: &str, job_id: &str) -> JobUpdateCall<'a, S> {
+    pub fn update(&self, request: Job, team_id: &str, job_id: u64) -> JobUpdateCall<'a, S> {
         JobUpdateCall {
             hub: self.hub,
             _request: request,
             _team_id: team_id.to_string(),
-            _job_id: job_id.to_string(),
+            _job_id: job_id,
             _title: Default::default(),
             _progress: Default::default(),
             _note: Default::default(),
@@ -824,7 +917,7 @@ impl<'a, S> JobMethods<'a, S> {
 
 
 /// A builder providing access to all methods supported on *location* resources.
-/// It is not used directly, but through the `Coordinate` hub.
+/// It is not used directly, but through the [`Coordinate`] hub.
 ///
 /// # Example
 ///
@@ -837,7 +930,7 @@ impl<'a, S> JobMethods<'a, S> {
 /// 
 /// # async fn dox() {
 /// use std::default::Default;
-/// use coordinate1::{Coordinate, oauth2, hyper, hyper_rustls};
+/// use coordinate1::{Coordinate, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// let secret: oauth2::ApplicationSecret = Default::default();
 /// let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -870,12 +963,12 @@ impl<'a, S> LocationMethods<'a, S> {
     /// * `teamId` - Team ID
     /// * `workerEmail` - Worker email address.
     /// * `startTimestampMs` - Start timestamp in milliseconds since the epoch.
-    pub fn list(&self, team_id: &str, worker_email: &str, start_timestamp_ms: &str) -> LocationListCall<'a, S> {
+    pub fn list(&self, team_id: &str, worker_email: &str, start_timestamp_ms: u64) -> LocationListCall<'a, S> {
         LocationListCall {
             hub: self.hub,
             _team_id: team_id.to_string(),
             _worker_email: worker_email.to_string(),
-            _start_timestamp_ms: start_timestamp_ms.to_string(),
+            _start_timestamp_ms: start_timestamp_ms,
             _page_token: Default::default(),
             _max_results: Default::default(),
             _delegate: Default::default(),
@@ -888,7 +981,7 @@ impl<'a, S> LocationMethods<'a, S> {
 
 
 /// A builder providing access to all methods supported on *schedule* resources.
-/// It is not used directly, but through the `Coordinate` hub.
+/// It is not used directly, but through the [`Coordinate`] hub.
 ///
 /// # Example
 ///
@@ -901,7 +994,7 @@ impl<'a, S> LocationMethods<'a, S> {
 /// 
 /// # async fn dox() {
 /// use std::default::Default;
-/// use coordinate1::{Coordinate, oauth2, hyper, hyper_rustls};
+/// use coordinate1::{Coordinate, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// let secret: oauth2::ApplicationSecret = Default::default();
 /// let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -933,11 +1026,11 @@ impl<'a, S> ScheduleMethods<'a, S> {
     ///
     /// * `teamId` - Team ID
     /// * `jobId` - Job number
-    pub fn get(&self, team_id: &str, job_id: &str) -> ScheduleGetCall<'a, S> {
+    pub fn get(&self, team_id: &str, job_id: u64) -> ScheduleGetCall<'a, S> {
         ScheduleGetCall {
             hub: self.hub,
             _team_id: team_id.to_string(),
-            _job_id: job_id.to_string(),
+            _job_id: job_id,
             _delegate: Default::default(),
             _additional_params: Default::default(),
             _scopes: Default::default(),
@@ -953,12 +1046,12 @@ impl<'a, S> ScheduleMethods<'a, S> {
     /// * `request` - No description provided.
     /// * `teamId` - Team ID
     /// * `jobId` - Job number
-    pub fn patch(&self, request: Schedule, team_id: &str, job_id: &str) -> SchedulePatchCall<'a, S> {
+    pub fn patch(&self, request: Schedule, team_id: &str, job_id: u64) -> SchedulePatchCall<'a, S> {
         SchedulePatchCall {
             hub: self.hub,
             _request: request,
             _team_id: team_id.to_string(),
-            _job_id: job_id.to_string(),
+            _job_id: job_id,
             _start_time: Default::default(),
             _end_time: Default::default(),
             _duration: Default::default(),
@@ -978,12 +1071,12 @@ impl<'a, S> ScheduleMethods<'a, S> {
     /// * `request` - No description provided.
     /// * `teamId` - Team ID
     /// * `jobId` - Job number
-    pub fn update(&self, request: Schedule, team_id: &str, job_id: &str) -> ScheduleUpdateCall<'a, S> {
+    pub fn update(&self, request: Schedule, team_id: &str, job_id: u64) -> ScheduleUpdateCall<'a, S> {
         ScheduleUpdateCall {
             hub: self.hub,
             _request: request,
             _team_id: team_id.to_string(),
-            _job_id: job_id.to_string(),
+            _job_id: job_id,
             _start_time: Default::default(),
             _end_time: Default::default(),
             _duration: Default::default(),
@@ -998,7 +1091,7 @@ impl<'a, S> ScheduleMethods<'a, S> {
 
 
 /// A builder providing access to all methods supported on *team* resources.
-/// It is not used directly, but through the `Coordinate` hub.
+/// It is not used directly, but through the [`Coordinate`] hub.
 ///
 /// # Example
 ///
@@ -1011,7 +1104,7 @@ impl<'a, S> ScheduleMethods<'a, S> {
 /// 
 /// # async fn dox() {
 /// use std::default::Default;
-/// use coordinate1::{Coordinate, oauth2, hyper, hyper_rustls};
+/// use coordinate1::{Coordinate, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// let secret: oauth2::ApplicationSecret = Default::default();
 /// let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -1054,7 +1147,7 @@ impl<'a, S> TeamMethods<'a, S> {
 
 
 /// A builder providing access to all methods supported on *worker* resources.
-/// It is not used directly, but through the `Coordinate` hub.
+/// It is not used directly, but through the [`Coordinate`] hub.
 ///
 /// # Example
 ///
@@ -1067,7 +1160,7 @@ impl<'a, S> TeamMethods<'a, S> {
 /// 
 /// # async fn dox() {
 /// use std::default::Default;
-/// use coordinate1::{Coordinate, oauth2, hyper, hyper_rustls};
+/// use coordinate1::{Coordinate, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// let secret: oauth2::ApplicationSecret = Default::default();
 /// let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -1120,7 +1213,7 @@ impl<'a, S> WorkerMethods<'a, S> {
 /// Retrieves a list of custom field definitions for a team.
 ///
 /// A builder for the *list* method supported by a *customFieldDef* resource.
-/// It is not used directly, but through a `CustomFieldDefMethods` instance.
+/// It is not used directly, but through a [`CustomFieldDefMethods`] instance.
 ///
 /// # Example
 ///
@@ -1132,7 +1225,7 @@ impl<'a, S> WorkerMethods<'a, S> {
 /// # extern crate google_coordinate1 as coordinate1;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use coordinate1::{Coordinate, oauth2, hyper, hyper_rustls};
+/// # use coordinate1::{Coordinate, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
 /// # let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -1154,14 +1247,14 @@ pub struct CustomFieldDefListCall<'a, S>
     _team_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
+    _scopes: BTreeSet<String>
 }
 
 impl<'a, S> client::CallBuilder for CustomFieldDefListCall<'a, S> {}
 
 impl<'a, S> CustomFieldDefListCall<'a, S>
 where
-    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
     S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
     S::Future: Send + Unpin + 'static,
     S::Error: Into<Box<dyn StdError + Send + Sync>>,
@@ -1172,68 +1265,53 @@ where
     pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, CustomFieldDefListResponse)> {
         use std::io::{Read, Seek};
         use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::ToParts;
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
         let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
         dlg.begin(client::MethodInfo { id: "coordinate.customFieldDef.list",
                                http_method: hyper::Method::GET });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
-        params.push(("teamId", self._team_id.to_string()));
+
         for &field in ["alt", "teamId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(client::Error::FieldClash(field));
             }
         }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
 
-        params.push(("alt", "json".to_string()));
+        let mut params = Params::with_capacity(3 + self._additional_params.len());
+        params.push("teamId", self._team_id);
 
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "teams/{teamId}/custom_fields";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::Readonly.as_ref().to_string());
         }
 
         for &(find_this, param_name) in [("{teamId}", "teamId")].iter() {
-            let mut replace_with: Option<&str> = None;
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = Some(value);
-                    break;
-                }
-            }
-            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+            url = params.uri_replacement(url, param_name, find_this, false);
         }
         {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
-            for param_name in ["teamId"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
+            let to_remove = ["teamId"];
+            params.remove_params(&to_remove);
         }
 
-        let url = url::Url::parse_with_params(&url, params).unwrap();
+        let url = params.parse_with_url(&url);
 
 
 
         loop {
-            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
-                Ok(token) => token.clone(),
-                Err(err) => {
-                    match  dlg.token(&err) {
-                        Some(token) => token,
-                        None => {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
                             dlg.finished(false);
-                            return Err(client::Error::MissingToken(err))
+                            return Err(client::Error::MissingToken(e));
                         }
                     }
                 }
@@ -1241,21 +1319,27 @@ where
             let mut req_result = {
                 let client = &self.hub.client;
                 dlg.pre_request();
-                let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
-                        .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::GET)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
 
 
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
-                
+
             };
 
             match req_result {
                 Err(err) => {
                     if let client::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep(d).await;
                         continue;
                     }
                     dlg.finished(false);
@@ -1271,7 +1355,7 @@ where
                         let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
                         if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
-                            sleep(d);
+                            sleep(d).await;
                             continue;
                         }
 
@@ -1315,7 +1399,8 @@ where
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.````
     ///
     /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CustomFieldDefListCall<'a, S> {
@@ -1347,25 +1432,36 @@ where
 
     /// Identifies the authorization scope for the method you are building.
     ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::Readonly`.
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::Readonly`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
     ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, St>(mut self, scope: T) -> CustomFieldDefListCall<'a, S>
-                                                        where T: Into<Option<St>>,
-                                                              St: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
+    pub fn add_scope<St>(mut self, scope: St) -> CustomFieldDefListCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> CustomFieldDefListCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> CustomFieldDefListCall<'a, S> {
+        self._scopes.clear();
         self
     }
 }
@@ -1374,7 +1470,7 @@ where
 /// Retrieves a job, including all the changes made to the job.
 ///
 /// A builder for the *get* method supported by a *job* resource.
-/// It is not used directly, but through a `JobMethods` instance.
+/// It is not used directly, but through a [`JobMethods`] instance.
 ///
 /// # Example
 ///
@@ -1386,7 +1482,7 @@ where
 /// # extern crate google_coordinate1 as coordinate1;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use coordinate1::{Coordinate, oauth2, hyper, hyper_rustls};
+/// # use coordinate1::{Coordinate, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
 /// # let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -1397,7 +1493,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.jobs().get("teamId", "jobId")
+/// let result = hub.jobs().get("teamId", 21)
 ///              .doit().await;
 /// # }
 /// ```
@@ -1406,17 +1502,17 @@ pub struct JobGetCall<'a, S>
 
     hub: &'a Coordinate<S>,
     _team_id: String,
-    _job_id: String,
+    _job_id: u64,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
+    _scopes: BTreeSet<String>
 }
 
 impl<'a, S> client::CallBuilder for JobGetCall<'a, S> {}
 
 impl<'a, S> JobGetCall<'a, S>
 where
-    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
     S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
     S::Future: Send + Unpin + 'static,
     S::Error: Into<Box<dyn StdError + Send + Sync>>,
@@ -1427,69 +1523,54 @@ where
     pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, Job)> {
         use std::io::{Read, Seek};
         use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::ToParts;
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
         let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
         dlg.begin(client::MethodInfo { id: "coordinate.jobs.get",
                                http_method: hyper::Method::GET });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
-        params.push(("teamId", self._team_id.to_string()));
-        params.push(("jobId", self._job_id.to_string()));
+
         for &field in ["alt", "teamId", "jobId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(client::Error::FieldClash(field));
             }
         }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
 
-        params.push(("alt", "json".to_string()));
+        let mut params = Params::with_capacity(4 + self._additional_params.len());
+        params.push("teamId", self._team_id);
+        params.push("jobId", self._job_id.to_string());
 
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "teams/{teamId}/jobs/{jobId}";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::Readonly.as_ref().to_string());
         }
 
         for &(find_this, param_name) in [("{teamId}", "teamId"), ("{jobId}", "jobId")].iter() {
-            let mut replace_with: Option<&str> = None;
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = Some(value);
-                    break;
-                }
-            }
-            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+            url = params.uri_replacement(url, param_name, find_this, false);
         }
         {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(2);
-            for param_name in ["jobId", "teamId"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
+            let to_remove = ["jobId", "teamId"];
+            params.remove_params(&to_remove);
         }
 
-        let url = url::Url::parse_with_params(&url, params).unwrap();
+        let url = params.parse_with_url(&url);
 
 
 
         loop {
-            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
-                Ok(token) => token.clone(),
-                Err(err) => {
-                    match  dlg.token(&err) {
-                        Some(token) => token,
-                        None => {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
                             dlg.finished(false);
-                            return Err(client::Error::MissingToken(err))
+                            return Err(client::Error::MissingToken(e));
                         }
                     }
                 }
@@ -1497,21 +1578,27 @@ where
             let mut req_result = {
                 let client = &self.hub.client;
                 dlg.pre_request();
-                let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
-                        .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::GET)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
 
 
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
-                
+
             };
 
             match req_result {
                 Err(err) => {
                     if let client::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep(d).await;
                         continue;
                     }
                     dlg.finished(false);
@@ -1527,7 +1614,7 @@ where
                         let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
                         if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
-                            sleep(d);
+                            sleep(d).await;
                             continue;
                         }
 
@@ -1574,14 +1661,15 @@ where
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn job_id(mut self, new_value: &str) -> JobGetCall<'a, S> {
-        self._job_id = new_value.to_string();
+    pub fn job_id(mut self, new_value: u64) -> JobGetCall<'a, S> {
+        self._job_id = new_value;
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.````
     ///
     /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> JobGetCall<'a, S> {
@@ -1613,25 +1701,36 @@ where
 
     /// Identifies the authorization scope for the method you are building.
     ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::Readonly`.
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::Readonly`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
     ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, St>(mut self, scope: T) -> JobGetCall<'a, S>
-                                                        where T: Into<Option<St>>,
-                                                              St: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
+    pub fn add_scope<St>(mut self, scope: St) -> JobGetCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> JobGetCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> JobGetCall<'a, S> {
+        self._scopes.clear();
         self
     }
 }
@@ -1640,7 +1739,7 @@ where
 /// Inserts a new job. Only the state field of the job should be set.
 ///
 /// A builder for the *insert* method supported by a *job* resource.
-/// It is not used directly, but through a `JobMethods` instance.
+/// It is not used directly, but through a [`JobMethods`] instance.
 ///
 /// # Example
 ///
@@ -1653,7 +1752,7 @@ where
 /// use coordinate1::api::Job;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use coordinate1::{Coordinate, oauth2, hyper, hyper_rustls};
+/// # use coordinate1::{Coordinate, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
 /// # let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -1695,14 +1794,14 @@ pub struct JobInsertCall<'a, S>
     _assignee: Option<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
+    _scopes: BTreeSet<String>
 }
 
 impl<'a, S> client::CallBuilder for JobInsertCall<'a, S> {}
 
 impl<'a, S> JobInsertCall<'a, S>
 where
-    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
     S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
     S::Future: Send + Unpin + 'static,
     S::Error: Into<Box<dyn StdError + Send + Sync>>,
@@ -1713,79 +1812,64 @@ where
     pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, Job)> {
         use std::io::{Read, Seek};
         use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::ToParts;
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
         let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
         dlg.begin(client::MethodInfo { id: "coordinate.jobs.insert",
                                http_method: hyper::Method::POST });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(13 + self._additional_params.len());
-        params.push(("teamId", self._team_id.to_string()));
-        params.push(("address", self._address.to_string()));
-        params.push(("lat", self._lat.to_string()));
-        params.push(("lng", self._lng.to_string()));
-        params.push(("title", self._title.to_string()));
-        if let Some(value) = self._note {
-            params.push(("note", value.to_string()));
-        }
-        if let Some(value) = self._customer_phone_number {
-            params.push(("customerPhoneNumber", value.to_string()));
-        }
-        if let Some(value) = self._customer_name {
-            params.push(("customerName", value.to_string()));
-        }
-        if self._custom_field.len() > 0 {
-            for f in self._custom_field.iter() {
-                params.push(("customField", f.to_string()));
-            }
-        }
-        if let Some(value) = self._assignee {
-            params.push(("assignee", value.to_string()));
-        }
+
         for &field in ["alt", "teamId", "address", "lat", "lng", "title", "note", "customerPhoneNumber", "customerName", "customField", "assignee"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(client::Error::FieldClash(field));
             }
         }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
+
+        let mut params = Params::with_capacity(13 + self._additional_params.len());
+        params.push("teamId", self._team_id);
+        params.push("address", self._address);
+        params.push("lat", self._lat.to_string());
+        params.push("lng", self._lng.to_string());
+        params.push("title", self._title);
+        if let Some(value) = self._note.as_ref() {
+            params.push("note", value);
+        }
+        if let Some(value) = self._customer_phone_number.as_ref() {
+            params.push("customerPhoneNumber", value);
+        }
+        if let Some(value) = self._customer_name.as_ref() {
+            params.push("customerName", value);
+        }
+        if self._custom_field.len() > 0 {
+            for f in self._custom_field.iter() {
+                params.push("customField", f);
+            }
+        }
+        if let Some(value) = self._assignee.as_ref() {
+            params.push("assignee", value);
         }
 
-        params.push(("alt", "json".to_string()));
+        params.extend(self._additional_params.iter());
 
+        params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "teams/{teamId}/jobs";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::Full.as_ref().to_string());
         }
 
         for &(find_this, param_name) in [("{teamId}", "teamId")].iter() {
-            let mut replace_with: Option<&str> = None;
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = Some(value);
-                    break;
-                }
-            }
-            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+            url = params.uri_replacement(url, param_name, find_this, false);
         }
         {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
-            for param_name in ["teamId"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
+            let to_remove = ["teamId"];
+            params.remove_params(&to_remove);
         }
 
-        let url = url::Url::parse_with_params(&url, params).unwrap();
+        let url = params.parse_with_url(&url);
 
-        let mut json_mime_type: mime::Mime = "application/json".parse().unwrap();
+        let mut json_mime_type = mime::APPLICATION_JSON;
         let mut request_value_reader =
             {
                 let mut value = json::value::to_value(&self._request).expect("serde to work");
@@ -1799,14 +1883,14 @@ where
 
 
         loop {
-            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
-                Ok(token) => token.clone(),
-                Err(err) => {
-                    match  dlg.token(&err) {
-                        Some(token) => token,
-                        None => {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
                             dlg.finished(false);
-                            return Err(client::Error::MissingToken(err))
+                            return Err(client::Error::MissingToken(e));
                         }
                     }
                 }
@@ -1815,23 +1899,29 @@ where
             let mut req_result = {
                 let client = &self.hub.client;
                 dlg.pre_request();
-                let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
-                        .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::POST)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
 
 
                         let request = req_builder
-                        .header(CONTENT_TYPE, format!("{}", json_mime_type.to_string()))
+                        .header(CONTENT_TYPE, json_mime_type.to_string())
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
                 client.request(request.unwrap()).await
-                
+
             };
 
             match req_result {
                 Err(err) => {
                     if let client::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep(d).await;
                         continue;
                     }
                     dlg.finished(false);
@@ -1847,7 +1937,7 @@ where
                         let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
                         if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
-                            sleep(d);
+                            sleep(d).await;
                             continue;
                         }
 
@@ -1976,7 +2066,8 @@ where
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.````
     ///
     /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> JobInsertCall<'a, S> {
@@ -2008,25 +2099,36 @@ where
 
     /// Identifies the authorization scope for the method you are building.
     ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::Full`.
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::Full`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
     ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, St>(mut self, scope: T) -> JobInsertCall<'a, S>
-                                                        where T: Into<Option<St>>,
-                                                              St: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
+    pub fn add_scope<St>(mut self, scope: St) -> JobInsertCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> JobInsertCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> JobInsertCall<'a, S> {
+        self._scopes.clear();
         self
     }
 }
@@ -2035,7 +2137,7 @@ where
 /// Retrieves jobs created or modified since the given timestamp.
 ///
 /// A builder for the *list* method supported by a *job* resource.
-/// It is not used directly, but through a `JobMethods` instance.
+/// It is not used directly, but through a [`JobMethods`] instance.
 ///
 /// # Example
 ///
@@ -2047,7 +2149,7 @@ where
 /// # extern crate google_coordinate1 as coordinate1;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use coordinate1::{Coordinate, oauth2, hyper, hyper_rustls};
+/// # use coordinate1::{Coordinate, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
 /// # let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -2061,7 +2163,7 @@ where
 /// let result = hub.jobs().list("teamId")
 ///              .page_token("dolore")
 ///              .omit_job_changes(false)
-///              .min_modified_timestamp_ms("diam")
+///              .min_modified_timestamp_ms(9)
 ///              .max_results(52)
 ///              .doit().await;
 /// # }
@@ -2073,18 +2175,18 @@ pub struct JobListCall<'a, S>
     _team_id: String,
     _page_token: Option<String>,
     _omit_job_changes: Option<bool>,
-    _min_modified_timestamp_ms: Option<String>,
+    _min_modified_timestamp_ms: Option<u64>,
     _max_results: Option<u32>,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
+    _scopes: BTreeSet<String>
 }
 
 impl<'a, S> client::CallBuilder for JobListCall<'a, S> {}
 
 impl<'a, S> JobListCall<'a, S>
 where
-    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
     S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
     S::Future: Send + Unpin + 'static,
     S::Error: Into<Box<dyn StdError + Send + Sync>>,
@@ -2095,80 +2197,65 @@ where
     pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, JobListResponse)> {
         use std::io::{Read, Seek};
         use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::ToParts;
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
         let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
         dlg.begin(client::MethodInfo { id: "coordinate.jobs.list",
                                http_method: hyper::Method::GET });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(7 + self._additional_params.len());
-        params.push(("teamId", self._team_id.to_string()));
-        if let Some(value) = self._page_token {
-            params.push(("pageToken", value.to_string()));
-        }
-        if let Some(value) = self._omit_job_changes {
-            params.push(("omitJobChanges", value.to_string()));
-        }
-        if let Some(value) = self._min_modified_timestamp_ms {
-            params.push(("minModifiedTimestampMs", value.to_string()));
-        }
-        if let Some(value) = self._max_results {
-            params.push(("maxResults", value.to_string()));
-        }
+
         for &field in ["alt", "teamId", "pageToken", "omitJobChanges", "minModifiedTimestampMs", "maxResults"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(client::Error::FieldClash(field));
             }
         }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
+
+        let mut params = Params::with_capacity(7 + self._additional_params.len());
+        params.push("teamId", self._team_id);
+        if let Some(value) = self._page_token.as_ref() {
+            params.push("pageToken", value);
+        }
+        if let Some(value) = self._omit_job_changes.as_ref() {
+            params.push("omitJobChanges", value.to_string());
+        }
+        if let Some(value) = self._min_modified_timestamp_ms.as_ref() {
+            params.push("minModifiedTimestampMs", value.to_string());
+        }
+        if let Some(value) = self._max_results.as_ref() {
+            params.push("maxResults", value.to_string());
         }
 
-        params.push(("alt", "json".to_string()));
+        params.extend(self._additional_params.iter());
 
+        params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "teams/{teamId}/jobs";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::Readonly.as_ref().to_string());
         }
 
         for &(find_this, param_name) in [("{teamId}", "teamId")].iter() {
-            let mut replace_with: Option<&str> = None;
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = Some(value);
-                    break;
-                }
-            }
-            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+            url = params.uri_replacement(url, param_name, find_this, false);
         }
         {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
-            for param_name in ["teamId"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
+            let to_remove = ["teamId"];
+            params.remove_params(&to_remove);
         }
 
-        let url = url::Url::parse_with_params(&url, params).unwrap();
+        let url = params.parse_with_url(&url);
 
 
 
         loop {
-            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
-                Ok(token) => token.clone(),
-                Err(err) => {
-                    match  dlg.token(&err) {
-                        Some(token) => token,
-                        None => {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
                             dlg.finished(false);
-                            return Err(client::Error::MissingToken(err))
+                            return Err(client::Error::MissingToken(e));
                         }
                     }
                 }
@@ -2176,21 +2263,27 @@ where
             let mut req_result = {
                 let client = &self.hub.client;
                 dlg.pre_request();
-                let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
-                        .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::GET)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
 
 
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
-                
+
             };
 
             match req_result {
                 Err(err) => {
                     if let client::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep(d).await;
                         continue;
                     }
                     dlg.finished(false);
@@ -2206,7 +2299,7 @@ where
                         let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
                         if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
-                            sleep(d);
+                            sleep(d).await;
                             continue;
                         }
 
@@ -2264,8 +2357,8 @@ where
     /// Minimum time a job was modified in milliseconds since epoch.
     ///
     /// Sets the *min modified timestamp ms* query property to the given value.
-    pub fn min_modified_timestamp_ms(mut self, new_value: &str) -> JobListCall<'a, S> {
-        self._min_modified_timestamp_ms = Some(new_value.to_string());
+    pub fn min_modified_timestamp_ms(mut self, new_value: u64) -> JobListCall<'a, S> {
+        self._min_modified_timestamp_ms = Some(new_value);
         self
     }
     /// Maximum number of results to return in one page.
@@ -2278,7 +2371,8 @@ where
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.````
     ///
     /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> JobListCall<'a, S> {
@@ -2310,25 +2404,36 @@ where
 
     /// Identifies the authorization scope for the method you are building.
     ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::Readonly`.
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::Readonly`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
     ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, St>(mut self, scope: T) -> JobListCall<'a, S>
-                                                        where T: Into<Option<St>>,
-                                                              St: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
+    pub fn add_scope<St>(mut self, scope: St) -> JobListCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> JobListCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> JobListCall<'a, S> {
+        self._scopes.clear();
         self
     }
 }
@@ -2337,7 +2442,7 @@ where
 /// Updates a job. Fields that are set in the job state will be updated. This method supports patch semantics.
 ///
 /// A builder for the *patch* method supported by a *job* resource.
-/// It is not used directly, but through a `JobMethods` instance.
+/// It is not used directly, but through a [`JobMethods`] instance.
 ///
 /// # Example
 ///
@@ -2350,7 +2455,7 @@ where
 /// use coordinate1::api::Job;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use coordinate1::{Coordinate, oauth2, hyper, hyper_rustls};
+/// # use coordinate1::{Coordinate, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
 /// # let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -2366,7 +2471,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.jobs().patch(req, "teamId", "jobId")
+/// let result = hub.jobs().patch(req, "teamId", 79)
 ///              .title("sadipscing")
 ///              .progress("Stet")
 ///              .note("dolor")
@@ -2386,7 +2491,7 @@ pub struct JobPatchCall<'a, S>
     hub: &'a Coordinate<S>,
     _request: Job,
     _team_id: String,
-    _job_id: String,
+    _job_id: u64,
     _title: Option<String>,
     _progress: Option<String>,
     _note: Option<String>,
@@ -2399,14 +2504,14 @@ pub struct JobPatchCall<'a, S>
     _address: Option<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
+    _scopes: BTreeSet<String>
 }
 
 impl<'a, S> client::CallBuilder for JobPatchCall<'a, S> {}
 
 impl<'a, S> JobPatchCall<'a, S>
 where
-    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
     S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
     S::Future: Send + Unpin + 'static,
     S::Error: Into<Box<dyn StdError + Send + Sync>>,
@@ -2417,91 +2522,76 @@ where
     pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, Job)> {
         use std::io::{Read, Seek};
         use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::ToParts;
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
         let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
         dlg.begin(client::MethodInfo { id: "coordinate.jobs.patch",
                                http_method: hyper::Method::PATCH });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(15 + self._additional_params.len());
-        params.push(("teamId", self._team_id.to_string()));
-        params.push(("jobId", self._job_id.to_string()));
-        if let Some(value) = self._title {
-            params.push(("title", value.to_string()));
-        }
-        if let Some(value) = self._progress {
-            params.push(("progress", value.to_string()));
-        }
-        if let Some(value) = self._note {
-            params.push(("note", value.to_string()));
-        }
-        if let Some(value) = self._lng {
-            params.push(("lng", value.to_string()));
-        }
-        if let Some(value) = self._lat {
-            params.push(("lat", value.to_string()));
-        }
-        if let Some(value) = self._customer_phone_number {
-            params.push(("customerPhoneNumber", value.to_string()));
-        }
-        if let Some(value) = self._customer_name {
-            params.push(("customerName", value.to_string()));
-        }
-        if self._custom_field.len() > 0 {
-            for f in self._custom_field.iter() {
-                params.push(("customField", f.to_string()));
-            }
-        }
-        if let Some(value) = self._assignee {
-            params.push(("assignee", value.to_string()));
-        }
-        if let Some(value) = self._address {
-            params.push(("address", value.to_string()));
-        }
+
         for &field in ["alt", "teamId", "jobId", "title", "progress", "note", "lng", "lat", "customerPhoneNumber", "customerName", "customField", "assignee", "address"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(client::Error::FieldClash(field));
             }
         }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
+
+        let mut params = Params::with_capacity(15 + self._additional_params.len());
+        params.push("teamId", self._team_id);
+        params.push("jobId", self._job_id.to_string());
+        if let Some(value) = self._title.as_ref() {
+            params.push("title", value);
+        }
+        if let Some(value) = self._progress.as_ref() {
+            params.push("progress", value);
+        }
+        if let Some(value) = self._note.as_ref() {
+            params.push("note", value);
+        }
+        if let Some(value) = self._lng.as_ref() {
+            params.push("lng", value.to_string());
+        }
+        if let Some(value) = self._lat.as_ref() {
+            params.push("lat", value.to_string());
+        }
+        if let Some(value) = self._customer_phone_number.as_ref() {
+            params.push("customerPhoneNumber", value);
+        }
+        if let Some(value) = self._customer_name.as_ref() {
+            params.push("customerName", value);
+        }
+        if self._custom_field.len() > 0 {
+            for f in self._custom_field.iter() {
+                params.push("customField", f);
+            }
+        }
+        if let Some(value) = self._assignee.as_ref() {
+            params.push("assignee", value);
+        }
+        if let Some(value) = self._address.as_ref() {
+            params.push("address", value);
         }
 
-        params.push(("alt", "json".to_string()));
+        params.extend(self._additional_params.iter());
 
+        params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "teams/{teamId}/jobs/{jobId}";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::Full.as_ref().to_string());
         }
 
         for &(find_this, param_name) in [("{teamId}", "teamId"), ("{jobId}", "jobId")].iter() {
-            let mut replace_with: Option<&str> = None;
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = Some(value);
-                    break;
-                }
-            }
-            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+            url = params.uri_replacement(url, param_name, find_this, false);
         }
         {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(2);
-            for param_name in ["jobId", "teamId"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
+            let to_remove = ["jobId", "teamId"];
+            params.remove_params(&to_remove);
         }
 
-        let url = url::Url::parse_with_params(&url, params).unwrap();
+        let url = params.parse_with_url(&url);
 
-        let mut json_mime_type: mime::Mime = "application/json".parse().unwrap();
+        let mut json_mime_type = mime::APPLICATION_JSON;
         let mut request_value_reader =
             {
                 let mut value = json::value::to_value(&self._request).expect("serde to work");
@@ -2515,14 +2605,14 @@ where
 
 
         loop {
-            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
-                Ok(token) => token.clone(),
-                Err(err) => {
-                    match  dlg.token(&err) {
-                        Some(token) => token,
-                        None => {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
                             dlg.finished(false);
-                            return Err(client::Error::MissingToken(err))
+                            return Err(client::Error::MissingToken(e));
                         }
                     }
                 }
@@ -2531,23 +2621,29 @@ where
             let mut req_result = {
                 let client = &self.hub.client;
                 dlg.pre_request();
-                let mut req_builder = hyper::Request::builder().method(hyper::Method::PATCH).uri(url.clone().into_string())
-                        .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::PATCH)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
 
 
                         let request = req_builder
-                        .header(CONTENT_TYPE, format!("{}", json_mime_type.to_string()))
+                        .header(CONTENT_TYPE, json_mime_type.to_string())
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
                 client.request(request.unwrap()).await
-                
+
             };
 
             match req_result {
                 Err(err) => {
                     if let client::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep(d).await;
                         continue;
                     }
                     dlg.finished(false);
@@ -2563,7 +2659,7 @@ where
                         let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
                         if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
-                            sleep(d);
+                            sleep(d).await;
                             continue;
                         }
 
@@ -2619,8 +2715,8 @@ where
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn job_id(mut self, new_value: &str) -> JobPatchCall<'a, S> {
-        self._job_id = new_value.to_string();
+    pub fn job_id(mut self, new_value: u64) -> JobPatchCall<'a, S> {
+        self._job_id = new_value;
         self
     }
     /// Job title
@@ -2697,7 +2793,8 @@ where
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.````
     ///
     /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> JobPatchCall<'a, S> {
@@ -2729,25 +2826,36 @@ where
 
     /// Identifies the authorization scope for the method you are building.
     ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::Full`.
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::Full`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
     ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, St>(mut self, scope: T) -> JobPatchCall<'a, S>
-                                                        where T: Into<Option<St>>,
-                                                              St: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
+    pub fn add_scope<St>(mut self, scope: St) -> JobPatchCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> JobPatchCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> JobPatchCall<'a, S> {
+        self._scopes.clear();
         self
     }
 }
@@ -2756,7 +2864,7 @@ where
 /// Updates a job. Fields that are set in the job state will be updated.
 ///
 /// A builder for the *update* method supported by a *job* resource.
-/// It is not used directly, but through a `JobMethods` instance.
+/// It is not used directly, but through a [`JobMethods`] instance.
 ///
 /// # Example
 ///
@@ -2769,7 +2877,7 @@ where
 /// use coordinate1::api::Job;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use coordinate1::{Coordinate, oauth2, hyper, hyper_rustls};
+/// # use coordinate1::{Coordinate, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
 /// # let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -2785,7 +2893,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.jobs().update(req, "teamId", "jobId")
+/// let result = hub.jobs().update(req, "teamId", 1)
 ///              .title("accusam")
 ///              .progress("takimata")
 ///              .note("consetetur")
@@ -2805,7 +2913,7 @@ pub struct JobUpdateCall<'a, S>
     hub: &'a Coordinate<S>,
     _request: Job,
     _team_id: String,
-    _job_id: String,
+    _job_id: u64,
     _title: Option<String>,
     _progress: Option<String>,
     _note: Option<String>,
@@ -2818,14 +2926,14 @@ pub struct JobUpdateCall<'a, S>
     _address: Option<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
+    _scopes: BTreeSet<String>
 }
 
 impl<'a, S> client::CallBuilder for JobUpdateCall<'a, S> {}
 
 impl<'a, S> JobUpdateCall<'a, S>
 where
-    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
     S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
     S::Future: Send + Unpin + 'static,
     S::Error: Into<Box<dyn StdError + Send + Sync>>,
@@ -2836,91 +2944,76 @@ where
     pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, Job)> {
         use std::io::{Read, Seek};
         use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::ToParts;
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
         let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
         dlg.begin(client::MethodInfo { id: "coordinate.jobs.update",
                                http_method: hyper::Method::PUT });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(15 + self._additional_params.len());
-        params.push(("teamId", self._team_id.to_string()));
-        params.push(("jobId", self._job_id.to_string()));
-        if let Some(value) = self._title {
-            params.push(("title", value.to_string()));
-        }
-        if let Some(value) = self._progress {
-            params.push(("progress", value.to_string()));
-        }
-        if let Some(value) = self._note {
-            params.push(("note", value.to_string()));
-        }
-        if let Some(value) = self._lng {
-            params.push(("lng", value.to_string()));
-        }
-        if let Some(value) = self._lat {
-            params.push(("lat", value.to_string()));
-        }
-        if let Some(value) = self._customer_phone_number {
-            params.push(("customerPhoneNumber", value.to_string()));
-        }
-        if let Some(value) = self._customer_name {
-            params.push(("customerName", value.to_string()));
-        }
-        if self._custom_field.len() > 0 {
-            for f in self._custom_field.iter() {
-                params.push(("customField", f.to_string()));
-            }
-        }
-        if let Some(value) = self._assignee {
-            params.push(("assignee", value.to_string()));
-        }
-        if let Some(value) = self._address {
-            params.push(("address", value.to_string()));
-        }
+
         for &field in ["alt", "teamId", "jobId", "title", "progress", "note", "lng", "lat", "customerPhoneNumber", "customerName", "customField", "assignee", "address"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(client::Error::FieldClash(field));
             }
         }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
+
+        let mut params = Params::with_capacity(15 + self._additional_params.len());
+        params.push("teamId", self._team_id);
+        params.push("jobId", self._job_id.to_string());
+        if let Some(value) = self._title.as_ref() {
+            params.push("title", value);
+        }
+        if let Some(value) = self._progress.as_ref() {
+            params.push("progress", value);
+        }
+        if let Some(value) = self._note.as_ref() {
+            params.push("note", value);
+        }
+        if let Some(value) = self._lng.as_ref() {
+            params.push("lng", value.to_string());
+        }
+        if let Some(value) = self._lat.as_ref() {
+            params.push("lat", value.to_string());
+        }
+        if let Some(value) = self._customer_phone_number.as_ref() {
+            params.push("customerPhoneNumber", value);
+        }
+        if let Some(value) = self._customer_name.as_ref() {
+            params.push("customerName", value);
+        }
+        if self._custom_field.len() > 0 {
+            for f in self._custom_field.iter() {
+                params.push("customField", f);
+            }
+        }
+        if let Some(value) = self._assignee.as_ref() {
+            params.push("assignee", value);
+        }
+        if let Some(value) = self._address.as_ref() {
+            params.push("address", value);
         }
 
-        params.push(("alt", "json".to_string()));
+        params.extend(self._additional_params.iter());
 
+        params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "teams/{teamId}/jobs/{jobId}";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::Full.as_ref().to_string());
         }
 
         for &(find_this, param_name) in [("{teamId}", "teamId"), ("{jobId}", "jobId")].iter() {
-            let mut replace_with: Option<&str> = None;
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = Some(value);
-                    break;
-                }
-            }
-            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+            url = params.uri_replacement(url, param_name, find_this, false);
         }
         {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(2);
-            for param_name in ["jobId", "teamId"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
+            let to_remove = ["jobId", "teamId"];
+            params.remove_params(&to_remove);
         }
 
-        let url = url::Url::parse_with_params(&url, params).unwrap();
+        let url = params.parse_with_url(&url);
 
-        let mut json_mime_type: mime::Mime = "application/json".parse().unwrap();
+        let mut json_mime_type = mime::APPLICATION_JSON;
         let mut request_value_reader =
             {
                 let mut value = json::value::to_value(&self._request).expect("serde to work");
@@ -2934,14 +3027,14 @@ where
 
 
         loop {
-            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
-                Ok(token) => token.clone(),
-                Err(err) => {
-                    match  dlg.token(&err) {
-                        Some(token) => token,
-                        None => {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
                             dlg.finished(false);
-                            return Err(client::Error::MissingToken(err))
+                            return Err(client::Error::MissingToken(e));
                         }
                     }
                 }
@@ -2950,23 +3043,29 @@ where
             let mut req_result = {
                 let client = &self.hub.client;
                 dlg.pre_request();
-                let mut req_builder = hyper::Request::builder().method(hyper::Method::PUT).uri(url.clone().into_string())
-                        .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::PUT)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
 
 
                         let request = req_builder
-                        .header(CONTENT_TYPE, format!("{}", json_mime_type.to_string()))
+                        .header(CONTENT_TYPE, json_mime_type.to_string())
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
                 client.request(request.unwrap()).await
-                
+
             };
 
             match req_result {
                 Err(err) => {
                     if let client::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep(d).await;
                         continue;
                     }
                     dlg.finished(false);
@@ -2982,7 +3081,7 @@ where
                         let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
                         if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
-                            sleep(d);
+                            sleep(d).await;
                             continue;
                         }
 
@@ -3038,8 +3137,8 @@ where
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn job_id(mut self, new_value: &str) -> JobUpdateCall<'a, S> {
-        self._job_id = new_value.to_string();
+    pub fn job_id(mut self, new_value: u64) -> JobUpdateCall<'a, S> {
+        self._job_id = new_value;
         self
     }
     /// Job title
@@ -3116,7 +3215,8 @@ where
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.````
     ///
     /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> JobUpdateCall<'a, S> {
@@ -3148,25 +3248,36 @@ where
 
     /// Identifies the authorization scope for the method you are building.
     ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::Full`.
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::Full`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
     ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, St>(mut self, scope: T) -> JobUpdateCall<'a, S>
-                                                        where T: Into<Option<St>>,
-                                                              St: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
+    pub fn add_scope<St>(mut self, scope: St) -> JobUpdateCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> JobUpdateCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> JobUpdateCall<'a, S> {
+        self._scopes.clear();
         self
     }
 }
@@ -3175,7 +3286,7 @@ where
 /// Retrieves a list of locations for a worker.
 ///
 /// A builder for the *list* method supported by a *location* resource.
-/// It is not used directly, but through a `LocationMethods` instance.
+/// It is not used directly, but through a [`LocationMethods`] instance.
 ///
 /// # Example
 ///
@@ -3187,7 +3298,7 @@ where
 /// # extern crate google_coordinate1 as coordinate1;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use coordinate1::{Coordinate, oauth2, hyper, hyper_rustls};
+/// # use coordinate1::{Coordinate, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
 /// # let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -3198,7 +3309,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.location().list("teamId", "workerEmail", "startTimestampMs")
+/// let result = hub.location().list("teamId", "workerEmail", 78)
 ///              .page_token("voluptua.")
 ///              .max_results(67)
 ///              .doit().await;
@@ -3210,19 +3321,19 @@ pub struct LocationListCall<'a, S>
     hub: &'a Coordinate<S>,
     _team_id: String,
     _worker_email: String,
-    _start_timestamp_ms: String,
+    _start_timestamp_ms: u64,
     _page_token: Option<String>,
     _max_results: Option<u32>,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
+    _scopes: BTreeSet<String>
 }
 
 impl<'a, S> client::CallBuilder for LocationListCall<'a, S> {}
 
 impl<'a, S> LocationListCall<'a, S>
 where
-    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
     S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
     S::Future: Send + Unpin + 'static,
     S::Error: Into<Box<dyn StdError + Send + Sync>>,
@@ -3233,76 +3344,61 @@ where
     pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, LocationListResponse)> {
         use std::io::{Read, Seek};
         use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::ToParts;
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
         let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
         dlg.begin(client::MethodInfo { id: "coordinate.location.list",
                                http_method: hyper::Method::GET });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(7 + self._additional_params.len());
-        params.push(("teamId", self._team_id.to_string()));
-        params.push(("workerEmail", self._worker_email.to_string()));
-        params.push(("startTimestampMs", self._start_timestamp_ms.to_string()));
-        if let Some(value) = self._page_token {
-            params.push(("pageToken", value.to_string()));
-        }
-        if let Some(value) = self._max_results {
-            params.push(("maxResults", value.to_string()));
-        }
+
         for &field in ["alt", "teamId", "workerEmail", "startTimestampMs", "pageToken", "maxResults"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(client::Error::FieldClash(field));
             }
         }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
+
+        let mut params = Params::with_capacity(7 + self._additional_params.len());
+        params.push("teamId", self._team_id);
+        params.push("workerEmail", self._worker_email);
+        params.push("startTimestampMs", self._start_timestamp_ms.to_string());
+        if let Some(value) = self._page_token.as_ref() {
+            params.push("pageToken", value);
+        }
+        if let Some(value) = self._max_results.as_ref() {
+            params.push("maxResults", value.to_string());
         }
 
-        params.push(("alt", "json".to_string()));
+        params.extend(self._additional_params.iter());
 
+        params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "teams/{teamId}/workers/{workerEmail}/locations";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::Readonly.as_ref().to_string());
         }
 
         for &(find_this, param_name) in [("{teamId}", "teamId"), ("{workerEmail}", "workerEmail")].iter() {
-            let mut replace_with: Option<&str> = None;
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = Some(value);
-                    break;
-                }
-            }
-            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+            url = params.uri_replacement(url, param_name, find_this, false);
         }
         {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(2);
-            for param_name in ["workerEmail", "teamId"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
+            let to_remove = ["workerEmail", "teamId"];
+            params.remove_params(&to_remove);
         }
 
-        let url = url::Url::parse_with_params(&url, params).unwrap();
+        let url = params.parse_with_url(&url);
 
 
 
         loop {
-            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
-                Ok(token) => token.clone(),
-                Err(err) => {
-                    match  dlg.token(&err) {
-                        Some(token) => token,
-                        None => {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
                             dlg.finished(false);
-                            return Err(client::Error::MissingToken(err))
+                            return Err(client::Error::MissingToken(e));
                         }
                     }
                 }
@@ -3310,21 +3406,27 @@ where
             let mut req_result = {
                 let client = &self.hub.client;
                 dlg.pre_request();
-                let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
-                        .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::GET)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
 
 
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
-                
+
             };
 
             match req_result {
                 Err(err) => {
                     if let client::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep(d).await;
                         continue;
                     }
                     dlg.finished(false);
@@ -3340,7 +3442,7 @@ where
                         let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
                         if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
-                            sleep(d);
+                            sleep(d).await;
                             continue;
                         }
 
@@ -3397,8 +3499,8 @@ where
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn start_timestamp_ms(mut self, new_value: &str) -> LocationListCall<'a, S> {
-        self._start_timestamp_ms = new_value.to_string();
+    pub fn start_timestamp_ms(mut self, new_value: u64) -> LocationListCall<'a, S> {
+        self._start_timestamp_ms = new_value;
         self
     }
     /// Continuation token
@@ -3418,7 +3520,8 @@ where
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.````
     ///
     /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> LocationListCall<'a, S> {
@@ -3450,25 +3553,36 @@ where
 
     /// Identifies the authorization scope for the method you are building.
     ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::Readonly`.
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::Readonly`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
     ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, St>(mut self, scope: T) -> LocationListCall<'a, S>
-                                                        where T: Into<Option<St>>,
-                                                              St: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
+    pub fn add_scope<St>(mut self, scope: St) -> LocationListCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> LocationListCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> LocationListCall<'a, S> {
+        self._scopes.clear();
         self
     }
 }
@@ -3477,7 +3591,7 @@ where
 /// Retrieves the schedule for a job.
 ///
 /// A builder for the *get* method supported by a *schedule* resource.
-/// It is not used directly, but through a `ScheduleMethods` instance.
+/// It is not used directly, but through a [`ScheduleMethods`] instance.
 ///
 /// # Example
 ///
@@ -3489,7 +3603,7 @@ where
 /// # extern crate google_coordinate1 as coordinate1;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use coordinate1::{Coordinate, oauth2, hyper, hyper_rustls};
+/// # use coordinate1::{Coordinate, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
 /// # let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -3500,7 +3614,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.schedule().get("teamId", "jobId")
+/// let result = hub.schedule().get("teamId", 67)
 ///              .doit().await;
 /// # }
 /// ```
@@ -3509,17 +3623,17 @@ pub struct ScheduleGetCall<'a, S>
 
     hub: &'a Coordinate<S>,
     _team_id: String,
-    _job_id: String,
+    _job_id: u64,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
+    _scopes: BTreeSet<String>
 }
 
 impl<'a, S> client::CallBuilder for ScheduleGetCall<'a, S> {}
 
 impl<'a, S> ScheduleGetCall<'a, S>
 where
-    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
     S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
     S::Future: Send + Unpin + 'static,
     S::Error: Into<Box<dyn StdError + Send + Sync>>,
@@ -3530,69 +3644,54 @@ where
     pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, Schedule)> {
         use std::io::{Read, Seek};
         use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::ToParts;
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
         let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
         dlg.begin(client::MethodInfo { id: "coordinate.schedule.get",
                                http_method: hyper::Method::GET });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
-        params.push(("teamId", self._team_id.to_string()));
-        params.push(("jobId", self._job_id.to_string()));
+
         for &field in ["alt", "teamId", "jobId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(client::Error::FieldClash(field));
             }
         }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
 
-        params.push(("alt", "json".to_string()));
+        let mut params = Params::with_capacity(4 + self._additional_params.len());
+        params.push("teamId", self._team_id);
+        params.push("jobId", self._job_id.to_string());
 
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "teams/{teamId}/jobs/{jobId}/schedule";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::Readonly.as_ref().to_string());
         }
 
         for &(find_this, param_name) in [("{teamId}", "teamId"), ("{jobId}", "jobId")].iter() {
-            let mut replace_with: Option<&str> = None;
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = Some(value);
-                    break;
-                }
-            }
-            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+            url = params.uri_replacement(url, param_name, find_this, false);
         }
         {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(2);
-            for param_name in ["jobId", "teamId"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
+            let to_remove = ["jobId", "teamId"];
+            params.remove_params(&to_remove);
         }
 
-        let url = url::Url::parse_with_params(&url, params).unwrap();
+        let url = params.parse_with_url(&url);
 
 
 
         loop {
-            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
-                Ok(token) => token.clone(),
-                Err(err) => {
-                    match  dlg.token(&err) {
-                        Some(token) => token,
-                        None => {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
                             dlg.finished(false);
-                            return Err(client::Error::MissingToken(err))
+                            return Err(client::Error::MissingToken(e));
                         }
                     }
                 }
@@ -3600,21 +3699,27 @@ where
             let mut req_result = {
                 let client = &self.hub.client;
                 dlg.pre_request();
-                let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
-                        .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::GET)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
 
 
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
-                
+
             };
 
             match req_result {
                 Err(err) => {
                     if let client::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep(d).await;
                         continue;
                     }
                     dlg.finished(false);
@@ -3630,7 +3735,7 @@ where
                         let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
                         if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
-                            sleep(d);
+                            sleep(d).await;
                             continue;
                         }
 
@@ -3677,14 +3782,15 @@ where
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn job_id(mut self, new_value: &str) -> ScheduleGetCall<'a, S> {
-        self._job_id = new_value.to_string();
+    pub fn job_id(mut self, new_value: u64) -> ScheduleGetCall<'a, S> {
+        self._job_id = new_value;
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.````
     ///
     /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ScheduleGetCall<'a, S> {
@@ -3716,25 +3822,36 @@ where
 
     /// Identifies the authorization scope for the method you are building.
     ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::Readonly`.
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::Readonly`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
     ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, St>(mut self, scope: T) -> ScheduleGetCall<'a, S>
-                                                        where T: Into<Option<St>>,
-                                                              St: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
+    pub fn add_scope<St>(mut self, scope: St) -> ScheduleGetCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> ScheduleGetCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> ScheduleGetCall<'a, S> {
+        self._scopes.clear();
         self
     }
 }
@@ -3743,7 +3860,7 @@ where
 /// Replaces the schedule of a job with the provided schedule. This method supports patch semantics.
 ///
 /// A builder for the *patch* method supported by a *schedule* resource.
-/// It is not used directly, but through a `ScheduleMethods` instance.
+/// It is not used directly, but through a [`ScheduleMethods`] instance.
 ///
 /// # Example
 ///
@@ -3756,7 +3873,7 @@ where
 /// use coordinate1::api::Schedule;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use coordinate1::{Coordinate, oauth2, hyper, hyper_rustls};
+/// # use coordinate1::{Coordinate, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
 /// # let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -3772,10 +3889,10 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.schedule().patch(req, "teamId", "jobId")
-///              .start_time("ea")
-///              .end_time("sadipscing")
-///              .duration("Lorem")
+/// let result = hub.schedule().patch(req, "teamId", 99)
+///              .start_time(84)
+///              .end_time(6)
+///              .duration(95)
 ///              .all_day(true)
 ///              .doit().await;
 /// # }
@@ -3786,21 +3903,21 @@ pub struct SchedulePatchCall<'a, S>
     hub: &'a Coordinate<S>,
     _request: Schedule,
     _team_id: String,
-    _job_id: String,
-    _start_time: Option<String>,
-    _end_time: Option<String>,
-    _duration: Option<String>,
+    _job_id: u64,
+    _start_time: Option<u64>,
+    _end_time: Option<u64>,
+    _duration: Option<u64>,
     _all_day: Option<bool>,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
+    _scopes: BTreeSet<String>
 }
 
 impl<'a, S> client::CallBuilder for SchedulePatchCall<'a, S> {}
 
 impl<'a, S> SchedulePatchCall<'a, S>
 where
-    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
     S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
     S::Future: Send + Unpin + 'static,
     S::Error: Into<Box<dyn StdError + Send + Sync>>,
@@ -3811,71 +3928,56 @@ where
     pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, Schedule)> {
         use std::io::{Read, Seek};
         use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::ToParts;
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
         let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
         dlg.begin(client::MethodInfo { id: "coordinate.schedule.patch",
                                http_method: hyper::Method::PATCH });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(9 + self._additional_params.len());
-        params.push(("teamId", self._team_id.to_string()));
-        params.push(("jobId", self._job_id.to_string()));
-        if let Some(value) = self._start_time {
-            params.push(("startTime", value.to_string()));
-        }
-        if let Some(value) = self._end_time {
-            params.push(("endTime", value.to_string()));
-        }
-        if let Some(value) = self._duration {
-            params.push(("duration", value.to_string()));
-        }
-        if let Some(value) = self._all_day {
-            params.push(("allDay", value.to_string()));
-        }
+
         for &field in ["alt", "teamId", "jobId", "startTime", "endTime", "duration", "allDay"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(client::Error::FieldClash(field));
             }
         }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
+
+        let mut params = Params::with_capacity(9 + self._additional_params.len());
+        params.push("teamId", self._team_id);
+        params.push("jobId", self._job_id.to_string());
+        if let Some(value) = self._start_time.as_ref() {
+            params.push("startTime", value.to_string());
+        }
+        if let Some(value) = self._end_time.as_ref() {
+            params.push("endTime", value.to_string());
+        }
+        if let Some(value) = self._duration.as_ref() {
+            params.push("duration", value.to_string());
+        }
+        if let Some(value) = self._all_day.as_ref() {
+            params.push("allDay", value.to_string());
         }
 
-        params.push(("alt", "json".to_string()));
+        params.extend(self._additional_params.iter());
 
+        params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "teams/{teamId}/jobs/{jobId}/schedule";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::Full.as_ref().to_string());
         }
 
         for &(find_this, param_name) in [("{teamId}", "teamId"), ("{jobId}", "jobId")].iter() {
-            let mut replace_with: Option<&str> = None;
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = Some(value);
-                    break;
-                }
-            }
-            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+            url = params.uri_replacement(url, param_name, find_this, false);
         }
         {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(2);
-            for param_name in ["jobId", "teamId"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
+            let to_remove = ["jobId", "teamId"];
+            params.remove_params(&to_remove);
         }
 
-        let url = url::Url::parse_with_params(&url, params).unwrap();
+        let url = params.parse_with_url(&url);
 
-        let mut json_mime_type: mime::Mime = "application/json".parse().unwrap();
+        let mut json_mime_type = mime::APPLICATION_JSON;
         let mut request_value_reader =
             {
                 let mut value = json::value::to_value(&self._request).expect("serde to work");
@@ -3889,14 +3991,14 @@ where
 
 
         loop {
-            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
-                Ok(token) => token.clone(),
-                Err(err) => {
-                    match  dlg.token(&err) {
-                        Some(token) => token,
-                        None => {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
                             dlg.finished(false);
-                            return Err(client::Error::MissingToken(err))
+                            return Err(client::Error::MissingToken(e));
                         }
                     }
                 }
@@ -3905,23 +4007,29 @@ where
             let mut req_result = {
                 let client = &self.hub.client;
                 dlg.pre_request();
-                let mut req_builder = hyper::Request::builder().method(hyper::Method::PATCH).uri(url.clone().into_string())
-                        .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::PATCH)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
 
 
                         let request = req_builder
-                        .header(CONTENT_TYPE, format!("{}", json_mime_type.to_string()))
+                        .header(CONTENT_TYPE, json_mime_type.to_string())
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
                 client.request(request.unwrap()).await
-                
+
             };
 
             match req_result {
                 Err(err) => {
                     if let client::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep(d).await;
                         continue;
                     }
                     dlg.finished(false);
@@ -3937,7 +4045,7 @@ where
                         let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
                         if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
-                            sleep(d);
+                            sleep(d).await;
                             continue;
                         }
 
@@ -3993,29 +4101,29 @@ where
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn job_id(mut self, new_value: &str) -> SchedulePatchCall<'a, S> {
-        self._job_id = new_value.to_string();
+    pub fn job_id(mut self, new_value: u64) -> SchedulePatchCall<'a, S> {
+        self._job_id = new_value;
         self
     }
     /// Scheduled start time in milliseconds since epoch.
     ///
     /// Sets the *start time* query property to the given value.
-    pub fn start_time(mut self, new_value: &str) -> SchedulePatchCall<'a, S> {
-        self._start_time = Some(new_value.to_string());
+    pub fn start_time(mut self, new_value: u64) -> SchedulePatchCall<'a, S> {
+        self._start_time = Some(new_value);
         self
     }
     /// Scheduled end time in milliseconds since epoch.
     ///
     /// Sets the *end time* query property to the given value.
-    pub fn end_time(mut self, new_value: &str) -> SchedulePatchCall<'a, S> {
-        self._end_time = Some(new_value.to_string());
+    pub fn end_time(mut self, new_value: u64) -> SchedulePatchCall<'a, S> {
+        self._end_time = Some(new_value);
         self
     }
     /// Job duration in milliseconds.
     ///
     /// Sets the *duration* query property to the given value.
-    pub fn duration(mut self, new_value: &str) -> SchedulePatchCall<'a, S> {
-        self._duration = Some(new_value.to_string());
+    pub fn duration(mut self, new_value: u64) -> SchedulePatchCall<'a, S> {
+        self._duration = Some(new_value);
         self
     }
     /// Whether the job is scheduled for the whole day. Time of day in start/end times is ignored if this is true.
@@ -4028,7 +4136,8 @@ where
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.````
     ///
     /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SchedulePatchCall<'a, S> {
@@ -4060,25 +4169,36 @@ where
 
     /// Identifies the authorization scope for the method you are building.
     ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::Full`.
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::Full`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
     ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, St>(mut self, scope: T) -> SchedulePatchCall<'a, S>
-                                                        where T: Into<Option<St>>,
-                                                              St: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
+    pub fn add_scope<St>(mut self, scope: St) -> SchedulePatchCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> SchedulePatchCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> SchedulePatchCall<'a, S> {
+        self._scopes.clear();
         self
     }
 }
@@ -4087,7 +4207,7 @@ where
 /// Replaces the schedule of a job with the provided schedule.
 ///
 /// A builder for the *update* method supported by a *schedule* resource.
-/// It is not used directly, but through a `ScheduleMethods` instance.
+/// It is not used directly, but through a [`ScheduleMethods`] instance.
 ///
 /// # Example
 ///
@@ -4100,7 +4220,7 @@ where
 /// use coordinate1::api::Schedule;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use coordinate1::{Coordinate, oauth2, hyper, hyper_rustls};
+/// # use coordinate1::{Coordinate, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
 /// # let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -4116,10 +4236,10 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.schedule().update(req, "teamId", "jobId")
-///              .start_time("At")
-///              .end_time("sed")
-///              .duration("sit")
+/// let result = hub.schedule().update(req, "teamId", 94)
+///              .start_time(74)
+///              .end_time(58)
+///              .duration(3)
 ///              .all_day(true)
 ///              .doit().await;
 /// # }
@@ -4130,21 +4250,21 @@ pub struct ScheduleUpdateCall<'a, S>
     hub: &'a Coordinate<S>,
     _request: Schedule,
     _team_id: String,
-    _job_id: String,
-    _start_time: Option<String>,
-    _end_time: Option<String>,
-    _duration: Option<String>,
+    _job_id: u64,
+    _start_time: Option<u64>,
+    _end_time: Option<u64>,
+    _duration: Option<u64>,
     _all_day: Option<bool>,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
+    _scopes: BTreeSet<String>
 }
 
 impl<'a, S> client::CallBuilder for ScheduleUpdateCall<'a, S> {}
 
 impl<'a, S> ScheduleUpdateCall<'a, S>
 where
-    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
     S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
     S::Future: Send + Unpin + 'static,
     S::Error: Into<Box<dyn StdError + Send + Sync>>,
@@ -4155,71 +4275,56 @@ where
     pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, Schedule)> {
         use std::io::{Read, Seek};
         use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::ToParts;
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
         let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
         dlg.begin(client::MethodInfo { id: "coordinate.schedule.update",
                                http_method: hyper::Method::PUT });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(9 + self._additional_params.len());
-        params.push(("teamId", self._team_id.to_string()));
-        params.push(("jobId", self._job_id.to_string()));
-        if let Some(value) = self._start_time {
-            params.push(("startTime", value.to_string()));
-        }
-        if let Some(value) = self._end_time {
-            params.push(("endTime", value.to_string()));
-        }
-        if let Some(value) = self._duration {
-            params.push(("duration", value.to_string()));
-        }
-        if let Some(value) = self._all_day {
-            params.push(("allDay", value.to_string()));
-        }
+
         for &field in ["alt", "teamId", "jobId", "startTime", "endTime", "duration", "allDay"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(client::Error::FieldClash(field));
             }
         }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
+
+        let mut params = Params::with_capacity(9 + self._additional_params.len());
+        params.push("teamId", self._team_id);
+        params.push("jobId", self._job_id.to_string());
+        if let Some(value) = self._start_time.as_ref() {
+            params.push("startTime", value.to_string());
+        }
+        if let Some(value) = self._end_time.as_ref() {
+            params.push("endTime", value.to_string());
+        }
+        if let Some(value) = self._duration.as_ref() {
+            params.push("duration", value.to_string());
+        }
+        if let Some(value) = self._all_day.as_ref() {
+            params.push("allDay", value.to_string());
         }
 
-        params.push(("alt", "json".to_string()));
+        params.extend(self._additional_params.iter());
 
+        params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "teams/{teamId}/jobs/{jobId}/schedule";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::Full.as_ref().to_string());
         }
 
         for &(find_this, param_name) in [("{teamId}", "teamId"), ("{jobId}", "jobId")].iter() {
-            let mut replace_with: Option<&str> = None;
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = Some(value);
-                    break;
-                }
-            }
-            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+            url = params.uri_replacement(url, param_name, find_this, false);
         }
         {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(2);
-            for param_name in ["jobId", "teamId"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
+            let to_remove = ["jobId", "teamId"];
+            params.remove_params(&to_remove);
         }
 
-        let url = url::Url::parse_with_params(&url, params).unwrap();
+        let url = params.parse_with_url(&url);
 
-        let mut json_mime_type: mime::Mime = "application/json".parse().unwrap();
+        let mut json_mime_type = mime::APPLICATION_JSON;
         let mut request_value_reader =
             {
                 let mut value = json::value::to_value(&self._request).expect("serde to work");
@@ -4233,14 +4338,14 @@ where
 
 
         loop {
-            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
-                Ok(token) => token.clone(),
-                Err(err) => {
-                    match  dlg.token(&err) {
-                        Some(token) => token,
-                        None => {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
                             dlg.finished(false);
-                            return Err(client::Error::MissingToken(err))
+                            return Err(client::Error::MissingToken(e));
                         }
                     }
                 }
@@ -4249,23 +4354,29 @@ where
             let mut req_result = {
                 let client = &self.hub.client;
                 dlg.pre_request();
-                let mut req_builder = hyper::Request::builder().method(hyper::Method::PUT).uri(url.clone().into_string())
-                        .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::PUT)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
 
 
                         let request = req_builder
-                        .header(CONTENT_TYPE, format!("{}", json_mime_type.to_string()))
+                        .header(CONTENT_TYPE, json_mime_type.to_string())
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
                 client.request(request.unwrap()).await
-                
+
             };
 
             match req_result {
                 Err(err) => {
                     if let client::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep(d).await;
                         continue;
                     }
                     dlg.finished(false);
@@ -4281,7 +4392,7 @@ where
                         let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
                         if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
-                            sleep(d);
+                            sleep(d).await;
                             continue;
                         }
 
@@ -4337,29 +4448,29 @@ where
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn job_id(mut self, new_value: &str) -> ScheduleUpdateCall<'a, S> {
-        self._job_id = new_value.to_string();
+    pub fn job_id(mut self, new_value: u64) -> ScheduleUpdateCall<'a, S> {
+        self._job_id = new_value;
         self
     }
     /// Scheduled start time in milliseconds since epoch.
     ///
     /// Sets the *start time* query property to the given value.
-    pub fn start_time(mut self, new_value: &str) -> ScheduleUpdateCall<'a, S> {
-        self._start_time = Some(new_value.to_string());
+    pub fn start_time(mut self, new_value: u64) -> ScheduleUpdateCall<'a, S> {
+        self._start_time = Some(new_value);
         self
     }
     /// Scheduled end time in milliseconds since epoch.
     ///
     /// Sets the *end time* query property to the given value.
-    pub fn end_time(mut self, new_value: &str) -> ScheduleUpdateCall<'a, S> {
-        self._end_time = Some(new_value.to_string());
+    pub fn end_time(mut self, new_value: u64) -> ScheduleUpdateCall<'a, S> {
+        self._end_time = Some(new_value);
         self
     }
     /// Job duration in milliseconds.
     ///
     /// Sets the *duration* query property to the given value.
-    pub fn duration(mut self, new_value: &str) -> ScheduleUpdateCall<'a, S> {
-        self._duration = Some(new_value.to_string());
+    pub fn duration(mut self, new_value: u64) -> ScheduleUpdateCall<'a, S> {
+        self._duration = Some(new_value);
         self
     }
     /// Whether the job is scheduled for the whole day. Time of day in start/end times is ignored if this is true.
@@ -4372,7 +4483,8 @@ where
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.````
     ///
     /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ScheduleUpdateCall<'a, S> {
@@ -4404,25 +4516,36 @@ where
 
     /// Identifies the authorization scope for the method you are building.
     ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::Full`.
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::Full`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
     ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, St>(mut self, scope: T) -> ScheduleUpdateCall<'a, S>
-                                                        where T: Into<Option<St>>,
-                                                              St: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
+    pub fn add_scope<St>(mut self, scope: St) -> ScheduleUpdateCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> ScheduleUpdateCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> ScheduleUpdateCall<'a, S> {
+        self._scopes.clear();
         self
     }
 }
@@ -4431,7 +4554,7 @@ where
 /// Retrieves a list of teams for a user.
 ///
 /// A builder for the *list* method supported by a *team* resource.
-/// It is not used directly, but through a `TeamMethods` instance.
+/// It is not used directly, but through a [`TeamMethods`] instance.
 ///
 /// # Example
 ///
@@ -4443,7 +4566,7 @@ where
 /// # extern crate google_coordinate1 as coordinate1;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use coordinate1::{Coordinate, oauth2, hyper, hyper_rustls};
+/// # use coordinate1::{Coordinate, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
 /// # let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -4470,14 +4593,14 @@ pub struct TeamListCall<'a, S>
     _admin: Option<bool>,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
+    _scopes: BTreeSet<String>
 }
 
 impl<'a, S> client::CallBuilder for TeamListCall<'a, S> {}
 
 impl<'a, S> TeamListCall<'a, S>
 where
-    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
     S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
     S::Future: Send + Unpin + 'static,
     S::Error: Into<Box<dyn StdError + Send + Sync>>,
@@ -4488,55 +4611,54 @@ where
     pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, TeamListResponse)> {
         use std::io::{Read, Seek};
         use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::ToParts;
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
         let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
         dlg.begin(client::MethodInfo { id: "coordinate.team.list",
                                http_method: hyper::Method::GET });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
-        if let Some(value) = self._worker {
-            params.push(("worker", value.to_string()));
-        }
-        if let Some(value) = self._dispatcher {
-            params.push(("dispatcher", value.to_string()));
-        }
-        if let Some(value) = self._admin {
-            params.push(("admin", value.to_string()));
-        }
+
         for &field in ["alt", "worker", "dispatcher", "admin"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(client::Error::FieldClash(field));
             }
         }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
+
+        let mut params = Params::with_capacity(5 + self._additional_params.len());
+        if let Some(value) = self._worker.as_ref() {
+            params.push("worker", value.to_string());
+        }
+        if let Some(value) = self._dispatcher.as_ref() {
+            params.push("dispatcher", value.to_string());
+        }
+        if let Some(value) = self._admin.as_ref() {
+            params.push("admin", value.to_string());
         }
 
-        params.push(("alt", "json".to_string()));
+        params.extend(self._additional_params.iter());
 
+        params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "teams";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::Readonly.as_ref().to_string());
         }
 
 
-        let url = url::Url::parse_with_params(&url, params).unwrap();
+        let url = params.parse_with_url(&url);
 
 
 
         loop {
-            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
-                Ok(token) => token.clone(),
-                Err(err) => {
-                    match  dlg.token(&err) {
-                        Some(token) => token,
-                        None => {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
                             dlg.finished(false);
-                            return Err(client::Error::MissingToken(err))
+                            return Err(client::Error::MissingToken(e));
                         }
                     }
                 }
@@ -4544,21 +4666,27 @@ where
             let mut req_result = {
                 let client = &self.hub.client;
                 dlg.pre_request();
-                let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
-                        .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::GET)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
 
 
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
-                
+
             };
 
             match req_result {
                 Err(err) => {
                     if let client::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep(d).await;
                         continue;
                     }
                     dlg.finished(false);
@@ -4574,7 +4702,7 @@ where
                         let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
                         if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
-                            sleep(d);
+                            sleep(d).await;
                             continue;
                         }
 
@@ -4629,7 +4757,8 @@ where
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.````
     ///
     /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TeamListCall<'a, S> {
@@ -4661,25 +4790,36 @@ where
 
     /// Identifies the authorization scope for the method you are building.
     ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::Readonly`.
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::Readonly`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
     ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, St>(mut self, scope: T) -> TeamListCall<'a, S>
-                                                        where T: Into<Option<St>>,
-                                                              St: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
+    pub fn add_scope<St>(mut self, scope: St) -> TeamListCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> TeamListCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> TeamListCall<'a, S> {
+        self._scopes.clear();
         self
     }
 }
@@ -4688,7 +4828,7 @@ where
 /// Retrieves a list of workers in a team.
 ///
 /// A builder for the *list* method supported by a *worker* resource.
-/// It is not used directly, but through a `WorkerMethods` instance.
+/// It is not used directly, but through a [`WorkerMethods`] instance.
 ///
 /// # Example
 ///
@@ -4700,7 +4840,7 @@ where
 /// # extern crate google_coordinate1 as coordinate1;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use coordinate1::{Coordinate, oauth2, hyper, hyper_rustls};
+/// # use coordinate1::{Coordinate, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
 /// # let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -4722,14 +4862,14 @@ pub struct WorkerListCall<'a, S>
     _team_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
+    _scopes: BTreeSet<String>
 }
 
 impl<'a, S> client::CallBuilder for WorkerListCall<'a, S> {}
 
 impl<'a, S> WorkerListCall<'a, S>
 where
-    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
     S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
     S::Future: Send + Unpin + 'static,
     S::Error: Into<Box<dyn StdError + Send + Sync>>,
@@ -4740,68 +4880,53 @@ where
     pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, WorkerListResponse)> {
         use std::io::{Read, Seek};
         use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::ToParts;
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
         let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
         dlg.begin(client::MethodInfo { id: "coordinate.worker.list",
                                http_method: hyper::Method::GET });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
-        params.push(("teamId", self._team_id.to_string()));
+
         for &field in ["alt", "teamId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(client::Error::FieldClash(field));
             }
         }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
 
-        params.push(("alt", "json".to_string()));
+        let mut params = Params::with_capacity(3 + self._additional_params.len());
+        params.push("teamId", self._team_id);
 
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "teams/{teamId}/workers";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::Readonly.as_ref().to_string());
         }
 
         for &(find_this, param_name) in [("{teamId}", "teamId")].iter() {
-            let mut replace_with: Option<&str> = None;
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = Some(value);
-                    break;
-                }
-            }
-            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+            url = params.uri_replacement(url, param_name, find_this, false);
         }
         {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
-            for param_name in ["teamId"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
+            let to_remove = ["teamId"];
+            params.remove_params(&to_remove);
         }
 
-        let url = url::Url::parse_with_params(&url, params).unwrap();
+        let url = params.parse_with_url(&url);
 
 
 
         loop {
-            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
-                Ok(token) => token.clone(),
-                Err(err) => {
-                    match  dlg.token(&err) {
-                        Some(token) => token,
-                        None => {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
                             dlg.finished(false);
-                            return Err(client::Error::MissingToken(err))
+                            return Err(client::Error::MissingToken(e));
                         }
                     }
                 }
@@ -4809,21 +4934,27 @@ where
             let mut req_result = {
                 let client = &self.hub.client;
                 dlg.pre_request();
-                let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
-                        .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::GET)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
 
 
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
-                
+
             };
 
             match req_result {
                 Err(err) => {
                     if let client::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep(d).await;
                         continue;
                     }
                     dlg.finished(false);
@@ -4839,7 +4970,7 @@ where
                         let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
                         if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
-                            sleep(d);
+                            sleep(d).await;
                             continue;
                         }
 
@@ -4883,7 +5014,8 @@ where
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.````
     ///
     /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> WorkerListCall<'a, S> {
@@ -4915,25 +5047,36 @@ where
 
     /// Identifies the authorization scope for the method you are building.
     ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::Readonly`.
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::Readonly`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
     ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, St>(mut self, scope: T) -> WorkerListCall<'a, S>
-                                                        where T: Into<Option<St>>,
-                                                              St: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
+    pub fn add_scope<St>(mut self, scope: St) -> WorkerListCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> WorkerListCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> WorkerListCall<'a, S> {
+        self._scopes.clear();
         self
     }
 }

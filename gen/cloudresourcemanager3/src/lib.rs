@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/generator/templates/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Cloud Resource Manager* crate version *4.0.1+20220306*, where *20220306* is the exact revision of the *cloudresourcemanager:v3* schema built by the [mako](http://www.makotemplates.org/) code generator *v4.0.1*.
+//! This documentation was generated from *Cloud Resource Manager* crate version *5.0.2-beta-1+20230115*, where *20230115* is the exact revision of the *cloudresourcemanager:v3* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.2-beta-1*.
 //! 
 //! Everything else about the *Cloud Resource Manager* *v3* API can be found at the
 //! [official documentation site](https://cloud.google.com/resource-manager).
@@ -11,6 +11,8 @@
 //! 
 //! Handle the following *Resources* with ease from the central [hub](CloudResourceManager) ... 
 //! 
+//! * [effective tags](api::EffectiveTag)
+//!  * [*list*](api::EffectiveTagListCall)
 //! * [folders](api::Folder)
 //!  * [*create*](api::FolderCreateCall), [*delete*](api::FolderDeleteCall), [*get*](api::FolderGetCall), [*get iam policy*](api::FolderGetIamPolicyCall), [*list*](api::FolderListCall), [*move*](api::FolderMoveCall), [*patch*](api::FolderPatchCall), [*search*](api::FolderSearchCall), [*set iam policy*](api::FolderSetIamPolicyCall), [*test iam permissions*](api::FolderTestIamPermissionCall) and [*undelete*](api::FolderUndeleteCall)
 //! * [liens](api::Lien)
@@ -26,7 +28,7 @@
 //! * [tag keys](api::TagKey)
 //!  * [*create*](api::TagKeyCreateCall), [*delete*](api::TagKeyDeleteCall), [*get*](api::TagKeyGetCall), [*get iam policy*](api::TagKeyGetIamPolicyCall), [*list*](api::TagKeyListCall), [*patch*](api::TagKeyPatchCall), [*set iam policy*](api::TagKeySetIamPolicyCall) and [*test iam permissions*](api::TagKeyTestIamPermissionCall)
 //! * [tag values](api::TagValue)
-//!  * [*create*](api::TagValueCreateCall), [*delete*](api::TagValueDeleteCall), [*get*](api::TagValueGetCall), [*get iam policy*](api::TagValueGetIamPolicyCall), [*list*](api::TagValueListCall), [*patch*](api::TagValuePatchCall), [*set iam policy*](api::TagValueSetIamPolicyCall) and [*test iam permissions*](api::TagValueTestIamPermissionCall)
+//!  * [*create*](api::TagValueCreateCall), [*delete*](api::TagValueDeleteCall), [*get*](api::TagValueGetCall), [*get iam policy*](api::TagValueGetIamPolicyCall), [*list*](api::TagValueListCall), [*patch*](api::TagValuePatchCall), [*set iam policy*](api::TagValueSetIamPolicyCall), [*tag holds create*](api::TagValueTagHoldCreateCall), [*tag holds delete*](api::TagValueTagHoldDeleteCall), [*tag holds list*](api::TagValueTagHoldListCall) and [*test iam permissions*](api::TagValueTestIamPermissionCall)
 //! 
 //! 
 //! 
@@ -77,6 +79,8 @@
 //! let r = hub.tag_keys().create(...).doit().await
 //! let r = hub.tag_keys().delete(...).doit().await
 //! let r = hub.tag_keys().patch(...).doit().await
+//! let r = hub.tag_values().tag_holds_create(...).doit().await
+//! let r = hub.tag_values().tag_holds_delete(...).doit().await
 //! let r = hub.tag_values().create(...).doit().await
 //! let r = hub.tag_values().delete(...).doit().await
 //! let r = hub.tag_values().patch(...).doit().await
@@ -110,7 +114,7 @@
 //! use cloudresourcemanager3::{Result, Error};
 //! # async fn dox() {
 //! use std::default::Default;
-//! use cloudresourcemanager3::{CloudResourceManager, oauth2, hyper, hyper_rustls};
+//! use cloudresourcemanager3::{CloudResourceManager, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 //! 
 //! // Get an ApplicationSecret instance by some means. It contains the `client_id` and 
 //! // `client_secret`, among other things.
@@ -135,7 +139,7 @@
 //! // Values shown here are possibly random and not representative !
 //! let result = hub.tag_keys().patch(req, "name")
 //!              .validate_only(false)
-//!              .update_mask("amet.")
+//!              .update_mask(&Default::default())
 //!              .doit().await;
 //! 
 //! match result {
@@ -221,22 +225,17 @@
 // This file was generated automatically from 'src/generator/templates/api/lib.rs.mako'
 // DO NOT EDIT !
 
-#[macro_use]
-extern crate serde_derive;
-
 // Re-export the hyper and hyper_rustls crate, they are required to build the hub
-pub extern crate hyper;
-pub extern crate hyper_rustls;
-extern crate serde;
-extern crate serde_json;
-// Re-export the yup_oauth2 crate, that is required to call some methods of the hub and the client
-pub extern crate yup_oauth2 as oauth2;
-extern crate mime;
-extern crate url;
-
+pub use hyper;
+pub use hyper_rustls;
+pub extern crate google_apis_common as client;
+pub use client::chrono;
 pub mod api;
-pub mod client;
 
 // Re-export the hub type and some basic client structs
 pub use api::CloudResourceManager;
-pub use client::{Result, Error, Delegate};
+pub use client::{Result, Error, Delegate, FieldMask};
+
+// Re-export the yup_oauth2 crate, that is required to call some methods of the hub and the client
+#[cfg(feature = "yup-oauth2")]
+pub use client::oauth2;

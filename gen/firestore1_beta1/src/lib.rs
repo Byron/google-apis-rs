@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/generator/templates/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Firestore* crate version *4.0.1+20220221*, where *20220221* is the exact revision of the *firestore:v1beta1* schema built by the [mako](http://www.makotemplates.org/) code generator *v4.0.1*.
+//! This documentation was generated from *Firestore* crate version *5.0.2-beta-1+20230118*, where *20230118* is the exact revision of the *firestore:v1beta1* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.2-beta-1*.
 //! 
 //! Everything else about the *Firestore* *v1_beta1* API can be found at the
 //! [official documentation site](https://cloud.google.com/firestore).
@@ -12,7 +12,7 @@
 //! Handle the following *Resources* with ease from the central [hub](Firestore) ... 
 //! 
 //! * projects
-//!  * [*databases documents batch get*](api::ProjectDatabaseDocumentBatchGetCall), [*databases documents batch write*](api::ProjectDatabaseDocumentBatchWriteCall), [*databases documents begin transaction*](api::ProjectDatabaseDocumentBeginTransactionCall), [*databases documents commit*](api::ProjectDatabaseDocumentCommitCall), [*databases documents create document*](api::ProjectDatabaseDocumentCreateDocumentCall), [*databases documents delete*](api::ProjectDatabaseDocumentDeleteCall), [*databases documents get*](api::ProjectDatabaseDocumentGetCall), [*databases documents list*](api::ProjectDatabaseDocumentListCall), [*databases documents list collection ids*](api::ProjectDatabaseDocumentListCollectionIdCall), [*databases documents listen*](api::ProjectDatabaseDocumentListenCall), [*databases documents partition query*](api::ProjectDatabaseDocumentPartitionQueryCall), [*databases documents patch*](api::ProjectDatabaseDocumentPatchCall), [*databases documents rollback*](api::ProjectDatabaseDocumentRollbackCall), [*databases documents run query*](api::ProjectDatabaseDocumentRunQueryCall), [*databases documents write*](api::ProjectDatabaseDocumentWriteCall), [*databases export documents*](api::ProjectDatabaseExportDocumentCall), [*databases import documents*](api::ProjectDatabaseImportDocumentCall), [*databases indexes create*](api::ProjectDatabaseIndexeCreateCall), [*databases indexes delete*](api::ProjectDatabaseIndexeDeleteCall), [*databases indexes get*](api::ProjectDatabaseIndexeGetCall) and [*databases indexes list*](api::ProjectDatabaseIndexeListCall)
+//!  * [*databases documents batch get*](api::ProjectDatabaseDocumentBatchGetCall), [*databases documents batch write*](api::ProjectDatabaseDocumentBatchWriteCall), [*databases documents begin transaction*](api::ProjectDatabaseDocumentBeginTransactionCall), [*databases documents commit*](api::ProjectDatabaseDocumentCommitCall), [*databases documents create document*](api::ProjectDatabaseDocumentCreateDocumentCall), [*databases documents delete*](api::ProjectDatabaseDocumentDeleteCall), [*databases documents get*](api::ProjectDatabaseDocumentGetCall), [*databases documents list*](api::ProjectDatabaseDocumentListCall), [*databases documents list collection ids*](api::ProjectDatabaseDocumentListCollectionIdCall), [*databases documents list documents*](api::ProjectDatabaseDocumentListDocumentCall), [*databases documents listen*](api::ProjectDatabaseDocumentListenCall), [*databases documents partition query*](api::ProjectDatabaseDocumentPartitionQueryCall), [*databases documents patch*](api::ProjectDatabaseDocumentPatchCall), [*databases documents rollback*](api::ProjectDatabaseDocumentRollbackCall), [*databases documents run aggregation query*](api::ProjectDatabaseDocumentRunAggregationQueryCall), [*databases documents run query*](api::ProjectDatabaseDocumentRunQueryCall), [*databases documents write*](api::ProjectDatabaseDocumentWriteCall), [*databases export documents*](api::ProjectDatabaseExportDocumentCall), [*databases import documents*](api::ProjectDatabaseImportDocumentCall), [*databases indexes create*](api::ProjectDatabaseIndexCreateCall), [*databases indexes delete*](api::ProjectDatabaseIndexDeleteCall), [*databases indexes get*](api::ProjectDatabaseIndexGetCall) and [*databases indexes list*](api::ProjectDatabaseIndexListCall)
 //! 
 //! 
 //! 
@@ -80,7 +80,7 @@
 //! use firestore1_beta1::{Result, Error};
 //! # async fn dox() {
 //! use std::default::Default;
-//! use firestore1_beta1::{Firestore, oauth2, hyper, hyper_rustls};
+//! use firestore1_beta1::{Firestore, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 //! 
 //! // Get an ApplicationSecret instance by some means. It contains the `client_id` and 
 //! // `client_secret`, among other things.
@@ -189,22 +189,17 @@
 // This file was generated automatically from 'src/generator/templates/api/lib.rs.mako'
 // DO NOT EDIT !
 
-#[macro_use]
-extern crate serde_derive;
-
 // Re-export the hyper and hyper_rustls crate, they are required to build the hub
-pub extern crate hyper;
-pub extern crate hyper_rustls;
-extern crate serde;
-extern crate serde_json;
-// Re-export the yup_oauth2 crate, that is required to call some methods of the hub and the client
-pub extern crate yup_oauth2 as oauth2;
-extern crate mime;
-extern crate url;
-
+pub use hyper;
+pub use hyper_rustls;
+pub extern crate google_apis_common as client;
+pub use client::chrono;
 pub mod api;
-pub mod client;
 
 // Re-export the hub type and some basic client structs
 pub use api::Firestore;
-pub use client::{Result, Error, Delegate};
+pub use client::{Result, Error, Delegate, FieldMask};
+
+// Re-export the yup_oauth2 crate, that is required to call some methods of the hub and the client
+#[cfg(feature = "yup-oauth2")]
+pub use client::oauth2;

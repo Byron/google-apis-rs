@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/generator/templates/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Access Context Manager* crate version *4.0.1+20220301*, where *20220301* is the exact revision of the *accesscontextmanager:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v4.0.1*.
+//! This documentation was generated from *Access Context Manager* crate version *5.0.2-beta-1+20230123*, where *20230123* is the exact revision of the *accesscontextmanager:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.2-beta-1*.
 //! 
 //! Everything else about the *Access Context Manager* *v1* API can be found at the
 //! [official documentation site](https://cloud.google.com/access-context-manager/docs/reference/rest/).
@@ -12,7 +12,7 @@
 //! Handle the following *Resources* with ease from the central [hub](AccessContextManager) ... 
 //! 
 //! * [access policies](api::AccessPolicy)
-//!  * [*access levels create*](api::AccessPolicyAccessLevelCreateCall), [*access levels delete*](api::AccessPolicyAccessLevelDeleteCall), [*access levels get*](api::AccessPolicyAccessLevelGetCall), [*access levels list*](api::AccessPolicyAccessLevelListCall), [*access levels patch*](api::AccessPolicyAccessLevelPatchCall), [*access levels replace all*](api::AccessPolicyAccessLevelReplaceAllCall), [*access levels test iam permissions*](api::AccessPolicyAccessLevelTestIamPermissionCall), [*create*](api::AccessPolicyCreateCall), [*delete*](api::AccessPolicyDeleteCall), [*get*](api::AccessPolicyGetCall), [*get iam policy*](api::AccessPolicyGetIamPolicyCall), [*list*](api::AccessPolicyListCall), [*patch*](api::AccessPolicyPatchCall), [*service perimeters commit*](api::AccessPolicyServicePerimeterCommitCall), [*service perimeters create*](api::AccessPolicyServicePerimeterCreateCall), [*service perimeters delete*](api::AccessPolicyServicePerimeterDeleteCall), [*service perimeters get*](api::AccessPolicyServicePerimeterGetCall), [*service perimeters list*](api::AccessPolicyServicePerimeterListCall), [*service perimeters patch*](api::AccessPolicyServicePerimeterPatchCall), [*service perimeters replace all*](api::AccessPolicyServicePerimeterReplaceAllCall), [*service perimeters test iam permissions*](api::AccessPolicyServicePerimeterTestIamPermissionCall), [*set iam policy*](api::AccessPolicySetIamPolicyCall) and [*test iam permissions*](api::AccessPolicyTestIamPermissionCall)
+//!  * [*access levels create*](api::AccessPolicyAccessLevelCreateCall), [*access levels delete*](api::AccessPolicyAccessLevelDeleteCall), [*access levels get*](api::AccessPolicyAccessLevelGetCall), [*access levels list*](api::AccessPolicyAccessLevelListCall), [*access levels patch*](api::AccessPolicyAccessLevelPatchCall), [*access levels replace all*](api::AccessPolicyAccessLevelReplaceAllCall), [*access levels test iam permissions*](api::AccessPolicyAccessLevelTestIamPermissionCall), [*authorized orgs descs create*](api::AccessPolicyAuthorizedOrgsDescCreateCall), [*authorized orgs descs delete*](api::AccessPolicyAuthorizedOrgsDescDeleteCall), [*authorized orgs descs get*](api::AccessPolicyAuthorizedOrgsDescGetCall), [*authorized orgs descs list*](api::AccessPolicyAuthorizedOrgsDescListCall), [*authorized orgs descs patch*](api::AccessPolicyAuthorizedOrgsDescPatchCall), [*create*](api::AccessPolicyCreateCall), [*delete*](api::AccessPolicyDeleteCall), [*get*](api::AccessPolicyGetCall), [*get iam policy*](api::AccessPolicyGetIamPolicyCall), [*list*](api::AccessPolicyListCall), [*patch*](api::AccessPolicyPatchCall), [*service perimeters commit*](api::AccessPolicyServicePerimeterCommitCall), [*service perimeters create*](api::AccessPolicyServicePerimeterCreateCall), [*service perimeters delete*](api::AccessPolicyServicePerimeterDeleteCall), [*service perimeters get*](api::AccessPolicyServicePerimeterGetCall), [*service perimeters list*](api::AccessPolicyServicePerimeterListCall), [*service perimeters patch*](api::AccessPolicyServicePerimeterPatchCall), [*service perimeters replace all*](api::AccessPolicyServicePerimeterReplaceAllCall), [*service perimeters test iam permissions*](api::AccessPolicyServicePerimeterTestIamPermissionCall), [*set iam policy*](api::AccessPolicySetIamPolicyCall) and [*test iam permissions*](api::AccessPolicyTestIamPermissionCall)
 //! * [operations](api::Operation)
 //!  * [*cancel*](api::OperationCancelCall), [*delete*](api::OperationDeleteCall), [*get*](api::OperationGetCall) and [*list*](api::OperationListCall)
 //! * organizations
@@ -55,6 +55,9 @@
 //! let r = hub.access_policies().access_levels_delete(...).doit().await
 //! let r = hub.access_policies().access_levels_patch(...).doit().await
 //! let r = hub.access_policies().access_levels_replace_all(...).doit().await
+//! let r = hub.access_policies().authorized_orgs_descs_create(...).doit().await
+//! let r = hub.access_policies().authorized_orgs_descs_delete(...).doit().await
+//! let r = hub.access_policies().authorized_orgs_descs_patch(...).doit().await
 //! let r = hub.access_policies().service_perimeters_commit(...).doit().await
 //! let r = hub.access_policies().service_perimeters_create(...).doit().await
 //! let r = hub.access_policies().service_perimeters_delete(...).doit().await
@@ -99,7 +102,7 @@
 //! use accesscontextmanager1::{Result, Error};
 //! # async fn dox() {
 //! use std::default::Default;
-//! use accesscontextmanager1::{AccessContextManager, oauth2, hyper, hyper_rustls};
+//! use accesscontextmanager1::{AccessContextManager, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 //! 
 //! // Get an ApplicationSecret instance by some means. It contains the `client_id` and 
 //! // `client_secret`, among other things.
@@ -206,22 +209,17 @@
 // This file was generated automatically from 'src/generator/templates/api/lib.rs.mako'
 // DO NOT EDIT !
 
-#[macro_use]
-extern crate serde_derive;
-
 // Re-export the hyper and hyper_rustls crate, they are required to build the hub
-pub extern crate hyper;
-pub extern crate hyper_rustls;
-extern crate serde;
-extern crate serde_json;
-// Re-export the yup_oauth2 crate, that is required to call some methods of the hub and the client
-pub extern crate yup_oauth2 as oauth2;
-extern crate mime;
-extern crate url;
-
+pub use hyper;
+pub use hyper_rustls;
+pub extern crate google_apis_common as client;
+pub use client::chrono;
 pub mod api;
-pub mod client;
 
 // Re-export the hub type and some basic client structs
 pub use api::AccessContextManager;
-pub use client::{Result, Error, Delegate};
+pub use client::{Result, Error, Delegate, FieldMask};
+
+// Re-export the yup_oauth2 crate, that is required to call some methods of the hub and the client
+#[cfg(feature = "yup-oauth2")]
+pub use client::oauth2;

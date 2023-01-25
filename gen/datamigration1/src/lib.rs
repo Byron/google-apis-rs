@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/generator/templates/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Database Migration Service* crate version *4.0.1+20220216*, where *20220216* is the exact revision of the *datamigration:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v4.0.1*.
+//! This documentation was generated from *Database Migration Service* crate version *5.0.2-beta-1+20230105*, where *20230105* is the exact revision of the *datamigration:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.2-beta-1*.
 //! 
 //! Everything else about the *Database Migration Service* *v1* API can be found at the
 //! [official documentation site](https://cloud.google.com/database-migration/).
@@ -12,7 +12,7 @@
 //! Handle the following *Resources* with ease from the central [hub](DatabaseMigrationService) ... 
 //! 
 //! * projects
-//!  * [*locations connection profiles create*](api::ProjectLocationConnectionProfileCreateCall), [*locations connection profiles delete*](api::ProjectLocationConnectionProfileDeleteCall), [*locations connection profiles get*](api::ProjectLocationConnectionProfileGetCall), [*locations connection profiles get iam policy*](api::ProjectLocationConnectionProfileGetIamPolicyCall), [*locations connection profiles list*](api::ProjectLocationConnectionProfileListCall), [*locations connection profiles patch*](api::ProjectLocationConnectionProfilePatchCall), [*locations connection profiles set iam policy*](api::ProjectLocationConnectionProfileSetIamPolicyCall), [*locations connection profiles test iam permissions*](api::ProjectLocationConnectionProfileTestIamPermissionCall), [*locations get*](api::ProjectLocationGetCall), [*locations list*](api::ProjectLocationListCall), [*locations migration jobs create*](api::ProjectLocationMigrationJobCreateCall), [*locations migration jobs delete*](api::ProjectLocationMigrationJobDeleteCall), [*locations migration jobs generate ssh script*](api::ProjectLocationMigrationJobGenerateSshScriptCall), [*locations migration jobs get*](api::ProjectLocationMigrationJobGetCall), [*locations migration jobs get iam policy*](api::ProjectLocationMigrationJobGetIamPolicyCall), [*locations migration jobs list*](api::ProjectLocationMigrationJobListCall), [*locations migration jobs patch*](api::ProjectLocationMigrationJobPatchCall), [*locations migration jobs promote*](api::ProjectLocationMigrationJobPromoteCall), [*locations migration jobs restart*](api::ProjectLocationMigrationJobRestartCall), [*locations migration jobs resume*](api::ProjectLocationMigrationJobResumeCall), [*locations migration jobs set iam policy*](api::ProjectLocationMigrationJobSetIamPolicyCall), [*locations migration jobs start*](api::ProjectLocationMigrationJobStartCall), [*locations migration jobs stop*](api::ProjectLocationMigrationJobStopCall), [*locations migration jobs test iam permissions*](api::ProjectLocationMigrationJobTestIamPermissionCall), [*locations migration jobs verify*](api::ProjectLocationMigrationJobVerifyCall), [*locations operations cancel*](api::ProjectLocationOperationCancelCall), [*locations operations delete*](api::ProjectLocationOperationDeleteCall), [*locations operations get*](api::ProjectLocationOperationGetCall) and [*locations operations list*](api::ProjectLocationOperationListCall)
+//!  * [*locations connection profiles create*](api::ProjectLocationConnectionProfileCreateCall), [*locations connection profiles delete*](api::ProjectLocationConnectionProfileDeleteCall), [*locations connection profiles get*](api::ProjectLocationConnectionProfileGetCall), [*locations connection profiles get iam policy*](api::ProjectLocationConnectionProfileGetIamPolicyCall), [*locations connection profiles list*](api::ProjectLocationConnectionProfileListCall), [*locations connection profiles patch*](api::ProjectLocationConnectionProfilePatchCall), [*locations connection profiles set iam policy*](api::ProjectLocationConnectionProfileSetIamPolicyCall), [*locations connection profiles test iam permissions*](api::ProjectLocationConnectionProfileTestIamPermissionCall), [*locations conversion workspaces apply*](api::ProjectLocationConversionWorkspaceApplyCall), [*locations conversion workspaces commit*](api::ProjectLocationConversionWorkspaceCommitCall), [*locations conversion workspaces convert*](api::ProjectLocationConversionWorkspaceConvertCall), [*locations conversion workspaces create*](api::ProjectLocationConversionWorkspaceCreateCall), [*locations conversion workspaces delete*](api::ProjectLocationConversionWorkspaceDeleteCall), [*locations conversion workspaces describe conversion workspace revisions*](api::ProjectLocationConversionWorkspaceDescribeConversionWorkspaceRevisionCall), [*locations conversion workspaces describe database entities*](api::ProjectLocationConversionWorkspaceDescribeDatabaseEntityCall), [*locations conversion workspaces get*](api::ProjectLocationConversionWorkspaceGetCall), [*locations conversion workspaces list*](api::ProjectLocationConversionWorkspaceListCall), [*locations conversion workspaces mapping rules import*](api::ProjectLocationConversionWorkspaceMappingRuleImportCall), [*locations conversion workspaces patch*](api::ProjectLocationConversionWorkspacePatchCall), [*locations conversion workspaces rollback*](api::ProjectLocationConversionWorkspaceRollbackCall), [*locations conversion workspaces search background jobs*](api::ProjectLocationConversionWorkspaceSearchBackgroundJobCall), [*locations conversion workspaces seed*](api::ProjectLocationConversionWorkspaceSeedCall), [*locations get*](api::ProjectLocationGetCall), [*locations list*](api::ProjectLocationListCall), [*locations migration jobs create*](api::ProjectLocationMigrationJobCreateCall), [*locations migration jobs delete*](api::ProjectLocationMigrationJobDeleteCall), [*locations migration jobs generate ssh script*](api::ProjectLocationMigrationJobGenerateSshScriptCall), [*locations migration jobs get*](api::ProjectLocationMigrationJobGetCall), [*locations migration jobs get iam policy*](api::ProjectLocationMigrationJobGetIamPolicyCall), [*locations migration jobs list*](api::ProjectLocationMigrationJobListCall), [*locations migration jobs patch*](api::ProjectLocationMigrationJobPatchCall), [*locations migration jobs promote*](api::ProjectLocationMigrationJobPromoteCall), [*locations migration jobs restart*](api::ProjectLocationMigrationJobRestartCall), [*locations migration jobs resume*](api::ProjectLocationMigrationJobResumeCall), [*locations migration jobs set iam policy*](api::ProjectLocationMigrationJobSetIamPolicyCall), [*locations migration jobs start*](api::ProjectLocationMigrationJobStartCall), [*locations migration jobs stop*](api::ProjectLocationMigrationJobStopCall), [*locations migration jobs test iam permissions*](api::ProjectLocationMigrationJobTestIamPermissionCall), [*locations migration jobs verify*](api::ProjectLocationMigrationJobVerifyCall), [*locations operations cancel*](api::ProjectLocationOperationCancelCall), [*locations operations delete*](api::ProjectLocationOperationDeleteCall), [*locations operations get*](api::ProjectLocationOperationGetCall), [*locations operations list*](api::ProjectLocationOperationListCall), [*locations private connections create*](api::ProjectLocationPrivateConnectionCreateCall), [*locations private connections delete*](api::ProjectLocationPrivateConnectionDeleteCall), [*locations private connections get*](api::ProjectLocationPrivateConnectionGetCall) and [*locations private connections list*](api::ProjectLocationPrivateConnectionListCall)
 //! 
 //! 
 //! 
@@ -50,6 +50,15 @@
 //! let r = hub.projects().locations_connection_profiles_create(...).doit().await
 //! let r = hub.projects().locations_connection_profiles_delete(...).doit().await
 //! let r = hub.projects().locations_connection_profiles_patch(...).doit().await
+//! let r = hub.projects().locations_conversion_workspaces_mapping_rules_import(...).doit().await
+//! let r = hub.projects().locations_conversion_workspaces_apply(...).doit().await
+//! let r = hub.projects().locations_conversion_workspaces_commit(...).doit().await
+//! let r = hub.projects().locations_conversion_workspaces_convert(...).doit().await
+//! let r = hub.projects().locations_conversion_workspaces_create(...).doit().await
+//! let r = hub.projects().locations_conversion_workspaces_delete(...).doit().await
+//! let r = hub.projects().locations_conversion_workspaces_patch(...).doit().await
+//! let r = hub.projects().locations_conversion_workspaces_rollback(...).doit().await
+//! let r = hub.projects().locations_conversion_workspaces_seed(...).doit().await
 //! let r = hub.projects().locations_migration_jobs_create(...).doit().await
 //! let r = hub.projects().locations_migration_jobs_delete(...).doit().await
 //! let r = hub.projects().locations_migration_jobs_patch(...).doit().await
@@ -60,6 +69,8 @@
 //! let r = hub.projects().locations_migration_jobs_stop(...).doit().await
 //! let r = hub.projects().locations_migration_jobs_verify(...).doit().await
 //! let r = hub.projects().locations_operations_get(...).doit().await
+//! let r = hub.projects().locations_private_connections_create(...).doit().await
+//! let r = hub.projects().locations_private_connections_delete(...).doit().await
 //! ```
 //! 
 //! The `resource()` and `activity(...)` calls create [builders][builder-pattern]. The second one dealing with `Activities` 
@@ -90,7 +101,7 @@
 //! use datamigration1::{Result, Error};
 //! # async fn dox() {
 //! use std::default::Default;
-//! use datamigration1::{DatabaseMigrationService, oauth2, hyper, hyper_rustls};
+//! use datamigration1::{DatabaseMigrationService, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 //! 
 //! // Get an ApplicationSecret instance by some means. It contains the `client_id` and 
 //! // `client_secret`, among other things.
@@ -114,8 +125,10 @@
 //! // execute the final call using `doit()`.
 //! // Values shown here are possibly random and not representative !
 //! let result = hub.projects().locations_connection_profiles_create(req, "parent")
-//!              .request_id("voluptua.")
-//!              .connection_profile_id("At")
+//!              .validate_only(true)
+//!              .skip_validation(true)
+//!              .request_id("Lorem")
+//!              .connection_profile_id("gubergren")
 //!              .doit().await;
 //! 
 //! match result {
@@ -201,22 +214,17 @@
 // This file was generated automatically from 'src/generator/templates/api/lib.rs.mako'
 // DO NOT EDIT !
 
-#[macro_use]
-extern crate serde_derive;
-
 // Re-export the hyper and hyper_rustls crate, they are required to build the hub
-pub extern crate hyper;
-pub extern crate hyper_rustls;
-extern crate serde;
-extern crate serde_json;
-// Re-export the yup_oauth2 crate, that is required to call some methods of the hub and the client
-pub extern crate yup_oauth2 as oauth2;
-extern crate mime;
-extern crate url;
-
+pub use hyper;
+pub use hyper_rustls;
+pub extern crate google_apis_common as client;
+pub use client::chrono;
 pub mod api;
-pub mod client;
 
 // Re-export the hub type and some basic client structs
 pub use api::DatabaseMigrationService;
-pub use client::{Result, Error, Delegate};
+pub use client::{Result, Error, Delegate, FieldMask};
+
+// Re-export the yup_oauth2 crate, that is required to call some methods of the hub and the client
+#[cfg(feature = "yup-oauth2")]
+pub use client::oauth2;

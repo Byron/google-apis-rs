@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/generator/templates/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *storage* crate version *4.0.1+20220228*, where *20220228* is the exact revision of the *storage:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v4.0.1*.
+//! This documentation was generated from *storage* crate version *5.0.2-beta-1+20230119*, where *20230119* is the exact revision of the *storage:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.2-beta-1*.
 //! 
 //! Everything else about the *storage* *v1* API can be found at the
 //! [official documentation site](https://developers.google.com/storage/docs/json_api/).
@@ -117,7 +117,7 @@
 //! use storage1::{Result, Error};
 //! # async fn dox() {
 //! use std::default::Default;
-//! use storage1::{Storage, oauth2, hyper, hyper_rustls};
+//! use storage1::{Storage, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 //! 
 //! // Get an ApplicationSecret instance by some means. It contains the `client_id` and 
 //! // `client_secret`, among other things.
@@ -141,22 +141,21 @@
 //! // execute the final call using `doit()`.
 //! // Values shown here are possibly random and not representative !
 //! let result = hub.objects().rewrite(req, "sourceBucket", "sourceObject", "destinationBucket", "destinationObject")
-//!              .user_project("sed")
-//!              .source_generation("ut")
-//!              .rewrite_token("gubergren")
-//!              .provisional_user_project("rebum.")
-//!              .projection("est")
-//!              .max_bytes_rewritten_per_call("ipsum")
-//!              .if_source_metageneration_not_match("ipsum")
-//!              .if_source_metageneration_match("est")
-//!              .if_source_generation_not_match("gubergren")
-//!              .if_source_generation_match("ea")
-//!              .if_metageneration_not_match("dolor")
-//!              .if_metageneration_match("Lorem")
-//!              .if_generation_not_match("eos")
-//!              .if_generation_match("labore")
-//!              .destination_predefined_acl("sed")
-//!              .destination_kms_key_name("duo")
+//!              .user_project("ipsum")
+//!              .source_generation(-93)
+//!              .rewrite_token("ut")
+//!              .projection("gubergren")
+//!              .max_bytes_rewritten_per_call(-16)
+//!              .if_source_metageneration_not_match(-57)
+//!              .if_source_metageneration_match(-50)
+//!              .if_source_generation_not_match(-50)
+//!              .if_source_generation_match(-7)
+//!              .if_metageneration_not_match(-62)
+//!              .if_metageneration_match(-17)
+//!              .if_generation_not_match(-99)
+//!              .if_generation_match(-56)
+//!              .destination_predefined_acl("eos")
+//!              .destination_kms_key_name("labore")
 //!              .doit().await;
 //! 
 //! match result {
@@ -242,22 +241,17 @@
 // This file was generated automatically from 'src/generator/templates/api/lib.rs.mako'
 // DO NOT EDIT !
 
-#[macro_use]
-extern crate serde_derive;
-
 // Re-export the hyper and hyper_rustls crate, they are required to build the hub
-pub extern crate hyper;
-pub extern crate hyper_rustls;
-extern crate serde;
-extern crate serde_json;
-// Re-export the yup_oauth2 crate, that is required to call some methods of the hub and the client
-pub extern crate yup_oauth2 as oauth2;
-extern crate mime;
-extern crate url;
-
+pub use hyper;
+pub use hyper_rustls;
+pub extern crate google_apis_common as client;
+pub use client::chrono;
 pub mod api;
-pub mod client;
 
 // Re-export the hub type and some basic client structs
 pub use api::Storage;
-pub use client::{Result, Error, Delegate};
+pub use client::{Result, Error, Delegate, FieldMask};
+
+// Re-export the yup_oauth2 crate, that is required to call some methods of the hub and the client
+#[cfg(feature = "yup-oauth2")]
+pub use client::oauth2;

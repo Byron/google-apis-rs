@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/generator/templates/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Bigtable Admin* crate version *4.0.1+20220222*, where *20220222* is the exact revision of the *bigtableadmin:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v4.0.1*.
+//! This documentation was generated from *Bigtable Admin* crate version *5.0.2-beta-1+20230110*, where *20230110* is the exact revision of the *bigtableadmin:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.2-beta-1*.
 //! 
 //! Everything else about the *Bigtable Admin* *v2* API can be found at the
 //! [official documentation site](https://cloud.google.com/bigtable/).
@@ -14,7 +14,7 @@
 //! * [operations](api::Operation)
 //!  * [*cancel*](api::OperationCancelCall), [*delete*](api::OperationDeleteCall), [*get*](api::OperationGetCall) and [*projects operations list*](api::OperationProjectOperationListCall)
 //! * projects
-//!  * [*instances app profiles create*](api::ProjectInstanceAppProfileCreateCall), [*instances app profiles delete*](api::ProjectInstanceAppProfileDeleteCall), [*instances app profiles get*](api::ProjectInstanceAppProfileGetCall), [*instances app profiles list*](api::ProjectInstanceAppProfileListCall), [*instances app profiles patch*](api::ProjectInstanceAppProfilePatchCall), [*instances clusters backups create*](api::ProjectInstanceClusterBackupCreateCall), [*instances clusters backups delete*](api::ProjectInstanceClusterBackupDeleteCall), [*instances clusters backups get*](api::ProjectInstanceClusterBackupGetCall), [*instances clusters backups get iam policy*](api::ProjectInstanceClusterBackupGetIamPolicyCall), [*instances clusters backups list*](api::ProjectInstanceClusterBackupListCall), [*instances clusters backups patch*](api::ProjectInstanceClusterBackupPatchCall), [*instances clusters backups set iam policy*](api::ProjectInstanceClusterBackupSetIamPolicyCall), [*instances clusters backups test iam permissions*](api::ProjectInstanceClusterBackupTestIamPermissionCall), [*instances clusters create*](api::ProjectInstanceClusterCreateCall), [*instances clusters delete*](api::ProjectInstanceClusterDeleteCall), [*instances clusters get*](api::ProjectInstanceClusterGetCall), [*instances clusters list*](api::ProjectInstanceClusterListCall), [*instances clusters partial update cluster*](api::ProjectInstanceClusterPartialUpdateClusterCall), [*instances clusters update*](api::ProjectInstanceClusterUpdateCall), [*instances create*](api::ProjectInstanceCreateCall), [*instances delete*](api::ProjectInstanceDeleteCall), [*instances get*](api::ProjectInstanceGetCall), [*instances get iam policy*](api::ProjectInstanceGetIamPolicyCall), [*instances list*](api::ProjectInstanceListCall), [*instances partial update instance*](api::ProjectInstancePartialUpdateInstanceCall), [*instances set iam policy*](api::ProjectInstanceSetIamPolicyCall), [*instances tables check consistency*](api::ProjectInstanceTableCheckConsistencyCall), [*instances tables create*](api::ProjectInstanceTableCreateCall), [*instances tables delete*](api::ProjectInstanceTableDeleteCall), [*instances tables drop row range*](api::ProjectInstanceTableDropRowRangeCall), [*instances tables generate consistency token*](api::ProjectInstanceTableGenerateConsistencyTokenCall), [*instances tables get*](api::ProjectInstanceTableGetCall), [*instances tables get iam policy*](api::ProjectInstanceTableGetIamPolicyCall), [*instances tables list*](api::ProjectInstanceTableListCall), [*instances tables modify column families*](api::ProjectInstanceTableModifyColumnFamilyCall), [*instances tables restore*](api::ProjectInstanceTableRestoreCall), [*instances tables set iam policy*](api::ProjectInstanceTableSetIamPolicyCall), [*instances tables test iam permissions*](api::ProjectInstanceTableTestIamPermissionCall), [*instances test iam permissions*](api::ProjectInstanceTestIamPermissionCall), [*instances update*](api::ProjectInstanceUpdateCall), [*locations get*](api::ProjectLocationGetCall) and [*locations list*](api::ProjectLocationListCall)
+//!  * [*instances app profiles create*](api::ProjectInstanceAppProfileCreateCall), [*instances app profiles delete*](api::ProjectInstanceAppProfileDeleteCall), [*instances app profiles get*](api::ProjectInstanceAppProfileGetCall), [*instances app profiles list*](api::ProjectInstanceAppProfileListCall), [*instances app profiles patch*](api::ProjectInstanceAppProfilePatchCall), [*instances clusters backups copy*](api::ProjectInstanceClusterBackupCopyCall), [*instances clusters backups create*](api::ProjectInstanceClusterBackupCreateCall), [*instances clusters backups delete*](api::ProjectInstanceClusterBackupDeleteCall), [*instances clusters backups get*](api::ProjectInstanceClusterBackupGetCall), [*instances clusters backups get iam policy*](api::ProjectInstanceClusterBackupGetIamPolicyCall), [*instances clusters backups list*](api::ProjectInstanceClusterBackupListCall), [*instances clusters backups patch*](api::ProjectInstanceClusterBackupPatchCall), [*instances clusters backups set iam policy*](api::ProjectInstanceClusterBackupSetIamPolicyCall), [*instances clusters backups test iam permissions*](api::ProjectInstanceClusterBackupTestIamPermissionCall), [*instances clusters create*](api::ProjectInstanceClusterCreateCall), [*instances clusters delete*](api::ProjectInstanceClusterDeleteCall), [*instances clusters get*](api::ProjectInstanceClusterGetCall), [*instances clusters hot tablets list*](api::ProjectInstanceClusterHotTabletListCall), [*instances clusters list*](api::ProjectInstanceClusterListCall), [*instances clusters partial update cluster*](api::ProjectInstanceClusterPartialUpdateClusterCall), [*instances clusters update*](api::ProjectInstanceClusterUpdateCall), [*instances create*](api::ProjectInstanceCreateCall), [*instances delete*](api::ProjectInstanceDeleteCall), [*instances get*](api::ProjectInstanceGetCall), [*instances get iam policy*](api::ProjectInstanceGetIamPolicyCall), [*instances list*](api::ProjectInstanceListCall), [*instances partial update instance*](api::ProjectInstancePartialUpdateInstanceCall), [*instances set iam policy*](api::ProjectInstanceSetIamPolicyCall), [*instances tables check consistency*](api::ProjectInstanceTableCheckConsistencyCall), [*instances tables create*](api::ProjectInstanceTableCreateCall), [*instances tables delete*](api::ProjectInstanceTableDeleteCall), [*instances tables drop row range*](api::ProjectInstanceTableDropRowRangeCall), [*instances tables generate consistency token*](api::ProjectInstanceTableGenerateConsistencyTokenCall), [*instances tables get*](api::ProjectInstanceTableGetCall), [*instances tables get iam policy*](api::ProjectInstanceTableGetIamPolicyCall), [*instances tables list*](api::ProjectInstanceTableListCall), [*instances tables modify column families*](api::ProjectInstanceTableModifyColumnFamilyCall), [*instances tables patch*](api::ProjectInstanceTablePatchCall), [*instances tables restore*](api::ProjectInstanceTableRestoreCall), [*instances tables set iam policy*](api::ProjectInstanceTableSetIamPolicyCall), [*instances tables test iam permissions*](api::ProjectInstanceTableTestIamPermissionCall), [*instances tables undelete*](api::ProjectInstanceTableUndeleteCall), [*instances test iam permissions*](api::ProjectInstanceTestIamPermissionCall), [*instances update*](api::ProjectInstanceUpdateCall), [*locations get*](api::ProjectLocationGetCall) and [*locations list*](api::ProjectLocationListCall)
 //! 
 //! 
 //! 
@@ -54,11 +54,14 @@
 //! let r = hub.operations().delete(...).doit().await
 //! let r = hub.operations().get(...).doit().await
 //! let r = hub.projects().instances_app_profiles_patch(...).doit().await
+//! let r = hub.projects().instances_clusters_backups_copy(...).doit().await
 //! let r = hub.projects().instances_clusters_backups_create(...).doit().await
 //! let r = hub.projects().instances_clusters_create(...).doit().await
 //! let r = hub.projects().instances_clusters_partial_update_cluster(...).doit().await
 //! let r = hub.projects().instances_clusters_update(...).doit().await
+//! let r = hub.projects().instances_tables_patch(...).doit().await
 //! let r = hub.projects().instances_tables_restore(...).doit().await
+//! let r = hub.projects().instances_tables_undelete(...).doit().await
 //! let r = hub.projects().instances_create(...).doit().await
 //! let r = hub.projects().instances_partial_update_instance(...).doit().await
 //! ```
@@ -90,7 +93,7 @@
 //! use bigtableadmin2::{Result, Error};
 //! # async fn dox() {
 //! use std::default::Default;
-//! use bigtableadmin2::{BigtableAdmin, oauth2, hyper, hyper_rustls};
+//! use bigtableadmin2::{BigtableAdmin, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 //! 
 //! // Get an ApplicationSecret instance by some means. It contains the `client_id` and 
 //! // `client_secret`, among other things.
@@ -197,22 +200,17 @@
 // This file was generated automatically from 'src/generator/templates/api/lib.rs.mako'
 // DO NOT EDIT !
 
-#[macro_use]
-extern crate serde_derive;
-
 // Re-export the hyper and hyper_rustls crate, they are required to build the hub
-pub extern crate hyper;
-pub extern crate hyper_rustls;
-extern crate serde;
-extern crate serde_json;
-// Re-export the yup_oauth2 crate, that is required to call some methods of the hub and the client
-pub extern crate yup_oauth2 as oauth2;
-extern crate mime;
-extern crate url;
-
+pub use hyper;
+pub use hyper_rustls;
+pub extern crate google_apis_common as client;
+pub use client::chrono;
 pub mod api;
-pub mod client;
 
 // Re-export the hub type and some basic client structs
 pub use api::BigtableAdmin;
-pub use client::{Result, Error, Delegate};
+pub use client::{Result, Error, Delegate, FieldMask};
+
+// Re-export the yup_oauth2 crate, that is required to call some methods of the hub and the client
+#[cfg(feature = "yup-oauth2")]
+pub use client::oauth2;

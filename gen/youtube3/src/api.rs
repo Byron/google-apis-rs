@@ -1704,6 +1704,11 @@ impl client::Part for ChannelStatus {}
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ChannelToStoreLinkDetails {
+    /// Google Merchant Center id of the store.
+    #[serde(rename="merchantId")]
+    
+    #[serde_as(as = "Option<::client::serde_with::DisplayFromStr>")]
+    pub merchant_id: Option<u64>,
     /// Name of the store.
     #[serde(rename="storeName")]
     
@@ -2400,6 +2405,64 @@ pub struct ContentRating {
 impl client::Part for ContentRating {}
 
 
+/// Note that there may be a 5-second end-point resolution issue. For instance, if a cuepoint comes in for 22:03:27, we may stuff the cuepoint into 22:03:25 or 22:03:30, depending. This is an artifact of HLS.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [insert cuepoint live broadcasts](LiveBroadcastInsertCuepointCall) (request|response)
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Cuepoint {
+    /// no description provided
+    #[serde(rename="cueType")]
+    
+    pub cue_type: Option<String>,
+    /// The duration of this cuepoint.
+    #[serde(rename="durationSecs")]
+    
+    pub duration_secs: Option<u32>,
+    /// no description provided
+    
+    pub etag: Option<String>,
+    /// The identifier for cuepoint resource.
+    
+    pub id: Option<String>,
+    /// The time when the cuepoint should be inserted by offset to the broadcast actual start time.
+    #[serde(rename="insertionOffsetTimeMs")]
+    
+    #[serde_as(as = "Option<::client::serde_with::DisplayFromStr>")]
+    pub insertion_offset_time_ms: Option<i64>,
+    /// The wall clock time at which the cuepoint should be inserted. Only one of insertion_offset_time_ms and walltime_ms may be set at a time.
+    #[serde(rename="walltimeMs")]
+    
+    #[serde_as(as = "Option<::client::serde_with::DisplayFromStr>")]
+    pub walltime_ms: Option<u64>,
+}
+
+impl client::RequestValue for Cuepoint {}
+impl client::ResponseResult for Cuepoint {}
+
+impl client::ToParts for Cuepoint {
+    /// Return a comma separated list of members that are currently set, i.e. for which `self.member.is_some()`.
+    /// The produced string is suitable for use as a parts list that indicates the parts you are sending, and/or
+    /// the parts you want to see in the server response.
+    fn to_parts(&self) -> String {
+        let mut r = String::new();
+        if self.cue_type.is_some() { r = r + "cueType,"; }
+        if self.duration_secs.is_some() { r = r + "durationSecs,"; }
+        if self.etag.is_some() { r = r + "etag,"; }
+        if self.id.is_some() { r = r + "id,"; }
+        if self.insertion_offset_time_ms.is_some() { r = r + "insertionOffsetTimeMs,"; }
+        if self.walltime_ms.is_some() { r = r + "walltimeMs,"; }
+        r.pop();
+        r
+    }
+}
+
 /// There is no detailed description.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -2918,6 +2981,7 @@ impl client::Part for LevelDetails {}
 /// * [bind live broadcasts](LiveBroadcastBindCall) (response)
 /// * [delete live broadcasts](LiveBroadcastDeleteCall) (none)
 /// * [insert live broadcasts](LiveBroadcastInsertCall) (request|response)
+/// * [insert cuepoint live broadcasts](LiveBroadcastInsertCuepointCall) (none)
 /// * [list live broadcasts](LiveBroadcastListCall) (none)
 /// * [transition live broadcasts](LiveBroadcastTransitionCall) (response)
 /// * [update live broadcasts](LiveBroadcastUpdateCall) (request|response)
@@ -3179,6 +3243,11 @@ impl client::Part for LiveBroadcastSnippet {}
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct LiveBroadcastStatistics {
+    /// The number of viewers currently watching the broadcast. The property and its value will be present if the broadcast has current viewers and the broadcast owner has not hidden the viewcount for the video. Note that YouTube stops tracking the number of concurrent viewers for a broadcast when the broadcast ends. So, this property would not identify the number of viewers watching an archived video of a live broadcast that already ended.
+    #[serde(rename="concurrentViewers")]
+    
+    #[serde_as(as = "Option<::client::serde_with::DisplayFromStr>")]
+    pub concurrent_viewers: Option<u64>,
     /// The total number of live chat messages currently on the broadcast. The property and its value will be present if the broadcast is public, has the live chat feature enabled, and has at least one message. Note that this field will not be filled after the broadcast ends. So this property would not identify the number of chat messages for an archived video of a completed live broadcast.
     #[serde(rename="totalChatCount")]
     
@@ -3334,6 +3403,30 @@ impl client::Part for LiveChatFanFundingEventDetails {}
 /// 
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct LiveChatGiftMembershipReceivedDetails {
+    /// The ID of the membership gifting message that is related to this gift membership. This ID will always refer to a message whose type is 'membershipGiftingEvent'.
+    #[serde(rename="associatedMembershipGiftingMessageId")]
+    
+    pub associated_membership_gifting_message_id: Option<String>,
+    /// The ID of the user that made the membership gifting purchase. This matches the `snippet.authorChannelId` of the associated membership gifting message.
+    #[serde(rename="gifterChannelId")]
+    
+    pub gifter_channel_id: Option<String>,
+    /// The name of the Level at which the viewer is a member. This matches the `snippet.membershipGiftingDetails.giftMembershipsLevelName` of the associated membership gifting message. The Level names are defined by the YouTube channel offering the Membership. In some situations this field isn't filled.
+    #[serde(rename="memberLevelName")]
+    
+    pub member_level_name: Option<String>,
+}
+
+impl client::Part for LiveChatGiftMembershipReceivedDetails {}
+
+
+/// There is no detailed description.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct LiveChatMemberMilestoneChatDetails {
     /// The name of the Level at which the viever is a member. The Level names are defined by the YouTube channel offering the Membership. In some situations this field isn't filled.
     #[serde(rename="memberLevelName")]
@@ -3350,6 +3443,26 @@ pub struct LiveChatMemberMilestoneChatDetails {
 }
 
 impl client::Part for LiveChatMemberMilestoneChatDetails {}
+
+
+/// There is no detailed description.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct LiveChatMembershipGiftingDetails {
+    /// The number of gift memberships purchased by the user.
+    #[serde(rename="giftMembershipsCount")]
+    
+    pub gift_memberships_count: Option<i32>,
+    /// The name of the level of the gift memberships purchased by the user. The Level names are defined by the YouTube channel offering the Membership. In some situations this field isn't filled.
+    #[serde(rename="giftMembershipsLevelName")]
+    
+    pub gift_memberships_level_name: Option<String>,
+}
+
+impl client::Part for LiveChatMembershipGiftingDetails {}
 
 
 /// A *liveChatMessage* resource represents a chat message in a YouTube Live Chat.
@@ -3554,14 +3667,14 @@ pub struct LiveChatMessageRetractedDetails {
 impl client::Part for LiveChatMessageRetractedDetails {}
 
 
-/// Next ID: 31
+/// Next ID: 33
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct LiveChatMessageSnippet {
-    /// The ID of the user that authored this message, this field is not always filled. textMessageEvent - the user that wrote the message fanFundingEvent - the user that funded the broadcast newSponsorEvent - the user that just became a sponsor memberMilestoneChatEvent - the member that sent the message messageDeletedEvent - the moderator that took the action messageRetractedEvent - the author that retracted their message userBannedEvent - the moderator that took the action superChatEvent - the user that made the purchase superStickerEvent - the user that made the purchase
+    /// The ID of the user that authored this message, this field is not always filled. textMessageEvent - the user that wrote the message fanFundingEvent - the user that funded the broadcast newSponsorEvent - the user that just became a sponsor memberMilestoneChatEvent - the member that sent the message membershipGiftingEvent - the user that made the purchase giftMembershipReceivedEvent - the user that received the gift membership messageDeletedEvent - the moderator that took the action messageRetractedEvent - the author that retracted their message userBannedEvent - the moderator that took the action superChatEvent - the user that made the purchase superStickerEvent - the user that made the purchase
     #[serde(rename="authorChannelId")]
     
     pub author_channel_id: Option<String>,
@@ -3573,6 +3686,10 @@ pub struct LiveChatMessageSnippet {
     #[serde(rename="fanFundingEventDetails")]
     
     pub fan_funding_event_details: Option<LiveChatFanFundingEventDetails>,
+    /// Details about the Gift Membership Received event, this is only set if the type is 'giftMembershipReceivedEvent'.
+    #[serde(rename="giftMembershipReceivedDetails")]
+    
+    pub gift_membership_received_details: Option<LiveChatGiftMembershipReceivedDetails>,
     /// Whether the message has display content that should be displayed to users.
     #[serde(rename="hasDisplayContent")]
     
@@ -3585,6 +3702,10 @@ pub struct LiveChatMessageSnippet {
     #[serde(rename="memberMilestoneChatDetails")]
     
     pub member_milestone_chat_details: Option<LiveChatMemberMilestoneChatDetails>,
+    /// Details about the Membership Gifting event, this is only set if the type is 'membershipGiftingEvent'.
+    #[serde(rename="membershipGiftingDetails")]
+    
+    pub membership_gifting_details: Option<LiveChatMembershipGiftingDetails>,
     /// no description provided
     #[serde(rename="messageDeletedDetails")]
     
@@ -5660,7 +5781,7 @@ impl client::Part for TestItemTestItemSnippet {}
 /// 
 /// * [delete third party links](ThirdPartyLinkDeleteCall) (none)
 /// * [insert third party links](ThirdPartyLinkInsertCall) (request|response)
-/// * [list third party links](ThirdPartyLinkListCall) (response)
+/// * [list third party links](ThirdPartyLinkListCall) (none)
 /// * [update third party links](ThirdPartyLinkUpdateCall) (request|response)
 /// 
 #[serde_with::serde_as(crate = "::client::serde_with")]
@@ -5699,6 +5820,45 @@ impl client::ToParts for ThirdPartyLink {
         if self.linking_token.is_some() { r = r + "linkingToken,"; }
         if self.snippet.is_some() { r = r + "snippet,"; }
         if self.status.is_some() { r = r + "status,"; }
+        r.pop();
+        r
+    }
+}
+
+/// There is no detailed description.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [list third party links](ThirdPartyLinkListCall) (response)
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ThirdPartyLinkListResponse {
+    /// Etag of this resource.
+    
+    pub etag: Option<String>,
+    /// no description provided
+    
+    pub items: Option<Vec<ThirdPartyLink>>,
+    /// Identifies what kind of resource this is. Value: the fixed string "youtube#thirdPartyLinkListResponse".
+    
+    pub kind: Option<String>,
+}
+
+impl client::ResponseResult for ThirdPartyLinkListResponse {}
+
+impl client::ToParts for ThirdPartyLinkListResponse {
+    /// Return a comma separated list of members that are currently set, i.e. for which `self.member.is_some()`.
+    /// The produced string is suitable for use as a parts list that indicates the parts you are sending, and/or
+    /// the parts you want to see in the server response.
+    fn to_parts(&self) -> String {
+        let mut r = String::new();
+        if self.etag.is_some() { r = r + "etag,"; }
+        if self.items.is_some() { r = r + "items,"; }
+        if self.kind.is_some() { r = r + "kind,"; }
         r.pop();
         r
     }
@@ -6855,7 +7015,7 @@ pub struct VideoStatistics {
 impl client::Part for VideoStatistics {}
 
 
-/// Basic details about a video category, such as its localized title. Next Id: 17
+/// Basic details about a video category, such as its localized title. Next Id: 18
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
@@ -7975,7 +8135,7 @@ impl<'a, S> I18nRegionMethods<'a, S> {
 ///     ).build().await.unwrap();
 /// let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
-/// // like `bind(...)`, `delete(...)`, `insert(...)`, `list(...)`, `transition(...)` and `update(...)`
+/// // like `bind(...)`, `delete(...)`, `insert(...)`, `insert_cuepoint(...)`, `list(...)`, `transition(...)` and `update(...)`
 /// // to build up your call.
 /// let rb = hub.live_broadcasts();
 /// # }
@@ -8047,6 +8207,27 @@ impl<'a, S> LiveBroadcastMethods<'a, S> {
             _part: parts,
             _on_behalf_of_content_owner_channel: Default::default(),
             _on_behalf_of_content_owner: Default::default(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Insert cuepoints in a broadcast
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    pub fn insert_cuepoint(&self, request: Cuepoint) -> LiveBroadcastInsertCuepointCall<'a, S> {
+        LiveBroadcastInsertCuepointCall {
+            hub: self.hub,
+            _request: request,
+            _part: Default::default(),
+            _on_behalf_of_content_owner_channel: Default::default(),
+            _on_behalf_of_content_owner: Default::default(),
+            _id: Default::default(),
             _delegate: Default::default(),
             _additional_params: Default::default(),
             _scopes: Default::default(),
@@ -18537,6 +18718,370 @@ where
 }
 
 
+/// Insert cuepoints in a broadcast
+///
+/// A builder for the *insertCuepoint* method supported by a *liveBroadcast* resource.
+/// It is not used directly, but through a [`LiveBroadcastMethods`] instance.
+///
+/// **Settable Parts**
+/// 
+/// * *id*
+/// * *snippet*
+/// * *contentDetails*
+/// * *status*
+///
+/// # Scopes
+///
+/// You will need authorization for at least one of the following scopes to make a valid call, possibly depending on *parts*:
+///
+/// * *https://www.googleapis.com/auth/youtube*
+/// * *https://www.googleapis.com/auth/youtube.force-ssl*
+/// * *https://www.googleapis.com/auth/youtubepartner*
+///
+/// The default scope will be `Scope::Full`.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_youtube3 as youtube3;
+/// use youtube3::api::Cuepoint;
+/// # async fn dox() {
+/// # use std::default::Default;
+/// # use youtube3::{YouTube, oauth2, hyper, hyper_rustls, chrono, FieldMask};
+/// 
+/// # let secret: oauth2::ApplicationSecret = Default::default();
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
+/// #         secret,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     ).build().await.unwrap();
+/// # let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = Cuepoint::default();
+/// req.id = Some("consetetur".to_string());
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.live_broadcasts().insert_cuepoint(req)
+///              .add_part("Stet")
+///              .on_behalf_of_content_owner_channel("est")
+///              .on_behalf_of_content_owner("aliquyam")
+///              .id("elitr")
+///              .doit().await;
+/// # }
+/// ```
+pub struct LiveBroadcastInsertCuepointCall<'a, S>
+    where S: 'a {
+
+    hub: &'a YouTube<S>,
+    _request: Cuepoint,
+    _part: Vec<String>,
+    _on_behalf_of_content_owner_channel: Option<String>,
+    _on_behalf_of_content_owner: Option<String>,
+    _id: Option<String>,
+    _delegate: Option<&'a mut dyn client::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>
+}
+
+impl<'a, S> client::CallBuilder for LiveBroadcastInsertCuepointCall<'a, S> {}
+
+impl<'a, S> LiveBroadcastInsertCuepointCall<'a, S>
+where
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
+
+
+    /// Perform the operation you have build so far.
+    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, Cuepoint)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
+        let mut dd = client::DefaultDelegate;
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(client::MethodInfo { id: "youtube.liveBroadcasts.insertCuepoint",
+                               http_method: hyper::Method::POST });
+
+        for &field in ["alt", "part", "onBehalfOfContentOwnerChannel", "onBehalfOfContentOwner", "id"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(client::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(7 + self._additional_params.len());
+        if self._part.is_empty() {
+            self._part.push(self._request.to_parts());
+        }
+        if self._part.len() > 0 {
+            for f in self._part.iter() {
+                params.push("part", f);
+            }
+        }
+        if let Some(value) = self._on_behalf_of_content_owner_channel.as_ref() {
+            params.push("onBehalfOfContentOwnerChannel", value);
+        }
+        if let Some(value) = self._on_behalf_of_content_owner.as_ref() {
+            params.push("onBehalfOfContentOwner", value);
+        }
+        if let Some(value) = self._id.as_ref() {
+            params.push("id", value);
+        }
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "youtube/v3/liveBroadcasts/cuepoint";
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::Full.as_ref().to_string());
+        }
+
+
+        let url = params.parse_with_url(&url);
+
+        let mut json_mime_type = mime::APPLICATION_JSON;
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                client::remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
+                            dlg.finished(false);
+                            return Err(client::Error::MissingToken(e));
+                        }
+                    }
+                }
+            };
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::POST)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+
+                        let request = req_builder
+                        .header(CONTENT_TYPE, json_mime_type.to_string())
+                        .header(CONTENT_LENGTH, request_size as u64)
+                        .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
+
+                client.request(request.unwrap()).await
+
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(client::Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
+
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
+
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
+                        }
+                    }
+                    let result_value = {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+
+                        match json::from_str(&res_body_string) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&res_body_string, &err);
+                                return Err(client::Error::JsonDecodeError(res_body_string, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    ///
+    /// **Settable Parts**
+    /// 
+    /// * *id*
+    /// * *snippet*
+    /// * *contentDetails*
+    /// * *status*
+    pub fn request(mut self, new_value: Cuepoint) -> LiveBroadcastInsertCuepointCall<'a, S> {
+        self._request = new_value;
+        self
+    }
+    /// The *part* parameter specifies a comma-separated list of one or more liveBroadcast resource properties that the API response will include. The part names that you can include in the parameter value are id, snippet, contentDetails, and status.
+    ///
+    /// Append the given value to the *part* query property.
+    /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
+    ///
+    /// Even though the *parts* list is automatically derived from *Resource* passed in
+    /// during instantiation and indicates which values you are passing, the response would contain the very same parts.
+    /// This may not always be desirable, as you can obtain (newly generated) parts you cannot pass in,
+    /// like statistics that are generated server side. Therefore you should use this method to specify
+    /// the parts you provide in addition to the ones you want in the response.
+    ///
+    /// **Settable Parts**
+    /// 
+    /// * *id*
+    /// * *snippet*
+    /// * *contentDetails*
+    /// * *status*
+    pub fn add_part(mut self, new_value: &str) -> LiveBroadcastInsertCuepointCall<'a, S> {
+        self._part.push(new_value.to_string());
+        self
+    }
+    /// This parameter can only be used in a properly authorized request. *Note:* This parameter is intended exclusively for YouTube content partners. The *onBehalfOfContentOwnerChannel* parameter specifies the YouTube channel ID of the channel to which a video is being added. This parameter is required when a request specifies a value for the onBehalfOfContentOwner parameter, and it can only be used in conjunction with that parameter. In addition, the request must be authorized using a CMS account that is linked to the content owner that the onBehalfOfContentOwner parameter specifies. Finally, the channel that the onBehalfOfContentOwnerChannel parameter value specifies must be linked to the content owner that the onBehalfOfContentOwner parameter specifies. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and perform actions on behalf of the channel specified in the parameter value, without having to provide authentication credentials for each separate channel.
+    ///
+    /// Sets the *on behalf of content owner channel* query property to the given value.
+    pub fn on_behalf_of_content_owner_channel(mut self, new_value: &str) -> LiveBroadcastInsertCuepointCall<'a, S> {
+        self._on_behalf_of_content_owner_channel = Some(new_value.to_string());
+        self
+    }
+    /// *Note:* This parameter is intended exclusively for YouTube content partners. The *onBehalfOfContentOwner* parameter indicates that the request's authorization credentials identify a YouTube CMS user who is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The CMS account that the user authenticates with must be linked to the specified YouTube content owner.
+    ///
+    /// Sets the *on behalf of content owner* query property to the given value.
+    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> LiveBroadcastInsertCuepointCall<'a, S> {
+        self._on_behalf_of_content_owner = Some(new_value.to_string());
+        self
+    }
+    /// Broadcast to insert ads to, or equivalently `external_video_id` for internal use.
+    ///
+    /// Sets the *id* query property to the given value.
+    pub fn id(mut self, new_value: &str) -> LiveBroadcastInsertCuepointCall<'a, S> {
+        self._id = Some(new_value.to_string());
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> LiveBroadcastInsertCuepointCall<'a, S> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(mut self, name: T, value: T) -> LiveBroadcastInsertCuepointCall<'a, S>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::Full`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(mut self, scope: St) -> LiveBroadcastInsertCuepointCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> LiveBroadcastInsertCuepointCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> LiveBroadcastInsertCuepointCall<'a, S> {
+        self._scopes.clear();
+        self
+    }
+}
+
+
 /// Retrieve the list of broadcasts associated with the given channel.
 ///
 /// A builder for the *list* method supported by a *liveBroadcast* resource.
@@ -18581,15 +19126,15 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.live_broadcasts().list(&vec!["consetetur".into()])
-///              .page_token("Stet")
+/// let result = hub.live_broadcasts().list(&vec!["duo".into()])
+///              .page_token("diam")
 ///              .on_behalf_of_content_owner_channel("est")
-///              .on_behalf_of_content_owner("aliquyam")
+///              .on_behalf_of_content_owner("sit")
 ///              .mine(false)
-///              .max_results(81)
-///              .add_id("diam")
-///              .broadcast_type("est")
-///              .broadcast_status("sit")
+///              .max_results(26)
+///              .add_id("Lorem")
+///              .broadcast_type("ea")
+///              .broadcast_status("Stet")
 ///              .doit().await;
 /// # }
 /// ```
@@ -18962,9 +19507,9 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.live_broadcasts().transition("broadcastStatus", "id", &vec!["Lorem".into()])
-///              .on_behalf_of_content_owner_channel("ea")
-///              .on_behalf_of_content_owner("Stet")
+/// let result = hub.live_broadcasts().transition("broadcastStatus", "id", &vec!["et".into()])
+///              .on_behalf_of_content_owner_channel("sea")
+///              .on_behalf_of_content_owner("et")
 ///              .doit().await;
 /// # }
 /// ```
@@ -19295,7 +19840,7 @@ where
 /// // Values shown here are possibly random and not representative !
 /// let mut req = LiveBroadcast::default();
 /// req.content_details = Default::default(); // is LiveBroadcastContentDetails
-/// req.id = Some("dolores".to_string());
+/// req.id = Some("At".to_string());
 /// req.snippet = Default::default(); // is LiveBroadcastSnippet
 /// req.status = Default::default(); // is LiveBroadcastStatus
 /// 
@@ -19303,8 +19848,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.live_broadcasts().update(req)
-///              .on_behalf_of_content_owner_channel("eos")
-///              .on_behalf_of_content_owner("et")
+///              .on_behalf_of_content_owner_channel("dolore")
+///              .on_behalf_of_content_owner("eirmod")
 ///              .doit().await;
 /// # }
 /// ```
@@ -20718,11 +21263,11 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.live_chat_messages().list("liveChatId", &vec!["dolore".into()])
-///              .profile_image_size(61)
-///              .page_token("Lorem")
-///              .max_results(78)
-///              .hl("amet")
+/// let result = hub.live_chat_messages().list("liveChatId", &vec!["erat".into()])
+///              .profile_image_size(32)
+///              .page_token("erat")
+///              .max_results(28)
+///              .hl("sea")
 ///              .doit().await;
 /// # }
 /// ```
@@ -21594,9 +22139,9 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.live_chat_moderators().list("liveChatId", &vec!["erat".into()])
-///              .page_token("accusam")
-///              .max_results(91)
+/// let result = hub.live_chat_moderators().list("liveChatId", &vec!["et".into()])
+///              .page_token("At")
+///              .max_results(97)
 ///              .doit().await;
 /// # }
 /// ```
@@ -21895,8 +22440,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.live_streams().delete("id")
-///              .on_behalf_of_content_owner_channel("Lorem")
-///              .on_behalf_of_content_owner("et")
+///              .on_behalf_of_content_owner_channel("sit")
+///              .on_behalf_of_content_owner("erat")
 ///              .doit().await;
 /// # }
 /// ```
@@ -22180,7 +22725,7 @@ where
 /// // Values shown here are possibly random and not representative !
 /// let mut req = LiveStream::default();
 /// req.cdn = Default::default(); // is CdnSettings
-/// req.id = Some("At".to_string());
+/// req.id = Some("sea".to_string());
 /// req.snippet = Default::default(); // is LiveStreamSnippet
 /// req.status = Default::default(); // is LiveStreamStatus
 /// 
@@ -22188,7 +22733,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.live_streams().insert(req)
-///              .on_behalf_of_content_owner_channel("dolor")
+///              .on_behalf_of_content_owner_channel("nonumy")
 ///              .on_behalf_of_content_owner("et")
 ///              .doit().await;
 /// # }
@@ -22533,13 +23078,13 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.live_streams().list(&vec!["sit".into()])
-///              .page_token("erat")
+/// let result = hub.live_streams().list(&vec!["gubergren".into()])
+///              .page_token("justo")
 ///              .on_behalf_of_content_owner_channel("sea")
-///              .on_behalf_of_content_owner("nonumy")
-///              .mine(true)
-///              .max_results(5)
-///              .add_id("sit")
+///              .on_behalf_of_content_owner("consetetur")
+///              .mine(false)
+///              .max_results(69)
+///              .add_id("eos")
 ///              .doit().await;
 /// # }
 /// ```
@@ -22892,7 +23437,7 @@ where
 /// // Values shown here are possibly random and not representative !
 /// let mut req = LiveStream::default();
 /// req.cdn = Default::default(); // is CdnSettings
-/// req.id = Some("aliquyam".to_string());
+/// req.id = Some("At".to_string());
 /// req.snippet = Default::default(); // is LiveStreamSnippet
 /// req.status = Default::default(); // is LiveStreamStatus
 /// 
@@ -22900,8 +23445,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.live_streams().update(req)
-///              .on_behalf_of_content_owner_channel("eos")
-///              .on_behalf_of_content_owner("At")
+///              .on_behalf_of_content_owner_channel("dolores")
+///              .on_behalf_of_content_owner("consetetur")
 ///              .doit().await;
 /// # }
 /// ```
@@ -23226,12 +23771,12 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.members().list(&vec!["dolores".into()])
-///              .page_token("consetetur")
-///              .mode("gubergren")
-///              .max_results(97)
-///              .has_access_to_level("aliquyam")
-///              .filter_by_member_channel_id("no")
+/// let result = hub.members().list(&vec!["gubergren".into()])
+///              .page_token("dolor")
+///              .mode("aliquyam")
+///              .max_results(40)
+///              .has_access_to_level("amet.")
+///              .filter_by_member_channel_id("ipsum")
 ///              .doit().await;
 /// # }
 /// ```
@@ -23556,7 +24101,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.memberships_levels().list(&vec!["amet.".into()])
+/// let result = hub.memberships_levels().list(&vec!["Lorem".into()])
 ///              .doit().await;
 /// # }
 /// ```
@@ -23821,7 +24366,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.playlist_items().delete("id")
-///              .on_behalf_of_content_owner("Lorem")
+///              .on_behalf_of_content_owner("gubergren")
 ///              .doit().await;
 /// # }
 /// ```
@@ -24081,7 +24626,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.playlist_items().insert(req)
-///              .on_behalf_of_content_owner("accusam")
+///              .on_behalf_of_content_owner("sadipscing")
 ///              .doit().await;
 /// # }
 /// ```
@@ -24381,13 +24926,13 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.playlist_items().list(&vec!["gubergren".into()])
-///              .video_id("sadipscing")
-///              .playlist_id("At")
+/// let result = hub.playlist_items().list(&vec!["At".into()])
+///              .video_id("sit")
+///              .playlist_id("duo")
 ///              .page_token("sit")
-///              .on_behalf_of_content_owner("duo")
-///              .max_results(48)
-///              .add_id("magna")
+///              .on_behalf_of_content_owner("magna")
+///              .max_results(79)
+///              .add_id("rebum.")
 ///              .doit().await;
 /// # }
 /// ```
@@ -24721,7 +25266,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.playlist_items().update(req)
-///              .on_behalf_of_content_owner("et")
+///              .on_behalf_of_content_owner("dolor")
 ///              .doit().await;
 /// # }
 /// ```
@@ -25022,7 +25567,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.playlists().delete("id")
-///              .on_behalf_of_content_owner("dolor")
+///              .on_behalf_of_content_owner("justo")
 ///              .doit().await;
 /// # }
 /// ```
@@ -25282,8 +25827,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.playlists().insert(req)
-///              .on_behalf_of_content_owner_channel("Lorem")
-///              .on_behalf_of_content_owner("justo")
+///              .on_behalf_of_content_owner_channel("amet.")
+///              .on_behalf_of_content_owner("no")
 ///              .doit().await;
 /// # }
 /// ```
@@ -25594,15 +26139,15 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.playlists().list(&vec!["amet.".into()])
-///              .page_token("no")
-///              .on_behalf_of_content_owner_channel("nonumy")
-///              .on_behalf_of_content_owner("sed")
-///              .mine(false)
-///              .max_results(43)
-///              .add_id("nonumy")
-///              .hl("rebum.")
-///              .channel_id("tempor")
+/// let result = hub.playlists().list(&vec!["nonumy".into()])
+///              .page_token("sed")
+///              .on_behalf_of_content_owner_channel("kasd")
+///              .on_behalf_of_content_owner("Lorem")
+///              .mine(true)
+///              .max_results(10)
+///              .add_id("rebum.")
+///              .hl("tempor")
+///              .channel_id("dolore")
 ///              .doit().await;
 /// # }
 /// ```
@@ -25837,7 +26382,7 @@ where
         self._id.push(new_value.to_string());
         self
     }
-    /// Returen content in specified language
+    /// Return content in specified language
     ///
     /// Sets the *hl* query property to the given value.
     pub fn hl(mut self, new_value: &str) -> PlaylistListCall<'a, S> {
@@ -25959,7 +26504,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.playlists().update(req)
-///              .on_behalf_of_content_owner("dolore")
+///              .on_behalf_of_content_owner("eos")
 ///              .doit().await;
 /// # }
 /// ```
@@ -26259,37 +26804,37 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.search().list(&vec!["eos".into()])
-///              .video_type("amet.")
-///              .video_syndicated("dolore")
-///              .video_license("amet")
-///              .video_embeddable("ut")
-///              .video_duration("At")
-///              .video_dimension("sit")
-///              .video_definition("vero")
-///              .video_category_id("duo")
-///              .video_caption("sadipscing")
-///              .add_type("ut")
-///              .topic_id("rebum.")
-///              .safe_search("duo")
-///              .relevance_language("kasd")
-///              .related_to_video_id("sadipscing")
-///              .region_code("tempor")
-///              .q("sea")
+/// let result = hub.search().list(&vec!["amet.".into()])
+///              .video_type("dolore")
+///              .video_syndicated("amet")
+///              .video_license("ut")
+///              .video_embeddable("At")
+///              .video_duration("sit")
+///              .video_dimension("vero")
+///              .video_definition("duo")
+///              .video_category_id("sadipscing")
+///              .video_caption("ut")
+///              .add_type("rebum.")
+///              .topic_id("duo")
+///              .safe_search("kasd")
+///              .relevance_language("sadipscing")
+///              .related_to_video_id("tempor")
+///              .region_code("sea")
+///              .q("et")
 ///              .published_before(chrono::Utc::now())
 ///              .published_after(chrono::Utc::now())
-///              .page_token("et")
-///              .order("Lorem")
-///              .on_behalf_of_content_owner("magna")
-///              .max_results(42)
-///              .location_radius("rebum.")
-///              .location("At")
+///              .page_token("Lorem")
+///              .order("magna")
+///              .on_behalf_of_content_owner("takimata")
+///              .max_results(35)
+///              .location_radius("At")
+///              .location("invidunt")
 ///              .for_mine(false)
 ///              .for_developer(false)
-///              .for_content_owner(false)
-///              .event_type("dolores")
-///              .channel_type("sed")
-///              .channel_id("invidunt")
+///              .for_content_owner(true)
+///              .event_type("clita")
+///              .channel_type("dolor")
+///              .channel_id("aliquyam")
 ///              .doit().await;
 /// # }
 /// ```
@@ -27418,11 +27963,11 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.subscriptions().list(&vec!["dolor".into()])
-///              .page_token("aliquyam")
-///              .order("magna")
-///              .on_behalf_of_content_owner_channel("diam")
-///              .on_behalf_of_content_owner("nonumy")
+/// let result = hub.subscriptions().list(&vec!["diam".into()])
+///              .page_token("nonumy")
+///              .order("et")
+///              .on_behalf_of_content_owner_channel("sanctus")
+///              .on_behalf_of_content_owner("accusam")
 ///              .my_subscribers(true)
 ///              .my_recent_subscribers(true)
 ///              .mine(false)
@@ -28970,7 +29515,7 @@ where
 
 
     /// Perform the operation you have build so far.
-    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, ThirdPartyLink)> {
+    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, ThirdPartyLinkListResponse)> {
         use std::io::{Read, Seek};
         use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
         use client::{ToParts, url::Params};
@@ -31118,8 +31663,8 @@ where
                             mp_reader.reserve_exact(2);
                             let size = reader.seek(io::SeekFrom::End(0)).unwrap();
                         reader.seek(io::SeekFrom::Start(0)).unwrap();
-                        if size > 137438953472 {
-                        	return Err(client::Error::UploadSizeLimitExceeded(size, 137438953472))
+                        if size > 274877906944 {
+                        	return Err(client::Error::UploadSizeLimitExceeded(size, 274877906944))
                         }
                             mp_reader.add_part(&mut request_value_reader, request_size, json_mime_type.clone())
                                      .add_part(&mut reader, size, reader_mime_type.clone());
@@ -31187,8 +31732,8 @@ where
                     if protocol == client::UploadProtocol::Resumable {
                         let size = reader.seek(io::SeekFrom::End(0)).unwrap();
                         reader.seek(io::SeekFrom::Start(0)).unwrap();
-                        if size > 137438953472 {
-                        	return Err(client::Error::UploadSizeLimitExceeded(size, 137438953472))
+                        if size > 274877906944 {
+                        	return Err(client::Error::UploadSizeLimitExceeded(size, 274877906944))
                         }
                         let upload_result = {
                             let url_str = &res.headers().get("Location").expect("LOCATION header is part of protocol").to_str().unwrap();
@@ -31258,7 +31803,7 @@ where
     /// `cancel_chunk_upload(...)`.
     ///
     /// * *multipart*: yes
-    /// * *max size*: 137438953472
+    /// * *max size*: 274877906944
     /// * *valid mime types*: 'video/*' and 'application/octet-stream'
     pub async fn upload_resumable<RS>(self, resumeable_stream: RS, mime_type: mime::Mime) -> client::Result<(hyper::Response<hyper::body::Body>, Video)>
                 where RS: client::ReadSeek {
@@ -31268,7 +31813,7 @@ where
     /// If the upload fails for whichever reason, all progress is lost.
     ///
     /// * *multipart*: yes
-    /// * *max size*: 137438953472
+    /// * *max size*: 274877906944
     /// * *valid mime types*: 'video/*' and 'application/octet-stream'
     pub async fn upload<RS>(self, stream: RS, mime_type: mime::Mime) -> client::Result<(hyper::Response<hyper::body::Body>, Video)>
                 where RS: client::ReadSeek {

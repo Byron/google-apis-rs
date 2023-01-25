@@ -1,19 +1,20 @@
 use std::collections::HashMap;
 use std::cell::RefCell;
 use std::default::Default;
-use std::collections::BTreeMap;
+use std::collections::BTreeSet;
 use std::error::Error as StdError;
 use serde_json as json;
 use std::io;
 use std::fs;
 use std::mem;
-use std::thread::sleep;
 
-use http::Uri;
 use hyper::client::connect;
 use tokio::io::{AsyncRead, AsyncWrite};
+use tokio::time::sleep;
 use tower_service;
-use crate::client;
+use serde::{Serialize, Deserialize};
+
+use crate::{client, client::GetToken, client::serde_with};
 
 // ##############
 // UTILITIES ###
@@ -40,7 +41,7 @@ use crate::client;
 /// use acceleratedmobilepageurl1::{Result, Error};
 /// # async fn dox() {
 /// use std::default::Default;
-/// use acceleratedmobilepageurl1::{Acceleratedmobilepageurl, oauth2, hyper, hyper_rustls};
+/// use acceleratedmobilepageurl1::{Acceleratedmobilepageurl, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// // Get an ApplicationSecret instance by some means. It contains the `client_id` and 
 /// // `client_secret`, among other things.
@@ -88,7 +89,7 @@ use crate::client;
 #[derive(Clone)]
 pub struct Acceleratedmobilepageurl<S> {
     pub client: hyper::Client<S, hyper::body::Body>,
-    pub auth: oauth2::authenticator::Authenticator<S>,
+    pub auth: Box<dyn client::GetToken>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
@@ -98,11 +99,11 @@ impl<'a, S> client::Hub for Acceleratedmobilepageurl<S> {}
 
 impl<'a, S> Acceleratedmobilepageurl<S> {
 
-    pub fn new(client: hyper::Client<S, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<S>) -> Acceleratedmobilepageurl<S> {
+    pub fn new<A: 'static + client::GetToken>(client: hyper::Client<S, hyper::body::Body>, auth: A) -> Acceleratedmobilepageurl<S> {
         Acceleratedmobilepageurl {
             client,
-            auth: authenticator,
-            _user_agent: "google-api-rust-client/4.0.1".to_string(),
+            auth: Box::new(auth),
+            _user_agent: "google-api-rust-client/5.0.2-beta-1".to_string(),
             _base_url: "https://acceleratedmobilepageurl.googleapis.com/".to_string(),
             _root_url: "https://acceleratedmobilepageurl.googleapis.com/".to_string(),
         }
@@ -113,7 +114,7 @@ impl<'a, S> Acceleratedmobilepageurl<S> {
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/4.0.1`.
+    /// It defaults to `google-api-rust-client/5.0.2-beta-1`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -150,16 +151,20 @@ impl<'a, S> Acceleratedmobilepageurl<S> {
 /// 
 /// * [batch get amp urls](AmpUrlBatchGetCall) (none)
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AmpUrl {
     /// The AMP URL pointing to the publisher's web server.
     #[serde(rename="ampUrl")]
+    
     pub amp_url: Option<String>,
     /// The [AMP Cache URL](/amp/cache/overview#amp-cache-url-format) pointing to the cached document in the Google AMP Cache.
     #[serde(rename="cdnAmpUrl")]
+    
     pub cdn_amp_url: Option<String>,
     /// The original non-AMP URL.
     #[serde(rename="originalUrl")]
+    
     pub original_url: Option<String>,
 }
 
@@ -170,16 +175,20 @@ impl client::Resource for AmpUrl {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AmpUrlError {
     /// The error code of an API call.
     #[serde(rename="errorCode")]
+    
     pub error_code: Option<String>,
     /// An optional descriptive error message.
     #[serde(rename="errorMessage")]
+    
     pub error_message: Option<String>,
     /// The original non-AMP URL.
     #[serde(rename="originalUrl")]
+    
     pub original_url: Option<String>,
 }
 
@@ -195,12 +204,15 @@ impl client::Part for AmpUrlError {}
 /// 
 /// * [batch get amp urls](AmpUrlBatchGetCall) (request)
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct BatchGetAmpUrlsRequest {
     /// The lookup_strategy being requested.
     #[serde(rename="lookupStrategy")]
+    
     pub lookup_strategy: Option<String>,
     /// List of URLs to look up for the paired AMP URLs. The URLs are case-sensitive. Up to 50 URLs per lookup (see [Usage Limits](/amp/cache/reference/limits)).
+    
     pub urls: Option<Vec<String>>,
 }
 
@@ -216,13 +228,16 @@ impl client::RequestValue for BatchGetAmpUrlsRequest {}
 /// 
 /// * [batch get amp urls](AmpUrlBatchGetCall) (response)
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct BatchGetAmpUrlsResponse {
     /// For each URL in BatchAmpUrlsRequest, the URL response. The response might not be in the same order as URLs in the batch request. If BatchAmpUrlsRequest contains duplicate URLs, AmpUrl is generated only once.
     #[serde(rename="ampUrls")]
+    
     pub amp_urls: Option<Vec<AmpUrl>>,
     /// The errors for requested URLs that have no AMP URL.
     #[serde(rename="urlErrors")]
+    
     pub url_errors: Option<Vec<AmpUrlError>>,
 }
 
@@ -235,7 +250,7 @@ impl client::ResponseResult for BatchGetAmpUrlsResponse {}
 // #################
 
 /// A builder providing access to all methods supported on *ampUrl* resources.
-/// It is not used directly, but through the `Acceleratedmobilepageurl` hub.
+/// It is not used directly, but through the [`Acceleratedmobilepageurl`] hub.
 ///
 /// # Example
 ///
@@ -248,7 +263,7 @@ impl client::ResponseResult for BatchGetAmpUrlsResponse {}
 /// 
 /// # async fn dox() {
 /// use std::default::Default;
-/// use acceleratedmobilepageurl1::{Acceleratedmobilepageurl, oauth2, hyper, hyper_rustls};
+/// use acceleratedmobilepageurl1::{Acceleratedmobilepageurl, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// let secret: oauth2::ApplicationSecret = Default::default();
 /// let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -300,7 +315,7 @@ impl<'a, S> AmpUrlMethods<'a, S> {
 /// Returns AMP URL(s) and equivalent [AMP Cache URL(s)](/amp/cache/overview#amp-cache-url-format).
 ///
 /// A builder for the *batchGet* method supported by a *ampUrl* resource.
-/// It is not used directly, but through a `AmpUrlMethods` instance.
+/// It is not used directly, but through a [`AmpUrlMethods`] instance.
 ///
 /// # Example
 ///
@@ -313,7 +328,7 @@ impl<'a, S> AmpUrlMethods<'a, S> {
 /// use acceleratedmobilepageurl1::api::BatchGetAmpUrlsRequest;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use acceleratedmobilepageurl1::{Acceleratedmobilepageurl, oauth2, hyper, hyper_rustls};
+/// # use acceleratedmobilepageurl1::{Acceleratedmobilepageurl, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
 /// # let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -346,7 +361,7 @@ impl<'a, S> client::CallBuilder for AmpUrlBatchGetCall<'a, S> {}
 
 impl<'a, S> AmpUrlBatchGetCall<'a, S>
 where
-    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
     S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
     S::Future: Send + Unpin + 'static,
     S::Error: Into<Box<dyn StdError + Send + Sync>>,
@@ -357,32 +372,30 @@ where
     pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, BatchGetAmpUrlsResponse)> {
         use std::io::{Read, Seek};
         use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::ToParts;
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
         let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
         dlg.begin(client::MethodInfo { id: "acceleratedmobilepageurl.ampUrls.batchGet",
                                http_method: hyper::Method::POST });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
+
         for &field in ["alt"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(client::Error::FieldClash(field));
             }
         }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
 
-        params.push(("alt", "json".to_string()));
+        let mut params = Params::with_capacity(3 + self._additional_params.len());
 
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "v1/ampUrls:batchGet";
         
-        let key = dlg.api_key();
-        match key {
-            Some(value) => params.push(("key", value)),
+        match dlg.api_key() {
+            Some(value) => params.push("key", value),
             None => {
                 dlg.finished(false);
                 return Err(client::Error::MissingAPIKey)
@@ -390,9 +403,9 @@ where
         }
 
 
-        let url = url::Url::parse_with_params(&url, params).unwrap();
+        let url = params.parse_with_url(&url);
 
-        let mut json_mime_type: mime::Mime = "application/json".parse().unwrap();
+        let mut json_mime_type = mime::APPLICATION_JSON;
         let mut request_value_reader =
             {
                 let mut value = json::value::to_value(&self._request).expect("serde to work");
@@ -410,23 +423,26 @@ where
             let mut req_result = {
                 let client = &self.hub.client;
                 dlg.pre_request();
-                let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
-                        .header(USER_AGENT, self.hub._user_agent.clone());
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::POST)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
 
 
                         let request = req_builder
-                        .header(CONTENT_TYPE, format!("{}", json_mime_type.to_string()))
+                        .header(CONTENT_TYPE, json_mime_type.to_string())
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
                 client.request(request.unwrap()).await
-                
+
             };
 
             match req_result {
                 Err(err) => {
                     if let client::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep(d).await;
                         continue;
                     }
                     dlg.finished(false);
@@ -442,7 +458,7 @@ where
                         let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
                         if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
-                            sleep(d);
+                            sleep(d).await;
                             continue;
                         }
 
@@ -485,7 +501,8 @@ where
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.````
     ///
     /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AmpUrlBatchGetCall<'a, S> {

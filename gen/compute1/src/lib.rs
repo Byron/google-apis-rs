@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/generator/templates/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *compute* crate version *4.0.1+20220224*, where *20220224* is the exact revision of the *compute:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v4.0.1*.
+//! This documentation was generated from *compute* crate version *5.0.2-beta-1+20230103*, where *20230103* is the exact revision of the *compute:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.2-beta-1*.
 //! 
 //! Everything else about the *compute* *v1* API can be found at the
 //! [official documentation site](https://cloud.google.com/compute/).
@@ -13,14 +13,14 @@
 //! 
 //! * [accelerator types](api::AcceleratorType)
 //!  * [*aggregated list*](api::AcceleratorTypeAggregatedListCall), [*get*](api::AcceleratorTypeGetCall) and [*list*](api::AcceleratorTypeListCall)
-//! * addresses
-//!  * [*aggregated list*](api::AddresseAggregatedListCall), [*delete*](api::AddresseDeleteCall), [*get*](api::AddresseGetCall), [*insert*](api::AddresseInsertCall) and [*list*](api::AddresseListCall)
+//! * [addresses](api::Address)
+//!  * [*aggregated list*](api::AddressAggregatedListCall), [*delete*](api::AddressDeleteCall), [*get*](api::AddressGetCall), [*insert*](api::AddressInsertCall), [*list*](api::AddressListCall) and [*set labels*](api::AddressSetLabelCall)
 //! * [autoscalers](api::Autoscaler)
 //!  * [*aggregated list*](api::AutoscalerAggregatedListCall), [*delete*](api::AutoscalerDeleteCall), [*get*](api::AutoscalerGetCall), [*insert*](api::AutoscalerInsertCall), [*list*](api::AutoscalerListCall), [*patch*](api::AutoscalerPatchCall) and [*update*](api::AutoscalerUpdateCall)
 //! * [backend buckets](api::BackendBucket)
 //!  * [*add signed url key*](api::BackendBucketAddSignedUrlKeyCall), [*delete*](api::BackendBucketDeleteCall), [*delete signed url key*](api::BackendBucketDeleteSignedUrlKeyCall), [*get*](api::BackendBucketGetCall), [*insert*](api::BackendBucketInsertCall), [*list*](api::BackendBucketListCall), [*patch*](api::BackendBucketPatchCall), [*set edge security policy*](api::BackendBucketSetEdgeSecurityPolicyCall) and [*update*](api::BackendBucketUpdateCall)
 //! * [backend services](api::BackendService)
-//!  * [*add signed url key*](api::BackendServiceAddSignedUrlKeyCall), [*aggregated list*](api::BackendServiceAggregatedListCall), [*delete*](api::BackendServiceDeleteCall), [*delete signed url key*](api::BackendServiceDeleteSignedUrlKeyCall), [*get*](api::BackendServiceGetCall), [*get health*](api::BackendServiceGetHealthCall), [*insert*](api::BackendServiceInsertCall), [*list*](api::BackendServiceListCall), [*patch*](api::BackendServicePatchCall), [*set edge security policy*](api::BackendServiceSetEdgeSecurityPolicyCall), [*set security policy*](api::BackendServiceSetSecurityPolicyCall) and [*update*](api::BackendServiceUpdateCall)
+//!  * [*add signed url key*](api::BackendServiceAddSignedUrlKeyCall), [*aggregated list*](api::BackendServiceAggregatedListCall), [*delete*](api::BackendServiceDeleteCall), [*delete signed url key*](api::BackendServiceDeleteSignedUrlKeyCall), [*get*](api::BackendServiceGetCall), [*get health*](api::BackendServiceGetHealthCall), [*get iam policy*](api::BackendServiceGetIamPolicyCall), [*insert*](api::BackendServiceInsertCall), [*list*](api::BackendServiceListCall), [*patch*](api::BackendServicePatchCall), [*set edge security policy*](api::BackendServiceSetEdgeSecurityPolicyCall), [*set iam policy*](api::BackendServiceSetIamPolicyCall), [*set security policy*](api::BackendServiceSetSecurityPolicyCall) and [*update*](api::BackendServiceUpdateCall)
 //! * [disk types](api::DiskType)
 //!  * [*aggregated list*](api::DiskTypeAggregatedListCall), [*get*](api::DiskTypeGetCall) and [*list*](api::DiskTypeListCall)
 //! * [disks](api::Disk)
@@ -34,7 +34,7 @@
 //! * [forwarding rules](api::ForwardingRule)
 //!  * [*aggregated list*](api::ForwardingRuleAggregatedListCall), [*delete*](api::ForwardingRuleDeleteCall), [*get*](api::ForwardingRuleGetCall), [*insert*](api::ForwardingRuleInsertCall), [*list*](api::ForwardingRuleListCall), [*patch*](api::ForwardingRulePatchCall), [*set labels*](api::ForwardingRuleSetLabelCall) and [*set target*](api::ForwardingRuleSetTargetCall)
 //! * global addresses
-//!  * [*delete*](api::GlobalAddresseDeleteCall), [*get*](api::GlobalAddresseGetCall), [*insert*](api::GlobalAddresseInsertCall) and [*list*](api::GlobalAddresseListCall)
+//!  * [*delete*](api::GlobalAddressDeleteCall), [*get*](api::GlobalAddressGetCall), [*insert*](api::GlobalAddressInsertCall), [*list*](api::GlobalAddressListCall) and [*set labels*](api::GlobalAddressSetLabelCall)
 //! * global forwarding rules
 //!  * [*delete*](api::GlobalForwardingRuleDeleteCall), [*get*](api::GlobalForwardingRuleGetCall), [*insert*](api::GlobalForwardingRuleInsertCall), [*list*](api::GlobalForwardingRuleListCall), [*patch*](api::GlobalForwardingRulePatchCall), [*set labels*](api::GlobalForwardingRuleSetLabelCall) and [*set target*](api::GlobalForwardingRuleSetTargetCall)
 //! * global network endpoint groups
@@ -44,7 +44,7 @@
 //! * global organization operations
 //!  * [*delete*](api::GlobalOrganizationOperationDeleteCall), [*get*](api::GlobalOrganizationOperationGetCall) and [*list*](api::GlobalOrganizationOperationListCall)
 //! * global public delegated prefixes
-//!  * [*delete*](api::GlobalPublicDelegatedPrefixeDeleteCall), [*get*](api::GlobalPublicDelegatedPrefixeGetCall), [*insert*](api::GlobalPublicDelegatedPrefixeInsertCall), [*list*](api::GlobalPublicDelegatedPrefixeListCall) and [*patch*](api::GlobalPublicDelegatedPrefixePatchCall)
+//!  * [*delete*](api::GlobalPublicDelegatedPrefixDeleteCall), [*get*](api::GlobalPublicDelegatedPrefixGetCall), [*insert*](api::GlobalPublicDelegatedPrefixInsertCall), [*list*](api::GlobalPublicDelegatedPrefixListCall) and [*patch*](api::GlobalPublicDelegatedPrefixPatchCall)
 //! * [health checks](api::HealthCheck)
 //!  * [*aggregated list*](api::HealthCheckAggregatedListCall), [*delete*](api::HealthCheckDeleteCall), [*get*](api::HealthCheckGetCall), [*insert*](api::HealthCheckInsertCall), [*list*](api::HealthCheckListCall), [*patch*](api::HealthCheckPatchCall) and [*update*](api::HealthCheckUpdateCall)
 //! * [http health checks](api::HttpHealthCheck)
@@ -64,11 +64,11 @@
 //! * [instances](api::Instance)
 //!  * [*add access config*](api::InstanceAddAccessConfigCall), [*add resource policies*](api::InstanceAddResourcePolicyCall), [*aggregated list*](api::InstanceAggregatedListCall), [*attach disk*](api::InstanceAttachDiskCall), [*bulk insert*](api::InstanceBulkInsertCall), [*delete*](api::InstanceDeleteCall), [*delete access config*](api::InstanceDeleteAccessConfigCall), [*detach disk*](api::InstanceDetachDiskCall), [*get*](api::InstanceGetCall), [*get effective firewalls*](api::InstanceGetEffectiveFirewallCall), [*get guest attributes*](api::InstanceGetGuestAttributeCall), [*get iam policy*](api::InstanceGetIamPolicyCall), [*get screenshot*](api::InstanceGetScreenshotCall), [*get serial port output*](api::InstanceGetSerialPortOutputCall), [*get shielded instance identity*](api::InstanceGetShieldedInstanceIdentityCall), [*insert*](api::InstanceInsertCall), [*list*](api::InstanceListCall), [*list referrers*](api::InstanceListReferrerCall), [*remove resource policies*](api::InstanceRemoveResourcePolicyCall), [*reset*](api::InstanceResetCall), [*resume*](api::InstanceResumeCall), [*send diagnostic interrupt*](api::InstanceSendDiagnosticInterruptCall), [*set deletion protection*](api::InstanceSetDeletionProtectionCall), [*set disk auto delete*](api::InstanceSetDiskAutoDeleteCall), [*set iam policy*](api::InstanceSetIamPolicyCall), [*set labels*](api::InstanceSetLabelCall), [*set machine resources*](api::InstanceSetMachineResourceCall), [*set machine type*](api::InstanceSetMachineTypeCall), [*set metadata*](api::InstanceSetMetadataCall), [*set min cpu platform*](api::InstanceSetMinCpuPlatformCall), [*set scheduling*](api::InstanceSetSchedulingCall), [*set service account*](api::InstanceSetServiceAccountCall), [*set shielded instance integrity policy*](api::InstanceSetShieldedInstanceIntegrityPolicyCall), [*set tags*](api::InstanceSetTagCall), [*simulate maintenance event*](api::InstanceSimulateMaintenanceEventCall), [*start*](api::InstanceStartCall), [*start with encryption key*](api::InstanceStartWithEncryptionKeyCall), [*stop*](api::InstanceStopCall), [*suspend*](api::InstanceSuspendCall), [*test iam permissions*](api::InstanceTestIamPermissionCall), [*update*](api::InstanceUpdateCall), [*update access config*](api::InstanceUpdateAccessConfigCall), [*update display device*](api::InstanceUpdateDisplayDeviceCall), [*update network interface*](api::InstanceUpdateNetworkInterfaceCall) and [*update shielded instance config*](api::InstanceUpdateShieldedInstanceConfigCall)
 //! * [interconnect attachments](api::InterconnectAttachment)
-//!  * [*aggregated list*](api::InterconnectAttachmentAggregatedListCall), [*delete*](api::InterconnectAttachmentDeleteCall), [*get*](api::InterconnectAttachmentGetCall), [*insert*](api::InterconnectAttachmentInsertCall), [*list*](api::InterconnectAttachmentListCall) and [*patch*](api::InterconnectAttachmentPatchCall)
+//!  * [*aggregated list*](api::InterconnectAttachmentAggregatedListCall), [*delete*](api::InterconnectAttachmentDeleteCall), [*get*](api::InterconnectAttachmentGetCall), [*insert*](api::InterconnectAttachmentInsertCall), [*list*](api::InterconnectAttachmentListCall), [*patch*](api::InterconnectAttachmentPatchCall) and [*set labels*](api::InterconnectAttachmentSetLabelCall)
 //! * [interconnect locations](api::InterconnectLocation)
 //!  * [*get*](api::InterconnectLocationGetCall) and [*list*](api::InterconnectLocationListCall)
 //! * [interconnects](api::Interconnect)
-//!  * [*delete*](api::InterconnectDeleteCall), [*get*](api::InterconnectGetCall), [*get diagnostics*](api::InterconnectGetDiagnosticCall), [*insert*](api::InterconnectInsertCall), [*list*](api::InterconnectListCall) and [*patch*](api::InterconnectPatchCall)
+//!  * [*delete*](api::InterconnectDeleteCall), [*get*](api::InterconnectGetCall), [*get diagnostics*](api::InterconnectGetDiagnosticCall), [*insert*](api::InterconnectInsertCall), [*list*](api::InterconnectListCall), [*patch*](api::InterconnectPatchCall) and [*set labels*](api::InterconnectSetLabelCall)
 //! * [license codes](api::LicenseCode)
 //!  * [*get*](api::LicenseCodeGetCall) and [*test iam permissions*](api::LicenseCodeTestIamPermissionCall)
 //! * [licenses](api::License)
@@ -77,6 +77,10 @@
 //!  * [*delete*](api::MachineImageDeleteCall), [*get*](api::MachineImageGetCall), [*get iam policy*](api::MachineImageGetIamPolicyCall), [*insert*](api::MachineImageInsertCall), [*list*](api::MachineImageListCall), [*set iam policy*](api::MachineImageSetIamPolicyCall) and [*test iam permissions*](api::MachineImageTestIamPermissionCall)
 //! * [machine types](api::MachineType)
 //!  * [*aggregated list*](api::MachineTypeAggregatedListCall), [*get*](api::MachineTypeGetCall) and [*list*](api::MachineTypeListCall)
+//! * [network attachments](api::NetworkAttachment)
+//!  * [*aggregated list*](api::NetworkAttachmentAggregatedListCall), [*delete*](api::NetworkAttachmentDeleteCall), [*get*](api::NetworkAttachmentGetCall), [*get iam policy*](api::NetworkAttachmentGetIamPolicyCall), [*insert*](api::NetworkAttachmentInsertCall), [*list*](api::NetworkAttachmentListCall), [*set iam policy*](api::NetworkAttachmentSetIamPolicyCall) and [*test iam permissions*](api::NetworkAttachmentTestIamPermissionCall)
+//! * [network edge security services](api::NetworkEdgeSecurityService)
+//!  * [*aggregated list*](api::NetworkEdgeSecurityServiceAggregatedListCall), [*delete*](api::NetworkEdgeSecurityServiceDeleteCall), [*get*](api::NetworkEdgeSecurityServiceGetCall), [*insert*](api::NetworkEdgeSecurityServiceInsertCall) and [*patch*](api::NetworkEdgeSecurityServicePatchCall)
 //! * [network endpoint groups](api::NetworkEndpointGroup)
 //!  * [*aggregated list*](api::NetworkEndpointGroupAggregatedListCall), [*attach network endpoints*](api::NetworkEndpointGroupAttachNetworkEndpointCall), [*delete*](api::NetworkEndpointGroupDeleteCall), [*detach network endpoints*](api::NetworkEndpointGroupDetachNetworkEndpointCall), [*get*](api::NetworkEndpointGroupGetCall), [*insert*](api::NetworkEndpointGroupInsertCall), [*list*](api::NetworkEndpointGroupListCall), [*list network endpoints*](api::NetworkEndpointGroupListNetworkEndpointCall) and [*test iam permissions*](api::NetworkEndpointGroupTestIamPermissionCall)
 //! * network firewall policies
@@ -93,14 +97,14 @@
 //!  * [*aggregated list*](api::PacketMirroringAggregatedListCall), [*delete*](api::PacketMirroringDeleteCall), [*get*](api::PacketMirroringGetCall), [*insert*](api::PacketMirroringInsertCall), [*list*](api::PacketMirroringListCall), [*patch*](api::PacketMirroringPatchCall) and [*test iam permissions*](api::PacketMirroringTestIamPermissionCall)
 //! * [projects](api::Project)
 //!  * [*disable xpn host*](api::ProjectDisableXpnHostCall), [*disable xpn resource*](api::ProjectDisableXpnResourceCall), [*enable xpn host*](api::ProjectEnableXpnHostCall), [*enable xpn resource*](api::ProjectEnableXpnResourceCall), [*get*](api::ProjectGetCall), [*get xpn host*](api::ProjectGetXpnHostCall), [*get xpn resources*](api::ProjectGetXpnResourceCall), [*list xpn hosts*](api::ProjectListXpnHostCall), [*move disk*](api::ProjectMoveDiskCall), [*move instance*](api::ProjectMoveInstanceCall), [*set common instance metadata*](api::ProjectSetCommonInstanceMetadataCall), [*set default network tier*](api::ProjectSetDefaultNetworkTierCall) and [*set usage export bucket*](api::ProjectSetUsageExportBucketCall)
-//! * public advertised prefixes
-//!  * [*delete*](api::PublicAdvertisedPrefixeDeleteCall), [*get*](api::PublicAdvertisedPrefixeGetCall), [*insert*](api::PublicAdvertisedPrefixeInsertCall), [*list*](api::PublicAdvertisedPrefixeListCall) and [*patch*](api::PublicAdvertisedPrefixePatchCall)
-//! * public delegated prefixes
-//!  * [*aggregated list*](api::PublicDelegatedPrefixeAggregatedListCall), [*delete*](api::PublicDelegatedPrefixeDeleteCall), [*get*](api::PublicDelegatedPrefixeGetCall), [*insert*](api::PublicDelegatedPrefixeInsertCall), [*list*](api::PublicDelegatedPrefixeListCall) and [*patch*](api::PublicDelegatedPrefixePatchCall)
+//! * [public advertised prefixes](api::PublicAdvertisedPrefix)
+//!  * [*delete*](api::PublicAdvertisedPrefixDeleteCall), [*get*](api::PublicAdvertisedPrefixGetCall), [*insert*](api::PublicAdvertisedPrefixInsertCall), [*list*](api::PublicAdvertisedPrefixListCall) and [*patch*](api::PublicAdvertisedPrefixPatchCall)
+//! * [public delegated prefixes](api::PublicDelegatedPrefix)
+//!  * [*aggregated list*](api::PublicDelegatedPrefixAggregatedListCall), [*delete*](api::PublicDelegatedPrefixDeleteCall), [*get*](api::PublicDelegatedPrefixGetCall), [*insert*](api::PublicDelegatedPrefixInsertCall), [*list*](api::PublicDelegatedPrefixListCall) and [*patch*](api::PublicDelegatedPrefixPatchCall)
 //! * region autoscalers
 //!  * [*delete*](api::RegionAutoscalerDeleteCall), [*get*](api::RegionAutoscalerGetCall), [*insert*](api::RegionAutoscalerInsertCall), [*list*](api::RegionAutoscalerListCall), [*patch*](api::RegionAutoscalerPatchCall) and [*update*](api::RegionAutoscalerUpdateCall)
 //! * region backend services
-//!  * [*delete*](api::RegionBackendServiceDeleteCall), [*get*](api::RegionBackendServiceGetCall), [*get health*](api::RegionBackendServiceGetHealthCall), [*insert*](api::RegionBackendServiceInsertCall), [*list*](api::RegionBackendServiceListCall), [*patch*](api::RegionBackendServicePatchCall) and [*update*](api::RegionBackendServiceUpdateCall)
+//!  * [*delete*](api::RegionBackendServiceDeleteCall), [*get*](api::RegionBackendServiceGetCall), [*get health*](api::RegionBackendServiceGetHealthCall), [*get iam policy*](api::RegionBackendServiceGetIamPolicyCall), [*insert*](api::RegionBackendServiceInsertCall), [*list*](api::RegionBackendServiceListCall), [*patch*](api::RegionBackendServicePatchCall), [*set iam policy*](api::RegionBackendServiceSetIamPolicyCall) and [*update*](api::RegionBackendServiceUpdateCall)
 //! * region commitments
 //!  * [*aggregated list*](api::RegionCommitmentAggregatedListCall), [*get*](api::RegionCommitmentGetCall), [*insert*](api::RegionCommitmentInsertCall), [*list*](api::RegionCommitmentListCall) and [*update*](api::RegionCommitmentUpdateCall)
 //! * region disk types
@@ -125,12 +129,18 @@
 //!  * [*delete*](api::RegionNotificationEndpointDeleteCall), [*get*](api::RegionNotificationEndpointGetCall), [*insert*](api::RegionNotificationEndpointInsertCall) and [*list*](api::RegionNotificationEndpointListCall)
 //! * region operations
 //!  * [*delete*](api::RegionOperationDeleteCall), [*get*](api::RegionOperationGetCall), [*list*](api::RegionOperationListCall) and [*wait*](api::RegionOperationWaitCall)
+//! * region security policies
+//!  * [*delete*](api::RegionSecurityPolicyDeleteCall), [*get*](api::RegionSecurityPolicyGetCall), [*insert*](api::RegionSecurityPolicyInsertCall), [*list*](api::RegionSecurityPolicyListCall) and [*patch*](api::RegionSecurityPolicyPatchCall)
 //! * region ssl certificates
 //!  * [*delete*](api::RegionSslCertificateDeleteCall), [*get*](api::RegionSslCertificateGetCall), [*insert*](api::RegionSslCertificateInsertCall) and [*list*](api::RegionSslCertificateListCall)
+//! * region ssl policies
+//!  * [*delete*](api::RegionSslPolicyDeleteCall), [*get*](api::RegionSslPolicyGetCall), [*insert*](api::RegionSslPolicyInsertCall), [*list*](api::RegionSslPolicyListCall), [*list available features*](api::RegionSslPolicyListAvailableFeatureCall) and [*patch*](api::RegionSslPolicyPatchCall)
 //! * region target http proxies
 //!  * [*delete*](api::RegionTargetHttpProxyDeleteCall), [*get*](api::RegionTargetHttpProxyGetCall), [*insert*](api::RegionTargetHttpProxyInsertCall), [*list*](api::RegionTargetHttpProxyListCall) and [*set url map*](api::RegionTargetHttpProxySetUrlMapCall)
 //! * region target https proxies
-//!  * [*delete*](api::RegionTargetHttpsProxyDeleteCall), [*get*](api::RegionTargetHttpsProxyGetCall), [*insert*](api::RegionTargetHttpsProxyInsertCall), [*list*](api::RegionTargetHttpsProxyListCall), [*set ssl certificates*](api::RegionTargetHttpsProxySetSslCertificateCall) and [*set url map*](api::RegionTargetHttpsProxySetUrlMapCall)
+//!  * [*delete*](api::RegionTargetHttpsProxyDeleteCall), [*get*](api::RegionTargetHttpsProxyGetCall), [*insert*](api::RegionTargetHttpsProxyInsertCall), [*list*](api::RegionTargetHttpsProxyListCall), [*patch*](api::RegionTargetHttpsProxyPatchCall), [*set ssl certificates*](api::RegionTargetHttpsProxySetSslCertificateCall) and [*set url map*](api::RegionTargetHttpsProxySetUrlMapCall)
+//! * region target tcp proxies
+//!  * [*delete*](api::RegionTargetTcpProxyDeleteCall), [*get*](api::RegionTargetTcpProxyGetCall), [*insert*](api::RegionTargetTcpProxyInsertCall) and [*list*](api::RegionTargetTcpProxyListCall)
 //! * region url maps
 //!  * [*delete*](api::RegionUrlMapDeleteCall), [*get*](api::RegionUrlMapGetCall), [*insert*](api::RegionUrlMapInsertCall), [*list*](api::RegionUrlMapListCall), [*patch*](api::RegionUrlMapPatchCall), [*update*](api::RegionUrlMapUpdateCall) and [*validate*](api::RegionUrlMapValidateCall)
 //! * [regions](api::Region)
@@ -144,7 +154,7 @@
 //! * [routes](api::Route)
 //!  * [*delete*](api::RouteDeleteCall), [*get*](api::RouteGetCall), [*insert*](api::RouteInsertCall) and [*list*](api::RouteListCall)
 //! * [security policies](api::SecurityPolicy)
-//!  * [*add rule*](api::SecurityPolicyAddRuleCall), [*delete*](api::SecurityPolicyDeleteCall), [*get*](api::SecurityPolicyGetCall), [*get rule*](api::SecurityPolicyGetRuleCall), [*insert*](api::SecurityPolicyInsertCall), [*list*](api::SecurityPolicyListCall), [*list preconfigured expression sets*](api::SecurityPolicyListPreconfiguredExpressionSetCall), [*patch*](api::SecurityPolicyPatchCall), [*patch rule*](api::SecurityPolicyPatchRuleCall) and [*remove rule*](api::SecurityPolicyRemoveRuleCall)
+//!  * [*add rule*](api::SecurityPolicyAddRuleCall), [*aggregated list*](api::SecurityPolicyAggregatedListCall), [*delete*](api::SecurityPolicyDeleteCall), [*get*](api::SecurityPolicyGetCall), [*get rule*](api::SecurityPolicyGetRuleCall), [*insert*](api::SecurityPolicyInsertCall), [*list*](api::SecurityPolicyListCall), [*list preconfigured expression sets*](api::SecurityPolicyListPreconfiguredExpressionSetCall), [*patch*](api::SecurityPolicyPatchCall), [*patch rule*](api::SecurityPolicyPatchRuleCall), [*remove rule*](api::SecurityPolicyRemoveRuleCall) and [*set labels*](api::SecurityPolicySetLabelCall)
 //! * [service attachments](api::ServiceAttachment)
 //!  * [*aggregated list*](api::ServiceAttachmentAggregatedListCall), [*delete*](api::ServiceAttachmentDeleteCall), [*get*](api::ServiceAttachmentGetCall), [*get iam policy*](api::ServiceAttachmentGetIamPolicyCall), [*insert*](api::ServiceAttachmentInsertCall), [*list*](api::ServiceAttachmentListCall), [*patch*](api::ServiceAttachmentPatchCall), [*set iam policy*](api::ServiceAttachmentSetIamPolicyCall) and [*test iam permissions*](api::ServiceAttachmentTestIamPermissionCall)
 //! * [snapshots](api::Snapshot)
@@ -152,7 +162,7 @@
 //! * [ssl certificates](api::SslCertificate)
 //!  * [*aggregated list*](api::SslCertificateAggregatedListCall), [*delete*](api::SslCertificateDeleteCall), [*get*](api::SslCertificateGetCall), [*insert*](api::SslCertificateInsertCall) and [*list*](api::SslCertificateListCall)
 //! * [ssl policies](api::SslPolicy)
-//!  * [*delete*](api::SslPolicyDeleteCall), [*get*](api::SslPolicyGetCall), [*insert*](api::SslPolicyInsertCall), [*list*](api::SslPolicyListCall), [*list available features*](api::SslPolicyListAvailableFeatureCall) and [*patch*](api::SslPolicyPatchCall)
+//!  * [*aggregated list*](api::SslPolicyAggregatedListCall), [*delete*](api::SslPolicyDeleteCall), [*get*](api::SslPolicyGetCall), [*insert*](api::SslPolicyInsertCall), [*list*](api::SslPolicyListCall), [*list available features*](api::SslPolicyListAvailableFeatureCall) and [*patch*](api::SslPolicyPatchCall)
 //! * [subnetworks](api::Subnetwork)
 //!  * [*aggregated list*](api::SubnetworkAggregatedListCall), [*delete*](api::SubnetworkDeleteCall), [*expand ip cidr range*](api::SubnetworkExpandIpCidrRangeCall), [*get*](api::SubnetworkGetCall), [*get iam policy*](api::SubnetworkGetIamPolicyCall), [*insert*](api::SubnetworkInsertCall), [*list*](api::SubnetworkListCall), [*list usable*](api::SubnetworkListUsableCall), [*patch*](api::SubnetworkPatchCall), [*set iam policy*](api::SubnetworkSetIamPolicyCall), [*set private ip google access*](api::SubnetworkSetPrivateIpGoogleAccesCall) and [*test iam permissions*](api::SubnetworkTestIamPermissionCall)
 //! * [target grpc proxies](api::TargetGrpcProxy)
@@ -160,23 +170,23 @@
 //! * [target http proxies](api::TargetHttpProxy)
 //!  * [*aggregated list*](api::TargetHttpProxyAggregatedListCall), [*delete*](api::TargetHttpProxyDeleteCall), [*get*](api::TargetHttpProxyGetCall), [*insert*](api::TargetHttpProxyInsertCall), [*list*](api::TargetHttpProxyListCall), [*patch*](api::TargetHttpProxyPatchCall) and [*set url map*](api::TargetHttpProxySetUrlMapCall)
 //! * [target https proxies](api::TargetHttpsProxy)
-//!  * [*aggregated list*](api::TargetHttpsProxyAggregatedListCall), [*delete*](api::TargetHttpsProxyDeleteCall), [*get*](api::TargetHttpsProxyGetCall), [*insert*](api::TargetHttpsProxyInsertCall), [*list*](api::TargetHttpsProxyListCall), [*patch*](api::TargetHttpsProxyPatchCall), [*set quic override*](api::TargetHttpsProxySetQuicOverrideCall), [*set ssl certificates*](api::TargetHttpsProxySetSslCertificateCall), [*set ssl policy*](api::TargetHttpsProxySetSslPolicyCall) and [*set url map*](api::TargetHttpsProxySetUrlMapCall)
+//!  * [*aggregated list*](api::TargetHttpsProxyAggregatedListCall), [*delete*](api::TargetHttpsProxyDeleteCall), [*get*](api::TargetHttpsProxyGetCall), [*insert*](api::TargetHttpsProxyInsertCall), [*list*](api::TargetHttpsProxyListCall), [*patch*](api::TargetHttpsProxyPatchCall), [*set certificate map*](api::TargetHttpsProxySetCertificateMapCall), [*set quic override*](api::TargetHttpsProxySetQuicOverrideCall), [*set ssl certificates*](api::TargetHttpsProxySetSslCertificateCall), [*set ssl policy*](api::TargetHttpsProxySetSslPolicyCall) and [*set url map*](api::TargetHttpsProxySetUrlMapCall)
 //! * [target instances](api::TargetInstance)
 //!  * [*aggregated list*](api::TargetInstanceAggregatedListCall), [*delete*](api::TargetInstanceDeleteCall), [*get*](api::TargetInstanceGetCall), [*insert*](api::TargetInstanceInsertCall) and [*list*](api::TargetInstanceListCall)
 //! * [target pools](api::TargetPool)
 //!  * [*add health check*](api::TargetPoolAddHealthCheckCall), [*add instance*](api::TargetPoolAddInstanceCall), [*aggregated list*](api::TargetPoolAggregatedListCall), [*delete*](api::TargetPoolDeleteCall), [*get*](api::TargetPoolGetCall), [*get health*](api::TargetPoolGetHealthCall), [*insert*](api::TargetPoolInsertCall), [*list*](api::TargetPoolListCall), [*remove health check*](api::TargetPoolRemoveHealthCheckCall), [*remove instance*](api::TargetPoolRemoveInstanceCall) and [*set backup*](api::TargetPoolSetBackupCall)
 //! * [target ssl proxies](api::TargetSslProxy)
-//!  * [*delete*](api::TargetSslProxyDeleteCall), [*get*](api::TargetSslProxyGetCall), [*insert*](api::TargetSslProxyInsertCall), [*list*](api::TargetSslProxyListCall), [*set backend service*](api::TargetSslProxySetBackendServiceCall), [*set proxy header*](api::TargetSslProxySetProxyHeaderCall), [*set ssl certificates*](api::TargetSslProxySetSslCertificateCall) and [*set ssl policy*](api::TargetSslProxySetSslPolicyCall)
+//!  * [*delete*](api::TargetSslProxyDeleteCall), [*get*](api::TargetSslProxyGetCall), [*insert*](api::TargetSslProxyInsertCall), [*list*](api::TargetSslProxyListCall), [*set backend service*](api::TargetSslProxySetBackendServiceCall), [*set certificate map*](api::TargetSslProxySetCertificateMapCall), [*set proxy header*](api::TargetSslProxySetProxyHeaderCall), [*set ssl certificates*](api::TargetSslProxySetSslCertificateCall) and [*set ssl policy*](api::TargetSslProxySetSslPolicyCall)
 //! * [target tcp proxies](api::TargetTcpProxy)
-//!  * [*delete*](api::TargetTcpProxyDeleteCall), [*get*](api::TargetTcpProxyGetCall), [*insert*](api::TargetTcpProxyInsertCall), [*list*](api::TargetTcpProxyListCall), [*set backend service*](api::TargetTcpProxySetBackendServiceCall) and [*set proxy header*](api::TargetTcpProxySetProxyHeaderCall)
+//!  * [*aggregated list*](api::TargetTcpProxyAggregatedListCall), [*delete*](api::TargetTcpProxyDeleteCall), [*get*](api::TargetTcpProxyGetCall), [*insert*](api::TargetTcpProxyInsertCall), [*list*](api::TargetTcpProxyListCall), [*set backend service*](api::TargetTcpProxySetBackendServiceCall) and [*set proxy header*](api::TargetTcpProxySetProxyHeaderCall)
 //! * [target vpn gateways](api::TargetVpnGateway)
-//!  * [*aggregated list*](api::TargetVpnGatewayAggregatedListCall), [*delete*](api::TargetVpnGatewayDeleteCall), [*get*](api::TargetVpnGatewayGetCall), [*insert*](api::TargetVpnGatewayInsertCall) and [*list*](api::TargetVpnGatewayListCall)
+//!  * [*aggregated list*](api::TargetVpnGatewayAggregatedListCall), [*delete*](api::TargetVpnGatewayDeleteCall), [*get*](api::TargetVpnGatewayGetCall), [*insert*](api::TargetVpnGatewayInsertCall), [*list*](api::TargetVpnGatewayListCall) and [*set labels*](api::TargetVpnGatewaySetLabelCall)
 //! * [url maps](api::UrlMap)
 //!  * [*aggregated list*](api::UrlMapAggregatedListCall), [*delete*](api::UrlMapDeleteCall), [*get*](api::UrlMapGetCall), [*insert*](api::UrlMapInsertCall), [*invalidate cache*](api::UrlMapInvalidateCacheCall), [*list*](api::UrlMapListCall), [*patch*](api::UrlMapPatchCall), [*update*](api::UrlMapUpdateCall) and [*validate*](api::UrlMapValidateCall)
 //! * [vpn gateways](api::VpnGateway)
 //!  * [*aggregated list*](api::VpnGatewayAggregatedListCall), [*delete*](api::VpnGatewayDeleteCall), [*get*](api::VpnGatewayGetCall), [*get status*](api::VpnGatewayGetStatuCall), [*insert*](api::VpnGatewayInsertCall), [*list*](api::VpnGatewayListCall), [*set labels*](api::VpnGatewaySetLabelCall) and [*test iam permissions*](api::VpnGatewayTestIamPermissionCall)
 //! * [vpn tunnels](api::VpnTunnel)
-//!  * [*aggregated list*](api::VpnTunnelAggregatedListCall), [*delete*](api::VpnTunnelDeleteCall), [*get*](api::VpnTunnelGetCall), [*insert*](api::VpnTunnelInsertCall) and [*list*](api::VpnTunnelListCall)
+//!  * [*aggregated list*](api::VpnTunnelAggregatedListCall), [*delete*](api::VpnTunnelDeleteCall), [*get*](api::VpnTunnelGetCall), [*insert*](api::VpnTunnelInsertCall), [*list*](api::VpnTunnelListCall) and [*set labels*](api::VpnTunnelSetLabelCall)
 //! * zone operations
 //!  * [*delete*](api::ZoneOperationDeleteCall), [*get*](api::ZoneOperationGetCall), [*list*](api::ZoneOperationListCall) and [*wait*](api::ZoneOperationWaitCall)
 //! * [zones](api::Zone)
@@ -217,6 +227,7 @@
 //! ```ignore
 //! let r = hub.addresses().delete(...).doit().await
 //! let r = hub.addresses().insert(...).doit().await
+//! let r = hub.addresses().set_labels(...).doit().await
 //! let r = hub.autoscalers().delete(...).doit().await
 //! let r = hub.autoscalers().insert(...).doit().await
 //! let r = hub.autoscalers().patch(...).doit().await
@@ -267,6 +278,7 @@
 //! let r = hub.forwarding_rules().set_target(...).doit().await
 //! let r = hub.global_addresses().delete(...).doit().await
 //! let r = hub.global_addresses().insert(...).doit().await
+//! let r = hub.global_addresses().set_labels(...).doit().await
 //! let r = hub.global_forwarding_rules().delete(...).doit().await
 //! let r = hub.global_forwarding_rules().insert(...).doit().await
 //! let r = hub.global_forwarding_rules().patch(...).doit().await
@@ -355,13 +367,20 @@
 //! let r = hub.interconnect_attachments().delete(...).doit().await
 //! let r = hub.interconnect_attachments().insert(...).doit().await
 //! let r = hub.interconnect_attachments().patch(...).doit().await
+//! let r = hub.interconnect_attachments().set_labels(...).doit().await
 //! let r = hub.interconnects().delete(...).doit().await
 //! let r = hub.interconnects().insert(...).doit().await
 //! let r = hub.interconnects().patch(...).doit().await
+//! let r = hub.interconnects().set_labels(...).doit().await
 //! let r = hub.licenses().delete(...).doit().await
 //! let r = hub.licenses().insert(...).doit().await
 //! let r = hub.machine_images().delete(...).doit().await
 //! let r = hub.machine_images().insert(...).doit().await
+//! let r = hub.network_attachments().delete(...).doit().await
+//! let r = hub.network_attachments().insert(...).doit().await
+//! let r = hub.network_edge_security_services().delete(...).doit().await
+//! let r = hub.network_edge_security_services().insert(...).doit().await
+//! let r = hub.network_edge_security_services().patch(...).doit().await
 //! let r = hub.network_endpoint_groups().attach_network_endpoints(...).doit().await
 //! let r = hub.network_endpoint_groups().delete(...).doit().await
 //! let r = hub.network_endpoint_groups().detach_network_endpoints(...).doit().await
@@ -463,15 +482,24 @@
 //! let r = hub.region_notification_endpoints().insert(...).doit().await
 //! let r = hub.region_operations().get(...).doit().await
 //! let r = hub.region_operations().wait(...).doit().await
+//! let r = hub.region_security_policies().delete(...).doit().await
+//! let r = hub.region_security_policies().insert(...).doit().await
+//! let r = hub.region_security_policies().patch(...).doit().await
 //! let r = hub.region_ssl_certificates().delete(...).doit().await
 //! let r = hub.region_ssl_certificates().insert(...).doit().await
+//! let r = hub.region_ssl_policies().delete(...).doit().await
+//! let r = hub.region_ssl_policies().insert(...).doit().await
+//! let r = hub.region_ssl_policies().patch(...).doit().await
 //! let r = hub.region_target_http_proxies().delete(...).doit().await
 //! let r = hub.region_target_http_proxies().insert(...).doit().await
 //! let r = hub.region_target_http_proxies().set_url_map(...).doit().await
 //! let r = hub.region_target_https_proxies().delete(...).doit().await
 //! let r = hub.region_target_https_proxies().insert(...).doit().await
+//! let r = hub.region_target_https_proxies().patch(...).doit().await
 //! let r = hub.region_target_https_proxies().set_ssl_certificates(...).doit().await
 //! let r = hub.region_target_https_proxies().set_url_map(...).doit().await
+//! let r = hub.region_target_tcp_proxies().delete(...).doit().await
+//! let r = hub.region_target_tcp_proxies().insert(...).doit().await
 //! let r = hub.region_url_maps().delete(...).doit().await
 //! let r = hub.region_url_maps().insert(...).doit().await
 //! let r = hub.region_url_maps().patch(...).doit().await
@@ -494,6 +522,7 @@
 //! let r = hub.security_policies().patch(...).doit().await
 //! let r = hub.security_policies().patch_rule(...).doit().await
 //! let r = hub.security_policies().remove_rule(...).doit().await
+//! let r = hub.security_policies().set_labels(...).doit().await
 //! let r = hub.service_attachments().delete(...).doit().await
 //! let r = hub.service_attachments().insert(...).doit().await
 //! let r = hub.service_attachments().patch(...).doit().await
@@ -520,6 +549,7 @@
 //! let r = hub.target_https_proxies().delete(...).doit().await
 //! let r = hub.target_https_proxies().insert(...).doit().await
 //! let r = hub.target_https_proxies().patch(...).doit().await
+//! let r = hub.target_https_proxies().set_certificate_map(...).doit().await
 //! let r = hub.target_https_proxies().set_quic_override(...).doit().await
 //! let r = hub.target_https_proxies().set_ssl_certificates(...).doit().await
 //! let r = hub.target_https_proxies().set_ssl_policy(...).doit().await
@@ -536,6 +566,7 @@
 //! let r = hub.target_ssl_proxies().delete(...).doit().await
 //! let r = hub.target_ssl_proxies().insert(...).doit().await
 //! let r = hub.target_ssl_proxies().set_backend_service(...).doit().await
+//! let r = hub.target_ssl_proxies().set_certificate_map(...).doit().await
 //! let r = hub.target_ssl_proxies().set_proxy_header(...).doit().await
 //! let r = hub.target_ssl_proxies().set_ssl_certificates(...).doit().await
 //! let r = hub.target_ssl_proxies().set_ssl_policy(...).doit().await
@@ -545,6 +576,7 @@
 //! let r = hub.target_tcp_proxies().set_proxy_header(...).doit().await
 //! let r = hub.target_vpn_gateways().delete(...).doit().await
 //! let r = hub.target_vpn_gateways().insert(...).doit().await
+//! let r = hub.target_vpn_gateways().set_labels(...).doit().await
 //! let r = hub.url_maps().delete(...).doit().await
 //! let r = hub.url_maps().insert(...).doit().await
 //! let r = hub.url_maps().invalidate_cache(...).doit().await
@@ -555,6 +587,7 @@
 //! let r = hub.vpn_gateways().set_labels(...).doit().await
 //! let r = hub.vpn_tunnels().delete(...).doit().await
 //! let r = hub.vpn_tunnels().insert(...).doit().await
+//! let r = hub.vpn_tunnels().set_labels(...).doit().await
 //! let r = hub.zone_operations().get(...).doit().await
 //! let r = hub.zone_operations().wait(...).doit().await
 //! ```
@@ -587,7 +620,7 @@
 //! use compute1::{Result, Error};
 //! # async fn dox() {
 //! use std::default::Default;
-//! use compute1::{Compute, oauth2, hyper, hyper_rustls};
+//! use compute1::{Compute, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 //! 
 //! // Get an ApplicationSecret instance by some means. It contains the `client_id` and 
 //! // `client_secret`, among other things.
@@ -699,22 +732,17 @@
 // This file was generated automatically from 'src/generator/templates/api/lib.rs.mako'
 // DO NOT EDIT !
 
-#[macro_use]
-extern crate serde_derive;
-
 // Re-export the hyper and hyper_rustls crate, they are required to build the hub
-pub extern crate hyper;
-pub extern crate hyper_rustls;
-extern crate serde;
-extern crate serde_json;
-// Re-export the yup_oauth2 crate, that is required to call some methods of the hub and the client
-pub extern crate yup_oauth2 as oauth2;
-extern crate mime;
-extern crate url;
-
+pub use hyper;
+pub use hyper_rustls;
+pub extern crate google_apis_common as client;
+pub use client::chrono;
 pub mod api;
-pub mod client;
 
 // Re-export the hub type and some basic client structs
 pub use api::Compute;
-pub use client::{Result, Error, Delegate};
+pub use client::{Result, Error, Delegate, FieldMask};
+
+// Re-export the yup_oauth2 crate, that is required to call some methods of the hub and the client
+#[cfg(feature = "yup-oauth2")]
+pub use client::oauth2;

@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/generator/templates/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Firebaseappcheck* crate version *4.0.1+20220225*, where *20220225* is the exact revision of the *firebaseappcheck:v1beta* schema built by the [mako](http://www.makotemplates.org/) code generator *v4.0.1*.
+//! This documentation was generated from *Firebaseappcheck* crate version *5.0.2-beta-1+20230116*, where *20230116* is the exact revision of the *firebaseappcheck:v1beta* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.2-beta-1*.
 //! 
 //! Everything else about the *Firebaseappcheck* *v1_beta* API can be found at the
 //! [official documentation site](https://firebase.google.com/docs/app-check).
@@ -14,7 +14,7 @@
 //! * jwks
 //!  * [*get*](api::JwkGetCall)
 //! * projects
-//!  * [*apps app attest config batch get*](api::ProjectAppAppAttestConfigBatchGetCall), [*apps app attest config get*](api::ProjectAppAppAttestConfigGetCall), [*apps app attest config patch*](api::ProjectAppAppAttestConfigPatchCall), [*apps debug tokens create*](api::ProjectAppDebugTokenCreateCall), [*apps debug tokens delete*](api::ProjectAppDebugTokenDeleteCall), [*apps debug tokens get*](api::ProjectAppDebugTokenGetCall), [*apps debug tokens list*](api::ProjectAppDebugTokenListCall), [*apps debug tokens patch*](api::ProjectAppDebugTokenPatchCall), [*apps device check config batch get*](api::ProjectAppDeviceCheckConfigBatchGetCall), [*apps device check config get*](api::ProjectAppDeviceCheckConfigGetCall), [*apps device check config patch*](api::ProjectAppDeviceCheckConfigPatchCall), [*apps exchange app attest assertion*](api::ProjectAppExchangeAppAttestAssertionCall), [*apps exchange app attest attestation*](api::ProjectAppExchangeAppAttestAttestationCall), [*apps exchange custom token*](api::ProjectAppExchangeCustomTokenCall), [*apps exchange debug token*](api::ProjectAppExchangeDebugTokenCall), [*apps exchange device check token*](api::ProjectAppExchangeDeviceCheckTokenCall), [*apps exchange recaptcha enterprise token*](api::ProjectAppExchangeRecaptchaEnterpriseTokenCall), [*apps exchange recaptcha token*](api::ProjectAppExchangeRecaptchaTokenCall), [*apps exchange safety net token*](api::ProjectAppExchangeSafetyNetTokenCall), [*apps generate app attest challenge*](api::ProjectAppGenerateAppAttestChallengeCall), [*apps recaptcha config batch get*](api::ProjectAppRecaptchaConfigBatchGetCall), [*apps recaptcha config get*](api::ProjectAppRecaptchaConfigGetCall), [*apps recaptcha config patch*](api::ProjectAppRecaptchaConfigPatchCall), [*apps recaptcha enterprise config batch get*](api::ProjectAppRecaptchaEnterpriseConfigBatchGetCall), [*apps recaptcha enterprise config get*](api::ProjectAppRecaptchaEnterpriseConfigGetCall), [*apps recaptcha enterprise config patch*](api::ProjectAppRecaptchaEnterpriseConfigPatchCall), [*apps safety net config batch get*](api::ProjectAppSafetyNetConfigBatchGetCall), [*apps safety net config get*](api::ProjectAppSafetyNetConfigGetCall), [*apps safety net config patch*](api::ProjectAppSafetyNetConfigPatchCall), [*services batch update*](api::ProjectServiceBatchUpdateCall), [*services get*](api::ProjectServiceGetCall), [*services list*](api::ProjectServiceListCall) and [*services patch*](api::ProjectServicePatchCall)
+//!  * [*apps app attest config batch get*](api::ProjectAppAppAttestConfigBatchGetCall), [*apps app attest config get*](api::ProjectAppAppAttestConfigGetCall), [*apps app attest config patch*](api::ProjectAppAppAttestConfigPatchCall), [*apps debug tokens create*](api::ProjectAppDebugTokenCreateCall), [*apps debug tokens delete*](api::ProjectAppDebugTokenDeleteCall), [*apps debug tokens get*](api::ProjectAppDebugTokenGetCall), [*apps debug tokens list*](api::ProjectAppDebugTokenListCall), [*apps debug tokens patch*](api::ProjectAppDebugTokenPatchCall), [*apps device check config batch get*](api::ProjectAppDeviceCheckConfigBatchGetCall), [*apps device check config get*](api::ProjectAppDeviceCheckConfigGetCall), [*apps device check config patch*](api::ProjectAppDeviceCheckConfigPatchCall), [*apps exchange app attest assertion*](api::ProjectAppExchangeAppAttestAssertionCall), [*apps exchange app attest attestation*](api::ProjectAppExchangeAppAttestAttestationCall), [*apps exchange custom token*](api::ProjectAppExchangeCustomTokenCall), [*apps exchange debug token*](api::ProjectAppExchangeDebugTokenCall), [*apps exchange device check token*](api::ProjectAppExchangeDeviceCheckTokenCall), [*apps exchange play integrity token*](api::ProjectAppExchangePlayIntegrityTokenCall), [*apps exchange recaptcha enterprise token*](api::ProjectAppExchangeRecaptchaEnterpriseTokenCall), [*apps exchange recaptcha token*](api::ProjectAppExchangeRecaptchaTokenCall), [*apps exchange recaptcha v3 token*](api::ProjectAppExchangeRecaptchaV3TokenCall), [*apps exchange safety net token*](api::ProjectAppExchangeSafetyNetTokenCall), [*apps generate app attest challenge*](api::ProjectAppGenerateAppAttestChallengeCall), [*apps generate play integrity challenge*](api::ProjectAppGeneratePlayIntegrityChallengeCall), [*apps play integrity config batch get*](api::ProjectAppPlayIntegrityConfigBatchGetCall), [*apps play integrity config get*](api::ProjectAppPlayIntegrityConfigGetCall), [*apps play integrity config patch*](api::ProjectAppPlayIntegrityConfigPatchCall), [*apps recaptcha config batch get*](api::ProjectAppRecaptchaConfigBatchGetCall), [*apps recaptcha config get*](api::ProjectAppRecaptchaConfigGetCall), [*apps recaptcha config patch*](api::ProjectAppRecaptchaConfigPatchCall), [*apps recaptcha enterprise config batch get*](api::ProjectAppRecaptchaEnterpriseConfigBatchGetCall), [*apps recaptcha enterprise config get*](api::ProjectAppRecaptchaEnterpriseConfigGetCall), [*apps recaptcha enterprise config patch*](api::ProjectAppRecaptchaEnterpriseConfigPatchCall), [*apps recaptcha v3 config batch get*](api::ProjectAppRecaptchaV3ConfigBatchGetCall), [*apps recaptcha v3 config get*](api::ProjectAppRecaptchaV3ConfigGetCall), [*apps recaptcha v3 config patch*](api::ProjectAppRecaptchaV3ConfigPatchCall), [*apps safety net config batch get*](api::ProjectAppSafetyNetConfigBatchGetCall), [*apps safety net config get*](api::ProjectAppSafetyNetConfigGetCall), [*apps safety net config patch*](api::ProjectAppSafetyNetConfigPatchCall), [*services batch update*](api::ProjectServiceBatchUpdateCall), [*services get*](api::ProjectServiceGetCall), [*services list*](api::ProjectServiceListCall) and [*services patch*](api::ProjectServicePatchCall)
 //! 
 //! 
 //! 
@@ -53,8 +53,10 @@
 //! let r = hub.projects().apps_exchange_custom_token(...).doit().await
 //! let r = hub.projects().apps_exchange_debug_token(...).doit().await
 //! let r = hub.projects().apps_exchange_device_check_token(...).doit().await
+//! let r = hub.projects().apps_exchange_play_integrity_token(...).doit().await
 //! let r = hub.projects().apps_exchange_recaptcha_enterprise_token(...).doit().await
 //! let r = hub.projects().apps_exchange_recaptcha_token(...).doit().await
+//! let r = hub.projects().apps_exchange_recaptcha_v3_token(...).doit().await
 //! let r = hub.projects().apps_exchange_safety_net_token(...).doit().await
 //! ```
 //! 
@@ -86,7 +88,7 @@
 //! use firebaseappcheck1_beta::{Result, Error};
 //! # async fn dox() {
 //! use std::default::Default;
-//! use firebaseappcheck1_beta::{Firebaseappcheck, oauth2, hyper, hyper_rustls};
+//! use firebaseappcheck1_beta::{Firebaseappcheck, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 //! 
 //! // Get an ApplicationSecret instance by some means. It contains the `client_id` and 
 //! // `client_secret`, among other things.
@@ -195,22 +197,17 @@
 // This file was generated automatically from 'src/generator/templates/api/lib.rs.mako'
 // DO NOT EDIT !
 
-#[macro_use]
-extern crate serde_derive;
-
 // Re-export the hyper and hyper_rustls crate, they are required to build the hub
-pub extern crate hyper;
-pub extern crate hyper_rustls;
-extern crate serde;
-extern crate serde_json;
-// Re-export the yup_oauth2 crate, that is required to call some methods of the hub and the client
-pub extern crate yup_oauth2 as oauth2;
-extern crate mime;
-extern crate url;
-
+pub use hyper;
+pub use hyper_rustls;
+pub extern crate google_apis_common as client;
+pub use client::chrono;
 pub mod api;
-pub mod client;
 
 // Re-export the hub type and some basic client structs
 pub use api::Firebaseappcheck;
-pub use client::{Result, Error, Delegate};
+pub use client::{Result, Error, Delegate, FieldMask};
+
+// Re-export the yup_oauth2 crate, that is required to call some methods of the hub and the client
+#[cfg(feature = "yup-oauth2")]
+pub use client::oauth2;

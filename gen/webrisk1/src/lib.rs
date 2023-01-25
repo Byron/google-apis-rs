@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/generator/templates/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Web Risk* crate version *4.0.1+20220226*, where *20220226* is the exact revision of the *webrisk:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v4.0.1*.
+//! This documentation was generated from *Web Risk* crate version *5.0.2-beta-1+20230121*, where *20230121* is the exact revision of the *webrisk:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.2-beta-1*.
 //! 
 //! Everything else about the *Web Risk* *v1* API can be found at the
 //! [official documentation site](https://cloud.google.com/web-risk/).
@@ -12,7 +12,7 @@
 //! Handle the following *Resources* with ease from the central [hub](WebRisk) ... 
 //! 
 //! * hashes
-//!  * [*search*](api::HasheSearchCall)
+//!  * [*search*](api::HashSearchCall)
 //! * projects
 //!  * [*operations cancel*](api::ProjectOperationCancelCall), [*operations delete*](api::ProjectOperationDeleteCall), [*operations get*](api::ProjectOperationGetCall), [*operations list*](api::ProjectOperationListCall), [*submissions create*](api::ProjectSubmissionCreateCall) and [*uris submit*](api::ProjectUriSubmitCall)
 //! * threat lists
@@ -85,7 +85,7 @@
 //! use webrisk1::{Result, Error};
 //! # async fn dox() {
 //! use std::default::Default;
-//! use webrisk1::{WebRisk, oauth2, hyper, hyper_rustls};
+//! use webrisk1::{WebRisk, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 //! 
 //! // Get an ApplicationSecret instance by some means. It contains the `client_id` and 
 //! // `client_secret`, among other things.
@@ -194,22 +194,17 @@
 // This file was generated automatically from 'src/generator/templates/api/lib.rs.mako'
 // DO NOT EDIT !
 
-#[macro_use]
-extern crate serde_derive;
-
 // Re-export the hyper and hyper_rustls crate, they are required to build the hub
-pub extern crate hyper;
-pub extern crate hyper_rustls;
-extern crate serde;
-extern crate serde_json;
-// Re-export the yup_oauth2 crate, that is required to call some methods of the hub and the client
-pub extern crate yup_oauth2 as oauth2;
-extern crate mime;
-extern crate url;
-
+pub use hyper;
+pub use hyper_rustls;
+pub extern crate google_apis_common as client;
+pub use client::chrono;
 pub mod api;
-pub mod client;
 
 // Re-export the hub type and some basic client structs
 pub use api::WebRisk;
-pub use client::{Result, Error, Delegate};
+pub use client::{Result, Error, Delegate, FieldMask};
+
+// Re-export the yup_oauth2 crate, that is required to call some methods of the hub and the client
+#[cfg(feature = "yup-oauth2")]
+pub use client::oauth2;

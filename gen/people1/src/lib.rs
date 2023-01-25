@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/generator/templates/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *People Service* crate version *4.0.1+20220303*, where *20220303* is the exact revision of the *people:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v4.0.1*.
+//! This documentation was generated from *People Service* crate version *5.0.2-beta-1+20230123*, where *20230123* is the exact revision of the *people:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.2-beta-1*.
 //! 
 //! Everything else about the *People Service* *v1* API can be found at the
 //! [official documentation site](https://developers.google.com/people/).
@@ -15,8 +15,8 @@
 //!  * [*batch get*](api::ContactGroupBatchGetCall), [*create*](api::ContactGroupCreateCall), [*delete*](api::ContactGroupDeleteCall), [*get*](api::ContactGroupGetCall), [*list*](api::ContactGroupListCall), [*members modify*](api::ContactGroupMemberModifyCall) and [*update*](api::ContactGroupUpdateCall)
 //! * other contacts
 //!  * [*copy other contact to my contacts group*](api::OtherContactCopyOtherContactToMyContactsGroupCall), [*list*](api::OtherContactListCall) and [*search*](api::OtherContactSearchCall)
-//! * people
-//!  * [*batch create contacts*](api::PeopleBatchCreateContactCall), [*batch delete contacts*](api::PeopleBatchDeleteContactCall), [*batch update contacts*](api::PeopleBatchUpdateContactCall), [*connections list*](api::PeopleConnectionListCall), [*create contact*](api::PeopleCreateContactCall), [*delete contact*](api::PeopleDeleteContactCall), [*delete contact photo*](api::PeopleDeleteContactPhotoCall), [*get*](api::PeopleGetCall), [*get batch get*](api::PeopleGetBatchGetCall), [*list directory people*](api::PeopleListDirectoryPeopleCall), [*search contacts*](api::PeopleSearchContactCall), [*search directory people*](api::PeopleSearchDirectoryPeopleCall), [*update contact*](api::PeopleUpdateContactCall) and [*update contact photo*](api::PeopleUpdateContactPhotoCall)
+//! * [people](api::Person)
+//!  * [*batch create contacts*](api::PersonBatchCreateContactCall), [*batch delete contacts*](api::PersonBatchDeleteContactCall), [*batch update contacts*](api::PersonBatchUpdateContactCall), [*connections list*](api::PersonConnectionListCall), [*create contact*](api::PersonCreateContactCall), [*delete contact*](api::PersonDeleteContactCall), [*delete contact photo*](api::PersonDeleteContactPhotoCall), [*get*](api::PersonGetCall), [*get batch get*](api::PersonGetBatchGetCall), [*list directory people*](api::PersonListDirectoryPersonCall), [*search contacts*](api::PersonSearchContactCall), [*search directory people*](api::PersonSearchDirectoryPersonCall), [*update contact*](api::PersonUpdateContactCall) and [*update contact photo*](api::PersonUpdateContactPhotoCall)
 //! 
 //! 
 //! 
@@ -87,7 +87,7 @@
 //! use people1::{Result, Error};
 //! # async fn dox() {
 //! use std::default::Default;
-//! use people1::{PeopleService, oauth2, hyper, hyper_rustls};
+//! use people1::{PeopleService, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 //! 
 //! // Get an ApplicationSecret instance by some means. It contains the `client_id` and 
 //! // `client_secret`, among other things.
@@ -106,10 +106,10 @@
 //! // execute the final call using `doit()`.
 //! // Values shown here are possibly random and not representative !
 //! let result = hub.contact_groups().list()
-//!              .sync_token("voluptua.")
-//!              .page_token("At")
-//!              .page_size(-8)
-//!              .group_fields("sed")
+//!              .sync_token("ipsum")
+//!              .page_token("voluptua.")
+//!              .page_size(-27)
+//!              .group_fields(&Default::default())
 //!              .doit().await;
 //! 
 //! match result {
@@ -195,22 +195,17 @@
 // This file was generated automatically from 'src/generator/templates/api/lib.rs.mako'
 // DO NOT EDIT !
 
-#[macro_use]
-extern crate serde_derive;
-
 // Re-export the hyper and hyper_rustls crate, they are required to build the hub
-pub extern crate hyper;
-pub extern crate hyper_rustls;
-extern crate serde;
-extern crate serde_json;
-// Re-export the yup_oauth2 crate, that is required to call some methods of the hub and the client
-pub extern crate yup_oauth2 as oauth2;
-extern crate mime;
-extern crate url;
-
+pub use hyper;
+pub use hyper_rustls;
+pub extern crate google_apis_common as client;
+pub use client::chrono;
 pub mod api;
-pub mod client;
 
 // Re-export the hub type and some basic client structs
 pub use api::PeopleService;
-pub use client::{Result, Error, Delegate};
+pub use client::{Result, Error, Delegate, FieldMask};
+
+// Re-export the yup_oauth2 crate, that is required to call some methods of the hub and the client
+#[cfg(feature = "yup-oauth2")]
+pub use client::oauth2;

@@ -5,16 +5,16 @@ DO NOT EDIT !
 -->
 The `google-spectrum1_explorer` library allows access to all features of the *Google spectrum* service.
 
-This documentation was generated from *spectrum* crate version *4.0.1+20170306*, where *20170306* is the exact revision of the *spectrum:v1explorer* schema built by the [mako](http://www.makotemplates.org/) code generator *v4.0.1*.
+This documentation was generated from *spectrum* crate version *5.0.2-beta-1+20170306*, where *20170306* is the exact revision of the *spectrum:v1explorer* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.2-beta-1*.
 
 Everything else about the *spectrum* *v1_explorer* API can be found at the
 [official documentation site](http://developers.google.com/spectrum).
 # Features
 
-Handle the following *Resources* with ease from the central [hub](https://docs.rs/google-spectrum1_explorer/4.0.1+20170306/google_spectrum1_explorer/Spectrum) ... 
+Handle the following *Resources* with ease from the central [hub](https://docs.rs/google-spectrum1_explorer/5.0.2-beta-1+20170306/google_spectrum1_explorer/Spectrum) ... 
 
 * paws
- * [*get spectrum*](https://docs.rs/google-spectrum1_explorer/4.0.1+20170306/google_spectrum1_explorer/api::PawGetSpectrumCall), [*get spectrum batch*](https://docs.rs/google-spectrum1_explorer/4.0.1+20170306/google_spectrum1_explorer/api::PawGetSpectrumBatchCall), [*init*](https://docs.rs/google-spectrum1_explorer/4.0.1+20170306/google_spectrum1_explorer/api::PawInitCall), [*notify spectrum use*](https://docs.rs/google-spectrum1_explorer/4.0.1+20170306/google_spectrum1_explorer/api::PawNotifySpectrumUseCall), [*register*](https://docs.rs/google-spectrum1_explorer/4.0.1+20170306/google_spectrum1_explorer/api::PawRegisterCall) and [*verify device*](https://docs.rs/google-spectrum1_explorer/4.0.1+20170306/google_spectrum1_explorer/api::PawVerifyDeviceCall)
+ * [*get spectrum*](https://docs.rs/google-spectrum1_explorer/5.0.2-beta-1+20170306/google_spectrum1_explorer/api::PawGetSpectrumCall), [*get spectrum batch*](https://docs.rs/google-spectrum1_explorer/5.0.2-beta-1+20170306/google_spectrum1_explorer/api::PawGetSpectrumBatchCall), [*init*](https://docs.rs/google-spectrum1_explorer/5.0.2-beta-1+20170306/google_spectrum1_explorer/api::PawInitCall), [*notify spectrum use*](https://docs.rs/google-spectrum1_explorer/5.0.2-beta-1+20170306/google_spectrum1_explorer/api::PawNotifySpectrumUseCall), [*register*](https://docs.rs/google-spectrum1_explorer/5.0.2-beta-1+20170306/google_spectrum1_explorer/api::PawRegisterCall) and [*verify device*](https://docs.rs/google-spectrum1_explorer/5.0.2-beta-1+20170306/google_spectrum1_explorer/api::PawVerifyDeviceCall)
 
 
 
@@ -23,17 +23,17 @@ Handle the following *Resources* with ease from the central [hub](https://docs.r
 
 The API is structured into the following primary items:
 
-* **[Hub](https://docs.rs/google-spectrum1_explorer/4.0.1+20170306/google_spectrum1_explorer/Spectrum)**
+* **[Hub](https://docs.rs/google-spectrum1_explorer/5.0.2-beta-1+20170306/google_spectrum1_explorer/Spectrum)**
     * a central object to maintain state and allow accessing all *Activities*
-    * creates [*Method Builders*](https://docs.rs/google-spectrum1_explorer/4.0.1+20170306/google_spectrum1_explorer/client::MethodsBuilder) which in turn
-      allow access to individual [*Call Builders*](https://docs.rs/google-spectrum1_explorer/4.0.1+20170306/google_spectrum1_explorer/client::CallBuilder)
-* **[Resources](https://docs.rs/google-spectrum1_explorer/4.0.1+20170306/google_spectrum1_explorer/client::Resource)**
+    * creates [*Method Builders*](https://docs.rs/google-spectrum1_explorer/5.0.2-beta-1+20170306/google_spectrum1_explorer/client::MethodsBuilder) which in turn
+      allow access to individual [*Call Builders*](https://docs.rs/google-spectrum1_explorer/5.0.2-beta-1+20170306/google_spectrum1_explorer/client::CallBuilder)
+* **[Resources](https://docs.rs/google-spectrum1_explorer/5.0.2-beta-1+20170306/google_spectrum1_explorer/client::Resource)**
     * primary types that you can apply *Activities* to
     * a collection of properties and *Parts*
-    * **[Parts](https://docs.rs/google-spectrum1_explorer/4.0.1+20170306/google_spectrum1_explorer/client::Part)**
+    * **[Parts](https://docs.rs/google-spectrum1_explorer/5.0.2-beta-1+20170306/google_spectrum1_explorer/client::Part)**
         * a collection of properties
         * never directly used in *Activities*
-* **[Activities](https://docs.rs/google-spectrum1_explorer/4.0.1+20170306/google_spectrum1_explorer/client::CallBuilder)**
+* **[Activities](https://docs.rs/google-spectrum1_explorer/5.0.2-beta-1+20170306/google_spectrum1_explorer/client::CallBuilder)**
     * operations to apply to *Resources*
 
 All *structures* are marked with applicable traits to further categorize them and ease browsing.
@@ -77,7 +77,7 @@ extern crate google_spectrum1_explorer as spectrum1_explorer;
 use spectrum1_explorer::api::PawsGetSpectrumBatchRequest;
 use spectrum1_explorer::{Result, Error};
 use std::default::Default;
-use spectrum1_explorer::{Spectrum, oauth2, hyper, hyper_rustls};
+use spectrum1_explorer::{Spectrum, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 
 // Get an ApplicationSecret instance by some means. It contains the `client_id` and 
 // `client_secret`, among other things.
@@ -124,17 +124,17 @@ match result {
 ```
 ## Handling Errors
 
-All errors produced by the system are provided either as [Result](https://docs.rs/google-spectrum1_explorer/4.0.1+20170306/google_spectrum1_explorer/client::Result) enumeration as return value of
+All errors produced by the system are provided either as [Result](https://docs.rs/google-spectrum1_explorer/5.0.2-beta-1+20170306/google_spectrum1_explorer/client::Result) enumeration as return value of
 the doit() methods, or handed as possibly intermediate results to either the 
-[Hub Delegate](https://docs.rs/google-spectrum1_explorer/4.0.1+20170306/google_spectrum1_explorer/client::Delegate), or the [Authenticator Delegate](https://docs.rs/yup-oauth2/*/yup_oauth2/trait.AuthenticatorDelegate.html).
+[Hub Delegate](https://docs.rs/google-spectrum1_explorer/5.0.2-beta-1+20170306/google_spectrum1_explorer/client::Delegate), or the [Authenticator Delegate](https://docs.rs/yup-oauth2/*/yup_oauth2/trait.AuthenticatorDelegate.html).
 
 When delegates handle errors or intermediate values, they may have a chance to instruct the system to retry. This 
 makes the system potentially resilient to all kinds of errors.
 
 ## Uploads and Downloads
-If a method supports downloads, the response body, which is part of the [Result](https://docs.rs/google-spectrum1_explorer/4.0.1+20170306/google_spectrum1_explorer/client::Result), should be
+If a method supports downloads, the response body, which is part of the [Result](https://docs.rs/google-spectrum1_explorer/5.0.2-beta-1+20170306/google_spectrum1_explorer/client::Result), should be
 read by you to obtain the media.
-If such a method also supports a [Response Result](https://docs.rs/google-spectrum1_explorer/4.0.1+20170306/google_spectrum1_explorer/client::ResponseResult), it will return that by default.
+If such a method also supports a [Response Result](https://docs.rs/google-spectrum1_explorer/5.0.2-beta-1+20170306/google_spectrum1_explorer/client::ResponseResult), it will return that by default.
 You can see it as meta-data for the actual media. To trigger a media download, you will have to set up the builder by making
 this call: `.param("alt", "media")`.
 
@@ -144,29 +144,29 @@ Methods supporting uploads can do so using up to 2 different protocols:
 
 ## Customization and Callbacks
 
-You may alter the way an `doit()` method is called by providing a [delegate](https://docs.rs/google-spectrum1_explorer/4.0.1+20170306/google_spectrum1_explorer/client::Delegate) to the 
-[Method Builder](https://docs.rs/google-spectrum1_explorer/4.0.1+20170306/google_spectrum1_explorer/client::CallBuilder) before making the final `doit()` call. 
+You may alter the way an `doit()` method is called by providing a [delegate](https://docs.rs/google-spectrum1_explorer/5.0.2-beta-1+20170306/google_spectrum1_explorer/client::Delegate) to the 
+[Method Builder](https://docs.rs/google-spectrum1_explorer/5.0.2-beta-1+20170306/google_spectrum1_explorer/client::CallBuilder) before making the final `doit()` call. 
 Respective methods will be called to provide progress information, as well as determine whether the system should 
 retry on failure.
 
-The [delegate trait](https://docs.rs/google-spectrum1_explorer/4.0.1+20170306/google_spectrum1_explorer/client::Delegate) is default-implemented, allowing you to customize it with minimal effort.
+The [delegate trait](https://docs.rs/google-spectrum1_explorer/5.0.2-beta-1+20170306/google_spectrum1_explorer/client::Delegate) is default-implemented, allowing you to customize it with minimal effort.
 
 ## Optional Parts in Server-Requests
 
-All structures provided by this library are made to be [encodable](https://docs.rs/google-spectrum1_explorer/4.0.1+20170306/google_spectrum1_explorer/client::RequestValue) and 
-[decodable](https://docs.rs/google-spectrum1_explorer/4.0.1+20170306/google_spectrum1_explorer/client::ResponseResult) via *json*. Optionals are used to indicate that partial requests are responses 
+All structures provided by this library are made to be [encodable](https://docs.rs/google-spectrum1_explorer/5.0.2-beta-1+20170306/google_spectrum1_explorer/client::RequestValue) and 
+[decodable](https://docs.rs/google-spectrum1_explorer/5.0.2-beta-1+20170306/google_spectrum1_explorer/client::ResponseResult) via *json*. Optionals are used to indicate that partial requests are responses 
 are valid.
-Most optionals are are considered [Parts](https://docs.rs/google-spectrum1_explorer/4.0.1+20170306/google_spectrum1_explorer/client::Part) which are identifiable by name, which will be sent to 
+Most optionals are are considered [Parts](https://docs.rs/google-spectrum1_explorer/5.0.2-beta-1+20170306/google_spectrum1_explorer/client::Part) which are identifiable by name, which will be sent to 
 the server to indicate either the set parts of the request or the desired parts in the response.
 
 ## Builder Arguments
 
-Using [method builders](https://docs.rs/google-spectrum1_explorer/4.0.1+20170306/google_spectrum1_explorer/client::CallBuilder), you are able to prepare an action call by repeatedly calling it's methods.
+Using [method builders](https://docs.rs/google-spectrum1_explorer/5.0.2-beta-1+20170306/google_spectrum1_explorer/client::CallBuilder), you are able to prepare an action call by repeatedly calling it's methods.
 These will always take a single argument, for which the following statements are true.
 
 * [PODs][wiki-pod] are handed by copy
 * strings are passed as `&str`
-* [request values](https://docs.rs/google-spectrum1_explorer/4.0.1+20170306/google_spectrum1_explorer/client::RequestValue) are moved
+* [request values](https://docs.rs/google-spectrum1_explorer/5.0.2-beta-1+20170306/google_spectrum1_explorer/client::RequestValue) are moved
 
 Arguments will always be copied or cloned into the builder, to make them independent of their original life times.
 

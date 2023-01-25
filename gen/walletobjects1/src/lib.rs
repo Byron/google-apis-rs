@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/generator/templates/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Walletobjects* crate version *4.0.4+20220928*, where *20220928* is the exact revision of the *walletobjects:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v4.0.4*.
+//! This documentation was generated from *Walletobjects* crate version *5.0.2-beta-1+20230124*, where *20230124* is the exact revision of the *walletobjects:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.2-beta-1*.
 //! 
 //! Everything else about the *Walletobjects* *v1* API can be found at the
 //! [official documentation site](https://developers.google.com/pay/passes).
@@ -35,6 +35,8 @@
 //!  * [*addmessage*](api::LoyaltyclasAddmessageCall), [*get*](api::LoyaltyclasGetCall), [*insert*](api::LoyaltyclasInsertCall), [*list*](api::LoyaltyclasListCall), [*patch*](api::LoyaltyclasPatchCall) and [*update*](api::LoyaltyclasUpdateCall)
 //! * loyaltyobject
 //!  * [*addmessage*](api::LoyaltyobjectAddmessageCall), [*get*](api::LoyaltyobjectGetCall), [*insert*](api::LoyaltyobjectInsertCall), [*list*](api::LoyaltyobjectListCall), [*modifylinkedofferobjects*](api::LoyaltyobjectModifylinkedofferobjectCall), [*patch*](api::LoyaltyobjectPatchCall) and [*update*](api::LoyaltyobjectUpdateCall)
+//! * [media](api::Media)
+//!  * [*upload*](api::MediaUploadCall)
 //! * offerclass
 //!  * [*addmessage*](api::OfferclasAddmessageCall), [*get*](api::OfferclasGetCall), [*insert*](api::OfferclasInsertCall), [*list*](api::OfferclasListCall), [*patch*](api::OfferclasPatchCall) and [*update*](api::OfferclasUpdateCall)
 //! * offerobject
@@ -47,7 +49,13 @@
 //!  * [*addmessage*](api::TransitclasAddmessageCall), [*get*](api::TransitclasGetCall), [*insert*](api::TransitclasInsertCall), [*list*](api::TransitclasListCall), [*patch*](api::TransitclasPatchCall) and [*update*](api::TransitclasUpdateCall)
 //! * transitobject
 //!  * [*addmessage*](api::TransitobjectAddmessageCall), [*get*](api::TransitobjectGetCall), [*insert*](api::TransitobjectInsertCall), [*list*](api::TransitobjectListCall), [*patch*](api::TransitobjectPatchCall) and [*update*](api::TransitobjectUpdateCall)
+//! * walletobjects
+//!  * [*v1 private content upload private data*](api::WalletobjectV1PrivateContentUploadPrivateDataCall)
 //! 
+//! 
+//! Upload supported by ...
+//! 
+//! * [*upload media*](api::MediaUploadCall)
 //! 
 //! 
 //! 
@@ -123,7 +131,7 @@
 //! use walletobjects1::{Result, Error};
 //! # async fn dox() {
 //! use std::default::Default;
-//! use walletobjects1::{Walletobjects, oauth2, hyper, hyper_rustls};
+//! use walletobjects1::{Walletobjects, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 //! 
 //! // Get an ApplicationSecret instance by some means. It contains the `client_id` and 
 //! // `client_secret`, among other things.
@@ -236,10 +244,13 @@
 pub use hyper;
 pub use hyper_rustls;
 pub extern crate google_apis_common as client;
-
+pub use client::chrono;
 pub mod api;
 
 // Re-export the hub type and some basic client structs
 pub use api::Walletobjects;
+pub use client::{Result, Error, Delegate, FieldMask};
+
 // Re-export the yup_oauth2 crate, that is required to call some methods of the hub and the client
-pub use client::{Result, Error, Delegate, oauth2};
+#[cfg(feature = "yup-oauth2")]
+pub use client::oauth2;

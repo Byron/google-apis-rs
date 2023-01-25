@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/generator/templates/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Iam* crate version *4.0.1+20220224*, where *20220224* is the exact revision of the *iam:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v4.0.1*.
+//! This documentation was generated from *Iam* crate version *5.0.2-beta-1+20230112*, where *20230112* is the exact revision of the *iam:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.2-beta-1*.
 //! 
 //! Everything else about the *Iam* *v1* API can be found at the
 //! [official documentation site](https://cloud.google.com/iam/).
@@ -14,7 +14,7 @@
 //! * iam policies
 //!  * [*lint policy*](api::IamPolicyLintPolicyCall) and [*query auditable services*](api::IamPolicyQueryAuditableServiceCall)
 //! * locations
-//!  * [*workforce pools operations get*](api::LocationWorkforcePoolOperationGetCall), [*workforce pools providers operations get*](api::LocationWorkforcePoolProviderOperationGetCall) and [*workforce pools subjects operations get*](api::LocationWorkforcePoolSubjectOperationGetCall)
+//!  * [*workforce pools operations get*](api::LocationWorkforcePoolOperationGetCall), [*workforce pools providers keys operations get*](api::LocationWorkforcePoolProviderKeyOperationGetCall), [*workforce pools providers operations get*](api::LocationWorkforcePoolProviderOperationGetCall) and [*workforce pools subjects operations get*](api::LocationWorkforcePoolSubjectOperationGetCall)
 //! * organizations
 //!  * [*roles create*](api::OrganizationRoleCreateCall), [*roles delete*](api::OrganizationRoleDeleteCall), [*roles get*](api::OrganizationRoleGetCall), [*roles list*](api::OrganizationRoleListCall), [*roles patch*](api::OrganizationRolePatchCall) and [*roles undelete*](api::OrganizationRoleUndeleteCall)
 //! * [permissions](api::Permission)
@@ -58,6 +58,7 @@
 //! 
 //! ```ignore
 //! let r = hub.locations().workforce_pools_operations_get(...).doit().await
+//! let r = hub.locations().workforce_pools_providers_keys_operations_get(...).doit().await
 //! let r = hub.locations().workforce_pools_providers_operations_get(...).doit().await
 //! let r = hub.locations().workforce_pools_subjects_operations_get(...).doit().await
 //! let r = hub.projects().locations_workload_identity_pools_operations_get(...).doit().await
@@ -101,7 +102,7 @@
 //! use iam1::{Result, Error};
 //! # async fn dox() {
 //! use std::default::Default;
-//! use iam1::{Iam, oauth2, hyper, hyper_rustls};
+//! use iam1::{Iam, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 //! 
 //! // Get an ApplicationSecret instance by some means. It contains the `client_id` and 
 //! // `client_secret`, among other things.
@@ -211,22 +212,17 @@
 // This file was generated automatically from 'src/generator/templates/api/lib.rs.mako'
 // DO NOT EDIT !
 
-#[macro_use]
-extern crate serde_derive;
-
 // Re-export the hyper and hyper_rustls crate, they are required to build the hub
-pub extern crate hyper;
-pub extern crate hyper_rustls;
-extern crate serde;
-extern crate serde_json;
-// Re-export the yup_oauth2 crate, that is required to call some methods of the hub and the client
-pub extern crate yup_oauth2 as oauth2;
-extern crate mime;
-extern crate url;
-
+pub use hyper;
+pub use hyper_rustls;
+pub extern crate google_apis_common as client;
+pub use client::chrono;
 pub mod api;
-pub mod client;
 
 // Re-export the hub type and some basic client structs
 pub use api::Iam;
-pub use client::{Result, Error, Delegate};
+pub use client::{Result, Error, Delegate, FieldMask};
+
+// Re-export the yup_oauth2 crate, that is required to call some methods of the hub and the client
+#[cfg(feature = "yup-oauth2")]
+pub use client::oauth2;

@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/generator/templates/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Doubleclicksearch* crate version *4.0.1+20220301*, where *20220301* is the exact revision of the *doubleclicksearch:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v4.0.1*.
+//! This documentation was generated from *Doubleclicksearch* crate version *5.0.2-beta-1+20230118*, where *20230118* is the exact revision of the *doubleclicksearch:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.2-beta-1*.
 //! 
 //! Everything else about the *Doubleclicksearch* *v2* API can be found at the
 //! [official documentation site](https://developers.google.com/search-ads).
@@ -12,9 +12,9 @@
 //! Handle the following *Resources* with ease from the central [hub](Doubleclicksearch) ... 
 //! 
 //! * [conversion](api::Conversion)
-//!  * [*get*](api::ConversionGetCall), [*insert*](api::ConversionInsertCall), [*update*](api::ConversionUpdateCall) and [*update availability*](api::ConversionUpdateAvailabilityCall)
+//!  * [*get*](api::ConversionGetCall), [*get by customer id*](api::ConversionGetByCustomerIdCall), [*insert*](api::ConversionInsertCall), [*update*](api::ConversionUpdateCall) and [*update availability*](api::ConversionUpdateAvailabilityCall)
 //! * [reports](api::Report)
-//!  * [*generate*](api::ReportGenerateCall), [*get*](api::ReportGetCall), [*get file*](api::ReportGetFileCall) and [*request*](api::ReportRequestCall)
+//!  * [*generate*](api::ReportGenerateCall), [*get*](api::ReportGetCall), [*get file*](api::ReportGetFileCall), [*get id mapping file*](api::ReportGetIdMappingFileCall) and [*request*](api::ReportRequestCall)
 //! * [saved columns](api::SavedColumn)
 //!  * [*list*](api::SavedColumnListCall)
 //! 
@@ -22,6 +22,7 @@
 //! Download supported by ...
 //! 
 //! * [*get file reports*](api::ReportGetFileCall)
+//! * [*get id mapping file reports*](api::ReportGetIdMappingFileCall)
 //! 
 //! 
 //! 
@@ -58,6 +59,7 @@
 //! let r = hub.reports().generate(...).doit().await
 //! let r = hub.reports().get(...).doit().await
 //! let r = hub.reports().get_file(...).doit().await
+//! let r = hub.reports().get_id_mapping_file(...).doit().await
 //! let r = hub.reports().request(...).doit().await
 //! ```
 //! 
@@ -88,7 +90,7 @@
 //! use doubleclicksearch2::{Result, Error};
 //! # async fn dox() {
 //! use std::default::Default;
-//! use doubleclicksearch2::{Doubleclicksearch, oauth2, hyper, hyper_rustls};
+//! use doubleclicksearch2::{Doubleclicksearch, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 //! 
 //! // Get an ApplicationSecret instance by some means. It contains the `client_id` and 
 //! // `client_secret`, among other things.
@@ -192,22 +194,17 @@
 // This file was generated automatically from 'src/generator/templates/api/lib.rs.mako'
 // DO NOT EDIT !
 
-#[macro_use]
-extern crate serde_derive;
-
 // Re-export the hyper and hyper_rustls crate, they are required to build the hub
-pub extern crate hyper;
-pub extern crate hyper_rustls;
-extern crate serde;
-extern crate serde_json;
-// Re-export the yup_oauth2 crate, that is required to call some methods of the hub and the client
-pub extern crate yup_oauth2 as oauth2;
-extern crate mime;
-extern crate url;
-
+pub use hyper;
+pub use hyper_rustls;
+pub extern crate google_apis_common as client;
+pub use client::chrono;
 pub mod api;
-pub mod client;
 
 // Re-export the hub type and some basic client structs
 pub use api::Doubleclicksearch;
-pub use client::{Result, Error, Delegate};
+pub use client::{Result, Error, Delegate, FieldMask};
+
+// Re-export the yup_oauth2 crate, that is required to call some methods of the hub and the client
+#[cfg(feature = "yup-oauth2")]
+pub use client::oauth2;

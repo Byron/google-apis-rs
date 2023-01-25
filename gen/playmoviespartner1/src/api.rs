@@ -1,19 +1,20 @@
 use std::collections::HashMap;
 use std::cell::RefCell;
 use std::default::Default;
-use std::collections::BTreeMap;
+use std::collections::BTreeSet;
 use std::error::Error as StdError;
 use serde_json as json;
 use std::io;
 use std::fs;
 use std::mem;
-use std::thread::sleep;
 
-use http::Uri;
 use hyper::client::connect;
 use tokio::io::{AsyncRead, AsyncWrite};
+use tokio::time::sleep;
 use tower_service;
-use crate::client;
+use serde::{Serialize, Deserialize};
+
+use crate::{client, client::GetToken, client::serde_with};
 
 // ##############
 // UTILITIES ###
@@ -61,7 +62,7 @@ impl Default for Scope {
 /// use playmoviespartner1::{Result, Error};
 /// # async fn dox() {
 /// use std::default::Default;
-/// use playmoviespartner1::{PlayMovies, oauth2, hyper, hyper_rustls};
+/// use playmoviespartner1::{PlayMovies, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// // Get an ApplicationSecret instance by some means. It contains the `client_id` and 
 /// // `client_secret`, among other things.
@@ -104,7 +105,7 @@ impl Default for Scope {
 #[derive(Clone)]
 pub struct PlayMovies<S> {
     pub client: hyper::Client<S, hyper::body::Body>,
-    pub auth: oauth2::authenticator::Authenticator<S>,
+    pub auth: Box<dyn client::GetToken>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
@@ -114,11 +115,11 @@ impl<'a, S> client::Hub for PlayMovies<S> {}
 
 impl<'a, S> PlayMovies<S> {
 
-    pub fn new(client: hyper::Client<S, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<S>) -> PlayMovies<S> {
+    pub fn new<A: 'static + client::GetToken>(client: hyper::Client<S, hyper::body::Body>, auth: A) -> PlayMovies<S> {
         PlayMovies {
             client,
-            auth: authenticator,
-            _user_agent: "google-api-rust-client/4.0.1".to_string(),
+            auth: Box::new(auth),
+            _user_agent: "google-api-rust-client/5.0.2-beta-1".to_string(),
             _base_url: "https://playmoviespartner.googleapis.com/".to_string(),
             _root_url: "https://playmoviespartner.googleapis.com/".to_string(),
         }
@@ -129,7 +130,7 @@ impl<'a, S> PlayMovies<S> {
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/4.0.1`.
+    /// It defaults to `google-api-rust-client/5.0.2-beta-1`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -173,96 +174,120 @@ impl<'a, S> PlayMovies<S> {
 /// 
 /// * [orders get accounts](AccountOrderGetCall) (response)
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Order {
     /// Countries where the Order is available,
     /// using the "ISO 3166-1 alpha-2" format (example: "US").
+    
     pub countries: Option<Vec<String>>,
     /// Detailed status of the order
     #[serde(rename="statusDetail")]
+    
     pub status_detail: Option<String>,
     /// High-level status of the order.
+    
     pub status: Option<String>,
     /// Timestamp of the earliest start date of the Avails
     /// linked to this Order.
     #[serde(rename="earliestAvailStartTime")]
-    pub earliest_avail_start_time: Option<String>,
+    
+    pub earliest_avail_start_time: Option<client::chrono::DateTime<client::chrono::offset::Utc>>,
     /// Default Edit name,
     /// usually in the language of the country of origin.
     /// Example: "Googlers, The".
+    
     pub name: Option<String>,
     /// Name of the studio that owns the Edit ordered.
     #[serde(rename="studioName")]
+    
     pub studio_name: Option<String>,
     /// Timestamp when the Order was fulfilled.
     #[serde(rename="receivedTime")]
-    pub received_time: Option<String>,
+    
+    pub received_time: Option<client::chrono::DateTime<client::chrono::offset::Utc>>,
     /// Default Season name,
     /// usually in the language of the country of origin.
     /// Only available for TV Edits
     /// Example: "Googlers, The - A Brave New World".
     #[serde(rename="seasonName")]
+    
     pub season_name: Option<String>,
     /// ID that can be used to externally identify an Order.
     /// This ID is provided by partners when submitting the Avails.
     /// Example: 'GOOGLER_2006'
     #[serde(rename="customId")]
+    
     pub custom_id: Option<String>,
     /// YouTube Channel Name that should be used to fulfill the Order.
     /// Example: "Google_channel".
     #[serde(rename="channelName")]
+    
     pub channel_name: Option<String>,
     /// Timestamp when the Order was approved.
     #[serde(rename="approvedTime")]
-    pub approved_time: Option<String>,
+    
+    pub approved_time: Option<client::chrono::DateTime<client::chrono::offset::Utc>>,
     /// Default Show name,
     /// usually in the language of the country of origin.
     /// Only available for TV Edits
     /// Example: "Googlers, The".
     #[serde(rename="showName")]
+    
     pub show_name: Option<String>,
     /// A simpler representation of the priority.
     #[serde(rename="normalizedPriority")]
+    
     pub normalized_priority: Option<String>,
     /// ID internally generated by Google to uniquely identify an Order.
     /// Example: 'abcde12_x'
     #[serde(rename="orderId")]
+    
     pub order_id: Option<String>,
     /// Type of the Edit linked to the Order.
     #[serde(rename="type")]
+    
     pub type_: Option<String>,
     /// Field explaining why an Order has been rejected.
     /// Example: "Trailer audio is 2ch mono, please re-deliver in stereo".
     #[serde(rename="rejectionNote")]
+    
     pub rejection_note: Option<String>,
     /// YouTube Channel ID that should be used to fulfill the Order.
     /// Example: "UCRG64darCZhb".
     #[serde(rename="channelId")]
+    
     pub channel_id: Option<String>,
     /// Legacy Order priority, as defined by Google.
     /// Example: 'P0'
     #[serde(rename="legacyPriority")]
+    
     pub legacy_priority: Option<String>,
     /// Name of the post-production house that manages the Edit ordered.
     #[serde(rename="pphName")]
+    
     pub pph_name: Option<String>,
     /// Timestamp when the Order was created.
     #[serde(rename="orderedTime")]
-    pub ordered_time: Option<String>,
+    
+    pub ordered_time: Option<client::chrono::DateTime<client::chrono::offset::Utc>>,
     /// Order priority, as defined by Google.
     /// The higher the value, the higher the priority.
     /// Example: 90
+    
     pub priority: Option<f64>,
     /// Google-generated ID identifying the video linked to this Order, once
     /// delivered.
     /// Example: 'gtry456_xc'.
     #[serde(rename="videoId")]
+    
     pub video_id: Option<String>,
     /// Default Episode name,
     /// usually in the language of the country of origin.
     /// Only available for TV Edits
     /// Example: "Googlers, The - Pilot".
     #[serde(rename="episodeName")]
+    
     pub episode_name: Option<String>,
 }
 
@@ -278,16 +303,20 @@ impl client::ResponseResult for Order {}
 /// 
 /// * [store infos list accounts](AccountStoreInfoListCall) (response)
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ListStoreInfosResponse {
     /// See 'List methods rules' for info about this field.
     #[serde(rename="nextPageToken")]
+    
     pub next_page_token: Option<String>,
     /// See _List methods rules_ for more information about this field.
     #[serde(rename="totalSize")]
+    
     pub total_size: Option<i32>,
     /// List of StoreInfos that match the request criteria.
     #[serde(rename="storeInfos")]
+    
     pub store_infos: Option<Vec<StoreInfo>>,
 }
 
@@ -303,15 +332,19 @@ impl client::ResponseResult for ListStoreInfosResponse {}
 /// 
 /// * [avails list accounts](AccountAvailListCall) (response)
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ListAvailsResponse {
     /// List of Avails that match the request criteria.
+    
     pub avails: Option<Vec<Avail>>,
     /// See _List methods rules_ for info about this field.
     #[serde(rename="nextPageToken")]
+    
     pub next_page_token: Option<String>,
     /// See _List methods rules_ for more information about this field.
     #[serde(rename="totalSize")]
+    
     pub total_size: Option<i32>,
 }
 
@@ -334,61 +367,77 @@ impl client::ResponseResult for ListAvailsResponse {}
 /// 
 /// * [store infos country get accounts](AccountStoreInfoCountryGetCall) (response)
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct StoreInfo {
     /// Timestamp when the Edit went live on the Store.
     #[serde(rename="liveTime")]
-    pub live_time: Option<String>,
+    
+    pub live_time: Option<client::chrono::DateTime<client::chrono::offset::Utc>>,
     /// Google-generated ID identifying the video linked to the Edit.
     /// Example: 'gtry456_xc'
     #[serde(rename="videoId")]
+    
     pub video_id: Option<String>,
     /// Whether the Edit has info cards.
     #[serde(rename="hasInfoCards")]
+    
     pub has_info_cards: Option<bool>,
     /// Whether the Edit has a VOD offer.
     #[serde(rename="hasVodOffer")]
+    
     pub has_vod_offer: Option<bool>,
     /// Name of the post-production houses that manage the Edit.
     #[serde(rename="pphNames")]
+    
     pub pph_names: Option<Vec<String>>,
     /// The number assigned to the episode within a season.
     /// Only available on TV Edits.
     /// Example: "1".
     #[serde(rename="episodeNumber")]
+    
     pub episode_number: Option<String>,
     /// Name of the studio that owns the Edit ordered.
     #[serde(rename="studioName")]
+    
     pub studio_name: Option<String>,
     /// Subtitles available for this Edit.
+    
     pub subtitles: Option<Vec<String>>,
     /// Audio tracks available for this Edit.
     #[serde(rename="audioTracks")]
+    
     pub audio_tracks: Option<Vec<String>>,
     /// Default Show name, usually in the language of the country of
     /// origin.
     /// Only available for TV Edits
     /// Example: "Googlers, The".
     #[serde(rename="showName")]
+    
     pub show_name: Option<String>,
     /// Country where Edit is available in ISO 3166-1 alpha-2 country
     /// code.
     /// Example: "US".
+    
     pub country: Option<String>,
     /// Google-generated ID identifying the show linked to the Edit.
     /// Only available for TV Edits.
     /// Example: 'et2hsue_x'
     #[serde(rename="showId")]
+    
     pub show_id: Option<String>,
     /// Edit type, like Movie, Episode or Season.
     #[serde(rename="type")]
+    
     pub type_: Option<String>,
     /// Google-generated ID identifying the trailer linked to the Edit.
     /// Example: 'bhd_4e_cx'
     #[serde(rename="trailerId")]
+    
     pub trailer_id: Option<String>,
     /// Whether the Edit has a HD offer.
     #[serde(rename="hasHdOffer")]
+    
     pub has_hd_offer: Option<bool>,
     /// Knowledge Graph ID associated to this Edit, if available.
     /// This ID links the Edit to its knowledge entity, externally accessible
@@ -396,43 +445,53 @@ pub struct StoreInfo {
     /// In the absense of Title EIDR or Edit EIDR, this ID helps link together
     /// multiple Edits across countries.
     /// Example: '/m/0ffx29'
+    
     pub mid: Option<String>,
     /// Whether the Edit has a 5.1 channel audio track.
     #[serde(rename="hasAudio51")]
+    
     pub has_audio51: Option<bool>,
     /// Default Edit name, usually in the language of the country of
     /// origin.
     /// Example: "Googlers, The".
+    
     pub name: Option<String>,
     /// Google-generated ID identifying the season linked to the Edit.
     /// Only available for TV Edits.
     /// Example: 'ster23ex'
     #[serde(rename="seasonId")]
+    
     pub season_id: Option<String>,
     /// Title-level EIDR ID.
     /// Example: "10.5240/1489-49A2-3956-4B2D-FE16-5".
     #[serde(rename="titleLevelEidr")]
+    
     pub title_level_eidr: Option<String>,
     /// Default Season name, usually in the language of the country of
     /// origin.
     /// Only available for TV Edits
     /// Example: "Googlers, The - A Brave New World".
     #[serde(rename="seasonName")]
+    
     pub season_name: Option<String>,
     /// The number assigned to the season within a show.
     /// Only available on TV Edits.
     /// Example: "1".
     #[serde(rename="seasonNumber")]
+    
     pub season_number: Option<String>,
     /// Whether the Edit has a EST offer.
     #[serde(rename="hasEstOffer")]
+    
     pub has_est_offer: Option<bool>,
     /// Edit-level EIDR ID.
     /// Example: "10.5240/1489-49A2-3956-4B2D-FE16-6".
     #[serde(rename="editLevelEidr")]
+    
     pub edit_level_eidr: Option<String>,
     /// Whether the Edit has a SD offer.
     #[serde(rename="hasSdOffer")]
+    
     pub has_sd_offer: Option<bool>,
 }
 
@@ -455,63 +514,76 @@ impl client::ResponseResult for StoreInfo {}
 /// 
 /// * [avails get accounts](AccountAvailGetCall) (response)
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Avail {
     /// Title used by involved parties to refer to this series.
     /// Only available on TV Avails.
     /// Example: "Googlers, The".
     #[serde(rename="seriesTitleInternalAlias")]
+    
     pub series_title_internal_alias: Option<String>,
     /// Indicates the format profile covered by the transaction.
     #[serde(rename="formatProfile")]
+    
     pub format_profile: Option<String>,
     /// Title Identifier. This should be the Title Level EIDR.
     /// Example: "10.5240/1489-49A2-3956-4B2D-FE16-5".
     #[serde(rename="contentId")]
+    
     pub content_id: Option<String>,
     /// Title used by involved parties to refer to this content.
     /// Example: "Googlers, The".
     /// Only available on Movie Avails.
     #[serde(rename="titleInternalAlias")]
+    
     pub title_internal_alias: Option<String>,
     /// Value representing the rating.
     /// Ratings should be formatted as per http://www.movielabs.com/md/ratings/
     /// Example: "PG"
     #[serde(rename="ratingValue")]
+    
     pub rating_value: Option<String>,
     /// Spoken language of the intended audience.
     /// Language shall be encoded in accordance with RFC 5646.
     /// Example: "fr".
     #[serde(rename="storeLanguage")]
+    
     pub store_language: Option<String>,
     /// Communicating an exempt category as defined by FCC regulations.
     /// It is not required for non-US Avails.
     /// Example: "1"
     #[serde(rename="captionExemption")]
+    
     pub caption_exemption: Option<String>,
     /// The name of the studio that owns the Edit referred in the Avail.
     /// This is the equivalent of `studio_name` in other resources, but it follows
     /// the EMA nomenclature.
     /// Example: "Google Films".
     #[serde(rename="displayName")]
+    
     pub display_name: Option<String>,
     /// Edit Identifier. This should be the Edit Level EIDR.
     /// Example: "10.2340/1489-49A2-3956-4B2D-FE16-6"
     #[serde(rename="productId")]
+    
     pub product_id: Option<String>,
     /// Title used by involved parties to refer to this season.
     /// Only available on TV Avails.
     /// Example: "Googlers, The".
     #[serde(rename="seasonTitleInternalAlias")]
+    
     pub season_title_internal_alias: Option<String>,
     /// Other identifier referring to the episode, as defined by partner.
     /// Only available on TV avails.
     /// Example: "rs_googlers_s1_3".
     #[serde(rename="episodeAltId")]
+    
     pub episode_alt_id: Option<String>,
     /// Value to be applied to the pricing type.
     /// Example: "4" or "2.99"
     #[serde(rename="priceValue")]
+    
     pub price_value: Option<String>,
     /// ISO 3166-1 alpha-2 country code for the country or territory
     /// of this Avail.
@@ -519,13 +591,16 @@ pub struct Avail {
     /// EMA specifications.
     /// But please note that Territory and Country identify the same thing.
     /// Example: "US".
+    
     pub territory: Option<String>,
     /// Work type as enumerated in EMA.
     #[serde(rename="workType")]
+    
     pub work_type: Option<String>,
     /// ID internally generated by Google to uniquely identify an Avail.
     /// Not part of EMA Specs.
     #[serde(rename="availId")]
+    
     pub avail_id: Option<String>,
     /// Value representing the rating reason.
     /// Rating reasons should be formatted as per
@@ -533,11 +608,13 @@ pub struct Avail {
     /// and comma-separated for inclusion of multiple reasons.
     /// Example: "L, S, V"
     #[serde(rename="ratingReason")]
+    
     pub rating_reason: Option<String>,
     /// OPTIONAL.TV Only. Title used by involved parties to refer to this episode.
     /// Only available on TV Avails.
     /// Example: "Coding at Google".
     #[serde(rename="episodeTitleInternalAlias")]
+    
     pub episode_title_internal_alias: Option<String>,
     /// First date an Edit could be publically announced as becoming
     /// available at a specific future date in territory of Avail.
@@ -546,52 +623,63 @@ pub struct Avail {
     /// Only available for pre-orders.
     /// Example: "2012-12-10"
     #[serde(rename="suppressionLiftDate")]
+    
     pub suppression_lift_date: Option<String>,
     /// Other identifier referring to the season, as defined by partner.
     /// Only available on TV avails.
     /// Example: "rs_googlers_s1".
     #[serde(rename="seasonAltId")]
+    
     pub season_alt_id: Option<String>,
     /// Manifestation Identifier. This should be the Manifestation
     /// Level EIDR.
     /// Example: "10.2340/1489-49A2-3956-4B2D-FE16-7"
     #[serde(rename="encodeId")]
+    
     pub encode_id: Option<String>,
     /// Type of pricing that should be applied to this Avail
     /// based on how the partner classify them.
     /// Example: "Tier", "WSP", "SRP", or "Category".
     #[serde(rename="priceType")]
+    
     pub price_type: Option<String>,
     /// Communicating if caption file will be delivered.
     #[serde(rename="captionIncluded")]
+    
     pub caption_included: Option<bool>,
     /// Type of transaction.
     #[serde(rename="licenseType")]
+    
     pub license_type: Option<String>,
     /// The number assigned to the season within a series.
     /// Only available on TV Avails.
     /// Example: "1".
     #[serde(rename="seasonNumber")]
+    
     pub season_number: Option<String>,
     /// Release date of the Title in earliest released territory.
     /// Typically it is just the year, but it is free-form as per EMA spec.
     /// Examples: "1979", "Oct 2014"
     #[serde(rename="releaseDate")]
+    
     pub release_date: Option<String>,
     /// End of term in YYYY-MM-DD format in the timezone of the country
     /// of the Avail.
     /// "Open" if no end date is available.
     /// Example: "2019-02-17"
+    
     pub end: Option<String>,
     /// Google-generated ID identifying the video linked to this Avail, once
     /// delivered.
     /// Not part of EMA Specs.
     /// Example: 'gtry456_xc'
     #[serde(rename="videoId")]
+    
     pub video_id: Option<String>,
     /// Start of term in YYYY-MM-DD format in the timezone of the
     /// country of the Avail.
     /// Example: "2013-05-14".
+    
     pub start: Option<String>,
     /// Rating system applied to the version of title within territory
     /// of Avail.
@@ -599,24 +687,29 @@ pub struct Avail {
     /// [EMA ratings spec](http://www.movielabs.com/md/ratings/)
     /// Example: "MPAA"
     #[serde(rename="ratingSystem")]
+    
     pub rating_system: Option<String>,
     /// Name of the post-production houses that manage the Avail.
     /// Not part of EMA Specs.
     #[serde(rename="pphNames")]
+    
     pub pph_names: Option<Vec<String>>,
     /// Other identifier referring to the series, as defined by partner.
     /// Only available on TV avails.
     /// Example: "rs_googlers".
     #[serde(rename="seriesAltId")]
+    
     pub series_alt_id: Option<String>,
     /// Other identifier referring to the Edit, as defined by partner.
     /// Example: "GOOGLER_2006"
     #[serde(rename="altId")]
+    
     pub alt_id: Option<String>,
     /// The number assigned to the episode within a season.
     /// Only available on TV Avails.
     /// Example: "3".
     #[serde(rename="episodeNumber")]
+    
     pub episode_number: Option<String>,
 }
 
@@ -632,15 +725,19 @@ impl client::ResponseResult for Avail {}
 /// 
 /// * [orders list accounts](AccountOrderListCall) (response)
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ListOrdersResponse {
     /// List of Orders that match the request criteria.
+    
     pub orders: Option<Vec<Order>>,
     /// See _List methods rules_ for info about this field.
     #[serde(rename="nextPageToken")]
+    
     pub next_page_token: Option<String>,
     /// See _List methods rules_ for more information about this field.
     #[serde(rename="totalSize")]
+    
     pub total_size: Option<i32>,
 }
 
@@ -653,7 +750,7 @@ impl client::ResponseResult for ListOrdersResponse {}
 // #################
 
 /// A builder providing access to all methods supported on *account* resources.
-/// It is not used directly, but through the `PlayMovies` hub.
+/// It is not used directly, but through the [`PlayMovies`] hub.
 ///
 /// # Example
 ///
@@ -666,7 +763,7 @@ impl client::ResponseResult for ListOrdersResponse {}
 /// 
 /// # async fn dox() {
 /// use std::default::Default;
-/// use playmoviespartner1::{PlayMovies, oauth2, hyper, hyper_rustls};
+/// use playmoviespartner1::{PlayMovies, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// let secret: oauth2::ApplicationSecret = Default::default();
 /// let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -857,7 +954,7 @@ impl<'a, S> AccountMethods<'a, S> {
 /// _List methods rules_ for more information about this method.
 ///
 /// A builder for the *orders.list* method supported by a *account* resource.
-/// It is not used directly, but through a `AccountMethods` instance.
+/// It is not used directly, but through a [`AccountMethods`] instance.
 ///
 /// # Example
 ///
@@ -869,7 +966,7 @@ impl<'a, S> AccountMethods<'a, S> {
 /// # extern crate google_playmoviespartner1 as playmoviespartner1;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use playmoviespartner1::{PlayMovies, oauth2, hyper, hyper_rustls};
+/// # use playmoviespartner1::{PlayMovies, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
 /// # let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -907,14 +1004,14 @@ pub struct AccountOrderListCall<'a, S>
     _custom_id: Option<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
+    _scopes: BTreeSet<String>
 }
 
 impl<'a, S> client::CallBuilder for AccountOrderListCall<'a, S> {}
 
 impl<'a, S> AccountOrderListCall<'a, S>
 where
-    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
     S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
     S::Future: Send + Unpin + 'static,
     S::Error: Into<Box<dyn StdError + Send + Sync>>,
@@ -925,100 +1022,85 @@ where
     pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, ListOrdersResponse)> {
         use std::io::{Read, Seek};
         use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::ToParts;
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
         let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
         dlg.begin(client::MethodInfo { id: "playmoviespartner.accounts.orders.list",
                                http_method: hyper::Method::GET });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(11 + self._additional_params.len());
-        params.push(("accountId", self._account_id.to_string()));
-        if self._video_ids.len() > 0 {
-            for f in self._video_ids.iter() {
-                params.push(("videoIds", f.to_string()));
-            }
-        }
-        if self._studio_names.len() > 0 {
-            for f in self._studio_names.iter() {
-                params.push(("studioNames", f.to_string()));
-            }
-        }
-        if self._status.len() > 0 {
-            for f in self._status.iter() {
-                params.push(("status", f.to_string()));
-            }
-        }
-        if self._pph_names.len() > 0 {
-            for f in self._pph_names.iter() {
-                params.push(("pphNames", f.to_string()));
-            }
-        }
-        if let Some(value) = self._page_token {
-            params.push(("pageToken", value.to_string()));
-        }
-        if let Some(value) = self._page_size {
-            params.push(("pageSize", value.to_string()));
-        }
-        if let Some(value) = self._name {
-            params.push(("name", value.to_string()));
-        }
-        if let Some(value) = self._custom_id {
-            params.push(("customId", value.to_string()));
-        }
+
         for &field in ["alt", "accountId", "videoIds", "studioNames", "status", "pphNames", "pageToken", "pageSize", "name", "customId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(client::Error::FieldClash(field));
             }
         }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
+
+        let mut params = Params::with_capacity(11 + self._additional_params.len());
+        params.push("accountId", self._account_id);
+        if self._video_ids.len() > 0 {
+            for f in self._video_ids.iter() {
+                params.push("videoIds", f);
+            }
+        }
+        if self._studio_names.len() > 0 {
+            for f in self._studio_names.iter() {
+                params.push("studioNames", f);
+            }
+        }
+        if self._status.len() > 0 {
+            for f in self._status.iter() {
+                params.push("status", f);
+            }
+        }
+        if self._pph_names.len() > 0 {
+            for f in self._pph_names.iter() {
+                params.push("pphNames", f);
+            }
+        }
+        if let Some(value) = self._page_token.as_ref() {
+            params.push("pageToken", value);
+        }
+        if let Some(value) = self._page_size.as_ref() {
+            params.push("pageSize", value.to_string());
+        }
+        if let Some(value) = self._name.as_ref() {
+            params.push("name", value);
+        }
+        if let Some(value) = self._custom_id.as_ref() {
+            params.push("customId", value);
         }
 
-        params.push(("alt", "json".to_string()));
+        params.extend(self._additional_params.iter());
 
+        params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "v1/accounts/{accountId}/orders";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::PlaymovyPartnerReadonly.as_ref().to_string(), ());
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::PlaymovyPartnerReadonly.as_ref().to_string());
         }
 
         for &(find_this, param_name) in [("{accountId}", "accountId")].iter() {
-            let mut replace_with: Option<&str> = None;
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = Some(value);
-                    break;
-                }
-            }
-            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+            url = params.uri_replacement(url, param_name, find_this, false);
         }
         {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
-            for param_name in ["accountId"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
+            let to_remove = ["accountId"];
+            params.remove_params(&to_remove);
         }
 
-        let url = url::Url::parse_with_params(&url, params).unwrap();
+        let url = params.parse_with_url(&url);
 
 
 
         loop {
-            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
-                Ok(token) => token.clone(),
-                Err(err) => {
-                    match  dlg.token(&err) {
-                        Some(token) => token,
-                        None => {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
                             dlg.finished(false);
-                            return Err(client::Error::MissingToken(err))
+                            return Err(client::Error::MissingToken(e));
                         }
                     }
                 }
@@ -1026,21 +1108,27 @@ where
             let mut req_result = {
                 let client = &self.hub.client;
                 dlg.pre_request();
-                let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
-                        .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::GET)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
 
 
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
-                
+
             };
 
             match req_result {
                 Err(err) => {
                     if let client::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep(d).await;
                         continue;
                     }
                     dlg.finished(false);
@@ -1056,7 +1144,7 @@ where
                         let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
                         if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
-                            sleep(d);
+                            sleep(d).await;
                             continue;
                         }
 
@@ -1161,7 +1249,8 @@ where
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.````
     ///
     /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountOrderListCall<'a, S> {
@@ -1199,25 +1288,36 @@ where
 
     /// Identifies the authorization scope for the method you are building.
     ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::PlaymovyPartnerReadonly`.
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::PlaymovyPartnerReadonly`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
     ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, St>(mut self, scope: T) -> AccountOrderListCall<'a, S>
-                                                        where T: Into<Option<St>>,
-                                                              St: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
+    pub fn add_scope<St>(mut self, scope: St) -> AccountOrderListCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> AccountOrderListCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> AccountOrderListCall<'a, S> {
+        self._scopes.clear();
         self
     }
 }
@@ -1229,7 +1329,7 @@ where
 /// _Get methods rules_ for more information about this method.
 ///
 /// A builder for the *orders.get* method supported by a *account* resource.
-/// It is not used directly, but through a `AccountMethods` instance.
+/// It is not used directly, but through a [`AccountMethods`] instance.
 ///
 /// # Example
 ///
@@ -1241,7 +1341,7 @@ where
 /// # extern crate google_playmoviespartner1 as playmoviespartner1;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use playmoviespartner1::{PlayMovies, oauth2, hyper, hyper_rustls};
+/// # use playmoviespartner1::{PlayMovies, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
 /// # let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -1264,14 +1364,14 @@ pub struct AccountOrderGetCall<'a, S>
     _order_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
+    _scopes: BTreeSet<String>
 }
 
 impl<'a, S> client::CallBuilder for AccountOrderGetCall<'a, S> {}
 
 impl<'a, S> AccountOrderGetCall<'a, S>
 where
-    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
     S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
     S::Future: Send + Unpin + 'static,
     S::Error: Into<Box<dyn StdError + Send + Sync>>,
@@ -1282,69 +1382,54 @@ where
     pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, Order)> {
         use std::io::{Read, Seek};
         use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::ToParts;
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
         let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
         dlg.begin(client::MethodInfo { id: "playmoviespartner.accounts.orders.get",
                                http_method: hyper::Method::GET });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
-        params.push(("accountId", self._account_id.to_string()));
-        params.push(("orderId", self._order_id.to_string()));
+
         for &field in ["alt", "accountId", "orderId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(client::Error::FieldClash(field));
             }
         }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
 
-        params.push(("alt", "json".to_string()));
+        let mut params = Params::with_capacity(4 + self._additional_params.len());
+        params.push("accountId", self._account_id);
+        params.push("orderId", self._order_id);
 
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "v1/accounts/{accountId}/orders/{orderId}";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::PlaymovyPartnerReadonly.as_ref().to_string(), ());
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::PlaymovyPartnerReadonly.as_ref().to_string());
         }
 
         for &(find_this, param_name) in [("{accountId}", "accountId"), ("{orderId}", "orderId")].iter() {
-            let mut replace_with: Option<&str> = None;
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = Some(value);
-                    break;
-                }
-            }
-            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+            url = params.uri_replacement(url, param_name, find_this, false);
         }
         {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(2);
-            for param_name in ["orderId", "accountId"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
+            let to_remove = ["orderId", "accountId"];
+            params.remove_params(&to_remove);
         }
 
-        let url = url::Url::parse_with_params(&url, params).unwrap();
+        let url = params.parse_with_url(&url);
 
 
 
         loop {
-            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
-                Ok(token) => token.clone(),
-                Err(err) => {
-                    match  dlg.token(&err) {
-                        Some(token) => token,
-                        None => {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
                             dlg.finished(false);
-                            return Err(client::Error::MissingToken(err))
+                            return Err(client::Error::MissingToken(e));
                         }
                     }
                 }
@@ -1352,21 +1437,27 @@ where
             let mut req_result = {
                 let client = &self.hub.client;
                 dlg.pre_request();
-                let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
-                        .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::GET)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
 
 
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
-                
+
             };
 
             match req_result {
                 Err(err) => {
                     if let client::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep(d).await;
                         continue;
                     }
                     dlg.finished(false);
@@ -1382,7 +1473,7 @@ where
                         let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
                         if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
-                            sleep(d);
+                            sleep(d).await;
                             continue;
                         }
 
@@ -1436,7 +1527,8 @@ where
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.````
     ///
     /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountOrderGetCall<'a, S> {
@@ -1474,25 +1566,36 @@ where
 
     /// Identifies the authorization scope for the method you are building.
     ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::PlaymovyPartnerReadonly`.
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::PlaymovyPartnerReadonly`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
     ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, St>(mut self, scope: T) -> AccountOrderGetCall<'a, S>
-                                                        where T: Into<Option<St>>,
-                                                              St: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
+    pub fn add_scope<St>(mut self, scope: St) -> AccountOrderGetCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> AccountOrderGetCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> AccountOrderGetCall<'a, S> {
+        self._scopes.clear();
         self
     }
 }
@@ -1504,7 +1607,7 @@ where
 /// _List methods rules_ for more information about this method.
 ///
 /// A builder for the *avails.list* method supported by a *account* resource.
-/// It is not used directly, but through a `AccountMethods` instance.
+/// It is not used directly, but through a [`AccountMethods`] instance.
 ///
 /// # Example
 ///
@@ -1516,7 +1619,7 @@ where
 /// # extern crate google_playmoviespartner1 as playmoviespartner1;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use playmoviespartner1::{PlayMovies, oauth2, hyper, hyper_rustls};
+/// # use playmoviespartner1::{PlayMovies, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
 /// # let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -1556,14 +1659,14 @@ pub struct AccountAvailListCall<'a, S>
     _alt_id: Option<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
+    _scopes: BTreeSet<String>
 }
 
 impl<'a, S> client::CallBuilder for AccountAvailListCall<'a, S> {}
 
 impl<'a, S> AccountAvailListCall<'a, S>
 where
-    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
     S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
     S::Future: Send + Unpin + 'static,
     S::Error: Into<Box<dyn StdError + Send + Sync>>,
@@ -1574,105 +1677,90 @@ where
     pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, ListAvailsResponse)> {
         use std::io::{Read, Seek};
         use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::ToParts;
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
         let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
         dlg.begin(client::MethodInfo { id: "playmoviespartner.accounts.avails.list",
                                http_method: hyper::Method::GET });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(12 + self._additional_params.len());
-        params.push(("accountId", self._account_id.to_string()));
-        if self._video_ids.len() > 0 {
-            for f in self._video_ids.iter() {
-                params.push(("videoIds", f.to_string()));
-            }
-        }
-        if let Some(value) = self._title {
-            params.push(("title", value.to_string()));
-        }
-        if self._territories.len() > 0 {
-            for f in self._territories.iter() {
-                params.push(("territories", f.to_string()));
-            }
-        }
-        if self._studio_names.len() > 0 {
-            for f in self._studio_names.iter() {
-                params.push(("studioNames", f.to_string()));
-            }
-        }
-        if self._pph_names.len() > 0 {
-            for f in self._pph_names.iter() {
-                params.push(("pphNames", f.to_string()));
-            }
-        }
-        if let Some(value) = self._page_token {
-            params.push(("pageToken", value.to_string()));
-        }
-        if let Some(value) = self._page_size {
-            params.push(("pageSize", value.to_string()));
-        }
-        if self._alt_ids.len() > 0 {
-            for f in self._alt_ids.iter() {
-                params.push(("altIds", f.to_string()));
-            }
-        }
-        if let Some(value) = self._alt_id {
-            params.push(("altId", value.to_string()));
-        }
+
         for &field in ["alt", "accountId", "videoIds", "title", "territories", "studioNames", "pphNames", "pageToken", "pageSize", "altIds", "altId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(client::Error::FieldClash(field));
             }
         }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
+
+        let mut params = Params::with_capacity(12 + self._additional_params.len());
+        params.push("accountId", self._account_id);
+        if self._video_ids.len() > 0 {
+            for f in self._video_ids.iter() {
+                params.push("videoIds", f);
+            }
+        }
+        if let Some(value) = self._title.as_ref() {
+            params.push("title", value);
+        }
+        if self._territories.len() > 0 {
+            for f in self._territories.iter() {
+                params.push("territories", f);
+            }
+        }
+        if self._studio_names.len() > 0 {
+            for f in self._studio_names.iter() {
+                params.push("studioNames", f);
+            }
+        }
+        if self._pph_names.len() > 0 {
+            for f in self._pph_names.iter() {
+                params.push("pphNames", f);
+            }
+        }
+        if let Some(value) = self._page_token.as_ref() {
+            params.push("pageToken", value);
+        }
+        if let Some(value) = self._page_size.as_ref() {
+            params.push("pageSize", value.to_string());
+        }
+        if self._alt_ids.len() > 0 {
+            for f in self._alt_ids.iter() {
+                params.push("altIds", f);
+            }
+        }
+        if let Some(value) = self._alt_id.as_ref() {
+            params.push("altId", value);
         }
 
-        params.push(("alt", "json".to_string()));
+        params.extend(self._additional_params.iter());
 
+        params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "v1/accounts/{accountId}/avails";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::PlaymovyPartnerReadonly.as_ref().to_string(), ());
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::PlaymovyPartnerReadonly.as_ref().to_string());
         }
 
         for &(find_this, param_name) in [("{accountId}", "accountId")].iter() {
-            let mut replace_with: Option<&str> = None;
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = Some(value);
-                    break;
-                }
-            }
-            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+            url = params.uri_replacement(url, param_name, find_this, false);
         }
         {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
-            for param_name in ["accountId"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
+            let to_remove = ["accountId"];
+            params.remove_params(&to_remove);
         }
 
-        let url = url::Url::parse_with_params(&url, params).unwrap();
+        let url = params.parse_with_url(&url);
 
 
 
         loop {
-            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
-                Ok(token) => token.clone(),
-                Err(err) => {
-                    match  dlg.token(&err) {
-                        Some(token) => token,
-                        None => {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
                             dlg.finished(false);
-                            return Err(client::Error::MissingToken(err))
+                            return Err(client::Error::MissingToken(e));
                         }
                     }
                 }
@@ -1680,21 +1768,27 @@ where
             let mut req_result = {
                 let client = &self.hub.client;
                 dlg.pre_request();
-                let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
-                        .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::GET)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
 
 
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
-                
+
             };
 
             match req_result {
                 Err(err) => {
                     if let client::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep(d).await;
                         continue;
                     }
                     dlg.finished(false);
@@ -1710,7 +1804,7 @@ where
                         let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
                         if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
-                            sleep(d);
+                            sleep(d).await;
                             continue;
                         }
 
@@ -1828,7 +1922,8 @@ where
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.````
     ///
     /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountAvailListCall<'a, S> {
@@ -1866,25 +1961,36 @@ where
 
     /// Identifies the authorization scope for the method you are building.
     ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::PlaymovyPartnerReadonly`.
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::PlaymovyPartnerReadonly`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
     ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, St>(mut self, scope: T) -> AccountAvailListCall<'a, S>
-                                                        where T: Into<Option<St>>,
-                                                              St: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
+    pub fn add_scope<St>(mut self, scope: St) -> AccountAvailListCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> AccountAvailListCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> AccountAvailListCall<'a, S> {
+        self._scopes.clear();
         self
     }
 }
@@ -1893,7 +1999,7 @@ where
 /// Get an Avail given its avail group id and avail id.
 ///
 /// A builder for the *avails.get* method supported by a *account* resource.
-/// It is not used directly, but through a `AccountMethods` instance.
+/// It is not used directly, but through a [`AccountMethods`] instance.
 ///
 /// # Example
 ///
@@ -1905,7 +2011,7 @@ where
 /// # extern crate google_playmoviespartner1 as playmoviespartner1;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use playmoviespartner1::{PlayMovies, oauth2, hyper, hyper_rustls};
+/// # use playmoviespartner1::{PlayMovies, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
 /// # let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -1928,14 +2034,14 @@ pub struct AccountAvailGetCall<'a, S>
     _avail_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
+    _scopes: BTreeSet<String>
 }
 
 impl<'a, S> client::CallBuilder for AccountAvailGetCall<'a, S> {}
 
 impl<'a, S> AccountAvailGetCall<'a, S>
 where
-    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
     S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
     S::Future: Send + Unpin + 'static,
     S::Error: Into<Box<dyn StdError + Send + Sync>>,
@@ -1946,69 +2052,54 @@ where
     pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, Avail)> {
         use std::io::{Read, Seek};
         use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::ToParts;
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
         let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
         dlg.begin(client::MethodInfo { id: "playmoviespartner.accounts.avails.get",
                                http_method: hyper::Method::GET });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
-        params.push(("accountId", self._account_id.to_string()));
-        params.push(("availId", self._avail_id.to_string()));
+
         for &field in ["alt", "accountId", "availId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(client::Error::FieldClash(field));
             }
         }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
 
-        params.push(("alt", "json".to_string()));
+        let mut params = Params::with_capacity(4 + self._additional_params.len());
+        params.push("accountId", self._account_id);
+        params.push("availId", self._avail_id);
 
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "v1/accounts/{accountId}/avails/{availId}";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::PlaymovyPartnerReadonly.as_ref().to_string(), ());
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::PlaymovyPartnerReadonly.as_ref().to_string());
         }
 
         for &(find_this, param_name) in [("{accountId}", "accountId"), ("{availId}", "availId")].iter() {
-            let mut replace_with: Option<&str> = None;
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = Some(value);
-                    break;
-                }
-            }
-            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+            url = params.uri_replacement(url, param_name, find_this, false);
         }
         {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(2);
-            for param_name in ["availId", "accountId"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
+            let to_remove = ["availId", "accountId"];
+            params.remove_params(&to_remove);
         }
 
-        let url = url::Url::parse_with_params(&url, params).unwrap();
+        let url = params.parse_with_url(&url);
 
 
 
         loop {
-            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
-                Ok(token) => token.clone(),
-                Err(err) => {
-                    match  dlg.token(&err) {
-                        Some(token) => token,
-                        None => {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
                             dlg.finished(false);
-                            return Err(client::Error::MissingToken(err))
+                            return Err(client::Error::MissingToken(e));
                         }
                     }
                 }
@@ -2016,21 +2107,27 @@ where
             let mut req_result = {
                 let client = &self.hub.client;
                 dlg.pre_request();
-                let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
-                        .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::GET)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
 
 
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
-                
+
             };
 
             match req_result {
                 Err(err) => {
                     if let client::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep(d).await;
                         continue;
                     }
                     dlg.finished(false);
@@ -2046,7 +2143,7 @@ where
                         let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
                         if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
-                            sleep(d);
+                            sleep(d).await;
                             continue;
                         }
 
@@ -2100,7 +2197,8 @@ where
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.````
     ///
     /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountAvailGetCall<'a, S> {
@@ -2138,25 +2236,36 @@ where
 
     /// Identifies the authorization scope for the method you are building.
     ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::PlaymovyPartnerReadonly`.
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::PlaymovyPartnerReadonly`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
     ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, St>(mut self, scope: T) -> AccountAvailGetCall<'a, S>
-                                                        where T: Into<Option<St>>,
-                                                              St: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
+    pub fn add_scope<St>(mut self, scope: St) -> AccountAvailGetCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> AccountAvailGetCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> AccountAvailGetCall<'a, S> {
+        self._scopes.clear();
         self
     }
 }
@@ -2168,7 +2277,7 @@ where
 /// _Get methods rules_ for more information about this method.
 ///
 /// A builder for the *storeInfos.country.get* method supported by a *account* resource.
-/// It is not used directly, but through a `AccountMethods` instance.
+/// It is not used directly, but through a [`AccountMethods`] instance.
 ///
 /// # Example
 ///
@@ -2180,7 +2289,7 @@ where
 /// # extern crate google_playmoviespartner1 as playmoviespartner1;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use playmoviespartner1::{PlayMovies, oauth2, hyper, hyper_rustls};
+/// # use playmoviespartner1::{PlayMovies, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
 /// # let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -2204,14 +2313,14 @@ pub struct AccountStoreInfoCountryGetCall<'a, S>
     _country: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
+    _scopes: BTreeSet<String>
 }
 
 impl<'a, S> client::CallBuilder for AccountStoreInfoCountryGetCall<'a, S> {}
 
 impl<'a, S> AccountStoreInfoCountryGetCall<'a, S>
 where
-    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
     S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
     S::Future: Send + Unpin + 'static,
     S::Error: Into<Box<dyn StdError + Send + Sync>>,
@@ -2222,70 +2331,55 @@ where
     pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, StoreInfo)> {
         use std::io::{Read, Seek};
         use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::ToParts;
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
         let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
         dlg.begin(client::MethodInfo { id: "playmoviespartner.accounts.storeInfos.country.get",
                                http_method: hyper::Method::GET });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
-        params.push(("accountId", self._account_id.to_string()));
-        params.push(("videoId", self._video_id.to_string()));
-        params.push(("country", self._country.to_string()));
+
         for &field in ["alt", "accountId", "videoId", "country"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(client::Error::FieldClash(field));
             }
         }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
 
-        params.push(("alt", "json".to_string()));
+        let mut params = Params::with_capacity(5 + self._additional_params.len());
+        params.push("accountId", self._account_id);
+        params.push("videoId", self._video_id);
+        params.push("country", self._country);
 
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "v1/accounts/{accountId}/storeInfos/{videoId}/country/{country}";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::PlaymovyPartnerReadonly.as_ref().to_string(), ());
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::PlaymovyPartnerReadonly.as_ref().to_string());
         }
 
         for &(find_this, param_name) in [("{accountId}", "accountId"), ("{videoId}", "videoId"), ("{country}", "country")].iter() {
-            let mut replace_with: Option<&str> = None;
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = Some(value);
-                    break;
-                }
-            }
-            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+            url = params.uri_replacement(url, param_name, find_this, false);
         }
         {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(3);
-            for param_name in ["country", "videoId", "accountId"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
+            let to_remove = ["country", "videoId", "accountId"];
+            params.remove_params(&to_remove);
         }
 
-        let url = url::Url::parse_with_params(&url, params).unwrap();
+        let url = params.parse_with_url(&url);
 
 
 
         loop {
-            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
-                Ok(token) => token.clone(),
-                Err(err) => {
-                    match  dlg.token(&err) {
-                        Some(token) => token,
-                        None => {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
                             dlg.finished(false);
-                            return Err(client::Error::MissingToken(err))
+                            return Err(client::Error::MissingToken(e));
                         }
                     }
                 }
@@ -2293,21 +2387,27 @@ where
             let mut req_result = {
                 let client = &self.hub.client;
                 dlg.pre_request();
-                let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
-                        .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::GET)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
 
 
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
-                
+
             };
 
             match req_result {
                 Err(err) => {
                     if let client::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep(d).await;
                         continue;
                     }
                     dlg.finished(false);
@@ -2323,7 +2423,7 @@ where
                         let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
                         if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
-                            sleep(d);
+                            sleep(d).await;
                             continue;
                         }
 
@@ -2387,7 +2487,8 @@ where
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.````
     ///
     /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountStoreInfoCountryGetCall<'a, S> {
@@ -2425,25 +2526,36 @@ where
 
     /// Identifies the authorization scope for the method you are building.
     ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::PlaymovyPartnerReadonly`.
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::PlaymovyPartnerReadonly`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
     ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, St>(mut self, scope: T) -> AccountStoreInfoCountryGetCall<'a, S>
-                                                        where T: Into<Option<St>>,
-                                                              St: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
+    pub fn add_scope<St>(mut self, scope: St) -> AccountStoreInfoCountryGetCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> AccountStoreInfoCountryGetCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> AccountStoreInfoCountryGetCall<'a, S> {
+        self._scopes.clear();
         self
     }
 }
@@ -2455,7 +2567,7 @@ where
 /// _List methods rules_ for more information about this method.
 ///
 /// A builder for the *storeInfos.list* method supported by a *account* resource.
-/// It is not used directly, but through a `AccountMethods` instance.
+/// It is not used directly, but through a [`AccountMethods`] instance.
 ///
 /// # Example
 ///
@@ -2467,7 +2579,7 @@ where
 /// # extern crate google_playmoviespartner1 as playmoviespartner1;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use playmoviespartner1::{PlayMovies, oauth2, hyper, hyper_rustls};
+/// # use playmoviespartner1::{PlayMovies, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
 /// # let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -2509,14 +2621,14 @@ pub struct AccountStoreInfoListCall<'a, S>
     _countries: Vec<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
+    _scopes: BTreeSet<String>
 }
 
 impl<'a, S> client::CallBuilder for AccountStoreInfoListCall<'a, S> {}
 
 impl<'a, S> AccountStoreInfoListCall<'a, S>
 where
-    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
     S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
     S::Future: Send + Unpin + 'static,
     S::Error: Into<Box<dyn StdError + Send + Sync>>,
@@ -2527,110 +2639,95 @@ where
     pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, ListStoreInfosResponse)> {
         use std::io::{Read, Seek};
         use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::ToParts;
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
         let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
         dlg.begin(client::MethodInfo { id: "playmoviespartner.accounts.storeInfos.list",
                                http_method: hyper::Method::GET });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(13 + self._additional_params.len());
-        params.push(("accountId", self._account_id.to_string()));
-        if self._video_ids.len() > 0 {
-            for f in self._video_ids.iter() {
-                params.push(("videoIds", f.to_string()));
-            }
-        }
-        if let Some(value) = self._video_id {
-            params.push(("videoId", value.to_string()));
-        }
-        if self._studio_names.len() > 0 {
-            for f in self._studio_names.iter() {
-                params.push(("studioNames", f.to_string()));
-            }
-        }
-        if self._season_ids.len() > 0 {
-            for f in self._season_ids.iter() {
-                params.push(("seasonIds", f.to_string()));
-            }
-        }
-        if self._pph_names.len() > 0 {
-            for f in self._pph_names.iter() {
-                params.push(("pphNames", f.to_string()));
-            }
-        }
-        if let Some(value) = self._page_token {
-            params.push(("pageToken", value.to_string()));
-        }
-        if let Some(value) = self._page_size {
-            params.push(("pageSize", value.to_string()));
-        }
-        if let Some(value) = self._name {
-            params.push(("name", value.to_string()));
-        }
-        if self._mids.len() > 0 {
-            for f in self._mids.iter() {
-                params.push(("mids", f.to_string()));
-            }
-        }
-        if self._countries.len() > 0 {
-            for f in self._countries.iter() {
-                params.push(("countries", f.to_string()));
-            }
-        }
+
         for &field in ["alt", "accountId", "videoIds", "videoId", "studioNames", "seasonIds", "pphNames", "pageToken", "pageSize", "name", "mids", "countries"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(client::Error::FieldClash(field));
             }
         }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
+
+        let mut params = Params::with_capacity(13 + self._additional_params.len());
+        params.push("accountId", self._account_id);
+        if self._video_ids.len() > 0 {
+            for f in self._video_ids.iter() {
+                params.push("videoIds", f);
+            }
+        }
+        if let Some(value) = self._video_id.as_ref() {
+            params.push("videoId", value);
+        }
+        if self._studio_names.len() > 0 {
+            for f in self._studio_names.iter() {
+                params.push("studioNames", f);
+            }
+        }
+        if self._season_ids.len() > 0 {
+            for f in self._season_ids.iter() {
+                params.push("seasonIds", f);
+            }
+        }
+        if self._pph_names.len() > 0 {
+            for f in self._pph_names.iter() {
+                params.push("pphNames", f);
+            }
+        }
+        if let Some(value) = self._page_token.as_ref() {
+            params.push("pageToken", value);
+        }
+        if let Some(value) = self._page_size.as_ref() {
+            params.push("pageSize", value.to_string());
+        }
+        if let Some(value) = self._name.as_ref() {
+            params.push("name", value);
+        }
+        if self._mids.len() > 0 {
+            for f in self._mids.iter() {
+                params.push("mids", f);
+            }
+        }
+        if self._countries.len() > 0 {
+            for f in self._countries.iter() {
+                params.push("countries", f);
+            }
         }
 
-        params.push(("alt", "json".to_string()));
+        params.extend(self._additional_params.iter());
 
+        params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "v1/accounts/{accountId}/storeInfos";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::PlaymovyPartnerReadonly.as_ref().to_string(), ());
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::PlaymovyPartnerReadonly.as_ref().to_string());
         }
 
         for &(find_this, param_name) in [("{accountId}", "accountId")].iter() {
-            let mut replace_with: Option<&str> = None;
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = Some(value);
-                    break;
-                }
-            }
-            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+            url = params.uri_replacement(url, param_name, find_this, false);
         }
         {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
-            for param_name in ["accountId"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
+            let to_remove = ["accountId"];
+            params.remove_params(&to_remove);
         }
 
-        let url = url::Url::parse_with_params(&url, params).unwrap();
+        let url = params.parse_with_url(&url);
 
 
 
         loop {
-            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
-                Ok(token) => token.clone(),
-                Err(err) => {
-                    match  dlg.token(&err) {
-                        Some(token) => token,
-                        None => {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
                             dlg.finished(false);
-                            return Err(client::Error::MissingToken(err))
+                            return Err(client::Error::MissingToken(e));
                         }
                     }
                 }
@@ -2638,21 +2735,27 @@ where
             let mut req_result = {
                 let client = &self.hub.client;
                 dlg.pre_request();
-                let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
-                        .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::GET)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
 
 
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
-                
+
             };
 
             match req_result {
                 Err(err) => {
                     if let client::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep(d).await;
                         continue;
                     }
                     dlg.finished(false);
@@ -2668,7 +2771,7 @@ where
                         let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
                         if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
-                            sleep(d);
+                            sleep(d).await;
                             continue;
                         }
 
@@ -2792,7 +2895,8 @@ where
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.````
     ///
     /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountStoreInfoListCall<'a, S> {
@@ -2830,25 +2934,36 @@ where
 
     /// Identifies the authorization scope for the method you are building.
     ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::PlaymovyPartnerReadonly`.
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::PlaymovyPartnerReadonly`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
     ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, St>(mut self, scope: T) -> AccountStoreInfoListCall<'a, S>
-                                                        where T: Into<Option<St>>,
-                                                              St: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
+    pub fn add_scope<St>(mut self, scope: St) -> AccountStoreInfoListCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> AccountStoreInfoListCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> AccountStoreInfoListCall<'a, S> {
+        self._scopes.clear();
         self
     }
 }

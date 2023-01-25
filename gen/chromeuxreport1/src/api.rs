@@ -1,19 +1,20 @@
 use std::collections::HashMap;
 use std::cell::RefCell;
 use std::default::Default;
-use std::collections::BTreeMap;
+use std::collections::BTreeSet;
 use std::error::Error as StdError;
 use serde_json as json;
 use std::io;
 use std::fs;
 use std::mem;
-use std::thread::sleep;
 
-use http::Uri;
 use hyper::client::connect;
 use tokio::io::{AsyncRead, AsyncWrite};
+use tokio::time::sleep;
 use tower_service;
-use crate::client;
+use serde::{Serialize, Deserialize};
+
+use crate::{client, client::GetToken, client::serde_with};
 
 // ##############
 // UTILITIES ###
@@ -40,7 +41,7 @@ use crate::client;
 /// use chromeuxreport1::{Result, Error};
 /// # async fn dox() {
 /// use std::default::Default;
-/// use chromeuxreport1::{ChromeUXReport, oauth2, hyper, hyper_rustls};
+/// use chromeuxreport1::{ChromeUXReport, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// // Get an ApplicationSecret instance by some means. It contains the `client_id` and 
 /// // `client_secret`, among other things.
@@ -88,7 +89,7 @@ use crate::client;
 #[derive(Clone)]
 pub struct ChromeUXReport<S> {
     pub client: hyper::Client<S, hyper::body::Body>,
-    pub auth: oauth2::authenticator::Authenticator<S>,
+    pub auth: Box<dyn client::GetToken>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
@@ -98,11 +99,11 @@ impl<'a, S> client::Hub for ChromeUXReport<S> {}
 
 impl<'a, S> ChromeUXReport<S> {
 
-    pub fn new(client: hyper::Client<S, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<S>) -> ChromeUXReport<S> {
+    pub fn new<A: 'static + client::GetToken>(client: hyper::Client<S, hyper::body::Body>, auth: A) -> ChromeUXReport<S> {
         ChromeUXReport {
             client,
-            auth: authenticator,
-            _user_agent: "google-api-rust-client/4.0.1".to_string(),
+            auth: Box::new(auth),
+            _user_agent: "google-api-rust-client/5.0.2-beta-1".to_string(),
             _base_url: "https://chromeuxreport.googleapis.com/".to_string(),
             _root_url: "https://chromeuxreport.googleapis.com/".to_string(),
         }
@@ -113,7 +114,7 @@ impl<'a, S> ChromeUXReport<S> {
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/4.0.1`.
+    /// It defaults to `google-api-rust-client/5.0.2-beta-1`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -145,34 +146,84 @@ impl<'a, S> ChromeUXReport<S> {
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Bin {
     /// The proportion of users that experienced this bin's value for the given metric.
+    
     pub density: Option<f64>,
     /// End is the end of the data bin. If end is not populated, then the bin has no end and is valid from start to +inf.
-    pub end: Option<String>,
+    
+    pub end: Option<json::Value>,
     /// Start is the beginning of the data bin.
-    pub start: Option<String>,
+    
+    pub start: Option<json::Value>,
 }
 
 impl client::Part for Bin {}
+
+
+/// The collection period is a date range which includes the `first` and `last` day.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct CollectionPeriod {
+    /// The first day in the collection period, inclusive.
+    #[serde(rename="firstDate")]
+    
+    pub first_date: Option<Date>,
+    /// The last day in the collection period, inclusive.
+    #[serde(rename="lastDate")]
+    
+    pub last_date: Option<Date>,
+}
+
+impl client::Part for CollectionPeriod {}
+
+
+/// Represents a whole or partial calendar date, such as a birthday. The time of day and time zone are either specified elsewhere or are insignificant. The date is relative to the Gregorian Calendar. This can represent one of the following: * A full date, with non-zero year, month, and day values. * A month and day, with a zero year (for example, an anniversary). * A year on its own, with a zero month and a zero day. * A year and month, with a zero day (for example, a credit card expiration date). Related types: * google.type.TimeOfDay * google.type.DateTime * google.protobuf.Timestamp
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Date {
+    /// Day of a month. Must be from 1 to 31 and valid for the year and month, or 0 to specify a year by itself or a year and month where the day isn't significant.
+    
+    pub day: Option<i32>,
+    /// Month of a year. Must be from 1 to 12, or 0 to specify a year without a month and day.
+    
+    pub month: Option<i32>,
+    /// Year of the date. Must be from 1 to 9999, or 0 to specify a date without a year.
+    
+    pub year: Option<i32>,
+}
+
+impl client::Part for Date {}
 
 
 /// Key defines all the dimensions that identify this record as unique.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Key {
     /// The effective connection type is the general connection class that all users experienced for this record. This field uses the values ["offline", "slow-2G", "2G", "3G", "4G"] as specified in: https://wicg.github.io/netinfo/#effective-connection-types If the effective connection type is unspecified, then aggregated data over all effective connection types will be returned.
     #[serde(rename="effectiveConnectionType")]
+    
     pub effective_connection_type: Option<String>,
     /// The form factor is the device class that all users used to access the site for this record. If the form factor is unspecified, then aggregated data over all form factors will be returned.
     #[serde(rename="formFactor")]
+    
     pub form_factor: Option<String>,
     /// Origin specifies the origin that this record is for. Note: When specifying an origin, data for loads under this origin over all pages are aggregated into origin level user experience data.
+    
     pub origin: Option<String>,
     /// Url specifies a specific url that this record is for. Note: When specifying a "url" only data for that specific url will be aggregated.
+    
     pub url: Option<String>,
 }
 
@@ -183,11 +234,14 @@ impl client::Part for Key {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Metric {
     /// The histogram of user experiences for a metric. The histogram will have at least one bin and the densities of all bins will add up to ~1.
+    
     pub histogram: Option<Vec<Bin>>,
-    /// Common useful percentiles of the Metric. The value type for the percentiles will be the same as the value types given for the Histogram bins.
+    /// Commonly useful percentiles of the Metric. The value type for the percentiles will be the same as the value types given for the Histogram bins.
+    
     pub percentiles: Option<Percentiles>,
 }
 
@@ -198,10 +252,12 @@ impl client::Part for Metric {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Percentiles {
     /// 75% of users experienced the given metric at or below this value.
-    pub p75: Option<String>,
+    
+    pub p75: Option<json::Value>,
 }
 
 impl client::Part for Percentiles {}
@@ -216,19 +272,25 @@ impl client::Part for Percentiles {}
 /// 
 /// * [query record records](RecordQueryRecordCall) (request)
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct QueryRequest {
     /// The effective connection type is a query dimension that specifies the effective network class that the record's data should belong to. This field uses the values ["offline", "slow-2G", "2G", "3G", "4G"] as specified in: https://wicg.github.io/netinfo/#effective-connection-types Note: If no effective connection type is specified, then a special record with aggregated data over all effective connection types will be returned.
     #[serde(rename="effectiveConnectionType")]
+    
     pub effective_connection_type: Option<String>,
     /// The form factor is a query dimension that specifies the device class that the record's data should belong to. Note: If no form factor is specified, then a special record with aggregated data over all form factors will be returned.
     #[serde(rename="formFactor")]
+    
     pub form_factor: Option<String>,
-    /// The metrics that should be included in the response. If none are specified then any metrics found will be returned. Allowed values: ["first_contentful_paint", "first_input_delay", "largest_contentful_paint", "cumulative_layout_shift", "experimental_uncapped_cumulative_layout_shift"]
+    /// The metrics that should be included in the response. If none are specified then any metrics found will be returned. Allowed values: ["first_contentful_paint", "first_input_delay", "largest_contentful_paint", "cumulative_layout_shift", "experimental_time_to_first_byte", "experimental_interaction_to_next_paint"]
+    
     pub metrics: Option<Vec<String>>,
     /// The url pattern "origin" refers to a url pattern that is the origin of a website. Examples: "https://example.com", "https://cloud.google.com"
+    
     pub origin: Option<String>,
     /// The url pattern "url" refers to a url pattern that is any arbitrary url. Examples: "https://example.com/", "https://cloud.google.com/why-google-cloud/"
+    
     pub url: Option<String>,
 }
 
@@ -244,12 +306,15 @@ impl client::RequestValue for QueryRequest {}
 /// 
 /// * [query record records](RecordQueryRecordCall) (response)
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct QueryResponse {
     /// The record that was found.
+    
     pub record: Option<Record>,
     /// These are details about automated normalization actions that were taken in order to make the requested `url_pattern` valid.
     #[serde(rename="urlNormalizationDetails")]
+    
     pub url_normalization_details: Option<UrlNormalization>,
 }
 
@@ -265,11 +330,18 @@ impl client::ResponseResult for QueryResponse {}
 /// 
 /// * [query record records](RecordQueryRecordCall) (none)
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Record {
+    /// The collection period indicates when the data reflected in this record was collected.
+    #[serde(rename="collectionPeriod")]
+    
+    pub collection_period: Option<CollectionPeriod>,
     /// Key defines all of the unique querying parameters needed to look up a user experience record.
+    
     pub key: Option<Key>,
-    /// Metrics is the map of user experience data available for the record defined in the key field. Metrics are keyed on the metric name. Allowed key values: ["first_contentful_paint", "first_input_delay", "largest_contentful_paint", "cumulative_layout_shift"]
+    /// Metrics is the map of user experience data available for the record defined in the key field. Metrics are keyed on the metric name. Allowed key values: ["first_contentful_paint", "first_input_delay", "largest_contentful_paint", "cumulative_layout_shift", "experimental_time_to_first_byte", "experimental_interaction_to_next_paint"]
+    
     pub metrics: Option<HashMap<String, Metric>>,
 }
 
@@ -280,13 +352,16 @@ impl client::Resource for Record {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct UrlNormalization {
     /// The URL after any normalization actions. This is a valid user experience URL that could reasonably be looked up.
     #[serde(rename="normalizedUrl")]
+    
     pub normalized_url: Option<String>,
     /// The original requested URL prior to any normalization actions.
     #[serde(rename="originalUrl")]
+    
     pub original_url: Option<String>,
 }
 
@@ -299,7 +374,7 @@ impl client::Part for UrlNormalization {}
 // #################
 
 /// A builder providing access to all methods supported on *record* resources.
-/// It is not used directly, but through the `ChromeUXReport` hub.
+/// It is not used directly, but through the [`ChromeUXReport`] hub.
 ///
 /// # Example
 ///
@@ -312,7 +387,7 @@ impl client::Part for UrlNormalization {}
 /// 
 /// # async fn dox() {
 /// use std::default::Default;
-/// use chromeuxreport1::{ChromeUXReport, oauth2, hyper, hyper_rustls};
+/// use chromeuxreport1::{ChromeUXReport, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// let secret: oauth2::ApplicationSecret = Default::default();
 /// let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -364,7 +439,7 @@ impl<'a, S> RecordMethods<'a, S> {
 /// Queries the Chrome User Experience for a single `record` for a given site. Returns a `record` that contains one or more `metrics` corresponding to performance data about the requested site.
 ///
 /// A builder for the *queryRecord* method supported by a *record* resource.
-/// It is not used directly, but through a `RecordMethods` instance.
+/// It is not used directly, but through a [`RecordMethods`] instance.
 ///
 /// # Example
 ///
@@ -377,7 +452,7 @@ impl<'a, S> RecordMethods<'a, S> {
 /// use chromeuxreport1::api::QueryRequest;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use chromeuxreport1::{ChromeUXReport, oauth2, hyper, hyper_rustls};
+/// # use chromeuxreport1::{ChromeUXReport, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
 /// # let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -410,7 +485,7 @@ impl<'a, S> client::CallBuilder for RecordQueryRecordCall<'a, S> {}
 
 impl<'a, S> RecordQueryRecordCall<'a, S>
 where
-    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
     S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
     S::Future: Send + Unpin + 'static,
     S::Error: Into<Box<dyn StdError + Send + Sync>>,
@@ -421,32 +496,30 @@ where
     pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, QueryResponse)> {
         use std::io::{Read, Seek};
         use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::ToParts;
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
         let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
         dlg.begin(client::MethodInfo { id: "chromeuxreport.records.queryRecord",
                                http_method: hyper::Method::POST });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
+
         for &field in ["alt"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(client::Error::FieldClash(field));
             }
         }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
 
-        params.push(("alt", "json".to_string()));
+        let mut params = Params::with_capacity(3 + self._additional_params.len());
 
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "v1/records:queryRecord";
         
-        let key = dlg.api_key();
-        match key {
-            Some(value) => params.push(("key", value)),
+        match dlg.api_key() {
+            Some(value) => params.push("key", value),
             None => {
                 dlg.finished(false);
                 return Err(client::Error::MissingAPIKey)
@@ -454,9 +527,9 @@ where
         }
 
 
-        let url = url::Url::parse_with_params(&url, params).unwrap();
+        let url = params.parse_with_url(&url);
 
-        let mut json_mime_type: mime::Mime = "application/json".parse().unwrap();
+        let mut json_mime_type = mime::APPLICATION_JSON;
         let mut request_value_reader =
             {
                 let mut value = json::value::to_value(&self._request).expect("serde to work");
@@ -474,23 +547,26 @@ where
             let mut req_result = {
                 let client = &self.hub.client;
                 dlg.pre_request();
-                let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
-                        .header(USER_AGENT, self.hub._user_agent.clone());
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::POST)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
 
 
                         let request = req_builder
-                        .header(CONTENT_TYPE, format!("{}", json_mime_type.to_string()))
+                        .header(CONTENT_TYPE, json_mime_type.to_string())
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
                 client.request(request.unwrap()).await
-                
+
             };
 
             match req_result {
                 Err(err) => {
                     if let client::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep(d).await;
                         continue;
                     }
                     dlg.finished(false);
@@ -506,7 +582,7 @@ where
                         let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
                         if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
-                            sleep(d);
+                            sleep(d).await;
                             continue;
                         }
 
@@ -549,7 +625,8 @@ where
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.````
     ///
     /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> RecordQueryRecordCall<'a, S> {
