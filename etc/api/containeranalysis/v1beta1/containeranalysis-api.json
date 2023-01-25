@@ -230,7 +230,7 @@
                             ],
                             "parameters": {
                                 "resource": {
-                                    "description": "REQUIRED: The resource for which the policy is being requested. See the operation documentation for the appropriate value for this field.",
+                                    "description": "REQUIRED: The resource for which the policy is being requested. See [Resource names](https://cloud.google.com/apis/design/resource_names) for the appropriate value for this field.",
                                     "location": "path",
                                     "pattern": "^projects/[^/]+/notes/[^/]+$",
                                     "required": true,
@@ -333,7 +333,7 @@
                             ],
                             "parameters": {
                                 "resource": {
-                                    "description": "REQUIRED: The resource for which the policy is being specified. See the operation documentation for the appropriate value for this field.",
+                                    "description": "REQUIRED: The resource for which the policy is being specified. See [Resource names](https://cloud.google.com/apis/design/resource_names) for the appropriate value for this field.",
                                     "location": "path",
                                     "pattern": "^projects/[^/]+/notes/[^/]+$",
                                     "required": true,
@@ -361,7 +361,7 @@
                             ],
                             "parameters": {
                                 "resource": {
-                                    "description": "REQUIRED: The resource for which the policy detail is being requested. See the operation documentation for the appropriate value for this field.",
+                                    "description": "REQUIRED: The resource for which the policy detail is being requested. See [Resource names](https://cloud.google.com/apis/design/resource_names) for the appropriate value for this field.",
                                     "location": "path",
                                     "pattern": "^projects/[^/]+/notes/[^/]+$",
                                     "required": true,
@@ -546,7 +546,7 @@
                             ],
                             "parameters": {
                                 "resource": {
-                                    "description": "REQUIRED: The resource for which the policy is being requested. See the operation documentation for the appropriate value for this field.",
+                                    "description": "REQUIRED: The resource for which the policy is being requested. See [Resource names](https://cloud.google.com/apis/design/resource_names) for the appropriate value for this field.",
                                     "location": "path",
                                     "pattern": "^projects/[^/]+/occurrences/[^/]+$",
                                     "required": true,
@@ -704,7 +704,7 @@
                             ],
                             "parameters": {
                                 "resource": {
-                                    "description": "REQUIRED: The resource for which the policy is being specified. See the operation documentation for the appropriate value for this field.",
+                                    "description": "REQUIRED: The resource for which the policy is being specified. See [Resource names](https://cloud.google.com/apis/design/resource_names) for the appropriate value for this field.",
                                     "location": "path",
                                     "pattern": "^projects/[^/]+/occurrences/[^/]+$",
                                     "required": true,
@@ -732,7 +732,7 @@
                             ],
                             "parameters": {
                                 "resource": {
-                                    "description": "REQUIRED: The resource for which the policy detail is being requested. See the operation documentation for the appropriate value for this field.",
+                                    "description": "REQUIRED: The resource for which the policy detail is being requested. See [Resource names](https://cloud.google.com/apis/design/resource_names) for the appropriate value for this field.",
                                     "location": "path",
                                     "pattern": "^projects/[^/]+/occurrences/[^/]+$",
                                     "required": true,
@@ -751,109 +751,11 @@
                             ]
                         }
                     }
-                },
-                "scanConfigs": {
-                    "methods": {
-                        "get": {
-                            "description": "Gets the specified scan configuration.",
-                            "flatPath": "v1beta1/projects/{projectsId}/scanConfigs/{scanConfigsId}",
-                            "httpMethod": "GET",
-                            "id": "containeranalysis.projects.scanConfigs.get",
-                            "parameterOrder": [
-                                "name"
-                            ],
-                            "parameters": {
-                                "name": {
-                                    "description": "Required. The name of the scan configuration in the form of `projects/[PROJECT_ID]/scanConfigs/[SCAN_CONFIG_ID]`.",
-                                    "location": "path",
-                                    "pattern": "^projects/[^/]+/scanConfigs/[^/]+$",
-                                    "required": true,
-                                    "type": "string"
-                                }
-                            },
-                            "path": "v1beta1/{+name}",
-                            "response": {
-                                "$ref": "ScanConfig"
-                            },
-                            "scopes": [
-                                "https://www.googleapis.com/auth/cloud-platform"
-                            ]
-                        },
-                        "list": {
-                            "description": "Lists scan configurations for the specified project.",
-                            "flatPath": "v1beta1/projects/{projectsId}/scanConfigs",
-                            "httpMethod": "GET",
-                            "id": "containeranalysis.projects.scanConfigs.list",
-                            "parameterOrder": [
-                                "parent"
-                            ],
-                            "parameters": {
-                                "filter": {
-                                    "description": "Required. The filter expression.",
-                                    "location": "query",
-                                    "type": "string"
-                                },
-                                "pageSize": {
-                                    "description": "The number of scan configs to return in the list.",
-                                    "format": "int32",
-                                    "location": "query",
-                                    "type": "integer"
-                                },
-                                "pageToken": {
-                                    "description": "Token to provide to skip to a particular spot in the list.",
-                                    "location": "query",
-                                    "type": "string"
-                                },
-                                "parent": {
-                                    "description": "Required. The name of the project to list scan configurations for in the form of `projects/[PROJECT_ID]`.",
-                                    "location": "path",
-                                    "pattern": "^projects/[^/]+$",
-                                    "required": true,
-                                    "type": "string"
-                                }
-                            },
-                            "path": "v1beta1/{+parent}/scanConfigs",
-                            "response": {
-                                "$ref": "ListScanConfigsResponse"
-                            },
-                            "scopes": [
-                                "https://www.googleapis.com/auth/cloud-platform"
-                            ]
-                        },
-                        "update": {
-                            "description": "Updates the specified scan configuration.",
-                            "flatPath": "v1beta1/projects/{projectsId}/scanConfigs/{scanConfigsId}",
-                            "httpMethod": "PUT",
-                            "id": "containeranalysis.projects.scanConfigs.update",
-                            "parameterOrder": [
-                                "name"
-                            ],
-                            "parameters": {
-                                "name": {
-                                    "description": "Required. The name of the scan configuration in the form of `projects/[PROJECT_ID]/scanConfigs/[SCAN_CONFIG_ID]`.",
-                                    "location": "path",
-                                    "pattern": "^projects/[^/]+/scanConfigs/[^/]+$",
-                                    "required": true,
-                                    "type": "string"
-                                }
-                            },
-                            "path": "v1beta1/{+name}",
-                            "request": {
-                                "$ref": "ScanConfig"
-                            },
-                            "response": {
-                                "$ref": "ScanConfig"
-                            },
-                            "scopes": [
-                                "https://www.googleapis.com/auth/cloud-platform"
-                            ]
-                        }
-                    }
                 }
             }
         }
     },
-    "revision": "20220225",
+    "revision": "20230106",
     "rootUrl": "https://containeranalysis.googleapis.com/",
     "schemas": {
         "AliasContext": {
@@ -879,6 +781,19 @@
                 "name": {
                     "description": "The alias name.",
                     "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "AnalysisCompleted": {
+            "description": "Indicates which analysis completed successfully. Multiple types of analysis can be performed on a single resource.",
+            "id": "AnalysisCompleted",
+            "properties": {
+                "analysisType": {
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": "array"
                 }
             },
             "type": "object"
@@ -1033,7 +948,7 @@
                     "description": "The condition that is associated with this binding. If the condition evaluates to `true`, then this binding applies to the current request. If the condition evaluates to `false`, then this binding does not apply to the current request. However, a different role binding might grant the same role to one or more of the principals in this binding. To learn which resources support conditions in their IAM policies, see the [IAM documentation](https://cloud.google.com/iam/help/conditions/resource-policies)."
                 },
                 "members": {
-                    "description": "Specifies the principals requesting access for a Cloud Platform resource. `members` can have the following values: * `allUsers`: A special identifier that represents anyone who is on the internet; with or without a Google account. * `allAuthenticatedUsers`: A special identifier that represents anyone who is authenticated with a Google account or a service account. * `user:{emailid}`: An email address that represents a specific Google account. For example, `alice@example.com` . * `serviceAccount:{emailid}`: An email address that represents a service account. For example, `my-other-app@appspot.gserviceaccount.com`. * `group:{emailid}`: An email address that represents a Google group. For example, `admins@example.com`. * `deleted:user:{emailid}?uid={uniqueid}`: An email address (plus unique identifier) representing a user that has been recently deleted. For example, `alice@example.com?uid=123456789012345678901`. If the user is recovered, this value reverts to `user:{emailid}` and the recovered user retains the role in the binding. * `deleted:serviceAccount:{emailid}?uid={uniqueid}`: An email address (plus unique identifier) representing a service account that has been recently deleted. For example, `my-other-app@appspot.gserviceaccount.com?uid=123456789012345678901`. If the service account is undeleted, this value reverts to `serviceAccount:{emailid}` and the undeleted service account retains the role in the binding. * `deleted:group:{emailid}?uid={uniqueid}`: An email address (plus unique identifier) representing a Google group that has been recently deleted. For example, `admins@example.com?uid=123456789012345678901`. If the group is recovered, this value reverts to `group:{emailid}` and the recovered group retains the role in the binding. * `domain:{domain}`: The G Suite domain (primary) that represents all the users of that domain. For example, `google.com` or `example.com`. ",
+                    "description": "Specifies the principals requesting access for a Google Cloud resource. `members` can have the following values: * `allUsers`: A special identifier that represents anyone who is on the internet; with or without a Google account. * `allAuthenticatedUsers`: A special identifier that represents anyone who is authenticated with a Google account or a service account. Does not include identities that come from external identity providers (IdPs) through identity federation. * `user:{emailid}`: An email address that represents a specific Google account. For example, `alice@example.com` . * `serviceAccount:{emailid}`: An email address that represents a Google service account. For example, `my-other-app@appspot.gserviceaccount.com`. * `serviceAccount:{projectid}.svc.id.goog[{namespace}/{kubernetes-sa}]`: An identifier for a [Kubernetes service account](https://cloud.google.com/kubernetes-engine/docs/how-to/kubernetes-service-accounts). For example, `my-project.svc.id.goog[my-namespace/my-kubernetes-sa]`. * `group:{emailid}`: An email address that represents a Google group. For example, `admins@example.com`. * `deleted:user:{emailid}?uid={uniqueid}`: An email address (plus unique identifier) representing a user that has been recently deleted. For example, `alice@example.com?uid=123456789012345678901`. If the user is recovered, this value reverts to `user:{emailid}` and the recovered user retains the role in the binding. * `deleted:serviceAccount:{emailid}?uid={uniqueid}`: An email address (plus unique identifier) representing a service account that has been recently deleted. For example, `my-other-app@appspot.gserviceaccount.com?uid=123456789012345678901`. If the service account is undeleted, this value reverts to `serviceAccount:{emailid}` and the undeleted service account retains the role in the binding. * `deleted:group:{emailid}?uid={uniqueid}`: An email address (plus unique identifier) representing a Google group that has been recently deleted. For example, `admins@example.com?uid=123456789012345678901`. If the group is recovered, this value reverts to `group:{emailid}` and the recovered group retains the role in the binding. * `domain:{domain}`: The G Suite domain (primary) that represents all the users of that domain. For example, `google.com` or `example.com`. ",
                     "items": {
                         "type": "string"
                     },
@@ -1166,6 +1081,128 @@
             },
             "type": "object"
         },
+        "BuildStep": {
+            "description": "A step in the build pipeline. Next ID: 20",
+            "id": "BuildStep",
+            "properties": {
+                "allowExitCodes": {
+                    "description": "Allow this build step to fail without failing the entire build if and only if the exit code is one of the specified codes. If allow_failure is also specified, this field will take precedence.",
+                    "items": {
+                        "format": "int32",
+                        "type": "integer"
+                    },
+                    "type": "array"
+                },
+                "allowFailure": {
+                    "description": "Allow this build step to fail without failing the entire build. If false, the entire build will fail if this step fails. Otherwise, the build will succeed, but this step will still have a failure status. Error information will be reported in the failure_detail field.",
+                    "type": "boolean"
+                },
+                "args": {
+                    "description": "A list of arguments that will be presented to the step when it is started. If the image used to run the step's container has an entrypoint, the `args` are used as arguments to that entrypoint. If the image does not define an entrypoint, the first element in args is used as the entrypoint, and the remainder will be used as arguments.",
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": "array"
+                },
+                "dir": {
+                    "description": "Working directory to use when running this step's container. If this value is a relative path, it is relative to the build's working directory. If this value is absolute, it may be outside the build's working directory, in which case the contents of the path may not be persisted across build step executions, unless a `volume` for that path is specified. If the build specifies a `RepoSource` with `dir` and a step with a `dir`, which specifies an absolute path, the `RepoSource` `dir` is ignored for the step's execution.",
+                    "type": "string"
+                },
+                "entrypoint": {
+                    "description": "Entrypoint to be used instead of the build step image's default entrypoint. If unset, the image's default entrypoint is used.",
+                    "type": "string"
+                },
+                "env": {
+                    "description": "A list of environment variable definitions to be used when running a step. The elements are of the form \"KEY=VALUE\" for the environment variable \"KEY\" being given the value \"VALUE\".",
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": "array"
+                },
+                "exitCode": {
+                    "description": "Output only. Return code from running the step.",
+                    "format": "int32",
+                    "type": "integer"
+                },
+                "id": {
+                    "description": "Unique identifier for this build step, used in `wait_for` to reference this build step as a dependency.",
+                    "type": "string"
+                },
+                "name": {
+                    "description": "Required. The name of the container image that will run this particular build step. If the image is available in the host's Docker daemon's cache, it will be run directly. If not, the host will attempt to pull the image first, using the builder service account's credentials if necessary. The Docker daemon's cache will already have the latest versions of all of the officially supported build steps ([https://github.com/GoogleCloudPlatform/cloud-builders](https://github.com/GoogleCloudPlatform/cloud-builders)). The Docker daemon will also have cached many of the layers for some popular images, like \"ubuntu\", \"debian\", but they will be refreshed at the time you attempt to use them. If you built an image in a previous build step, it will be stored in the host's Docker daemon's cache and is available to use as the name for a later build step.",
+                    "type": "string"
+                },
+                "pullTiming": {
+                    "$ref": "TimeSpan",
+                    "description": "Output only. Stores timing information for pulling this build step's builder image only."
+                },
+                "script": {
+                    "description": "A shell script to be executed in the step. When script is provided, the user cannot specify the entrypoint or args.",
+                    "type": "string"
+                },
+                "secretEnv": {
+                    "description": "A list of environment variables which are encrypted using a Cloud Key Management Service crypto key. These values must be specified in the build's `Secret`.",
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": "array"
+                },
+                "status": {
+                    "description": "Output only. Status of the build step. At this time, build step status is only updated on build completion; step status is not updated in real-time as the build progresses.",
+                    "enum": [
+                        "STATUS_UNKNOWN",
+                        "PENDING",
+                        "QUEUING",
+                        "QUEUED",
+                        "WORKING",
+                        "SUCCESS",
+                        "FAILURE",
+                        "INTERNAL_ERROR",
+                        "TIMEOUT",
+                        "CANCELLED",
+                        "EXPIRED"
+                    ],
+                    "enumDescriptions": [
+                        "Status of the build is unknown.",
+                        "Build has been created and is pending execution and queuing. It has not been queued.",
+                        "Build has been received and is being queued.",
+                        "Build or step is queued; work has not yet begun.",
+                        "Build or step is being executed.",
+                        "Build or step finished successfully.",
+                        "Build or step failed to complete successfully.",
+                        "Build or step failed due to an internal cause.",
+                        "Build or step took longer than was allowed.",
+                        "Build or step was canceled by a user.",
+                        "Build was enqueued for longer than the value of `queue_ttl`."
+                    ],
+                    "type": "string"
+                },
+                "timeout": {
+                    "description": "Time limit for executing this build step. If not defined, the step has no time limit and will be allowed to continue to run until either it completes or the build itself times out.",
+                    "format": "google-duration",
+                    "type": "string"
+                },
+                "timing": {
+                    "$ref": "TimeSpan",
+                    "description": "Output only. Stores timing information for executing this build step."
+                },
+                "volumes": {
+                    "description": "List of volumes to mount into the build step. Each volume is created as an empty volume prior to execution of the build step. Upon completion of the build, volumes and their contents are discarded. Using a named volume in only one step is not valid as it is indicative of a build request with an incorrect configuration.",
+                    "items": {
+                        "$ref": "Volume"
+                    },
+                    "type": "array"
+                },
+                "waitFor": {
+                    "description": "The ID(s) of the step(s) that this build step depends on. This build step will not start until all the build steps in `wait_for` have completed successfully. If `wait_for` is empty, this build step will start when all previous build steps in the `Build.Steps` list have completed successfully.",
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": "array"
+                }
+            },
+            "type": "object"
+        },
         "ByProducts": {
             "description": "Defines an object for the byproducts field in in-toto links. The suggested fields are \"stderr\", \"stdout\", and \"return-value\".",
             "id": "ByProducts",
@@ -1179,8 +1216,182 @@
             },
             "type": "object"
         },
+        "CVSS": {
+            "description": "Common Vulnerability Scoring System. This message is compatible with CVSS v2 and v3. For CVSS v2 details, see https://www.first.org/cvss/v2/guide CVSS v2 calculator: https://nvd.nist.gov/vuln-metrics/cvss/v2-calculator For CVSS v3 details, see https://www.first.org/cvss/specification-document CVSS v3 calculator: https://nvd.nist.gov/vuln-metrics/cvss/v3-calculator",
+            "id": "CVSS",
+            "properties": {
+                "attackComplexity": {
+                    "description": "Defined in CVSS v3, CVSS v2",
+                    "enum": [
+                        "ATTACK_COMPLEXITY_UNSPECIFIED",
+                        "ATTACK_COMPLEXITY_LOW",
+                        "ATTACK_COMPLEXITY_HIGH",
+                        "ATTACK_COMPLEXITY_MEDIUM"
+                    ],
+                    "enumDescriptions": [
+                        "Defined in CVSS v3, CVSS v2",
+                        "Defined in CVSS v3, CVSS v2",
+                        "Defined in CVSS v3, CVSS v2",
+                        "Defined in CVSS v2"
+                    ],
+                    "type": "string"
+                },
+                "attackVector": {
+                    "description": "Base Metrics Represents the intrinsic characteristics of a vulnerability that are constant over time and across user environments. Defined in CVSS v3, CVSS v2",
+                    "enum": [
+                        "ATTACK_VECTOR_UNSPECIFIED",
+                        "ATTACK_VECTOR_NETWORK",
+                        "ATTACK_VECTOR_ADJACENT",
+                        "ATTACK_VECTOR_LOCAL",
+                        "ATTACK_VECTOR_PHYSICAL"
+                    ],
+                    "enumDescriptions": [
+                        "Defined in CVSS v3, CVSS v2",
+                        "Defined in CVSS v3, CVSS v2",
+                        "Defined in CVSS v3, CVSS v2",
+                        "Defined in CVSS v3, CVSS v2",
+                        "Defined in CVSS v3"
+                    ],
+                    "type": "string"
+                },
+                "authentication": {
+                    "description": "Defined in CVSS v2",
+                    "enum": [
+                        "AUTHENTICATION_UNSPECIFIED",
+                        "AUTHENTICATION_MULTIPLE",
+                        "AUTHENTICATION_SINGLE",
+                        "AUTHENTICATION_NONE"
+                    ],
+                    "enumDescriptions": [
+                        "Defined in CVSS v2",
+                        "Defined in CVSS v2",
+                        "Defined in CVSS v2",
+                        "Defined in CVSS v2"
+                    ],
+                    "type": "string"
+                },
+                "availabilityImpact": {
+                    "description": "Defined in CVSS v3, CVSS v2",
+                    "enum": [
+                        "IMPACT_UNSPECIFIED",
+                        "IMPACT_HIGH",
+                        "IMPACT_LOW",
+                        "IMPACT_NONE",
+                        "IMPACT_PARTIAL",
+                        "IMPACT_COMPLETE"
+                    ],
+                    "enumDescriptions": [
+                        "Defined in CVSS v3, CVSS v2",
+                        "Defined in CVSS v3",
+                        "Defined in CVSS v3",
+                        "Defined in CVSS v3, CVSS v2",
+                        "Defined in CVSS v2",
+                        "Defined in CVSS v2"
+                    ],
+                    "type": "string"
+                },
+                "baseScore": {
+                    "description": "The base score is a function of the base metric scores.",
+                    "format": "float",
+                    "type": "number"
+                },
+                "confidentialityImpact": {
+                    "description": "Defined in CVSS v3, CVSS v2",
+                    "enum": [
+                        "IMPACT_UNSPECIFIED",
+                        "IMPACT_HIGH",
+                        "IMPACT_LOW",
+                        "IMPACT_NONE",
+                        "IMPACT_PARTIAL",
+                        "IMPACT_COMPLETE"
+                    ],
+                    "enumDescriptions": [
+                        "Defined in CVSS v3, CVSS v2",
+                        "Defined in CVSS v3",
+                        "Defined in CVSS v3",
+                        "Defined in CVSS v3, CVSS v2",
+                        "Defined in CVSS v2",
+                        "Defined in CVSS v2"
+                    ],
+                    "type": "string"
+                },
+                "exploitabilityScore": {
+                    "format": "float",
+                    "type": "number"
+                },
+                "impactScore": {
+                    "format": "float",
+                    "type": "number"
+                },
+                "integrityImpact": {
+                    "description": "Defined in CVSS v3, CVSS v2",
+                    "enum": [
+                        "IMPACT_UNSPECIFIED",
+                        "IMPACT_HIGH",
+                        "IMPACT_LOW",
+                        "IMPACT_NONE",
+                        "IMPACT_PARTIAL",
+                        "IMPACT_COMPLETE"
+                    ],
+                    "enumDescriptions": [
+                        "Defined in CVSS v3, CVSS v2",
+                        "Defined in CVSS v3",
+                        "Defined in CVSS v3",
+                        "Defined in CVSS v3, CVSS v2",
+                        "Defined in CVSS v2",
+                        "Defined in CVSS v2"
+                    ],
+                    "type": "string"
+                },
+                "privilegesRequired": {
+                    "description": "Defined in CVSS v3",
+                    "enum": [
+                        "PRIVILEGES_REQUIRED_UNSPECIFIED",
+                        "PRIVILEGES_REQUIRED_NONE",
+                        "PRIVILEGES_REQUIRED_LOW",
+                        "PRIVILEGES_REQUIRED_HIGH"
+                    ],
+                    "enumDescriptions": [
+                        "Defined in CVSS v3",
+                        "Defined in CVSS v3",
+                        "Defined in CVSS v3",
+                        "Defined in CVSS v3"
+                    ],
+                    "type": "string"
+                },
+                "scope": {
+                    "description": "Defined in CVSS v3",
+                    "enum": [
+                        "SCOPE_UNSPECIFIED",
+                        "SCOPE_UNCHANGED",
+                        "SCOPE_CHANGED"
+                    ],
+                    "enumDescriptions": [
+                        "Defined in CVSS v3",
+                        "Defined in CVSS v3",
+                        "Defined in CVSS v3"
+                    ],
+                    "type": "string"
+                },
+                "userInteraction": {
+                    "description": "Defined in CVSS v3",
+                    "enum": [
+                        "USER_INTERACTION_UNSPECIFIED",
+                        "USER_INTERACTION_NONE",
+                        "USER_INTERACTION_REQUIRED"
+                    ],
+                    "enumDescriptions": [
+                        "Defined in CVSS v3",
+                        "Defined in CVSS v3",
+                        "Defined in CVSS v3"
+                    ],
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
         "CVSSv3": {
-            "description": "Common Vulnerability Scoring System version 3. For details, see https://www.first.org/cvss/specification-document",
+            "description": "Deprecated. Common Vulnerability Scoring System version 3. For details, see https://www.first.org/cvss/specification-document",
             "id": "CVSSv3",
             "properties": {
                 "attackComplexity": {
@@ -1437,9 +1648,23 @@
                     },
                     "type": "array"
                 },
+                "mavenArtifacts": {
+                    "description": "A list of Maven artifacts to be uploaded to Artifact Registry upon successful completion of all build steps. Artifacts in the workspace matching specified paths globs will be uploaded to the specified Artifact Registry repository using the builder service account's credentials. If any artifacts fail to be pushed, the build is marked FAILURE.",
+                    "items": {
+                        "$ref": "ContaineranalysisGoogleDevtoolsCloudbuildV1ArtifactsMavenArtifact"
+                    },
+                    "type": "array"
+                },
                 "objects": {
                     "$ref": "ContaineranalysisGoogleDevtoolsCloudbuildV1ArtifactsArtifactObjects",
                     "description": "A list of objects to be uploaded to Cloud Storage upon successful completion of all build steps. Files in the workspace matching specified paths globs will be uploaded to the specified Cloud Storage location using the builder service account's credentials. The location and generation of the uploaded objects will be stored in the Build resource's results field. If any objects fail to be pushed, the build is marked FAILURE."
+                },
+                "pythonPackages": {
+                    "description": "A list of Python packages to be uploaded to Artifact Registry upon successful completion of all build steps. The build service account credentials will be used to perform the upload. If any objects fail to be pushed, the build is marked FAILURE.",
+                    "items": {
+                        "$ref": "ContaineranalysisGoogleDevtoolsCloudbuildV1ArtifactsPythonPackage"
+                    },
+                    "type": "array"
                 }
             },
             "type": "object"
@@ -1463,6 +1688,51 @@
                     "$ref": "ContaineranalysisGoogleDevtoolsCloudbuildV1TimeSpan",
                     "description": "Output only. Stores timing information for pushing all artifact objects.",
                     "readOnly": true
+                }
+            },
+            "type": "object"
+        },
+        "ContaineranalysisGoogleDevtoolsCloudbuildV1ArtifactsMavenArtifact": {
+            "description": "A Maven artifact to upload to Artifact Registry upon successful completion of all build steps.",
+            "id": "ContaineranalysisGoogleDevtoolsCloudbuildV1ArtifactsMavenArtifact",
+            "properties": {
+                "artifactId": {
+                    "description": "Maven `artifactId` value used when uploading the artifact to Artifact Registry.",
+                    "type": "string"
+                },
+                "groupId": {
+                    "description": "Maven `groupId` value used when uploading the artifact to Artifact Registry.",
+                    "type": "string"
+                },
+                "path": {
+                    "description": "Path to an artifact in the build's workspace to be uploaded to Artifact Registry. This can be either an absolute path, e.g. /workspace/my-app/target/my-app-1.0.SNAPSHOT.jar or a relative path from /workspace, e.g. my-app/target/my-app-1.0.SNAPSHOT.jar.",
+                    "type": "string"
+                },
+                "repository": {
+                    "description": "Artifact Registry repository, in the form \"https://$REGION-maven.pkg.dev/$PROJECT/$REPOSITORY\" Artifact in the workspace specified by path will be uploaded to Artifact Registry with this location as a prefix.",
+                    "type": "string"
+                },
+                "version": {
+                    "description": "Maven `version` value used when uploading the artifact to Artifact Registry.",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "ContaineranalysisGoogleDevtoolsCloudbuildV1ArtifactsPythonPackage": {
+            "description": "Python package to upload to Artifact Registry upon successful completion of all build steps. A package can encapsulate multiple objects to be uploaded to a single repository.",
+            "id": "ContaineranalysisGoogleDevtoolsCloudbuildV1ArtifactsPythonPackage",
+            "properties": {
+                "paths": {
+                    "description": "Path globs used to match files in the build's workspace. For Python/ Twine, this is usually `dist/*`, and sometimes additionally an `.asc` file.",
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": "array"
+                },
+                "repository": {
+                    "description": "Artifact Registry repository, in the form \"https://$REGION-python.pkg.dev/$PROJECT/$REPOSITORY\" Files in the workspace matching any path pattern will be uploaded to Artifact Registry with this location as a prefix.",
+                    "type": "string"
                 }
             },
             "type": "object"
@@ -1641,7 +1911,7 @@
                     "additionalProperties": {
                         "$ref": "ContaineranalysisGoogleDevtoolsCloudbuildV1TimeSpan"
                     },
-                    "description": "Output only. Stores timing information for phases of the build. Valid keys are: * BUILD: time to execute all build steps. * PUSH: time to push all specified images. * FETCHSOURCE: time to fetch source. * SETUPBUILD: time to set up build. If the build does not specify source or images, these keys will not be included.",
+                    "description": "Output only. Stores timing information for phases of the build. Valid keys are: * BUILD: time to execute all build steps. * PUSH: time to push all artifacts including docker images and non docker artifacts. * FETCHSOURCE: time to fetch source. * SETUPBUILD: time to set up build. If the build does not specify source or images, these keys will not be included.",
                     "readOnly": true,
                     "type": "object"
                 },
@@ -1730,7 +2000,7 @@
             "id": "ContaineranalysisGoogleDevtoolsCloudbuildV1BuildOptions",
             "properties": {
                 "diskSizeGb": {
-                    "description": "Requested disk size for the VM that runs the build. Note that this is *NOT* \"disk free\"; some of the space will be used by the operating system and build utilities. Also note that this is the minimum disk size that will be allocated for the build -- the build may run with a larger disk than requested. At present, the maximum disk size is 1000GB; builds that request more than the maximum are rejected with an error.",
+                    "description": "Requested disk size for the VM that runs the build. Note that this is *NOT* \"disk free\"; some of the space will be used by the operating system and build utilities. Also note that this is the minimum disk size that will be allocated for the build -- the build may run with a larger disk than requested. At present, the maximum disk size is 2000GB; builds that request more than the maximum are rejected with an error.",
                     "format": "int64",
                     "type": "string"
                 },
@@ -1808,8 +2078,8 @@
                         "VERIFIED"
                     ],
                     "enumDescriptions": [
-                        "Not a verifiable build. (default)",
-                        "Verified build."
+                        "Not a verifiable build (the default).",
+                        "Build must be verified."
                     ],
                     "type": "string"
                 },
@@ -1878,6 +2148,18 @@
             "description": "A step in the build pipeline.",
             "id": "ContaineranalysisGoogleDevtoolsCloudbuildV1BuildStep",
             "properties": {
+                "allowExitCodes": {
+                    "description": "Allow this build step to fail without failing the entire build if and only if the exit code is one of the specified codes. If allow_failure is also specified, this field will take precedence.",
+                    "items": {
+                        "format": "int32",
+                        "type": "integer"
+                    },
+                    "type": "array"
+                },
+                "allowFailure": {
+                    "description": "Allow this build step to fail without failing the entire build. If false, the entire build will fail if this step fails. Otherwise, the build will succeed, but this step will still have a failure status. Error information will be reported in the failure_detail field.",
+                    "type": "boolean"
+                },
                 "args": {
                     "description": "A list of arguments that will be presented to the step when it is started. If the image used to run the step's container has an entrypoint, the `args` are used as arguments to that entrypoint. If the image does not define an entrypoint, the first element in args is used as the entrypoint, and the remainder will be used as arguments.",
                     "items": {
@@ -1899,6 +2181,12 @@
                         "type": "string"
                     },
                     "type": "array"
+                },
+                "exitCode": {
+                    "description": "Output only. Return code from running the step.",
+                    "format": "int32",
+                    "readOnly": true,
+                    "type": "integer"
                 },
                 "id": {
                     "description": "Unique identifier for this build step, used in `wait_for` to reference this build step as a dependency.",
@@ -2133,12 +2421,12 @@
             "id": "ContaineranalysisGoogleDevtoolsCloudbuildV1Results",
             "properties": {
                 "artifactManifest": {
-                    "description": "Path to the artifact manifest. Only populated when artifacts are uploaded.",
+                    "description": "Path to the artifact manifest for non-container artifacts uploaded to Cloud Storage. Only populated when artifacts are uploaded to Cloud Storage.",
                     "type": "string"
                 },
                 "artifactTiming": {
                     "$ref": "ContaineranalysisGoogleDevtoolsCloudbuildV1TimeSpan",
-                    "description": "Time to push all non-container artifacts."
+                    "description": "Time to push all non-container artifacts to Cloud Storage."
                 },
                 "buildStepImages": {
                     "description": "List of build step digests, in the order corresponding to build step indices.",
@@ -2162,10 +2450,24 @@
                     },
                     "type": "array"
                 },
+                "mavenArtifacts": {
+                    "description": "Maven artifacts uploaded to Artifact Registry at the end of the build.",
+                    "items": {
+                        "$ref": "ContaineranalysisGoogleDevtoolsCloudbuildV1UploadedMavenArtifact"
+                    },
+                    "type": "array"
+                },
                 "numArtifacts": {
-                    "description": "Number of artifacts uploaded. Only populated when artifacts are uploaded.",
+                    "description": "Number of non-container artifacts uploaded to Cloud Storage. Only populated when artifacts are uploaded to Cloud Storage.",
                     "format": "int64",
                     "type": "string"
+                },
+                "pythonPackages": {
+                    "description": "Python artifacts uploaded to Artifact Registry at the end of the build.",
+                    "items": {
+                        "$ref": "ContaineranalysisGoogleDevtoolsCloudbuildV1UploadedPythonPackage"
+                    },
+                    "type": "array"
                 }
             },
             "type": "object"
@@ -2323,6 +2625,46 @@
                 "startTime": {
                     "description": "Start of time span.",
                     "format": "google-datetime",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "ContaineranalysisGoogleDevtoolsCloudbuildV1UploadedMavenArtifact": {
+            "description": "A Maven artifact uploaded using the MavenArtifact directive.",
+            "id": "ContaineranalysisGoogleDevtoolsCloudbuildV1UploadedMavenArtifact",
+            "properties": {
+                "fileHashes": {
+                    "$ref": "ContaineranalysisGoogleDevtoolsCloudbuildV1FileHashes",
+                    "description": "Hash types and values of the Maven Artifact."
+                },
+                "pushTiming": {
+                    "$ref": "ContaineranalysisGoogleDevtoolsCloudbuildV1TimeSpan",
+                    "description": "Output only. Stores timing information for pushing the specified artifact.",
+                    "readOnly": true
+                },
+                "uri": {
+                    "description": "URI of the uploaded artifact.",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "ContaineranalysisGoogleDevtoolsCloudbuildV1UploadedPythonPackage": {
+            "description": "Artifact uploaded using the PythonPackage directive.",
+            "id": "ContaineranalysisGoogleDevtoolsCloudbuildV1UploadedPythonPackage",
+            "properties": {
+                "fileHashes": {
+                    "$ref": "ContaineranalysisGoogleDevtoolsCloudbuildV1FileHashes",
+                    "description": "Hash types and values of the Python Artifact."
+                },
+                "pushTiming": {
+                    "$ref": "ContaineranalysisGoogleDevtoolsCloudbuildV1TimeSpan",
+                    "description": "Output only. Stores timing information for pushing the specified artifact.",
+                    "readOnly": true
+                },
+                "uri": {
+                    "description": "URI of the uploaded artifact.",
                     "type": "string"
                 }
             },
@@ -2503,10 +2845,36 @@
             },
             "type": "object"
         },
+        "Digest": {
+            "description": "Digest information.",
+            "id": "Digest",
+            "properties": {
+                "algo": {
+                    "description": "`SHA1`, `SHA512` etc.",
+                    "type": "string"
+                },
+                "digestBytes": {
+                    "description": "Value of the digest.",
+                    "format": "byte",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
         "Discovered": {
             "description": "Provides information about the analysis status of a discovered resource.",
             "id": "Discovered",
             "properties": {
+                "analysisCompleted": {
+                    "$ref": "AnalysisCompleted"
+                },
+                "analysisError": {
+                    "description": "Indicates any errors encountered during analysis of a resource. There could be 0 or more of these errors.",
+                    "items": {
+                        "$ref": "Status"
+                    },
+                    "type": "array"
+                },
                 "analysisStatus": {
                     "description": "The status of discovery for the resource.",
                     "enum": [
@@ -2514,6 +2882,7 @@
                         "PENDING",
                         "SCANNING",
                         "FINISHED_SUCCESS",
+                        "COMPLETE",
                         "FINISHED_FAILED",
                         "FINISHED_UNSUPPORTED"
                     ],
@@ -2522,6 +2891,7 @@
                         "Resource is known but no action has been taken yet.",
                         "Resource is being analyzed.",
                         "Analysis has finished successfully.",
+                        "Analysis has completed.",
                         "Analysis has finished unsuccessfully, the analysis itself is in a bad state.",
                         "The resource is known not to be supported"
                     ],
@@ -2636,7 +3006,7 @@
             "type": "object"
         },
         "DocumentNote": {
-            "description": "DocumentNote represents an SPDX Document Creation Infromation section: https://spdx.github.io/spdx-spec/2-document-creation-information/",
+            "description": "DocumentNote represents an SPDX Document Creation Information section: https://spdx.github.io/spdx-spec/v2.3/document-creation-information/",
             "id": "DocumentNote",
             "properties": {
                 "dataLicence": {
@@ -2651,7 +3021,7 @@
             "type": "object"
         },
         "DocumentOccurrence": {
-            "description": "DocumentOccurrence represents an SPDX Document Creation Information section: https://spdx.github.io/spdx-spec/2-document-creation-information/",
+            "description": "DocumentOccurrence represents an SPDX Document Creation Information section: https://spdx.github.io/spdx-spec/v2.3/document-creation-information/",
             "id": "DocumentOccurrence",
             "properties": {
                 "createTime": {
@@ -2701,9 +3071,42 @@
             "type": "object"
         },
         "Empty": {
-            "description": "A generic empty message that you can re-use to avoid defining duplicated empty messages in your APIs. A typical example is to use it as the request or the response type of an API method. For instance: service Foo { rpc Bar(google.protobuf.Empty) returns (google.protobuf.Empty); } The JSON representation for `Empty` is empty JSON object `{}`.",
+            "description": "A generic empty message that you can re-use to avoid defining duplicated empty messages in your APIs. A typical example is to use it as the request or the response type of an API method. For instance: service Foo { rpc Bar(google.protobuf.Empty) returns (google.protobuf.Empty); }",
             "id": "Empty",
             "properties": {},
+            "type": "object"
+        },
+        "Envelope": {
+            "description": "MUST match https://github.com/secure-systems-lab/dsse/blob/master/envelope.proto. An authenticated message of arbitrary type.",
+            "id": "Envelope",
+            "properties": {
+                "payload": {
+                    "format": "byte",
+                    "type": "string"
+                },
+                "payloadType": {
+                    "type": "string"
+                },
+                "signatures": {
+                    "items": {
+                        "$ref": "EnvelopeSignature"
+                    },
+                    "type": "array"
+                }
+            },
+            "type": "object"
+        },
+        "EnvelopeSignature": {
+            "id": "EnvelopeSignature",
+            "properties": {
+                "keyid": {
+                    "type": "string"
+                },
+                "sig": {
+                    "format": "byte",
+                    "type": "string"
+                }
+            },
             "type": "object"
         },
         "Environment": {
@@ -3172,6 +3575,20 @@
                     "format": "float",
                     "type": "number"
                 },
+                "cvssVersion": {
+                    "description": "Output only. CVSS version used to populate cvss_score and severity.",
+                    "enum": [
+                        "CVSS_VERSION_UNSPECIFIED",
+                        "CVSS_VERSION_2",
+                        "CVSS_VERSION_3"
+                    ],
+                    "enumDescriptions": [
+                        "",
+                        "",
+                        ""
+                    ],
+                    "type": "string"
+                },
                 "effectiveSeverity": {
                     "description": "The distro assigned severity for this vulnerability when it is available, and note provider assigned severity when distro has not yet assigned a severity for this vulnerability. When there are multiple PackageIssues for this vulnerability, they can have different effective severities because some might be provided by the distro while others are provided by the language ecosystem for a language pack. For this reason, it is advised to use the effective severity on the PackageIssue level. In the case where multiple PackageIssues have differing effective severities, this field should be the highest severity for any of the PackageIssues.",
                     "enum": [
@@ -3323,16 +3740,51 @@
             "description": "This represents how a particular software package may be installed on a system.",
             "id": "Installation",
             "properties": {
+                "architecture": {
+                    "description": "Output only. The CPU architecture for which packages in this distribution channel were built. Architecture will be blank for language packages.",
+                    "enum": [
+                        "ARCHITECTURE_UNSPECIFIED",
+                        "X86",
+                        "X64"
+                    ],
+                    "enumDescriptions": [
+                        "Unknown architecture.",
+                        "X86 architecture.",
+                        "X64 architecture."
+                    ],
+                    "readOnly": true,
+                    "type": "string"
+                },
+                "cpeUri": {
+                    "description": "Output only. The cpe_uri in [CPE format](https://cpe.mitre.org/specification/) denoting the package manager version distributing a package. The cpe_uri will be blank for language packages.",
+                    "readOnly": true,
+                    "type": "string"
+                },
+                "license": {
+                    "$ref": "License",
+                    "description": "Licenses that have been declared by the authors of the package."
+                },
                 "location": {
-                    "description": "Required. All of the places within the filesystem versions of this package have been found.",
+                    "description": "All of the places within the filesystem versions of this package have been found.",
                     "items": {
                         "$ref": "Location"
                     },
                     "type": "array"
                 },
                 "name": {
-                    "description": "Output only. The name of the installed package.",
+                    "description": "Required. Output only. The name of the installed package.",
+                    "readOnly": true,
                     "type": "string"
+                },
+                "packageType": {
+                    "description": "Output only. The type of package; whether native or non native (e.g., ruby gems, node.js packages, etc.).",
+                    "readOnly": true,
+                    "type": "string"
+                },
+                "version": {
+                    "$ref": "Version",
+                    "description": "Output only. The version of the package.",
+                    "readOnly": true
                 }
             },
             "type": "object"
@@ -3407,7 +3859,7 @@
             "type": "object"
         },
         "License": {
-            "description": "License information: https://spdx.github.io/spdx-spec/3-package-information/#315-declared-license",
+            "description": "License information.",
             "id": "License",
             "properties": {
                 "comments": {
@@ -3415,7 +3867,7 @@
                     "type": "string"
                 },
                 "expression": {
-                    "description": "Expression: https://spdx.github.io/spdx-spec/appendix-IV-SPDX-license-expressions/",
+                    "description": "Often a single license can be used to represent the licensing terms. Sometimes it is necessary to include a choice of one or more licenses or some combination of license identifiers. Examples: \"LGPL-2.1-only OR MIT\", \"LGPL-2.1-only AND MIT\", \"GPL-2.0-or-later WITH Bison-exception-2.2\".",
                     "type": "string"
                 }
             },
@@ -3511,30 +3963,12 @@
             },
             "type": "object"
         },
-        "ListScanConfigsResponse": {
-            "description": "Response for listing scan configurations.",
-            "id": "ListScanConfigsResponse",
-            "properties": {
-                "nextPageToken": {
-                    "description": "The next pagination token in the list response. It should be used as `page_token` for the following request. An empty value means no more results.",
-                    "type": "string"
-                },
-                "scanConfigs": {
-                    "description": "The scan configurations requested.",
-                    "items": {
-                        "$ref": "ScanConfig"
-                    },
-                    "type": "array"
-                }
-            },
-            "type": "object"
-        },
         "Location": {
             "description": "An occurrence of a particular package installation found within a system's filesystem. E.g., glibc was found in `/var/lib/dpkg/status`.",
             "id": "Location",
             "properties": {
                 "cpeUri": {
-                    "description": "Required. The CPE URI in [CPE format](https://cpe.mitre.org/specification/) denoting the package manager version distributing a package.",
+                    "description": "Deprecated. The CPE URI in [CPE format](https://cpe.mitre.org/specification/) denoting the package manager version distributing a package.",
                     "type": "string"
                 },
                 "path": {
@@ -3543,7 +3977,7 @@
                 },
                 "version": {
                     "$ref": "Version",
-                    "description": "The version installed at this location."
+                    "description": "Deprecated. The version installed at this location."
                 }
             },
             "type": "object"
@@ -3707,6 +4141,10 @@
                     "$ref": "GrafeasV1beta1DiscoveryDetails",
                     "description": "Describes when a resource was discovered."
                 },
+                "envelope": {
+                    "$ref": "Envelope",
+                    "description": "https://github.com/secure-systems-lab/dsse"
+                },
                 "installation": {
                     "$ref": "GrafeasV1beta1PackageDetails",
                     "description": "Describes the installation of a package on the linked resource."
@@ -3794,9 +4232,38 @@
             "type": "object"
         },
         "Package": {
-            "description": "This represents a particular package that is distributed over various channels. E.g., glibc (aka libc6) is distributed by many, at various versions.",
+            "description": "Package represents a particular package version.",
             "id": "Package",
             "properties": {
+                "architecture": {
+                    "description": "The CPU architecture for which packages in this distribution channel were built. Architecture will be blank for language packages.",
+                    "enum": [
+                        "ARCHITECTURE_UNSPECIFIED",
+                        "X86",
+                        "X64"
+                    ],
+                    "enumDescriptions": [
+                        "Unknown architecture.",
+                        "X86 architecture.",
+                        "X64 architecture."
+                    ],
+                    "type": "string"
+                },
+                "cpeUri": {
+                    "description": "The cpe_uri in [CPE format](https://cpe.mitre.org/specification/) denoting the package manager version distributing a package. The cpe_uri will be blank for language packages.",
+                    "type": "string"
+                },
+                "description": {
+                    "description": "The description of this package.",
+                    "type": "string"
+                },
+                "digest": {
+                    "description": "Hash value, typically a file digest, that allows unique identification a specific package.",
+                    "items": {
+                        "$ref": "Digest"
+                    },
+                    "type": "array"
+                },
                 "distribution": {
                     "description": "The various channels by which a package is distributed.",
                     "items": {
@@ -3804,9 +4271,29 @@
                     },
                     "type": "array"
                 },
+                "license": {
+                    "$ref": "License",
+                    "description": "Licenses that have been declared by the authors of the package."
+                },
+                "maintainer": {
+                    "description": "A freeform text denoting the maintainer of this package.",
+                    "type": "string"
+                },
                 "name": {
                     "description": "Required. Immutable. The name of the package.",
                     "type": "string"
+                },
+                "packageType": {
+                    "description": "The type of package; whether native or non native (e.g., ruby gems, node.js packages, etc.).",
+                    "type": "string"
+                },
+                "url": {
+                    "description": "The homepage for this package.",
+                    "type": "string"
+                },
+                "version": {
+                    "$ref": "Version",
+                    "description": "The version of the package."
                 }
             },
             "type": "object"
@@ -4005,7 +4492,7 @@
                     "type": "string"
                 },
                 "pgpKeyId": {
-                    "description": "The cryptographic fingerprint of the key used to generate the signature, as output by, e.g. `gpg --list-keys`. This should be the version 4, full 160-bit fingerprint, expressed as a 40 character hexidecimal string. See https://tools.ietf.org/html/rfc4880#section-12.2 for details. Implementations may choose to acknowledge \"LONG\", \"SHORT\", or other abbreviated key IDs, but only the full fingerprint is guaranteed to work. In gpg, the full fingerprint can be retrieved from the `fpr` field returned when calling --list-keys with --with-colons. For example: ``` gpg --with-colons --with-fingerprint --force-v4-certs \\ --list-keys attester@example.com tru::1:1513631572:0:3:1:5 pub:...... fpr:::::::::24FF6481B76AC91E66A00AC657A93A81EF3AE6FB: ``` Above, the fingerprint is `24FF6481B76AC91E66A00AC657A93A81EF3AE6FB`.",
+                    "description": "The cryptographic fingerprint of the key used to generate the signature, as output by, e.g. `gpg --list-keys`. This should be the version 4, full 160-bit fingerprint, expressed as a 40 character hexadecimal string. See https://tools.ietf.org/html/rfc4880#section-12.2 for details. Implementations may choose to acknowledge \"LONG\", \"SHORT\", or other abbreviated key IDs, but only the full fingerprint is guaranteed to work. In gpg, the full fingerprint can be retrieved from the `fpr` field returned when calling --list-keys with --with-colons. For example: ``` gpg --with-colons --with-fingerprint --force-v4-certs \\ --list-keys attester@example.com tru::1:1513631572:0:3:1:5 pub:...... fpr:::::::::24FF6481B76AC91E66A00AC657A93A81EF3AE6FB: ``` Above, the fingerprint is `24FF6481B76AC91E66A00AC657A93A81EF3AE6FB`.",
                     "type": "string"
                 },
                 "signature": {
@@ -4322,42 +4809,13 @@
             },
             "type": "object"
         },
-        "ScanConfig": {
-            "description": "A scan configuration specifies whether Cloud components in a project have a particular type of analysis being run. For example, it can configure whether vulnerability scanning is being done on Docker images or not.",
-            "id": "ScanConfig",
-            "properties": {
-                "createTime": {
-                    "description": "Output only. The time this scan config was created.",
-                    "format": "google-datetime",
-                    "type": "string"
-                },
-                "description": {
-                    "description": "Output only. A human-readable description of what the scan configuration does.",
-                    "type": "string"
-                },
-                "enabled": {
-                    "description": "Whether the scan is enabled.",
-                    "type": "boolean"
-                },
-                "name": {
-                    "description": "Output only. The name of the scan configuration in the form of `projects/[PROJECT_ID]/scanConfigs/[SCAN_CONFIG_ID]`.",
-                    "type": "string"
-                },
-                "updateTime": {
-                    "description": "Output only. The time this scan config was last updated.",
-                    "format": "google-datetime",
-                    "type": "string"
-                }
-            },
-            "type": "object"
-        },
         "SetIamPolicyRequest": {
             "description": "Request message for `SetIamPolicy` method.",
             "id": "SetIamPolicyRequest",
             "properties": {
                 "policy": {
                     "$ref": "Policy",
-                    "description": "REQUIRED: The complete policy to be applied to the `resource`. The size of the policy is limited to a few 10s of KB. An empty policy is a valid policy but certain Cloud Platform services (such as Projects) might reject them."
+                    "description": "REQUIRED: The complete policy to be applied to the `resource`. The size of the policy is limited to a few 10s of KB. An empty policy is a valid policy but certain Google Cloud services (such as Projects) might reject them."
                 }
             },
             "type": "object"
@@ -4488,7 +4946,7 @@
             "id": "TestIamPermissionsRequest",
             "properties": {
                 "permissions": {
-                    "description": "The set of permissions to check for the `resource`. Permissions with wildcards (such as '*' or 'storage.*') are not allowed. For more information see [IAM Overview](https://cloud.google.com/iam/docs/overview#permissions).",
+                    "description": "The set of permissions to check for the `resource`. Permissions with wildcards (such as `*` or `storage.*`) are not allowed. For more information see [IAM Overview](https://cloud.google.com/iam/docs/overview#permissions).",
                     "items": {
                         "type": "string"
                     },
@@ -4507,6 +4965,23 @@
                         "type": "string"
                     },
                     "type": "array"
+                }
+            },
+            "type": "object"
+        },
+        "TimeSpan": {
+            "description": "Start and end times for a build execution phase. Next ID: 3",
+            "id": "TimeSpan",
+            "properties": {
+                "endTime": {
+                    "description": "End of time span.",
+                    "format": "google-datetime",
+                    "type": "string"
+                },
+                "startTime": {
+                    "description": "Start of time span.",
+                    "format": "google-datetime",
+                    "type": "string"
                 }
             },
             "type": "object"
@@ -4551,6 +5026,21 @@
             },
             "type": "object"
         },
+        "Volume": {
+            "description": "Volume describes a Docker container volume which is mounted into build steps in order to persist files across build step execution. Next ID: 3",
+            "id": "Volume",
+            "properties": {
+                "name": {
+                    "description": "Name of the volume to mount. Volume names must be unique per build step and must be valid names for Docker volumes. Each named volume must be used by at least two build steps.",
+                    "type": "string"
+                },
+                "path": {
+                    "description": "Path at which to mount the volume. Paths must be absolute and cannot conflict with other volume paths on the same build step or with certain reserved volume paths.",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
         "Vulnerability": {
             "description": "Vulnerability provides metadata about a security vulnerability in a Note.",
             "id": "Vulnerability",
@@ -4560,9 +5050,34 @@
                     "format": "float",
                     "type": "number"
                 },
+                "cvssV2": {
+                    "$ref": "CVSS",
+                    "description": "The full description of the CVSS for version 2."
+                },
                 "cvssV3": {
                     "$ref": "CVSSv3",
-                    "description": "The full description of the CVSSv3."
+                    "description": "The full description of the CVSS for version 3."
+                },
+                "cvssVersion": {
+                    "description": "CVSS version used to populate cvss_score and severity.",
+                    "enum": [
+                        "CVSS_VERSION_UNSPECIFIED",
+                        "CVSS_VERSION_2",
+                        "CVSS_VERSION_3"
+                    ],
+                    "enumDescriptions": [
+                        "",
+                        "",
+                        ""
+                    ],
+                    "type": "string"
+                },
+                "cwe": {
+                    "description": "A list of CWE for this vulnerability. For details, see: https://cwe.mitre.org/index.html",
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": "array"
                 },
                 "details": {
                     "description": "All information about the package to specifically identify this vulnerability. One entry per (version range and cpe_uri) the package vulnerability has manifested in.",

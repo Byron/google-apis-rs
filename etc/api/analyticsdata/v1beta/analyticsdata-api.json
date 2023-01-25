@@ -178,7 +178,7 @@
                     ],
                     "parameters": {
                         "property": {
-                            "description": "A Google Analytics GA4 property identifier whose events are tracked. To learn more, see [where to find your Property ID](https://developers.google.com/analytics/devguides/reporting/data/v1/property-id). `property` should be the same value as in your `runReport` request. Example: properties/1234 Set the Property ID to 0 for compatibility checking on dimensions and metrics common to all properties. In this special mode, this method will not return custom dimensions and metrics.",
+                            "description": "A Google Analytics GA4 property identifier whose events are tracked. To learn more, see [where to find your Property ID](https://developers.google.com/analytics/devguides/reporting/data/v1/property-id). `property` should be the same value as in your `runReport` request. Example: properties/1234",
                             "location": "path",
                             "pattern": "^properties/[^/]+$",
                             "required": true,
@@ -253,7 +253,7 @@
                     ]
                 },
                 "runRealtimeReport": {
-                    "description": "The Google Analytics Realtime API returns a customized report of realtime event data for your property. These reports show events and usage from the last 30 minutes.",
+                    "description": "Returns a customized report of realtime event data for your property. Events appear in realtime reports seconds after they have been sent to the Google Analytics. Realtime reports show events and usage data for the periods of time ranging from the present moment to 30 minutes ago (up to 60 minutes for Google Analytics 360 properties). For a guide to constructing realtime requests & understanding responses, see [Creating a Realtime Report](https://developers.google.com/analytics/devguides/reporting/data/v1/realtime-basics).",
                     "flatPath": "v1beta/properties/{propertiesId}:runRealtimeReport",
                     "httpMethod": "POST",
                     "id": "analyticsdata.properties.runRealtimeReport",
@@ -282,7 +282,7 @@
                     ]
                 },
                 "runReport": {
-                    "description": "Returns a customized report of your Google Analytics event data. Reports contain statistics derived from data collected by the Google Analytics tracking code. The data returned from the API is as a table with columns for the requested dimensions and metrics. Metrics are individual measurements of user activity on your property, such as active users or event count. Dimensions break down metrics across some common criteria, such as country or event name.",
+                    "description": "Returns a customized report of your Google Analytics event data. Reports contain statistics derived from data collected by the Google Analytics tracking code. The data returned from the API is as a table with columns for the requested dimensions and metrics. Metrics are individual measurements of user activity on your property, such as active users or event count. Dimensions break down metrics across some common criteria, such as country or event name. For a guide to constructing requests & understanding responses, see [Creating a Report](https://developers.google.com/analytics/devguides/reporting/data/v1/basics).",
                     "flatPath": "v1beta/properties/{propertiesId}:runReport",
                     "httpMethod": "POST",
                     "id": "analyticsdata.properties.runReport",
@@ -313,7 +313,7 @@
             }
         }
     },
-    "revision": "20220303",
+    "revision": "20230123",
     "rootUrl": "https://analyticsdata.googleapis.com/",
     "schemas": {
         "ActiveMetricRestriction": {
@@ -771,7 +771,7 @@
                     "description": "A filter for two values."
                 },
                 "fieldName": {
-                    "description": "The dimension name or metric name. Must be a name defined in dimensions or metrics.",
+                    "description": "The dimension name or metric name. In most methods, dimensions & metrics can be used for the first time in this field. However in a RunPivotReportRequest, this field must be additionally specified by name in the RunPivotReportRequest's dimensions or metrics.",
                     "type": "string"
                 },
                 "inListFilter": {
@@ -1139,7 +1139,7 @@
             "type": "object"
         },
         "OrderBy": {
-            "description": "The sort options.",
+            "description": "Order bys define how rows will be sorted in the response. For example, ordering rows by descending event count is one ordering, and ordering rows by the event name string is a different ordering.",
             "id": "OrderBy",
             "properties": {
                 "desc": {
@@ -1301,7 +1301,11 @@
                 },
                 "tokensPerHour": {
                     "$ref": "QuotaStatus",
-                    "description": "Standard Analytics Properties can use up to 5,000 tokens per hour; Analytics 360 Properties can use 50,000 tokens per hour. An API request consumes a single number of tokens, and that number is deducted from both the hourly and daily quotas."
+                    "description": "Standard Analytics Properties can use up to 5,000 tokens per hour; Analytics 360 Properties can use 50,000 tokens per hour. An API request consumes a single number of tokens, and that number is deducted from all of the hourly, daily, and per project hourly quotas."
+                },
+                "tokensPerProjectPerHour": {
+                    "$ref": "QuotaStatus",
+                    "description": "Analytics Properties can use up to 25% of their tokens per project per hour. This amounts to standard Analytics Properties can use up to 1,250 tokens per project per hour, and Analytics 360 Properties can use 12,500 tokens per project per hour. An API request consumes a single number of tokens, and that number is deducted from all of the hourly, daily, and per project hourly quotas."
                 }
             },
             "type": "object"
@@ -1498,7 +1502,7 @@
             "properties": {
                 "dimensionFilter": {
                     "$ref": "FilterExpression",
-                    "description": "The filter clause of dimensions. Dimensions must be requested to be used in this filter. Metrics cannot be used in this filter."
+                    "description": "The filter clause of dimensions. Metrics cannot be used in this filter."
                 },
                 "dimensions": {
                     "description": "The dimensions requested and displayed.",
@@ -1535,7 +1539,7 @@
                 },
                 "metricFilter": {
                     "$ref": "FilterExpression",
-                    "description": "The filter clause of metrics. Applied at post aggregation phase, similar to SQL having-clause. Metrics must be requested to be used in this filter. Dimensions cannot be used in this filter."
+                    "description": "The filter clause of metrics. Applied at post aggregation phase, similar to SQL having-clause. Dimensions cannot be used in this filter."
                 },
                 "metrics": {
                     "description": "The metrics requested and displayed.",

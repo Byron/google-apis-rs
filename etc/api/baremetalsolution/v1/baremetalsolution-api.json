@@ -226,49 +226,9 @@
                     ]
                 }
             }
-        },
-        "projects": {
-            "resources": {
-                "locations": {
-                    "resources": {
-                        "instances": {
-                            "methods": {
-                                "resetInstance": {
-                                    "description": "Perform an ungraceful, hard reset on a machine (equivalent to shutting the power off, and then turning it back on).",
-                                    "flatPath": "v1/projects/{projectsId}/locations/{locationsId}/instances/{instancesId}:resetInstance",
-                                    "httpMethod": "POST",
-                                    "id": "baremetalsolution.projects.locations.instances.resetInstance",
-                                    "parameterOrder": [
-                                        "instance"
-                                    ],
-                                    "parameters": {
-                                        "instance": {
-                                            "description": "Required. Name of the instance to reset.",
-                                            "location": "path",
-                                            "pattern": "^projects/[^/]+/locations/[^/]+/instances/[^/]+$",
-                                            "required": true,
-                                            "type": "string"
-                                        }
-                                    },
-                                    "path": "v1/{+instance}:resetInstance",
-                                    "request": {
-                                        "$ref": "ResetInstanceRequest"
-                                    },
-                                    "response": {
-                                        "$ref": "ResetInstanceResponse"
-                                    },
-                                    "scopes": [
-                                        "https://www.googleapis.com/auth/cloud-platform"
-                                    ]
-                                }
-                            }
-                        }
-                    }
-                }
-            }
         }
     },
-    "revision": "20220209",
+    "revision": "20230113",
     "rootUrl": "https://baremetalsolution.googleapis.com/",
     "schemas": {
         "CancelOperationRequest": {
@@ -278,7 +238,7 @@
             "type": "object"
         },
         "Empty": {
-            "description": "A generic empty message that you can re-use to avoid defining duplicated empty messages in your APIs. A typical example is to use it as the request or the response type of an API method. For instance: service Foo { rpc Bar(google.protobuf.Empty) returns (google.protobuf.Empty); } The JSON representation for `Empty` is empty JSON object `{}`.",
+            "description": "A generic empty message that you can re-use to avoid defining duplicated empty messages in your APIs. A typical example is to use it as the request or the response type of an API method. For instance: service Foo { rpc Bar(google.protobuf.Empty) returns (google.protobuf.Empty); }",
             "id": "Empty",
             "properties": {},
             "type": "object"
@@ -336,16 +296,73 @@
             },
             "type": "object"
         },
-        "ResetInstanceRequest": {
-            "description": "Request for ResetInstance.",
-            "id": "ResetInstanceRequest",
-            "properties": {},
+        "OperationMetadata": {
+            "description": "Represents the metadata of the long-running operation.",
+            "id": "OperationMetadata",
+            "properties": {
+                "apiVersion": {
+                    "description": "Output only. API version used to start the operation.",
+                    "readOnly": true,
+                    "type": "string"
+                },
+                "cancelRequested": {
+                    "description": "Output only. Identifies whether the user has requested cancellation of the operation. Operations that have been cancelled successfully have Operation.error value with a google.rpc.Status.code of 1, corresponding to `Code.CANCELLED`.",
+                    "readOnly": true,
+                    "type": "boolean"
+                },
+                "createTime": {
+                    "description": "Output only. The time the operation was created.",
+                    "format": "google-datetime",
+                    "readOnly": true,
+                    "type": "string"
+                },
+                "endTime": {
+                    "description": "Output only. The time the operation finished running.",
+                    "format": "google-datetime",
+                    "readOnly": true,
+                    "type": "string"
+                },
+                "statusDetail": {
+                    "description": "Output only. Human-readable status of the operation, if any.",
+                    "readOnly": true,
+                    "type": "string"
+                },
+                "target": {
+                    "description": "Output only. Server-defined resource path for the target of the operation.",
+                    "readOnly": true,
+                    "type": "string"
+                },
+                "verb": {
+                    "description": "Output only. Name of the verb executed by the operation.",
+                    "readOnly": true,
+                    "type": "string"
+                }
+            },
             "type": "object"
         },
-        "ResetInstanceResponse": {
-            "description": "Response for ResetInstance.",
-            "id": "ResetInstanceResponse",
-            "properties": {},
+        "ReconciliationOperationMetadata": {
+            "description": "Operation metadata returned by the CLH during resource state reconciliation.",
+            "id": "ReconciliationOperationMetadata",
+            "properties": {
+                "deleteResource": {
+                    "description": "DEPRECATED. Use exclusive_action instead.",
+                    "type": "boolean"
+                },
+                "exclusiveAction": {
+                    "description": "Excluisive action returned by the CLH.",
+                    "enum": [
+                        "UNKNOWN_REPAIR_ACTION",
+                        "DELETE",
+                        "RETRY"
+                    ],
+                    "enumDescriptions": [
+                        "Unknown repair action.",
+                        "The resource has to be deleted. When using this bit, the CLH should fail the operation. DEPRECATED. Instead use DELETE_RESOURCE OperationSignal in SideChannel. For more information - go/ccfe-delete-on-upsert, go/ccfe-reconciliation-protocol-ug#apply_delete",
+                        "This resource could not be repaired but the repair should be tried again at a later time. This can happen if there is a dependency that needs to be resolved first- e.g. if a parent resource must be repaired before a child resource."
+                    ],
+                    "type": "string"
+                }
+            },
             "type": "object"
         },
         "Status": {

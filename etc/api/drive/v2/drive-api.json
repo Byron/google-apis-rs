@@ -38,7 +38,7 @@
     "description": "Manages files in Drive including uploading, downloading, searching, detecting changes, and updating sharing permissions.",
     "discoveryVersion": "v1",
     "documentationLink": "https://developers.google.com/drive/",
-    "etag": "\"uWj2hSb4GVjzdDlAnRd2gbM1ZQ8/PaSrKCCNSmaLx57wbfYZy_-0zZ0\"",
+    "etag": "\"uWj2hSb4GVjzdDlAnRd2gbM1ZQ8/byG3pWBUi-1LOkF3mhOR7Bw-WBQ\"",
     "icons": {
         "x16": "https://ssl.gstatic.com/docs/doclist/images/drive_icon_16.png",
         "x32": "https://ssl.gstatic.com/docs/doclist/images/drive_icon_32.png"
@@ -327,6 +327,11 @@
                             "location": "query",
                             "type": "boolean"
                         },
+                        "includeLabels": {
+                            "description": "A comma-separated list of IDs of labels to include in the labelInfo part of the response.",
+                            "location": "query",
+                            "type": "string"
+                        },
                         "includePermissionsForView": {
                             "description": "Specifies which additional view's permissions to include in the response. Only 'published' is supported.",
                             "location": "query",
@@ -429,6 +434,11 @@
                             "description": "Whether both My Drive and shared drive items should be included in results.",
                             "location": "query",
                             "type": "boolean"
+                        },
+                        "includeLabels": {
+                            "description": "A comma-separated list of IDs of labels to include in the labelInfo part of the response.",
+                            "location": "query",
+                            "type": "string"
                         },
                         "includePermissionsForView": {
                             "description": "Specifies which additional view's permissions to include in the response. Only 'published' is supported.",
@@ -932,11 +942,23 @@
                         "driveId"
                     ],
                     "parameters": {
+                        "allowItemDeletion": {
+                            "default": "false",
+                            "description": "Whether any items inside the shared drive should also be deleted. This option is only supported when useDomainAdminAccess is also set to true.",
+                            "location": "query",
+                            "type": "boolean"
+                        },
                         "driveId": {
                             "description": "The ID of the shared drive.",
                             "location": "path",
                             "required": true,
                             "type": "string"
+                        },
+                        "useDomainAdminAccess": {
+                            "default": "false",
+                            "description": "Issue the request as a domain administrator; if set to true, then the requester will be granted access if they are an administrator of the domain to which the shared drive belongs.",
+                            "location": "query",
+                            "type": "boolean"
                         }
                     },
                     "path": "drives/{driveId}",
@@ -1146,6 +1168,11 @@
                             "description": "The ID of the file to copy.",
                             "location": "path",
                             "required": true,
+                            "type": "string"
+                        },
+                        "includeLabels": {
+                            "description": "A comma-separated list of IDs of labels to include in the labelInfo part of the response.",
+                            "location": "query",
                             "type": "string"
                         },
                         "includePermissionsForView": {
@@ -1366,6 +1393,11 @@
                             "required": true,
                             "type": "string"
                         },
+                        "includeLabels": {
+                            "description": "A comma-separated list of IDs of labels to include in the labelInfo part of the response.",
+                            "location": "query",
+                            "type": "string"
+                        },
                         "includePermissionsForView": {
                             "description": "Specifies which additional view's permissions to include in the response. Only 'published' is supported.",
                             "location": "query",
@@ -1457,6 +1489,11 @@
                             "description": "Deprecated. Creating files in multiple folders is no longer supported.",
                             "location": "query",
                             "type": "boolean"
+                        },
+                        "includeLabels": {
+                            "description": "A comma-separated list of IDs of labels to include in the labelInfo part of the response.",
+                            "location": "query",
+                            "type": "string"
                         },
                         "includePermissionsForView": {
                             "description": "Specifies which additional view's permissions to include in the response. Only 'published' is supported.",
@@ -1573,6 +1610,11 @@
                             "location": "query",
                             "type": "boolean"
                         },
+                        "includeLabels": {
+                            "description": "A comma-separated list of IDs of labels to include in the labelInfo part of the response.",
+                            "location": "query",
+                            "type": "string"
+                        },
                         "includePermissionsForView": {
                             "description": "Specifies which additional view's permissions to include in the response. Only 'published' is supported.",
                             "location": "query",
@@ -1658,6 +1700,75 @@
                         "https://www.googleapis.com/auth/drive.readonly"
                     ]
                 },
+                "listLabels": {
+                    "description": "Lists the labels on a file.",
+                    "httpMethod": "GET",
+                    "id": "drive.files.listLabels",
+                    "parameterOrder": [
+                        "fileId"
+                    ],
+                    "parameters": {
+                        "fileId": {
+                            "description": "The ID of the file.",
+                            "location": "path",
+                            "required": true,
+                            "type": "string"
+                        },
+                        "maxResults": {
+                            "default": "100",
+                            "description": "The maximum number of labels to return per page. When not set, this defaults to 100.",
+                            "format": "int32",
+                            "location": "query",
+                            "maximum": "100",
+                            "minimum": "1",
+                            "type": "integer"
+                        },
+                        "pageToken": {
+                            "description": "The token for continuing a previous list request on the next page. This should be set to the value of 'nextPageToken' from the previous response.",
+                            "location": "query",
+                            "type": "string"
+                        }
+                    },
+                    "path": "files/{fileId}/listLabels",
+                    "response": {
+                        "$ref": "LabelList"
+                    },
+                    "scopes": [
+                        "https://www.googleapis.com/auth/drive",
+                        "https://www.googleapis.com/auth/drive.file",
+                        "https://www.googleapis.com/auth/drive.metadata",
+                        "https://www.googleapis.com/auth/drive.metadata.readonly",
+                        "https://www.googleapis.com/auth/drive.readonly"
+                    ]
+                },
+                "modifyLabels": {
+                    "description": "Modifies the set of labels on a file.",
+                    "httpMethod": "POST",
+                    "id": "drive.files.modifyLabels",
+                    "parameterOrder": [
+                        "fileId"
+                    ],
+                    "parameters": {
+                        "fileId": {
+                            "description": "The ID of the file for which the labels are modified.",
+                            "location": "path",
+                            "required": true,
+                            "type": "string"
+                        }
+                    },
+                    "path": "files/{fileId}/modifyLabels",
+                    "request": {
+                        "$ref": "ModifyLabelsRequest"
+                    },
+                    "response": {
+                        "$ref": "ModifyLabelsResponse"
+                    },
+                    "scopes": [
+                        "https://www.googleapis.com/auth/drive",
+                        "https://www.googleapis.com/auth/drive.file",
+                        "https://www.googleapis.com/auth/drive.metadata"
+                    ]
+                },
                 "patch": {
                     "description": "Updates a file's metadata and/or content. When calling this method, only populate fields in the request that you want to modify. When updating fields, some fields might change automatically, such as modifiedDate. This method supports patch semantics.",
                     "httpMethod": "PATCH",
@@ -1687,6 +1798,11 @@
                             "description": "The ID of the file to update.",
                             "location": "path",
                             "required": true,
+                            "type": "string"
+                        },
+                        "includeLabels": {
+                            "description": "A comma-separated list of IDs of labels to include in the labelInfo part of the response.",
+                            "location": "query",
                             "type": "string"
                         },
                         "includePermissionsForView": {
@@ -1814,6 +1930,11 @@
                             "required": true,
                             "type": "string"
                         },
+                        "includeLabels": {
+                            "description": "A comma-separated list of IDs of labels to include in the labelInfo part of the response.",
+                            "location": "query",
+                            "type": "string"
+                        },
                         "includePermissionsForView": {
                             "description": "Specifies which additional view's permissions to include in the response. Only 'published' is supported.",
                             "location": "query",
@@ -1858,6 +1979,11 @@
                             "required": true,
                             "type": "string"
                         },
+                        "includeLabels": {
+                            "description": "A comma-separated list of IDs of labels to include in the labelInfo part of the response.",
+                            "location": "query",
+                            "type": "string"
+                        },
                         "includePermissionsForView": {
                             "description": "Specifies which additional view's permissions to include in the response. Only 'published' is supported.",
                             "location": "query",
@@ -1899,6 +2025,11 @@
                             "description": "The ID of the file to untrash.",
                             "location": "path",
                             "required": true,
+                            "type": "string"
+                        },
+                        "includeLabels": {
+                            "description": "A comma-separated list of IDs of labels to include in the labelInfo part of the response.",
+                            "location": "query",
                             "type": "string"
                         },
                         "includePermissionsForView": {
@@ -1975,6 +2106,11 @@
                             "description": "The ID of the file to update.",
                             "location": "path",
                             "required": true,
+                            "type": "string"
+                        },
+                        "includeLabels": {
+                            "description": "A comma-separated list of IDs of labels to include in the labelInfo part of the response.",
+                            "location": "query",
                             "type": "string"
                         },
                         "includePermissionsForView": {
@@ -2090,7 +2226,7 @@
                     "supportsMediaUpload": true
                 },
                 "watch": {
-                    "description": "Subscribe to changes on a file",
+                    "description": "Subscribes to changes to a file. While you can establish a channel for changes to a file on a shared drive, a change to a shared drive file won't create a notification.",
                     "httpMethod": "POST",
                     "id": "drive.files.watch",
                     "parameterOrder": [
@@ -2107,6 +2243,11 @@
                             "description": "The ID for the file in question.",
                             "location": "path",
                             "required": true,
+                            "type": "string"
+                        },
+                        "includeLabels": {
+                            "description": "A comma-separated list of IDs of labels to include in the labelInfo part of the response.",
+                            "location": "query",
                             "type": "string"
                         },
                         "includePermissionsForView": {
@@ -3527,7 +3668,7 @@
             }
         }
     },
-    "revision": "20220225",
+    "revision": "20230115",
     "rootUrl": "https://www.googleapis.com/",
     "schemas": {
         "About": {
@@ -4519,6 +4660,10 @@
                             "description": "Whether the current user can rename this shared drive.",
                             "type": "boolean"
                         },
+                        "canResetDriveRestrictions": {
+                            "description": "Whether the current user can reset the shared drive restrictions to defaults.",
+                            "type": "boolean"
+                        },
                         "canShare": {
                             "description": "Whether the current user can share files or folders in this shared drive.",
                             "type": "boolean"
@@ -4704,6 +4849,10 @@
                             "description": "Whether the current user can modify restrictions on content of this file.",
                             "type": "boolean"
                         },
+                        "canModifyLabels": {
+                            "description": "Whether the current user can modify the labels on this file.",
+                            "type": "boolean"
+                        },
                         "canMoveChildrenOutOfDrive": {
                             "description": "Whether the current user can move children of this folder outside of the shared drive. This is false when the item is not a folder. Only populated for items in shared drives.",
                             "type": "boolean"
@@ -4748,8 +4897,12 @@
                             "description": "Whether the current user can read the shared drive to which this file belongs. Only populated for items in shared drives.",
                             "type": "boolean"
                         },
+                        "canReadLabels": {
+                            "description": "Whether the current user can read the labels on this file.",
+                            "type": "boolean"
+                        },
                         "canReadRevisions": {
-                            "description": "Whether the current user can read the revisions resource of this file. For a shared drive item, whether revisions of non-folder descendants of this item, or this item itself if it is not a folder, can be read.",
+                            "description": "Whether the current user can read the revisions resource of this file. For a shared drive item, whether revisions of non-folder descendants of this item, or this item itself if it isn't a folder, can be read.",
                             "type": "boolean"
                         },
                         "canReadTeamDrive": {
@@ -4816,7 +4969,7 @@
                     "type": "string"
                 },
                 "downloadUrl": {
-                    "description": "Short lived download URL for the file. This field is only populated for files with content stored in Google Drive; it is not populated for Docs Editors or shortcut files.",
+                    "description": "Short lived download URL for the file. This field is only populated for files with content stored in Google Drive; it isn't populated for Docs Editors or shortcut files.",
                     "type": "string"
                 },
                 "driveId": {
@@ -4849,11 +5002,11 @@
                     "type": "object"
                 },
                 "fileExtension": {
-                    "description": "The final component of fullFileExtension with trailing text that does not appear to be part of the extension removed. This field is only populated for files with content stored in Google Drive; it is not populated for Docs Editors or shortcut files.",
+                    "description": "The final component of fullFileExtension with trailing text that does not appear to be part of the extension removed. This field is only populated for files with content stored in Google Drive; it isn't populated for Docs Editors or shortcut files.",
                     "type": "string"
                 },
                 "fileSize": {
-                    "description": "The size of the file in bytes. This field is populated for files with content stored in Google Drive and for files in Docs Editors; it is not populated for shortcut files.",
+                    "description": "The size of the file in bytes. This field is populated for files with content stored in Google Drive and for files in Docs Editors; it isn't populated for shortcut files.",
                     "format": "int64",
                     "type": "string"
                 },
@@ -4862,7 +5015,7 @@
                     "type": "string"
                 },
                 "fullFileExtension": {
-                    "description": "The full file extension; extracted from the title. May contain multiple concatenated extensions, such as \"tar.gz\". Removing an extension from the title does not clear this field; however, changing the extension on the title does update this field. This field is only populated for files with content stored in Google Drive; it is not populated for Docs Editors or shortcut files.",
+                    "description": "The full file extension; extracted from the title. May contain multiple concatenated extensions, such as \"tar.gz\". Removing an extension from the title does not clear this field; however, changing the extension on the title does update this field. This field is only populated for files with content stored in Google Drive; it isn't populated for Docs Editors or shortcut files.",
                     "type": "string"
                 },
                 "hasAugmentedPermissions": {
@@ -4874,7 +5027,7 @@
                     "type": "boolean"
                 },
                 "headRevisionId": {
-                    "description": "The ID of the file's head revision. This field is only populated for files with content stored in Google Drive; it is not populated for Docs Editors or shortcut files.",
+                    "description": "The ID of the file's head revision. This field is only populated for files with content stored in Google Drive; it isn't populated for Docs Editors or shortcut files.",
                     "type": "string"
                 },
                 "iconLink": {
@@ -5003,7 +5156,7 @@
                     "type": "object"
                 },
                 "indexableText": {
-                    "description": "Indexable text attributes for the file (can only be written)",
+                    "description": "Indexable text attributes for the file (can only be written). For more information, see Manage file metadata.",
                     "properties": {
                         "text": {
                             "description": "The text to be indexed for this file.",
@@ -5020,6 +5173,19 @@
                     "default": "drive#file",
                     "description": "The type of file. This is always drive#file.",
                     "type": "string"
+                },
+                "labelInfo": {
+                    "description": "An overview of the labels on the file.",
+                    "properties": {
+                        "labels": {
+                            "description": "The set of labels on the file as requested by the label IDs in the includeLabels parameter. By default, no labels are returned.",
+                            "items": {
+                                "$ref": "Label"
+                            },
+                            "type": "array"
+                        }
+                    },
+                    "type": "object"
                 },
                 "labels": {
                     "description": "A group of labels for the file.",
@@ -5084,7 +5250,7 @@
                     "type": "string"
                 },
                 "md5Checksum": {
-                    "description": "An MD5 checksum for the content of this file. This field is only populated for files with content stored in Google Drive; it is not populated for Docs Editors or shortcut files.",
+                    "description": "An MD5 checksum for the content of this file. This field is only populated for files with content stored in Google Drive; it isn't populated for Docs Editors or shortcut files.",
                     "type": "string"
                 },
                 "mimeType": {
@@ -5169,6 +5335,14 @@
                 },
                 "selfLink": {
                     "description": "A link back to this file.",
+                    "type": "string"
+                },
+                "sha1Checksum": {
+                    "description": "The SHA1 checksum associated with this file, if available. This field is only populated for files with content stored in Google Drive; it isn't populated for Docs Editors or shortcut files.",
+                    "type": "string"
+                },
+                "sha256Checksum": {
+                    "description": "The SHA256 checksum associated with this file, if available. This field is only populated for files with content stored in Google Drive; it isn't populated for Docs Editors or shortcut files.",
                     "type": "string"
                 },
                 "shareable": {
@@ -5361,6 +5535,240 @@
             },
             "type": "object"
         },
+        "Label": {
+            "description": "Representation of a label and its fields.",
+            "id": "Label",
+            "properties": {
+                "fields": {
+                    "additionalProperties": {
+                        "$ref": "LabelField"
+                    },
+                    "description": "A map of the label's fields keyed by the field ID.",
+                    "type": "object"
+                },
+                "id": {
+                    "description": "The ID of the label.",
+                    "type": "string"
+                },
+                "kind": {
+                    "default": "drive#label",
+                    "description": "This is always drive#label",
+                    "type": "string"
+                },
+                "revisionId": {
+                    "description": "The revision ID of the label.",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "LabelField": {
+            "description": "Representation of a label field.",
+            "id": "LabelField",
+            "properties": {
+                "dateString": {
+                    "description": "Only present if valueType is dateString. RFC 3339 formatted date: YYYY-MM-DD.",
+                    "items": {
+                        "format": "date",
+                        "type": "string"
+                    },
+                    "type": "array"
+                },
+                "id": {
+                    "description": "The identifier of this field.",
+                    "type": "string"
+                },
+                "integer": {
+                    "description": "Only present if valueType is integer.",
+                    "items": {
+                        "format": "int64",
+                        "type": "string"
+                    },
+                    "type": "array"
+                },
+                "kind": {
+                    "default": "drive#labelField",
+                    "description": "This is always drive#labelField.",
+                    "type": "string"
+                },
+                "selection": {
+                    "description": "Only present if valueType is selection.",
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": "array"
+                },
+                "text": {
+                    "description": "Only present if valueType is text.",
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": "array"
+                },
+                "user": {
+                    "description": "Only present if valueType is user.",
+                    "items": {
+                        "$ref": "User"
+                    },
+                    "type": "array"
+                },
+                "valueType": {
+                    "description": "The field type. While new values may be supported in the future, the following are currently allowed:  \n- dateString \n- integer \n- selection \n- text \n- user",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "LabelFieldModification": {
+            "description": "A modification to a label's field.",
+            "id": "LabelFieldModification",
+            "properties": {
+                "fieldId": {
+                    "description": "The ID of the field to be modified.",
+                    "type": "string"
+                },
+                "kind": {
+                    "default": "drive#labelFieldModification",
+                    "description": "This is always drive#labelFieldModification.",
+                    "type": "string"
+                },
+                "setDateValues": {
+                    "description": "Replaces a dateString field with these new values. The values must be strings in the RFC 3339 full-date format: YYYY-MM-DD.",
+                    "items": {
+                        "format": "date",
+                        "type": "string"
+                    },
+                    "type": "array"
+                },
+                "setIntegerValues": {
+                    "description": "Replaces an integer field with these new values.",
+                    "items": {
+                        "format": "int64",
+                        "type": "string"
+                    },
+                    "type": "array"
+                },
+                "setSelectionValues": {
+                    "description": "Replaces a selection field with these new values.",
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": "array"
+                },
+                "setTextValues": {
+                    "description": "Replaces a text field with these new values.",
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": "array"
+                },
+                "setUserValues": {
+                    "description": "Replaces a user field with these new values. The values must be valid email addresses.",
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": "array"
+                },
+                "unsetValues": {
+                    "description": "Unsets the values for this field.",
+                    "type": "boolean"
+                }
+            },
+            "type": "object"
+        },
+        "LabelList": {
+            "description": "A list of labels.",
+            "id": "LabelList",
+            "properties": {
+                "items": {
+                    "description": "The list of labels.",
+                    "items": {
+                        "$ref": "Label"
+                    },
+                    "type": "array"
+                },
+                "kind": {
+                    "default": "drive#labelList",
+                    "description": "This is always drive#labelList",
+                    "type": "string"
+                },
+                "nextPageToken": {
+                    "description": "The page token for the next page of labels. This field will be absent if the end of the list has been reached. If the token is rejected for any reason, it should be discarded, and pagination should be restarted from the first page of results.",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "LabelModification": {
+            "description": "A modification to a label on a file. A LabelModification can be used to apply a label to a file, update an existing label on a file, or remove a label from a file.",
+            "id": "LabelModification",
+            "properties": {
+                "fieldModifications": {
+                    "description": "The list of modifications to this label's fields.",
+                    "items": {
+                        "$ref": "LabelFieldModification"
+                    },
+                    "type": "array"
+                },
+                "kind": {
+                    "default": "drive#labelModification",
+                    "description": "This is always drive#labelModification.",
+                    "type": "string"
+                },
+                "labelId": {
+                    "annotations": {
+                        "required": [
+                            "drive.files.modifyLabels"
+                        ]
+                    },
+                    "description": "The ID of the label to modify.",
+                    "type": "string"
+                },
+                "removeLabel": {
+                    "description": "If true, the label will be removed from the file.",
+                    "type": "boolean"
+                }
+            },
+            "type": "object"
+        },
+        "ModifyLabelsRequest": {
+            "description": "A request to modify the set of labels on a file. This request may contain many modifications that will either all succeed or all fail transactionally.",
+            "id": "ModifyLabelsRequest",
+            "properties": {
+                "kind": {
+                    "default": "drive#modifyLabelsRequest",
+                    "description": "This is always drive#modifyLabelsRequest",
+                    "type": "string"
+                },
+                "labelModifications": {
+                    "description": "The list of modifications to apply to the labels on the file.",
+                    "items": {
+                        "$ref": "LabelModification"
+                    },
+                    "type": "array"
+                }
+            },
+            "type": "object"
+        },
+        "ModifyLabelsResponse": {
+            "description": "Response to a ModifyLabels request. This contains only those labels which were added or updated by the request.",
+            "id": "ModifyLabelsResponse",
+            "properties": {
+                "kind": {
+                    "default": "drive#modifyLabelsResponse",
+                    "description": "This is always drive#modifyLabelsResponse",
+                    "type": "string"
+                },
+                "modifiedLabels": {
+                    "description": "The list of labels which were added or updated by the request.",
+                    "items": {
+                        "$ref": "Label"
+                    },
+                    "type": "array"
+                }
+            },
+            "type": "object"
+        },
         "ParentList": {
             "description": "A list of a file's parents.",
             "id": "ParentList",
@@ -5453,7 +5861,7 @@
                     "type": "string"
                 },
                 "expirationDate": {
-                    "description": "The time at which this permission will expire (RFC 3339 date-time). Expiration dates have the following restrictions:  \n- They cannot be set on shared drive items \n- They can only be set on user and group permissions \n- The date must be in the future \n- The date cannot be more than a year in the future \n- The date can only be set on drive.permissions.update or drive.permissions.patch requests",
+                    "description": "The time at which this permission will expire (RFC 3339 date-time). Expiration dates have the following restrictions:  \n- They cannot be set on shared drive items \n- They can only be set on user and group permissions \n- The date must be in the future \n- The date cannot be more than a year in the future",
                     "format": "date-time",
                     "type": "string"
                 },
@@ -5925,6 +6333,10 @@
                         },
                         "canRenameTeamDrive": {
                             "description": "Whether the current user can rename this Team Drive.",
+                            "type": "boolean"
+                        },
+                        "canResetTeamDriveRestrictions": {
+                            "description": "Whether the current user can reset the Team Drive restrictions to defaults.",
                             "type": "boolean"
                         },
                         "canShare": {

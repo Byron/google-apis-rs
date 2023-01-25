@@ -1463,7 +1463,7 @@
             }
         }
     },
-    "revision": "20220307",
+    "revision": "20230124",
     "rootUrl": "https://toolresults.googleapis.com/",
     "schemas": {
         "ANR": {
@@ -1768,6 +1768,12 @@
             },
             "type": "object"
         },
+        "DetectedAppSplashScreen": {
+            "description": "A notification that Robo detected a splash screen provided by app (vs. Android OS splash screen).",
+            "id": "DetectedAppSplashScreen",
+            "properties": {},
+            "type": "object"
+        },
         "DeviceOutOfMemory": {
             "description": "A warning that device ran out of memory",
             "id": "DeviceOutOfMemory",
@@ -1899,7 +1905,7 @@
             "type": "object"
         },
         "Execution": {
-            "description": "An Execution represents a collection of Steps. For instance, it could represent: - a mobile test executed across a range of device configurations - a jenkins job with a build step followed by a test step The maximum size of an execution message is 1 MiB. An Execution can be updated until its state is set to COMPLETE at which point it becomes immutable.",
+            "description": "An Execution represents a collection of Steps. For instance, it could represent: - a mobile test executed across a range of device configurations - a jenkins job with a build step followed by a test step The maximum size of an execution message is 1 MiB. An Execution can be updated until its state is set to COMPLETE at which point it becomes immutable. Next tag: 16",
             "id": "Execution",
             "properties": {
                 "completionTime": {
@@ -3616,7 +3622,8 @@
                         "overlappingUiElements",
                         "unityException",
                         "deviceOutOfMemory",
-                        "logcatCollectionError"
+                        "logcatCollectionError",
+                        "detectedAppSplashScreen"
                     ],
                     "enumDescriptions": [
                         "Default unspecified type. Do not use. For versioning only.",
@@ -3649,7 +3656,8 @@
                         "Overlapping UI elements are found in the Robo crawl",
                         "An uncaught Unity exception was detected (these don't crash apps).",
                         "Device running out of memory was detected",
-                        "Problems detected while collecting logcat"
+                        "Problems detected while collecting logcat",
+                        "Robo detected a splash screen provided by app (vs. Android OS splash screen)."
                     ],
                     "type": "string"
                 },

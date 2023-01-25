@@ -12,7 +12,7 @@
     "baseUrl": "https://transcoder.googleapis.com/",
     "batchPath": "batch",
     "canonicalName": "Transcoder",
-    "description": "This API converts video files into formats suitable for consumer distribution. ",
+    "description": "This API converts video files into formats suitable for consumer distribution. For more information, see the Transcoder API overview. ",
     "discoveryVersion": "v1",
     "documentationLink": "https://cloud.google.com/transcoder/docs/",
     "fullyEncodeReservedExpansion": true,
@@ -385,7 +385,7 @@
             }
         }
     },
-    "revision": "20220201",
+    "revision": "20230105",
     "rootUrl": "https://transcoder.googleapis.com/",
     "schemas": {
         "AdBreak": {
@@ -487,11 +487,11 @@
             "id": "Audio",
             "properties": {
                 "highBoost": {
-                    "description": "Enable boosting high frequency components. The default is `false`.",
+                    "description": "Enable boosting high frequency components. The default is `false`. **Note:** This field is not supported.",
                     "type": "boolean"
                 },
                 "lowBoost": {
-                    "description": "Enable boosting low frequency components. The default is `false`.",
+                    "description": "Enable boosting low frequency components. The default is `false`. **Note:** This field is not supported.",
                     "type": "boolean"
                 },
                 "lufs": {
@@ -577,8 +577,27 @@
             },
             "type": "object"
         },
+        "BwdifConfig": {
+            "description": "Bob Weaver Deinterlacing Filter Configuration.",
+            "id": "BwdifConfig",
+            "properties": {
+                "deinterlaceAllFrames": {
+                    "description": "Deinterlace all frames rather than just the frames identified as interlaced. The default is `false`.",
+                    "type": "boolean"
+                },
+                "mode": {
+                    "description": "Specifies the deinterlacing mode to adopt. The default is `send_frame`. Supported values: - `send_frame`: Output one frame for each frame - `send_field`: Output one frame for each field",
+                    "type": "string"
+                },
+                "parity": {
+                    "description": "The picture field parity assumed for the input interlaced video. The default is `auto`. Supported values: - `tff`: Assume the top field is first - `bff`: Assume the bottom field is first - `auto`: Enable automatic detection of field parity",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
         "Color": {
-            "description": "Color preprocessing configuration.",
+            "description": "Color preprocessing configuration. **Note:** This configuration is not supported.",
             "id": "Color",
             "properties": {
                 "brightness": {
@@ -627,7 +646,7 @@
             "type": "object"
         },
         "Deblock": {
-            "description": "Deblock preprocessing configuration.",
+            "description": "Deblock preprocessing configuration. **Note:** This configuration is not supported.",
             "id": "Deblock",
             "properties": {
                 "enabled": {
@@ -642,8 +661,23 @@
             },
             "type": "object"
         },
+        "Deinterlace": {
+            "description": "Deinterlace configuration for input video.",
+            "id": "Deinterlace",
+            "properties": {
+                "bwdif": {
+                    "$ref": "BwdifConfig",
+                    "description": "Specifies the Bob Weaver Deinterlacing Filter Configuration."
+                },
+                "yadif": {
+                    "$ref": "YadifConfig",
+                    "description": "Specifies the Yet Another Deinterlacing Filter Configuration."
+                }
+            },
+            "type": "object"
+        },
         "Denoise": {
-            "description": "Denoise preprocessing configuration.",
+            "description": "Denoise preprocessing configuration. **Note:** This configuration is not supported.",
             "id": "Denoise",
             "properties": {
                 "strength": {
@@ -710,7 +744,7 @@
             "type": "object"
         },
         "Empty": {
-            "description": "A generic empty message that you can re-use to avoid defining duplicated empty messages in your APIs. A typical example is to use it as the request or the response type of an API method. For instance: service Foo { rpc Bar(google.protobuf.Empty) returns (google.protobuf.Empty); } The JSON representation for `Empty` is empty JSON object `{}`.",
+            "description": "A generic empty message that you can re-use to avoid defining duplicated empty messages in your APIs. A typical example is to use it as the request or the response type of an API method. For instance: service Foo { rpc Bar(google.protobuf.Empty) returns (google.protobuf.Empty); }",
             "id": "Empty",
             "properties": {},
             "type": "object"
@@ -771,7 +805,7 @@
                     "type": "integer"
                 },
                 "heightPixels": {
-                    "description": "The height of the video in pixels. Must be an even integer. When not specified, the height is adjusted to match the specified width and input aspect ratio. If both are omitted, the input height is used.",
+                    "description": "The height of the video in pixels. Must be an even integer. When not specified, the height is adjusted to match the specified width and input aspect ratio. If both are omitted, the input height is used. For portrait videos that contain horizontal ASR and rotation metadata, provide the height, in pixels, per the horizontal ASR. The API calculates the width per the horizontal ASR. The API detects any rotation metadata and swaps the requested height and width for the output.",
                     "format": "int32",
                     "type": "integer"
                 },
@@ -806,7 +840,7 @@
                     "type": "integer"
                 },
                 "widthPixels": {
-                    "description": "The width of the video in pixels. Must be an even integer. When not specified, the width is adjusted to match the specified height and input aspect ratio. If both are omitted, the input width is used.",
+                    "description": "The width of the video in pixels. Must be an even integer. When not specified, the width is adjusted to match the specified height and input aspect ratio. If both are omitted, the input width is used. For portrait videos that contain horizontal ASR and rotation metadata, provide the width, in pixels, per the horizontal ASR. The API calculates the height per the horizontal ASR. The API detects any rotation metadata and swaps the requested height and width for the output.",
                     "format": "int32",
                     "type": "integer"
                 }
@@ -865,7 +899,7 @@
                     "type": "integer"
                 },
                 "heightPixels": {
-                    "description": "The height of the video in pixels. Must be an even integer. When not specified, the height is adjusted to match the specified width and input aspect ratio. If both are omitted, the input height is used.",
+                    "description": "The height of the video in pixels. Must be an even integer. When not specified, the height is adjusted to match the specified width and input aspect ratio. If both are omitted, the input height is used. For portrait videos that contain horizontal ASR and rotation metadata, provide the height, in pixels, per the horizontal ASR. The API calculates the width per the horizontal ASR. The API detects any rotation metadata and swaps the requested height and width for the output.",
                     "format": "int32",
                     "type": "integer"
                 },
@@ -900,7 +934,7 @@
                     "type": "integer"
                 },
                 "widthPixels": {
-                    "description": "The width of the video in pixels. Must be an even integer. When not specified, the width is adjusted to match the specified height and input aspect ratio. If both are omitted, the input width is used.",
+                    "description": "The width of the video in pixels. Must be an even integer. When not specified, the width is adjusted to match the specified height and input aspect ratio. If both are omitted, the input width is used. For portrait videos that contain horizontal ASR and rotation metadata, provide the width, in pixels, per the horizontal ASR. The API calculates the height per the horizontal ASR. The API detects any rotation metadata and swaps the requested height and width for the output.",
                     "format": "int32",
                     "type": "integer"
                 }
@@ -940,7 +974,7 @@
                     "description": "Preprocessing configurations."
                 },
                 "uri": {
-                    "description": "URI of the media. Input files must be at least 5 seconds in duration and stored in Cloud Storage (for example, `gs://bucket/inputs/file.mp4`). If empty, the value will be populated from `Job.input_uri`.",
+                    "description": "URI of the media. Input files must be at least 5 seconds in duration and stored in Cloud Storage (for example, `gs://bucket/inputs/file.mp4`). If empty, the value is populated from `Job.input_uri`. See [Supported input and output formats](https://cloud.google.com/transcoder/docs/concepts/supported-input-and-output-formats).",
                     "type": "string"
                 }
             },
@@ -972,15 +1006,22 @@
                     "readOnly": true
                 },
                 "inputUri": {
-                    "description": "Input only. Specify the `input_uri` to populate empty `uri` fields in each element of `Job.config.inputs` or `JobTemplate.config.inputs` when using template. URI of the media. Input files must be at least 5 seconds in duration and stored in Cloud Storage (for example, `gs://bucket/inputs/file.mp4`).",
+                    "description": "Input only. Specify the `input_uri` to populate empty `uri` fields in each element of `Job.config.inputs` or `JobTemplate.config.inputs` when using template. URI of the media. Input files must be at least 5 seconds in duration and stored in Cloud Storage (for example, `gs://bucket/inputs/file.mp4`). See [Supported input and output formats](https://cloud.google.com/transcoder/docs/concepts/supported-input-and-output-formats).",
                     "type": "string"
+                },
+                "labels": {
+                    "additionalProperties": {
+                        "type": "string"
+                    },
+                    "description": "The labels associated with this job. You can use these to organize and group your jobs.",
+                    "type": "object"
                 },
                 "name": {
                     "description": "The resource name of the job. Format: `projects/{project_number}/locations/{location}/jobs/{job}`",
                     "type": "string"
                 },
                 "outputUri": {
-                    "description": "Input only. Specify the `output_uri` to populate an empty `Job.config.output.uri` or `JobTemplate.config.output.uri` when using template. URI for the output file(s). For example, `gs://my-bucket/outputs/`.",
+                    "description": "Input only. Specify the `output_uri` to populate an empty `Job.config.output.uri` or `JobTemplate.config.output.uri` when using template. URI for the output file(s). For example, `gs://my-bucket/outputs/`. See [Supported input and output formats](https://cloud.google.com/transcoder/docs/concepts/supported-input-and-output-formats).",
                     "type": "string"
                 },
                 "startTime": {
@@ -1082,7 +1123,7 @@
                     "description": "Destination on Pub/Sub."
                 },
                 "spriteSheets": {
-                    "description": "List of output sprite sheets.",
+                    "description": "List of output sprite sheets. Spritesheets require at least one VideoStream in the Jobconfig.",
                     "items": {
                         "$ref": "SpriteSheet"
                     },
@@ -1098,6 +1139,13 @@
                 "config": {
                     "$ref": "JobConfig",
                     "description": "The configuration for this template."
+                },
+                "labels": {
+                    "additionalProperties": {
+                        "type": "string"
+                    },
+                    "description": "The labels associated with this job template. You can use these to organize and group your job templates.",
+                    "type": "object"
                 },
                 "name": {
                     "description": "The resource name of the job template. Format: `projects/{project_number}/locations/{location}/jobTemplates/{job_template}`",
@@ -1193,7 +1241,7 @@
             "id": "MuxStream",
             "properties": {
                 "container": {
-                    "description": "The container format. The default is `mp4` Supported container formats: - `ts` - `fmp4`- the corresponding file extension is `.m4s` - `mp4` - `vtt`",
+                    "description": "The container format. The default is `mp4` Supported container formats: - `ts` - `fmp4`- the corresponding file extension is `.m4s` - `mp4` - `vtt` See also: [Supported input and output formats](https://cloud.google.com/transcoder/docs/concepts/supported-input-and-output-formats)",
                     "type": "string"
                 },
                 "elementaryStreams": {
@@ -1240,7 +1288,7 @@
             "id": "Output",
             "properties": {
                 "uri": {
-                    "description": "URI for the output file(s). For example, `gs://my-bucket/outputs/`. If empty the value is populated from `Job.output_uri`.",
+                    "description": "URI for the output file(s). For example, `gs://my-bucket/outputs/`. If empty, the value is populated from `Job.output_uri`. See [Supported input and output formats](https://cloud.google.com/transcoder/docs/concepts/supported-input-and-output-formats).",
                     "type": "string"
                 }
             },
@@ -1310,6 +1358,10 @@
                 "deblock": {
                     "$ref": "Deblock",
                     "description": "Deblock preprocessing configuration."
+                },
+                "deinterlace": {
+                    "$ref": "Deinterlace",
+                    "description": "Specify the video deinterlace configuration."
                 },
                 "denoise": {
                     "$ref": "Denoise",
@@ -1387,12 +1439,12 @@
                     "type": "integer"
                 },
                 "spriteHeightPixels": {
-                    "description": "Required. The height of sprite in pixels. Must be an even integer. To preserve the source aspect ratio, set the SpriteSheet.sprite_height_pixels field or the SpriteSheet.sprite_width_pixels field, but not both (the API will automatically calculate the missing field).",
+                    "description": "Required. The height of sprite in pixels. Must be an even integer. To preserve the source aspect ratio, set the SpriteSheet.sprite_height_pixels field or the SpriteSheet.sprite_width_pixels field, but not both (the API will automatically calculate the missing field). For portrait videos that contain horizontal ASR and rotation metadata, provide the height, in pixels, per the horizontal ASR. The API calculates the width per the horizontal ASR. The API detects any rotation metadata and swaps the requested height and width for the output.",
                     "format": "int32",
                     "type": "integer"
                 },
                 "spriteWidthPixels": {
-                    "description": "Required. The width of sprite in pixels. Must be an even integer. To preserve the source aspect ratio, set the SpriteSheet.sprite_width_pixels field or the SpriteSheet.sprite_height_pixels field, but not both (the API will automatically calculate the missing field).",
+                    "description": "Required. The width of sprite in pixels. Must be an even integer. To preserve the source aspect ratio, set the SpriteSheet.sprite_width_pixels field or the SpriteSheet.sprite_height_pixels field, but not both (the API will automatically calculate the missing field). For portrait videos that contain horizontal ASR and rotation metadata, provide the width, in pixels, per the horizontal ASR. The API calculates the height per the horizontal ASR. The API detects any rotation metadata and swaps the requested height and width for the output.",
                     "format": "int32",
                     "type": "integer"
                 },
@@ -1503,7 +1555,7 @@
                     "type": "integer"
                 },
                 "crfLevel": {
-                    "description": "Target CRF level. Must be between 10 and 36, where 10 is the highest quality and 36 is the most efficient compression. The default is 21. *Note*: This field is not supported. ",
+                    "description": "Target CRF level. Must be between 10 and 36, where 10 is the highest quality and 36 is the most efficient compression. The default is 21. **Note:** This field is not supported.",
                     "format": "int32",
                     "type": "integer"
                 },
@@ -1523,7 +1575,7 @@
                     "type": "integer"
                 },
                 "heightPixels": {
-                    "description": "The height of the video in pixels. Must be an even integer. When not specified, the height is adjusted to match the specified width and input aspect ratio. If both are omitted, the input height is used.",
+                    "description": "The height of the video in pixels. Must be an even integer. When not specified, the height is adjusted to match the specified width and input aspect ratio. If both are omitted, the input height is used. For portrait videos that contain horizontal ASR and rotation metadata, provide the height, in pixels, per the horizontal ASR. The API calculates the width per the horizontal ASR. The API detects any rotation metadata and swaps the requested height and width for the output.",
                     "format": "int32",
                     "type": "integer"
                 },
@@ -1540,9 +1592,32 @@
                     "type": "string"
                 },
                 "widthPixels": {
-                    "description": "The width of the video in pixels. Must be an even integer. When not specified, the width is adjusted to match the specified height and input aspect ratio. If both are omitted, the input width is used.",
+                    "description": "The width of the video in pixels. Must be an even integer. When not specified, the width is adjusted to match the specified height and input aspect ratio. If both are omitted, the input width is used. For portrait videos that contain horizontal ASR and rotation metadata, provide the width, in pixels, per the horizontal ASR. The API calculates the height per the horizontal ASR. The API detects any rotation metadata and swaps the requested height and width for the output.",
                     "format": "int32",
                     "type": "integer"
+                }
+            },
+            "type": "object"
+        },
+        "YadifConfig": {
+            "description": "Yet Another Deinterlacing Filter Configuration.",
+            "id": "YadifConfig",
+            "properties": {
+                "deinterlaceAllFrames": {
+                    "description": "Deinterlace all frames rather than just the frames identified as interlaced. The default is `false`.",
+                    "type": "boolean"
+                },
+                "disableSpatialInterlacing": {
+                    "description": "Disable spacial interlacing. The default is `false`.",
+                    "type": "boolean"
+                },
+                "mode": {
+                    "description": "Specifies the deinterlacing mode to adopt. The default is `send_frame`. Supported values: - `send_frame`: Output one frame for each frame - `send_field`: Output one frame for each field",
+                    "type": "string"
+                },
+                "parity": {
+                    "description": "The picture field parity assumed for the input interlaced video. The default is `auto`. Supported values: - `tff`: Assume the top field is first - `bff`: Assume the bottom field is first - `auto`: Enable automatic detection of field parity",
+                    "type": "string"
                 }
             },
             "type": "object"

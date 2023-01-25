@@ -12,7 +12,7 @@
     "baseUrl": "https://alertcenter.googleapis.com/",
     "batchPath": "batch",
     "canonicalName": "AlertCenter",
-    "description": "Manages alerts on issues affecting your domain.",
+    "description": "Manages alerts on issues affecting your domain. Note: The current version of this API (v1beta1) is available to all Google Workspace customers. ",
     "discoveryVersion": "v1",
     "documentationLink": "https://developers.google.com/admin-sdk/alertcenter/",
     "fullyEncodeReservedExpansion": true,
@@ -159,7 +159,7 @@
                             "type": "string"
                         },
                         "customerId": {
-                            "description": "Optional. The unique identifier of the Google Workspace organization account of the customer the alert is associated with. Inferred from the caller identity if not provided.",
+                            "description": "Optional. The unique identifier of the Google Workspace account of the customer the alert is associated with. The `customer_id` must have the initial \"C\" stripped (for example, `046psxkn`). Inferred from the caller identity if not provided. [Find your customer ID](https://support.google.com/cloudidentity/answer/10070793).",
                             "location": "query",
                             "type": "string"
                         }
@@ -188,7 +188,7 @@
                             "type": "string"
                         },
                         "customerId": {
-                            "description": "Optional. The unique identifier of the Google Workspace organization account of the customer the alert is associated with. Inferred from the caller identity if not provided.",
+                            "description": "Optional. The unique identifier of the Google Workspace account of the customer the alert is associated with. The `customer_id` must have the initial \"C\" stripped (for example, `046psxkn`). Inferred from the caller identity if not provided. [Find your customer ID](https://support.google.com/cloudidentity/answer/10070793).",
                             "location": "query",
                             "type": "string"
                         }
@@ -217,7 +217,7 @@
                             "type": "string"
                         },
                         "customerId": {
-                            "description": "Optional. The unique identifier of the Google Workspace organization account of the customer the alert metadata is associated with. Inferred from the caller identity if not provided.",
+                            "description": "Optional. The unique identifier of the Google Workspace account of the customer the alert metadata is associated with. The `customer_id` must have the initial \"C\" stripped (for example, `046psxkn`). Inferred from the caller identity if not provided. [Find your customer ID](https://support.google.com/cloudidentity/answer/10070793).",
                             "location": "query",
                             "type": "string"
                         }
@@ -238,7 +238,7 @@
                     "parameterOrder": [],
                     "parameters": {
                         "customerId": {
-                            "description": "Optional. The unique identifier of the Google Workspace organization account of the customer the alerts are associated with. Inferred from the caller identity if not provided.",
+                            "description": "Optional. The unique identifier of the Google Workspace account of the customer the alerts are associated with. The `customer_id` must have the initial \"C\" stripped (for example, `046psxkn`). Inferred from the caller identity if not provided. [Find your customer ID](https://support.google.com/cloudidentity/answer/10070793).",
                             "location": "query",
                             "type": "string"
                         },
@@ -319,7 +319,7 @@
                                     "type": "string"
                                 },
                                 "customerId": {
-                                    "description": "Optional. The unique identifier of the Google Workspace organization account of the customer the alert is associated with. Inferred from the caller identity if not provided.",
+                                    "description": "Optional. The unique identifier of the Google Workspace account of the customer the alert is associated with. The `customer_id` must have the initial \"C\" stripped (for example, `046psxkn`). Inferred from the caller identity if not provided. [Find your customer ID](https://support.google.com/cloudidentity/answer/10070793).",
                                     "location": "query",
                                     "type": "string"
                                 }
@@ -351,7 +351,7 @@
                                     "type": "string"
                                 },
                                 "customerId": {
-                                    "description": "Optional. The unique identifier of the Google Workspace organization account of the customer the alert feedback are associated with. Inferred from the caller identity if not provided.",
+                                    "description": "Optional. The unique identifier of the Google Workspace account of the customer the alert is associated with. The `customer_id` must have the initial \"C\" stripped (for example, `046psxkn`). Inferred from the caller identity if not provided. [Find your customer ID](https://support.google.com/cloudidentity/answer/10070793).",
                                     "location": "query",
                                     "type": "string"
                                 },
@@ -383,7 +383,7 @@
                     "parameterOrder": [],
                     "parameters": {
                         "customerId": {
-                            "description": "Optional. The unique identifier of the Google Workspace organization account of the customer the alert settings are associated with. Inferred from the caller identity if not provided.",
+                            "description": "Optional. The unique identifier of the Google Workspace account of the customer the alert settings are associated with. The `customer_id` must/ have the initial \"C\" stripped (for example, `046psxkn`). Inferred from the caller identity if not provided. [Find your customer ID](https://support.google.com/cloudidentity/answer/10070793).",
                             "location": "query",
                             "type": "string"
                         }
@@ -404,7 +404,7 @@
                     "parameterOrder": [],
                     "parameters": {
                         "customerId": {
-                            "description": "Optional. The unique identifier of the Google Workspace organization account of the customer the alert settings are associated with. Inferred from the caller identity if not provided.",
+                            "description": "Optional. The unique identifier of the Google Workspace account of the customer the alert settings are associated with. The `customer_id` must have the initial \"C\" stripped (for example, `046psxkn`). Inferred from the caller identity if not provided. [Find your customer ID](https://support.google.com/cloudidentity/answer/10070793).",
                             "location": "query",
                             "type": "string"
                         }
@@ -423,9 +423,40 @@
             }
         }
     },
-    "revision": "20220221",
+    "revision": "20230123",
     "rootUrl": "https://alertcenter.googleapis.com/",
     "schemas": {
+        "AbuseDetected": {
+            "description": "A generic alert for abusive user activity occurring with a customer.",
+            "id": "AbuseDetected",
+            "properties": {
+                "additionalDetails": {
+                    "$ref": "EntityList",
+                    "description": "List of abusive users/entities to be displayed in a table in the alert."
+                },
+                "alertDescriptor": {
+                    "description": "Displayed after Customer abuse detected - {alert_descriptor}. If missing, alert name will be displayed as Customer abuse detected.",
+                    "type": "string"
+                },
+                "nextSteps": {
+                    "description": "Customizable text to display in the next steps section of the alert. Will be parsed as HTML to allow new paragraphs and hyperlinks.",
+                    "type": "string"
+                },
+                "product": {
+                    "description": "Product that the abuse is originating from.",
+                    "type": "string"
+                },
+                "subAlertId": {
+                    "description": "Unique identifier of each alert that is onboarded.",
+                    "type": "string"
+                },
+                "summary": {
+                    "description": "Customizable text to display in the summary section of the alert. Will be parsed as HTML to allow new paragraphs and hyperlinks.",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
         "AccountSuspensionDetails": {
             "description": "Details about why an account is receiving an account suspension warning.",
             "id": "AccountSuspensionDetails",
@@ -599,7 +630,7 @@
                     "type": "string"
                 },
                 "customerId": {
-                    "description": "Output only. The unique identifier of the Google account of the customer.",
+                    "description": "Output only. The unique identifier of the Google Workspace account of the customer.",
                     "type": "string"
                 },
                 "data": {
@@ -666,7 +697,7 @@
                     "type": "string"
                 },
                 "customerId": {
-                    "description": "Output only. The unique identifier of the Google account of the customer.",
+                    "description": "Output only. The unique identifier of the Google Workspace account of the customer.",
                     "type": "string"
                 },
                 "email": {
@@ -709,7 +740,7 @@
                     "type": "string"
                 },
                 "customerId": {
-                    "description": "Output only. The unique identifier of the Google account of the customer.",
+                    "description": "Output only. The unique identifier of the Google Workspace account of the customer.",
                     "type": "string"
                 },
                 "etag": {
@@ -727,6 +758,26 @@
                 "updateTime": {
                     "description": "Output only. The time this metadata was last updated.",
                     "format": "google-datetime",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "ApnsCertificateExpirationInfo": {
+            "description": "The explanation message associated with ApnsCertificationExpiring and ApnsCertificationExpired alerts.",
+            "id": "ApnsCertificateExpirationInfo",
+            "properties": {
+                "appleId": {
+                    "description": "The Apple ID used for the certificate may be blank if admins didn't enter it.",
+                    "type": "string"
+                },
+                "expirationTime": {
+                    "description": "The expiration date of the APNS Certificate.",
+                    "format": "google-datetime",
+                    "type": "string"
+                },
+                "uid": {
+                    "description": "The UID for the certificate.",
                     "type": "string"
                 }
             },
@@ -864,14 +915,14 @@
             "id": "BatchDeleteAlertsRequest",
             "properties": {
                 "alertId": {
-                    "description": "Required. list of alert IDs.",
+                    "description": "Required. The list of alert IDs to delete.",
                     "items": {
                         "type": "string"
                     },
                     "type": "array"
                 },
                 "customerId": {
-                    "description": "Optional. The unique identifier of the Google Workspace organization account of the customer the alerts are associated with.",
+                    "description": "Optional. The unique identifier of the Google Workspace account of the customer the alerts are associated with. The `customer_id` must have the initial \"C\" stripped (for example, `046psxkn`). Inferred from the caller identity if not provided. [Find your customer ID](https://support.google.com/cloudidentity/answer/10070793).",
                     "type": "string"
                 }
             },
@@ -885,7 +936,7 @@
                     "additionalProperties": {
                         "$ref": "Status"
                     },
-                    "description": "The status details for each failed alert_id.",
+                    "description": "The status details for each failed `alert_id`.",
                     "type": "object"
                 },
                 "successAlertIds": {
@@ -903,14 +954,14 @@
             "id": "BatchUndeleteAlertsRequest",
             "properties": {
                 "alertId": {
-                    "description": "Required. list of alert IDs.",
+                    "description": "Required. The list of alert IDs to undelete.",
                     "items": {
                         "type": "string"
                     },
                     "type": "array"
                 },
                 "customerId": {
-                    "description": "Optional. The unique identifier of the Google Workspace organization account of the customer the alerts are associated with.",
+                    "description": "Optional. The unique identifier of the Google Workspace account of the customer the alerts are associated with. The `customer_id` must have the initial \"C\" stripped (for example, `046psxkn`). Inferred from the caller identity if not provided. [Find your customer ID](https://support.google.com/cloudidentity/answer/10070793).",
                     "type": "string"
                 }
             },
@@ -924,7 +975,7 @@
                     "additionalProperties": {
                         "$ref": "Status"
                     },
-                    "description": "The status details for each failed alert_id.",
+                    "description": "The status details for each failed `alert_id`.",
                     "type": "object"
                 },
                 "successAlertIds": {
@@ -1086,9 +1137,56 @@
             "type": "object"
         },
         "Empty": {
-            "description": "A generic empty message that you can re-use to avoid defining duplicated empty messages in your APIs. A typical example is to use it as the request or the response type of an API method. For instance: service Foo { rpc Bar(google.protobuf.Empty) returns (google.protobuf.Empty); } The JSON representation for `Empty` is empty JSON object `{}`.",
+            "description": "A generic empty message that you can re-use to avoid defining duplicated empty messages in your APIs. A typical example is to use it as the request or the response type of an API method. For instance: service Foo { rpc Bar(google.protobuf.Empty) returns (google.protobuf.Empty); }",
             "id": "Empty",
             "properties": {},
+            "type": "object"
+        },
+        "Entity": {
+            "description": "Individual entity affected by, or related to, an alert.",
+            "id": "Entity",
+            "properties": {
+                "link": {
+                    "description": "Link to a Security Investigation Tool search based on this entity, if available.",
+                    "type": "string"
+                },
+                "name": {
+                    "description": "Human-readable name of this entity, such as an email address, file ID, or device name.",
+                    "type": "string"
+                },
+                "values": {
+                    "description": "Extra values beyond name. The order of values should align with headers in EntityList.",
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": "array"
+                }
+            },
+            "type": "object"
+        },
+        "EntityList": {
+            "description": "EntityList stores entities in a format that can be translated to a table in the Alert Center UI.",
+            "id": "EntityList",
+            "properties": {
+                "entities": {
+                    "description": "List of entities affected by the alert.",
+                    "items": {
+                        "$ref": "Entity"
+                    },
+                    "type": "array"
+                },
+                "headers": {
+                    "description": "Headers of the values in entities. If no value is defined in Entity, this field should be empty.",
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": "array"
+                },
+                "name": {
+                    "description": "Name of the key detail used to display this entity list.",
+                    "type": "string"
+                }
+            },
             "type": "object"
         },
         "GmailMessageInfo": {
@@ -1275,6 +1373,21 @@
             },
             "type": "object"
         },
+        "MandatoryServiceAnnouncement": {
+            "description": "Alert Created by the MSA team for communications necessary for continued use of Google Workspace Products.",
+            "id": "MandatoryServiceAnnouncement",
+            "properties": {
+                "description": {
+                    "description": "Detailed, freeform text describing the announcement",
+                    "type": "string"
+                },
+                "title": {
+                    "description": "One line summary of the announcement",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
         "MatchInfo": {
             "description": "Proto that contains match information from the condition part of the rule.",
             "id": "MatchInfo",
@@ -1348,6 +1461,25 @@
             "properties": {
                 "detectorName": {
                     "description": "Name that uniquely identifies the detector.",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "PrimaryAdminChangedEvent": {
+            "description": "Event occurred when primary admin changed in customer's account. The event are being received from insight forwarder",
+            "id": "PrimaryAdminChangedEvent",
+            "properties": {
+                "domain": {
+                    "description": "domain in which actioned occurred",
+                    "type": "string"
+                },
+                "previousAdminEmail": {
+                    "description": "Email of person who was the primary admin before the action",
+                    "type": "string"
+                },
+                "updatedAdminEmail": {
+                    "description": "Email of person who is the primary admin after the action",
                     "type": "string"
                 }
             },
@@ -1472,6 +1604,7 @@
                             "ACTION_TYPE_UNSPECIFIED",
                             "DRIVE_BLOCK_EXTERNAL_SHARING",
                             "DRIVE_WARN_ON_EXTERNAL_SHARING",
+                            "DELETE_WEBPROTECT_EVIDENCE",
                             "ALERT",
                             "RULE_ACTIVATE",
                             "RULE_DEACTIVATE"
@@ -1480,6 +1613,7 @@
                             "Action type is unspecified.",
                             "Block sharing a file externally.",
                             "Show a warning message when sharing a file externally.",
+                            "Delete web protect evidence file",
                             "Send alert.",
                             "Activate Rule Action",
                             "Deactivate Rule Action"
@@ -1514,6 +1648,7 @@
                             "ACTION_TYPE_UNSPECIFIED",
                             "DRIVE_BLOCK_EXTERNAL_SHARING",
                             "DRIVE_WARN_ON_EXTERNAL_SHARING",
+                            "DELETE_WEBPROTECT_EVIDENCE",
                             "ALERT",
                             "RULE_ACTIVATE",
                             "RULE_DEACTIVATE"
@@ -1522,6 +1657,7 @@
                             "Action type is unspecified.",
                             "Block sharing a file externally.",
                             "Show a warning message when sharing a file externally.",
+                            "Delete web protect evidence file",
                             "Send alert.",
                             "Activate Rule Action",
                             "Deactivate Rule Action"
@@ -1533,6 +1669,79 @@
                 "triggeringUserEmail": {
                     "description": "Email of the user who caused the violation. Value could be empty if not applicable, for example, a violation found by drive continuous scan.",
                     "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "SSOProfileCreatedEvent": {
+            "description": "Event occurred when SSO Profile created in customer's account. The event are being received from insight forwarder",
+            "id": "SSOProfileCreatedEvent",
+            "properties": {
+                "inboundSsoProfileName": {
+                    "description": "sso profile name which got created",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "SSOProfileDeletedEvent": {
+            "description": "Event occurred when SSO Profile deleted in customer's account. The event are being received from insight forwarder",
+            "id": "SSOProfileDeletedEvent",
+            "properties": {
+                "inboundSsoProfileName": {
+                    "description": "sso profile name which got deleted",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "SSOProfileUpdatedEvent": {
+            "description": "Event occurred when SSO Profile updated in customer's account. The event are being received from insight forwarder",
+            "id": "SSOProfileUpdatedEvent",
+            "properties": {
+                "inboundSsoProfileChanges": {
+                    "description": "changes made to sso profile",
+                    "type": "string"
+                },
+                "inboundSsoProfileName": {
+                    "description": "sso profile name which got updated",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "SensitiveAdminAction": {
+            "description": "Alert that is triggered when Sensitive Admin Action occur in customer account.",
+            "id": "SensitiveAdminAction",
+            "properties": {
+                "actorEmail": {
+                    "description": "Email of person who performed the action",
+                    "type": "string"
+                },
+                "eventTime": {
+                    "description": "The time at which event occurred",
+                    "format": "google-datetime",
+                    "type": "string"
+                },
+                "primaryAdminChangedEvent": {
+                    "$ref": "PrimaryAdminChangedEvent",
+                    "description": "Event occurred when primary admin changed in customer's account"
+                },
+                "ssoProfileCreatedEvent": {
+                    "$ref": "SSOProfileCreatedEvent",
+                    "description": "Event occurred when SSO Profile created in customer's account"
+                },
+                "ssoProfileDeletedEvent": {
+                    "$ref": "SSOProfileDeletedEvent",
+                    "description": "Event occurred when SSO Profile deleted in customer's account"
+                },
+                "ssoProfileUpdatedEvent": {
+                    "$ref": "SSOProfileUpdatedEvent",
+                    "description": "Event occurred when SSO Profile updated in customer's account"
+                },
+                "superAdminPasswordResetEvent": {
+                    "$ref": "SuperAdminPasswordResetEvent",
+                    "description": "Event occurred when password was reset for super admin in customer's account"
                 }
             },
             "type": "object"
@@ -1584,6 +1793,17 @@
                 },
                 "message": {
                     "description": "A developer-facing error message, which should be in English. Any user-facing error message should be localized and sent in the google.rpc.Status.details field, or localized by the client.",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "SuperAdminPasswordResetEvent": {
+            "description": "Event occurred when password was reset for super admin in customer's account. The event are being received from insight forwarder",
+            "id": "SuperAdminPasswordResetEvent",
+            "properties": {
+                "userEmail": {
+                    "description": "email of person whose password was reset",
                     "type": "string"
                 }
             },
@@ -1650,12 +1870,79 @@
             },
             "type": "object"
         },
+        "TransferError": {
+            "description": "Details for an invalid transfer or forward.",
+            "id": "TransferError",
+            "properties": {
+                "email": {
+                    "description": "User's email address. This may be unavailable if the entity was deleted.",
+                    "type": "string"
+                },
+                "entityType": {
+                    "description": "Type of entity being transferred to. For ring group members, this should always be USER.",
+                    "enum": [
+                        "TRANSFER_ENTITY_TYPE_UNSPECIFIED",
+                        "TRANSFER_AUTO_ATTENDANT",
+                        "TRANSFER_RING_GROUP",
+                        "TRANSFER_USER"
+                    ],
+                    "enumDescriptions": [
+                        "Entity type wasn't set.",
+                        "Transfer to auto attendant.",
+                        "Transfer to ring group.",
+                        "Transfer to user."
+                    ],
+                    "type": "string"
+                },
+                "id": {
+                    "description": "Ring group or auto attendant ID. Not set for users.",
+                    "type": "string"
+                },
+                "invalidReason": {
+                    "description": "Reason for the error.",
+                    "enum": [
+                        "TRANSFER_INVALID_REASON_UNSPECIFIED",
+                        "TRANSFER_TARGET_DELETED",
+                        "UNLICENSED",
+                        "SUSPENDED",
+                        "NO_PHONE_NUMBER"
+                    ],
+                    "enumDescriptions": [
+                        "Reason wasn't specified.",
+                        "The transfer target can't be found\u2014most likely it was deleted.",
+                        "The user's Google Voice license was removed.",
+                        "The user's Google Workspace account was suspended.",
+                        "The transfer target no longer has a phone number. This reason should become deprecated once we support numberless transfer."
+                    ],
+                    "type": "string"
+                },
+                "name": {
+                    "description": "User's full name, or the ring group / auto attendant name. This may be unavailable if the entity was deleted.",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "TransferMisconfiguration": {
+            "description": "Error related to transferring or forwarding a phone call.",
+            "id": "TransferMisconfiguration",
+            "properties": {
+                "errors": {
+                    "description": "Details for each invalid transfer or forward.",
+                    "items": {
+                        "$ref": "TransferError"
+                    },
+                    "type": "array"
+                }
+            },
+            "type": "object"
+        },
         "UndeleteAlertRequest": {
             "description": "A request to undelete a specific alert that was marked for deletion.",
             "id": "UndeleteAlertRequest",
             "properties": {
                 "customerId": {
-                    "description": "Optional. The unique identifier of the Google Workspace organization account of the customer the alert is associated with. Inferred from the caller identity if not provided.",
+                    "description": "Optional. The unique identifier of the Google Workspace account of the customer the alert is associated with. The `customer_id` must have the initial \"C\" stripped (for example, `046psxkn`). Inferred from the caller identity if not provided. [Find your customer ID](https://support.google.com/cloudidentity/answer/10070793).",
                     "type": "string"
                 }
             },
@@ -1697,6 +1984,86 @@
                 },
                 "resourceName": {
                     "description": "Resource name that uniquely identifies the detector.",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "VoiceMisconfiguration": {
+            "description": "An alert triggered when Google Voice configuration becomes invalid, generally due to an external entity being modified or deleted.",
+            "id": "VoiceMisconfiguration",
+            "properties": {
+                "entityName": {
+                    "description": "Name of the entity whose configuration is now invalid.",
+                    "type": "string"
+                },
+                "entityType": {
+                    "description": "Type of the entity whose configuration is now invalid.",
+                    "enum": [
+                        "ENTITY_TYPE_UNSPECIFIED",
+                        "AUTO_ATTENDANT",
+                        "RING_GROUP"
+                    ],
+                    "enumDescriptions": [
+                        "Entity type wasn't set.",
+                        "Invalid auto attendant.",
+                        "Invalid ring group."
+                    ],
+                    "type": "string"
+                },
+                "fixUri": {
+                    "description": "Link that the admin can follow to fix the issue.",
+                    "type": "string"
+                },
+                "membersMisconfiguration": {
+                    "$ref": "TransferMisconfiguration",
+                    "description": "Issue(s) with members of a ring group."
+                },
+                "transferMisconfiguration": {
+                    "$ref": "TransferMisconfiguration",
+                    "description": "Issue(s) with transferring or forwarding to an external entity."
+                },
+                "voicemailMisconfiguration": {
+                    "$ref": "VoicemailMisconfiguration",
+                    "description": "Issue(s) with sending to voicemail."
+                }
+            },
+            "type": "object"
+        },
+        "VoicemailMisconfiguration": {
+            "description": "Issue(s) with sending to voicemail.",
+            "id": "VoicemailMisconfiguration",
+            "properties": {
+                "errors": {
+                    "description": "Issue(s) with voicemail recipients.",
+                    "items": {
+                        "$ref": "VoicemailRecipientError"
+                    },
+                    "type": "array"
+                }
+            },
+            "type": "object"
+        },
+        "VoicemailRecipientError": {
+            "description": "Issue(s) with a voicemail recipient.",
+            "id": "VoicemailRecipientError",
+            "properties": {
+                "email": {
+                    "description": "Email address of the invalid recipient. This may be unavailable if the recipient was deleted.",
+                    "type": "string"
+                },
+                "invalidReason": {
+                    "description": "Reason for the error.",
+                    "enum": [
+                        "EMAIL_INVALID_REASON_UNSPECIFIED",
+                        "OUT_OF_QUOTA",
+                        "RECIPIENT_DELETED"
+                    ],
+                    "enumDescriptions": [
+                        "Reason wasn't specified.",
+                        "User can't receive emails due to insufficient quota.",
+                        "All recipients were deleted."
+                    ],
                     "type": "string"
                 }
             },

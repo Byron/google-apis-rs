@@ -641,7 +641,7 @@
             }
         }
     },
-    "revision": "20220303",
+    "revision": "20230117",
     "rootUrl": "https://photoslibrary.googleapis.com/",
     "schemas": {
         "AddEnrichmentToAlbumRequest": {
@@ -776,7 +776,7 @@
                     "description": "Position in the album where the media items are added. If not specified, the media items are added to the end of the album (as per the default value, that is, `LAST_IN_ALBUM`). The request fails if this field is set and the `albumId` is not specified. The request will also fail if you set the field and are not the owner of the shared album."
                 },
                 "newMediaItems": {
-                    "description": "Required. List of media items to be created.",
+                    "description": "Required. List of media items to be created. Maximum 50 media items per call.",
                     "items": {
                         "$ref": "NewMediaItem"
                     },
@@ -1282,7 +1282,7 @@
                     "description": "Information about the user who added this media item. Note that this is only included when using mediaItems.search with the ID of a shared album. The album must be created by your app and you must have the sharing scope."
                 },
                 "description": {
-                    "description": "Description of the media item. This is shown to the user in the item's info section in the Google Photos app.",
+                    "description": "Description of the media item. This is shown to the user in the item's info section in the Google Photos app. Must be shorter than 1000 characters. Only include text written by users. Descriptions should add context and help users understand media. Do not include any auto-generated strings such as filenames, tags, and other metadata.",
                     "type": "string"
                 },
                 "filename": {
@@ -1401,7 +1401,7 @@
             "id": "NewMediaItem",
             "properties": {
                 "description": {
-                    "description": "Description of the media item. This will be shown to the user in the item's info section in the Google Photos app. This string shouldn't be more than 1000 characters.",
+                    "description": "Description of the media item. This is shown to the user in the item's info section in the Google Photos app. Must be shorter than 1000 characters. Only include text written by users. Descriptions should add context and help users understand media. Do not include any auto-generated strings such as filenames, tags, and other metadata.",
                     "type": "string"
                 },
                 "simpleMediaItem": {
@@ -1424,7 +1424,7 @@
                     "description": "If an error occurred during the creation of this media item, this field is populated with information related to the error. For details regarding this field, see Status."
                 },
                 "uploadToken": {
-                    "description": "The upload token used to create this new media item.",
+                    "description": "The upload token used to create this new (simple) media item. Only populated if the media item is simple and required a single upload token.",
                     "type": "string"
                 }
             },

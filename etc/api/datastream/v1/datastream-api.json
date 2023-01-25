@@ -180,7 +180,7 @@
                             ],
                             "parameters": {
                                 "filter": {
-                                    "description": "A filter to narrow down results to a preferred subset. The filtering language accepts strings like \"displayName=tokyo\", and is documented in more detail in [AIP-160](https://google.aip.dev/160).",
+                                    "description": "A filter to narrow down results to a preferred subset. The filtering language accepts strings like `\"displayName=tokyo\"`, and is documented in more detail in [AIP-160](https://google.aip.dev/160).",
                                     "location": "query",
                                     "type": "string"
                                 },
@@ -577,6 +577,11 @@
                                         "parent"
                                     ],
                                     "parameters": {
+                                        "force": {
+                                            "description": "Optional. If set to true, will skip validations.",
+                                            "location": "query",
+                                            "type": "boolean"
+                                        },
                                         "parent": {
                                             "description": "Required. The parent that owns the collection of PrivateConnections.",
                                             "location": "path",
@@ -1217,7 +1222,7 @@
             }
         }
     },
-    "revision": "20220207",
+    "revision": "20230111",
     "rootUrl": "https://datastream.googleapis.com/",
     "schemas": {
         "AvroFileFormat": {
@@ -1237,6 +1242,10 @@
                 "oracleExcludedObjects": {
                     "$ref": "OracleRdbms",
                     "description": "Oracle data source objects to avoid backfilling."
+                },
+                "postgresqlExcludedObjects": {
+                    "$ref": "PostgresqlRdbms",
+                    "description": "PostgreSQL data source objects to avoid backfilling."
                 }
             },
             "type": "object"
@@ -1312,6 +1321,31 @@
             "properties": {},
             "type": "object"
         },
+        "BigQueryDestinationConfig": {
+            "id": "BigQueryDestinationConfig",
+            "properties": {
+                "dataFreshness": {
+                    "description": "The guaranteed data freshness (in seconds) when querying tables created by the stream. Editing this field will only affect new tables created in the future, but existing tables will not be impacted. Lower values mean that queries will return fresher data, but may result in higher cost.",
+                    "format": "google-duration",
+                    "type": "string"
+                },
+                "singleTargetDataset": {
+                    "$ref": "SingleTargetDataset",
+                    "description": "Single destination dataset."
+                },
+                "sourceHierarchyDatasets": {
+                    "$ref": "SourceHierarchyDatasets",
+                    "description": "Source hierarchy datasets."
+                }
+            },
+            "type": "object"
+        },
+        "BigQueryProfile": {
+            "description": "BigQuery warehouse profile.",
+            "id": "BigQueryProfile",
+            "properties": {},
+            "type": "object"
+        },
         "CancelOperationRequest": {
             "description": "The request message for Operations.CancelOperation.",
             "id": "CancelOperationRequest",
@@ -1322,6 +1356,10 @@
             "description": "A set of reusable connection configurations to be used as a source or destination for a stream.",
             "id": "ConnectionProfile",
             "properties": {
+                "bigqueryProfile": {
+                    "$ref": "BigQueryProfile",
+                    "description": "BigQuery Connection Profile configuration."
+                },
                 "createTime": {
                     "description": "Output only. The create time of the resource.",
                     "format": "google-datetime",
@@ -1360,6 +1398,10 @@
                     "$ref": "OracleProfile",
                     "description": "Oracle ConnectionProfile configuration."
                 },
+                "postgresqlProfile": {
+                    "$ref": "PostgresqlProfile",
+                    "description": "PostgreSQL Connection Profile configuration."
+                },
                 "privateConnectivity": {
                     "$ref": "PrivateConnectivity",
                     "description": "Private connectivity."
@@ -1377,10 +1419,33 @@
             },
             "type": "object"
         },
+        "DatasetTemplate": {
+            "description": "Dataset template used for dynamic dataset creation.",
+            "id": "DatasetTemplate",
+            "properties": {
+                "datasetIdPrefix": {
+                    "description": "If supplied, every created dataset will have its name prefixed by the provided value. The prefix and name will be separated by an underscore. i.e. _.",
+                    "type": "string"
+                },
+                "kmsKeyName": {
+                    "description": "Describes the Cloud KMS encryption key that will be used to protect destination BigQuery table. The BigQuery Service Account associated with your project requires access to this encryption key. i.e. projects/{project}/locations/{location}/keyRings/{key_ring}/cryptoKeys/{cryptoKey}. See https://cloud.google.com/bigquery/docs/customer-managed-encryption for more information.",
+                    "type": "string"
+                },
+                "location": {
+                    "description": "Required. The geographic location where the dataset should reside. See https://cloud.google.com/bigquery/docs/locations for supported locations.",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
         "DestinationConfig": {
             "description": "The configuration of the stream destination.",
             "id": "DestinationConfig",
             "properties": {
+                "bigqueryDestinationConfig": {
+                    "$ref": "BigQueryDestinationConfig",
+                    "description": "BigQuery destination configuration."
+                },
                 "destinationConnectionProfile": {
                     "description": "Required. Destination connection profile resource. Format: `projects/{project}/locations/{location}/connectionProfiles/{name}`",
                     "type": "string"
@@ -1420,6 +1485,10 @@
                 "oracleRdbms": {
                     "$ref": "OracleRdbms",
                     "description": "Oracle RDBMS to enrich with child data objects and metadata."
+                },
+                "postgresqlRdbms": {
+                    "$ref": "PostgresqlRdbms",
+                    "description": "PostgreSQL RDBMS to enrich with child data objects and metadata."
                 }
             },
             "type": "object"
@@ -1435,12 +1504,22 @@
                 "oracleRdbms": {
                     "$ref": "OracleRdbms",
                     "description": "Enriched Oracle RDBMS object."
+                },
+                "postgresqlRdbms": {
+                    "$ref": "PostgresqlRdbms",
+                    "description": "Enriched PostgreSQL RDBMS object."
                 }
             },
             "type": "object"
         },
+        "DropLargeObjects": {
+            "description": "Configuration to drop large object values.",
+            "id": "DropLargeObjects",
+            "properties": {},
+            "type": "object"
+        },
         "Empty": {
-            "description": "A generic empty message that you can re-use to avoid defining duplicated empty messages in your APIs. A typical example is to use it as the request or the response type of an API method. For instance: service Foo { rpc Bar(google.protobuf.Empty) returns (google.protobuf.Empty); } The JSON representation for `Empty` is empty JSON object `{}`.",
+            "description": "A generic empty message that you can re-use to avoid defining duplicated empty messages in your APIs. A typical example is to use it as the request or the response type of an API method. For instance: service Foo { rpc Bar(google.protobuf.Empty) returns (google.protobuf.Empty); }",
             "id": "Empty",
             "properties": {},
             "type": "object"
@@ -1923,6 +2002,11 @@
                 "includeObjects": {
                     "$ref": "MysqlRdbms",
                     "description": "MySQL objects to retrieve from the source."
+                },
+                "maxConcurrentCdcTasks": {
+                    "description": "Maximum number of concurrent CDC tasks. The number should be non negative. If not set (or set to 0), the system's default value will be used.",
+                    "format": "int32",
+                    "type": "integer"
                 }
             },
             "type": "object"
@@ -1966,7 +2050,7 @@
             "id": "MysqlTable",
             "properties": {
                 "mysqlColumns": {
-                    "description": "MySQL columns in the database. When unspecified as part of include/exclude lists, includes/excludes everything.",
+                    "description": "MySQL columns in the database. When unspecified as part of include/exclude objects, includes/excludes everything.",
                     "items": {
                         "$ref": "MysqlColumn"
                     },
@@ -2196,6 +2280,10 @@
             "description": "Oracle data source configuration",
             "id": "OracleSourceConfig",
             "properties": {
+                "dropLargeObjects": {
+                    "$ref": "DropLargeObjects",
+                    "description": "Drop large object values."
+                },
                 "excludeObjects": {
                     "$ref": "OracleRdbms",
                     "description": "Oracle objects to exclude from the stream."
@@ -2203,6 +2291,15 @@
                 "includeObjects": {
                     "$ref": "OracleRdbms",
                     "description": "Oracle objects to include in the stream."
+                },
+                "maxConcurrentCdcTasks": {
+                    "description": "Maximum number of concurrent CDC tasks. The number should be non negative. If not set (or set to 0), the system's default value will be used.",
+                    "format": "int32",
+                    "type": "integer"
+                },
+                "streamLargeObjects": {
+                    "$ref": "StreamLargeObjects",
+                    "description": "Stream large object values. NOTE: This feature is currently experimental."
                 }
             },
             "type": "object"
@@ -2212,9 +2309,168 @@
             "id": "OracleTable",
             "properties": {
                 "oracleColumns": {
-                    "description": "Oracle columns in the schema. When unspecified as part of inclue/exclude lists, includes/excludes everything.",
+                    "description": "Oracle columns in the schema. When unspecified as part of include/exclude objects, includes/excludes everything.",
                     "items": {
                         "$ref": "OracleColumn"
+                    },
+                    "type": "array"
+                },
+                "table": {
+                    "description": "Table name.",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "PostgresqlColumn": {
+            "description": "PostgreSQL Column.",
+            "id": "PostgresqlColumn",
+            "properties": {
+                "column": {
+                    "description": "Column name.",
+                    "type": "string"
+                },
+                "dataType": {
+                    "description": "The PostgreSQL data type.",
+                    "type": "string"
+                },
+                "length": {
+                    "description": "Column length.",
+                    "format": "int32",
+                    "type": "integer"
+                },
+                "nullable": {
+                    "description": "Whether or not the column can accept a null value.",
+                    "type": "boolean"
+                },
+                "ordinalPosition": {
+                    "description": "The ordinal position of the column in the table.",
+                    "format": "int32",
+                    "type": "integer"
+                },
+                "precision": {
+                    "description": "Column precision.",
+                    "format": "int32",
+                    "type": "integer"
+                },
+                "primaryKey": {
+                    "description": "Whether or not the column represents a primary key.",
+                    "type": "boolean"
+                },
+                "scale": {
+                    "description": "Column scale.",
+                    "format": "int32",
+                    "type": "integer"
+                }
+            },
+            "type": "object"
+        },
+        "PostgresqlObjectIdentifier": {
+            "description": "PostgreSQL data source object identifier.",
+            "id": "PostgresqlObjectIdentifier",
+            "properties": {
+                "schema": {
+                    "description": "Required. The schema name.",
+                    "type": "string"
+                },
+                "table": {
+                    "description": "Required. The table name.",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "PostgresqlProfile": {
+            "description": "PostgreSQL database profile.",
+            "id": "PostgresqlProfile",
+            "properties": {
+                "database": {
+                    "description": "Required. Database for the PostgreSQL connection.",
+                    "type": "string"
+                },
+                "hostname": {
+                    "description": "Required. Hostname for the PostgreSQL connection.",
+                    "type": "string"
+                },
+                "password": {
+                    "description": "Required. Password for the PostgreSQL connection.",
+                    "type": "string"
+                },
+                "port": {
+                    "description": "Port for the PostgreSQL connection, default value is 5432.",
+                    "format": "int32",
+                    "type": "integer"
+                },
+                "username": {
+                    "description": "Required. Username for the PostgreSQL connection.",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "PostgresqlRdbms": {
+            "description": "PostgreSQL database structure.",
+            "id": "PostgresqlRdbms",
+            "properties": {
+                "postgresqlSchemas": {
+                    "description": "PostgreSQL schemas in the database server.",
+                    "items": {
+                        "$ref": "PostgresqlSchema"
+                    },
+                    "type": "array"
+                }
+            },
+            "type": "object"
+        },
+        "PostgresqlSchema": {
+            "description": "PostgreSQL schema.",
+            "id": "PostgresqlSchema",
+            "properties": {
+                "postgresqlTables": {
+                    "description": "Tables in the schema.",
+                    "items": {
+                        "$ref": "PostgresqlTable"
+                    },
+                    "type": "array"
+                },
+                "schema": {
+                    "description": "Schema name.",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "PostgresqlSourceConfig": {
+            "description": "PostgreSQL data source configuration",
+            "id": "PostgresqlSourceConfig",
+            "properties": {
+                "excludeObjects": {
+                    "$ref": "PostgresqlRdbms",
+                    "description": "PostgreSQL objects to exclude from the stream."
+                },
+                "includeObjects": {
+                    "$ref": "PostgresqlRdbms",
+                    "description": "PostgreSQL objects to include in the stream."
+                },
+                "publication": {
+                    "description": "Required. The name of the publication that includes the set of all tables that are defined in the stream's include_objects.",
+                    "type": "string"
+                },
+                "replicationSlot": {
+                    "description": "Required. Immutable. The name of the logical replication slot that's configured with the pgoutput plugin.",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "PostgresqlTable": {
+            "description": "PostgreSQL table.",
+            "id": "PostgresqlTable",
+            "properties": {
+                "postgresqlColumns": {
+                    "description": "PostgreSQL columns in the schema. When unspecified as part of include/exclude objects, includes/excludes everything.",
+                    "items": {
+                        "$ref": "PostgresqlColumn"
                     },
                     "type": "array"
                 },
@@ -2345,21 +2601,46 @@
             },
             "type": "object"
         },
+        "SingleTargetDataset": {
+            "description": "A single target dataset to which all data will be streamed.",
+            "id": "SingleTargetDataset",
+            "properties": {
+                "datasetId": {
+                    "description": "The dataset ID of the target dataset.",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
         "SourceConfig": {
             "description": "The configuration of the stream source.",
             "id": "SourceConfig",
             "properties": {
                 "mysqlSourceConfig": {
                     "$ref": "MysqlSourceConfig",
-                    "description": "MySQL data source configuration"
+                    "description": "MySQL data source configuration."
                 },
                 "oracleSourceConfig": {
                     "$ref": "OracleSourceConfig",
-                    "description": "Oracle data source configuration"
+                    "description": "Oracle data source configuration."
+                },
+                "postgresqlSourceConfig": {
+                    "$ref": "PostgresqlSourceConfig",
+                    "description": "PostgreSQL data source configuration."
                 },
                 "sourceConnectionProfile": {
                     "description": "Required. Source connection profile resoource. Format: `projects/{project}/locations/{location}/connectionProfiles/{name}`",
                     "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "SourceHierarchyDatasets": {
+            "description": "Destination datasets are created so that hierarchy of the destination data objects matches the source hierarchy.",
+            "id": "SourceHierarchyDatasets",
+            "properties": {
+                "datasetTemplate": {
+                    "$ref": "DatasetTemplate"
                 }
             },
             "type": "object"
@@ -2375,6 +2656,10 @@
                 "oracleIdentifier": {
                     "$ref": "OracleObjectIdentifier",
                     "description": "Oracle data source object identifier."
+                },
+                "postgresqlIdentifier": {
+                    "$ref": "PostgresqlObjectIdentifier",
+                    "description": "PostgreSQL data source object identifier."
                 }
             },
             "type": "object"
@@ -2535,6 +2820,12 @@
             },
             "type": "object"
         },
+        "StreamLargeObjects": {
+            "description": "Configuration to stream large object values.",
+            "id": "StreamLargeObjects",
+            "properties": {},
+            "type": "object"
+        },
         "StreamObject": {
             "description": "A specific stream object (e.g a specific DB table).",
             "id": "StreamObject",
@@ -2672,7 +2963,7 @@
             "id": "VpcPeeringConfig",
             "properties": {
                 "subnet": {
-                    "description": "Required. A free subnet for peering. (CIDR of /29) TODO(b/172995841) add validators.",
+                    "description": "Required. A free subnet for peering. (CIDR of /29)",
                     "type": "string"
                 },
                 "vpc": {

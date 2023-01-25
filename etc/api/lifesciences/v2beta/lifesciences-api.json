@@ -144,7 +144,7 @@
                             ],
                             "parameters": {
                                 "filter": {
-                                    "description": "A filter to narrow down results to a preferred subset. The filtering language accepts strings like \"displayName=tokyo\", and is documented in more detail in [AIP-160](https://google.aip.dev/160).",
+                                    "description": "A filter to narrow down results to a preferred subset. The filtering language accepts strings like `\"displayName=tokyo\"`, and is documented in more detail in [AIP-160](https://google.aip.dev/160).",
                                     "location": "query",
                                     "type": "string"
                                 },
@@ -312,7 +312,7 @@
             }
         }
     },
-    "revision": "20220211",
+    "revision": "20230106",
     "rootUrl": "https://lifesciences.googleapis.com/",
     "schemas": {
         "Accelerator": {
@@ -541,7 +541,7 @@
             "type": "object"
         },
         "Empty": {
-            "description": "A generic empty message that you can re-use to avoid defining duplicated empty messages in your APIs. A typical example is to use it as the request or the response type of an API method. For instance: service Foo { rpc Bar(google.protobuf.Empty) returns (google.protobuf.Empty); } The JSON representation for `Empty` is empty JSON object `{}`.",
+            "description": "A generic empty message that you can re-use to avoid defining duplicated empty messages in your APIs. A typical example is to use it as the request or the response type of an API method. For instance: service Foo { rpc Bar(google.protobuf.Empty) returns (google.protobuf.Empty); }",
             "id": "Empty",
             "properties": {},
             "type": "object"
@@ -643,7 +643,7 @@
                         "DATA_LOSS"
                     ],
                     "enumDescriptions": [
-                        "Not an error; returned on success HTTP Mapping: 200 OK",
+                        "Not an error; returned on success. HTTP Mapping: 200 OK",
                         "The operation was cancelled, typically by the caller. HTTP Mapping: 499 Client Closed Request",
                         "Unknown error. For example, this error may be returned when a `Status` value received from another address space belongs to an error space that is not known in this address space. Also errors raised by APIs that do not return enough error information may be converted to this error. HTTP Mapping: 500 Internal Server Error",
                         "The client specified an invalid argument. Note that this differs from `FAILED_PRECONDITION`. `INVALID_ARGUMENT` indicates arguments that are problematic regardless of the state of the system (e.g., a malformed file name). HTTP Mapping: 400 Bad Request",

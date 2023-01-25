@@ -1282,7 +1282,7 @@
             }
         }
     },
-    "revision": "20220225",
+    "revision": "20230113",
     "rootUrl": "https://vision.googleapis.com/",
     "schemas": {
         "AddProductToProductSetRequest": {
@@ -1891,7 +1891,7 @@
             "type": "object"
         },
         "Empty": {
-            "description": "A generic empty message that you can re-use to avoid defining duplicated empty messages in your APIs. A typical example is to use it as the request or the response type of an API method. For instance: service Foo { rpc Bar(google.protobuf.Empty) returns (google.protobuf.Empty); } The JSON representation for `Empty` is empty JSON object `{}`.",
+            "description": "A generic empty message that you can re-use to avoid defining duplicated empty messages in your APIs. A typical example is to use it as the request or the response type of an API method. For instance: service Foo { rpc Bar(google.protobuf.Empty) returns (google.protobuf.Empty); }",
             "id": "Empty",
             "properties": {},
             "type": "object"
@@ -2145,7 +2145,7 @@
                     "type": "integer"
                 },
                 "model": {
-                    "description": "Model to use for the feature. Supported values: \"builtin/stable\" (the default if unset) and \"builtin/latest\".",
+                    "description": "Model to use for the feature. Supported values: \"builtin/stable\" (the default if unset) and \"builtin/latest\". `DOCUMENT_TEXT_DETECTION` and `TEXT_DETECTION` also support \"builtin/weekly\" for the bleeding edge release updated weekly.",
                     "type": "string"
                 },
                 "type": {
@@ -9147,6 +9147,13 @@
             "description": "Parameters for text detections. This is used to control TEXT_DETECTION and DOCUMENT_TEXT_DETECTION features.",
             "id": "TextDetectionParams",
             "properties": {
+                "advancedOcrOptions": {
+                    "description": "A list of advanced OCR options to fine-tune OCR behavior.",
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": "array"
+                },
                 "enableTextDetectionConfidenceScore": {
                     "description": "By default, Cloud Vision API only includes confidence score for DOCUMENT_TEXT_DETECTION result. Set the flag to true to include confidence score for TEXT_DETECTION as well.",
                     "type": "boolean"

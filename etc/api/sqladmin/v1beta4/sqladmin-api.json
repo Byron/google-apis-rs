@@ -920,7 +920,7 @@
                             "type": "string"
                         },
                         "maxResults": {
-                            "description": "The maximum number of results to return per response.",
+                            "description": "The maximum number of instances to return. The service may return fewer than this value. If unspecified, at most 500 instances are returned. The maximum value is 1000; values above 1000 are coerced to 1000.",
                             "format": "uint32",
                             "location": "query",
                             "type": "integer"
@@ -979,7 +979,7 @@
                     ]
                 },
                 "patch": {
-                    "description": "Updates settings of a Cloud SQL instance. This method supports patch semantics.",
+                    "description": "Partially updates settings of a Cloud SQL instance by merging the request with the current configuration. This method supports patch semantics.",
                     "flatPath": "sql/v1beta4/projects/{project}/instances/{instance}",
                     "httpMethod": "PATCH",
                     "id": "sql.instances.patch",
@@ -1762,6 +1762,50 @@
                         "https://www.googleapis.com/auth/sqlservice.admin"
                     ]
                 },
+                "get": {
+                    "description": "Retrieves a resource containing information about a user.",
+                    "flatPath": "sql/v1beta4/projects/{project}/instances/{instance}/users/{name}",
+                    "httpMethod": "GET",
+                    "id": "sql.users.get",
+                    "parameterOrder": [
+                        "project",
+                        "instance",
+                        "name"
+                    ],
+                    "parameters": {
+                        "host": {
+                            "description": "Host of a user of the instance.",
+                            "location": "query",
+                            "type": "string"
+                        },
+                        "instance": {
+                            "description": "Database instance ID. This does not include the project ID.",
+                            "location": "path",
+                            "required": true,
+                            "type": "string"
+                        },
+                        "name": {
+                            "description": "User of the instance.",
+                            "location": "path",
+                            "required": true,
+                            "type": "string"
+                        },
+                        "project": {
+                            "description": "Project ID of the project that contains the instance.",
+                            "location": "path",
+                            "required": true,
+                            "type": "string"
+                        }
+                    },
+                    "path": "sql/v1beta4/projects/{project}/instances/{instance}/users/{name}",
+                    "response": {
+                        "$ref": "User"
+                    },
+                    "scopes": [
+                        "https://www.googleapis.com/auth/cloud-platform",
+                        "https://www.googleapis.com/auth/sqlservice.admin"
+                    ]
+                },
                 "insert": {
                     "description": "Creates a new user in a Cloud SQL instance.",
                     "flatPath": "sql/v1beta4/projects/{project}/instances/{instance}/users",
@@ -1877,7 +1921,7 @@
             }
         }
     },
-    "revision": "20220226",
+    "revision": "20221209",
     "rootUrl": "https://sqladmin.googleapis.com/",
     "schemas": {
         "AclEntry": {
@@ -1912,11 +1956,13 @@
                     "description": "Code to uniquely identify the warning type.",
                     "enum": [
                         "SQL_API_WARNING_CODE_UNSPECIFIED",
-                        "REGION_UNREACHABLE"
+                        "REGION_UNREACHABLE",
+                        "MAX_RESULTS_EXCEEDS_LIMIT"
                     ],
                     "enumDescriptions": [
                         "An unknown or unset warning type from Cloud SQL API.",
-                        "Warning when one or more regions are not reachable. The returned result set may be incomplete."
+                        "Warning when one or more regions are not reachable. The returned result set may be incomplete.",
+                        "Warning when user provided maxResults parameter exceeds the limit. The returned result set may be incomplete."
                     ],
                     "type": "string"
                 },
@@ -2113,8 +2159,12 @@
                     ],
                     "type": "string"
                 },
+                "timeZone": {
+                    "description": "Backup time zone to prevent restores to an instance with a different time zone. Now relevant only for SQL Server.",
+                    "type": "string"
+                },
                 "type": {
-                    "description": "The type of this run; can be either \"AUTOMATED\" or \"ON_DEMAND\". This field defaults to \"ON_DEMAND\" and is ignored, when specified for insert requests.",
+                    "description": "The type of this run; can be either \"AUTOMATED\" or \"ON_DEMAND\" or \"FINAL\". This field defaults to \"ON_DEMAND\" and is ignored, when specified for insert requests.",
                     "enum": [
                         "SQL_BACKUP_RUN_TYPE_UNSPECIFIED",
                         "AUTOMATED",
@@ -2182,12 +2232,19 @@
             "id": "CloneContext",
             "properties": {
                 "allocatedIpRange": {
-                    "description": "The name of the allocated ip range for the private ip CloudSQL instance. For example: \"google-managed-services-default\". If set, the cloned instance ip will be created in the allocated range. The range name must comply with [RFC 1035](https://tools.ietf.org/html/rfc1035). Specifically, the name must be 1-63 characters long and match the regular expression [a-z]([-a-z0-9]*[a-z0-9])?. Reserved for future use.",
+                    "description": "The name of the allocated ip range for the private ip Cloud SQL instance. For example: \"google-managed-services-default\". If set, the cloned instance ip will be created in the allocated range. The range name must comply with [RFC 1035](https://tools.ietf.org/html/rfc1035). Specifically, the name must be 1-63 characters long and match the regular expression [a-z]([-a-z0-9]*[a-z0-9])?. Reserved for future use.",
                     "type": "string"
                 },
                 "binLogCoordinates": {
                     "$ref": "BinLogCoordinates",
                     "description": "Binary log coordinates, if specified, identify the position up to which the source instance is cloned. If not specified, the source instance is cloned up to the most recent binary log coordinates."
+                },
+                "databaseNames": {
+                    "description": "(SQL Server only) Clone only the specified databases from the source instance. Clone all databases if empty.",
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": "array"
                 },
                 "destinationInstanceName": {
                     "description": "Name of the Cloud SQL instance to be created as a clone.",
@@ -2238,19 +2295,24 @@
                         "MYSQL_5_5",
                         "MYSQL_5_6",
                         "MYSQL_5_7",
-                        "POSTGRES_9_6",
-                        "POSTGRES_11",
                         "SQLSERVER_2017_STANDARD",
                         "SQLSERVER_2017_ENTERPRISE",
                         "SQLSERVER_2017_EXPRESS",
                         "SQLSERVER_2017_WEB",
+                        "POSTGRES_9_6",
                         "POSTGRES_10",
+                        "POSTGRES_11",
                         "POSTGRES_12",
+                        "POSTGRES_13",
+                        "POSTGRES_14",
                         "MYSQL_8_0",
                         "MYSQL_8_0_18",
                         "MYSQL_8_0_26",
-                        "POSTGRES_13",
-                        "POSTGRES_14",
+                        "MYSQL_8_0_27",
+                        "MYSQL_8_0_28",
+                        "MYSQL_8_0_29",
+                        "MYSQL_8_0_30",
+                        "MYSQL_8_0_31",
                         "SQLSERVER_2019_STANDARD",
                         "SQLSERVER_2019_ENTERPRISE",
                         "SQLSERVER_2019_EXPRESS",
@@ -2262,19 +2324,24 @@
                         "The database version is MySQL 5.5.",
                         "The database version is MySQL 5.6.",
                         "The database version is MySQL 5.7.",
-                        "The database version is PostgreSQL 9.6.",
-                        "The database version is PostgreSQL 11.",
                         "The database version is SQL Server 2017 Standard.",
                         "The database version is SQL Server 2017 Enterprise.",
                         "The database version is SQL Server 2017 Express.",
                         "The database version is SQL Server 2017 Web.",
+                        "The database version is PostgreSQL 9.6.",
                         "The database version is PostgreSQL 10.",
+                        "The database version is PostgreSQL 11.",
                         "The database version is PostgreSQL 12.",
+                        "The database version is PostgreSQL 13.",
+                        "The database version is PostgreSQL 14.",
                         "The database version is MySQL 8.",
                         "The database major version is MySQL 8.0 and the minor version is 18.",
                         "The database major version is MySQL 8.0 and the minor version is 26.",
-                        "The database version is PostgreSQL 13.",
-                        "The database version is PostgreSQL 14.",
+                        "The database major version is MySQL 8.0 and the minor version is 27.",
+                        "The database major version is MySQL 8.0 and the minor version is 28.",
+                        "The database major version is MySQL 8.0 and the minor version is 29.",
+                        "The database major version is MySQL 8.0 and the minor version is 30.",
+                        "The database major version is MySQL 8.0 and the minor version is 31.",
                         "The database version is SQL Server 2019 Standard.",
                         "The database version is SQL Server 2019 Enterprise.",
                         "The database version is SQL Server 2019 Express.",
@@ -2416,19 +2483,24 @@
                         "MYSQL_5_5",
                         "MYSQL_5_6",
                         "MYSQL_5_7",
-                        "POSTGRES_9_6",
-                        "POSTGRES_11",
                         "SQLSERVER_2017_STANDARD",
                         "SQLSERVER_2017_ENTERPRISE",
                         "SQLSERVER_2017_EXPRESS",
                         "SQLSERVER_2017_WEB",
+                        "POSTGRES_9_6",
                         "POSTGRES_10",
+                        "POSTGRES_11",
                         "POSTGRES_12",
+                        "POSTGRES_13",
+                        "POSTGRES_14",
                         "MYSQL_8_0",
                         "MYSQL_8_0_18",
                         "MYSQL_8_0_26",
-                        "POSTGRES_13",
-                        "POSTGRES_14",
+                        "MYSQL_8_0_27",
+                        "MYSQL_8_0_28",
+                        "MYSQL_8_0_29",
+                        "MYSQL_8_0_30",
+                        "MYSQL_8_0_31",
                         "SQLSERVER_2019_STANDARD",
                         "SQLSERVER_2019_ENTERPRISE",
                         "SQLSERVER_2019_EXPRESS",
@@ -2440,19 +2512,24 @@
                         "The database version is MySQL 5.5.",
                         "The database version is MySQL 5.6.",
                         "The database version is MySQL 5.7.",
-                        "The database version is PostgreSQL 9.6.",
-                        "The database version is PostgreSQL 11.",
                         "The database version is SQL Server 2017 Standard.",
                         "The database version is SQL Server 2017 Enterprise.",
                         "The database version is SQL Server 2017 Express.",
                         "The database version is SQL Server 2017 Web.",
+                        "The database version is PostgreSQL 9.6.",
                         "The database version is PostgreSQL 10.",
+                        "The database version is PostgreSQL 11.",
                         "The database version is PostgreSQL 12.",
+                        "The database version is PostgreSQL 13.",
+                        "The database version is PostgreSQL 14.",
                         "The database version is MySQL 8.",
                         "The database major version is MySQL 8.0 and the minor version is 18.",
                         "The database major version is MySQL 8.0 and the minor version is 26.",
-                        "The database version is PostgreSQL 13.",
-                        "The database version is PostgreSQL 14.",
+                        "The database major version is MySQL 8.0 and the minor version is 27.",
+                        "The database major version is MySQL 8.0 and the minor version is 28.",
+                        "The database major version is MySQL 8.0 and the minor version is 29.",
+                        "The database major version is MySQL 8.0 and the minor version is 30.",
+                        "The database major version is MySQL 8.0 and the minor version is 31.",
                         "The database version is SQL Server 2019 Standard.",
                         "The database version is SQL Server 2019 Enterprise.",
                         "The database version is SQL Server 2019 Express.",
@@ -2566,7 +2643,7 @@
                     "type": "array"
                 },
                 "rootPassword": {
-                    "description": "Initial root password. Use only on creation.",
+                    "description": "Initial root password. Use only on creation. You must set root passwords before you can connect to PostgreSQL instances.",
                     "type": "string"
                 },
                 "satisfiesPzs": {
@@ -2789,6 +2866,21 @@
             "description": "Database instance export context.",
             "id": "ExportContext",
             "properties": {
+                "bakExportOptions": {
+                    "description": "Options for exporting BAK files (SQL Server-only)",
+                    "properties": {
+                        "stripeCount": {
+                            "description": "Option for specifying how many stripes to use for the export. If blank, and the value of the striped field is true, the number of stripes is automatically chosen.",
+                            "format": "int32",
+                            "type": "integer"
+                        },
+                        "striped": {
+                            "description": "Whether or not the export should be striped.",
+                            "type": "boolean"
+                        }
+                    },
+                    "type": "object"
+                },
                 "csvExportOptions": {
                     "description": "Options for exporting data as CSV. `MySQL` and `PostgreSQL` instances only.",
                     "properties": {
@@ -2925,19 +3017,24 @@
                             "MYSQL_5_5",
                             "MYSQL_5_6",
                             "MYSQL_5_7",
-                            "POSTGRES_9_6",
-                            "POSTGRES_11",
                             "SQLSERVER_2017_STANDARD",
                             "SQLSERVER_2017_ENTERPRISE",
                             "SQLSERVER_2017_EXPRESS",
                             "SQLSERVER_2017_WEB",
+                            "POSTGRES_9_6",
                             "POSTGRES_10",
+                            "POSTGRES_11",
                             "POSTGRES_12",
+                            "POSTGRES_13",
+                            "POSTGRES_14",
                             "MYSQL_8_0",
                             "MYSQL_8_0_18",
                             "MYSQL_8_0_26",
-                            "POSTGRES_13",
-                            "POSTGRES_14",
+                            "MYSQL_8_0_27",
+                            "MYSQL_8_0_28",
+                            "MYSQL_8_0_29",
+                            "MYSQL_8_0_30",
+                            "MYSQL_8_0_31",
                             "SQLSERVER_2019_STANDARD",
                             "SQLSERVER_2019_ENTERPRISE",
                             "SQLSERVER_2019_EXPRESS",
@@ -2949,19 +3046,24 @@
                             "The database version is MySQL 5.5.",
                             "The database version is MySQL 5.6.",
                             "The database version is MySQL 5.7.",
-                            "The database version is PostgreSQL 9.6.",
-                            "The database version is PostgreSQL 11.",
                             "The database version is SQL Server 2017 Standard.",
                             "The database version is SQL Server 2017 Enterprise.",
                             "The database version is SQL Server 2017 Express.",
                             "The database version is SQL Server 2017 Web.",
+                            "The database version is PostgreSQL 9.6.",
                             "The database version is PostgreSQL 10.",
+                            "The database version is PostgreSQL 11.",
                             "The database version is PostgreSQL 12.",
+                            "The database version is PostgreSQL 13.",
+                            "The database version is PostgreSQL 14.",
                             "The database version is MySQL 8.",
                             "The database major version is MySQL 8.0 and the minor version is 18.",
                             "The database major version is MySQL 8.0 and the minor version is 26.",
-                            "The database version is PostgreSQL 13.",
-                            "The database version is PostgreSQL 14.",
+                            "The database major version is MySQL 8.0 and the minor version is 27.",
+                            "The database major version is MySQL 8.0 and the minor version is 28.",
+                            "The database major version is MySQL 8.0 and the minor version is 29.",
+                            "The database major version is MySQL 8.0 and the minor version is 30.",
+                            "The database major version is MySQL 8.0 and the minor version is 31.",
                             "The database version is SQL Server 2019 Standard.",
                             "The database version is SQL Server 2019 Enterprise.",
                             "The database version is SQL Server 2019 Express.",
@@ -3101,6 +3203,10 @@
                                 }
                             },
                             "type": "object"
+                        },
+                        "striped": {
+                            "description": "Whether or not the backup set being restored is striped. Applies only to Cloud SQL for SQL Server.",
+                            "type": "boolean"
                         }
                     },
                     "type": "object"
@@ -3364,7 +3470,7 @@
             "id": "IpConfiguration",
             "properties": {
                 "allocatedIpRange": {
-                    "description": "The name of the allocated ip range for the private ip CloudSQL instance. For example: \"google-managed-services-default\". If set, the instance ip will be created in the allocated range. The range name must comply with [RFC 1035](https://tools.ietf.org/html/rfc1035). Specifically, the name must be 1-63 characters long and match the regular expression `[a-z]([-a-z0-9]*[a-z0-9])?.`",
+                    "description": "The name of the allocated ip range for the private ip Cloud SQL instance. For example: \"google-managed-services-default\". If set, the instance ip will be created in the allocated range. The range name must comply with [RFC 1035](https://tools.ietf.org/html/rfc1035). Specifically, the name must be 1-63 characters long and match the regular expression `[a-z]([-a-z0-9]*[a-z0-9])?.`",
                     "type": "string"
                 },
                 "authorizedNetworks": {
@@ -3373,6 +3479,10 @@
                         "$ref": "AclEntry"
                     },
                     "type": "array"
+                },
+                "enablePrivatePathForGoogleCloudServices": {
+                    "description": "Controls connectivity to private IP instances from Google services, such as BigQuery.",
+                    "type": "boolean"
                 },
                 "ipv4Enabled": {
                     "description": "Whether the instance is assigned a public IP address or not.",
@@ -3666,7 +3776,9 @@
                         "DEFER_MAINTENANCE",
                         "CREATE_CLONE",
                         "RESCHEDULE_MAINTENANCE",
-                        "START_EXTERNAL_SYNC"
+                        "START_EXTERNAL_SYNC",
+                        "LOG_CLEANUP",
+                        "AUTO_RESTART"
                     ],
                     "enumDescriptions": [
                         "Unknown operation type.",
@@ -3703,7 +3815,9 @@
                         "",
                         "Creates clone instance.",
                         "Reschedule maintenance to another time.",
-                        "Starts external sync of a Cloud SQL EM replica to an external primary instance."
+                        "Starts external sync of a Cloud SQL EM replica to an external primary instance.",
+                        "Recovers logs from an instance's old data disk.",
+                        "Performs auto-restart of an HA-enabled Cloud SQL database for auto recovery."
                     ],
                     "type": "string"
                 },
@@ -3845,13 +3959,17 @@
                     "description": "Disallow username as a part of the password.",
                     "type": "boolean"
                 },
+                "enablePasswordPolicy": {
+                    "description": "Whether the password policy is enabled or not.",
+                    "type": "boolean"
+                },
                 "minLength": {
                     "description": "Minimum number of characters allowed.",
                     "format": "int32",
                     "type": "integer"
                 },
                 "passwordChangeInterval": {
-                    "description": "Minimum interval after which the password can be changed. This flag is only supported for PostgresSQL.",
+                    "description": "Minimum interval after which the password can be changed. This flag is only supported for PostgreSQL.",
                     "format": "google-duration",
                     "type": "string"
                 },
@@ -4001,6 +4119,20 @@
                     "description": "The name of server Instance collation.",
                     "type": "string"
                 },
+                "connectorEnforcement": {
+                    "description": "Specifies if connections must use Cloud SQL connectors. Option values include the following: `NOT_REQUIRED` (Cloud SQL instances can be connected without Cloud SQL Connectors) and `REQUIRED` (Only allow connections that use Cloud SQL Connectors) Note that using REQUIRED disables all existing authorized networks. If this field is not specified when creating a new instance, NOT_REQUIRED is used. If this field is not specified when patching or updating an existing instance, it is left unchanged in the instance.",
+                    "enum": [
+                        "CONNECTOR_ENFORCEMENT_UNSPECIFIED",
+                        "NOT_REQUIRED",
+                        "REQUIRED"
+                    ],
+                    "enumDescriptions": [
+                        "The requirement for Cloud SQL connectors is unknown.",
+                        "Do not require Cloud SQL connectors.",
+                        "Require all connections to use Cloud SQL connectors, including the Cloud SQL Auth Proxy and Cloud SQL Java, Python, and Go connectors. Note: This disables all existing authorized networks."
+                    ],
+                    "type": "string"
+                },
                 "crashSafeReplicationEnabled": {
                     "description": "Configuration specific to read replica instances. Indicates whether database flags for crash-safe replication are enabled. This property was only applicable to First Generation instances.",
                     "type": "boolean"
@@ -4035,6 +4167,10 @@
                 },
                 "databaseReplicationEnabled": {
                     "description": "Configuration specific to read replica instances. Indicates whether replication is enabled or not. WARNING: Changing this restarts the instance.",
+                    "type": "boolean"
+                },
+                "deletionProtectionEnabled": {
+                    "description": "Configuration to protect against accidental instance deletion.",
                     "type": "boolean"
                 },
                 "denyMaintenancePeriods": {
@@ -4118,6 +4254,10 @@
                     "description": "The tier (or machine type) for this instance, for example `db-custom-1-3840`. WARNING: Changing this restarts the instance.",
                     "type": "string"
                 },
+                "timeZone": {
+                    "description": "Server timezone, relevant only for Cloud SQL for SQL Server.",
+                    "type": "string"
+                },
                 "userLabels": {
                     "additionalProperties": {
                         "type": "string"
@@ -4183,7 +4323,9 @@
                         "SQLSERVER_SERVERNAME_MISMATCH",
                         "PRIMARY_ALREADY_SETUP",
                         "UNSUPPORTED_BINLOG_FORMAT",
-                        "BINLOG_RETENTION_SETTING"
+                        "BINLOG_RETENTION_SETTING",
+                        "UNSUPPORTED_STORAGE_ENGINE",
+                        "LIMITED_SUPPORT_TABLES"
                     ],
                     "enumDescriptions": [
                         "",
@@ -4211,7 +4353,9 @@
                         "SQL Server @@SERVERNAME does not match actual host name",
                         "The primary instance has been setup and will fail the setup.",
                         "The primary instance has unsupported binary log format.",
-                        "The primary instance's binary log retention setting."
+                        "The primary instance's binary log retention setting.",
+                        "The primary instance has tables with unsupported storage engine.",
+                        "Source has tables with limited support eg: PostgreSQL tables without primary keys"
                     ],
                     "type": "string"
                 }
@@ -4341,7 +4485,7 @@
             "type": "object"
         },
         "SqlScheduledMaintenance": {
-            "description": "Any scheduled maintenancce for this instance.",
+            "description": "Any scheduled maintenance for this instance.",
             "id": "SqlScheduledMaintenance",
             "properties": {
                 "canDefer": {
@@ -4374,6 +4518,16 @@
                 },
                 "kind": {
                     "description": "This is always sql#sqlServerAuditConfig",
+                    "type": "string"
+                },
+                "retentionInterval": {
+                    "description": "How long to keep generated audit files.",
+                    "format": "google-duration",
+                    "type": "string"
+                },
+                "uploadInterval": {
+                    "description": "How often to upload generated audit files.",
+                    "format": "google-duration",
                     "type": "string"
                 }
             },
@@ -4624,6 +4778,22 @@
             "description": "A Cloud SQL user resource.",
             "id": "User",
             "properties": {
+                "dualPasswordType": {
+                    "description": "Dual password status for the user.",
+                    "enum": [
+                        "DUAL_PASSWORD_TYPE_UNSPECIFIED",
+                        "NO_MODIFY_DUAL_PASSWORD",
+                        "NO_DUAL_PASSWORD",
+                        "DUAL_PASSWORD"
+                    ],
+                    "enumDescriptions": [
+                        "The default value.",
+                        "Do not update the user's dual password status.",
+                        "No dual password usable for connecting using this user.",
+                        "Dual password usable for connecting using this user."
+                    ],
+                    "type": "string"
+                },
                 "etag": {
                     "description": "This field is deprecated and will be removed from a future version of the API.",
                     "type": "string"
@@ -4687,6 +4857,10 @@
                 },
                 "enableFailedAttemptsCheck": {
                     "description": "If true, failed login attempts check will be enabled.",
+                    "type": "boolean"
+                },
+                "enablePasswordVerification": {
+                    "description": "If true, the user must specify the current password before changing the password. This flag is supported only for MySQL.",
                     "type": "boolean"
                 },
                 "passwordExpirationDuration": {

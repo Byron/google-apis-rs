@@ -197,7 +197,7 @@
             }
         }
     },
-    "revision": "20220227",
+    "revision": "20230106",
     "rootUrl": "https://servicecontrol.googleapis.com/",
     "schemas": {
         "AllocateInfo": {
@@ -331,6 +331,10 @@
                     "description": "The number of items returned from a List or Query API method, if applicable.",
                     "format": "int64",
                     "type": "string"
+                },
+                "policyViolationInfo": {
+                    "$ref": "PolicyViolationInfo",
+                    "description": "Indicates the policy violations for this request. If the request is denied by the policy, violation information will be logged here."
                 },
                 "request": {
                     "additionalProperties": {
@@ -527,7 +531,8 @@
                         "LOAS_PROJECT_LOOKUP_UNAVAILABLE",
                         "CLOUD_RESOURCE_MANAGER_BACKEND_UNAVAILABLE",
                         "SECURITY_POLICY_BACKEND_UNAVAILABLE",
-                        "LOCATION_POLICY_BACKEND_UNAVAILABLE"
+                        "LOCATION_POLICY_BACKEND_UNAVAILABLE",
+                        "INJECTED_ERROR"
                     ],
                     "enumDescriptions": [
                         "This is never used in `CheckResponse`.",
@@ -565,7 +570,8 @@
                         "The Spanner for looking up LOAS project is unavailable.",
                         "Cloud Resource Manager backend server is unavailable.",
                         "NOTE: for customers in the scope of Beta/GA of https://cloud.google.com/vpc-service-controls, this error is no longer returned. If the security backend is unavailable, rpc UNAVAILABLE status will be returned instead. It should be ignored and should not be used to reject client requests.",
-                        "Backend server for evaluating location policy is unavailable."
+                        "Backend server for evaluating location policy is unavailable.",
+                        "Part of the project of fault injection: go/chemist-slo-validation. To distinguish between artificially injected errors and organic ones, this value will be exported for the per_service_check_error_count streamz. http://google3/apiserving/servicecontrol/server/controller_service.cc;l=196 Rpcinjectz2 works by injecting errors early in the rpc life cycle, before any of the chemist business logic runs."
                     ],
                     "type": "string"
                 },
@@ -1165,17 +1171,6 @@
                     "format": "google-datetime",
                     "type": "string"
                 },
-                "extensions": {
-                    "description": "Unimplemented.",
-                    "items": {
-                        "additionalProperties": {
-                            "description": "Properties of the object. Contains field @type with type URL.",
-                            "type": "any"
-                        },
-                        "type": "object"
-                    },
-                    "type": "array"
-                },
                 "importance": {
                     "description": "DO NOT USE. This is an experimental field.",
                     "enum": [
@@ -1252,6 +1247,39 @@
             },
             "type": "object"
         },
+        "OrgPolicyViolationInfo": {
+            "description": "Represents OrgPolicy Violation information.",
+            "id": "OrgPolicyViolationInfo",
+            "properties": {
+                "payload": {
+                    "additionalProperties": {
+                        "description": "Properties of the object.",
+                        "type": "any"
+                    },
+                    "description": "Optional. Resource payload that is currently in scope and is subjected to orgpolicy conditions. This payload may be the subset of the actual Resource that may come in the request. This payload should not contain any core content.",
+                    "type": "object"
+                },
+                "resourceTags": {
+                    "additionalProperties": {
+                        "type": "string"
+                    },
+                    "description": "Optional. Tags referenced on the resource at the time of evaluation. These also include the federated tags, if they are supplied in the CheckOrgPolicy or CheckCustomConstraints Requests. Optional field as of now. These tags are the Cloud tags that are available on the resource during the policy evaluation and will be available as part of the OrgPolicy check response for logging purposes.",
+                    "type": "object"
+                },
+                "resourceType": {
+                    "description": "Optional. Resource type that the orgpolicy is checked against. Example: compute.googleapis.com/Instance, store.googleapis.com/bucket",
+                    "type": "string"
+                },
+                "violationInfo": {
+                    "description": "Optional. Policy violations",
+                    "items": {
+                        "$ref": "ViolationInfo"
+                    },
+                    "type": "array"
+                }
+            },
+            "type": "object"
+        },
         "Peer": {
             "description": "This message defines attributes for a node that handles a network request. The node can be either a service or an application that sends, forwards, or receives the request. Service peers should fill in `principal` and `labels` as appropriate.",
             "id": "Peer",
@@ -1273,12 +1301,23 @@
                     "type": "string"
                 },
                 "principal": {
-                    "description": "The identity of this peer. Similar to `Request.auth.principal`, but relative to the peer instead of the request. For example, the idenity associated with a load balancer that forwared the request.",
+                    "description": "The identity of this peer. Similar to `Request.auth.principal`, but relative to the peer instead of the request. For example, the identity associated with a load balancer that forwarded the request.",
                     "type": "string"
                 },
                 "regionCode": {
                     "description": "The CLDR country/region code associated with the above IP address. If the IP address is private, the `region_code` should reflect the physical location where this peer is running.",
                     "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "PolicyViolationInfo": {
+            "description": "Information related to policy violations for this request.",
+            "id": "PolicyViolationInfo",
+            "properties": {
+                "orgPolicyViolationInfo": {
+                    "$ref": "OrgPolicyViolationInfo",
+                    "description": "Indicates the orgpolicy violations for this resource."
                 }
             },
             "type": "object"
@@ -1404,7 +1443,6 @@
                         "NORMAL",
                         "BEST_EFFORT",
                         "CHECK_ONLY",
-                        "QUERY_ONLY",
                         "ADJUST_ONLY"
                     ],
                     "enumDescriptions": [
@@ -1412,7 +1450,6 @@
                         "For AllocateQuota request, allocates quota for the amount specified in the service configuration or specified using the quota metrics. If the amount is higher than the available quota, allocation error will be returned and no quota will be allocated. If multiple quotas are part of the request, and one fails, none of the quotas are allocated or released.",
                         "The operation allocates quota for the amount specified in the service configuration or specified using the quota metrics. If the amount is higher than the available quota, request does not fail but all available quota will be allocated. For rate quota, BEST_EFFORT will continue to deduct from other groups even if one does not have enough quota. For allocation, it will find the minimum available amount across all groups and deduct that amount from all the affected groups.",
                         "For AllocateQuota request, only checks if there is enough quota available and does not change the available quota. No lock is placed on the available quota either.",
-                        "Deprecated. Please use QueryLimits API to query quota limits.",
                         "The operation allocates quota for the amount specified in the service configuration or specified using the quota metrics. If the requested amount is higher than the available quota, request does not fail and remaining quota would become negative (going over the limit). Not supported for Rate Quota."
                     ],
                     "type": "string"
@@ -1429,14 +1466,12 @@
                     "enum": [
                         "ACQUIRE",
                         "ACQUIRE_BEST_EFFORT",
-                        "CHECK",
-                        "RELEASE"
+                        "CHECK"
                     ],
                     "enumDescriptions": [
                         "Decreases available quota by the cost specified for the operation. If cost is higher than available quota, operation fails and returns error.",
                         "Decreases available quota by the cost specified for the operation. If cost is higher than available quota, operation does not fail and available quota goes down to zero but it returns error.",
-                        "Does not change any available quota. Only checks if there is enough quota. No lock is placed on the checked tokens neither.",
-                        "DEPRECATED: Increases available quota by the operation cost specified for the operation."
+                        "Does not change any available quota. Only checks if there is enough quota. No lock is placed on the checked tokens neither."
                     ],
                     "type": "string"
                 }
@@ -1563,7 +1598,7 @@
             "id": "RequestMetadata",
             "properties": {
                 "callerIp": {
-                    "description": "The IP address of the caller. For caller from internet, this will be public IPv4 or IPv6 address. For caller from a Compute Engine VM with external IP address, this will be the VM's external IP address. For caller from a Compute Engine VM without external IP address, if the VM is in the same organization (or project) as the accessed resource, `caller_ip` will be the VM's internal IPv4 address, otherwise the `caller_ip` will be redacted to \"gce-internal-ip\". See https://cloud.google.com/compute/docs/vpc/ for more information.",
+                    "description": "The IP address of the caller. For a caller from the internet, this will be the public IPv4 or IPv6 address. For calls made from inside Google's internal production network from one GCP service to another, `caller_ip` will be redacted to \"private\". For a caller from a Compute Engine VM with a external IP address, `caller_ip` will be the VM's external IP address. For a caller from a Compute Engine VM without a external IP address, if the VM is in the same organization (or project) as the accessed resource, `caller_ip` will be the VM's internal IPv4 address, otherwise `caller_ip` will be redacted to \"gce-internal-ip\". See https://cloud.google.com/compute/docs/vpc/ for more information.",
                     "type": "string"
                 },
                 "callerNetwork": {
@@ -1571,7 +1606,7 @@
                     "type": "string"
                 },
                 "callerSuppliedUserAgent": {
-                    "description": "The user agent of the caller. This information is not authenticated and should be treated accordingly. For example: + `google-api-python-client/1.4.0`: The request was made by the Google API client for Python. + `Cloud SDK Command Line Tool apitools-client/1.0 gcloud/0.9.62`: The request was made by the Google Cloud SDK CLI (gcloud). + `AppEngine-Google; (+http://code.google.com/appengine; appid: s~my-project`: The request was made from the `my-project` App Engine app. NOLINT",
+                    "description": "The user agent of the caller. This information is not authenticated and should be treated accordingly. For example: + `google-api-python-client/1.4.0`: The request was made by the Google API client for Python. + `Cloud SDK Command Line Tool apitools-client/1.0 gcloud/0.9.62`: The request was made by the Google Cloud SDK CLI (gcloud). + `AppEngine-Google; (+http://code.google.com/appengine; appid: s~my-project`: The request was made from the `my-project` App Engine app.",
                     "type": "string"
                 },
                 "destinationAttributes": {
@@ -1653,6 +1688,10 @@
             "description": "Describes a resource associated with this operation.",
             "id": "ResourceInfo",
             "properties": {
+                "permission": {
+                    "description": "The resource permission required for this request.",
+                    "type": "string"
+                },
                 "resourceContainer": {
                     "description": "The identifier of the parent of this resource instance. Must be in one of the following formats: - `projects/` - `folders/` - `organizations/`",
                     "type": "string"
@@ -2053,6 +2092,41 @@
                 "line": {
                     "description": "Optional. Line within the source file. 1-based; 0 indicates no line number available.",
                     "format": "int64",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "ViolationInfo": {
+            "description": "Provides information about the Policy violation info for this request.",
+            "id": "ViolationInfo",
+            "properties": {
+                "checkedValue": {
+                    "description": "Optional. Value that is being checked for the policy. This could be in encrypted form (if pii sensitive). This field will only be emitted in LIST_POLICY types",
+                    "type": "string"
+                },
+                "constraint": {
+                    "description": "Optional. Constraint name",
+                    "type": "string"
+                },
+                "errorMessage": {
+                    "description": "Optional. Error message that policy is indicating.",
+                    "type": "string"
+                },
+                "policyType": {
+                    "description": "Optional. Indicates the type of the policy.",
+                    "enum": [
+                        "POLICY_TYPE_UNSPECIFIED",
+                        "BOOLEAN_CONSTRAINT",
+                        "LIST_CONSTRAINT",
+                        "CUSTOM_CONSTRAINT"
+                    ],
+                    "enumDescriptions": [
+                        "Default value. This value should not be used.",
+                        "Indicates boolean policy constraint",
+                        "Indicates list policy constraint",
+                        "Indicates custom policy constraint"
+                    ],
                     "type": "string"
                 }
             },

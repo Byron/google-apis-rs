@@ -684,7 +684,7 @@
             }
         }
     },
-    "revision": "20220301",
+    "revision": "20230121",
     "rootUrl": "https://osconfig.googleapis.com/",
     "schemas": {
         "CVSSv3": {
@@ -862,7 +862,7 @@
             "type": "object"
         },
         "Empty": {
-            "description": "A generic empty message that you can re-use to avoid defining duplicated empty messages in your APIs. A typical example is to use it as the request or the response type of an API method. For instance: service Foo { rpc Bar(google.protobuf.Empty) returns (google.protobuf.Empty); } The JSON representation for `Empty` is empty JSON object `{}`.",
+            "description": "A generic empty message that you can re-use to avoid defining duplicated empty messages in your APIs. A typical example is to use it as the request or the response type of an API method. For instance: service Foo { rpc Bar(google.protobuf.Empty) returns (google.protobuf.Empty); }",
             "id": "Empty",
             "properties": {},
             "type": "object"
@@ -2100,7 +2100,7 @@
                     "type": "string"
                 },
                 "script": {
-                    "description": "An inline script. The size of the script is limited to 1024 characters.",
+                    "description": "An inline script. The size of the script is limited to 32KiB.",
                     "type": "string"
                 }
             },
@@ -2169,7 +2169,7 @@
             "id": "OSPolicyResourceFileResource",
             "properties": {
                 "content": {
-                    "description": "A a file with this content. The size of the content is limited to 1024 characters.",
+                    "description": "A a file with this content. The size of the content is limited to 32KiB.",
                     "type": "string"
                 },
                 "file": {

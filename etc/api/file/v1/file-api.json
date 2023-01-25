@@ -144,7 +144,7 @@
                             ],
                             "parameters": {
                                 "filter": {
-                                    "description": "A filter to narrow down results to a preferred subset. The filtering language accepts strings like \"displayName=tokyo\", and is documented in more detail in [AIP-160](https://google.aip.dev/160).",
+                                    "description": "A filter to narrow down results to a preferred subset. The filtering language accepts strings like `\"displayName=tokyo\"`, and is documented in more detail in [AIP-160](https://google.aip.dev/160).",
                                     "location": "query",
                                     "type": "string"
                                 },
@@ -199,7 +199,7 @@
                                             "type": "string"
                                         },
                                         "parent": {
-                                            "description": "Required. The backup's project and location, in the format `projects/{project_number}/locations/{location}`. In Cloud Filestore, backup locations map to GCP regions, for example **us-west1**.",
+                                            "description": "Required. The backup's project and location, in the format `projects/{project_number}/locations/{location}`. In Filestore, backup locations map to Google Cloud regions, for example **us-west1**.",
                                             "location": "path",
                                             "pattern": "^projects/[^/]+/locations/[^/]+$",
                                             "required": true,
@@ -298,7 +298,7 @@
                                             "type": "string"
                                         },
                                         "parent": {
-                                            "description": "Required. The project and location for which to retrieve backup information, in the format `projects/{project_number}/locations/{location}`. In Cloud Filestore, backup locations map to GCP regions, for example **us-west1**. To retrieve backup information for all locations, use \"-\" for the `{location}` value.",
+                                            "description": "Required. The project and location for which to retrieve backup information, in the format `projects/{project_number}/locations/{location}`. In Filestore, backup locations map to Google Cloud regions, for example **us-west1**. To retrieve backup information for all locations, use \"-\" for the `{location}` value.",
                                             "location": "path",
                                             "pattern": "^projects/[^/]+/locations/[^/]+$",
                                             "required": true,
@@ -366,7 +366,7 @@
                                             "type": "string"
                                         },
                                         "parent": {
-                                            "description": "Required. The instance's project and location, in the format `projects/{project_id}/locations/{location}`. In Cloud Filestore, locations map to GCP zones, for example **us-west1-b**.",
+                                            "description": "Required. The instance's project and location, in the format `projects/{project_id}/locations/{location}`. In Filestore, locations map to Google Cloud zones, for example **us-west1-b**.",
                                             "location": "path",
                                             "pattern": "^projects/[^/]+/locations/[^/]+$",
                                             "required": true,
@@ -470,7 +470,7 @@
                                             "type": "string"
                                         },
                                         "parent": {
-                                            "description": "Required. The project and location for which to retrieve instance information, in the format `projects/{project_id}/locations/{location}`. In Cloud Filestore, locations map to GCP zones, for example **us-west1-b**. To retrieve instance information for all locations, use \"-\" for the `{location}` value.",
+                                            "description": "Required. The project and location for which to retrieve instance information, in the format `projects/{project_id}/locations/{location}`. In Cloud Filestore, locations map to Google Cloud zones, for example **us-west1-b**. To retrieve instance information for all locations, use \"-\" for the `{location}` value.",
                                             "location": "path",
                                             "pattern": "^projects/[^/]+/locations/[^/]+$",
                                             "required": true,
@@ -846,11 +846,11 @@
             }
         }
     },
-    "revision": "20220214",
+    "revision": "20230103",
     "rootUrl": "https://file.googleapis.com/",
     "schemas": {
         "Backup": {
-            "description": "A Cloud Filestore backup.",
+            "description": "A Filestore backup.",
             "id": "Backup",
             "properties": {
                 "capacityGb": {
@@ -893,15 +893,15 @@
                     "type": "boolean"
                 },
                 "sourceFileShare": {
-                    "description": "Name of the file share in the source Cloud Filestore instance that the backup is created from.",
+                    "description": "Name of the file share in the source Filestore instance that the backup is created from.",
                     "type": "string"
                 },
                 "sourceInstance": {
-                    "description": "The resource name of the source Cloud Filestore instance, in the format `projects/{project_number}/locations/{location_id}/instances/{instance_id}`, used to create this backup.",
+                    "description": "The resource name of the source Filestore instance, in the format `projects/{project_number}/locations/{location_id}/instances/{instance_id}`, used to create this backup.",
                     "type": "string"
                 },
                 "sourceInstanceTier": {
-                    "description": "Output only. The service tier of the source Cloud Filestore instance that this backup is created from.",
+                    "description": "Output only. The service tier of the source Filestore instance that this backup is created from.",
                     "enum": [
                         "TIER_UNSPECIFIED",
                         "STANDARD",
@@ -913,8 +913,8 @@
                     ],
                     "enumDescriptions": [
                         "Not set.",
-                        "STANDARD tier.",
-                        "PREMIUM tier.",
+                        "STANDARD tier. BASIC_HDD is the preferred term for this tier.",
+                        "PREMIUM tier. BASIC_SSD is the preferred term for this tier.",
                         "BASIC instances offer a maximum capacity of 63.9 TB. BASIC_HDD is an alias for STANDARD Tier, offering economical performance backed by HDD.",
                         "BASIC instances offer a maximum capacity of 63.9 TB. BASIC_SSD is an alias for PREMIUM Tier, and offers improved performance backed by SSD.",
                         "HIGH_SCALE instances offer expanded capacity and performance scaling capabilities.",
@@ -974,7 +974,7 @@
             "type": "object"
         },
         "Date": {
-            "description": "Represents a whole or partial calendar date, such as a birthday. The time of day and time zone are either specified elsewhere or are insignificant. The date is relative to the Gregorian Calendar. This can represent one of the following: * A full date, with non-zero year, month, and day values * A month and day, with a zero year (e.g., an anniversary) * A year on its own, with a zero month and a zero day * A year and month, with a zero day (e.g., a credit card expiration date) Related types: * google.type.TimeOfDay * google.type.DateTime * google.protobuf.Timestamp",
+            "description": "Represents a whole or partial calendar date, such as a birthday. The time of day and time zone are either specified elsewhere or are insignificant. The date is relative to the Gregorian Calendar. This can represent one of the following: * A full date, with non-zero year, month, and day values. * A month and day, with a zero year (for example, an anniversary). * A year on its own, with a zero month and a zero day. * A year and month, with a zero day (for example, a credit card expiration date). Related types: * google.type.TimeOfDay * google.type.DateTime * google.protobuf.Timestamp",
             "id": "Date",
             "properties": {
                 "day": {
@@ -1015,7 +1015,7 @@
             "type": "object"
         },
         "Empty": {
-            "description": "A generic empty message that you can re-use to avoid defining duplicated empty messages in your APIs. A typical example is to use it as the request or the response type of an API method. For instance: service Foo { rpc Bar(google.protobuf.Empty) returns (google.protobuf.Empty); } The JSON representation for `Empty` is empty JSON object `{}`.",
+            "description": "A generic empty message that you can re-use to avoid defining duplicated empty messages in your APIs. A typical example is to use it as the request or the response type of an API method. For instance: service Foo { rpc Bar(google.protobuf.Empty) returns (google.protobuf.Empty); }",
             "id": "Empty",
             "properties": {},
             "type": "object"
@@ -1025,7 +1025,7 @@
             "id": "FileShareConfig",
             "properties": {
                 "capacityGb": {
-                    "description": "File share capacity in gigabytes (GB). Cloud Filestore defines 1 GB as 1024^3 bytes.",
+                    "description": "File share capacity in gigabytes (GB). Filestore defines 1 GB as 1024^3 bytes.",
                     "format": "int64",
                     "type": "string"
                 },
@@ -1061,7 +1061,7 @@
                     "type": "string"
                 },
                 "instanceType": {
-                    "description": "Optional. The instance_type of this instance of format: projects/{project_id}/locations/{location_id}/instanceTypes/{instance_type_id}. Instance Type represents a high-level tier or SKU of the service that this instance belong to. When enabled(eg: Maintenance Rollout), Rollout uses 'instance_type' along with 'software_versions' to determine whether instance needs an update or not.",
+                    "description": "Optional. The instance_type of this instance of format: projects/{project_number}/locations/{location_id}/instanceTypes/{instance_type_id}. Instance Type represents a high-level tier or SKU of the service that this instance belong to. When enabled(eg: Maintenance Rollout), Rollout uses 'instance_type' along with 'software_versions' to determine whether instance needs an update or not.",
                     "type": "string"
                 },
                 "labels": {
@@ -1075,7 +1075,7 @@
                     "additionalProperties": {
                         "type": "string"
                     },
-                    "description": "Deprecated. The MaintenancePolicies that have been attached to the instance. The key must be of the type name of the oneof policy name defined in MaintenancePolicy, and the referenced policy must define the same policy type. For complete details of MaintenancePolicy, please refer to go/cloud-saas-mw-ug.",
+                    "description": "Optional. Deprecated. The MaintenancePolicies that have been attached to the instance. The key must be of the type name of the oneof policy name defined in MaintenancePolicy, and the referenced policy must define the same policy type. For complete details of MaintenancePolicy, please refer to go/cloud-saas-mw-ug.",
                     "type": "object"
                 },
                 "maintenanceSchedules": {
@@ -1090,14 +1090,14 @@
                     "description": "Optional. The MaintenanceSettings associated with instance."
                 },
                 "name": {
-                    "description": "Unique name of the resource. It uses the form: `projects/{project_id|project_number}/locations/{location_id}/instances/{instance_id}` Note: Either project_id or project_number can be used, but keep it consistent with other APIs (e.g. RescheduleUpdate)",
+                    "description": "Unique name of the resource. It uses the form: `projects/{project_number}/locations/{location_id}/instances/{instance_id}` Note: This name is passed, stored and logged across the rollout system. So use of consumer project_id or any other consumer PII in the name is strongly discouraged for wipeout (go/wipeout) compliance. See go/elysium/project_ids#storage-guidance for more details.",
                     "type": "string"
                 },
                 "notificationParameters": {
                     "additionalProperties": {
-                        "type": "string"
+                        "$ref": "GoogleCloudSaasacceleratorManagementProvidersV1NotificationParameter"
                     },
-                    "description": "Optional. notification_parameters are information that service producers may like to include that is not relevant to Rollout. This parameter will only be passed to Gamma and Cloud Logging for notification/logging purpose.",
+                    "description": "Optional. notification_parameter are information that service producers may like to include that is not relevant to Rollout. This parameter will only be passed to Gamma and Cloud Logging for notification/logging purpose.",
                     "type": "object"
                 },
                 "producerMetadata": {
@@ -1215,7 +1215,7 @@
                     "additionalProperties": {
                         "$ref": "MaintenancePolicy"
                     },
-                    "description": "Optional. The MaintenancePolicies that have been attached to the instance. The key must be of the type name of the oneof policy name defined in MaintenancePolicy, and the embedded policy must define the same policy type. For complete details of MaintenancePolicy, please refer to go/cloud-saas-mw-ug. If only the name is needed (like in the deprecated Instance.maintenance_policy_names field) then only populate MaintenancePolicy.name.",
+                    "description": "Optional. The MaintenancePolicies that have been attached to the instance. The key must be of the type name of the oneof policy name defined in MaintenancePolicy, and the embedded policy must define the same policy type. For complete details of MaintenancePolicy, please refer to go/cloud-saas-mw-ug. If only the name is needed, then only populate MaintenancePolicy.name.",
                     "type": "object"
                 }
             },
@@ -1236,6 +1236,20 @@
                 "perSliEligibility": {
                     "$ref": "GoogleCloudSaasacceleratorManagementProvidersV1PerSliSloEligibility",
                     "description": "If present, this will override eligibility for the node coming from instance or exclusions for specified SLIs."
+                }
+            },
+            "type": "object"
+        },
+        "GoogleCloudSaasacceleratorManagementProvidersV1NotificationParameter": {
+            "description": "Contains notification related data.",
+            "id": "GoogleCloudSaasacceleratorManagementProvidersV1NotificationParameter",
+            "properties": {
+                "values": {
+                    "description": "Optional. Array of string values. e.g. instance's replica information.",
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": "array"
                 }
             },
             "type": "object"
@@ -1307,7 +1321,7 @@
             "type": "object"
         },
         "Instance": {
-            "description": "A Cloud Filestore instance.",
+            "description": "A Filestore instance.",
             "id": "Instance",
             "properties": {
                 "createTime": {
@@ -1369,7 +1383,9 @@
                         "DELETING",
                         "ERROR",
                         "RESTORING",
-                        "SUSPENDED"
+                        "SUSPENDED",
+                        "SUSPENDING",
+                        "RESUMING"
                     ],
                     "enumDescriptions": [
                         "State not set.",
@@ -1379,7 +1395,9 @@
                         "The instance is shutting down.",
                         "The instance is experiencing an issue and might be unusable. You can get further details from the `statusMessage` field of the `Instance` resource.",
                         "The instance is restoring a backup to an existing file share and may be unusable during this time.",
-                        "The instance is suspended. You can get further details from the `suspension_reasons` field of the `Instance` resource."
+                        "The instance is suspended. You can get further details from the `suspension_reasons` field of the `Instance` resource.",
+                        "The instance is in the process of becoming suspended.",
+                        "The instance is in the process of becoming active."
                     ],
                     "readOnly": true,
                     "type": "string"
@@ -1390,7 +1408,7 @@
                     "type": "string"
                 },
                 "suspensionReasons": {
-                    "description": "Output only. field indicates all the reasons the instance is in \"SUSPENDED\" state.",
+                    "description": "Output only. Field indicates all the reasons the instance is in \"SUSPENDED\" state.",
                     "items": {
                         "enum": [
                             "SUSPENSION_REASON_UNSPECIFIED",
@@ -1418,8 +1436,8 @@
                     ],
                     "enumDescriptions": [
                         "Not set.",
-                        "STANDARD tier.",
-                        "PREMIUM tier.",
+                        "STANDARD tier. BASIC_HDD is the preferred term for this tier.",
+                        "PREMIUM tier. BASIC_SSD is the preferred term for this tier.",
                         "BASIC instances offer a maximum capacity of 63.9 TB. BASIC_HDD is an alias for STANDARD Tier, offering economical performance backed by HDD.",
                         "BASIC instances offer a maximum capacity of 63.9 TB. BASIC_SSD is an alias for PREMIUM Tier, and offers improved performance backed by SSD.",
                         "HIGH_SCALE instances offer expanded capacity and performance scaling capabilities.",
@@ -1569,7 +1587,7 @@
             "type": "object"
         },
         "MaintenancePolicy": {
-            "description": "Defines policies to service maintenance events.",
+            "description": "LINT.IfChange Defines policies to service maintenance events.",
             "id": "MaintenancePolicy",
             "properties": {
                 "createTime": {
@@ -1679,7 +1697,7 @@
                     "type": "string"
                 },
                 "reservedIpRange": {
-                    "description": "Optional, reserved_ip_range can have one of the following two types of values. * CIDR range value when using DIRECT_PEERING connect mode. * [Allocated IP address range](https://cloud.google.com/compute/docs/ip-addresses/reserve-static-internal-ip-address) when using PRIVATE_SERVICE_ACCESS connect mode. When the name of an allocated IP address range is specified, it must be one of the ranges associated with the private service access connection. When specified as a direct CIDR value, it must be a /29 CIDR block for Basic tier or a /24 CIDR block for High Scale or Enterprise tier in one of the [internal IP address ranges](https://www.arin.net/reference/research/statistics/address_filters/) that identifies the range of IP addresses reserved for this instance. For example, 10.0.0.0/29 or 192.168.0.0/24. The range you specify can't overlap with either existing subnets or assigned IP address ranges for other Cloud Filestore instances in the selected VPC network.",
+                    "description": "Optional, reserved_ip_range can have one of the following two types of values. * CIDR range value when using DIRECT_PEERING connect mode. * [Allocated IP address range](https://cloud.google.com/compute/docs/ip-addresses/reserve-static-internal-ip-address) when using PRIVATE_SERVICE_ACCESS connect mode. When the name of an allocated IP address range is specified, it must be one of the ranges associated with the private service access connection. When specified as a direct CIDR value, it must be a /29 CIDR block for Basic tier, a /24 CIDR block for High Scale tier, or a /26 CIDR block for Enterprise tier in one of the [internal IP address ranges](https://www.arin.net/reference/research/statistics/address_filters/) that identifies the range of IP addresses reserved for this instance. For example, 10.0.0.0/29, 192.168.0.0/24 or 192.168.0.0/26, respectively. The range you specify can't overlap with either existing subnets or assigned IP address ranges for other Filestore instances in the selected VPC network.",
                     "type": "string"
                 }
             },
@@ -1821,7 +1839,7 @@
             "id": "RestoreInstanceRequest",
             "properties": {
                 "fileShare": {
-                    "description": "Required. Name of the file share in the Cloud Filestore instance that the backup is being restored to.",
+                    "description": "Required. Name of the file share in the Filestore instance that the backup is being restored to.",
                     "type": "string"
                 },
                 "sourceBackup": {
@@ -1986,12 +2004,18 @@
                     "enum": [
                         "UPDATE_CHANNEL_UNSPECIFIED",
                         "EARLIER",
-                        "LATER"
+                        "LATER",
+                        "WEEK1",
+                        "WEEK2",
+                        "WEEK5"
                     ],
                     "enumDescriptions": [
                         "Unspecified channel.",
                         "Early channel within a customer project.",
-                        "Later channel within a customer project."
+                        "Later channel within a customer project.",
+                        "! ! The follow channels can ONLY be used if you adopt the new MW system! ! ! NOTE: all WEEK channels are assumed to be under a weekly window. ! There is currently no dedicated channel definitions for Daily windows. ! If you use Daily window, the system will assume a 1d (24Hours) advanced ! notification period b/w EARLY and LATER. ! We may consider support more flexible daily channel specifications in ! the future. WEEK1 == EARLIER with minimum 7d advanced notification. {7d, 14d} The system will treat them equally and will use WEEK1 whenever it can. New customers are encouraged to use this channel annotation.",
+                        "WEEK2 == LATER with minimum 14d advanced notification {14d, 21d}.",
+                        "WEEK5 == 40d support. minimum 35d advanced notification {35d, 42d}."
                     ],
                     "type": "string"
                 },

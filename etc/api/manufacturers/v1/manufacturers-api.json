@@ -15,6 +15,7 @@
     "description": "Public API for managing Manufacturer Center related data.",
     "discoveryVersion": "v1",
     "documentationLink": "https://developers.google.com/manufacturers/",
+    "fullyEncodeReservedExpansion": true,
     "icons": {
         "x16": "http://www.google.com/images/icons/product/search-16.gif",
         "x32": "http://www.google.com/images/icons/product/search-32.gif"
@@ -287,7 +288,7 @@
             }
         }
     },
-    "revision": "20220303",
+    "revision": "20230123",
     "rootUrl": "https://manufacturers.googleapis.com/",
     "schemas": {
         "Attributes": {
@@ -355,6 +356,10 @@
                     "description": "The target gender of the product. For more information, see https://support.google.com/manufacturers/answer/6124116#gender.",
                     "type": "string"
                 },
+                "grocery": {
+                    "$ref": "Grocery",
+                    "description": "Grocery Attributes. See more at https://support.google.com/manufacturers/answer/12098458#grocery."
+                },
                 "gtin": {
                     "description": "The Global Trade Item Number (GTIN) of the product. For more information, see https://support.google.com/manufacturers/answer/6124116#gtin.",
                     "items": {
@@ -384,6 +389,10 @@
                 "mpn": {
                     "description": "The Manufacturer Part Number (MPN) of the product. For more information, see https://support.google.com/manufacturers/answer/6124116#mpn.",
                     "type": "string"
+                },
+                "nutrition": {
+                    "$ref": "Nutrition",
+                    "description": "Nutrition Attributes. See more at https://support.google.com/manufacturers/answer/12098458#food-servings."
                 },
                 "pattern": {
                     "description": "The pattern of the product. For more information, see https://support.google.com/manufacturers/answer/6124116#pattern.",
@@ -538,7 +547,7 @@
             "type": "object"
         },
         "Empty": {
-            "description": "A generic empty message that you can re-use to avoid defining duplicated empty messages in your APIs. A typical example is to use it as the request or the response type of an API method. For instance: service Foo { rpc Bar(google.protobuf.Empty) returns (google.protobuf.Empty); } The JSON representation for `Empty` is empty JSON object `{}`.",
+            "description": "A generic empty message that you can re-use to avoid defining duplicated empty messages in your APIs. A typical example is to use it as the request or the response type of an API method. For instance: service Foo { rpc Bar(google.protobuf.Empty) returns (google.protobuf.Empty); }",
             "id": "Empty",
             "properties": {},
             "type": "object"
@@ -557,6 +566,71 @@
                 },
                 "text": {
                     "description": "A detailed description of the feature.",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "FloatUnit": {
+            "description": "Combination of float amount and unit.",
+            "id": "FloatUnit",
+            "properties": {
+                "amount": {
+                    "description": "amount.",
+                    "format": "double",
+                    "type": "number"
+                },
+                "unit": {
+                    "description": "unit.",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "Grocery": {
+            "id": "Grocery",
+            "properties": {
+                "activeIngredients": {
+                    "description": "Active ingredients.",
+                    "type": "string"
+                },
+                "alcoholByVolume": {
+                    "description": "Alcohol by volume.",
+                    "format": "double",
+                    "type": "number"
+                },
+                "allergens": {
+                    "description": "Allergens.",
+                    "type": "string"
+                },
+                "derivedNutritionClaim": {
+                    "description": "Derived nutrition claim.",
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": "array"
+                },
+                "directions": {
+                    "description": "Directions.",
+                    "type": "string"
+                },
+                "indications": {
+                    "description": "Indications.",
+                    "type": "string"
+                },
+                "ingredients": {
+                    "description": "Ingredients.",
+                    "type": "string"
+                },
+                "nutritionClaim": {
+                    "description": "Nutrition claim.",
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": "array"
+                },
+                "storageInstructions": {
+                    "description": "Storage instructions.",
                     "type": "string"
                 }
             },
@@ -700,6 +774,203 @@
             },
             "type": "object"
         },
+        "Nutrition": {
+            "id": "Nutrition",
+            "properties": {
+                "addedSugars": {
+                    "$ref": "FloatUnit",
+                    "description": "Added sugars."
+                },
+                "addedSugarsDailyPercentage": {
+                    "description": "Added sugars daily percentage.",
+                    "format": "double",
+                    "type": "number"
+                },
+                "calcium": {
+                    "$ref": "FloatUnit",
+                    "description": "Calcium."
+                },
+                "calciumDailyPercentage": {
+                    "description": "Calcium daily percentage.",
+                    "format": "double",
+                    "type": "number"
+                },
+                "cholesterol": {
+                    "$ref": "FloatUnit",
+                    "description": "Cholesterol."
+                },
+                "cholesterolDailyPercentage": {
+                    "description": "Cholesterol daily percentage.",
+                    "format": "double",
+                    "type": "number"
+                },
+                "dietaryFiber": {
+                    "$ref": "FloatUnit",
+                    "description": "Dietary fiber."
+                },
+                "dietaryFiberDailyPercentage": {
+                    "description": "Dietary fiber daily percentage.",
+                    "format": "double",
+                    "type": "number"
+                },
+                "energy": {
+                    "$ref": "FloatUnit",
+                    "description": "Mandatory Nutrition Facts. Energy."
+                },
+                "energyFromFat": {
+                    "$ref": "FloatUnit",
+                    "description": "Energy from fat."
+                },
+                "folateDailyPercentage": {
+                    "description": "Folate daily percentage.",
+                    "format": "double",
+                    "type": "number"
+                },
+                "folateFolicAcid": {
+                    "$ref": "FloatUnit",
+                    "description": "Folate folic acid."
+                },
+                "folateMcgDfe": {
+                    "description": "Folate mcg DFE.",
+                    "format": "double",
+                    "type": "number"
+                },
+                "iron": {
+                    "$ref": "FloatUnit",
+                    "description": "Iron."
+                },
+                "ironDailyPercentage": {
+                    "description": "Iron daily percentage.",
+                    "format": "double",
+                    "type": "number"
+                },
+                "monounsaturatedFat": {
+                    "$ref": "FloatUnit",
+                    "description": "Monounsaturated fat."
+                },
+                "nutritionFactMeasure": {
+                    "description": "Nutrition fact measure.",
+                    "type": "string"
+                },
+                "polyols": {
+                    "$ref": "FloatUnit",
+                    "description": "Polyols."
+                },
+                "polyunsaturatedFat": {
+                    "$ref": "FloatUnit",
+                    "description": "Polyunsaturated fat."
+                },
+                "potassium": {
+                    "$ref": "FloatUnit",
+                    "description": "Potassium."
+                },
+                "potassiumDailyPercentage": {
+                    "description": "Potassium daily percentage.",
+                    "format": "double",
+                    "type": "number"
+                },
+                "preparedSizeDescription": {
+                    "description": "Prepared size description.",
+                    "type": "string"
+                },
+                "protein": {
+                    "$ref": "FloatUnit",
+                    "description": "Protein."
+                },
+                "proteinDailyPercentage": {
+                    "description": "Protein daily percentage.",
+                    "format": "double",
+                    "type": "number"
+                },
+                "saturatedFat": {
+                    "$ref": "FloatUnit",
+                    "description": "Saturated fat."
+                },
+                "saturatedFatDailyPercentage": {
+                    "description": "Saturated fat daily percentage.",
+                    "format": "double",
+                    "type": "number"
+                },
+                "servingSizeDescription": {
+                    "description": "Food Serving Size. Serving size description.",
+                    "type": "string"
+                },
+                "servingSizeMeasure": {
+                    "$ref": "FloatUnit",
+                    "description": "Serving size measure."
+                },
+                "servingsPerContainer": {
+                    "description": "Servings per container.",
+                    "type": "string"
+                },
+                "sodium": {
+                    "$ref": "FloatUnit",
+                    "description": "Sodium."
+                },
+                "sodiumDailyPercentage": {
+                    "description": "Sodium daily percentage.",
+                    "format": "double",
+                    "type": "number"
+                },
+                "starch": {
+                    "$ref": "FloatUnit",
+                    "description": "Starch."
+                },
+                "totalCarbohydrate": {
+                    "$ref": "FloatUnit",
+                    "description": "Total carbohydrate."
+                },
+                "totalCarbohydrateDailyPercentage": {
+                    "description": "Total carbohydrate daily percentage.",
+                    "format": "double",
+                    "type": "number"
+                },
+                "totalFat": {
+                    "$ref": "FloatUnit",
+                    "description": "Total fat."
+                },
+                "totalFatDailyPercentage": {
+                    "description": "Total fat daily percentage.",
+                    "format": "double",
+                    "type": "number"
+                },
+                "totalSugars": {
+                    "$ref": "FloatUnit",
+                    "description": "Total sugars."
+                },
+                "totalSugarsDailyPercentage": {
+                    "description": "Total sugars daily percentage.",
+                    "format": "double",
+                    "type": "number"
+                },
+                "transFat": {
+                    "$ref": "FloatUnit",
+                    "description": "Trans fat."
+                },
+                "transFatDailyPercentage": {
+                    "description": "Trans fat daily percentage.",
+                    "format": "double",
+                    "type": "number"
+                },
+                "vitaminD": {
+                    "$ref": "FloatUnit",
+                    "description": "Vitamin D."
+                },
+                "vitaminDDailyPercentage": {
+                    "description": "Vitamin D daily percentage.",
+                    "format": "double",
+                    "type": "number"
+                },
+                "voluntaryNutritionFact": {
+                    "description": "Voluntary nutrition fact.",
+                    "items": {
+                        "$ref": "VoluntaryNutritionFact"
+                    },
+                    "type": "array"
+                }
+            },
+            "type": "object"
+        },
         "Price": {
             "description": "A price.",
             "id": "Price",
@@ -775,6 +1046,26 @@
                 "sectionName": {
                     "description": "A short section name that can be reused between multiple product details.",
                     "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "VoluntaryNutritionFact": {
+            "description": "Voluntary Nutrition Facts.",
+            "id": "VoluntaryNutritionFact",
+            "properties": {
+                "dailyPercentage": {
+                    "description": "Daily percentage.",
+                    "format": "double",
+                    "type": "number"
+                },
+                "name": {
+                    "description": "Name.",
+                    "type": "string"
+                },
+                "value": {
+                    "$ref": "FloatUnit",
+                    "description": "Value."
                 }
             },
             "type": "object"

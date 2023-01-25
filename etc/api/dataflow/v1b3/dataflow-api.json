@@ -218,6 +218,11 @@
                                     "location": "query",
                                     "type": "string"
                                 },
+                                "name": {
+                                    "description": "Optional. The job name. Optional.",
+                                    "location": "query",
+                                    "type": "string"
+                                },
                                 "pageSize": {
                                     "description": "If there are many jobs, limit response to at most this many. The actual number of jobs returned will be the lesser of max_responses and an unspecified server-defined limit.",
                                     "format": "int32",
@@ -265,7 +270,7 @@
                             ]
                         },
                         "create": {
-                            "description": "Creates a Cloud Dataflow job. To create a job, we recommend using `projects.locations.jobs.create` with a [regional endpoint] (https://cloud.google.com/dataflow/docs/concepts/regional-endpoints). Using `projects.jobs.create` is not recommended, as your job will always start in `us-central1`.",
+                            "description": "Creates a Cloud Dataflow job. To create a job, we recommend using `projects.locations.jobs.create` with a [regional endpoint] (https://cloud.google.com/dataflow/docs/concepts/regional-endpoints). Using `projects.jobs.create` is not recommended, as your job will always start in `us-central1`. Do not enter confidential information when you supply string values using the API.",
                             "flatPath": "v1b3/projects/{projectId}/jobs",
                             "httpMethod": "POST",
                             "id": "dataflow.projects.jobs.create",
@@ -450,6 +455,11 @@
                                 },
                                 "location": {
                                     "description": "The [regional endpoint] (https://cloud.google.com/dataflow/docs/concepts/regional-endpoints) that contains this job.",
+                                    "location": "query",
+                                    "type": "string"
+                                },
+                                "name": {
+                                    "description": "Optional. The job name. Optional.",
                                     "location": "query",
                                     "type": "string"
                                 },
@@ -910,7 +920,7 @@
                         "jobs": {
                             "methods": {
                                 "create": {
-                                    "description": "Creates a Cloud Dataflow job. To create a job, we recommend using `projects.locations.jobs.create` with a [regional endpoint] (https://cloud.google.com/dataflow/docs/concepts/regional-endpoints). Using `projects.jobs.create` is not recommended, as your job will always start in `us-central1`.",
+                                    "description": "Creates a Cloud Dataflow job. To create a job, we recommend using `projects.locations.jobs.create` with a [regional endpoint] (https://cloud.google.com/dataflow/docs/concepts/regional-endpoints). Using `projects.jobs.create` is not recommended, as your job will always start in `us-central1`. Do not enter confidential information when you supply string values using the API.",
                                     "flatPath": "v1b3/projects/{projectId}/locations/{location}/jobs",
                                     "httpMethod": "POST",
                                     "id": "dataflow.projects.locations.jobs.create",
@@ -1156,6 +1166,11 @@
                                             "description": "The [regional endpoint] (https://cloud.google.com/dataflow/docs/concepts/regional-endpoints) that contains this job.",
                                             "location": "path",
                                             "required": true,
+                                            "type": "string"
+                                        },
+                                        "name": {
+                                            "description": "Optional. The job name. Optional.",
+                                            "location": "query",
                                             "type": "string"
                                         },
                                         "pageSize": {
@@ -1858,7 +1873,7 @@
                         "templates": {
                             "methods": {
                                 "create": {
-                                    "description": "Creates a Cloud Dataflow job from a template.",
+                                    "description": "Creates a Cloud Dataflow job from a template. Do not enter confidential information when you supply string values using the API.",
                                     "flatPath": "v1b3/projects/{projectId}/locations/{location}/templates",
                                     "httpMethod": "POST",
                                     "id": "dataflow.projects.locations.templates.create",
@@ -2088,7 +2103,7 @@
                 "templates": {
                     "methods": {
                         "create": {
-                            "description": "Creates a Cloud Dataflow job from a template.",
+                            "description": "Creates a Cloud Dataflow job from a template. Do not enter confidential information when you supply string values using the API.",
                             "flatPath": "v1b3/projects/{projectId}/templates",
                             "httpMethod": "POST",
                             "id": "dataflow.projects.templates.create",
@@ -2225,7 +2240,7 @@
             }
         }
     },
-    "revision": "20220218",
+    "revision": "20230106",
     "rootUrl": "https://dataflow.googleapis.com/",
     "schemas": {
         "ApproximateProgress": {
@@ -2539,6 +2554,18 @@
                 },
                 "image": {
                     "description": "Name of the docker container image. E.g., gcr.io/project/some-image",
+                    "type": "string"
+                },
+                "imageRepositoryCertPath": {
+                    "description": "Cloud Storage path to self-signed certificate of private registry.",
+                    "type": "string"
+                },
+                "imageRepositoryPasswordSecretId": {
+                    "description": "Secret Manager secret id for password to authenticate to private registry.",
+                    "type": "string"
+                },
+                "imageRepositoryUsernameSecretId": {
+                    "description": "Secret Manager secret id for username to authenticate to private registry.",
                     "type": "string"
                 },
                 "metadata": {
@@ -3334,7 +3361,11 @@
                     "type": "integer"
                 },
                 "dumpHeapOnOom": {
-                    "description": "If true, save a heap dump before killing a thread or process which is GC thrashing or out of memory. The location of the heap file will either be echoed back to the user, or the user will be given the opportunity to download the heap file.",
+                    "description": "If true, when processing time is spent almost entirely on garbage collection (GC), saves a heap dump before ending the thread or process. If false, ends the thread or process without saving a heap dump. Does not save a heap dump when the Java Virtual Machine (JVM) has an out of memory error during processing. The location of the heap file is either echoed back to the user, or the user is given the opportunity to download the heap file.",
+                    "type": "boolean"
+                },
+                "enableLauncherVmSerialPortLogging": {
+                    "description": "If true serial port logging will be enabled for the launcher VM.",
                     "type": "boolean"
                 },
                 "enableStreamingEngine": {
@@ -3396,7 +3427,7 @@
                     "type": "integer"
                 },
                 "saveHeapDumpsToGcsPath": {
-                    "description": "Cloud Storage bucket (directory) to upload heap dumps to the given location. Enabling this implies that heap dumps should be generated on OOM (dump_heap_on_oom is set to true).",
+                    "description": "Cloud Storage bucket (directory) to upload heap dumps to. Enabling this field implies that `dump_heap_on_oom` is set to true.",
                     "type": "string"
                 },
                 "sdkContainerImage": {
@@ -3548,6 +3579,20 @@
             },
             "type": "object"
         },
+        "HotKeyDebuggingInfo": {
+            "description": "Information useful for debugging a hot key detection.",
+            "id": "HotKeyDebuggingInfo",
+            "properties": {
+                "detectedHotKeys": {
+                    "additionalProperties": {
+                        "$ref": "HotKeyInfo"
+                    },
+                    "description": "Debugging information for each detected hot key. Keyed by a hash of the key.",
+                    "type": "object"
+                }
+            },
+            "type": "object"
+        },
         "HotKeyDetection": {
             "description": "Proto describing a hot key detected on a given WorkItem.",
             "id": "HotKeyDetection",
@@ -3564,6 +3609,26 @@
                 "userStepName": {
                     "description": "User-provided name of the step that contains this hot key.",
                     "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "HotKeyInfo": {
+            "description": "Information about a hot key.",
+            "id": "HotKeyInfo",
+            "properties": {
+                "hotKeyAge": {
+                    "description": "The age of the hot key measured from when it was first detected.",
+                    "format": "google-duration",
+                    "type": "string"
+                },
+                "key": {
+                    "description": "A detected hot key that is causing limited parallelism. This field will be populated only if the following flag is set to true: \"--enable_hot_key_logging\".",
+                    "type": "string"
+                },
+                "keyTruncated": {
+                    "description": "If true, then the above key is truncated and cannot be deserialized. This occurs if the key above is populated and the key size is >5MB.",
+                    "type": "boolean"
                 }
             },
             "type": "object"
@@ -3666,7 +3731,7 @@
             "type": "object"
         },
         "Job": {
-            "description": "Defines a job to be run by the Cloud Dataflow service.",
+            "description": "Defines a job to be run by the Cloud Dataflow service. Do not enter confidential information when you supply string values using the API.",
             "id": "Job",
             "properties": {
                 "clientRequestId": {
@@ -3749,7 +3814,7 @@
                     "type": "string"
                 },
                 "name": {
-                    "description": "The user-specified Cloud Dataflow job name. Only one Job with a given name may exist in a project at any given time. If a caller attempts to create a Job with the same name as an already-existing Job, the attempt returns the existing Job. The name must match the regular expression `[a-z]([-a-z0-9]{0,38}[a-z0-9])?`",
+                    "description": "The user-specified Cloud Dataflow job name. Only one Job with a given name can exist in a project within one region at any given time. Jobs in different regions can have the same name. If a caller attempts to create a Job with the same name as an already-existing Job, the attempt returns the existing Job. The name must match the regular expression `[a-z]([-a-z0-9]{0,1022}[a-z0-9])?`",
                     "type": "string"
                 },
                 "pipelineDescription": {
@@ -4139,7 +4204,7 @@
             "type": "object"
         },
         "LaunchTemplateParameters": {
-            "description": "Parameters to provide to the template being launched.",
+            "description": "Parameters to provide to the template being launched. Note that the [metadata in the pipeline code] (https://cloud.google.com/dataflow/docs/guides/templates/creating-templates#metadata) determines which runtime parameters are valid.",
             "id": "LaunchTemplateParameters",
             "properties": {
                 "environment": {
@@ -4147,7 +4212,7 @@
                     "description": "The runtime environment for the job."
                 },
                 "jobName": {
-                    "description": "Required. The job name to use for the created job.",
+                    "description": "Required. The job name to use for the created job. The name must match the regular expression `[a-z]([-a-z0-9]{0,1022}[a-z0-9])?`",
                     "type": "string"
                 },
                 "parameters": {
@@ -4678,7 +4743,9 @@
                         "GCS_READ_FOLDER",
                         "GCS_WRITE_FOLDER",
                         "PUBSUB_TOPIC",
-                        "PUBSUB_SUBSCRIPTION"
+                        "PUBSUB_SUBSCRIPTION",
+                        "BIGQUERY_TABLE",
+                        "JAVASCRIPT_UDF_FILE"
                     ],
                     "enumDescriptions": [
                         "Default input type.",
@@ -4690,7 +4757,9 @@
                         "The parameter specifies a Cloud Storage folder path to read from.",
                         "The parameter specifies a Cloud Storage folder to write to.",
                         "The parameter specifies a Pub/Sub Topic.",
-                        "The parameter specifies a Pub/Sub Subscription."
+                        "The parameter specifies a Pub/Sub Subscription.",
+                        "The parameter specifies a BigQuery table.",
+                        "The parameter specifies a JavaScript UDF in Cloud Storage."
                     ],
                     "type": "string"
                 },
@@ -4770,6 +4839,10 @@
                         "$ref": "TransformSummary"
                     },
                     "type": "array"
+                },
+                "stepNamesHash": {
+                    "description": "A hash value of the submitted pipeline portable graph step names if exists.",
+                    "type": "string"
                 }
             },
             "type": "object"
@@ -5111,7 +5184,7 @@
                     "type": "string"
                 },
                 "numWorkers": {
-                    "description": "The initial number of Google Compute Engine instnaces for the job.",
+                    "description": "The initial number of Google Compute Engine instances for the job.",
                     "format": "int32",
                     "type": "integer"
                 },
@@ -5169,12 +5242,14 @@
                     "enum": [
                         "UNKNOWN",
                         "JAVA",
-                        "PYTHON"
+                        "PYTHON",
+                        "GO"
                     ],
                     "enumDescriptions": [
                         "UNKNOWN Language.",
                         "Java.",
-                        "Python."
+                        "Python.",
+                        "Go."
                     ],
                     "type": "string"
                 },
@@ -5186,9 +5261,16 @@
             "type": "object"
         },
         "SdkHarnessContainerImage": {
-            "description": "Defines a SDK harness container for executing Dataflow pipelines.",
+            "description": "Defines an SDK harness container for executing Dataflow pipelines.",
             "id": "SdkHarnessContainerImage",
             "properties": {
+                "capabilities": {
+                    "description": "The set of capabilities enumerated in the above Environment proto. See also [beam_runner_api.proto](https://github.com/apache/beam/blob/master/model/pipeline/src/main/proto/org/apache/beam/model/pipeline/v1/beam_runner_api.proto)",
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": "array"
+                },
                 "containerImage": {
                     "description": "A docker container image that resides in Google Container Registry.",
                     "type": "string"
@@ -5238,7 +5320,7 @@
             "type": "object"
         },
         "SendDebugCaptureRequest": {
-            "description": "Request to send encoded debug information.",
+            "description": "Request to send encoded debug information. Next ID: 8",
             "id": "SendDebugCaptureRequest",
             "properties": {
                 "componentId": {
@@ -5247,6 +5329,24 @@
                 },
                 "data": {
                     "description": "The encoded debug information.",
+                    "type": "string"
+                },
+                "dataFormat": {
+                    "description": "Format for the data field above (id=5).",
+                    "enum": [
+                        "DATA_FORMAT_UNSPECIFIED",
+                        "RAW",
+                        "JSON",
+                        "ZLIB",
+                        "BROTLI"
+                    ],
+                    "enumDescriptions": [
+                        "Format unspecified, parsing is determined based upon page type and legacy encoding. (go/protodosdonts#do-include-an-unspecified-value-in-an-enum)",
+                        "Raw HTML string.",
+                        "JSON-encoded string.",
+                        "Websafe encoded zlib-compressed string.",
+                        "Websafe encoded brotli-compressed string."
+                    ],
                     "type": "string"
                 },
                 "location": {
@@ -5885,6 +5985,10 @@
                         "Execution of the component was cancelled."
                     ],
                     "type": "string"
+                },
+                "stragglerSummary": {
+                    "$ref": "StragglerSummary",
+                    "description": "Straggler summary for this stage."
                 }
             },
             "type": "object"
@@ -5932,7 +6036,7 @@
             "type": "object"
         },
         "Step": {
-            "description": "Defines a particular step within a Cloud Dataflow job. A job consists of multiple steps, each of which performs some specific operation as part of the overall job. Data is typically passed from one step to another as part of the job. Here's an example of a sequence of steps which together implement a Map-Reduce job: * Read a collection of data from some source, parsing the collection's elements. * Validate the elements. * Apply a user-defined function to map each element to some value and extract an element-specific key value. * Group elements with the same key into a single element with that key, transforming a multiply-keyed collection into a uniquely-keyed collection. * Write the elements out to some data sink. Note that the Cloud Dataflow service may be used to run many different types of jobs, not just Map-Reduce.",
+            "description": "Defines a particular step within a Cloud Dataflow job. A job consists of multiple steps, each of which performs some specific operation as part of the overall job. Data is typically passed from one step to another as part of the job. **Note:** The properties of this object are not stable and might change. Here's an example of a sequence of steps which together implement a Map-Reduce job: * Read a collection of data from some source, parsing the collection's elements. * Validate the elements. * Apply a user-defined function to map each element to some value and extract an element-specific key value. * Group elements with the same key into a single element with that key, transforming a multiply-keyed collection into a uniquely-keyed collection. * Write the elements out to some data sink. Note that the Cloud Dataflow service may be used to run many different types of jobs, not just Map-Reduce.",
             "id": "Step",
             "properties": {
                 "kind": {
@@ -5950,6 +6054,78 @@
                     },
                     "description": "Named properties associated with the step. Each kind of predefined step has its own required set of properties. Must be provided on Create. Only retrieved with JOB_VIEW_ALL.",
                     "type": "object"
+                }
+            },
+            "type": "object"
+        },
+        "Straggler": {
+            "description": "Information for a straggler.",
+            "id": "Straggler",
+            "properties": {
+                "batchStraggler": {
+                    "$ref": "StragglerInfo",
+                    "description": "Batch straggler identification and debugging information."
+                },
+                "streamingStraggler": {
+                    "$ref": "StreamingStragglerInfo",
+                    "description": "Streaming straggler identification and debugging information."
+                }
+            },
+            "type": "object"
+        },
+        "StragglerDebuggingInfo": {
+            "description": "Information useful for debugging a straggler. Each type will provide specialized debugging information relevant for a particular cause. The StragglerDebuggingInfo will be 1:1 mapping to the StragglerCause enum.",
+            "id": "StragglerDebuggingInfo",
+            "properties": {
+                "hotKey": {
+                    "$ref": "HotKeyDebuggingInfo",
+                    "description": "Hot key debugging details."
+                }
+            },
+            "type": "object"
+        },
+        "StragglerInfo": {
+            "description": "Information useful for straggler identification and debugging.",
+            "id": "StragglerInfo",
+            "properties": {
+                "causes": {
+                    "additionalProperties": {
+                        "$ref": "StragglerDebuggingInfo"
+                    },
+                    "description": "The straggler causes, keyed by the string representation of the StragglerCause enum and contains specialized debugging information for each straggler cause.",
+                    "type": "object"
+                },
+                "startTime": {
+                    "description": "The time when the work item attempt became a straggler.",
+                    "format": "google-datetime",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "StragglerSummary": {
+            "description": "Summarized straggler identification details.",
+            "id": "StragglerSummary",
+            "properties": {
+                "recentStragglers": {
+                    "description": "The most recent stragglers.",
+                    "items": {
+                        "$ref": "Straggler"
+                    },
+                    "type": "array"
+                },
+                "stragglerCauseCount": {
+                    "additionalProperties": {
+                        "format": "int64",
+                        "type": "string"
+                    },
+                    "description": "Aggregated counts of straggler causes, keyed by the string representation of the StragglerCause enum.",
+                    "type": "object"
+                },
+                "totalStragglerCount": {
+                    "description": "The total count of stragglers.",
+                    "format": "int64",
+                    "type": "string"
                 }
             },
             "type": "object"
@@ -6173,6 +6349,37 @@
             "properties": {
                 "streamId": {
                     "description": "Identifies the particular stream within the streaming Dataflow job.",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "StreamingStragglerInfo": {
+            "description": "Information useful for streaming straggler identification and debugging.",
+            "id": "StreamingStragglerInfo",
+            "properties": {
+                "dataWatermarkLag": {
+                    "description": "The event-time watermark lag at the time of the straggler detection.",
+                    "format": "google-duration",
+                    "type": "string"
+                },
+                "endTime": {
+                    "description": "End time of this straggler.",
+                    "format": "google-datetime",
+                    "type": "string"
+                },
+                "startTime": {
+                    "description": "Start time of this straggler.",
+                    "format": "google-datetime",
+                    "type": "string"
+                },
+                "systemWatermarkLag": {
+                    "description": "The system watermark lag at the time of the straggler detection.",
+                    "format": "google-duration",
+                    "type": "string"
+                },
+                "workerName": {
+                    "description": "Name of the worker where the straggler was detected.",
                     "type": "string"
                 }
             },
@@ -6560,6 +6767,10 @@
                     ],
                     "type": "string"
                 },
+                "stragglerInfo": {
+                    "$ref": "StragglerInfo",
+                    "description": "Information about straggler detections for this work item."
+                },
                 "taskId": {
                     "description": "Name of this work item.",
                     "type": "string"
@@ -6851,6 +7062,10 @@
                 "workerShutdownNotice": {
                     "$ref": "WorkerShutdownNotice",
                     "description": "Shutdown notice by workers."
+                },
+                "workerThreadScalingReport": {
+                    "$ref": "WorkerThreadScalingReport",
+                    "description": "Thread scaling information reported by workers."
                 }
             },
             "type": "object"
@@ -6889,6 +7104,10 @@
                 "workerShutdownNoticeResponse": {
                     "$ref": "WorkerShutdownNoticeResponse",
                     "description": "Service's response to shutdown notice (currently empty)."
+                },
+                "workerThreadScalingReportResponse": {
+                    "$ref": "WorkerThreadScalingReportResponse",
+                    "description": "Service's thread scaling recommendation for workers."
                 }
             },
             "type": "object"
@@ -7087,6 +7306,30 @@
             "description": "Service-side response to WorkerMessage issuing shutdown notice.",
             "id": "WorkerShutdownNoticeResponse",
             "properties": {},
+            "type": "object"
+        },
+        "WorkerThreadScalingReport": {
+            "description": "Contains information about the thread scaling information of a worker.",
+            "id": "WorkerThreadScalingReport",
+            "properties": {
+                "currentThreadCount": {
+                    "description": "Current number of active threads in a worker.",
+                    "format": "int32",
+                    "type": "integer"
+                }
+            },
+            "type": "object"
+        },
+        "WorkerThreadScalingReportResponse": {
+            "description": "Contains the thread scaling recommendation for a worker from the backend.",
+            "id": "WorkerThreadScalingReportResponse",
+            "properties": {
+                "recommendedThreadCount": {
+                    "description": "Recommended number of threads for a worker.",
+                    "format": "int32",
+                    "type": "integer"
+                }
+            },
             "type": "object"
         },
         "WriteInstruction": {

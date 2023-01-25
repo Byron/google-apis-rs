@@ -446,6 +446,43 @@
                                     "resources": {
                                         "v1": {
                                             "methods": {
+                                                "labels": {
+                                                    "description": "Lists labels for metrics.",
+                                                    "flatPath": "v1/projects/{projectsId}/location/{location}/prometheus/api/v1/labels",
+                                                    "httpMethod": "POST",
+                                                    "id": "monitoring.projects.location.prometheus.api.v1.labels",
+                                                    "parameterOrder": [
+                                                        "name",
+                                                        "location"
+                                                    ],
+                                                    "parameters": {
+                                                        "location": {
+                                                            "description": "Location of the resource information. Has to be \"global\" now.",
+                                                            "location": "path",
+                                                            "required": true,
+                                                            "type": "string"
+                                                        },
+                                                        "name": {
+                                                            "description": "The workspace on which to execute the request. It is not part of the open source API but used as a request path prefix to distinguish different virtual Prometheus instances of Google Prometheus Engine. The format is: projects/PROJECT_ID_OR_NUMBER.",
+                                                            "location": "path",
+                                                            "pattern": "^projects/[^/]+$",
+                                                            "required": true,
+                                                            "type": "string"
+                                                        }
+                                                    },
+                                                    "path": "v1/{+name}/location/{location}/prometheus/api/v1/labels",
+                                                    "request": {
+                                                        "$ref": "ListLabelsRequest"
+                                                    },
+                                                    "response": {
+                                                        "$ref": "HttpBody"
+                                                    },
+                                                    "scopes": [
+                                                        "https://www.googleapis.com/auth/cloud-platform",
+                                                        "https://www.googleapis.com/auth/monitoring",
+                                                        "https://www.googleapis.com/auth/monitoring.read"
+                                                    ]
+                                                },
                                                 "query": {
                                                     "description": "Evaluate a PromQL query at a single point in time.",
                                                     "flatPath": "v1/projects/{projectsId}/location/{location}/prometheus/api/v1/query",
@@ -619,6 +656,59 @@
                                                         }
                                                     }
                                                 },
+                                                "labels": {
+                                                    "methods": {
+                                                        "list": {
+                                                            "description": "Lists labels for metrics.",
+                                                            "flatPath": "v1/projects/{projectsId}/location/{location}/prometheus/api/v1/labels",
+                                                            "httpMethod": "GET",
+                                                            "id": "monitoring.projects.location.prometheus.api.v1.labels.list",
+                                                            "parameterOrder": [
+                                                                "name",
+                                                                "location"
+                                                            ],
+                                                            "parameters": {
+                                                                "end": {
+                                                                    "description": "The end time to evaluate the query for. Either floating point UNIX seconds or RFC3339 formatted timestamp.",
+                                                                    "location": "query",
+                                                                    "type": "string"
+                                                                },
+                                                                "location": {
+                                                                    "description": "Location of the resource information. Has to be \"global\" now.",
+                                                                    "location": "path",
+                                                                    "required": true,
+                                                                    "type": "string"
+                                                                },
+                                                                "match": {
+                                                                    "description": "A list of matchers encoded in the Prometheus label matcher format to constrain the values to series that satisfy them.",
+                                                                    "location": "query",
+                                                                    "type": "string"
+                                                                },
+                                                                "name": {
+                                                                    "description": "The workspace on which to execute the request. It is not part of the open source API but used as a request path prefix to distinguish different virtual Prometheus instances of Google Prometheus Engine. The format is: projects/PROJECT_ID_OR_NUMBER.",
+                                                                    "location": "path",
+                                                                    "pattern": "^projects/[^/]+$",
+                                                                    "required": true,
+                                                                    "type": "string"
+                                                                },
+                                                                "start": {
+                                                                    "description": "The start time to evaluate the query for. Either floating point UNIX seconds or RFC3339 formatted timestamp.",
+                                                                    "location": "query",
+                                                                    "type": "string"
+                                                                }
+                                                            },
+                                                            "path": "v1/{+name}/location/{location}/prometheus/api/v1/labels",
+                                                            "response": {
+                                                                "$ref": "HttpBody"
+                                                            },
+                                                            "scopes": [
+                                                                "https://www.googleapis.com/auth/cloud-platform",
+                                                                "https://www.googleapis.com/auth/monitoring",
+                                                                "https://www.googleapis.com/auth/monitoring.read"
+                                                            ]
+                                                        }
+                                                    }
+                                                },
                                                 "metadata": {
                                                     "methods": {
                                                         "list": {
@@ -679,7 +769,7 @@
             }
         }
     },
-    "revision": "20220218",
+    "revision": "20230115",
     "rootUrl": "https://monitoring.googleapis.com/",
     "schemas": {
         "Aggregation": {
@@ -886,6 +976,21 @@
             },
             "type": "object"
         },
+        "ColumnSettings": {
+            "description": "The persistent settings for a table's columns.",
+            "id": "ColumnSettings",
+            "properties": {
+                "column": {
+                    "description": "Required. The id of the column.",
+                    "type": "string"
+                },
+                "visible": {
+                    "description": "Required. Whether the column should be visible on page load.",
+                    "type": "boolean"
+                }
+            },
+            "type": "object"
+        },
         "Dashboard": {
             "description": "A Google Stackdriver dashboard. Dashboards define the content and layout of pages in the Stackdriver web application.",
             "id": "Dashboard",
@@ -893,6 +998,13 @@
                 "columnLayout": {
                     "$ref": "ColumnLayout",
                     "description": "The content is divided into equally spaced columns and the widgets are arranged vertically."
+                },
+                "dashboardFilters": {
+                    "description": "Filters to reduce the amount of data charted based on the filter criteria.",
+                    "items": {
+                        "$ref": "DashboardFilter"
+                    },
+                    "type": "array"
                 },
                 "displayName": {
                     "description": "Required. The mutable, human-readable name.",
@@ -924,6 +1036,45 @@
                 "rowLayout": {
                     "$ref": "RowLayout",
                     "description": "The content is divided into equally spaced rows and the widgets are arranged horizontally."
+                }
+            },
+            "type": "object"
+        },
+        "DashboardFilter": {
+            "description": "A filter to reduce the amount of data charted in relevant widgets.",
+            "id": "DashboardFilter",
+            "properties": {
+                "filterType": {
+                    "description": "The specified filter type",
+                    "enum": [
+                        "FILTER_TYPE_UNSPECIFIED",
+                        "RESOURCE_LABEL",
+                        "METRIC_LABEL",
+                        "USER_METADATA_LABEL",
+                        "SYSTEM_METADATA_LABEL",
+                        "GROUP"
+                    ],
+                    "enumDescriptions": [
+                        "Filter type is unspecified. This is not valid in a well-formed request.",
+                        "Filter on a resource label value",
+                        "Filter on a metrics label value",
+                        "Filter on a user metadata label value",
+                        "Filter on a system metadata label value",
+                        "Filter on a group id"
+                    ],
+                    "type": "string"
+                },
+                "labelKey": {
+                    "description": "Required. The key for the label",
+                    "type": "string"
+                },
+                "stringValue": {
+                    "description": "A variable-length string value.",
+                    "type": "string"
+                },
+                "templateVariable": {
+                    "description": "The placeholder text that can be referenced in a filter string or MQL query. If omitted, the dashboard filter will be applied to all relevant widgets in the dashboard.",
+                    "type": "string"
                 }
             },
             "type": "object"
@@ -995,7 +1146,7 @@
             "type": "object"
         },
         "Empty": {
-            "description": "A generic empty message that you can re-use to avoid defining duplicated empty messages in your APIs. A typical example is to use it as the request or the response type of an API method. For instance: service Foo { rpc Bar(google.protobuf.Empty) returns (google.protobuf.Empty); } The JSON representation for Empty is empty JSON object {}.",
+            "description": "A generic empty message that you can re-use to avoid defining duplicated empty messages in your APIs. A typical example is to use it as the request or the response type of an API method. For instance: service Foo { rpc Bar(google.protobuf.Empty) returns (google.protobuf.Empty); } ",
             "id": "Empty",
             "properties": {},
             "type": "object"
@@ -1182,6 +1333,25 @@
                 },
                 "nextPageToken": {
                     "description": "If there are more results than have been returned, then this field is set to a non-empty value. To see the additional results, use that value as page_token in the next call to this method.",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "ListLabelsRequest": {
+            "description": "ListLabelsRequest holds all parameters of the Prometheus upstream API for returning a list of label names.",
+            "id": "ListLabelsRequest",
+            "properties": {
+                "end": {
+                    "description": "The end time to evaluate the query for. Either floating point UNIX seconds or RFC3339 formatted timestamp.",
+                    "type": "string"
+                },
+                "match": {
+                    "description": "A list of matchers encoded in the Prometheus label matcher format to constrain the values to series that satisfy them.",
+                    "type": "string"
+                },
+                "start": {
+                    "description": "The start time to evaluate the query for. Either floating point UNIX seconds or RFC3339 formatted timestamp.",
                     "type": "string"
                 }
             },
@@ -1543,7 +1713,7 @@
                     "description": "Will cause the scorecard to show a spark chart."
                 },
                 "thresholds": {
-                    "description": "The thresholds used to determine the state of the scorecard given the time series' current value. For an actual value x, the scorecard is in a danger state if x is less than or equal to a danger threshold that triggers below, or greater than or equal to a danger threshold that triggers above. Similarly, if x is above/below a warning threshold that triggers above/below, then the scorecard is in a warning state - unless x also puts it in a danger state. (Danger trumps warning.)As an example, consider a scorecard with the following four thresholds: { value: 90, category: 'DANGER', trigger: 'ABOVE', }, { value: 70, category: 'WARNING', trigger: 'ABOVE', }, { value: 10, category: 'DANGER', trigger: 'BELOW', }, { value: 20, category: 'WARNING', trigger: 'BELOW', }Then: values less than or equal to 10 would put the scorecard in a DANGER state, values greater than 10 but less than or equal to 20 a WARNING state, values strictly between 20 and 70 an OK state, values greater than or equal to 70 but less than 90 a WARNING state, and values greater than or equal to 90 a DANGER state.",
+                    "description": "The thresholds used to determine the state of the scorecard given the time series' current value. For an actual value x, the scorecard is in a danger state if x is less than or equal to a danger threshold that triggers below, or greater than or equal to a danger threshold that triggers above. Similarly, if x is above/below a warning threshold that triggers above/below, then the scorecard is in a warning state - unless x also puts it in a danger state. (Danger trumps warning.)As an example, consider a scorecard with the following four thresholds: { value: 90, category: 'DANGER', trigger: 'ABOVE', }, { value: 70, category: 'WARNING', trigger: 'ABOVE', }, { value: 10, category: 'DANGER', trigger: 'BELOW', }, { value: 20, category: 'WARNING', trigger: 'BELOW', } Then: values less than or equal to 10 would put the scorecard in a DANGER state, values greater than 10 but less than or equal to 20 a WARNING state, values strictly between 20 and 70 an OK state, values greater than or equal to 70 but less than 90 a WARNING state, and values greater than or equal to 90 a DANGER state.",
                     "items": {
                         "$ref": "Threshold"
                     },
@@ -1684,7 +1854,7 @@
             "id": "TableDisplayOptions",
             "properties": {
                 "shownColumns": {
-                    "description": "Optional. Columns to display in the table. Leave empty to display all available columns. Note: This field is for future features and is not currently used.",
+                    "description": "Optional. This field is unused and has been replaced by TimeSeriesTable.column_settings",
                     "items": {
                         "type": "string"
                     },
@@ -1865,6 +2035,10 @@
             "description": "TimeSeriesQuery collects the set of supported methods for querying time series data from the Stackdriver metrics API.",
             "id": "TimeSeriesQuery",
             "properties": {
+                "prometheusQuery": {
+                    "description": "A query used to fetch time series with PromQL.",
+                    "type": "string"
+                },
                 "timeSeriesFilter": {
                     "$ref": "TimeSeriesFilter",
                     "description": "Filter parameters to fetch time series."
@@ -1874,7 +2048,7 @@
                     "description": "Parameters to fetch a ratio between two time series filters."
                 },
                 "timeSeriesQueryLanguage": {
-                    "description": "A query used to fetch time series.",
+                    "description": "A query used to fetch time series with MQL.",
                     "type": "string"
                 },
                 "unitOverride": {
@@ -1888,12 +2062,33 @@
             "description": "A table that displays time series data.",
             "id": "TimeSeriesTable",
             "properties": {
+                "columnSettings": {
+                    "description": "Optional. The list of the persistent column settings for the table.",
+                    "items": {
+                        "$ref": "ColumnSettings"
+                    },
+                    "type": "array"
+                },
                 "dataSets": {
                     "description": "Required. The data displayed in this table.",
                     "items": {
                         "$ref": "TableDataSet"
                     },
                     "type": "array"
+                },
+                "metricVisualization": {
+                    "description": "Optional. Store rendering strategy",
+                    "enum": [
+                        "METRIC_VISUALIZATION_UNSPECIFIED",
+                        "NUMBER",
+                        "BAR"
+                    ],
+                    "enumDescriptions": [
+                        "Unspecified state",
+                        "Default text rendering",
+                        "Horizontal bar rendering"
+                    ],
+                    "type": "string"
                 }
             },
             "type": "object"
