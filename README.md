@@ -88,6 +88,10 @@ For example, to update all json files and possibly retrieve new API schemas, do 
 rm -f .api.deps .cli.deps && FETCH_APIS=1 make update-json -j8
 ```
 
+Now run `make cargo-api ARGS=check` and each time that fails, add it to [the list of forbidden APIs](https://github.com/Byron/google-apis-rs/blob/main/etc/api/shared.yaml#L3) along with a note as to why it fails,
+regenerate all APIs with the make invocation above.
+When done and all APIs pass `cargo check`, commit changes in the `shared.yml` file.
+
 # Setup API and CLI version numbers
 
 The version numbers for the respective program types are setup in `etc/api/type-*.yaml` where `*` resolves
