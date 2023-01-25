@@ -4,12 +4,12 @@
 [package]
 
 name = "google-sourcerepo1"
-version = "5.0.2-beta-1+20230123"
+version = "5.0.2-beta-1+20230110"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Cloud Source Repositories (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/sourcerepo1"
 homepage = "https://cloud.google.com/source-repositories/docs/apis"
-documentation = "https://docs.rs/google-sourcerepo1/5.0.2-beta-1+20230123"
+documentation = "https://docs.rs/google-sourcerepo1/5.0.2-beta-1+20230110"
 license = "MIT"
 keywords = ["sourcerepo", "google", "protocol", "web", "api"]
 autobins = false

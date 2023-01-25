@@ -4,12 +4,12 @@
 [package]
 
 name = "google-cloudshell1"
-version = "5.0.2-beta-1+20230109"
+version = "5.0.2-beta-1+20230123"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Cloud Shell (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/cloudshell1"
 homepage = "https://cloud.google.com/shell/docs/"
-documentation = "https://docs.rs/google-cloudshell1/5.0.2-beta-1+20230109"
+documentation = "https://docs.rs/google-cloudshell1/5.0.2-beta-1+20230123"
 license = "MIT"
 keywords = ["cloudshell", "google", "protocol", "web", "api"]
 autobins = false

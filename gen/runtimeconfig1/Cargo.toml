@@ -4,12 +4,12 @@
 [package]
 
 name = "google-runtimeconfig1"
-version = "5.0.2-beta-1+20230109"
+version = "5.0.2-beta-1+20230123"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Cloud RuntimeConfig (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/runtimeconfig1"
 homepage = "https://cloud.google.com/deployment-manager/runtime-configurator/"
-documentation = "https://docs.rs/google-runtimeconfig1/5.0.2-beta-1+20230109"
+documentation = "https://docs.rs/google-runtimeconfig1/5.0.2-beta-1+20230123"
 license = "MIT"
 keywords = ["runtimeconfig", "google", "protocol", "web", "api"]
 autobins = false

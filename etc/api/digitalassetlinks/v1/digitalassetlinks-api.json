@@ -199,7 +199,7 @@
             }
         }
     },
-    "revision": "20230117",
+    "revision": "20230121",
     "rootUrl": "https://digitalassetlinks.googleapis.com/",
     "schemas": {
         "AndroidAppAsset": {

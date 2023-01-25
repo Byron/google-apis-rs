@@ -4,12 +4,12 @@
 [package]
 
 name = "google-gamesconfiguration1_configuration"
-version = "5.0.2-beta-1+20230112"
+version = "5.0.2-beta-1+20230120"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Games Configuration (protocol v1configuration)"
 repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/gamesconfiguration1_configuration"
 homepage = "https://developers.google.com/games/"
-documentation = "https://docs.rs/google-gamesconfiguration1_configuration/5.0.2-beta-1+20230112"
+documentation = "https://docs.rs/google-gamesconfiguration1_configuration/5.0.2-beta-1+20230120"
 license = "MIT"
 keywords = ["gamesConfiguration", "google", "protocol", "web", "api"]
 autobins = false

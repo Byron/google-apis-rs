@@ -8161,7 +8161,7 @@ where
         self._uncommitted = Some(new_value);
         self
     }
-    /// The tree to fetch
+    /// The tree to fetch.
     ///
     /// Sets the *tree* query property to the given value.
     pub fn tree(mut self, new_value: &str) -> ProjectLocationConversionWorkspaceDescribeDatabaseEntityCall<'a, S> {
@@ -8182,7 +8182,7 @@ where
         self._page_size = Some(new_value);
         self
     }
-    /// Filter the returned entities based on AIP-160 standard
+    /// Filter the returned entities based on AIP-160 standard.
     ///
     /// Sets the *filter* query property to the given value.
     pub fn filter(mut self, new_value: &str) -> ProjectLocationConversionWorkspaceDescribeDatabaseEntityCall<'a, S> {

@@ -4,12 +4,12 @@
 [package]
 
 name = "google-realtimebidding1"
-version = "5.0.2-beta-1+20230124"
+version = "5.0.2-beta-1+20230125"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Real-time Bidding (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/realtimebidding1"
 homepage = "https://developers.google.com/authorized-buyers/apis/realtimebidding/reference/rest/"
-documentation = "https://docs.rs/google-realtimebidding1/5.0.2-beta-1+20230124"
+documentation = "https://docs.rs/google-realtimebidding1/5.0.2-beta-1+20230125"
 license = "MIT"
 keywords = ["realtimebidding", "google", "protocol", "web", "api"]
 autobins = false

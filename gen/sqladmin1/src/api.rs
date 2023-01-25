@@ -2763,7 +2763,7 @@ pub struct UsersListResponse {
     /// This is always `sql#usersList`.
     
     pub kind: Option<String>,
-    /// An identifier that uniquely identifies the operation. You can use this identifier to retrieve the Operations resource that has information about the operation.
+    /// Unused.
     #[serde(rename="nextPageToken")]
     
     pub next_page_token: Option<String>,

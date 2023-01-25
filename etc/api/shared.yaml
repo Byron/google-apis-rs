@@ -51,6 +51,8 @@ api:
     - youtubeanalytics
     # returned by google APIs, but can't be fetched
     - osconfig
+    # rustc failure
+    - translate2
   manually_added:
     - name: mybusiness
       version: v4
