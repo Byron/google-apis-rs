@@ -428,9 +428,8 @@ impl<'a> Read for MultiPartReader<'a> {
                         .join(LINE_ENDING),
                     LINE_ENDING,
                     LINE_ENDING,
-                ))
-                .unwrap();
-                c.rewind().unwrap();
+                ))?;
+                c.rewind()?;
                 self.current_part = Some((c, reader));
             }
             _ => {}
