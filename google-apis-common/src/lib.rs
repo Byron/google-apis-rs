@@ -430,7 +430,7 @@ impl<'a> Read for MultiPartReader<'a> {
                     LINE_ENDING,
                 ))
                 .unwrap();
-                c.seek(SeekFrom::Start(0)).unwrap();
+                c.rewind().unwrap();
                 self.current_part = Some((c, reader));
             }
             _ => {}
