@@ -1,4 +1,4 @@
-site_name: spectrum v4.0.1+20170306
+site_name: spectrum v5.0.2+20170306
 site_url: http://byron.github.io/google-apis-rs/google-spectrum1_explorer-cli
 site_description: A complete library to interact with spectrum (protocol v1explorer)
 
@@ -7,14 +7,15 @@ repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/spectrum1_explor
 docs_dir: docs
 site_dir: build_html
 
-pages:
-- ['index.md', 'Home']
-- ['paws_get-spectrum.md', 'Paws', 'Get Spectrum']
-- ['paws_get-spectrum-batch.md', 'Paws', 'Get Spectrum Batch']
-- ['paws_init.md', 'Paws', 'Init']
-- ['paws_notify-spectrum-use.md', 'Paws', 'Notify Spectrum Use']
-- ['paws_register.md', 'Paws', 'Register']
-- ['paws_verify-device.md', 'Paws', 'Verify Device']
+nav:
+- Home: 'index.md'
+- 'Paws':
+    - 'Get Spectrum': 'paws_get-spectrum.md'
+    - 'Get Spectrum Batch': 'paws_get-spectrum-batch.md'
+    - 'Init': 'paws_init.md'
+    - 'Notify Spectrum Use': 'paws_notify-spectrum-use.md'
+    - 'Register': 'paws_register.md'
+    - 'Verify Device': 'paws_verify-device.md'
 
 theme: readthedocs
 

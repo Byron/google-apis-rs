@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Data Catalog* API at revision *20220224*. The CLI is at version *4.0.1*.
+This documentation was generated from the *Data Catalog* API at revision *20230117*. The CLI is at version *5.0.2*.
 
 ```bash
 datacatalog1 [options]
@@ -40,6 +40,7 @@ datacatalog1 [options]
                 locations-entry-groups-entries-delete <name> [-p <v>]... [-o <out>]
                 locations-entry-groups-entries-get <name> [-p <v>]... [-o <out>]
                 locations-entry-groups-entries-get-iam-policy <resource> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-entry-groups-entries-import <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-entry-groups-entries-list <parent> [-p <v>]... [-o <out>]
                 locations-entry-groups-entries-modify-entry-contacts <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-entry-groups-entries-modify-entry-overview <name> (-r <kv>)... [-p <v>]... [-o <out>]
@@ -61,6 +62,10 @@ datacatalog1 [options]
                 locations-entry-groups-tags-list <parent> [-p <v>]... [-o <out>]
                 locations-entry-groups-tags-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-entry-groups-test-iam-permissions <resource> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-operations-cancel <name> [-p <v>]... [-o <out>]
+                locations-operations-delete <name> [-p <v>]... [-o <out>]
+                locations-operations-get <name> [-p <v>]... [-o <out>]
+                locations-operations-list <name> [-p <v>]... [-o <out>]
                 locations-tag-templates-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-tag-templates-delete <name> [-p <v>]... [-o <out>]
                 locations-tag-templates-fields-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]

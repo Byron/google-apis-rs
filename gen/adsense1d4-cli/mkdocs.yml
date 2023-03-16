@@ -1,4 +1,4 @@
-site_name: AdSense v4.0.1+20201002
+site_name: AdSense v5.0.2+20201002
 site_url: http://byron.github.io/google-apis-rs/google-adsense1d4-cli
 site_description: A complete library to interact with AdSense (protocol v1.4)
 
@@ -7,47 +7,57 @@ repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/adsense1d4-cli
 docs_dir: docs
 site_dir: build_html
 
-pages:
-- ['index.md', 'Home']
-- ['accounts_adclients-get-ad-code.md', 'Accounts', 'Adclients Get Ad Code']
-- ['accounts_adclients-list.md', 'Accounts', 'Adclients List']
-- ['accounts_adunits-customchannels-list.md', 'Accounts', 'Adunits Customchannels List']
-- ['accounts_adunits-get.md', 'Accounts', 'Adunits Get']
-- ['accounts_adunits-get-ad-code.md', 'Accounts', 'Adunits Get Ad Code']
-- ['accounts_adunits-list.md', 'Accounts', 'Adunits List']
-- ['accounts_alerts-delete.md', 'Accounts', 'Alerts Delete']
-- ['accounts_alerts-list.md', 'Accounts', 'Alerts List']
-- ['accounts_customchannels-adunits-list.md', 'Accounts', 'Customchannels Adunits List']
-- ['accounts_customchannels-get.md', 'Accounts', 'Customchannels Get']
-- ['accounts_customchannels-list.md', 'Accounts', 'Customchannels List']
-- ['accounts_get.md', 'Accounts', 'Get']
-- ['accounts_list.md', 'Accounts', 'List']
-- ['accounts_payments-list.md', 'Accounts', 'Payments List']
-- ['accounts_reports-generate.md', 'Accounts', 'Reports Generate']
-- ['accounts_reports-saved-generate.md', 'Accounts', 'Reports Saved Generate']
-- ['accounts_reports-saved-list.md', 'Accounts', 'Reports Saved List']
-- ['accounts_savedadstyles-get.md', 'Accounts', 'Savedadstyles Get']
-- ['accounts_savedadstyles-list.md', 'Accounts', 'Savedadstyles List']
-- ['accounts_urlchannels-list.md', 'Accounts', 'Urlchannels List']
-- ['adclients_list.md', 'Adclients', 'List']
-- ['adunits_customchannels-list.md', 'Adunits', 'Customchannels List']
-- ['adunits_get.md', 'Adunits', 'Get']
-- ['adunits_get-ad-code.md', 'Adunits', 'Get Ad Code']
-- ['adunits_list.md', 'Adunits', 'List']
-- ['alerts_delete.md', 'Alerts', 'Delete']
-- ['alerts_list.md', 'Alerts', 'List']
-- ['customchannels_adunits-list.md', 'Customchannels', 'Adunits List']
-- ['customchannels_get.md', 'Customchannels', 'Get']
-- ['customchannels_list.md', 'Customchannels', 'List']
-- ['metadata_dimensions-list.md', 'Metadata', 'Dimensions List']
-- ['metadata_metrics-list.md', 'Metadata', 'Metrics List']
-- ['payments_list.md', 'Payments', 'List']
-- ['reports_generate.md', 'Reports', 'Generate']
-- ['reports_saved-generate.md', 'Reports', 'Saved Generate']
-- ['reports_saved-list.md', 'Reports', 'Saved List']
-- ['savedadstyles_get.md', 'Savedadstyles', 'Get']
-- ['savedadstyles_list.md', 'Savedadstyles', 'List']
-- ['urlchannels_list.md', 'Urlchannels', 'List']
+nav:
+- Home: 'index.md'
+- 'Accounts':
+    - 'Adclients Get Ad Code': 'accounts_adclients-get-ad-code.md'
+    - 'Adclients List': 'accounts_adclients-list.md'
+    - 'Adunits Customchannels List': 'accounts_adunits-customchannels-list.md'
+    - 'Adunits Get': 'accounts_adunits-get.md'
+    - 'Adunits Get Ad Code': 'accounts_adunits-get-ad-code.md'
+    - 'Adunits List': 'accounts_adunits-list.md'
+    - 'Alerts Delete': 'accounts_alerts-delete.md'
+    - 'Alerts List': 'accounts_alerts-list.md'
+    - 'Customchannels Adunits List': 'accounts_customchannels-adunits-list.md'
+    - 'Customchannels Get': 'accounts_customchannels-get.md'
+    - 'Customchannels List': 'accounts_customchannels-list.md'
+    - 'Get': 'accounts_get.md'
+    - 'List': 'accounts_list.md'
+    - 'Payments List': 'accounts_payments-list.md'
+    - 'Reports Generate': 'accounts_reports-generate.md'
+    - 'Reports Saved Generate': 'accounts_reports-saved-generate.md'
+    - 'Reports Saved List': 'accounts_reports-saved-list.md'
+    - 'Savedadstyles Get': 'accounts_savedadstyles-get.md'
+    - 'Savedadstyles List': 'accounts_savedadstyles-list.md'
+    - 'Urlchannels List': 'accounts_urlchannels-list.md'
+- 'Adclients':
+    - 'List': 'adclients_list.md'
+- 'Adunits':
+    - 'Customchannels List': 'adunits_customchannels-list.md'
+    - 'Get': 'adunits_get.md'
+    - 'Get Ad Code': 'adunits_get-ad-code.md'
+    - 'List': 'adunits_list.md'
+- 'Alerts':
+    - 'Delete': 'alerts_delete.md'
+    - 'List': 'alerts_list.md'
+- 'Customchannels':
+    - 'Adunits List': 'customchannels_adunits-list.md'
+    - 'Get': 'customchannels_get.md'
+    - 'List': 'customchannels_list.md'
+- 'Metadata':
+    - 'Dimensions List': 'metadata_dimensions-list.md'
+    - 'Metrics List': 'metadata_metrics-list.md'
+- 'Payments':
+    - 'List': 'payments_list.md'
+- 'Reports':
+    - 'Generate': 'reports_generate.md'
+    - 'Saved Generate': 'reports_saved-generate.md'
+    - 'Saved List': 'reports_saved-list.md'
+- 'Savedadstyles':
+    - 'Get': 'savedadstyles_get.md'
+    - 'List': 'savedadstyles_list.md'
+- 'Urlchannels':
+    - 'List': 'urlchannels_list.md'
 
 theme: readthedocs
 

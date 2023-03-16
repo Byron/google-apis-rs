@@ -1,4 +1,4 @@
-site_name: Cloud Talent Solution v4.0.1+20220211
+site_name: Cloud Talent Solution v5.0.2+20230120
 site_url: http://byron.github.io/google-apis-rs/google-jobs3-cli
 site_description: A complete library to interact with Cloud Talent Solution (protocol v3)
 
@@ -7,23 +7,24 @@ repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/jobs3-cli
 docs_dir: docs
 site_dir: build_html
 
-pages:
-- ['index.md', 'Home']
-- ['projects_client-events-create.md', 'Projects', 'Client Events Create']
-- ['projects_companies-create.md', 'Projects', 'Companies Create']
-- ['projects_companies-delete.md', 'Projects', 'Companies Delete']
-- ['projects_companies-get.md', 'Projects', 'Companies Get']
-- ['projects_companies-list.md', 'Projects', 'Companies List']
-- ['projects_companies-patch.md', 'Projects', 'Companies Patch']
-- ['projects_complete.md', 'Projects', 'Complete']
-- ['projects_jobs-batch-delete.md', 'Projects', 'Jobs Batch Delete']
-- ['projects_jobs-create.md', 'Projects', 'Jobs Create']
-- ['projects_jobs-delete.md', 'Projects', 'Jobs Delete']
-- ['projects_jobs-get.md', 'Projects', 'Jobs Get']
-- ['projects_jobs-list.md', 'Projects', 'Jobs List']
-- ['projects_jobs-patch.md', 'Projects', 'Jobs Patch']
-- ['projects_jobs-search.md', 'Projects', 'Jobs Search']
-- ['projects_jobs-search-for-alert.md', 'Projects', 'Jobs Search For Alert']
+nav:
+- Home: 'index.md'
+- 'Projects':
+    - 'Client Events Create': 'projects_client-events-create.md'
+    - 'Companies Create': 'projects_companies-create.md'
+    - 'Companies Delete': 'projects_companies-delete.md'
+    - 'Companies Get': 'projects_companies-get.md'
+    - 'Companies List': 'projects_companies-list.md'
+    - 'Companies Patch': 'projects_companies-patch.md'
+    - 'Complete': 'projects_complete.md'
+    - 'Jobs Batch Delete': 'projects_jobs-batch-delete.md'
+    - 'Jobs Create': 'projects_jobs-create.md'
+    - 'Jobs Delete': 'projects_jobs-delete.md'
+    - 'Jobs Get': 'projects_jobs-get.md'
+    - 'Jobs List': 'projects_jobs-list.md'
+    - 'Jobs Patch': 'projects_jobs-patch.md'
+    - 'Jobs Search': 'projects_jobs-search.md'
+    - 'Jobs Search For Alert': 'projects_jobs-search-for-alert.md'
 
 theme: readthedocs
 

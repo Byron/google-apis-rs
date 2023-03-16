@@ -1,4 +1,4 @@
-site_name: My Business Verifications v4.0.1+20220305
+site_name: My Business Verifications v5.0.2+20230124
 site_url: http://byron.github.io/google-apis-rs/google-mybusinessverifications1-cli
 site_description: A complete library to interact with My Business Verifications (protocol v1)
 
@@ -7,14 +7,16 @@ repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/mybusinessverifi
 docs_dir: docs
 site_dir: build_html
 
-pages:
-- ['index.md', 'Home']
-- ['locations_fetch-verification-options.md', 'Locations', 'Fetch Verification Options']
-- ['locations_get-voice-of-merchant-state.md', 'Locations', 'Get Voice Of Merchant State']
-- ['locations_verifications-complete.md', 'Locations', 'Verifications Complete']
-- ['locations_verifications-list.md', 'Locations', 'Verifications List']
-- ['locations_verify.md', 'Locations', 'Verify']
-- ['verification-tokens_generate.md', 'Verification Tokens', 'Generate']
+nav:
+- Home: 'index.md'
+- 'Locations':
+    - 'Fetch Verification Options': 'locations_fetch-verification-options.md'
+    - 'Get Voice Of Merchant State': 'locations_get-voice-of-merchant-state.md'
+    - 'Verifications Complete': 'locations_verifications-complete.md'
+    - 'Verifications List': 'locations_verifications-list.md'
+    - 'Verify': 'locations_verify.md'
+- 'Verification Tokens':
+    - 'Generate': 'verification-tokens_generate.md'
 
 theme: readthedocs
 

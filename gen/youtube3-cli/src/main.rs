@@ -3,8 +3,6 @@
 // DO NOT EDIT !
 #![allow(unused_variables, unused_imports, dead_code, unused_mut)]
 
-extern crate tokio;
-
 #[macro_use]
 extern crate clap;
 
@@ -12,9 +10,10 @@ use std::env;
 use std::io::{self, Write};
 use clap::{App, SubCommand, Arg};
 
-use google_youtube3::{api, Error, oauth2};
+use google_youtube3::{api, Error, oauth2, client::chrono, FieldMask};
 
-mod client;
+
+use google_clis_common as client;
 
 use client::{InvalidOptionsError, CLIError, arg_from_str, writer_from_opts, parse_kv_arg,
           input_file_from_opts, input_mime_from_opts, FieldCursor, FieldError, CallType, UploadProtocol,
@@ -149,22 +148,22 @@ where
                     call = call.region_code(value.unwrap_or(""));
                 },
                 "published-before" => {
-                    call = call.published_before(value.unwrap_or(""));
+                    call = call.published_before(        value.map(|v| arg_from_str(v, err, "published-before", "google-datetime")).unwrap_or(chrono::Utc::now()));
                 },
                 "published-after" => {
-                    call = call.published_after(value.unwrap_or(""));
+                    call = call.published_after(        value.map(|v| arg_from_str(v, err, "published-after", "google-datetime")).unwrap_or(chrono::Utc::now()));
                 },
                 "page-token" => {
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "mine" => {
-                    call = call.mine(arg_from_str(value.unwrap_or("false"), err, "mine", "boolean"));
+                    call = call.mine(        value.map(|v| arg_from_str(v, err, "mine", "boolean")).unwrap_or(false));
                 },
                 "max-results" => {
-                    call = call.max_results(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
+                    call = call.max_results(        value.map(|v| arg_from_str(v, err, "max-results", "uint32")).unwrap_or(0));
                 },
                 "home" => {
-                    call = call.home(arg_from_str(value.unwrap_or("false"), err, "home", "boolean"));
+                    call = call.home(        value.map(|v| arg_from_str(v, err, "home", "boolean")).unwrap_or(false));
                 },
                 "channel-id" => {
                     call = call.channel_id(value.unwrap_or(""));
@@ -393,7 +392,7 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "sync" => {
-                    call = call.sync(arg_from_str(value.unwrap_or("false"), err, "sync", "boolean"));
+                    call = call.sync(        value.map(|v| arg_from_str(v, err, "sync", "boolean")).unwrap_or(false));
                 },
                 "on-behalf-of-content-owner" => {
                     call = call.on_behalf_of_content_owner(value.unwrap_or(""));
@@ -568,7 +567,7 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "sync" => {
-                    call = call.sync(arg_from_str(value.unwrap_or("false"), err, "sync", "boolean"));
+                    call = call.sync(        value.map(|v| arg_from_str(v, err, "sync", "boolean")).unwrap_or(false));
                 },
                 "on-behalf-of-content-owner" => {
                     call = call.on_behalf_of_content_owner(value.unwrap_or(""));
@@ -890,7 +889,7 @@ where
                     call = call.on_behalf_of_content_owner(value.unwrap_or(""));
                 },
                 "mine" => {
-                    call = call.mine(arg_from_str(value.unwrap_or("false"), err, "mine", "boolean"));
+                    call = call.mine(        value.map(|v| arg_from_str(v, err, "mine", "boolean")).unwrap_or(false));
                 },
                 "id" => {
                     call = call.add_id(value.unwrap_or(""));
@@ -1064,16 +1063,16 @@ where
                     call = call.on_behalf_of_content_owner(value.unwrap_or(""));
                 },
                 "my-subscribers" => {
-                    call = call.my_subscribers(arg_from_str(value.unwrap_or("false"), err, "my-subscribers", "boolean"));
+                    call = call.my_subscribers(        value.map(|v| arg_from_str(v, err, "my-subscribers", "boolean")).unwrap_or(false));
                 },
                 "mine" => {
-                    call = call.mine(arg_from_str(value.unwrap_or("false"), err, "mine", "boolean"));
+                    call = call.mine(        value.map(|v| arg_from_str(v, err, "mine", "boolean")).unwrap_or(false));
                 },
                 "max-results" => {
-                    call = call.max_results(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
+                    call = call.max_results(        value.map(|v| arg_from_str(v, err, "max-results", "uint32")).unwrap_or(0));
                 },
                 "managed-by-me" => {
-                    call = call.managed_by_me(arg_from_str(value.unwrap_or("false"), err, "managed-by-me", "boolean"));
+                    call = call.managed_by_me(        value.map(|v| arg_from_str(v, err, "managed-by-me", "boolean")).unwrap_or(false));
                 },
                 "id" => {
                     call = call.add_id(value.unwrap_or(""));
@@ -1449,7 +1448,7 @@ where
                     call = call.moderation_status(value.unwrap_or(""));
                 },
                 "max-results" => {
-                    call = call.max_results(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
+                    call = call.max_results(        value.map(|v| arg_from_str(v, err, "max-results", "uint32")).unwrap_or(0));
                 },
                 "id" => {
                     call = call.add_id(value.unwrap_or(""));
@@ -1669,7 +1668,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "max-results" => {
-                    call = call.max_results(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
+                    call = call.max_results(        value.map(|v| arg_from_str(v, err, "max-results", "uint32")).unwrap_or(0));
                 },
                 "id" => {
                     call = call.add_id(value.unwrap_or(""));
@@ -1772,7 +1771,7 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "ban-author" => {
-                    call = call.ban_author(arg_from_str(value.unwrap_or("false"), err, "ban-author", "boolean"));
+                    call = call.ban_author(        value.map(|v| arg_from_str(v, err, "ban-author", "boolean")).unwrap_or(false));
                 },
                 _ => {
                     let mut found = false;
@@ -2210,6 +2209,7 @@ where
                     "snippet.thumbnails.standard.url" => Some(("snippet.thumbnails.standard.url", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "snippet.thumbnails.standard.width" => Some(("snippet.thumbnails.standard.width", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "snippet.title" => Some(("snippet.title", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "statistics.concurrent-viewers" => Some(("statistics.concurrentViewers", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "statistics.total-chat-count" => Some(("statistics.totalChatCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "status.life-cycle-status" => Some(("status.lifeCycleStatus", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "status.live-broadcast-priority" => Some(("status.liveBroadcastPriority", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -2218,7 +2218,7 @@ where
                     "status.recording-status" => Some(("status.recordingStatus", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "status.self-declared-made-for-kids" => Some(("status.selfDeclaredMadeForKids", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["actual-end-time", "actual-start-time", "bound-stream-id", "bound-stream-last-update-time-ms", "broadcast-stream-delay-ms", "channel-id", "closed-captions-type", "content-details", "default", "description", "embed-html", "enable-auto-start", "enable-auto-stop", "enable-closed-captions", "enable-content-encryption", "enable-dvr", "enable-embed", "enable-low-latency", "enable-monitor-stream", "etag", "height", "high", "id", "is-default-broadcast", "kind", "latency-preference", "life-cycle-status", "live-broadcast-priority", "live-chat-id", "made-for-kids", "maxres", "medium", "mesh", "monitor-stream", "privacy-status", "projection", "published-at", "record-from-start", "recording-status", "scheduled-end-time", "scheduled-start-time", "self-declared-made-for-kids", "snippet", "standard", "start-with-slate", "statistics", "status", "stereo-layout", "thumbnails", "title", "total-chat-count", "url", "width"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["actual-end-time", "actual-start-time", "bound-stream-id", "bound-stream-last-update-time-ms", "broadcast-stream-delay-ms", "channel-id", "closed-captions-type", "concurrent-viewers", "content-details", "default", "description", "embed-html", "enable-auto-start", "enable-auto-stop", "enable-closed-captions", "enable-content-encryption", "enable-dvr", "enable-embed", "enable-low-latency", "enable-monitor-stream", "etag", "height", "high", "id", "is-default-broadcast", "kind", "latency-preference", "life-cycle-status", "live-broadcast-priority", "live-chat-id", "made-for-kids", "maxres", "medium", "mesh", "monitor-stream", "privacy-status", "projection", "published-at", "record-from-start", "recording-status", "scheduled-end-time", "scheduled-start-time", "self-declared-made-for-kids", "snippet", "standard", "start-with-slate", "statistics", "status", "stereo-layout", "thumbnails", "title", "total-chat-count", "url", "width"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -2285,6 +2285,109 @@ where
         }
     }
 
+    async fn _live_broadcasts_insert_cuepoint(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "cue-type" => Some(("cueType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "duration-secs" => Some(("durationSecs", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "etag" => Some(("etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "insertion-offset-time-ms" => Some(("insertionOffsetTimeMs", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "walltime-ms" => Some(("walltimeMs", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["cue-type", "duration-secs", "etag", "id", "insertion-offset-time-ms", "walltime-ms"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::Cuepoint = json::value::from_value(object).unwrap();
+        let mut call = self.hub.live_broadcasts().insert_cuepoint(request);
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "part" => {
+                    call = call.add_part(value.unwrap_or(""));
+                },
+                "on-behalf-of-content-owner-channel" => {
+                    call = call.on_behalf_of_content_owner_channel(value.unwrap_or(""));
+                },
+                "on-behalf-of-content-owner" => {
+                    call = call.on_behalf_of_content_owner(value.unwrap_or(""));
+                },
+                "id" => {
+                    call = call.id(value.unwrap_or(""));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["id", "on-behalf-of-content-owner", "on-behalf-of-content-owner-channel", "part"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
     async fn _live_broadcasts_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.live_broadcasts().list(&opt.values_of("part").map(|i|i.collect()).unwrap_or(Vec::new()).iter().map(|&v| v.to_string()).collect::<Vec<String>>());
@@ -2301,10 +2404,10 @@ where
                     call = call.on_behalf_of_content_owner(value.unwrap_or(""));
                 },
                 "mine" => {
-                    call = call.mine(arg_from_str(value.unwrap_or("false"), err, "mine", "boolean"));
+                    call = call.mine(        value.map(|v| arg_from_str(v, err, "mine", "boolean")).unwrap_or(false));
                 },
                 "max-results" => {
-                    call = call.max_results(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
+                    call = call.max_results(        value.map(|v| arg_from_str(v, err, "max-results", "uint32")).unwrap_or(0));
                 },
                 "id" => {
                     call = call.add_id(value.unwrap_or(""));
@@ -2491,6 +2594,7 @@ where
                     "snippet.thumbnails.standard.url" => Some(("snippet.thumbnails.standard.url", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "snippet.thumbnails.standard.width" => Some(("snippet.thumbnails.standard.width", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "snippet.title" => Some(("snippet.title", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "statistics.concurrent-viewers" => Some(("statistics.concurrentViewers", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "statistics.total-chat-count" => Some(("statistics.totalChatCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "status.life-cycle-status" => Some(("status.lifeCycleStatus", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "status.live-broadcast-priority" => Some(("status.liveBroadcastPriority", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -2499,7 +2603,7 @@ where
                     "status.recording-status" => Some(("status.recordingStatus", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "status.self-declared-made-for-kids" => Some(("status.selfDeclaredMadeForKids", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["actual-end-time", "actual-start-time", "bound-stream-id", "bound-stream-last-update-time-ms", "broadcast-stream-delay-ms", "channel-id", "closed-captions-type", "content-details", "default", "description", "embed-html", "enable-auto-start", "enable-auto-stop", "enable-closed-captions", "enable-content-encryption", "enable-dvr", "enable-embed", "enable-low-latency", "enable-monitor-stream", "etag", "height", "high", "id", "is-default-broadcast", "kind", "latency-preference", "life-cycle-status", "live-broadcast-priority", "live-chat-id", "made-for-kids", "maxres", "medium", "mesh", "monitor-stream", "privacy-status", "projection", "published-at", "record-from-start", "recording-status", "scheduled-end-time", "scheduled-start-time", "self-declared-made-for-kids", "snippet", "standard", "start-with-slate", "statistics", "status", "stereo-layout", "thumbnails", "title", "total-chat-count", "url", "width"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["actual-end-time", "actual-start-time", "bound-stream-id", "bound-stream-last-update-time-ms", "broadcast-stream-delay-ms", "channel-id", "closed-captions-type", "concurrent-viewers", "content-details", "default", "description", "embed-html", "enable-auto-start", "enable-auto-stop", "enable-closed-captions", "enable-content-encryption", "enable-dvr", "enable-embed", "enable-low-latency", "enable-monitor-stream", "etag", "height", "high", "id", "is-default-broadcast", "kind", "latency-preference", "life-cycle-status", "live-broadcast-priority", "live-chat-id", "made-for-kids", "maxres", "medium", "mesh", "monitor-stream", "privacy-status", "projection", "published-at", "record-from-start", "recording-status", "scheduled-end-time", "scheduled-start-time", "self-declared-made-for-kids", "snippet", "standard", "start-with-slate", "statistics", "status", "stereo-layout", "thumbnails", "title", "total-chat-count", "url", "width"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -2788,11 +2892,16 @@ where
                     "snippet.fan-funding-event-details.amount-micros" => Some(("snippet.fanFundingEventDetails.amountMicros", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "snippet.fan-funding-event-details.currency" => Some(("snippet.fanFundingEventDetails.currency", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "snippet.fan-funding-event-details.user-comment" => Some(("snippet.fanFundingEventDetails.userComment", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.gift-membership-received-details.associated-membership-gifting-message-id" => Some(("snippet.giftMembershipReceivedDetails.associatedMembershipGiftingMessageId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.gift-membership-received-details.gifter-channel-id" => Some(("snippet.giftMembershipReceivedDetails.gifterChannelId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.gift-membership-received-details.member-level-name" => Some(("snippet.giftMembershipReceivedDetails.memberLevelName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "snippet.has-display-content" => Some(("snippet.hasDisplayContent", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "snippet.live-chat-id" => Some(("snippet.liveChatId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "snippet.member-milestone-chat-details.member-level-name" => Some(("snippet.memberMilestoneChatDetails.memberLevelName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "snippet.member-milestone-chat-details.member-month" => Some(("snippet.memberMilestoneChatDetails.memberMonth", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "snippet.member-milestone-chat-details.user-comment" => Some(("snippet.memberMilestoneChatDetails.userComment", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.membership-gifting-details.gift-memberships-count" => Some(("snippet.membershipGiftingDetails.giftMembershipsCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "snippet.membership-gifting-details.gift-memberships-level-name" => Some(("snippet.membershipGiftingDetails.giftMembershipsLevelName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "snippet.message-deleted-details.deleted-message-id" => Some(("snippet.messageDeletedDetails.deletedMessageId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "snippet.message-retracted-details.retracted-message-id" => Some(("snippet.messageRetractedDetails.retractedMessageId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "snippet.new-sponsor-details.is-upgrade" => Some(("snippet.newSponsorDetails.isUpgrade", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
@@ -2819,7 +2928,7 @@ where
                     "snippet.user-banned-details.banned-user-details.display-name" => Some(("snippet.userBannedDetails.bannedUserDetails.displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "snippet.user-banned-details.banned-user-details.profile-image-url" => Some(("snippet.userBannedDetails.bannedUserDetails.profileImageUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["alt-text", "alt-text-language", "amount-display-string", "amount-micros", "author-channel-id", "author-details", "ban-duration-seconds", "ban-type", "banned-user-details", "channel-id", "channel-url", "currency", "deleted-message-id", "display-message", "display-name", "etag", "fan-funding-event-details", "has-display-content", "id", "is-chat-moderator", "is-chat-owner", "is-chat-sponsor", "is-upgrade", "is-verified", "kind", "live-chat-id", "member-level-name", "member-milestone-chat-details", "member-month", "message-deleted-details", "message-retracted-details", "message-text", "new-sponsor-details", "profile-image-url", "published-at", "retracted-message-id", "snippet", "sticker-id", "super-chat-details", "super-sticker-details", "super-sticker-metadata", "text-message-details", "tier", "type", "user-banned-details", "user-comment"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["alt-text", "alt-text-language", "amount-display-string", "amount-micros", "associated-membership-gifting-message-id", "author-channel-id", "author-details", "ban-duration-seconds", "ban-type", "banned-user-details", "channel-id", "channel-url", "currency", "deleted-message-id", "display-message", "display-name", "etag", "fan-funding-event-details", "gift-membership-received-details", "gift-memberships-count", "gift-memberships-level-name", "gifter-channel-id", "has-display-content", "id", "is-chat-moderator", "is-chat-owner", "is-chat-sponsor", "is-upgrade", "is-verified", "kind", "live-chat-id", "member-level-name", "member-milestone-chat-details", "member-month", "membership-gifting-details", "message-deleted-details", "message-retracted-details", "message-text", "new-sponsor-details", "profile-image-url", "published-at", "retracted-message-id", "snippet", "sticker-id", "super-chat-details", "super-sticker-details", "super-sticker-metadata", "text-message-details", "tier", "type", "user-banned-details", "user-comment"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -2886,13 +2995,13 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "profile-image-size" => {
-                    call = call.profile_image_size(arg_from_str(value.unwrap_or("-0"), err, "profile-image-size", "integer"));
+                    call = call.profile_image_size(        value.map(|v| arg_from_str(v, err, "profile-image-size", "uint32")).unwrap_or(0));
                 },
                 "page-token" => {
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "max-results" => {
-                    call = call.max_results(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
+                    call = call.max_results(        value.map(|v| arg_from_str(v, err, "max-results", "uint32")).unwrap_or(0));
                 },
                 "hl" => {
                     call = call.hl(value.unwrap_or(""));
@@ -3090,7 +3199,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "max-results" => {
-                    call = call.max_results(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
+                    call = call.max_results(        value.map(|v| arg_from_str(v, err, "max-results", "uint32")).unwrap_or(0));
                 },
                 _ => {
                     let mut found = false;
@@ -3319,10 +3428,10 @@ where
                     call = call.on_behalf_of_content_owner(value.unwrap_or(""));
                 },
                 "mine" => {
-                    call = call.mine(arg_from_str(value.unwrap_or("false"), err, "mine", "boolean"));
+                    call = call.mine(        value.map(|v| arg_from_str(v, err, "mine", "boolean")).unwrap_or(false));
                 },
                 "max-results" => {
-                    call = call.max_results(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
+                    call = call.max_results(        value.map(|v| arg_from_str(v, err, "max-results", "uint32")).unwrap_or(0));
                 },
                 "id" => {
                     call = call.add_id(value.unwrap_or(""));
@@ -3500,7 +3609,7 @@ where
                     call = call.mode(value.unwrap_or(""));
                 },
                 "max-results" => {
-                    call = call.max_results(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
+                    call = call.max_results(        value.map(|v| arg_from_str(v, err, "max-results", "uint32")).unwrap_or(0));
                 },
                 "has-access-to-level" => {
                     call = call.has_access_to_level(value.unwrap_or(""));
@@ -3799,7 +3908,7 @@ where
                     call = call.on_behalf_of_content_owner(value.unwrap_or(""));
                 },
                 "max-results" => {
-                    call = call.max_results(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
+                    call = call.max_results(        value.map(|v| arg_from_str(v, err, "max-results", "uint32")).unwrap_or(0));
                 },
                 "id" => {
                     call = call.add_id(value.unwrap_or(""));
@@ -4162,10 +4271,10 @@ where
                     call = call.on_behalf_of_content_owner(value.unwrap_or(""));
                 },
                 "mine" => {
-                    call = call.mine(arg_from_str(value.unwrap_or("false"), err, "mine", "boolean"));
+                    call = call.mine(        value.map(|v| arg_from_str(v, err, "mine", "boolean")).unwrap_or(false));
                 },
                 "max-results" => {
-                    call = call.max_results(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
+                    call = call.max_results(        value.map(|v| arg_from_str(v, err, "max-results", "uint32")).unwrap_or(0));
                 },
                 "id" => {
                     call = call.add_id(value.unwrap_or(""));
@@ -4397,10 +4506,10 @@ where
                     call = call.q(value.unwrap_or(""));
                 },
                 "published-before" => {
-                    call = call.published_before(value.unwrap_or(""));
+                    call = call.published_before(        value.map(|v| arg_from_str(v, err, "published-before", "google-datetime")).unwrap_or(chrono::Utc::now()));
                 },
                 "published-after" => {
-                    call = call.published_after(value.unwrap_or(""));
+                    call = call.published_after(        value.map(|v| arg_from_str(v, err, "published-after", "google-datetime")).unwrap_or(chrono::Utc::now()));
                 },
                 "page-token" => {
                     call = call.page_token(value.unwrap_or(""));
@@ -4412,7 +4521,7 @@ where
                     call = call.on_behalf_of_content_owner(value.unwrap_or(""));
                 },
                 "max-results" => {
-                    call = call.max_results(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
+                    call = call.max_results(        value.map(|v| arg_from_str(v, err, "max-results", "uint32")).unwrap_or(0));
                 },
                 "location-radius" => {
                     call = call.location_radius(value.unwrap_or(""));
@@ -4421,13 +4530,13 @@ where
                     call = call.location(value.unwrap_or(""));
                 },
                 "for-mine" => {
-                    call = call.for_mine(arg_from_str(value.unwrap_or("false"), err, "for-mine", "boolean"));
+                    call = call.for_mine(        value.map(|v| arg_from_str(v, err, "for-mine", "boolean")).unwrap_or(false));
                 },
                 "for-developer" => {
-                    call = call.for_developer(arg_from_str(value.unwrap_or("false"), err, "for-developer", "boolean"));
+                    call = call.for_developer(        value.map(|v| arg_from_str(v, err, "for-developer", "boolean")).unwrap_or(false));
                 },
                 "for-content-owner" => {
-                    call = call.for_content_owner(arg_from_str(value.unwrap_or("false"), err, "for-content-owner", "boolean"));
+                    call = call.for_content_owner(        value.map(|v| arg_from_str(v, err, "for-content-owner", "boolean")).unwrap_or(false));
                 },
                 "event-type" => {
                     call = call.event_type(value.unwrap_or(""));
@@ -4680,16 +4789,16 @@ where
                     call = call.on_behalf_of_content_owner(value.unwrap_or(""));
                 },
                 "my-subscribers" => {
-                    call = call.my_subscribers(arg_from_str(value.unwrap_or("false"), err, "my-subscribers", "boolean"));
+                    call = call.my_subscribers(        value.map(|v| arg_from_str(v, err, "my-subscribers", "boolean")).unwrap_or(false));
                 },
                 "my-recent-subscribers" => {
-                    call = call.my_recent_subscribers(arg_from_str(value.unwrap_or("false"), err, "my-recent-subscribers", "boolean"));
+                    call = call.my_recent_subscribers(        value.map(|v| arg_from_str(v, err, "my-recent-subscribers", "boolean")).unwrap_or(false));
                 },
                 "mine" => {
-                    call = call.mine(arg_from_str(value.unwrap_or("false"), err, "mine", "boolean"));
+                    call = call.mine(        value.map(|v| arg_from_str(v, err, "mine", "boolean")).unwrap_or(false));
                 },
                 "max-results" => {
-                    call = call.max_results(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
+                    call = call.max_results(        value.map(|v| arg_from_str(v, err, "max-results", "uint32")).unwrap_or(0));
                 },
                 "id" => {
                     call = call.add_id(value.unwrap_or(""));
@@ -4757,7 +4866,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "max-results" => {
-                    call = call.max_results(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
+                    call = call.max_results(        value.map(|v| arg_from_str(v, err, "max-results", "uint32")).unwrap_or(0));
                 },
                 "hl" => {
                     call = call.hl(value.unwrap_or(""));
@@ -4974,12 +5083,13 @@ where
                     "etag" => Some(("etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "linking-token" => Some(("linkingToken", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.channel-to-store-link.merchant-id" => Some(("snippet.channelToStoreLink.merchantId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "snippet.channel-to-store-link.store-name" => Some(("snippet.channelToStoreLink.storeName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "snippet.channel-to-store-link.store-url" => Some(("snippet.channelToStoreLink.storeUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "snippet.type" => Some(("snippet.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "status.link-status" => Some(("status.linkStatus", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["channel-to-store-link", "etag", "kind", "link-status", "linking-token", "snippet", "status", "store-name", "store-url", "type"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["channel-to-store-link", "etag", "kind", "link-status", "linking-token", "merchant-id", "snippet", "status", "store-name", "store-url", "type"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -5125,12 +5235,13 @@ where
                     "etag" => Some(("etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "linking-token" => Some(("linkingToken", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.channel-to-store-link.merchant-id" => Some(("snippet.channelToStoreLink.merchantId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "snippet.channel-to-store-link.store-name" => Some(("snippet.channelToStoreLink.storeName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "snippet.channel-to-store-link.store-url" => Some(("snippet.channelToStoreLink.storeUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "snippet.type" => Some(("snippet.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "status.link-status" => Some(("status.linkStatus", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["channel-to-store-link", "etag", "kind", "link-status", "linking-token", "snippet", "status", "store-name", "store-url", "type"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["channel-to-store-link", "etag", "kind", "link-status", "linking-token", "merchant-id", "snippet", "status", "store-name", "store-url", "type"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -5681,7 +5792,7 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "stabilize" => {
-                    call = call.stabilize(arg_from_str(value.unwrap_or("false"), err, "stabilize", "boolean"));
+                    call = call.stabilize(        value.map(|v| arg_from_str(v, err, "stabilize", "boolean")).unwrap_or(false));
                 },
                 "on-behalf-of-content-owner-channel" => {
                     call = call.on_behalf_of_content_owner_channel(value.unwrap_or(""));
@@ -5690,10 +5801,10 @@ where
                     call = call.on_behalf_of_content_owner(value.unwrap_or(""));
                 },
                 "notify-subscribers" => {
-                    call = call.notify_subscribers(arg_from_str(value.unwrap_or("false"), err, "notify-subscribers", "boolean"));
+                    call = call.notify_subscribers(        value.map(|v| arg_from_str(v, err, "notify-subscribers", "boolean")).unwrap_or(false));
                 },
                 "auto-levels" => {
-                    call = call.auto_levels(arg_from_str(value.unwrap_or("false"), err, "auto-levels", "boolean"));
+                    call = call.auto_levels(        value.map(|v| arg_from_str(v, err, "auto-levels", "boolean")).unwrap_or(false));
                 },
                 _ => {
                     let mut found = false;
@@ -5767,13 +5878,13 @@ where
                     call = call.my_rating(value.unwrap_or(""));
                 },
                 "max-width" => {
-                    call = call.max_width(arg_from_str(value.unwrap_or("-0"), err, "max-width", "integer"));
+                    call = call.max_width(        value.map(|v| arg_from_str(v, err, "max-width", "int32")).unwrap_or(-0));
                 },
                 "max-results" => {
-                    call = call.max_results(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
+                    call = call.max_results(        value.map(|v| arg_from_str(v, err, "max-results", "uint32")).unwrap_or(0));
                 },
                 "max-height" => {
-                    call = call.max_height(arg_from_str(value.unwrap_or("-0"), err, "max-height", "integer"));
+                    call = call.max_height(        value.map(|v| arg_from_str(v, err, "max-height", "int32")).unwrap_or(-0));
                 },
                 "locale" => {
                     call = call.locale(value.unwrap_or(""));
@@ -6638,6 +6749,9 @@ where
                     },
                     ("insert", Some(opt)) => {
                         call_result = self._live_broadcasts_insert(opt, dry_run, &mut err).await;
+                    },
+                    ("insert-cuepoint", Some(opt)) => {
+                        call_result = self._live_broadcasts_insert_cuepoint(opt, dry_run, &mut err).await;
                     },
                     ("list", Some(opt)) => {
                         call_result = self._live_broadcasts_list(opt, dry_run, &mut err).await;
@@ -7587,7 +7701,7 @@ async fn main() {
                   ]),
             ]),
         
-        ("live-broadcasts", "methods: 'bind', 'delete', 'insert', 'list', 'transition' and 'update'", vec![
+        ("live-broadcasts", "methods: 'bind', 'delete', 'insert', 'insert-cuepoint', 'list', 'transition' and 'update'", vec![
             ("bind",
                     Some(r##"Bind a broadcast to a stream."##),
                     "Details at http://byron.github.io/google-apis-rs/google_youtube3_cli/live-broadcasts_bind",
@@ -7635,6 +7749,28 @@ async fn main() {
             ("insert",
                     Some(r##"Inserts a new stream for the authenticated user."##),
                     "Details at http://byron.github.io/google-apis-rs/google_youtube3_cli/live-broadcasts_insert",
+                  vec![
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("insert-cuepoint",
+                    Some(r##"Insert cuepoints in a broadcast"##),
+                    "Details at http://byron.github.io/google-apis-rs/google_youtube3_cli/live-broadcasts_insert-cuepoint",
                   vec![
                     (Some(r##"kv"##),
                      Some(r##"r"##),
@@ -8755,7 +8891,7 @@ async fn main() {
     
     let mut app = App::new("youtube3")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("4.0.1+20220303")
+           .version("5.0.2+20230123")
            .about("The YouTube Data API v3 is an API that provides access to YouTube data, such as videos, playlists, and channels.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_youtube3_cli")
            .arg(Arg::with_name("url")

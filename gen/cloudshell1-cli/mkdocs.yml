@@ -1,4 +1,4 @@
-site_name: Cloud Shell v4.0.1+20220301
+site_name: Cloud Shell v5.0.2+20230109
 site_url: http://byron.github.io/google-apis-rs/google-cloudshell1-cli
 site_description: A complete library to interact with Cloud Shell (protocol v1)
 
@@ -7,17 +7,19 @@ repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/cloudshell1-cli
 docs_dir: docs
 site_dir: build_html
 
-pages:
-- ['index.md', 'Home']
-- ['operations_cancel.md', 'Operations', 'Cancel']
-- ['operations_delete.md', 'Operations', 'Delete']
-- ['operations_get.md', 'Operations', 'Get']
-- ['operations_list.md', 'Operations', 'List']
-- ['users_environments-add-public-key.md', 'Users', 'Environments Add Public Key']
-- ['users_environments-authorize.md', 'Users', 'Environments Authorize']
-- ['users_environments-get.md', 'Users', 'Environments Get']
-- ['users_environments-remove-public-key.md', 'Users', 'Environments Remove Public Key']
-- ['users_environments-start.md', 'Users', 'Environments Start']
+nav:
+- Home: 'index.md'
+- 'Operations':
+    - 'Cancel': 'operations_cancel.md'
+    - 'Delete': 'operations_delete.md'
+    - 'Get': 'operations_get.md'
+    - 'List': 'operations_list.md'
+- 'Users':
+    - 'Environments Add Public Key': 'users_environments-add-public-key.md'
+    - 'Environments Authorize': 'users_environments-authorize.md'
+    - 'Environments Get': 'users_environments-get.md'
+    - 'Environments Remove Public Key': 'users_environments-remove-public-key.md'
+    - 'Environments Start': 'users_environments-start.md'
 
 theme: readthedocs
 

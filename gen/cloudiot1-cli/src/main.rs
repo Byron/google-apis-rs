@@ -3,8 +3,6 @@
 // DO NOT EDIT !
 #![allow(unused_variables, unused_imports, dead_code, unused_mut)]
 
-extern crate tokio;
-
 #[macro_use]
 extern crate clap;
 
@@ -12,9 +10,10 @@ use std::env;
 use std::io::{self, Write};
 use clap::{App, SubCommand, Arg};
 
-use google_cloudiot1::{api, Error, oauth2};
+use google_cloudiot1::{api, Error, oauth2, client::chrono, FieldMask};
 
-mod client;
+
+use google_clis_common as client;
 
 use client::{InvalidOptionsError, CLIError, arg_from_str, writer_from_opts, parse_kv_arg,
           input_file_from_opts, input_mime_from_opts, FieldCursor, FieldError, CallType, UploadProtocol,
@@ -286,7 +285,7 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "num-versions" => {
-                    call = call.num_versions(arg_from_str(value.unwrap_or("-0"), err, "num-versions", "integer"));
+                    call = call.num_versions(        value.map(|v| arg_from_str(v, err, "num-versions", "int32")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -502,7 +501,7 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "field-mask" => {
-                    call = call.field_mask(value.unwrap_or(""));
+                    call = call.field_mask(        value.map(|v| arg_from_str(v, err, "field-mask", "google-fieldmask")).unwrap_or(FieldMask::default()));
                 },
                 _ => {
                     let mut found = false;
@@ -561,7 +560,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 "gateway-list-options-gateway-type" => {
                     call = call.gateway_list_options_gateway_type(value.unwrap_or(""));
@@ -573,10 +572,10 @@ where
                     call = call.gateway_list_options_associations_device_id(value.unwrap_or(""));
                 },
                 "field-mask" => {
-                    call = call.field_mask(value.unwrap_or(""));
+                    call = call.field_mask(        value.map(|v| arg_from_str(v, err, "field-mask", "google-fieldmask")).unwrap_or(FieldMask::default()));
                 },
                 "device-num-ids" => {
-                    call = call.add_device_num_ids(value.unwrap_or(""));
+                    call = call.add_device_num_ids(        value.map(|v| arg_from_str(v, err, "device-num-ids", "uint64")).unwrap_or(0));
                 },
                 "device-ids" => {
                     call = call.add_device_ids(value.unwrap_or(""));
@@ -777,7 +776,7 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "update-mask" => {
-                    call = call.update_mask(value.unwrap_or(""));
+                    call = call.update_mask(        value.map(|v| arg_from_str(v, err, "update-mask", "google-fieldmask")).unwrap_or(FieldMask::default()));
                 },
                 _ => {
                     let mut found = false;
@@ -919,7 +918,7 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "num-states" => {
-                    call = call.num_states(arg_from_str(value.unwrap_or("-0"), err, "num-states", "integer"));
+                    call = call.num_states(        value.map(|v| arg_from_str(v, err, "num-states", "int32")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -1115,7 +1114,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 "gateway-list-options-gateway-type" => {
                     call = call.gateway_list_options_gateway_type(value.unwrap_or(""));
@@ -1127,10 +1126,10 @@ where
                     call = call.gateway_list_options_associations_device_id(value.unwrap_or(""));
                 },
                 "field-mask" => {
-                    call = call.field_mask(value.unwrap_or(""));
+                    call = call.field_mask(        value.map(|v| arg_from_str(v, err, "field-mask", "google-fieldmask")).unwrap_or(FieldMask::default()));
                 },
                 "device-num-ids" => {
-                    call = call.add_device_num_ids(value.unwrap_or(""));
+                    call = call.add_device_num_ids(        value.map(|v| arg_from_str(v, err, "device-num-ids", "uint64")).unwrap_or(0));
                 },
                 "device-ids" => {
                     call = call.add_device_ids(value.unwrap_or(""));
@@ -1448,7 +1447,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -1542,7 +1541,7 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "update-mask" => {
-                    call = call.update_mask(value.unwrap_or(""));
+                    call = call.update_mask(        value.map(|v| arg_from_str(v, err, "update-mask", "google-fieldmask")).unwrap_or(FieldMask::default()));
                 },
                 _ => {
                     let mut found = false;
@@ -2332,7 +2331,7 @@ async fn main() {
                   vec![
                     (Some(r##"resource"##),
                      None,
-                     Some(r##"REQUIRED: The resource for which the policy is being requested. See the operation documentation for the appropriate value for this field."##),
+                     Some(r##"REQUIRED: The resource for which the policy is being requested. See [Resource names](https://cloud.google.com/apis/design/resource_names) for the appropriate value for this field."##),
                      Some(true),
                      Some(false)),
         
@@ -2382,7 +2381,7 @@ async fn main() {
                   vec![
                     (Some(r##"resource"##),
                      None,
-                     Some(r##"REQUIRED: The resource for which the policy is being requested. See the operation documentation for the appropriate value for this field."##),
+                     Some(r##"REQUIRED: The resource for which the policy is being requested. See [Resource names](https://cloud.google.com/apis/design/resource_names) for the appropriate value for this field."##),
                      Some(true),
                      Some(false)),
         
@@ -2410,7 +2409,7 @@ async fn main() {
                   vec![
                     (Some(r##"resource"##),
                      None,
-                     Some(r##"REQUIRED: The resource for which the policy is being specified. See the operation documentation for the appropriate value for this field."##),
+                     Some(r##"REQUIRED: The resource for which the policy is being specified. See [Resource names](https://cloud.google.com/apis/design/resource_names) for the appropriate value for this field."##),
                      Some(true),
                      Some(false)),
         
@@ -2438,7 +2437,7 @@ async fn main() {
                   vec![
                     (Some(r##"resource"##),
                      None,
-                     Some(r##"REQUIRED: The resource for which the policy detail is being requested. See the operation documentation for the appropriate value for this field."##),
+                     Some(r##"REQUIRED: The resource for which the policy detail is being requested. See [Resource names](https://cloud.google.com/apis/design/resource_names) for the appropriate value for this field."##),
                      Some(true),
                      Some(false)),
         
@@ -2516,7 +2515,7 @@ async fn main() {
                   vec![
                     (Some(r##"resource"##),
                      None,
-                     Some(r##"REQUIRED: The resource for which the policy is being specified. See the operation documentation for the appropriate value for this field."##),
+                     Some(r##"REQUIRED: The resource for which the policy is being specified. See [Resource names](https://cloud.google.com/apis/design/resource_names) for the appropriate value for this field."##),
                      Some(true),
                      Some(false)),
         
@@ -2544,7 +2543,7 @@ async fn main() {
                   vec![
                     (Some(r##"resource"##),
                      None,
-                     Some(r##"REQUIRED: The resource for which the policy detail is being requested. See the operation documentation for the appropriate value for this field."##),
+                     Some(r##"REQUIRED: The resource for which the policy detail is being requested. See [Resource names](https://cloud.google.com/apis/design/resource_names) for the appropriate value for this field."##),
                      Some(true),
                      Some(false)),
         
@@ -2600,7 +2599,7 @@ async fn main() {
     
     let mut app = App::new("cloudiot1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("4.0.1+20220131")
+           .version("5.0.2+20230102")
            .about("Registers and manages IoT (Internet of Things) devices that connect to the Google Cloud Platform. ")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_cloudiot1_cli")
            .arg(Arg::with_name("url")

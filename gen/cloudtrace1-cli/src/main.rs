@@ -3,8 +3,6 @@
 // DO NOT EDIT !
 #![allow(unused_variables, unused_imports, dead_code, unused_mut)]
 
-extern crate tokio;
-
 #[macro_use]
 extern crate clap;
 
@@ -12,9 +10,10 @@ use std::env;
 use std::io::{self, Write};
 use clap::{App, SubCommand, Arg};
 
-use google_cloudtrace1::{api, Error, oauth2};
+use google_cloudtrace1::{api, Error, oauth2, client::chrono, FieldMask};
 
-mod client;
+
+use google_clis_common as client;
 
 use client::{InvalidOptionsError, CLIError, arg_from_str, writer_from_opts, parse_kv_arg,
           input_file_from_opts, input_mime_from_opts, FieldCursor, FieldError, CallType, UploadProtocol,
@@ -197,13 +196,13 @@ where
                     call = call.view(value.unwrap_or(""));
                 },
                 "start-time" => {
-                    call = call.start_time(value.unwrap_or(""));
+                    call = call.start_time(        value.map(|v| arg_from_str(v, err, "start-time", "google-datetime")).unwrap_or(chrono::Utc::now()));
                 },
                 "page-token" => {
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 "order-by" => {
                     call = call.order_by(value.unwrap_or(""));
@@ -212,7 +211,7 @@ where
                     call = call.filter(value.unwrap_or(""));
                 },
                 "end-time" => {
-                    call = call.end_time(value.unwrap_or(""));
+                    call = call.end_time(        value.map(|v| arg_from_str(v, err, "end-time", "google-datetime")).unwrap_or(chrono::Utc::now()));
                 },
                 _ => {
                     let mut found = false;
@@ -441,7 +440,7 @@ async fn main() {
     
     let mut app = App::new("cloudtrace1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("4.0.1+20220224")
+           .version("5.0.2+20230112")
            .about("Sends application trace data to Cloud Trace for viewing. Trace data is collected for all App Engine applications by default. Trace data from other applications can be provided using this API. This library is used to interact with the Cloud Trace API directly. If you are looking to instrument your application for Cloud Trace, we recommend using OpenTelemetry. ")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_cloudtrace1_cli")
            .arg(Arg::with_name("url")

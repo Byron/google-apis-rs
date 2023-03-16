@@ -1,4 +1,4 @@
-site_name: Cloud Resource Manager v4.0.1+20220306
+site_name: Cloud Resource Manager v5.0.2+20230115
 site_url: http://byron.github.io/google-apis-rs/google-cloudresourcemanager2-cli
 site_description: A complete library to interact with Cloud Resource Manager (protocol v2)
 
@@ -7,20 +7,22 @@ repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/cloudresourceman
 docs_dir: docs
 site_dir: build_html
 
-pages:
-- ['index.md', 'Home']
-- ['folders_create.md', 'Folders', 'Create']
-- ['folders_delete.md', 'Folders', 'Delete']
-- ['folders_get.md', 'Folders', 'Get']
-- ['folders_get-iam-policy.md', 'Folders', 'Get Iam Policy']
-- ['folders_list.md', 'Folders', 'List']
-- ['folders_move.md', 'Folders', 'Move']
-- ['folders_patch.md', 'Folders', 'Patch']
-- ['folders_search.md', 'Folders', 'Search']
-- ['folders_set-iam-policy.md', 'Folders', 'Set Iam Policy']
-- ['folders_test-iam-permissions.md', 'Folders', 'Test Iam Permissions']
-- ['folders_undelete.md', 'Folders', 'Undelete']
-- ['operations_get.md', 'Operations', 'Get']
+nav:
+- Home: 'index.md'
+- 'Folders':
+    - 'Create': 'folders_create.md'
+    - 'Delete': 'folders_delete.md'
+    - 'Get': 'folders_get.md'
+    - 'Get Iam Policy': 'folders_get-iam-policy.md'
+    - 'List': 'folders_list.md'
+    - 'Move': 'folders_move.md'
+    - 'Patch': 'folders_patch.md'
+    - 'Search': 'folders_search.md'
+    - 'Set Iam Policy': 'folders_set-iam-policy.md'
+    - 'Test Iam Permissions': 'folders_test-iam-permissions.md'
+    - 'Undelete': 'folders_undelete.md'
+- 'Operations':
+    - 'Get': 'operations_get.md'
 
 theme: readthedocs
 

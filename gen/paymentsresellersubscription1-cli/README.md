@@ -25,12 +25,13 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Payments Reseller Subscription* API at revision *20220307*. The CLI is at version *4.0.1*.
+This documentation was generated from the *Payments Reseller Subscription* API at revision *20230123*. The CLI is at version *5.0.2*.
 
 ```bash
 paymentsresellersubscription1 [options]
         partners
                 products-list <parent> [-p <v>]... [-o <out>]
+                promotions-find-eligible <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 promotions-list <parent> [-p <v>]... [-o <out>]
                 subscriptions-cancel <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 subscriptions-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]

@@ -4,12 +4,12 @@
 [package]
 
 name = "google-domains1_beta1"
-version = "5.0.2-beta-1+20230105"
+version = "5.0.2+20230105"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Cloud Domains (protocol v1beta1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/domains1_beta1"
 homepage = "https://cloud.google.com/domains/"
-documentation = "https://docs.rs/google-domains1_beta1/5.0.2-beta-1+20230105"
+documentation = "https://docs.rs/google-domains1_beta1/5.0.2+20230105"
 license = "MIT"
 keywords = ["domains", "google", "protocol", "web", "api"]
 autobins = false

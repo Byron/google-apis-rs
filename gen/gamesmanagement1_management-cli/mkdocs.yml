@@ -1,4 +1,4 @@
-site_name: Games Management v4.0.1+20220217
+site_name: Games Management v5.0.2+20230112
 site_url: http://byron.github.io/google-apis-rs/google-gamesmanagement1_management-cli
 site_description: A complete library to interact with Games Management (protocol v1management)
 
@@ -7,26 +7,31 @@ repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/gamesmanagement1
 docs_dir: docs
 site_dir: build_html
 
-pages:
-- ['index.md', 'Home']
-- ['achievements_reset.md', 'Achievements', 'Reset']
-- ['achievements_reset-all.md', 'Achievements', 'Reset All']
-- ['achievements_reset-all-for-all-players.md', 'Achievements', 'Reset All For All Players']
-- ['achievements_reset-for-all-players.md', 'Achievements', 'Reset For All Players']
-- ['achievements_reset-multiple-for-all-players.md', 'Achievements', 'Reset Multiple For All Players']
-- ['applications_list-hidden.md', 'Applications', 'List Hidden']
-- ['events_reset.md', 'Events', 'Reset']
-- ['events_reset-all.md', 'Events', 'Reset All']
-- ['events_reset-all-for-all-players.md', 'Events', 'Reset All For All Players']
-- ['events_reset-for-all-players.md', 'Events', 'Reset For All Players']
-- ['events_reset-multiple-for-all-players.md', 'Events', 'Reset Multiple For All Players']
-- ['players_hide.md', 'Players', 'Hide']
-- ['players_unhide.md', 'Players', 'Unhide']
-- ['scores_reset.md', 'Scores', 'Reset']
-- ['scores_reset-all.md', 'Scores', 'Reset All']
-- ['scores_reset-all-for-all-players.md', 'Scores', 'Reset All For All Players']
-- ['scores_reset-for-all-players.md', 'Scores', 'Reset For All Players']
-- ['scores_reset-multiple-for-all-players.md', 'Scores', 'Reset Multiple For All Players']
+nav:
+- Home: 'index.md'
+- 'Achievements':
+    - 'Reset': 'achievements_reset.md'
+    - 'Reset All': 'achievements_reset-all.md'
+    - 'Reset All For All Players': 'achievements_reset-all-for-all-players.md'
+    - 'Reset For All Players': 'achievements_reset-for-all-players.md'
+    - 'Reset Multiple For All Players': 'achievements_reset-multiple-for-all-players.md'
+- 'Applications':
+    - 'List Hidden': 'applications_list-hidden.md'
+- 'Events':
+    - 'Reset': 'events_reset.md'
+    - 'Reset All': 'events_reset-all.md'
+    - 'Reset All For All Players': 'events_reset-all-for-all-players.md'
+    - 'Reset For All Players': 'events_reset-for-all-players.md'
+    - 'Reset Multiple For All Players': 'events_reset-multiple-for-all-players.md'
+- 'Players':
+    - 'Hide': 'players_hide.md'
+    - 'Unhide': 'players_unhide.md'
+- 'Scores':
+    - 'Reset': 'scores_reset.md'
+    - 'Reset All': 'scores_reset-all.md'
+    - 'Reset All For All Players': 'scores_reset-all-for-all-players.md'
+    - 'Reset For All Players': 'scores_reset-for-all-players.md'
+    - 'Reset Multiple For All Players': 'scores_reset-multiple-for-all-players.md'
 
 theme: readthedocs
 

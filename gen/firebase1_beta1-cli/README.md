@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Firebase Management* API at revision *20220304*. The CLI is at version *4.0.1*.
+This documentation was generated from the *Firebase Management* API at revision *20230123*. The CLI is at version *5.0.2*.
 
 ```bash
 firebase1-beta1 [options]
@@ -41,9 +41,11 @@ firebase1-beta1 [options]
                 android-apps-get-config <name> [-p <v>]... [-o <out>]
                 android-apps-list <parent> [-p <v>]... [-o <out>]
                 android-apps-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                android-apps-remove <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 android-apps-sha-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 android-apps-sha-delete <name> [-p <v>]... [-o <out>]
                 android-apps-sha-list <parent> [-p <v>]... [-o <out>]
+                android-apps-undelete <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 available-locations-list <parent> [-p <v>]... [-o <out>]
                 default-location-finalize <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 get <name> [-p <v>]... [-o <out>]
@@ -54,6 +56,8 @@ firebase1-beta1 [options]
                 ios-apps-get-config <name> [-p <v>]... [-o <out>]
                 ios-apps-list <parent> [-p <v>]... [-o <out>]
                 ios-apps-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                ios-apps-remove <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                ios-apps-undelete <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 list [-p <v>]... [-o <out>]
                 patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 remove-analytics <parent> (-r <kv>)... [-p <v>]... [-o <out>]
@@ -63,6 +67,8 @@ firebase1-beta1 [options]
                 web-apps-get-config <name> [-p <v>]... [-o <out>]
                 web-apps-list <parent> [-p <v>]... [-o <out>]
                 web-apps-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                web-apps-remove <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                web-apps-undelete <name> (-r <kv>)... [-p <v>]... [-o <out>]
   firebase1-beta1 --help
 
 Configuration:

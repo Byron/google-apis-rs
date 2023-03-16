@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Cloud Deploy* API at revision *20220223*. The CLI is at version *4.0.1*.
+This documentation was generated from the *Cloud Deploy* API at revision *20230105*. The CLI is at version *5.0.2*.
 
 ```bash
 clouddeploy1 [options]
@@ -36,13 +36,17 @@ clouddeploy1 [options]
                 locations-delivery-pipelines-get-iam-policy <resource> [-p <v>]... [-o <out>]
                 locations-delivery-pipelines-list <parent> [-p <v>]... [-o <out>]
                 locations-delivery-pipelines-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-delivery-pipelines-releases-abandon <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-delivery-pipelines-releases-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-delivery-pipelines-releases-get <name> [-p <v>]... [-o <out>]
                 locations-delivery-pipelines-releases-list <parent> [-p <v>]... [-o <out>]
                 locations-delivery-pipelines-releases-rollouts-approve <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-delivery-pipelines-releases-rollouts-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-delivery-pipelines-releases-rollouts-get <name> [-p <v>]... [-o <out>]
+                locations-delivery-pipelines-releases-rollouts-job-runs-get <name> [-p <v>]... [-o <out>]
+                locations-delivery-pipelines-releases-rollouts-job-runs-list <parent> [-p <v>]... [-o <out>]
                 locations-delivery-pipelines-releases-rollouts-list <parent> [-p <v>]... [-o <out>]
+                locations-delivery-pipelines-releases-rollouts-retry-job <rollout> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-delivery-pipelines-set-iam-policy <resource> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-delivery-pipelines-test-iam-permissions <resource> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-get <name> [-p <v>]... [-o <out>]

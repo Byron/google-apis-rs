@@ -3,8 +3,6 @@
 // DO NOT EDIT !
 #![allow(unused_variables, unused_imports, dead_code, unused_mut)]
 
-extern crate tokio;
-
 #[macro_use]
 extern crate clap;
 
@@ -12,9 +10,10 @@ use std::env;
 use std::io::{self, Write};
 use clap::{App, SubCommand, Arg};
 
-use google_clouddebugger2::{api, Error, oauth2};
+use google_clouddebugger2::{api, Error, oauth2, client::chrono, FieldMask};
 
-mod client;
+
+use google_clis_common as client;
 
 use client::{InvalidOptionsError, CLIError, arg_from_str, writer_from_opts, parse_kv_arg,
           input_file_from_opts, input_mime_from_opts, FieldCursor, FieldError, CallType, UploadProtocol,
@@ -61,7 +60,7 @@ where
                     call = call.wait_token(value.unwrap_or(""));
                 },
                 "success-on-timeout" => {
-                    call = call.success_on_timeout(arg_from_str(value.unwrap_or("false"), err, "success-on-timeout", "boolean"));
+                    call = call.success_on_timeout(        value.map(|v| arg_from_str(v, err, "success-on-timeout", "boolean")).unwrap_or(false));
                 },
                 "agent-id" => {
                     call = call.agent_id(value.unwrap_or(""));
@@ -436,13 +435,13 @@ where
                     call = call.wait_token(value.unwrap_or(""));
                 },
                 "strip-results" => {
-                    call = call.strip_results(arg_from_str(value.unwrap_or("false"), err, "strip-results", "boolean"));
+                    call = call.strip_results(        value.map(|v| arg_from_str(v, err, "strip-results", "boolean")).unwrap_or(false));
                 },
                 "include-inactive" => {
-                    call = call.include_inactive(arg_from_str(value.unwrap_or("false"), err, "include-inactive", "boolean"));
+                    call = call.include_inactive(        value.map(|v| arg_from_str(v, err, "include-inactive", "boolean")).unwrap_or(false));
                 },
                 "include-all-users" => {
-                    call = call.include_all_users(arg_from_str(value.unwrap_or("false"), err, "include-all-users", "boolean"));
+                    call = call.include_all_users(        value.map(|v| arg_from_str(v, err, "include-all-users", "boolean")).unwrap_or(false));
                 },
                 "client-version" => {
                     call = call.client_version(value.unwrap_or(""));
@@ -618,7 +617,7 @@ where
                     call = call.project(value.unwrap_or(""));
                 },
                 "include-inactive" => {
-                    call = call.include_inactive(arg_from_str(value.unwrap_or("false"), err, "include-inactive", "boolean"));
+                    call = call.include_inactive(        value.map(|v| arg_from_str(v, err, "include-inactive", "boolean")).unwrap_or(false));
                 },
                 "client-version" => {
                     call = call.client_version(value.unwrap_or(""));
@@ -998,7 +997,7 @@ async fn main() {
     
     let mut app = App::new("clouddebugger2")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("4.0.1+20220225")
+           .version("5.0.2+20230113")
            .about("Examines the call stack and variables of a running application without stopping or slowing it down. ")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_clouddebugger2_cli")
            .arg(Arg::with_name("url")

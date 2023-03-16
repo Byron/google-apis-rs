@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Dialogflow* API at revision *20220228*. The CLI is at version *4.0.1*.
+This documentation was generated from the *Dialogflow* API at revision *20230110*. The CLI is at version *5.0.2*.
 
 ```bash
 dialogflow2-beta1 [options]
@@ -128,6 +128,7 @@ dialogflow2-beta1 [options]
                 conversations-participants-suggestions-suggest-articles <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 conversations-participants-suggestions-suggest-faq-answers <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 conversations-participants-suggestions-suggest-smart-replies <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                conversations-suggestions-suggest-conversation-summary <conversation> (-r <kv>)... [-p <v>]... [-o <out>]
                 delete-agent <parent> [-p <v>]... [-o <out>]
                 get-agent <parent> [-p <v>]... [-o <out>]
                 knowledge-bases-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
@@ -227,6 +228,7 @@ dialogflow2-beta1 [options]
                 locations-conversations-participants-suggestions-suggest-articles <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-conversations-participants-suggestions-suggest-faq-answers <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-conversations-participants-suggestions-suggest-smart-replies <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-conversations-suggestions-suggest-conversation-summary <conversation> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-delete-agent <parent> [-p <v>]... [-o <out>]
                 locations-get <name> [-p <v>]... [-o <out>]
                 locations-get-agent <parent> [-p <v>]... [-o <out>]

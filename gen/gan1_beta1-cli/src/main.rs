@@ -3,8 +3,6 @@
 // DO NOT EDIT !
 #![allow(unused_variables, unused_imports, dead_code, unused_mut)]
 
-extern crate tokio;
-
 #[macro_use]
 extern crate clap;
 
@@ -12,9 +10,10 @@ use std::env;
 use std::io::{self, Write};
 use clap::{App, SubCommand, Arg};
 
-use google_gan1_beta1::{api, Error, oauth2};
+use google_gan1_beta1::{api, Error, oauth2, client::chrono, FieldMask};
 
-mod client;
+
+use google_clis_common as client;
 
 use client::{InvalidOptionsError, CLIError, arg_from_str, writer_from_opts, parse_kv_arg,
           input_file_from_opts, input_mime_from_opts, FieldCursor, FieldError, CallType, UploadProtocol,
@@ -117,16 +116,16 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "min-seven-day-epc" => {
-                    call = call.min_seven_day_epc(arg_from_str(value.unwrap_or("0.0"), err, "min-seven-day-epc", "number"));
+                    call = call.min_seven_day_epc(        value.map(|v| arg_from_str(v, err, "min-seven-day-epc", "double")).unwrap_or(0.0));
                 },
                 "min-payout-rank" => {
-                    call = call.min_payout_rank(arg_from_str(value.unwrap_or("-0"), err, "min-payout-rank", "integer"));
+                    call = call.min_payout_rank(        value.map(|v| arg_from_str(v, err, "min-payout-rank", "int32")).unwrap_or(-0));
                 },
                 "min-ninety-day-epc" => {
-                    call = call.min_ninety_day_epc(arg_from_str(value.unwrap_or("0.0"), err, "min-ninety-day-epc", "number"));
+                    call = call.min_ninety_day_epc(        value.map(|v| arg_from_str(v, err, "min-ninety-day-epc", "double")).unwrap_or(0.0));
                 },
                 "max-results" => {
-                    call = call.max_results(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
+                    call = call.max_results(        value.map(|v| arg_from_str(v, err, "max-results", "uint32")).unwrap_or(0));
                 },
                 "advertiser-category" => {
                     call = call.advertiser_category(value.unwrap_or(""));
@@ -268,7 +267,7 @@ where
                     call = call.member_id(value.unwrap_or(""));
                 },
                 "max-results" => {
-                    call = call.max_results(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
+                    call = call.max_results(        value.map(|v| arg_from_str(v, err, "max-results", "uint32")).unwrap_or(0));
                 },
                 "link-id" => {
                     call = call.link_id(value.unwrap_or(""));
@@ -518,7 +517,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "max-results" => {
-                    call = call.max_results(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
+                    call = call.max_results(        value.map(|v| arg_from_str(v, err, "max-results", "uint32")).unwrap_or(0));
                 },
                 "link-type" => {
                     call = call.link_type(value.unwrap_or(""));
@@ -536,7 +535,7 @@ where
                     call = call.add_asset_size(value.unwrap_or(""));
                 },
                 "advertiser-id" => {
-                    call = call.add_advertiser_id(value.unwrap_or(""));
+                    call = call.add_advertiser_id(        value.map(|v| arg_from_str(v, err, "advertiser-id", "int64")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -651,16 +650,16 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "min-seven-day-epc" => {
-                    call = call.min_seven_day_epc(arg_from_str(value.unwrap_or("0.0"), err, "min-seven-day-epc", "number"));
+                    call = call.min_seven_day_epc(        value.map(|v| arg_from_str(v, err, "min-seven-day-epc", "double")).unwrap_or(0.0));
                 },
                 "min-payout-rank" => {
-                    call = call.min_payout_rank(arg_from_str(value.unwrap_or("-0"), err, "min-payout-rank", "integer"));
+                    call = call.min_payout_rank(        value.map(|v| arg_from_str(v, err, "min-payout-rank", "int32")).unwrap_or(-0));
                 },
                 "min-ninety-day-epc" => {
-                    call = call.min_ninety_day_epc(arg_from_str(value.unwrap_or("0.0"), err, "min-ninety-day-epc", "number"));
+                    call = call.min_ninety_day_epc(        value.map(|v| arg_from_str(v, err, "min-ninety-day-epc", "double")).unwrap_or(0.0));
                 },
                 "max-results" => {
-                    call = call.max_results(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
+                    call = call.max_results(        value.map(|v| arg_from_str(v, err, "max-results", "uint32")).unwrap_or(0));
                 },
                 _ => {
                     let mut found = false;
@@ -716,7 +715,7 @@ where
                     call = call.status(value.unwrap_or(""));
                 },
                 "start-index" => {
-                    call = call.start_index(arg_from_str(value.unwrap_or("-0"), err, "start-index", "integer"));
+                    call = call.start_index(        value.map(|v| arg_from_str(v, err, "start-index", "uint32")).unwrap_or(0));
                 },
                 "start-date" => {
                     call = call.start_date(value.unwrap_or(""));
@@ -728,7 +727,7 @@ where
                     call = call.add_order_id(value.unwrap_or(""));
                 },
                 "max-results" => {
-                    call = call.max_results(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
+                    call = call.max_results(        value.map(|v| arg_from_str(v, err, "max-results", "uint32")).unwrap_or(0));
                 },
                 "link-id" => {
                     call = call.add_link_id(value.unwrap_or(""));
@@ -740,7 +739,7 @@ where
                     call = call.end_date(value.unwrap_or(""));
                 },
                 "calculate-totals" => {
-                    call = call.calculate_totals(arg_from_str(value.unwrap_or("false"), err, "calculate-totals", "boolean"));
+                    call = call.calculate_totals(        value.map(|v| arg_from_str(v, err, "calculate-totals", "boolean")).unwrap_or(false));
                 },
                 "advertiser-id" => {
                     call = call.add_advertiser_id(value.unwrap_or(""));
@@ -1256,7 +1255,7 @@ async fn main() {
     
     let mut app = App::new("gan1-beta1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("4.0.1+20130205")
+           .version("5.0.2+20130205")
            .about("Lets you have programmatic access to your Google Affiliate Network data.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_gan1_beta1_cli")
            .arg(Arg::with_name("folder")

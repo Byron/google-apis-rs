@@ -3,8 +3,6 @@
 // DO NOT EDIT !
 #![allow(unused_variables, unused_imports, dead_code, unused_mut)]
 
-extern crate tokio;
-
 #[macro_use]
 extern crate clap;
 
@@ -12,9 +10,10 @@ use std::env;
 use std::io::{self, Write};
 use clap::{App, SubCommand, Arg};
 
-use google_dialogflow3::{api, Error, oauth2};
+use google_dialogflow3::{api, Error, oauth2, client::chrono, FieldMask};
 
-mod client;
+
+use google_clis_common as client;
 
 use client::{InvalidOptionsError, CLIError, arg_from_str, writer_from_opts, parse_kv_arg,
           input_file_from_opts, input_mime_from_opts, FieldCursor, FieldError, CallType, UploadProtocol,
@@ -113,7 +112,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 "filter" => {
                     call = call.filter(value.unwrap_or(""));
@@ -196,6 +195,7 @@ where
                     "display-name" => Some(("displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "enable-spell-correction" => Some(("enableSpellCorrection", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "enable-stackdriver-logging" => Some(("enableStackdriverLogging", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "locked" => Some(("locked", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "security-settings" => Some(("securitySettings", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "speech-to-text-settings.enable-speech-adaptation" => Some(("speechToTextSettings.enableSpeechAdaptation", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
@@ -203,7 +203,7 @@ where
                     "supported-language-codes" => Some(("supportedLanguageCodes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "time-zone" => Some(("timeZone", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["advanced-settings", "avatar-uri", "default-language-code", "description", "display-name", "enable-interaction-logging", "enable-speech-adaptation", "enable-spell-correction", "enable-stackdriver-logging", "logging-settings", "name", "security-settings", "speech-to-text-settings", "start-flow", "supported-language-codes", "time-zone"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["advanced-settings", "avatar-uri", "default-language-code", "description", "display-name", "enable-interaction-logging", "enable-speech-adaptation", "enable-spell-correction", "enable-stackdriver-logging", "locked", "logging-settings", "name", "security-settings", "speech-to-text-settings", "start-flow", "supported-language-codes", "time-zone"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -416,7 +416,7 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "force" => {
-                    call = call.force(arg_from_str(value.unwrap_or("false"), err, "force", "boolean"));
+                    call = call.force(        value.map(|v| arg_from_str(v, err, "force", "boolean")).unwrap_or(false));
                 },
                 _ => {
                     let mut found = false;
@@ -531,7 +531,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 "language-code" => {
                     call = call.language_code(value.unwrap_or(""));
@@ -628,7 +628,7 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "update-mask" => {
-                    call = call.update_mask(value.unwrap_or(""));
+                    call = call.update_mask(        value.map(|v| arg_from_str(v, err, "update-mask", "google-fieldmask")).unwrap_or(FieldMask::default()));
                 },
                 "language-code" => {
                     call = call.language_code(value.unwrap_or(""));
@@ -690,7 +690,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -1029,7 +1029,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -1293,7 +1293,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -1398,7 +1398,7 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "update-mask" => {
-                    call = call.update_mask(value.unwrap_or(""));
+                    call = call.update_mask(        value.map(|v| arg_from_str(v, err, "update-mask", "google-fieldmask")).unwrap_or(FieldMask::default()));
                 },
                 _ => {
                     let mut found = false;
@@ -1677,7 +1677,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -1736,7 +1736,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -1831,7 +1831,7 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "update-mask" => {
-                    call = call.update_mask(value.unwrap_or(""));
+                    call = call.update_mask(        value.map(|v| arg_from_str(v, err, "update-mask", "google-fieldmask")).unwrap_or(FieldMask::default()));
                 },
                 _ => {
                     let mut found = false;
@@ -2010,6 +2010,7 @@ where
                     "query-input.language-code" => Some(("queryInput.languageCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "query-input.text.text" => Some(("queryInput.text.text", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "query-params.analyze-query-text-sentiment" => Some(("queryParams.analyzeQueryTextSentiment", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "query-params.channel" => Some(("queryParams.channel", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "query-params.current-page" => Some(("queryParams.currentPage", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "query-params.disable-webhook" => Some(("queryParams.disableWebhook", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "query-params.flow-versions" => Some(("queryParams.flowVersions", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
@@ -2018,7 +2019,7 @@ where
                     "query-params.time-zone" => Some(("queryParams.timeZone", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "query-params.webhook-headers" => Some(("queryParams.webhookHeaders", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["analyze-query-text-sentiment", "audio", "audio-encoding", "config", "current-page", "digits", "disable-webhook", "dtmf", "effects-profile-id", "enable-word-info", "event", "finish-digit", "flow-versions", "geo-location", "intent", "language-code", "latitude", "longitude", "model", "model-variant", "name", "output-audio-config", "phrase-hints", "pitch", "query-input", "query-params", "sample-rate-hertz", "single-utterance", "speaking-rate", "ssml-gender", "synthesize-speech-config", "text", "time-zone", "voice", "volume-gain-db", "webhook-headers"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["analyze-query-text-sentiment", "audio", "audio-encoding", "channel", "config", "current-page", "digits", "disable-webhook", "dtmf", "effects-profile-id", "enable-word-info", "event", "finish-digit", "flow-versions", "geo-location", "intent", "language-code", "latitude", "longitude", "model", "model-variant", "name", "output-audio-config", "phrase-hints", "pitch", "query-input", "query-params", "sample-rate-hertz", "single-utterance", "speaking-rate", "ssml-gender", "synthesize-speech-config", "text", "time-zone", "voice", "volume-gain-db", "webhook-headers"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -2278,7 +2279,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -2368,7 +2369,7 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "update-mask" => {
-                    call = call.update_mask(value.unwrap_or(""));
+                    call = call.update_mask(        value.map(|v| arg_from_str(v, err, "update-mask", "google-fieldmask")).unwrap_or(FieldMask::default()));
                 },
                 _ => {
                     let mut found = false;
@@ -2465,6 +2466,7 @@ where
                     "match-intent-request.query-input.language-code" => Some(("matchIntentRequest.queryInput.languageCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "match-intent-request.query-input.text.text" => Some(("matchIntentRequest.queryInput.text.text", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "match-intent-request.query-params.analyze-query-text-sentiment" => Some(("matchIntentRequest.queryParams.analyzeQueryTextSentiment", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "match-intent-request.query-params.channel" => Some(("matchIntentRequest.queryParams.channel", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "match-intent-request.query-params.current-page" => Some(("matchIntentRequest.queryParams.currentPage", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "match-intent-request.query-params.disable-webhook" => Some(("matchIntentRequest.queryParams.disableWebhook", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "match-intent-request.query-params.flow-versions" => Some(("matchIntentRequest.queryParams.flowVersions", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
@@ -2481,7 +2483,7 @@ where
                     "output-audio-config.synthesize-speech-config.voice.ssml-gender" => Some(("outputAudioConfig.synthesizeSpeechConfig.voice.ssmlGender", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "output-audio-config.synthesize-speech-config.volume-gain-db" => Some(("outputAudioConfig.synthesizeSpeechConfig.volumeGainDb", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["analyze-query-text-sentiment", "audio", "audio-encoding", "confidence", "config", "current-page", "description", "digits", "disable-webhook", "display-name", "dtmf", "effects-profile-id", "enable-word-info", "event", "finish-digit", "flow-versions", "geo-location", "intent", "is-fallback", "labels", "language-code", "latitude", "longitude", "match", "match-intent-request", "match-type", "model", "model-variant", "name", "output-audio-config", "phrase-hints", "pitch", "priority", "query-input", "query-params", "resolved-input", "sample-rate-hertz", "single-utterance", "speaking-rate", "ssml-gender", "synthesize-speech-config", "text", "time-zone", "voice", "volume-gain-db", "webhook-headers"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["analyze-query-text-sentiment", "audio", "audio-encoding", "channel", "confidence", "config", "current-page", "description", "digits", "disable-webhook", "display-name", "dtmf", "effects-profile-id", "enable-word-info", "event", "finish-digit", "flow-versions", "geo-location", "intent", "is-fallback", "labels", "language-code", "latitude", "longitude", "match", "match-intent-request", "match-type", "model", "model-variant", "name", "output-audio-config", "phrase-hints", "pitch", "priority", "query-input", "query-params", "resolved-input", "sample-rate-hertz", "single-utterance", "speaking-rate", "ssml-gender", "synthesize-speech-config", "text", "time-zone", "voice", "volume-gain-db", "webhook-headers"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -2579,6 +2581,7 @@ where
                     "query-input.language-code" => Some(("queryInput.languageCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "query-input.text.text" => Some(("queryInput.text.text", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "query-params.analyze-query-text-sentiment" => Some(("queryParams.analyzeQueryTextSentiment", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "query-params.channel" => Some(("queryParams.channel", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "query-params.current-page" => Some(("queryParams.currentPage", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "query-params.disable-webhook" => Some(("queryParams.disableWebhook", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "query-params.flow-versions" => Some(("queryParams.flowVersions", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
@@ -2587,7 +2590,7 @@ where
                     "query-params.time-zone" => Some(("queryParams.timeZone", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "query-params.webhook-headers" => Some(("queryParams.webhookHeaders", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["analyze-query-text-sentiment", "audio", "audio-encoding", "config", "current-page", "digits", "disable-webhook", "dtmf", "enable-word-info", "event", "finish-digit", "flow-versions", "geo-location", "intent", "language-code", "latitude", "longitude", "model", "model-variant", "phrase-hints", "query-input", "query-params", "sample-rate-hertz", "single-utterance", "text", "time-zone", "webhook-headers"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["analyze-query-text-sentiment", "audio", "audio-encoding", "channel", "config", "current-page", "digits", "disable-webhook", "dtmf", "enable-word-info", "event", "finish-digit", "flow-versions", "geo-location", "intent", "language-code", "latitude", "longitude", "model", "model-variant", "phrase-hints", "query-input", "query-params", "sample-rate-hertz", "single-utterance", "text", "time-zone", "webhook-headers"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -2671,9 +2674,10 @@ where
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
                     "agent-uri" => Some(("agentUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "data-format" => Some(("dataFormat", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "environment" => Some(("environment", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["agent-uri", "environment"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["agent-uri", "data-format", "environment"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -2835,7 +2839,7 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "force" => {
-                    call = call.force(arg_from_str(value.unwrap_or("false"), err, "force", "boolean"));
+                    call = call.force(        value.map(|v| arg_from_str(v, err, "force", "boolean")).unwrap_or(false));
                 },
                 _ => {
                     let mut found = false;
@@ -3179,7 +3183,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 "language-code" => {
                     call = call.language_code(value.unwrap_or(""));
@@ -3332,7 +3336,7 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "force" => {
-                    call = call.force(arg_from_str(value.unwrap_or("false"), err, "force", "boolean"));
+                    call = call.force(        value.map(|v| arg_from_str(v, err, "force", "boolean")).unwrap_or(false));
                 },
                 _ => {
                     let mut found = false;
@@ -3447,7 +3451,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 "language-code" => {
                     call = call.language_code(value.unwrap_or(""));
@@ -3544,7 +3548,7 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "update-mask" => {
-                    call = call.update_mask(value.unwrap_or(""));
+                    call = call.update_mask(        value.map(|v| arg_from_str(v, err, "update-mask", "google-fieldmask")).unwrap_or(FieldMask::default()));
                 },
                 "language-code" => {
                     call = call.language_code(value.unwrap_or(""));
@@ -3642,7 +3646,7 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "update-mask" => {
-                    call = call.update_mask(value.unwrap_or(""));
+                    call = call.update_mask(        value.map(|v| arg_from_str(v, err, "update-mask", "google-fieldmask")).unwrap_or(FieldMask::default()));
                 },
                 "language-code" => {
                     call = call.language_code(value.unwrap_or(""));
@@ -3875,7 +3879,7 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "force" => {
-                    call = call.force(arg_from_str(value.unwrap_or("false"), err, "force", "boolean"));
+                    call = call.force(        value.map(|v| arg_from_str(v, err, "force", "boolean")).unwrap_or(false));
                 },
                 _ => {
                     let mut found = false;
@@ -3990,7 +3994,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 "language-code" => {
                     call = call.language_code(value.unwrap_or(""));
@@ -4083,7 +4087,7 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "update-mask" => {
-                    call = call.update_mask(value.unwrap_or(""));
+                    call = call.update_mask(        value.map(|v| arg_from_str(v, err, "update-mask", "google-fieldmask")).unwrap_or(FieldMask::default()));
                 },
                 "language-code" => {
                     call = call.language_code(value.unwrap_or(""));
@@ -4512,7 +4516,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -4693,7 +4697,7 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "update-mask" => {
-                    call = call.update_mask(value.unwrap_or(""));
+                    call = call.update_mask(        value.map(|v| arg_from_str(v, err, "update-mask", "google-fieldmask")).unwrap_or(FieldMask::default()));
                 },
                 _ => {
                     let mut found = false;
@@ -5062,7 +5066,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 "language-code" => {
                     call = call.language_code(value.unwrap_or(""));
@@ -5162,7 +5166,7 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "update-mask" => {
-                    call = call.update_mask(value.unwrap_or(""));
+                    call = call.update_mask(        value.map(|v| arg_from_str(v, err, "update-mask", "google-fieldmask")).unwrap_or(FieldMask::default()));
                 },
                 "language-code" => {
                     call = call.language_code(value.unwrap_or(""));
@@ -5224,7 +5228,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -5304,6 +5308,7 @@ where
                     "display-name" => Some(("displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "enable-spell-correction" => Some(("enableSpellCorrection", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "enable-stackdriver-logging" => Some(("enableStackdriverLogging", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "locked" => Some(("locked", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "security-settings" => Some(("securitySettings", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "speech-to-text-settings.enable-speech-adaptation" => Some(("speechToTextSettings.enableSpeechAdaptation", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
@@ -5311,7 +5316,7 @@ where
                     "supported-language-codes" => Some(("supportedLanguageCodes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "time-zone" => Some(("timeZone", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["advanced-settings", "avatar-uri", "default-language-code", "description", "display-name", "enable-interaction-logging", "enable-speech-adaptation", "enable-spell-correction", "enable-stackdriver-logging", "logging-settings", "name", "security-settings", "speech-to-text-settings", "start-flow", "supported-language-codes", "time-zone"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["advanced-settings", "avatar-uri", "default-language-code", "description", "display-name", "enable-interaction-logging", "enable-speech-adaptation", "enable-spell-correction", "enable-stackdriver-logging", "locked", "logging-settings", "name", "security-settings", "speech-to-text-settings", "start-flow", "supported-language-codes", "time-zone"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -5326,7 +5331,7 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "update-mask" => {
-                    call = call.update_mask(value.unwrap_or(""));
+                    call = call.update_mask(        value.map(|v| arg_from_str(v, err, "update-mask", "google-fieldmask")).unwrap_or(FieldMask::default()));
                 },
                 _ => {
                     let mut found = false;
@@ -5508,6 +5513,7 @@ where
                     "query-input.language-code" => Some(("queryInput.languageCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "query-input.text.text" => Some(("queryInput.text.text", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "query-params.analyze-query-text-sentiment" => Some(("queryParams.analyzeQueryTextSentiment", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "query-params.channel" => Some(("queryParams.channel", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "query-params.current-page" => Some(("queryParams.currentPage", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "query-params.disable-webhook" => Some(("queryParams.disableWebhook", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "query-params.flow-versions" => Some(("queryParams.flowVersions", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
@@ -5516,7 +5522,7 @@ where
                     "query-params.time-zone" => Some(("queryParams.timeZone", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "query-params.webhook-headers" => Some(("queryParams.webhookHeaders", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["analyze-query-text-sentiment", "audio", "audio-encoding", "config", "current-page", "digits", "disable-webhook", "dtmf", "effects-profile-id", "enable-word-info", "event", "finish-digit", "flow-versions", "geo-location", "intent", "language-code", "latitude", "longitude", "model", "model-variant", "name", "output-audio-config", "phrase-hints", "pitch", "query-input", "query-params", "sample-rate-hertz", "single-utterance", "speaking-rate", "ssml-gender", "synthesize-speech-config", "text", "time-zone", "voice", "volume-gain-db", "webhook-headers"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["analyze-query-text-sentiment", "audio", "audio-encoding", "channel", "config", "current-page", "digits", "disable-webhook", "dtmf", "effects-profile-id", "enable-word-info", "event", "finish-digit", "flow-versions", "geo-location", "intent", "language-code", "latitude", "longitude", "model", "model-variant", "name", "output-audio-config", "phrase-hints", "pitch", "query-input", "query-params", "sample-rate-hertz", "single-utterance", "speaking-rate", "ssml-gender", "synthesize-speech-config", "text", "time-zone", "voice", "volume-gain-db", "webhook-headers"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -5776,7 +5782,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -5866,7 +5872,7 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "update-mask" => {
-                    call = call.update_mask(value.unwrap_or(""));
+                    call = call.update_mask(        value.map(|v| arg_from_str(v, err, "update-mask", "google-fieldmask")).unwrap_or(FieldMask::default()));
                 },
                 _ => {
                     let mut found = false;
@@ -5963,6 +5969,7 @@ where
                     "match-intent-request.query-input.language-code" => Some(("matchIntentRequest.queryInput.languageCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "match-intent-request.query-input.text.text" => Some(("matchIntentRequest.queryInput.text.text", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "match-intent-request.query-params.analyze-query-text-sentiment" => Some(("matchIntentRequest.queryParams.analyzeQueryTextSentiment", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "match-intent-request.query-params.channel" => Some(("matchIntentRequest.queryParams.channel", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "match-intent-request.query-params.current-page" => Some(("matchIntentRequest.queryParams.currentPage", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "match-intent-request.query-params.disable-webhook" => Some(("matchIntentRequest.queryParams.disableWebhook", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "match-intent-request.query-params.flow-versions" => Some(("matchIntentRequest.queryParams.flowVersions", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
@@ -5979,7 +5986,7 @@ where
                     "output-audio-config.synthesize-speech-config.voice.ssml-gender" => Some(("outputAudioConfig.synthesizeSpeechConfig.voice.ssmlGender", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "output-audio-config.synthesize-speech-config.volume-gain-db" => Some(("outputAudioConfig.synthesizeSpeechConfig.volumeGainDb", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["analyze-query-text-sentiment", "audio", "audio-encoding", "confidence", "config", "current-page", "description", "digits", "disable-webhook", "display-name", "dtmf", "effects-profile-id", "enable-word-info", "event", "finish-digit", "flow-versions", "geo-location", "intent", "is-fallback", "labels", "language-code", "latitude", "longitude", "match", "match-intent-request", "match-type", "model", "model-variant", "name", "output-audio-config", "phrase-hints", "pitch", "priority", "query-input", "query-params", "resolved-input", "sample-rate-hertz", "single-utterance", "speaking-rate", "ssml-gender", "synthesize-speech-config", "text", "time-zone", "voice", "volume-gain-db", "webhook-headers"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["analyze-query-text-sentiment", "audio", "audio-encoding", "channel", "confidence", "config", "current-page", "description", "digits", "disable-webhook", "display-name", "dtmf", "effects-profile-id", "enable-word-info", "event", "finish-digit", "flow-versions", "geo-location", "intent", "is-fallback", "labels", "language-code", "latitude", "longitude", "match", "match-intent-request", "match-type", "model", "model-variant", "name", "output-audio-config", "phrase-hints", "pitch", "priority", "query-input", "query-params", "resolved-input", "sample-rate-hertz", "single-utterance", "speaking-rate", "ssml-gender", "synthesize-speech-config", "text", "time-zone", "voice", "volume-gain-db", "webhook-headers"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -6077,6 +6084,7 @@ where
                     "query-input.language-code" => Some(("queryInput.languageCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "query-input.text.text" => Some(("queryInput.text.text", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "query-params.analyze-query-text-sentiment" => Some(("queryParams.analyzeQueryTextSentiment", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "query-params.channel" => Some(("queryParams.channel", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "query-params.current-page" => Some(("queryParams.currentPage", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "query-params.disable-webhook" => Some(("queryParams.disableWebhook", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "query-params.flow-versions" => Some(("queryParams.flowVersions", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
@@ -6085,7 +6093,7 @@ where
                     "query-params.time-zone" => Some(("queryParams.timeZone", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "query-params.webhook-headers" => Some(("queryParams.webhookHeaders", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["analyze-query-text-sentiment", "audio", "audio-encoding", "config", "current-page", "digits", "disable-webhook", "dtmf", "enable-word-info", "event", "finish-digit", "flow-versions", "geo-location", "intent", "language-code", "latitude", "longitude", "model", "model-variant", "phrase-hints", "query-input", "query-params", "sample-rate-hertz", "single-utterance", "text", "time-zone", "webhook-headers"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["analyze-query-text-sentiment", "audio", "audio-encoding", "channel", "config", "current-page", "digits", "disable-webhook", "dtmf", "enable-word-info", "event", "finish-digit", "flow-versions", "geo-location", "intent", "language-code", "latitude", "longitude", "model", "model-variant", "phrase-hints", "query-input", "query-params", "sample-rate-hertz", "single-utterance", "text", "time-zone", "webhook-headers"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -6405,9 +6413,10 @@ where
                     "notes" => Some(("notes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "tags" => Some(("tags", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "test-config.flow" => Some(("testConfig.flow", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "test-config.page" => Some(("testConfig.page", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "test-config.tracking-parameters" => Some(("testConfig.trackingParameters", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["creation-time", "display-name", "environment", "flow", "last-test-result", "name", "notes", "tags", "test-config", "test-result", "test-time", "tracking-parameters"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["creation-time", "display-name", "environment", "flow", "last-test-result", "name", "notes", "page", "tags", "test-config", "test-result", "test-time", "tracking-parameters"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -6705,7 +6714,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -6787,9 +6796,10 @@ where
                     "notes" => Some(("notes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "tags" => Some(("tags", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "test-config.flow" => Some(("testConfig.flow", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "test-config.page" => Some(("testConfig.page", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "test-config.tracking-parameters" => Some(("testConfig.trackingParameters", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["creation-time", "display-name", "environment", "flow", "last-test-result", "name", "notes", "tags", "test-config", "test-result", "test-time", "tracking-parameters"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["creation-time", "display-name", "environment", "flow", "last-test-result", "name", "notes", "page", "tags", "test-config", "test-result", "test-time", "tracking-parameters"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -6804,7 +6814,7 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "update-mask" => {
-                    call = call.update_mask(value.unwrap_or(""));
+                    call = call.update_mask(        value.map(|v| arg_from_str(v, err, "update-mask", "google-fieldmask")).unwrap_or(FieldMask::default()));
                 },
                 _ => {
                     let mut found = false;
@@ -6915,7 +6925,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 "filter" => {
                     call = call.filter(value.unwrap_or(""));
@@ -7243,7 +7253,7 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "force" => {
-                    call = call.force(arg_from_str(value.unwrap_or("false"), err, "force", "boolean"));
+                    call = call.force(        value.map(|v| arg_from_str(v, err, "force", "boolean")).unwrap_or(false));
                 },
                 _ => {
                     let mut found = false;
@@ -7354,7 +7364,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -7457,7 +7467,7 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "update-mask" => {
-                    call = call.update_mask(value.unwrap_or(""));
+                    call = call.update_mask(        value.map(|v| arg_from_str(v, err, "update-mask", "google-fieldmask")).unwrap_or(FieldMask::default()));
                 },
                 _ => {
                     let mut found = false;
@@ -7568,7 +7578,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 "filter" => {
                     call = call.filter(value.unwrap_or(""));
@@ -7734,7 +7744,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 "filter" => {
                     call = call.filter(value.unwrap_or(""));
@@ -7809,6 +7819,10 @@ where
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
+                    "audio-export-settings.audio-export-pattern" => Some(("audioExportSettings.audioExportPattern", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "audio-export-settings.audio-format" => Some(("audioExportSettings.audioFormat", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "audio-export-settings.enable-audio-redaction" => Some(("audioExportSettings.enableAudioRedaction", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "audio-export-settings.gcs-bucket" => Some(("audioExportSettings.gcsBucket", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "deidentify-template" => Some(("deidentifyTemplate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "display-name" => Some(("displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "insights-export-settings.enable-insights-export" => Some(("insightsExportSettings.enableInsightsExport", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
@@ -7819,7 +7833,7 @@ where
                     "redaction-strategy" => Some(("redactionStrategy", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "retention-window-days" => Some(("retentionWindowDays", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["deidentify-template", "display-name", "enable-insights-export", "insights-export-settings", "inspect-template", "name", "purge-data-types", "redaction-scope", "redaction-strategy", "retention-window-days"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["audio-export-pattern", "audio-export-settings", "audio-format", "deidentify-template", "display-name", "enable-audio-redaction", "enable-insights-export", "gcs-bucket", "insights-export-settings", "inspect-template", "name", "purge-data-types", "redaction-scope", "redaction-strategy", "retention-window-days"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -7993,7 +8007,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -8065,6 +8079,10 @@ where
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
+                    "audio-export-settings.audio-export-pattern" => Some(("audioExportSettings.audioExportPattern", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "audio-export-settings.audio-format" => Some(("audioExportSettings.audioFormat", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "audio-export-settings.enable-audio-redaction" => Some(("audioExportSettings.enableAudioRedaction", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "audio-export-settings.gcs-bucket" => Some(("audioExportSettings.gcsBucket", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "deidentify-template" => Some(("deidentifyTemplate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "display-name" => Some(("displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "insights-export-settings.enable-insights-export" => Some(("insightsExportSettings.enableInsightsExport", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
@@ -8075,7 +8093,7 @@ where
                     "redaction-strategy" => Some(("redactionStrategy", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "retention-window-days" => Some(("retentionWindowDays", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["deidentify-template", "display-name", "enable-insights-export", "insights-export-settings", "inspect-template", "name", "purge-data-types", "redaction-scope", "redaction-strategy", "retention-window-days"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["audio-export-pattern", "audio-export-settings", "audio-format", "deidentify-template", "display-name", "enable-audio-redaction", "enable-insights-export", "gcs-bucket", "insights-export-settings", "inspect-template", "name", "purge-data-types", "redaction-scope", "redaction-strategy", "retention-window-days"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -8090,7 +8108,7 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "update-mask" => {
-                    call = call.update_mask(value.unwrap_or(""));
+                    call = call.update_mask(        value.map(|v| arg_from_str(v, err, "update-mask", "google-fieldmask")).unwrap_or(FieldMask::default()));
                 },
                 _ => {
                     let mut found = false;
@@ -8253,7 +8271,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 "filter" => {
                     call = call.filter(value.unwrap_or(""));
@@ -10907,7 +10925,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("locations-agents-test-cases-import",
-                    Some(r##"Imports the test cases from a Cloud Storage bucket or a local file. It always creates new test cases and won't overwite any existing ones. The provided ID in the imported test case is neglected. This method is a [long-running operation](https://cloud.google.com/dialogflow/cx/docs/how/long-running-operation). The returned `Operation` type has the following method-specific fields: - `metadata`: ImportTestCasesMetadata - `response`: ImportTestCasesResponse"##),
+                    Some(r##"Imports the test cases from a Cloud Storage bucket or a local file. It always creates new test cases and won't overwrite any existing ones. The provided ID in the imported test case is neglected. This method is a [long-running operation](https://cloud.google.com/dialogflow/cx/docs/how/long-running-operation). The returned `Operation` type has the following method-specific fields: - `metadata`: ImportTestCasesMetadata - `response`: ImportTestCasesResponse"##),
                     "Details at http://byron.github.io/google-apis-rs/google_dialogflow3_cli/projects_locations-agents-test-cases-import",
                   vec![
                     (Some(r##"parent"##),
@@ -11510,7 +11528,7 @@ async fn main() {
     
     let mut app = App::new("dialogflow3")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("4.0.1+20220228")
+           .version("5.0.2+20230110")
            .about("Builds conversational interfaces (for example, chatbots, and voice-powered apps and devices).")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_dialogflow3_cli")
            .arg(Arg::with_name("url")

@@ -1,4 +1,4 @@
-site_name: Assuredworkloads v4.0.1+20220224
+site_name: Assuredworkloads v5.0.2+20230116
 site_url: http://byron.github.io/google-apis-rs/google-assuredworkloads1-cli
 site_description: A complete library to interact with Assuredworkloads (protocol v1)
 
@@ -7,15 +7,21 @@ repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/assuredworkloads
 docs_dir: docs
 site_dir: build_html
 
-pages:
-- ['index.md', 'Home']
-- ['organizations_locations-operations-get.md', 'Organizations', 'Locations Operations Get']
-- ['organizations_locations-operations-list.md', 'Organizations', 'Locations Operations List']
-- ['organizations_locations-workloads-create.md', 'Organizations', 'Locations Workloads Create']
-- ['organizations_locations-workloads-delete.md', 'Organizations', 'Locations Workloads Delete']
-- ['organizations_locations-workloads-get.md', 'Organizations', 'Locations Workloads Get']
-- ['organizations_locations-workloads-list.md', 'Organizations', 'Locations Workloads List']
-- ['organizations_locations-workloads-patch.md', 'Organizations', 'Locations Workloads Patch']
+nav:
+- Home: 'index.md'
+- 'Organizations':
+    - 'Locations Operations Get': 'organizations_locations-operations-get.md'
+    - 'Locations Operations List': 'organizations_locations-operations-list.md'
+    - 'Locations Workloads Create': 'organizations_locations-workloads-create.md'
+    - 'Locations Workloads Delete': 'organizations_locations-workloads-delete.md'
+    - 'Locations Workloads Get': 'organizations_locations-workloads-get.md'
+    - 'Locations Workloads List': 'organizations_locations-workloads-list.md'
+    - 'Locations Workloads Mutate Partner Permissions': 'organizations_locations-workloads-mutate-partner-permissions.md'
+    - 'Locations Workloads Patch': 'organizations_locations-workloads-patch.md'
+    - 'Locations Workloads Restrict Allowed Resources': 'organizations_locations-workloads-restrict-allowed-resources.md'
+    - 'Locations Workloads Violations Acknowledge': 'organizations_locations-workloads-violations-acknowledge.md'
+    - 'Locations Workloads Violations Get': 'organizations_locations-workloads-violations-get.md'
+    - 'Locations Workloads Violations List': 'organizations_locations-workloads-violations-list.md'
 
 theme: readthedocs
 

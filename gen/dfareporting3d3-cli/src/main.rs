@@ -3,8 +3,6 @@
 // DO NOT EDIT !
 #![allow(unused_variables, unused_imports, dead_code, unused_mut)]
 
-extern crate tokio;
-
 #[macro_use]
 extern crate clap;
 
@@ -12,9 +10,10 @@ use std::env;
 use std::io::{self, Write};
 use clap::{App, SubCommand, Arg};
 
-use google_dfareporting3d3::{api, Error, oauth2};
+use google_dfareporting3d3::{api, Error, oauth2, client::chrono, FieldMask};
 
-mod client;
+
+use google_clis_common as client;
 
 use client::{InvalidOptionsError, CLIError, arg_from_str, writer_from_opts, parse_kv_arg,
           input_file_from_opts, input_mime_from_opts, FieldCursor, FieldError, CallType, UploadProtocol,
@@ -478,10 +477,10 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "user-role-id" => {
-                    call = call.user_role_id(value.unwrap_or(""));
+                    call = call.user_role_id(        value.map(|v| arg_from_str(v, err, "user-role-id", "int64")).unwrap_or(-0));
                 },
                 "subaccount-id" => {
-                    call = call.subaccount_id(value.unwrap_or(""));
+                    call = call.subaccount_id(        value.map(|v| arg_from_str(v, err, "subaccount-id", "int64")).unwrap_or(-0));
                 },
                 "sort-order" => {
                     call = call.sort_order(value.unwrap_or(""));
@@ -496,13 +495,13 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "max-results" => {
-                    call = call.max_results(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
+                    call = call.max_results(        value.map(|v| arg_from_str(v, err, "max-results", "int32")).unwrap_or(-0));
                 },
                 "ids" => {
-                    call = call.add_ids(value.unwrap_or(""));
+                    call = call.add_ids(        value.map(|v| arg_from_str(v, err, "ids", "int64")).unwrap_or(-0));
                 },
                 "active" => {
-                    call = call.active(arg_from_str(value.unwrap_or("false"), err, "active", "boolean"));
+                    call = call.active(        value.map(|v| arg_from_str(v, err, "active", "boolean")).unwrap_or(false));
                 },
                 _ => {
                     let mut found = false;
@@ -838,13 +837,13 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "max-results" => {
-                    call = call.max_results(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
+                    call = call.max_results(        value.map(|v| arg_from_str(v, err, "max-results", "int32")).unwrap_or(-0));
                 },
                 "ids" => {
-                    call = call.add_ids(value.unwrap_or(""));
+                    call = call.add_ids(        value.map(|v| arg_from_str(v, err, "ids", "int64")).unwrap_or(-0));
                 },
                 "active" => {
-                    call = call.active(arg_from_str(value.unwrap_or("false"), err, "active", "boolean"));
+                    call = call.active(        value.map(|v| arg_from_str(v, err, "active", "boolean")).unwrap_or(false));
                 },
                 _ => {
                     let mut found = false;
@@ -1317,10 +1316,10 @@ where
                     call = call.add_type(value.unwrap_or(""));
                 },
                 "ssl-required" => {
-                    call = call.ssl_required(arg_from_str(value.unwrap_or("false"), err, "ssl-required", "boolean"));
+                    call = call.ssl_required(        value.map(|v| arg_from_str(v, err, "ssl-required", "boolean")).unwrap_or(false));
                 },
                 "ssl-compliant" => {
-                    call = call.ssl_compliant(arg_from_str(value.unwrap_or("false"), err, "ssl-compliant", "boolean"));
+                    call = call.ssl_compliant(        value.map(|v| arg_from_str(v, err, "ssl-compliant", "boolean")).unwrap_or(false));
                 },
                 "sort-order" => {
                     call = call.sort_order(value.unwrap_or(""));
@@ -1329,58 +1328,58 @@ where
                     call = call.sort_field(value.unwrap_or(""));
                 },
                 "size-ids" => {
-                    call = call.add_size_ids(value.unwrap_or(""));
+                    call = call.add_size_ids(        value.map(|v| arg_from_str(v, err, "size-ids", "int64")).unwrap_or(-0));
                 },
                 "search-string" => {
                     call = call.search_string(value.unwrap_or(""));
                 },
                 "remarketing-list-ids" => {
-                    call = call.add_remarketing_list_ids(value.unwrap_or(""));
+                    call = call.add_remarketing_list_ids(        value.map(|v| arg_from_str(v, err, "remarketing-list-ids", "int64")).unwrap_or(-0));
                 },
                 "placement-ids" => {
-                    call = call.add_placement_ids(value.unwrap_or(""));
+                    call = call.add_placement_ids(        value.map(|v| arg_from_str(v, err, "placement-ids", "int64")).unwrap_or(-0));
                 },
                 "page-token" => {
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "overridden-event-tag-id" => {
-                    call = call.overridden_event_tag_id(value.unwrap_or(""));
+                    call = call.overridden_event_tag_id(        value.map(|v| arg_from_str(v, err, "overridden-event-tag-id", "int64")).unwrap_or(-0));
                 },
                 "max-results" => {
-                    call = call.max_results(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
+                    call = call.max_results(        value.map(|v| arg_from_str(v, err, "max-results", "int32")).unwrap_or(-0));
                 },
                 "landing-page-ids" => {
-                    call = call.add_landing_page_ids(value.unwrap_or(""));
+                    call = call.add_landing_page_ids(        value.map(|v| arg_from_str(v, err, "landing-page-ids", "int64")).unwrap_or(-0));
                 },
                 "ids" => {
-                    call = call.add_ids(value.unwrap_or(""));
+                    call = call.add_ids(        value.map(|v| arg_from_str(v, err, "ids", "int64")).unwrap_or(-0));
                 },
                 "dynamic-click-tracker" => {
-                    call = call.dynamic_click_tracker(arg_from_str(value.unwrap_or("false"), err, "dynamic-click-tracker", "boolean"));
+                    call = call.dynamic_click_tracker(        value.map(|v| arg_from_str(v, err, "dynamic-click-tracker", "boolean")).unwrap_or(false));
                 },
                 "creative-optimization-configuration-ids" => {
-                    call = call.add_creative_optimization_configuration_ids(value.unwrap_or(""));
+                    call = call.add_creative_optimization_configuration_ids(        value.map(|v| arg_from_str(v, err, "creative-optimization-configuration-ids", "int64")).unwrap_or(-0));
                 },
                 "creative-ids" => {
-                    call = call.add_creative_ids(value.unwrap_or(""));
+                    call = call.add_creative_ids(        value.map(|v| arg_from_str(v, err, "creative-ids", "int64")).unwrap_or(-0));
                 },
                 "compatibility" => {
                     call = call.compatibility(value.unwrap_or(""));
                 },
                 "campaign-ids" => {
-                    call = call.add_campaign_ids(value.unwrap_or(""));
+                    call = call.add_campaign_ids(        value.map(|v| arg_from_str(v, err, "campaign-ids", "int64")).unwrap_or(-0));
                 },
                 "audience-segment-ids" => {
-                    call = call.add_audience_segment_ids(value.unwrap_or(""));
+                    call = call.add_audience_segment_ids(        value.map(|v| arg_from_str(v, err, "audience-segment-ids", "int64")).unwrap_or(-0));
                 },
                 "archived" => {
-                    call = call.archived(arg_from_str(value.unwrap_or("false"), err, "archived", "boolean"));
+                    call = call.archived(        value.map(|v| arg_from_str(v, err, "archived", "boolean")).unwrap_or(false));
                 },
                 "advertiser-id" => {
-                    call = call.advertiser_id(value.unwrap_or(""));
+                    call = call.advertiser_id(        value.map(|v| arg_from_str(v, err, "advertiser-id", "int64")).unwrap_or(-0));
                 },
                 "active" => {
-                    call = call.active(arg_from_str(value.unwrap_or("false"), err, "active", "boolean"));
+                    call = call.active(        value.map(|v| arg_from_str(v, err, "active", "boolean")).unwrap_or(false));
                 },
                 _ => {
                     let mut found = false;
@@ -1932,10 +1931,10 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "max-results" => {
-                    call = call.max_results(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
+                    call = call.max_results(        value.map(|v| arg_from_str(v, err, "max-results", "int32")).unwrap_or(-0));
                 },
                 "ids" => {
-                    call = call.add_ids(value.unwrap_or(""));
+                    call = call.add_ids(        value.map(|v| arg_from_str(v, err, "ids", "int64")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -2309,7 +2308,7 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "subaccount-id" => {
-                    call = call.subaccount_id(value.unwrap_or(""));
+                    call = call.subaccount_id(        value.map(|v| arg_from_str(v, err, "subaccount-id", "int64")).unwrap_or(-0));
                 },
                 "sort-order" => {
                     call = call.sort_order(value.unwrap_or(""));
@@ -2324,19 +2323,19 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "max-results" => {
-                    call = call.max_results(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
+                    call = call.max_results(        value.map(|v| arg_from_str(v, err, "max-results", "int32")).unwrap_or(-0));
                 },
                 "ids" => {
-                    call = call.add_ids(value.unwrap_or(""));
+                    call = call.add_ids(        value.map(|v| arg_from_str(v, err, "ids", "int64")).unwrap_or(-0));
                 },
                 "campaign-ids" => {
-                    call = call.add_campaign_ids(value.unwrap_or(""));
+                    call = call.add_campaign_ids(        value.map(|v| arg_from_str(v, err, "campaign-ids", "int64")).unwrap_or(-0));
                 },
                 "archived" => {
-                    call = call.archived(arg_from_str(value.unwrap_or("false"), err, "archived", "boolean"));
+                    call = call.archived(        value.map(|v| arg_from_str(v, err, "archived", "boolean")).unwrap_or(false));
                 },
                 "advertiser-ids" => {
-                    call = call.add_advertiser_ids(value.unwrap_or(""));
+                    call = call.add_advertiser_ids(        value.map(|v| arg_from_str(v, err, "advertiser-ids", "int64")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -2733,7 +2732,7 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "subaccount-id" => {
-                    call = call.subaccount_id(value.unwrap_or(""));
+                    call = call.subaccount_id(        value.map(|v| arg_from_str(v, err, "subaccount-id", "int64")).unwrap_or(-0));
                 },
                 "status" => {
                     call = call.status(value.unwrap_or(""));
@@ -2751,22 +2750,22 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "only-parent" => {
-                    call = call.only_parent(arg_from_str(value.unwrap_or("false"), err, "only-parent", "boolean"));
+                    call = call.only_parent(        value.map(|v| arg_from_str(v, err, "only-parent", "boolean")).unwrap_or(false));
                 },
                 "max-results" => {
-                    call = call.max_results(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
+                    call = call.max_results(        value.map(|v| arg_from_str(v, err, "max-results", "int32")).unwrap_or(-0));
                 },
                 "include-advertisers-without-groups-only" => {
-                    call = call.include_advertisers_without_groups_only(arg_from_str(value.unwrap_or("false"), err, "include-advertisers-without-groups-only", "boolean"));
+                    call = call.include_advertisers_without_groups_only(        value.map(|v| arg_from_str(v, err, "include-advertisers-without-groups-only", "boolean")).unwrap_or(false));
                 },
                 "ids" => {
-                    call = call.add_ids(value.unwrap_or(""));
+                    call = call.add_ids(        value.map(|v| arg_from_str(v, err, "ids", "int64")).unwrap_or(-0));
                 },
                 "floodlight-configuration-ids" => {
-                    call = call.add_floodlight_configuration_ids(value.unwrap_or(""));
+                    call = call.add_floodlight_configuration_ids(        value.map(|v| arg_from_str(v, err, "floodlight-configuration-ids", "int64")).unwrap_or(-0));
                 },
                 "advertiser-group-ids" => {
-                    call = call.add_advertiser_group_ids(value.unwrap_or(""));
+                    call = call.add_advertiser_group_ids(        value.map(|v| arg_from_str(v, err, "advertiser-group-ids", "int64")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -3184,7 +3183,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "max-results" => {
-                    call = call.max_results(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
+                    call = call.max_results(        value.map(|v| arg_from_str(v, err, "max-results", "int32")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -3418,7 +3417,7 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "subaccount-id" => {
-                    call = call.subaccount_id(value.unwrap_or(""));
+                    call = call.subaccount_id(        value.map(|v| arg_from_str(v, err, "subaccount-id", "int64")).unwrap_or(-0));
                 },
                 "sort-order" => {
                     call = call.sort_order(value.unwrap_or(""));
@@ -3433,28 +3432,28 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "overridden-event-tag-id" => {
-                    call = call.overridden_event_tag_id(value.unwrap_or(""));
+                    call = call.overridden_event_tag_id(        value.map(|v| arg_from_str(v, err, "overridden-event-tag-id", "int64")).unwrap_or(-0));
                 },
                 "max-results" => {
-                    call = call.max_results(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
+                    call = call.max_results(        value.map(|v| arg_from_str(v, err, "max-results", "int32")).unwrap_or(-0));
                 },
                 "ids" => {
-                    call = call.add_ids(value.unwrap_or(""));
+                    call = call.add_ids(        value.map(|v| arg_from_str(v, err, "ids", "int64")).unwrap_or(-0));
                 },
                 "excluded-ids" => {
-                    call = call.add_excluded_ids(value.unwrap_or(""));
+                    call = call.add_excluded_ids(        value.map(|v| arg_from_str(v, err, "excluded-ids", "int64")).unwrap_or(-0));
                 },
                 "at-least-one-optimization-activity" => {
-                    call = call.at_least_one_optimization_activity(arg_from_str(value.unwrap_or("false"), err, "at-least-one-optimization-activity", "boolean"));
+                    call = call.at_least_one_optimization_activity(        value.map(|v| arg_from_str(v, err, "at-least-one-optimization-activity", "boolean")).unwrap_or(false));
                 },
                 "archived" => {
-                    call = call.archived(arg_from_str(value.unwrap_or("false"), err, "archived", "boolean"));
+                    call = call.archived(        value.map(|v| arg_from_str(v, err, "archived", "boolean")).unwrap_or(false));
                 },
                 "advertiser-ids" => {
-                    call = call.add_advertiser_ids(value.unwrap_or(""));
+                    call = call.add_advertiser_ids(        value.map(|v| arg_from_str(v, err, "advertiser-ids", "int64")).unwrap_or(-0));
                 },
                 "advertiser-group-ids" => {
-                    call = call.add_advertiser_group_ids(value.unwrap_or(""));
+                    call = call.add_advertiser_group_ids(        value.map(|v| arg_from_str(v, err, "advertiser-group-ids", "int64")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -3814,7 +3813,7 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "user-profile-ids" => {
-                    call = call.add_user_profile_ids(value.unwrap_or(""));
+                    call = call.add_user_profile_ids(        value.map(|v| arg_from_str(v, err, "user-profile-ids", "int64")).unwrap_or(-0));
                 },
                 "search-string" => {
                     call = call.search_string(value.unwrap_or(""));
@@ -3826,19 +3825,19 @@ where
                     call = call.object_type(value.unwrap_or(""));
                 },
                 "object-ids" => {
-                    call = call.add_object_ids(value.unwrap_or(""));
+                    call = call.add_object_ids(        value.map(|v| arg_from_str(v, err, "object-ids", "int64")).unwrap_or(-0));
                 },
                 "min-change-time" => {
                     call = call.min_change_time(value.unwrap_or(""));
                 },
                 "max-results" => {
-                    call = call.max_results(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
+                    call = call.max_results(        value.map(|v| arg_from_str(v, err, "max-results", "int32")).unwrap_or(-0));
                 },
                 "max-change-time" => {
                     call = call.max_change_time(value.unwrap_or(""));
                 },
                 "ids" => {
-                    call = call.add_ids(value.unwrap_or(""));
+                    call = call.add_ids(        value.map(|v| arg_from_str(v, err, "ids", "int64")).unwrap_or(-0));
                 },
                 "action" => {
                     call = call.action(value.unwrap_or(""));
@@ -3897,16 +3896,16 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "region-dart-ids" => {
-                    call = call.add_region_dart_ids(value.unwrap_or(""));
+                    call = call.add_region_dart_ids(        value.map(|v| arg_from_str(v, err, "region-dart-ids", "int64")).unwrap_or(-0));
                 },
                 "name-prefix" => {
                     call = call.name_prefix(value.unwrap_or(""));
                 },
                 "dart-ids" => {
-                    call = call.add_dart_ids(value.unwrap_or(""));
+                    call = call.add_dart_ids(        value.map(|v| arg_from_str(v, err, "dart-ids", "int64")).unwrap_or(-0));
                 },
                 "country-dart-ids" => {
-                    call = call.add_country_dart_ids(value.unwrap_or(""));
+                    call = call.add_country_dart_ids(        value.map(|v| arg_from_str(v, err, "country-dart-ids", "int64")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -4262,10 +4261,10 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "max-results" => {
-                    call = call.max_results(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
+                    call = call.max_results(        value.map(|v| arg_from_str(v, err, "max-results", "int32")).unwrap_or(-0));
                 },
                 "ids" => {
-                    call = call.add_ids(value.unwrap_or(""));
+                    call = call.add_ids(        value.map(|v| arg_from_str(v, err, "ids", "int64")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -5073,10 +5072,10 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "max-results" => {
-                    call = call.max_results(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
+                    call = call.max_results(        value.map(|v| arg_from_str(v, err, "max-results", "int32")).unwrap_or(-0));
                 },
                 "ids" => {
-                    call = call.add_ids(value.unwrap_or(""));
+                    call = call.add_ids(        value.map(|v| arg_from_str(v, err, "ids", "int64")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -5510,13 +5509,13 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "max-results" => {
-                    call = call.max_results(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
+                    call = call.max_results(        value.map(|v| arg_from_str(v, err, "max-results", "int32")).unwrap_or(-0));
                 },
                 "ids" => {
-                    call = call.add_ids(value.unwrap_or(""));
+                    call = call.add_ids(        value.map(|v| arg_from_str(v, err, "ids", "int64")).unwrap_or(-0));
                 },
                 "advertiser-ids" => {
-                    call = call.add_advertiser_ids(value.unwrap_or(""));
+                    call = call.add_advertiser_ids(        value.map(|v| arg_from_str(v, err, "advertiser-ids", "int64")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -5925,16 +5924,16 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "max-results" => {
-                    call = call.max_results(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
+                    call = call.max_results(        value.map(|v| arg_from_str(v, err, "max-results", "int32")).unwrap_or(-0));
                 },
                 "ids" => {
-                    call = call.add_ids(value.unwrap_or(""));
+                    call = call.add_ids(        value.map(|v| arg_from_str(v, err, "ids", "int64")).unwrap_or(-0));
                 },
                 "group-number" => {
-                    call = call.group_number(arg_from_str(value.unwrap_or("-0"), err, "group-number", "integer"));
+                    call = call.group_number(        value.map(|v| arg_from_str(v, err, "group-number", "int32")).unwrap_or(-0));
                 },
                 "advertiser-ids" => {
-                    call = call.add_advertiser_ids(value.unwrap_or(""));
+                    call = call.add_advertiser_ids(        value.map(|v| arg_from_str(v, err, "advertiser-ids", "int64")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -6403,7 +6402,7 @@ where
                     call = call.add_types(value.unwrap_or(""));
                 },
                 "studio-creative-id" => {
-                    call = call.studio_creative_id(value.unwrap_or(""));
+                    call = call.studio_creative_id(        value.map(|v| arg_from_str(v, err, "studio-creative-id", "int64")).unwrap_or(-0));
                 },
                 "sort-order" => {
                     call = call.sort_order(value.unwrap_or(""));
@@ -6412,40 +6411,40 @@ where
                     call = call.sort_field(value.unwrap_or(""));
                 },
                 "size-ids" => {
-                    call = call.add_size_ids(value.unwrap_or(""));
+                    call = call.add_size_ids(        value.map(|v| arg_from_str(v, err, "size-ids", "int64")).unwrap_or(-0));
                 },
                 "search-string" => {
                     call = call.search_string(value.unwrap_or(""));
                 },
                 "rendering-ids" => {
-                    call = call.add_rendering_ids(value.unwrap_or(""));
+                    call = call.add_rendering_ids(        value.map(|v| arg_from_str(v, err, "rendering-ids", "int64")).unwrap_or(-0));
                 },
                 "page-token" => {
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "max-results" => {
-                    call = call.max_results(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
+                    call = call.max_results(        value.map(|v| arg_from_str(v, err, "max-results", "int32")).unwrap_or(-0));
                 },
                 "ids" => {
-                    call = call.add_ids(value.unwrap_or(""));
+                    call = call.add_ids(        value.map(|v| arg_from_str(v, err, "ids", "int64")).unwrap_or(-0));
                 },
                 "creative-field-ids" => {
-                    call = call.add_creative_field_ids(value.unwrap_or(""));
+                    call = call.add_creative_field_ids(        value.map(|v| arg_from_str(v, err, "creative-field-ids", "int64")).unwrap_or(-0));
                 },
                 "companion-creative-ids" => {
-                    call = call.add_companion_creative_ids(value.unwrap_or(""));
+                    call = call.add_companion_creative_ids(        value.map(|v| arg_from_str(v, err, "companion-creative-ids", "int64")).unwrap_or(-0));
                 },
                 "campaign-id" => {
-                    call = call.campaign_id(value.unwrap_or(""));
+                    call = call.campaign_id(        value.map(|v| arg_from_str(v, err, "campaign-id", "int64")).unwrap_or(-0));
                 },
                 "archived" => {
-                    call = call.archived(arg_from_str(value.unwrap_or("false"), err, "archived", "boolean"));
+                    call = call.archived(        value.map(|v| arg_from_str(v, err, "archived", "boolean")).unwrap_or(false));
                 },
                 "advertiser-id" => {
-                    call = call.advertiser_id(value.unwrap_or(""));
+                    call = call.advertiser_id(        value.map(|v| arg_from_str(v, err, "advertiser-id", "int64")).unwrap_or(-0));
                 },
                 "active" => {
-                    call = call.active(arg_from_str(value.unwrap_or("false"), err, "active", "boolean"));
+                    call = call.active(        value.map(|v| arg_from_str(v, err, "active", "boolean")).unwrap_or(false));
                 },
                 _ => {
                     let mut found = false;
@@ -6868,7 +6867,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "max-results" => {
-                    call = call.max_results(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
+                    call = call.max_results(        value.map(|v| arg_from_str(v, err, "max-results", "int32")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -7093,25 +7092,25 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "max-results" => {
-                    call = call.max_results(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
+                    call = call.max_results(        value.map(|v| arg_from_str(v, err, "max-results", "int32")).unwrap_or(-0));
                 },
                 "ids" => {
-                    call = call.add_ids(value.unwrap_or(""));
+                    call = call.add_ids(        value.map(|v| arg_from_str(v, err, "ids", "int64")).unwrap_or(-0));
                 },
                 "dfp-network-code" => {
                     call = call.dfp_network_code(value.unwrap_or(""));
                 },
                 "active" => {
-                    call = call.active(arg_from_str(value.unwrap_or("false"), err, "active", "boolean"));
+                    call = call.active(        value.map(|v| arg_from_str(v, err, "active", "boolean")).unwrap_or(false));
                 },
                 "accepts-publisher-paid-placements" => {
-                    call = call.accepts_publisher_paid_placements(arg_from_str(value.unwrap_or("false"), err, "accepts-publisher-paid-placements", "boolean"));
+                    call = call.accepts_publisher_paid_placements(        value.map(|v| arg_from_str(v, err, "accepts-publisher-paid-placements", "boolean")).unwrap_or(false));
                 },
                 "accepts-interstitial-placements" => {
-                    call = call.accepts_interstitial_placements(arg_from_str(value.unwrap_or("false"), err, "accepts-interstitial-placements", "boolean"));
+                    call = call.accepts_interstitial_placements(        value.map(|v| arg_from_str(v, err, "accepts-interstitial-placements", "boolean")).unwrap_or(false));
                 },
                 "accepts-in-stream-video-placements" => {
-                    call = call.accepts_in_stream_video_placements(arg_from_str(value.unwrap_or("false"), err, "accepts-in-stream-video-placements", "boolean"));
+                    call = call.accepts_in_stream_video_placements(        value.map(|v| arg_from_str(v, err, "accepts-in-stream-video-placements", "boolean")).unwrap_or(false));
                 },
                 _ => {
                     let mut found = false;
@@ -7302,13 +7301,13 @@ where
                     call = call.object_type(value.unwrap_or(""));
                 },
                 "object-id" => {
-                    call = call.object_id(value.unwrap_or(""));
+                    call = call.object_id(        value.map(|v| arg_from_str(v, err, "object-id", "int64")).unwrap_or(-0));
                 },
                 "names" => {
                     call = call.add_names(value.unwrap_or(""));
                 },
                 "advertiser-id" => {
-                    call = call.advertiser_id(value.unwrap_or(""));
+                    call = call.advertiser_id(        value.map(|v| arg_from_str(v, err, "advertiser-id", "int64")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -7581,25 +7580,25 @@ where
                     call = call.search_string(value.unwrap_or(""));
                 },
                 "ids" => {
-                    call = call.add_ids(value.unwrap_or(""));
+                    call = call.add_ids(        value.map(|v| arg_from_str(v, err, "ids", "int64")).unwrap_or(-0));
                 },
                 "event-tag-types" => {
                     call = call.add_event_tag_types(value.unwrap_or(""));
                 },
                 "enabled" => {
-                    call = call.enabled(arg_from_str(value.unwrap_or("false"), err, "enabled", "boolean"));
+                    call = call.enabled(        value.map(|v| arg_from_str(v, err, "enabled", "boolean")).unwrap_or(false));
                 },
                 "definitions-only" => {
-                    call = call.definitions_only(arg_from_str(value.unwrap_or("false"), err, "definitions-only", "boolean"));
+                    call = call.definitions_only(        value.map(|v| arg_from_str(v, err, "definitions-only", "boolean")).unwrap_or(false));
                 },
                 "campaign-id" => {
-                    call = call.campaign_id(value.unwrap_or(""));
+                    call = call.campaign_id(        value.map(|v| arg_from_str(v, err, "campaign-id", "int64")).unwrap_or(-0));
                 },
                 "advertiser-id" => {
-                    call = call.advertiser_id(value.unwrap_or(""));
+                    call = call.advertiser_id(        value.map(|v| arg_from_str(v, err, "advertiser-id", "int64")).unwrap_or(-0));
                 },
                 "ad-id" => {
-                    call = call.ad_id(value.unwrap_or(""));
+                    call = call.ad_id(        value.map(|v| arg_from_str(v, err, "ad-id", "int64")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -7953,7 +7952,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "max-results" => {
-                    call = call.max_results(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
+                    call = call.max_results(        value.map(|v| arg_from_str(v, err, "max-results", "int32")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -8053,7 +8052,7 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "floodlight-activity-id" => {
-                    call = call.floodlight_activity_id(value.unwrap_or(""));
+                    call = call.floodlight_activity_id(        value.map(|v| arg_from_str(v, err, "floodlight-activity-id", "int64")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -8301,13 +8300,13 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "max-results" => {
-                    call = call.max_results(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
+                    call = call.max_results(        value.map(|v| arg_from_str(v, err, "max-results", "int32")).unwrap_or(-0));
                 },
                 "ids" => {
-                    call = call.add_ids(value.unwrap_or(""));
+                    call = call.add_ids(        value.map(|v| arg_from_str(v, err, "ids", "int64")).unwrap_or(-0));
                 },
                 "floodlight-configuration-id" => {
-                    call = call.floodlight_configuration_id(value.unwrap_or(""));
+                    call = call.floodlight_configuration_id(        value.map(|v| arg_from_str(v, err, "floodlight-configuration-id", "int64")).unwrap_or(-0));
                 },
                 "floodlight-activity-group-type" => {
                     call = call.floodlight_activity_group_type(value.unwrap_or(""));
@@ -8319,10 +8318,10 @@ where
                     call = call.floodlight_activity_group_name(value.unwrap_or(""));
                 },
                 "floodlight-activity-group-ids" => {
-                    call = call.add_floodlight_activity_group_ids(value.unwrap_or(""));
+                    call = call.add_floodlight_activity_group_ids(        value.map(|v| arg_from_str(v, err, "floodlight-activity-group-ids", "int64")).unwrap_or(-0));
                 },
                 "advertiser-id" => {
-                    call = call.advertiser_id(value.unwrap_or(""));
+                    call = call.advertiser_id(        value.map(|v| arg_from_str(v, err, "advertiser-id", "int64")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -8806,16 +8805,16 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "max-results" => {
-                    call = call.max_results(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
+                    call = call.max_results(        value.map(|v| arg_from_str(v, err, "max-results", "int32")).unwrap_or(-0));
                 },
                 "ids" => {
-                    call = call.add_ids(value.unwrap_or(""));
+                    call = call.add_ids(        value.map(|v| arg_from_str(v, err, "ids", "int64")).unwrap_or(-0));
                 },
                 "floodlight-configuration-id" => {
-                    call = call.floodlight_configuration_id(value.unwrap_or(""));
+                    call = call.floodlight_configuration_id(        value.map(|v| arg_from_str(v, err, "floodlight-configuration-id", "int64")).unwrap_or(-0));
                 },
                 "advertiser-id" => {
-                    call = call.advertiser_id(value.unwrap_or(""));
+                    call = call.advertiser_id(        value.map(|v| arg_from_str(v, err, "advertiser-id", "int64")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -9145,7 +9144,7 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "ids" => {
-                    call = call.add_ids(value.unwrap_or(""));
+                    call = call.add_ids(        value.map(|v| arg_from_str(v, err, "ids", "int64")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -9498,22 +9497,22 @@ where
                     call = call.sort_field(value.unwrap_or(""));
                 },
                 "site-id" => {
-                    call = call.add_site_id(value.unwrap_or(""));
+                    call = call.add_site_id(        value.map(|v| arg_from_str(v, err, "site-id", "int64")).unwrap_or(-0));
                 },
                 "page-token" => {
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "order-id" => {
-                    call = call.add_order_id(value.unwrap_or(""));
+                    call = call.add_order_id(        value.map(|v| arg_from_str(v, err, "order-id", "int64")).unwrap_or(-0));
                 },
                 "max-results" => {
-                    call = call.max_results(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
+                    call = call.max_results(        value.map(|v| arg_from_str(v, err, "max-results", "int32")).unwrap_or(-0));
                 },
                 "in-plan" => {
-                    call = call.in_plan(arg_from_str(value.unwrap_or("false"), err, "in-plan", "boolean"));
+                    call = call.in_plan(        value.map(|v| arg_from_str(v, err, "in-plan", "boolean")).unwrap_or(false));
                 },
                 "ids" => {
-                    call = call.add_ids(value.unwrap_or(""));
+                    call = call.add_ids(        value.map(|v| arg_from_str(v, err, "ids", "int64")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -9731,7 +9730,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "max-results" => {
-                    call = call.max_results(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
+                    call = call.max_results(        value.map(|v| arg_from_str(v, err, "max-results", "int32")).unwrap_or(-0));
                 },
                 "ids" => {
                     call = call.add_ids(value.unwrap_or(""));
@@ -10163,7 +10162,7 @@ where
                     call = call.sort_field(value.unwrap_or(""));
                 },
                 "site-id" => {
-                    call = call.add_site_id(value.unwrap_or(""));
+                    call = call.add_site_id(        value.map(|v| arg_from_str(v, err, "site-id", "int64")).unwrap_or(-0));
                 },
                 "search-string" => {
                     call = call.search_string(value.unwrap_or(""));
@@ -10172,16 +10171,16 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "order-id" => {
-                    call = call.add_order_id(value.unwrap_or(""));
+                    call = call.add_order_id(        value.map(|v| arg_from_str(v, err, "order-id", "int64")).unwrap_or(-0));
                 },
                 "max-results" => {
-                    call = call.max_results(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
+                    call = call.max_results(        value.map(|v| arg_from_str(v, err, "max-results", "int32")).unwrap_or(-0));
                 },
                 "ids" => {
-                    call = call.add_ids(value.unwrap_or(""));
+                    call = call.add_ids(        value.map(|v| arg_from_str(v, err, "ids", "int64")).unwrap_or(-0));
                 },
                 "approved" => {
-                    call = call.approved(arg_from_str(value.unwrap_or("false"), err, "approved", "boolean"));
+                    call = call.approved(        value.map(|v| arg_from_str(v, err, "approved", "boolean")).unwrap_or(false));
                 },
                 _ => {
                     let mut found = false;
@@ -10295,7 +10294,7 @@ where
                     call = call.sort_field(value.unwrap_or(""));
                 },
                 "site-id" => {
-                    call = call.add_site_id(value.unwrap_or(""));
+                    call = call.add_site_id(        value.map(|v| arg_from_str(v, err, "site-id", "int64")).unwrap_or(-0));
                 },
                 "search-string" => {
                     call = call.search_string(value.unwrap_or(""));
@@ -10304,10 +10303,10 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "max-results" => {
-                    call = call.max_results(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
+                    call = call.max_results(        value.map(|v| arg_from_str(v, err, "max-results", "int32")).unwrap_or(-0));
                 },
                 "ids" => {
-                    call = call.add_ids(value.unwrap_or(""));
+                    call = call.add_ids(        value.map(|v| arg_from_str(v, err, "ids", "int64")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -10568,7 +10567,7 @@ where
                     call = call.sort_field(value.unwrap_or(""));
                 },
                 "site-ids" => {
-                    call = call.add_site_ids(value.unwrap_or(""));
+                    call = call.add_site_ids(        value.map(|v| arg_from_str(v, err, "site-ids", "int64")).unwrap_or(-0));
                 },
                 "search-string" => {
                     call = call.search_string(value.unwrap_or(""));
@@ -10577,7 +10576,7 @@ where
                     call = call.add_pricing_types(value.unwrap_or(""));
                 },
                 "placement-strategy-ids" => {
-                    call = call.add_placement_strategy_ids(value.unwrap_or(""));
+                    call = call.add_placement_strategy_ids(        value.map(|v| arg_from_str(v, err, "placement-strategy-ids", "int64")).unwrap_or(-0));
                 },
                 "placement-group-type" => {
                     call = call.placement_group_type(value.unwrap_or(""));
@@ -10595,28 +10594,28 @@ where
                     call = call.max_start_date(value.unwrap_or(""));
                 },
                 "max-results" => {
-                    call = call.max_results(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
+                    call = call.max_results(        value.map(|v| arg_from_str(v, err, "max-results", "int32")).unwrap_or(-0));
                 },
                 "max-end-date" => {
                     call = call.max_end_date(value.unwrap_or(""));
                 },
                 "ids" => {
-                    call = call.add_ids(value.unwrap_or(""));
+                    call = call.add_ids(        value.map(|v| arg_from_str(v, err, "ids", "int64")).unwrap_or(-0));
                 },
                 "directory-site-ids" => {
-                    call = call.add_directory_site_ids(value.unwrap_or(""));
+                    call = call.add_directory_site_ids(        value.map(|v| arg_from_str(v, err, "directory-site-ids", "int64")).unwrap_or(-0));
                 },
                 "content-category-ids" => {
-                    call = call.add_content_category_ids(value.unwrap_or(""));
+                    call = call.add_content_category_ids(        value.map(|v| arg_from_str(v, err, "content-category-ids", "int64")).unwrap_or(-0));
                 },
                 "campaign-ids" => {
-                    call = call.add_campaign_ids(value.unwrap_or(""));
+                    call = call.add_campaign_ids(        value.map(|v| arg_from_str(v, err, "campaign-ids", "int64")).unwrap_or(-0));
                 },
                 "archived" => {
-                    call = call.archived(arg_from_str(value.unwrap_or("false"), err, "archived", "boolean"));
+                    call = call.archived(        value.map(|v| arg_from_str(v, err, "archived", "boolean")).unwrap_or(false));
                 },
                 "advertiser-ids" => {
-                    call = call.add_advertiser_ids(value.unwrap_or(""));
+                    call = call.add_advertiser_ids(        value.map(|v| arg_from_str(v, err, "advertiser-ids", "int64")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -11162,10 +11161,10 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "max-results" => {
-                    call = call.max_results(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
+                    call = call.max_results(        value.map(|v| arg_from_str(v, err, "max-results", "int32")).unwrap_or(-0));
                 },
                 "ids" => {
-                    call = call.add_ids(value.unwrap_or(""));
+                    call = call.add_ids(        value.map(|v| arg_from_str(v, err, "ids", "int64")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -11400,10 +11399,10 @@ where
                     call = call.add_tag_formats(value.unwrap_or(""));
                 },
                 "placement-ids" => {
-                    call = call.add_placement_ids(value.unwrap_or(""));
+                    call = call.add_placement_ids(        value.map(|v| arg_from_str(v, err, "placement-ids", "int64")).unwrap_or(-0));
                 },
                 "campaign-id" => {
-                    call = call.campaign_id(value.unwrap_or(""));
+                    call = call.campaign_id(        value.map(|v| arg_from_str(v, err, "campaign-id", "int64")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -11698,10 +11697,10 @@ where
                     call = call.sort_field(value.unwrap_or(""));
                 },
                 "size-ids" => {
-                    call = call.add_size_ids(value.unwrap_or(""));
+                    call = call.add_size_ids(        value.map(|v| arg_from_str(v, err, "size-ids", "int64")).unwrap_or(-0));
                 },
                 "site-ids" => {
-                    call = call.add_site_ids(value.unwrap_or(""));
+                    call = call.add_site_ids(        value.map(|v| arg_from_str(v, err, "site-ids", "int64")).unwrap_or(-0));
                 },
                 "search-string" => {
                     call = call.search_string(value.unwrap_or(""));
@@ -11710,7 +11709,7 @@ where
                     call = call.add_pricing_types(value.unwrap_or(""));
                 },
                 "placement-strategy-ids" => {
-                    call = call.add_placement_strategy_ids(value.unwrap_or(""));
+                    call = call.add_placement_strategy_ids(        value.map(|v| arg_from_str(v, err, "placement-strategy-ids", "int64")).unwrap_or(-0));
                 },
                 "payment-source" => {
                     call = call.payment_source(value.unwrap_or(""));
@@ -11728,34 +11727,34 @@ where
                     call = call.max_start_date(value.unwrap_or(""));
                 },
                 "max-results" => {
-                    call = call.max_results(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
+                    call = call.max_results(        value.map(|v| arg_from_str(v, err, "max-results", "int32")).unwrap_or(-0));
                 },
                 "max-end-date" => {
                     call = call.max_end_date(value.unwrap_or(""));
                 },
                 "ids" => {
-                    call = call.add_ids(value.unwrap_or(""));
+                    call = call.add_ids(        value.map(|v| arg_from_str(v, err, "ids", "int64")).unwrap_or(-0));
                 },
                 "group-ids" => {
-                    call = call.add_group_ids(value.unwrap_or(""));
+                    call = call.add_group_ids(        value.map(|v| arg_from_str(v, err, "group-ids", "int64")).unwrap_or(-0));
                 },
                 "directory-site-ids" => {
-                    call = call.add_directory_site_ids(value.unwrap_or(""));
+                    call = call.add_directory_site_ids(        value.map(|v| arg_from_str(v, err, "directory-site-ids", "int64")).unwrap_or(-0));
                 },
                 "content-category-ids" => {
-                    call = call.add_content_category_ids(value.unwrap_or(""));
+                    call = call.add_content_category_ids(        value.map(|v| arg_from_str(v, err, "content-category-ids", "int64")).unwrap_or(-0));
                 },
                 "compatibilities" => {
                     call = call.add_compatibilities(value.unwrap_or(""));
                 },
                 "campaign-ids" => {
-                    call = call.add_campaign_ids(value.unwrap_or(""));
+                    call = call.add_campaign_ids(        value.map(|v| arg_from_str(v, err, "campaign-ids", "int64")).unwrap_or(-0));
                 },
                 "archived" => {
-                    call = call.archived(arg_from_str(value.unwrap_or("false"), err, "archived", "boolean"));
+                    call = call.archived(        value.map(|v| arg_from_str(v, err, "archived", "boolean")).unwrap_or(false));
                 },
                 "advertiser-ids" => {
-                    call = call.add_advertiser_ids(value.unwrap_or(""));
+                    call = call.add_advertiser_ids(        value.map(|v| arg_from_str(v, err, "advertiser-ids", "int64")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -12445,13 +12444,13 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "max-results" => {
-                    call = call.max_results(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
+                    call = call.max_results(        value.map(|v| arg_from_str(v, err, "max-results", "int32")).unwrap_or(-0));
                 },
                 "ids" => {
-                    call = call.add_ids(value.unwrap_or(""));
+                    call = call.add_ids(        value.map(|v| arg_from_str(v, err, "ids", "int64")).unwrap_or(-0));
                 },
                 "advertiser-ids" => {
-                    call = call.add_advertiser_ids(value.unwrap_or(""));
+                    call = call.add_advertiser_ids(        value.map(|v| arg_from_str(v, err, "advertiser-ids", "int64")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -12954,13 +12953,13 @@ where
                     call = call.name(value.unwrap_or(""));
                 },
                 "max-results" => {
-                    call = call.max_results(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
+                    call = call.max_results(        value.map(|v| arg_from_str(v, err, "max-results", "int32")).unwrap_or(-0));
                 },
                 "floodlight-activity-id" => {
-                    call = call.floodlight_activity_id(value.unwrap_or(""));
+                    call = call.floodlight_activity_id(        value.map(|v| arg_from_str(v, err, "floodlight-activity-id", "int64")).unwrap_or(-0));
                 },
                 "active" => {
-                    call = call.active(arg_from_str(value.unwrap_or("false"), err, "active", "boolean"));
+                    call = call.active(        value.map(|v| arg_from_str(v, err, "active", "boolean")).unwrap_or(false));
                 },
                 _ => {
                     let mut found = false;
@@ -13502,7 +13501,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "max-results" => {
-                    call = call.max_results(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
+                    call = call.max_results(        value.map(|v| arg_from_str(v, err, "max-results", "int32")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -13787,7 +13786,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "max-results" => {
-                    call = call.max_results(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
+                    call = call.max_results(        value.map(|v| arg_from_str(v, err, "max-results", "int32")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -14008,7 +14007,7 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "synchronous" => {
-                    call = call.synchronous(arg_from_str(value.unwrap_or("false"), err, "synchronous", "boolean"));
+                    call = call.synchronous(        value.map(|v| arg_from_str(v, err, "synchronous", "boolean")).unwrap_or(false));
                 },
                 _ => {
                     let mut found = false;
@@ -14407,10 +14406,10 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "unmapped-site" => {
-                    call = call.unmapped_site(arg_from_str(value.unwrap_or("false"), err, "unmapped-site", "boolean"));
+                    call = call.unmapped_site(        value.map(|v| arg_from_str(v, err, "unmapped-site", "boolean")).unwrap_or(false));
                 },
                 "subaccount-id" => {
-                    call = call.subaccount_id(value.unwrap_or(""));
+                    call = call.subaccount_id(        value.map(|v| arg_from_str(v, err, "subaccount-id", "int64")).unwrap_or(-0));
                 },
                 "sort-order" => {
                     call = call.sort_order(value.unwrap_or(""));
@@ -14425,31 +14424,31 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "max-results" => {
-                    call = call.max_results(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
+                    call = call.max_results(        value.map(|v| arg_from_str(v, err, "max-results", "int32")).unwrap_or(-0));
                 },
                 "ids" => {
-                    call = call.add_ids(value.unwrap_or(""));
+                    call = call.add_ids(        value.map(|v| arg_from_str(v, err, "ids", "int64")).unwrap_or(-0));
                 },
                 "directory-site-ids" => {
-                    call = call.add_directory_site_ids(value.unwrap_or(""));
+                    call = call.add_directory_site_ids(        value.map(|v| arg_from_str(v, err, "directory-site-ids", "int64")).unwrap_or(-0));
                 },
                 "campaign-ids" => {
-                    call = call.add_campaign_ids(value.unwrap_or(""));
+                    call = call.add_campaign_ids(        value.map(|v| arg_from_str(v, err, "campaign-ids", "int64")).unwrap_or(-0));
                 },
                 "approved" => {
-                    call = call.approved(arg_from_str(value.unwrap_or("false"), err, "approved", "boolean"));
+                    call = call.approved(        value.map(|v| arg_from_str(v, err, "approved", "boolean")).unwrap_or(false));
                 },
                 "ad-words-site" => {
-                    call = call.ad_words_site(arg_from_str(value.unwrap_or("false"), err, "ad-words-site", "boolean"));
+                    call = call.ad_words_site(        value.map(|v| arg_from_str(v, err, "ad-words-site", "boolean")).unwrap_or(false));
                 },
                 "accepts-publisher-paid-placements" => {
-                    call = call.accepts_publisher_paid_placements(arg_from_str(value.unwrap_or("false"), err, "accepts-publisher-paid-placements", "boolean"));
+                    call = call.accepts_publisher_paid_placements(        value.map(|v| arg_from_str(v, err, "accepts-publisher-paid-placements", "boolean")).unwrap_or(false));
                 },
                 "accepts-interstitial-placements" => {
-                    call = call.accepts_interstitial_placements(arg_from_str(value.unwrap_or("false"), err, "accepts-interstitial-placements", "boolean"));
+                    call = call.accepts_interstitial_placements(        value.map(|v| arg_from_str(v, err, "accepts-interstitial-placements", "boolean")).unwrap_or(false));
                 },
                 "accepts-in-stream-video-placements" => {
-                    call = call.accepts_in_stream_video_placements(arg_from_str(value.unwrap_or("false"), err, "accepts-in-stream-video-placements", "boolean"));
+                    call = call.accepts_in_stream_video_placements(        value.map(|v| arg_from_str(v, err, "accepts-in-stream-video-placements", "boolean")).unwrap_or(false));
                 },
                 _ => {
                     let mut found = false;
@@ -14898,16 +14897,16 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "width" => {
-                    call = call.width(arg_from_str(value.unwrap_or("-0"), err, "width", "integer"));
+                    call = call.width(        value.map(|v| arg_from_str(v, err, "width", "int32")).unwrap_or(-0));
                 },
                 "ids" => {
-                    call = call.add_ids(value.unwrap_or(""));
+                    call = call.add_ids(        value.map(|v| arg_from_str(v, err, "ids", "int64")).unwrap_or(-0));
                 },
                 "iab-standard" => {
-                    call = call.iab_standard(arg_from_str(value.unwrap_or("false"), err, "iab-standard", "boolean"));
+                    call = call.iab_standard(        value.map(|v| arg_from_str(v, err, "iab-standard", "boolean")).unwrap_or(false));
                 },
                 "height" => {
-                    call = call.height(arg_from_str(value.unwrap_or("-0"), err, "height", "integer"));
+                    call = call.height(        value.map(|v| arg_from_str(v, err, "height", "int32")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -15116,10 +15115,10 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "max-results" => {
-                    call = call.max_results(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
+                    call = call.max_results(        value.map(|v| arg_from_str(v, err, "max-results", "int32")).unwrap_or(-0));
                 },
                 "ids" => {
-                    call = call.add_ids(value.unwrap_or(""));
+                    call = call.add_ids(        value.map(|v| arg_from_str(v, err, "ids", "int64")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -15417,10 +15416,10 @@ where
                     call = call.name(value.unwrap_or(""));
                 },
                 "max-results" => {
-                    call = call.max_results(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
+                    call = call.max_results(        value.map(|v| arg_from_str(v, err, "max-results", "int32")).unwrap_or(-0));
                 },
                 "active" => {
-                    call = call.active(arg_from_str(value.unwrap_or("false"), err, "active", "boolean"));
+                    call = call.active(        value.map(|v| arg_from_str(v, err, "active", "boolean")).unwrap_or(false));
                 },
                 _ => {
                     let mut found = false;
@@ -15642,13 +15641,13 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "max-results" => {
-                    call = call.max_results(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
+                    call = call.max_results(        value.map(|v| arg_from_str(v, err, "max-results", "int32")).unwrap_or(-0));
                 },
                 "ids" => {
-                    call = call.add_ids(value.unwrap_or(""));
+                    call = call.add_ids(        value.map(|v| arg_from_str(v, err, "ids", "int64")).unwrap_or(-0));
                 },
                 "advertiser-id" => {
-                    call = call.advertiser_id(value.unwrap_or(""));
+                    call = call.advertiser_id(        value.map(|v| arg_from_str(v, err, "advertiser-id", "int64")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -16168,7 +16167,7 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "ids" => {
-                    call = call.add_ids(value.unwrap_or(""));
+                    call = call.add_ids(        value.map(|v| arg_from_str(v, err, "ids", "int64")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -16411,7 +16410,7 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "subaccount-id" => {
-                    call = call.subaccount_id(value.unwrap_or(""));
+                    call = call.subaccount_id(        value.map(|v| arg_from_str(v, err, "subaccount-id", "int64")).unwrap_or(-0));
                 },
                 "sort-order" => {
                     call = call.sort_order(value.unwrap_or(""));
@@ -16426,13 +16425,13 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "max-results" => {
-                    call = call.max_results(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
+                    call = call.max_results(        value.map(|v| arg_from_str(v, err, "max-results", "int32")).unwrap_or(-0));
                 },
                 "ids" => {
-                    call = call.add_ids(value.unwrap_or(""));
+                    call = call.add_ids(        value.map(|v| arg_from_str(v, err, "ids", "int64")).unwrap_or(-0));
                 },
                 "account-user-role-only" => {
-                    call = call.account_user_role_only(arg_from_str(value.unwrap_or("false"), err, "account-user-role-only", "boolean"));
+                    call = call.account_user_role_only(        value.map(|v| arg_from_str(v, err, "account-user-role-only", "boolean")).unwrap_or(false));
                 },
                 _ => {
                     let mut found = false;
@@ -23709,7 +23708,7 @@ async fn main() {
     
     let mut app = App::new("dfareporting3d3")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("4.0.1+20220104")
+           .version("5.0.2+20220104")
            .about("Build applications to efficiently manage large or complex trafficking, reporting, and attribution workflows for Campaign Manager 360.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_dfareporting3d3_cli")
            .arg(Arg::with_name("url")

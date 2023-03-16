@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Games Configuration* API at revision *20220217*. The CLI is at version *4.0.1*.
+This documentation was generated from the *Games Configuration* API at revision *20230112*. The CLI is at version *5.0.2*.
 
 ```bash
 gamesconfiguration1-configuration [options]
@@ -35,8 +35,6 @@ gamesconfiguration1-configuration [options]
                 insert <application-id> (-r <kv>)... [-p <v>]... [-o <out>]
                 list <application-id> [-p <v>]... [-o <out>]
                 update <achievement-id> (-r <kv>)... [-p <v>]... [-o <out>]
-        image-configurations
-                upload <resource-id> <image-type> (-u simple -f <file> [-m <mime>]) [-p <v>]... [-o <out>]
         leaderboard-configurations
                 delete <leaderboard-id> [-p <v>]...
                 get <leaderboard-id> [-p <v>]... [-o <out>]

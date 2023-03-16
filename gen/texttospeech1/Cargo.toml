@@ -4,12 +4,12 @@
 [package]
 
 name = "google-texttospeech1"
-version = "5.0.2-beta-1+20230118"
+version = "5.0.2+20230118"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Texttospeech (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/texttospeech1"
 homepage = "https://cloud.google.com/text-to-speech/"
-documentation = "https://docs.rs/google-texttospeech1/5.0.2-beta-1+20230118"
+documentation = "https://docs.rs/google-texttospeech1/5.0.2+20230118"
 license = "MIT"
 keywords = ["texttospeech", "google", "protocol", "web", "api"]
 autobins = false

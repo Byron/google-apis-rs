@@ -1,4 +1,4 @@
-site_name: Binary Authorization v4.0.1+20220225
+site_name: Binary Authorization v5.0.2+20230113
 site_url: http://byron.github.io/google-apis-rs/google-binaryauthorization1_beta1-cli
 site_description: A complete library to interact with Binary Authorization (protocol v1beta1)
 
@@ -7,23 +7,25 @@ repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/binaryauthorizat
 docs_dir: docs
 site_dir: build_html
 
-pages:
-- ['index.md', 'Home']
-- ['projects_attestors-create.md', 'Projects', 'Attestors Create']
-- ['projects_attestors-delete.md', 'Projects', 'Attestors Delete']
-- ['projects_attestors-get.md', 'Projects', 'Attestors Get']
-- ['projects_attestors-get-iam-policy.md', 'Projects', 'Attestors Get Iam Policy']
-- ['projects_attestors-list.md', 'Projects', 'Attestors List']
-- ['projects_attestors-set-iam-policy.md', 'Projects', 'Attestors Set Iam Policy']
-- ['projects_attestors-test-iam-permissions.md', 'Projects', 'Attestors Test Iam Permissions']
-- ['projects_attestors-update.md', 'Projects', 'Attestors Update']
-- ['projects_attestors-validate-attestation-occurrence.md', 'Projects', 'Attestors Validate Attestation Occurrence']
-- ['projects_get-policy.md', 'Projects', 'Get Policy']
-- ['projects_policy-get-iam-policy.md', 'Projects', 'Policy Get Iam Policy']
-- ['projects_policy-set-iam-policy.md', 'Projects', 'Policy Set Iam Policy']
-- ['projects_policy-test-iam-permissions.md', 'Projects', 'Policy Test Iam Permissions']
-- ['projects_update-policy.md', 'Projects', 'Update Policy']
-- ['systempolicy_get-policy.md', 'Systempolicy', 'Get Policy']
+nav:
+- Home: 'index.md'
+- 'Projects':
+    - 'Attestors Create': 'projects_attestors-create.md'
+    - 'Attestors Delete': 'projects_attestors-delete.md'
+    - 'Attestors Get': 'projects_attestors-get.md'
+    - 'Attestors Get Iam Policy': 'projects_attestors-get-iam-policy.md'
+    - 'Attestors List': 'projects_attestors-list.md'
+    - 'Attestors Set Iam Policy': 'projects_attestors-set-iam-policy.md'
+    - 'Attestors Test Iam Permissions': 'projects_attestors-test-iam-permissions.md'
+    - 'Attestors Update': 'projects_attestors-update.md'
+    - 'Attestors Validate Attestation Occurrence': 'projects_attestors-validate-attestation-occurrence.md'
+    - 'Get Policy': 'projects_get-policy.md'
+    - 'Policy Get Iam Policy': 'projects_policy-get-iam-policy.md'
+    - 'Policy Set Iam Policy': 'projects_policy-set-iam-policy.md'
+    - 'Policy Test Iam Permissions': 'projects_policy-test-iam-permissions.md'
+    - 'Update Policy': 'projects_update-policy.md'
+- 'Systempolicy':
+    - 'Get Policy': 'systempolicy_get-policy.md'
 
 theme: readthedocs
 

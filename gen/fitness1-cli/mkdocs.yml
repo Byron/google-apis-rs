@@ -1,4 +1,4 @@
-site_name: fitness v4.0.1+20220302
+site_name: fitness v5.0.2+20230120
 site_url: http://byron.github.io/google-apis-rs/google-fitness1-cli
 site_description: A complete library to interact with fitness (protocol v1)
 
@@ -7,21 +7,22 @@ repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/fitness1-cli
 docs_dir: docs
 site_dir: build_html
 
-pages:
-- ['index.md', 'Home']
-- ['users_data-sources-create.md', 'Users', 'Data Sources Create']
-- ['users_data-sources-data-point-changes-list.md', 'Users', 'Data Sources Data Point Changes List']
-- ['users_data-sources-datasets-delete.md', 'Users', 'Data Sources Datasets Delete']
-- ['users_data-sources-datasets-get.md', 'Users', 'Data Sources Datasets Get']
-- ['users_data-sources-datasets-patch.md', 'Users', 'Data Sources Datasets Patch']
-- ['users_data-sources-delete.md', 'Users', 'Data Sources Delete']
-- ['users_data-sources-get.md', 'Users', 'Data Sources Get']
-- ['users_data-sources-list.md', 'Users', 'Data Sources List']
-- ['users_data-sources-update.md', 'Users', 'Data Sources Update']
-- ['users_dataset-aggregate.md', 'Users', 'Dataset Aggregate']
-- ['users_sessions-delete.md', 'Users', 'Sessions Delete']
-- ['users_sessions-list.md', 'Users', 'Sessions List']
-- ['users_sessions-update.md', 'Users', 'Sessions Update']
+nav:
+- Home: 'index.md'
+- 'Users':
+    - 'Data Sources Create': 'users_data-sources-create.md'
+    - 'Data Sources Data Point Changes List': 'users_data-sources-data-point-changes-list.md'
+    - 'Data Sources Datasets Delete': 'users_data-sources-datasets-delete.md'
+    - 'Data Sources Datasets Get': 'users_data-sources-datasets-get.md'
+    - 'Data Sources Datasets Patch': 'users_data-sources-datasets-patch.md'
+    - 'Data Sources Delete': 'users_data-sources-delete.md'
+    - 'Data Sources Get': 'users_data-sources-get.md'
+    - 'Data Sources List': 'users_data-sources-list.md'
+    - 'Data Sources Update': 'users_data-sources-update.md'
+    - 'Dataset Aggregate': 'users_dataset-aggregate.md'
+    - 'Sessions Delete': 'users_sessions-delete.md'
+    - 'Sessions List': 'users_sessions-list.md'
+    - 'Sessions Update': 'users_sessions-update.md'
 
 theme: readthedocs
 

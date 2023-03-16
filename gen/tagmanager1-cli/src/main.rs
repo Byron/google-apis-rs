@@ -3,8 +3,6 @@
 // DO NOT EDIT !
 #![allow(unused_variables, unused_imports, dead_code, unused_mut)]
 
-extern crate tokio;
-
 #[macro_use]
 extern crate clap;
 
@@ -12,9 +10,10 @@ use std::env;
 use std::io::{self, Write};
 use clap::{App, SubCommand, Arg};
 
-use google_tagmanager1::{api, Error, oauth2};
+use google_tagmanager1::{api, Error, oauth2, client::chrono, FieldMask};
 
-mod client;
+
+use google_clis_common as client;
 
 use client::{InvalidOptionsError, CLIError, arg_from_str, writer_from_opts, parse_kv_arg,
           input_file_from_opts, input_mime_from_opts, FieldCursor, FieldError, CallType, UploadProtocol,
@@ -2636,10 +2635,10 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "include-deleted" => {
-                    call = call.include_deleted(arg_from_str(value.unwrap_or("false"), err, "include-deleted", "boolean"));
+                    call = call.include_deleted(        value.map(|v| arg_from_str(v, err, "include-deleted", "boolean")).unwrap_or(false));
                 },
                 "headers" => {
-                    call = call.headers(arg_from_str(value.unwrap_or("false"), err, "headers", "boolean"));
+                    call = call.headers(        value.map(|v| arg_from_str(v, err, "headers", "boolean")).unwrap_or(false));
                 },
                 _ => {
                     let mut found = false;
@@ -5242,7 +5241,7 @@ async fn main() {
     
     let mut app = App::new("tagmanager1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("4.0.1+20220301")
+           .version("5.0.2+20230123")
            .about("This API allows clients to access and modify container and tag configuration.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_tagmanager1_cli")
            .arg(Arg::with_name("url")

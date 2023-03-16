@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Display Video* API at revision *20220303*. The CLI is at version *4.0.1*.
+This documentation was generated from the *Display Video* API at revision *20230119*. The CLI is at version *5.0.2*.
 
 ```bash
 displayvideo1 [options]
@@ -138,6 +138,12 @@ displayvideo1 [options]
         google-audiences
                 get <google-audience-id> [-p <v>]... [-o <out>]
                 list [-p <v>]... [-o <out>]
+        guaranteed-orders
+                create (-r <kv>)... [-p <v>]... [-o <out>]
+                edit-guaranteed-order-read-accessors <guaranteed-order-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                get <guaranteed-order-id> [-p <v>]... [-o <out>]
+                list [-p <v>]... [-o <out>]
+                patch <guaranteed-order-id> (-r <kv>)... [-p <v>]... [-o <out>]
         inventory-source-groups
                 assigned-inventory-sources-bulk-edit <inventory-source-group-id> (-r <kv>)... [-p <v>]... [-o <out>]
                 assigned-inventory-sources-create <inventory-source-group-id> (-r <kv>)... [-p <v>]... [-o <out>]
@@ -149,8 +155,11 @@ displayvideo1 [options]
                 list [-p <v>]... [-o <out>]
                 patch <inventory-source-group-id> (-r <kv>)... [-p <v>]... [-o <out>]
         inventory-sources
+                create (-r <kv>)... [-p <v>]... [-o <out>]
+                edit-inventory-source-read-write-accessors <inventory-source-id> (-r <kv>)... [-p <v>]... [-o <out>]
                 get <inventory-source-id> [-p <v>]... [-o <out>]
                 list [-p <v>]... [-o <out>]
+                patch <inventory-source-id> (-r <kv>)... [-p <v>]... [-o <out>]
         media
                 download <resource-name> [-p <v>]... [-o <out>]
                 upload <resource-name> (-r <kv>)... (-u simple -f <file> [-m <mime>]) [-p <v>]... [-o <out>]

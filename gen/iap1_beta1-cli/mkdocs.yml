@@ -1,4 +1,4 @@
-site_name: Cloud IAP v4.0.1+20220225
+site_name: Cloud IAP v5.0.2+20230118
 site_url: http://byron.github.io/google-apis-rs/google-iap1_beta1-cli
 site_description: A complete library to interact with Cloud IAP (protocol v1beta1)
 
@@ -7,11 +7,12 @@ repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/iap1_beta1-cli
 docs_dir: docs
 site_dir: build_html
 
-pages:
-- ['index.md', 'Home']
-- ['methods_get-iam-policy.md', 'Methods', 'Get Iam Policy']
-- ['methods_set-iam-policy.md', 'Methods', 'Set Iam Policy']
-- ['methods_test-iam-permissions.md', 'Methods', 'Test Iam Permissions']
+nav:
+- Home: 'index.md'
+- 'Methods':
+    - 'Get Iam Policy': 'methods_get-iam-policy.md'
+    - 'Set Iam Policy': 'methods_set-iam-policy.md'
+    - 'Test Iam Permissions': 'methods_test-iam-permissions.md'
 
 theme: readthedocs
 

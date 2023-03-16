@@ -3,8 +3,6 @@
 // DO NOT EDIT !
 #![allow(unused_variables, unused_imports, dead_code, unused_mut)]
 
-extern crate tokio;
-
 #[macro_use]
 extern crate clap;
 
@@ -12,9 +10,10 @@ use std::env;
 use std::io::{self, Write};
 use clap::{App, SubCommand, Arg};
 
-use google_containeranalysis1_beta1::{api, Error, oauth2};
+use google_containeranalysis1_beta1::{api, Error, oauth2, client::chrono, FieldMask};
 
-mod client;
+
+use google_clis_common as client;
 
 use client::{InvalidOptionsError, CLIError, arg_from_str, writer_from_opts, parse_kv_arg,
           input_file_from_opts, input_mime_from_opts, FieldCursor, FieldError, CallType, UploadProtocol,
@@ -178,7 +177,20 @@ where
                     "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "long-description" => Some(("longDescription", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "package.architecture" => Some(("package.architecture", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "package.cpe-uri" => Some(("package.cpeUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "package.description" => Some(("package.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "package.license.comments" => Some(("package.license.comments", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "package.license.expression" => Some(("package.license.expression", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "package.maintainer" => Some(("package.maintainer", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "package.name" => Some(("package.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "package.package-type" => Some(("package.packageType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "package.url" => Some(("package.url", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "package.version.epoch" => Some(("package.version.epoch", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "package.version.inclusive" => Some(("package.version.inclusive", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "package.version.kind" => Some(("package.version.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "package.version.name" => Some(("package.version.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "package.version.revision" => Some(("package.version.revision", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "related-note-names" => Some(("relatedNoteNames", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "sbom.data-licence" => Some(("sbom.dataLicence", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "sbom.spdx-version" => Some(("sbom.spdxVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -206,6 +218,18 @@ where
                     "spdx-relationship.type" => Some(("spdxRelationship.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "vulnerability.cvss-score" => Some(("vulnerability.cvssScore", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "vulnerability.cvss-v2.attack-complexity" => Some(("vulnerability.cvssV2.attackComplexity", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "vulnerability.cvss-v2.attack-vector" => Some(("vulnerability.cvssV2.attackVector", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "vulnerability.cvss-v2.authentication" => Some(("vulnerability.cvssV2.authentication", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "vulnerability.cvss-v2.availability-impact" => Some(("vulnerability.cvssV2.availabilityImpact", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "vulnerability.cvss-v2.base-score" => Some(("vulnerability.cvssV2.baseScore", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "vulnerability.cvss-v2.confidentiality-impact" => Some(("vulnerability.cvssV2.confidentialityImpact", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "vulnerability.cvss-v2.exploitability-score" => Some(("vulnerability.cvssV2.exploitabilityScore", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "vulnerability.cvss-v2.impact-score" => Some(("vulnerability.cvssV2.impactScore", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "vulnerability.cvss-v2.integrity-impact" => Some(("vulnerability.cvssV2.integrityImpact", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "vulnerability.cvss-v2.privileges-required" => Some(("vulnerability.cvssV2.privilegesRequired", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "vulnerability.cvss-v2.scope" => Some(("vulnerability.cvssV2.scope", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "vulnerability.cvss-v2.user-interaction" => Some(("vulnerability.cvssV2.userInteraction", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "vulnerability.cvss-v3.attack-complexity" => Some(("vulnerability.cvssV3.attackComplexity", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "vulnerability.cvss-v3.attack-vector" => Some(("vulnerability.cvssV3.attackVector", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "vulnerability.cvss-v3.availability-impact" => Some(("vulnerability.cvssV3.availabilityImpact", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -217,10 +241,12 @@ where
                     "vulnerability.cvss-v3.privileges-required" => Some(("vulnerability.cvssV3.privilegesRequired", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "vulnerability.cvss-v3.scope" => Some(("vulnerability.cvssV3.scope", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "vulnerability.cvss-v3.user-interaction" => Some(("vulnerability.cvssV3.userInteraction", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "vulnerability.cvss-version" => Some(("vulnerability.cvssVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "vulnerability.cwe" => Some(("vulnerability.cwe", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "vulnerability.severity" => Some(("vulnerability.severity", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "vulnerability.source-update-time" => Some(("vulnerability.sourceUpdateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["analysis-kind", "analyzed", "attack-complexity", "attack-vector", "attestation-authority", "attribution", "availability-impact", "base-image", "base-score", "build", "builder-version", "checksum", "comments", "confidentiality-impact", "copyright", "create-time", "cvss-score", "cvss-v3", "data-licence", "deployable", "detailed-description", "discovery", "download-location", "expected-command", "expiration-time", "exploitability-score", "expression", "file-type", "files-license-info", "fingerprint", "hint", "home-page", "human-readable-name", "impact-score", "integrity-impact", "intoto", "key-id", "key-type", "kind", "license-declared", "long-description", "name", "originator", "package", "package-type", "privileges-required", "public-key", "related-note-names", "resource-uri", "resource-url", "sbom", "scope", "severity", "short-description", "signature", "source-update-time", "spdx-file", "spdx-package", "spdx-relationship", "spdx-version", "step-name", "summary-description", "supplier", "threshold", "title", "type", "update-time", "user-interaction", "v1-name", "v2-blob", "v2-name", "verification-code", "version", "vulnerability"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["analysis-kind", "analyzed", "architecture", "attack-complexity", "attack-vector", "attestation-authority", "attribution", "authentication", "availability-impact", "base-image", "base-score", "build", "builder-version", "checksum", "comments", "confidentiality-impact", "copyright", "cpe-uri", "create-time", "cvss-score", "cvss-v2", "cvss-v3", "cvss-version", "cwe", "data-licence", "deployable", "description", "detailed-description", "discovery", "download-location", "epoch", "expected-command", "expiration-time", "exploitability-score", "expression", "file-type", "files-license-info", "fingerprint", "hint", "home-page", "human-readable-name", "impact-score", "inclusive", "integrity-impact", "intoto", "key-id", "key-type", "kind", "license", "license-declared", "long-description", "maintainer", "name", "originator", "package", "package-type", "privileges-required", "public-key", "related-note-names", "resource-uri", "resource-url", "revision", "sbom", "scope", "severity", "short-description", "signature", "source-update-time", "spdx-file", "spdx-package", "spdx-relationship", "spdx-version", "step-name", "summary-description", "supplier", "threshold", "title", "type", "update-time", "url", "user-interaction", "v1-name", "v2-blob", "v2-name", "verification-code", "version", "vulnerability"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -483,7 +509,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 "filter" => {
                     call = call.filter(value.unwrap_or(""));
@@ -545,7 +571,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 "filter" => {
                     call = call.filter(value.unwrap_or(""));
@@ -640,7 +666,20 @@ where
                     "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "long-description" => Some(("longDescription", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "package.architecture" => Some(("package.architecture", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "package.cpe-uri" => Some(("package.cpeUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "package.description" => Some(("package.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "package.license.comments" => Some(("package.license.comments", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "package.license.expression" => Some(("package.license.expression", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "package.maintainer" => Some(("package.maintainer", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "package.name" => Some(("package.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "package.package-type" => Some(("package.packageType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "package.url" => Some(("package.url", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "package.version.epoch" => Some(("package.version.epoch", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "package.version.inclusive" => Some(("package.version.inclusive", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "package.version.kind" => Some(("package.version.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "package.version.name" => Some(("package.version.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "package.version.revision" => Some(("package.version.revision", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "related-note-names" => Some(("relatedNoteNames", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "sbom.data-licence" => Some(("sbom.dataLicence", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "sbom.spdx-version" => Some(("sbom.spdxVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -668,6 +707,18 @@ where
                     "spdx-relationship.type" => Some(("spdxRelationship.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "vulnerability.cvss-score" => Some(("vulnerability.cvssScore", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "vulnerability.cvss-v2.attack-complexity" => Some(("vulnerability.cvssV2.attackComplexity", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "vulnerability.cvss-v2.attack-vector" => Some(("vulnerability.cvssV2.attackVector", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "vulnerability.cvss-v2.authentication" => Some(("vulnerability.cvssV2.authentication", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "vulnerability.cvss-v2.availability-impact" => Some(("vulnerability.cvssV2.availabilityImpact", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "vulnerability.cvss-v2.base-score" => Some(("vulnerability.cvssV2.baseScore", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "vulnerability.cvss-v2.confidentiality-impact" => Some(("vulnerability.cvssV2.confidentialityImpact", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "vulnerability.cvss-v2.exploitability-score" => Some(("vulnerability.cvssV2.exploitabilityScore", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "vulnerability.cvss-v2.impact-score" => Some(("vulnerability.cvssV2.impactScore", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "vulnerability.cvss-v2.integrity-impact" => Some(("vulnerability.cvssV2.integrityImpact", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "vulnerability.cvss-v2.privileges-required" => Some(("vulnerability.cvssV2.privilegesRequired", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "vulnerability.cvss-v2.scope" => Some(("vulnerability.cvssV2.scope", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "vulnerability.cvss-v2.user-interaction" => Some(("vulnerability.cvssV2.userInteraction", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "vulnerability.cvss-v3.attack-complexity" => Some(("vulnerability.cvssV3.attackComplexity", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "vulnerability.cvss-v3.attack-vector" => Some(("vulnerability.cvssV3.attackVector", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "vulnerability.cvss-v3.availability-impact" => Some(("vulnerability.cvssV3.availabilityImpact", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -679,10 +730,12 @@ where
                     "vulnerability.cvss-v3.privileges-required" => Some(("vulnerability.cvssV3.privilegesRequired", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "vulnerability.cvss-v3.scope" => Some(("vulnerability.cvssV3.scope", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "vulnerability.cvss-v3.user-interaction" => Some(("vulnerability.cvssV3.userInteraction", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "vulnerability.cvss-version" => Some(("vulnerability.cvssVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "vulnerability.cwe" => Some(("vulnerability.cwe", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "vulnerability.severity" => Some(("vulnerability.severity", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "vulnerability.source-update-time" => Some(("vulnerability.sourceUpdateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["analysis-kind", "analyzed", "attack-complexity", "attack-vector", "attestation-authority", "attribution", "availability-impact", "base-image", "base-score", "build", "builder-version", "checksum", "comments", "confidentiality-impact", "copyright", "create-time", "cvss-score", "cvss-v3", "data-licence", "deployable", "detailed-description", "discovery", "download-location", "expected-command", "expiration-time", "exploitability-score", "expression", "file-type", "files-license-info", "fingerprint", "hint", "home-page", "human-readable-name", "impact-score", "integrity-impact", "intoto", "key-id", "key-type", "kind", "license-declared", "long-description", "name", "originator", "package", "package-type", "privileges-required", "public-key", "related-note-names", "resource-uri", "resource-url", "sbom", "scope", "severity", "short-description", "signature", "source-update-time", "spdx-file", "spdx-package", "spdx-relationship", "spdx-version", "step-name", "summary-description", "supplier", "threshold", "title", "type", "update-time", "user-interaction", "v1-name", "v2-blob", "v2-name", "verification-code", "version", "vulnerability"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["analysis-kind", "analyzed", "architecture", "attack-complexity", "attack-vector", "attestation-authority", "attribution", "authentication", "availability-impact", "base-image", "base-score", "build", "builder-version", "checksum", "comments", "confidentiality-impact", "copyright", "cpe-uri", "create-time", "cvss-score", "cvss-v2", "cvss-v3", "cvss-version", "cwe", "data-licence", "deployable", "description", "detailed-description", "discovery", "download-location", "epoch", "expected-command", "expiration-time", "exploitability-score", "expression", "file-type", "files-license-info", "fingerprint", "hint", "home-page", "human-readable-name", "impact-score", "inclusive", "integrity-impact", "intoto", "key-id", "key-type", "kind", "license", "license-declared", "long-description", "maintainer", "name", "originator", "package", "package-type", "privileges-required", "public-key", "related-note-names", "resource-uri", "resource-url", "revision", "sbom", "scope", "severity", "short-description", "signature", "source-update-time", "spdx-file", "spdx-package", "spdx-relationship", "spdx-version", "step-name", "summary-description", "supplier", "threshold", "title", "type", "update-time", "url", "user-interaction", "v1-name", "v2-blob", "v2-name", "verification-code", "version", "vulnerability"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -697,7 +750,7 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "update-mask" => {
-                    call = call.update_mask(value.unwrap_or(""));
+                    call = call.update_mask(        value.map(|v| arg_from_str(v, err, "update-mask", "google-fieldmask")).unwrap_or(FieldMask::default()));
                 },
                 _ => {
                     let mut found = false;
@@ -1068,12 +1121,25 @@ where
                     "derived-image.derived-image.fingerprint.v1-name" => Some(("derivedImage.derivedImage.fingerprint.v1Name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "derived-image.derived-image.fingerprint.v2-blob" => Some(("derivedImage.derivedImage.fingerprint.v2Blob", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "derived-image.derived-image.fingerprint.v2-name" => Some(("derivedImage.derivedImage.fingerprint.v2Name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "discovered.discovered.analysis-completed.analysis-type" => Some(("discovered.discovered.analysisCompleted.analysisType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "discovered.discovered.analysis-status" => Some(("discovered.discovered.analysisStatus", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "discovered.discovered.analysis-status-error.code" => Some(("discovered.discovered.analysisStatusError.code", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "discovered.discovered.analysis-status-error.message" => Some(("discovered.discovered.analysisStatusError.message", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "discovered.discovered.continuous-analysis" => Some(("discovered.discovered.continuousAnalysis", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "discovered.discovered.last-analysis-time" => Some(("discovered.discovered.lastAnalysisTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "envelope.payload" => Some(("envelope.payload", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "envelope.payload-type" => Some(("envelope.payloadType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "installation.installation.architecture" => Some(("installation.installation.architecture", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "installation.installation.cpe-uri" => Some(("installation.installation.cpeUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "installation.installation.license.comments" => Some(("installation.installation.license.comments", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "installation.installation.license.expression" => Some(("installation.installation.license.expression", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "installation.installation.name" => Some(("installation.installation.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "installation.installation.package-type" => Some(("installation.installation.packageType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "installation.installation.version.epoch" => Some(("installation.installation.version.epoch", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "installation.installation.version.inclusive" => Some(("installation.installation.version.inclusive", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "installation.installation.version.kind" => Some(("installation.installation.version.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "installation.installation.version.name" => Some(("installation.installation.version.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "installation.installation.version.revision" => Some(("installation.installation.version.revision", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "intoto.signed.byproducts.custom-values" => Some(("intoto.signed.byproducts.customValues", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "intoto.signed.command" => Some(("intoto.signed.command", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "intoto.signed.environment.custom-values" => Some(("intoto.signed.environment.customValues", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
@@ -1120,13 +1186,14 @@ where
                     "spdx-relationship.type" => Some(("spdxRelationship.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "vulnerability.cvss-score" => Some(("vulnerability.cvssScore", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "vulnerability.cvss-version" => Some(("vulnerability.cvssVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "vulnerability.effective-severity" => Some(("vulnerability.effectiveSeverity", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "vulnerability.long-description" => Some(("vulnerability.longDescription", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "vulnerability.severity" => Some(("vulnerability.severity", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "vulnerability.short-description" => Some(("vulnerability.shortDescription", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "vulnerability.type" => Some(("vulnerability.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["address", "alias-context", "analysis-status", "analysis-status-error", "artifact-storage-source-uri", "attestation", "attributions", "base-resource-url", "build", "build-options", "builder-version", "byproducts", "cloud-repo", "code", "command", "comment", "comments", "config", "content-hash", "content-type", "context", "continuous-analysis", "contributors", "copyright", "create-time", "creator", "creator-comment", "creators", "custom-values", "cvss-score", "deploy-time", "deployment", "derived-image", "discovered", "distance", "document-comment", "effective-severity", "end-time", "environment", "expression", "external-document-refs", "filename", "files-license-info", "fingerprint", "generic-signed-attestation", "gerrit", "gerrit-project", "git", "home-page", "host-uri", "id", "installation", "intoto", "kind", "labels", "last-analysis-time", "license-concluded", "license-list-version", "logs-uri", "long-description", "message", "name", "namespace", "note-name", "notice", "package-type", "pgp-key-id", "pgp-signed-attestation", "platform", "project-id", "project-repo-id", "provenance", "provenance-bytes", "remediation", "repo-id", "repo-name", "resource", "resource-uri", "revision-id", "sbom", "serialized-payload", "severity", "short-description", "signature", "signed", "source", "source-info", "source-provenance", "spdx-file", "spdx-package", "spdx-relationship", "start-time", "summary-description", "target", "title", "trigger-id", "type", "uid", "undeploy-time", "update-time", "uri", "url", "user-email", "v1-name", "v2-blob", "v2-name", "value", "version", "vulnerability"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["address", "alias-context", "analysis-completed", "analysis-status", "analysis-status-error", "analysis-type", "architecture", "artifact-storage-source-uri", "attestation", "attributions", "base-resource-url", "build", "build-options", "builder-version", "byproducts", "cloud-repo", "code", "command", "comment", "comments", "config", "content-hash", "content-type", "context", "continuous-analysis", "contributors", "copyright", "cpe-uri", "create-time", "creator", "creator-comment", "creators", "custom-values", "cvss-score", "cvss-version", "deploy-time", "deployment", "derived-image", "discovered", "distance", "document-comment", "effective-severity", "end-time", "envelope", "environment", "epoch", "expression", "external-document-refs", "filename", "files-license-info", "fingerprint", "generic-signed-attestation", "gerrit", "gerrit-project", "git", "home-page", "host-uri", "id", "inclusive", "installation", "intoto", "kind", "labels", "last-analysis-time", "license", "license-concluded", "license-list-version", "logs-uri", "long-description", "message", "name", "namespace", "note-name", "notice", "package-type", "payload", "payload-type", "pgp-key-id", "pgp-signed-attestation", "platform", "project-id", "project-repo-id", "provenance", "provenance-bytes", "remediation", "repo-id", "repo-name", "resource", "resource-uri", "revision", "revision-id", "sbom", "serialized-payload", "severity", "short-description", "signature", "signed", "source", "source-info", "source-provenance", "spdx-file", "spdx-package", "spdx-relationship", "start-time", "summary-description", "target", "title", "trigger-id", "type", "uid", "undeploy-time", "update-time", "uri", "url", "user-email", "v1-name", "v2-blob", "v2-name", "value", "version", "vulnerability"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1493,7 +1560,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 "filter" => {
                     call = call.filter(value.unwrap_or(""));
@@ -1612,12 +1679,25 @@ where
                     "derived-image.derived-image.fingerprint.v1-name" => Some(("derivedImage.derivedImage.fingerprint.v1Name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "derived-image.derived-image.fingerprint.v2-blob" => Some(("derivedImage.derivedImage.fingerprint.v2Blob", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "derived-image.derived-image.fingerprint.v2-name" => Some(("derivedImage.derivedImage.fingerprint.v2Name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "discovered.discovered.analysis-completed.analysis-type" => Some(("discovered.discovered.analysisCompleted.analysisType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "discovered.discovered.analysis-status" => Some(("discovered.discovered.analysisStatus", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "discovered.discovered.analysis-status-error.code" => Some(("discovered.discovered.analysisStatusError.code", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "discovered.discovered.analysis-status-error.message" => Some(("discovered.discovered.analysisStatusError.message", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "discovered.discovered.continuous-analysis" => Some(("discovered.discovered.continuousAnalysis", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "discovered.discovered.last-analysis-time" => Some(("discovered.discovered.lastAnalysisTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "envelope.payload" => Some(("envelope.payload", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "envelope.payload-type" => Some(("envelope.payloadType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "installation.installation.architecture" => Some(("installation.installation.architecture", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "installation.installation.cpe-uri" => Some(("installation.installation.cpeUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "installation.installation.license.comments" => Some(("installation.installation.license.comments", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "installation.installation.license.expression" => Some(("installation.installation.license.expression", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "installation.installation.name" => Some(("installation.installation.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "installation.installation.package-type" => Some(("installation.installation.packageType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "installation.installation.version.epoch" => Some(("installation.installation.version.epoch", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "installation.installation.version.inclusive" => Some(("installation.installation.version.inclusive", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "installation.installation.version.kind" => Some(("installation.installation.version.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "installation.installation.version.name" => Some(("installation.installation.version.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "installation.installation.version.revision" => Some(("installation.installation.version.revision", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "intoto.signed.byproducts.custom-values" => Some(("intoto.signed.byproducts.customValues", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "intoto.signed.command" => Some(("intoto.signed.command", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "intoto.signed.environment.custom-values" => Some(("intoto.signed.environment.customValues", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
@@ -1664,13 +1744,14 @@ where
                     "spdx-relationship.type" => Some(("spdxRelationship.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "vulnerability.cvss-score" => Some(("vulnerability.cvssScore", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "vulnerability.cvss-version" => Some(("vulnerability.cvssVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "vulnerability.effective-severity" => Some(("vulnerability.effectiveSeverity", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "vulnerability.long-description" => Some(("vulnerability.longDescription", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "vulnerability.severity" => Some(("vulnerability.severity", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "vulnerability.short-description" => Some(("vulnerability.shortDescription", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "vulnerability.type" => Some(("vulnerability.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["address", "alias-context", "analysis-status", "analysis-status-error", "artifact-storage-source-uri", "attestation", "attributions", "base-resource-url", "build", "build-options", "builder-version", "byproducts", "cloud-repo", "code", "command", "comment", "comments", "config", "content-hash", "content-type", "context", "continuous-analysis", "contributors", "copyright", "create-time", "creator", "creator-comment", "creators", "custom-values", "cvss-score", "deploy-time", "deployment", "derived-image", "discovered", "distance", "document-comment", "effective-severity", "end-time", "environment", "expression", "external-document-refs", "filename", "files-license-info", "fingerprint", "generic-signed-attestation", "gerrit", "gerrit-project", "git", "home-page", "host-uri", "id", "installation", "intoto", "kind", "labels", "last-analysis-time", "license-concluded", "license-list-version", "logs-uri", "long-description", "message", "name", "namespace", "note-name", "notice", "package-type", "pgp-key-id", "pgp-signed-attestation", "platform", "project-id", "project-repo-id", "provenance", "provenance-bytes", "remediation", "repo-id", "repo-name", "resource", "resource-uri", "revision-id", "sbom", "serialized-payload", "severity", "short-description", "signature", "signed", "source", "source-info", "source-provenance", "spdx-file", "spdx-package", "spdx-relationship", "start-time", "summary-description", "target", "title", "trigger-id", "type", "uid", "undeploy-time", "update-time", "uri", "url", "user-email", "v1-name", "v2-blob", "v2-name", "value", "version", "vulnerability"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["address", "alias-context", "analysis-completed", "analysis-status", "analysis-status-error", "analysis-type", "architecture", "artifact-storage-source-uri", "attestation", "attributions", "base-resource-url", "build", "build-options", "builder-version", "byproducts", "cloud-repo", "code", "command", "comment", "comments", "config", "content-hash", "content-type", "context", "continuous-analysis", "contributors", "copyright", "cpe-uri", "create-time", "creator", "creator-comment", "creators", "custom-values", "cvss-score", "cvss-version", "deploy-time", "deployment", "derived-image", "discovered", "distance", "document-comment", "effective-severity", "end-time", "envelope", "environment", "epoch", "expression", "external-document-refs", "filename", "files-license-info", "fingerprint", "generic-signed-attestation", "gerrit", "gerrit-project", "git", "home-page", "host-uri", "id", "inclusive", "installation", "intoto", "kind", "labels", "last-analysis-time", "license", "license-concluded", "license-list-version", "logs-uri", "long-description", "message", "name", "namespace", "note-name", "notice", "package-type", "payload", "payload-type", "pgp-key-id", "pgp-signed-attestation", "platform", "project-id", "project-repo-id", "provenance", "provenance-bytes", "remediation", "repo-id", "repo-name", "resource", "resource-uri", "revision", "revision-id", "sbom", "serialized-payload", "severity", "short-description", "signature", "signed", "source", "source-info", "source-provenance", "spdx-file", "spdx-package", "spdx-relationship", "start-time", "summary-description", "target", "title", "trigger-id", "type", "uid", "undeploy-time", "update-time", "uri", "url", "user-email", "v1-name", "v2-blob", "v2-name", "value", "version", "vulnerability"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1685,7 +1766,7 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "update-mask" => {
-                    call = call.update_mask(value.unwrap_or(""));
+                    call = call.update_mask(        value.map(|v| arg_from_str(v, err, "update-mask", "google-fieldmask")).unwrap_or(FieldMask::default()));
                 },
                 _ => {
                     let mut found = false;
@@ -1905,209 +1986,6 @@ where
         }
     }
 
-    async fn _projects_scan_configs_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        let mut call = self.hub.projects().scan_configs_get(opt.value_of("name").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-            let (key, value) = parse_kv_arg(&*parg, err, false);
-            match key {
-                _ => {
-                    let mut found = false;
-                    for param in &self.gp {
-                        if key == *param {
-                            found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
-                            break;
-                        }
-                    }
-                    if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v } ));
-                    }
-                }
-            }
-        }
-        let protocol = CallType::Standard;
-        if dry_run {
-            Ok(())
-        } else {
-            assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-                call = call.add_scope(scope);
-            }
-            let mut ostream = match writer_from_opts(opt.value_of("out")) {
-                Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
-            };
-            match match protocol {
-                CallType::Standard => call.doit().await,
-                _ => unreachable!()
-            } {
-                Err(api_err) => Err(DoitError::ApiError(api_err)),
-                Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
-                    remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
-                    ostream.flush().unwrap();
-                    Ok(())
-                }
-            }
-        }
-    }
-
-    async fn _projects_scan_configs_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        let mut call = self.hub.projects().scan_configs_list(opt.value_of("parent").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-            let (key, value) = parse_kv_arg(&*parg, err, false);
-            match key {
-                "page-token" => {
-                    call = call.page_token(value.unwrap_or(""));
-                },
-                "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
-                },
-                "filter" => {
-                    call = call.filter(value.unwrap_or(""));
-                },
-                _ => {
-                    let mut found = false;
-                    for param in &self.gp {
-                        if key == *param {
-                            found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
-                            break;
-                        }
-                    }
-                    if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["filter", "page-size", "page-token"].iter().map(|v|*v));
-                                                                           v } ));
-                    }
-                }
-            }
-        }
-        let protocol = CallType::Standard;
-        if dry_run {
-            Ok(())
-        } else {
-            assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-                call = call.add_scope(scope);
-            }
-            let mut ostream = match writer_from_opts(opt.value_of("out")) {
-                Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
-            };
-            match match protocol {
-                CallType::Standard => call.doit().await,
-                _ => unreachable!()
-            } {
-                Err(api_err) => Err(DoitError::ApiError(api_err)),
-                Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
-                    remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
-                    ostream.flush().unwrap();
-                    Ok(())
-                }
-            }
-        }
-    }
-
-    async fn _projects_scan_configs_update(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        
-        let mut field_cursor = FieldCursor::default();
-        let mut object = json::value::Value::Object(Default::default());
-        
-        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-            let last_errc = err.issues.len();
-            let (key, value) = parse_kv_arg(&*kvarg, err, false);
-            let mut temp_cursor = field_cursor.clone();
-            if let Err(field_err) = temp_cursor.set(&*key) {
-                err.issues.push(field_err);
-            }
-            if value.is_none() {
-                field_cursor = temp_cursor.clone();
-                if err.issues.len() > last_errc {
-                    err.issues.remove(last_errc);
-                }
-                continue;
-            }
-        
-            let type_info: Option<(&'static str, JsonTypeInfo)> =
-                match &temp_cursor.to_string()[..] {
-                    "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "enabled" => Some(("enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["create-time", "description", "enabled", "name", "update-time"]);
-                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                        None
-                    }
-                };
-            if let Some((field_cursor_str, type_info)) = type_info {
-                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
-            }
-        }
-        let mut request: api::ScanConfig = json::value::from_value(object).unwrap();
-        let mut call = self.hub.projects().scan_configs_update(request, opt.value_of("name").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-            let (key, value) = parse_kv_arg(&*parg, err, false);
-            match key {
-                _ => {
-                    let mut found = false;
-                    for param in &self.gp {
-                        if key == *param {
-                            found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
-                            break;
-                        }
-                    }
-                    if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v } ));
-                    }
-                }
-            }
-        }
-        let protocol = CallType::Standard;
-        if dry_run {
-            Ok(())
-        } else {
-            assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-                call = call.add_scope(scope);
-            }
-            let mut ostream = match writer_from_opts(opt.value_of("out")) {
-                Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
-            };
-            match match protocol {
-                CallType::Standard => call.doit().await,
-                _ => unreachable!()
-            } {
-                Err(api_err) => Err(DoitError::ApiError(api_err)),
-                Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
-                    remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
-                    ostream.flush().unwrap();
-                    Ok(())
-                }
-            }
-        }
-    }
-
     async fn _doit(&self, dry_run: bool) -> Result<Result<(), DoitError>, Option<InvalidOptionsError>> {
         let mut err = InvalidOptionsError::new();
         let mut call_result: Result<(), DoitError> = Ok(());
@@ -2177,15 +2055,6 @@ where
                     },
                     ("occurrences-test-iam-permissions", Some(opt)) => {
                         call_result = self._projects_occurrences_test_iam_permissions(opt, dry_run, &mut err).await;
-                    },
-                    ("scan-configs-get", Some(opt)) => {
-                        call_result = self._projects_scan_configs_get(opt, dry_run, &mut err).await;
-                    },
-                    ("scan-configs-list", Some(opt)) => {
-                        call_result = self._projects_scan_configs_list(opt, dry_run, &mut err).await;
-                    },
-                    ("scan-configs-update", Some(opt)) => {
-                        call_result = self._projects_scan_configs_update(opt, dry_run, &mut err).await;
                     },
                     _ => {
                         err.issues.push(CLIError::MissingMethodError("projects".to_string()));
@@ -2266,7 +2135,7 @@ where
 async fn main() {
     let mut exit_status = 0i32;
     let arg_data = [
-        ("projects", "methods: 'notes-batch-create', 'notes-create', 'notes-delete', 'notes-get', 'notes-get-iam-policy', 'notes-list', 'notes-occurrences-list', 'notes-patch', 'notes-set-iam-policy', 'notes-test-iam-permissions', 'occurrences-batch-create', 'occurrences-create', 'occurrences-delete', 'occurrences-get', 'occurrences-get-iam-policy', 'occurrences-get-notes', 'occurrences-get-vulnerability-summary', 'occurrences-list', 'occurrences-patch', 'occurrences-set-iam-policy', 'occurrences-test-iam-permissions', 'scan-configs-get', 'scan-configs-list' and 'scan-configs-update'", vec![
+        ("projects", "methods: 'notes-batch-create', 'notes-create', 'notes-delete', 'notes-get', 'notes-get-iam-policy', 'notes-list', 'notes-occurrences-list', 'notes-patch', 'notes-set-iam-policy', 'notes-test-iam-permissions', 'occurrences-batch-create', 'occurrences-create', 'occurrences-delete', 'occurrences-get', 'occurrences-get-iam-policy', 'occurrences-get-notes', 'occurrences-get-vulnerability-summary', 'occurrences-list', 'occurrences-patch', 'occurrences-set-iam-policy' and 'occurrences-test-iam-permissions'", vec![
             ("notes-batch-create",
                     Some(r##"Creates new notes in batch."##),
                     "Details at http://byron.github.io/google-apis-rs/google_containeranalysis1_beta1_cli/projects_notes-batch-create",
@@ -2373,7 +2242,7 @@ async fn main() {
                   vec![
                     (Some(r##"resource"##),
                      None,
-                     Some(r##"REQUIRED: The resource for which the policy is being requested. See the operation documentation for the appropriate value for this field."##),
+                     Some(r##"REQUIRED: The resource for which the policy is being requested. See [Resource names](https://cloud.google.com/apis/design/resource_names) for the appropriate value for this field."##),
                      Some(true),
                      Some(false)),
         
@@ -2473,7 +2342,7 @@ async fn main() {
                   vec![
                     (Some(r##"resource"##),
                      None,
-                     Some(r##"REQUIRED: The resource for which the policy is being specified. See the operation documentation for the appropriate value for this field."##),
+                     Some(r##"REQUIRED: The resource for which the policy is being specified. See [Resource names](https://cloud.google.com/apis/design/resource_names) for the appropriate value for this field."##),
                      Some(true),
                      Some(false)),
         
@@ -2501,7 +2370,7 @@ async fn main() {
                   vec![
                     (Some(r##"resource"##),
                      None,
-                     Some(r##"REQUIRED: The resource for which the policy detail is being requested. See the operation documentation for the appropriate value for this field."##),
+                     Some(r##"REQUIRED: The resource for which the policy detail is being requested. See [Resource names](https://cloud.google.com/apis/design/resource_names) for the appropriate value for this field."##),
                      Some(true),
                      Some(false)),
         
@@ -2629,7 +2498,7 @@ async fn main() {
                   vec![
                     (Some(r##"resource"##),
                      None,
-                     Some(r##"REQUIRED: The resource for which the policy is being requested. See the operation documentation for the appropriate value for this field."##),
+                     Some(r##"REQUIRED: The resource for which the policy is being requested. See [Resource names](https://cloud.google.com/apis/design/resource_names) for the appropriate value for this field."##),
                      Some(true),
                      Some(false)),
         
@@ -2751,7 +2620,7 @@ async fn main() {
                   vec![
                     (Some(r##"resource"##),
                      None,
-                     Some(r##"REQUIRED: The resource for which the policy is being specified. See the operation documentation for the appropriate value for this field."##),
+                     Some(r##"REQUIRED: The resource for which the policy is being specified. See [Resource names](https://cloud.google.com/apis/design/resource_names) for the appropriate value for this field."##),
                      Some(true),
                      Some(false)),
         
@@ -2779,79 +2648,7 @@ async fn main() {
                   vec![
                     (Some(r##"resource"##),
                      None,
-                     Some(r##"REQUIRED: The resource for which the policy detail is being requested. See the operation documentation for the appropriate value for this field."##),
-                     Some(true),
-                     Some(false)),
-        
-                    (Some(r##"kv"##),
-                     Some(r##"r"##),
-                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
-                     Some(true),
-                     Some(true)),
-        
-                    (Some(r##"v"##),
-                     Some(r##"p"##),
-                     Some(r##"Set various optional parameters, matching the key=value form"##),
-                     Some(false),
-                     Some(true)),
-        
-                    (Some(r##"out"##),
-                     Some(r##"o"##),
-                     Some(r##"Specify the file into which to write the program's output"##),
-                     Some(false),
-                     Some(false)),
-                  ]),
-            ("scan-configs-get",
-                    Some(r##"Gets the specified scan configuration."##),
-                    "Details at http://byron.github.io/google-apis-rs/google_containeranalysis1_beta1_cli/projects_scan-configs-get",
-                  vec![
-                    (Some(r##"name"##),
-                     None,
-                     Some(r##"Required. The name of the scan configuration in the form of `projects/[PROJECT_ID]/scanConfigs/[SCAN_CONFIG_ID]`."##),
-                     Some(true),
-                     Some(false)),
-        
-                    (Some(r##"v"##),
-                     Some(r##"p"##),
-                     Some(r##"Set various optional parameters, matching the key=value form"##),
-                     Some(false),
-                     Some(true)),
-        
-                    (Some(r##"out"##),
-                     Some(r##"o"##),
-                     Some(r##"Specify the file into which to write the program's output"##),
-                     Some(false),
-                     Some(false)),
-                  ]),
-            ("scan-configs-list",
-                    Some(r##"Lists scan configurations for the specified project."##),
-                    "Details at http://byron.github.io/google-apis-rs/google_containeranalysis1_beta1_cli/projects_scan-configs-list",
-                  vec![
-                    (Some(r##"parent"##),
-                     None,
-                     Some(r##"Required. The name of the project to list scan configurations for in the form of `projects/[PROJECT_ID]`."##),
-                     Some(true),
-                     Some(false)),
-        
-                    (Some(r##"v"##),
-                     Some(r##"p"##),
-                     Some(r##"Set various optional parameters, matching the key=value form"##),
-                     Some(false),
-                     Some(true)),
-        
-                    (Some(r##"out"##),
-                     Some(r##"o"##),
-                     Some(r##"Specify the file into which to write the program's output"##),
-                     Some(false),
-                     Some(false)),
-                  ]),
-            ("scan-configs-update",
-                    Some(r##"Updates the specified scan configuration."##),
-                    "Details at http://byron.github.io/google-apis-rs/google_containeranalysis1_beta1_cli/projects_scan-configs-update",
-                  vec![
-                    (Some(r##"name"##),
-                     None,
-                     Some(r##"Required. The name of the scan configuration in the form of `projects/[PROJECT_ID]/scanConfigs/[SCAN_CONFIG_ID]`."##),
+                     Some(r##"REQUIRED: The resource for which the policy detail is being requested. See [Resource names](https://cloud.google.com/apis/design/resource_names) for the appropriate value for this field."##),
                      Some(true),
                      Some(false)),
         
@@ -2879,7 +2676,7 @@ async fn main() {
     
     let mut app = App::new("containeranalysis1-beta1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("4.0.1+20220225")
+           .version("5.0.2+20230106")
            .about("An implementation of the Grafeas API, which stores, and enables querying and retrieval of critical metadata about all of your software artifacts.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_containeranalysis1_beta1_cli")
            .arg(Arg::with_name("url")

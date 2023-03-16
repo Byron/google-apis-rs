@@ -1,4 +1,4 @@
-site_name: OrgPolicy API v4.0.1+20220305
+site_name: OrgPolicy API v5.0.2+20230123
 site_url: http://byron.github.io/google-apis-rs/google-orgpolicy2-cli
 site_description: A complete library to interact with OrgPolicy API (protocol v2)
 
@@ -7,29 +7,37 @@ repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/orgpolicy2-cli
 docs_dir: docs
 site_dir: build_html
 
-pages:
-- ['index.md', 'Home']
-- ['folders_constraints-list.md', 'Folders', 'Constraints List']
-- ['folders_policies-create.md', 'Folders', 'Policies Create']
-- ['folders_policies-delete.md', 'Folders', 'Policies Delete']
-- ['folders_policies-get.md', 'Folders', 'Policies Get']
-- ['folders_policies-get-effective-policy.md', 'Folders', 'Policies Get Effective Policy']
-- ['folders_policies-list.md', 'Folders', 'Policies List']
-- ['folders_policies-patch.md', 'Folders', 'Policies Patch']
-- ['organizations_constraints-list.md', 'Organizations', 'Constraints List']
-- ['organizations_policies-create.md', 'Organizations', 'Policies Create']
-- ['organizations_policies-delete.md', 'Organizations', 'Policies Delete']
-- ['organizations_policies-get.md', 'Organizations', 'Policies Get']
-- ['organizations_policies-get-effective-policy.md', 'Organizations', 'Policies Get Effective Policy']
-- ['organizations_policies-list.md', 'Organizations', 'Policies List']
-- ['organizations_policies-patch.md', 'Organizations', 'Policies Patch']
-- ['projects_constraints-list.md', 'Projects', 'Constraints List']
-- ['projects_policies-create.md', 'Projects', 'Policies Create']
-- ['projects_policies-delete.md', 'Projects', 'Policies Delete']
-- ['projects_policies-get.md', 'Projects', 'Policies Get']
-- ['projects_policies-get-effective-policy.md', 'Projects', 'Policies Get Effective Policy']
-- ['projects_policies-list.md', 'Projects', 'Policies List']
-- ['projects_policies-patch.md', 'Projects', 'Policies Patch']
+nav:
+- Home: 'index.md'
+- 'Folders':
+    - 'Constraints List': 'folders_constraints-list.md'
+    - 'Policies Create': 'folders_policies-create.md'
+    - 'Policies Delete': 'folders_policies-delete.md'
+    - 'Policies Get': 'folders_policies-get.md'
+    - 'Policies Get Effective Policy': 'folders_policies-get-effective-policy.md'
+    - 'Policies List': 'folders_policies-list.md'
+    - 'Policies Patch': 'folders_policies-patch.md'
+- 'Organizations':
+    - 'Constraints List': 'organizations_constraints-list.md'
+    - 'Custom Constraints Create': 'organizations_custom-constraints-create.md'
+    - 'Custom Constraints Delete': 'organizations_custom-constraints-delete.md'
+    - 'Custom Constraints Get': 'organizations_custom-constraints-get.md'
+    - 'Custom Constraints List': 'organizations_custom-constraints-list.md'
+    - 'Custom Constraints Patch': 'organizations_custom-constraints-patch.md'
+    - 'Policies Create': 'organizations_policies-create.md'
+    - 'Policies Delete': 'organizations_policies-delete.md'
+    - 'Policies Get': 'organizations_policies-get.md'
+    - 'Policies Get Effective Policy': 'organizations_policies-get-effective-policy.md'
+    - 'Policies List': 'organizations_policies-list.md'
+    - 'Policies Patch': 'organizations_policies-patch.md'
+- 'Projects':
+    - 'Constraints List': 'projects_constraints-list.md'
+    - 'Policies Create': 'projects_policies-create.md'
+    - 'Policies Delete': 'projects_policies-delete.md'
+    - 'Policies Get': 'projects_policies-get.md'
+    - 'Policies Get Effective Policy': 'projects_policies-get-effective-policy.md'
+    - 'Policies List': 'projects_policies-list.md'
+    - 'Policies Patch': 'projects_policies-patch.md'
 
 theme: readthedocs
 

@@ -3,8 +3,6 @@
 // DO NOT EDIT !
 #![allow(unused_variables, unused_imports, dead_code, unused_mut)]
 
-extern crate tokio;
-
 #[macro_use]
 extern crate clap;
 
@@ -12,9 +10,10 @@ use std::env;
 use std::io::{self, Write};
 use clap::{App, SubCommand, Arg};
 
-use google_people1::{api, Error, oauth2};
+use google_people1::{api, Error, oauth2, client::chrono, FieldMask};
 
-mod client;
+
+use google_clis_common as client;
 
 use client::{InvalidOptionsError, CLIError, arg_from_str, writer_from_opts, parse_kv_arg,
           input_file_from_opts, input_mime_from_opts, FieldCursor, FieldError, CallType, UploadProtocol,
@@ -61,10 +60,10 @@ where
                     call = call.add_resource_names(value.unwrap_or(""));
                 },
                 "max-members" => {
-                    call = call.max_members(arg_from_str(value.unwrap_or("-0"), err, "max-members", "integer"));
+                    call = call.max_members(        value.map(|v| arg_from_str(v, err, "max-members", "int32")).unwrap_or(-0));
                 },
                 "group-fields" => {
-                    call = call.group_fields(value.unwrap_or(""));
+                    call = call.group_fields(        value.map(|v| arg_from_str(v, err, "group-fields", "google-fieldmask")).unwrap_or(FieldMask::default()));
                 },
                 _ => {
                     let mut found = false;
@@ -214,7 +213,7 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "delete-contacts" => {
-                    call = call.delete_contacts(arg_from_str(value.unwrap_or("false"), err, "delete-contacts", "boolean"));
+                    call = call.delete_contacts(        value.map(|v| arg_from_str(v, err, "delete-contacts", "boolean")).unwrap_or(false));
                 },
                 _ => {
                     let mut found = false;
@@ -270,10 +269,10 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "max-members" => {
-                    call = call.max_members(arg_from_str(value.unwrap_or("-0"), err, "max-members", "integer"));
+                    call = call.max_members(        value.map(|v| arg_from_str(v, err, "max-members", "int32")).unwrap_or(-0));
                 },
                 "group-fields" => {
-                    call = call.group_fields(value.unwrap_or(""));
+                    call = call.group_fields(        value.map(|v| arg_from_str(v, err, "group-fields", "google-fieldmask")).unwrap_or(FieldMask::default()));
                 },
                 _ => {
                     let mut found = false;
@@ -335,10 +334,10 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 "group-fields" => {
-                    call = call.group_fields(value.unwrap_or(""));
+                    call = call.group_fields(        value.map(|v| arg_from_str(v, err, "group-fields", "google-fieldmask")).unwrap_or(FieldMask::default()));
                 },
                 _ => {
                     let mut found = false;
@@ -668,16 +667,16 @@ where
                     call = call.add_sources(value.unwrap_or(""));
                 },
                 "request-sync-token" => {
-                    call = call.request_sync_token(arg_from_str(value.unwrap_or("false"), err, "request-sync-token", "boolean"));
+                    call = call.request_sync_token(        value.map(|v| arg_from_str(v, err, "request-sync-token", "boolean")).unwrap_or(false));
                 },
                 "read-mask" => {
-                    call = call.read_mask(value.unwrap_or(""));
+                    call = call.read_mask(        value.map(|v| arg_from_str(v, err, "read-mask", "google-fieldmask")).unwrap_or(FieldMask::default()));
                 },
                 "page-token" => {
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -733,13 +732,13 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "read-mask" => {
-                    call = call.read_mask(value.unwrap_or(""));
+                    call = call.read_mask(        value.map(|v| arg_from_str(v, err, "read-mask", "google-fieldmask")).unwrap_or(FieldMask::default()));
                 },
                 "query" => {
                     call = call.query(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -1062,19 +1061,19 @@ where
                     call = call.sort_order(value.unwrap_or(""));
                 },
                 "request-sync-token" => {
-                    call = call.request_sync_token(arg_from_str(value.unwrap_or("false"), err, "request-sync-token", "boolean"));
+                    call = call.request_sync_token(        value.map(|v| arg_from_str(v, err, "request-sync-token", "boolean")).unwrap_or(false));
                 },
                 "request-mask-include-field" => {
-                    call = call.request_mask_include_field(value.unwrap_or(""));
+                    call = call.request_mask_include_field(        value.map(|v| arg_from_str(v, err, "request-mask-include-field", "google-fieldmask")).unwrap_or(FieldMask::default()));
                 },
                 "person-fields" => {
-                    call = call.person_fields(value.unwrap_or(""));
+                    call = call.person_fields(        value.map(|v| arg_from_str(v, err, "person-fields", "google-fieldmask")).unwrap_or(FieldMask::default()));
                 },
                 "page-token" => {
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -1172,7 +1171,7 @@ where
                     call = call.add_sources(value.unwrap_or(""));
                 },
                 "person-fields" => {
-                    call = call.person_fields(value.unwrap_or(""));
+                    call = call.person_fields(        value.map(|v| arg_from_str(v, err, "person-fields", "google-fieldmask")).unwrap_or(FieldMask::default()));
                 },
                 _ => {
                     let mut found = false;
@@ -1283,7 +1282,7 @@ where
                     call = call.add_sources(value.unwrap_or(""));
                 },
                 "person-fields" => {
-                    call = call.person_fields(value.unwrap_or(""));
+                    call = call.person_fields(        value.map(|v| arg_from_str(v, err, "person-fields", "google-fieldmask")).unwrap_or(FieldMask::default()));
                 },
                 _ => {
                     let mut found = false;
@@ -1342,10 +1341,10 @@ where
                     call = call.add_sources(value.unwrap_or(""));
                 },
                 "request-mask-include-field" => {
-                    call = call.request_mask_include_field(value.unwrap_or(""));
+                    call = call.request_mask_include_field(        value.map(|v| arg_from_str(v, err, "request-mask-include-field", "google-fieldmask")).unwrap_or(FieldMask::default()));
                 },
                 "person-fields" => {
-                    call = call.person_fields(value.unwrap_or(""));
+                    call = call.person_fields(        value.map(|v| arg_from_str(v, err, "person-fields", "google-fieldmask")).unwrap_or(FieldMask::default()));
                 },
                 _ => {
                     let mut found = false;
@@ -1407,10 +1406,10 @@ where
                     call = call.add_resource_names(value.unwrap_or(""));
                 },
                 "request-mask-include-field" => {
-                    call = call.request_mask_include_field(value.unwrap_or(""));
+                    call = call.request_mask_include_field(        value.map(|v| arg_from_str(v, err, "request-mask-include-field", "google-fieldmask")).unwrap_or(FieldMask::default()));
                 },
                 "person-fields" => {
-                    call = call.person_fields(value.unwrap_or(""));
+                    call = call.person_fields(        value.map(|v| arg_from_str(v, err, "person-fields", "google-fieldmask")).unwrap_or(FieldMask::default()));
                 },
                 _ => {
                     let mut found = false;
@@ -1472,16 +1471,16 @@ where
                     call = call.add_sources(value.unwrap_or(""));
                 },
                 "request-sync-token" => {
-                    call = call.request_sync_token(arg_from_str(value.unwrap_or("false"), err, "request-sync-token", "boolean"));
+                    call = call.request_sync_token(        value.map(|v| arg_from_str(v, err, "request-sync-token", "boolean")).unwrap_or(false));
                 },
                 "read-mask" => {
-                    call = call.read_mask(value.unwrap_or(""));
+                    call = call.read_mask(        value.map(|v| arg_from_str(v, err, "read-mask", "google-fieldmask")).unwrap_or(FieldMask::default()));
                 },
                 "page-token" => {
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 "merge-sources" => {
                     call = call.add_merge_sources(value.unwrap_or(""));
@@ -1543,13 +1542,13 @@ where
                     call = call.add_sources(value.unwrap_or(""));
                 },
                 "read-mask" => {
-                    call = call.read_mask(value.unwrap_or(""));
+                    call = call.read_mask(        value.map(|v| arg_from_str(v, err, "read-mask", "google-fieldmask")).unwrap_or(FieldMask::default()));
                 },
                 "query" => {
                     call = call.query(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -1608,7 +1607,7 @@ where
                     call = call.add_sources(value.unwrap_or(""));
                 },
                 "read-mask" => {
-                    call = call.read_mask(value.unwrap_or(""));
+                    call = call.read_mask(        value.map(|v| arg_from_str(v, err, "read-mask", "google-fieldmask")).unwrap_or(FieldMask::default()));
                 },
                 "query" => {
                     call = call.query(value.unwrap_or(""));
@@ -1617,7 +1616,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 "merge-sources" => {
                     call = call.add_merge_sources(value.unwrap_or(""));
@@ -1715,13 +1714,13 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "update-person-fields" => {
-                    call = call.update_person_fields(value.unwrap_or(""));
+                    call = call.update_person_fields(        value.map(|v| arg_from_str(v, err, "update-person-fields", "google-fieldmask")).unwrap_or(FieldMask::default()));
                 },
                 "sources" => {
                     call = call.add_sources(value.unwrap_or(""));
                 },
                 "person-fields" => {
-                    call = call.person_fields(value.unwrap_or(""));
+                    call = call.person_fields(        value.map(|v| arg_from_str(v, err, "person-fields", "google-fieldmask")).unwrap_or(FieldMask::default()));
                 },
                 _ => {
                     let mut found = false;
@@ -2218,7 +2217,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("list",
-                    Some(r##"List all "Other contacts", that is contacts that are not in a contact group. "Other contacts" are typically auto created contacts from interactions. Sync tokens expire 7 days after the full sync. A request with an expired sync token will result in a 410 error. In the case of such an error clients should make a full sync request without a `sync_token`. The first page of a full sync request has an additional quota. If the quota is exceeded, a 429 error will be returned. This quota is fixed and can not be increased. When the `sync_token` is specified, resources deleted since the last sync will be returned as a person with `PersonMetadata.deleted` set to true. When the `page_token` or `sync_token` is specified, all other request parameters must match the first call. Writes may have a propagation delay of several minutes for sync requests. Incremental syncs are not intended for read-after-write use cases. See example usage at [List the user's other contacts that have changed](/people/v1/other-contacts#list_the_users_other_contacts_that_have_changed)."##),
+                    Some(r##"List all "Other contacts", that is contacts that are not in a contact group. "Other contacts" are typically auto created contacts from interactions. Sync tokens expire 7 days after the full sync. A request with an expired sync token will get an error with an [google.rpc.ErrorInfo](https://cloud.google.com/apis/design/errors#error_info) with reason "EXPIRED_SYNC_TOKEN". In the case of such an error clients should make a full sync request without a `sync_token`. The first page of a full sync request has an additional quota. If the quota is exceeded, a 429 error will be returned. This quota is fixed and can not be increased. When the `sync_token` is specified, resources deleted since the last sync will be returned as a person with `PersonMetadata.deleted` set to true. When the `page_token` or `sync_token` is specified, all other request parameters must match the first call. Writes may have a propagation delay of several minutes for sync requests. Incremental syncs are not intended for read-after-write use cases. See example usage at [List the user's other contacts that have changed](/people/v1/other-contacts#list_the_users_other_contacts_that_have_changed)."##),
                     "Details at http://byron.github.io/google-apis-rs/google_people1_cli/other-contacts_list",
                   vec![
                     (Some(r##"v"##),
@@ -2319,7 +2318,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("connections-list",
-                    Some(r##"Provides a list of the authenticated user's contacts. Sync tokens expire 7 days after the full sync. A request with an expired sync token will result in a 410 error. In the case of such an error clients should make a full sync request without a `sync_token`. The first page of a full sync request has an additional quota. If the quota is exceeded, a 429 error will be returned. This quota is fixed and can not be increased. When the `sync_token` is specified, resources deleted since the last sync will be returned as a person with `PersonMetadata.deleted` set to true. When the `page_token` or `sync_token` is specified, all other request parameters must match the first call. Writes may have a propagation delay of several minutes for sync requests. Incremental syncs are not intended for read-after-write use cases. See example usage at [List the user's contacts that have changed](/people/v1/contacts#list_the_users_contacts_that_have_changed)."##),
+                    Some(r##"Provides a list of the authenticated user's contacts. Sync tokens expire 7 days after the full sync. A request with an expired sync token will get an error with an [google.rpc.ErrorInfo](https://cloud.google.com/apis/design/errors#error_info) with reason "EXPIRED_SYNC_TOKEN". In the case of such an error clients should make a full sync request without a `sync_token`. The first page of a full sync request has an additional quota. If the quota is exceeded, a 429 error will be returned. This quota is fixed and can not be increased. When the `sync_token` is specified, resources deleted since the last sync will be returned as a person with `PersonMetadata.deleted` set to true. When the `page_token` or `sync_token` is specified, all other request parameters must match the first call. Writes may have a propagation delay of several minutes for sync requests. Incremental syncs are not intended for read-after-write use cases. See example usage at [List the user's contacts that have changed](/people/v1/contacts#list_the_users_contacts_that_have_changed)."##),
                     "Details at http://byron.github.io/google-apis-rs/google_people1_cli/people_connections-list",
                   vec![
                     (Some(r##"resource-name"##),
@@ -2498,7 +2497,7 @@ async fn main() {
                   vec![
                     (Some(r##"resource-name"##),
                      None,
-                     Some(r##"The resource name for the person, assigned by the server. An ASCII string with a max length of 27 characters, in the form of `people/{person_id}`."##),
+                     Some(r##"The resource name for the person, assigned by the server. An ASCII string in the form of `people/{person_id}`."##),
                      Some(true),
                      Some(false)),
         
@@ -2554,7 +2553,7 @@ async fn main() {
     
     let mut app = App::new("people1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("4.0.1+20220303")
+           .version("5.0.2+20230123")
            .about("Provides access to information about profiles and contacts.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_people1_cli")
            .arg(Arg::with_name("url")

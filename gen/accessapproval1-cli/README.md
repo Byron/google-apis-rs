@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Access Approval* API at revision *20220225*. The CLI is at version *4.0.1*.
+This documentation was generated from the *Access Approval* API at revision *20230120*. The CLI is at version *5.0.2*.
 
 ```bash
 accessapproval1 [options]
@@ -33,25 +33,31 @@ accessapproval1 [options]
                 approval-requests-approve <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 approval-requests-dismiss <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 approval-requests-get <name> [-p <v>]... [-o <out>]
+                approval-requests-invalidate <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 approval-requests-list <parent> [-p <v>]... [-o <out>]
                 delete-access-approval-settings <name> [-p <v>]... [-o <out>]
                 get-access-approval-settings <name> [-p <v>]... [-o <out>]
+                get-service-account <name> [-p <v>]... [-o <out>]
                 update-access-approval-settings <name> (-r <kv>)... [-p <v>]... [-o <out>]
         organizations
                 approval-requests-approve <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 approval-requests-dismiss <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 approval-requests-get <name> [-p <v>]... [-o <out>]
+                approval-requests-invalidate <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 approval-requests-list <parent> [-p <v>]... [-o <out>]
                 delete-access-approval-settings <name> [-p <v>]... [-o <out>]
                 get-access-approval-settings <name> [-p <v>]... [-o <out>]
+                get-service-account <name> [-p <v>]... [-o <out>]
                 update-access-approval-settings <name> (-r <kv>)... [-p <v>]... [-o <out>]
         projects
                 approval-requests-approve <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 approval-requests-dismiss <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 approval-requests-get <name> [-p <v>]... [-o <out>]
+                approval-requests-invalidate <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 approval-requests-list <parent> [-p <v>]... [-o <out>]
                 delete-access-approval-settings <name> [-p <v>]... [-o <out>]
                 get-access-approval-settings <name> [-p <v>]... [-o <out>]
+                get-service-account <name> [-p <v>]... [-o <out>]
                 update-access-approval-settings <name> (-r <kv>)... [-p <v>]... [-o <out>]
   accessapproval1 --help
 

@@ -1,4 +1,4 @@
-site_name: Dataproc Metastore v4.0.1+20220222
+site_name: Dataproc Metastore v5.0.2+20230111
 site_url: http://byron.github.io/google-apis-rs/google-metastore1_beta-cli
 site_description: A complete library to interact with Dataproc Metastore (protocol v1beta)
 
@@ -7,41 +7,53 @@ repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/metastore1_beta-
 docs_dir: docs
 site_dir: build_html
 
-pages:
-- ['index.md', 'Home']
-- ['projects_locations-get.md', 'Projects', 'Locations Get']
-- ['projects_locations-list.md', 'Projects', 'Locations List']
-- ['projects_locations-operations-delete.md', 'Projects', 'Locations Operations Delete']
-- ['projects_locations-operations-get.md', 'Projects', 'Locations Operations Get']
-- ['projects_locations-operations-list.md', 'Projects', 'Locations Operations List']
-- ['projects_locations-services-backups-create.md', 'Projects', 'Locations Services Backups Create']
-- ['projects_locations-services-backups-delete.md', 'Projects', 'Locations Services Backups Delete']
-- ['projects_locations-services-backups-get.md', 'Projects', 'Locations Services Backups Get']
-- ['projects_locations-services-backups-get-iam-policy.md', 'Projects', 'Locations Services Backups Get Iam Policy']
-- ['projects_locations-services-backups-list.md', 'Projects', 'Locations Services Backups List']
-- ['projects_locations-services-backups-set-iam-policy.md', 'Projects', 'Locations Services Backups Set Iam Policy']
-- ['projects_locations-services-backups-test-iam-permissions.md', 'Projects', 'Locations Services Backups Test Iam Permissions']
-- ['projects_locations-services-create.md', 'Projects', 'Locations Services Create']
-- ['projects_locations-services-databases-get-iam-policy.md', 'Projects', 'Locations Services Databases Get Iam Policy']
-- ['projects_locations-services-databases-set-iam-policy.md', 'Projects', 'Locations Services Databases Set Iam Policy']
-- ['projects_locations-services-databases-tables-get-iam-policy.md', 'Projects', 'Locations Services Databases Tables Get Iam Policy']
-- ['projects_locations-services-databases-tables-set-iam-policy.md', 'Projects', 'Locations Services Databases Tables Set Iam Policy']
-- ['projects_locations-services-databases-tables-test-iam-permissions.md', 'Projects', 'Locations Services Databases Tables Test Iam Permissions']
-- ['projects_locations-services-databases-test-iam-permissions.md', 'Projects', 'Locations Services Databases Test Iam Permissions']
-- ['projects_locations-services-delete.md', 'Projects', 'Locations Services Delete']
-- ['projects_locations-services-export-metadata.md', 'Projects', 'Locations Services Export Metadata']
-- ['projects_locations-services-get.md', 'Projects', 'Locations Services Get']
-- ['projects_locations-services-get-iam-policy.md', 'Projects', 'Locations Services Get Iam Policy']
-- ['projects_locations-services-list.md', 'Projects', 'Locations Services List']
-- ['projects_locations-services-metadata-imports-create.md', 'Projects', 'Locations Services Metadata Imports Create']
-- ['projects_locations-services-metadata-imports-get.md', 'Projects', 'Locations Services Metadata Imports Get']
-- ['projects_locations-services-metadata-imports-list.md', 'Projects', 'Locations Services Metadata Imports List']
-- ['projects_locations-services-metadata-imports-patch.md', 'Projects', 'Locations Services Metadata Imports Patch']
-- ['projects_locations-services-patch.md', 'Projects', 'Locations Services Patch']
-- ['projects_locations-services-remove-iam-policy.md', 'Projects', 'Locations Services Remove Iam Policy']
-- ['projects_locations-services-restore.md', 'Projects', 'Locations Services Restore']
-- ['projects_locations-services-set-iam-policy.md', 'Projects', 'Locations Services Set Iam Policy']
-- ['projects_locations-services-test-iam-permissions.md', 'Projects', 'Locations Services Test Iam Permissions']
+nav:
+- Home: 'index.md'
+- 'Projects':
+    - 'Locations Federations Create': 'projects_locations-federations-create.md'
+    - 'Locations Federations Delete': 'projects_locations-federations-delete.md'
+    - 'Locations Federations Get': 'projects_locations-federations-get.md'
+    - 'Locations Federations Get Iam Policy': 'projects_locations-federations-get-iam-policy.md'
+    - 'Locations Federations List': 'projects_locations-federations-list.md'
+    - 'Locations Federations Patch': 'projects_locations-federations-patch.md'
+    - 'Locations Federations Set Iam Policy': 'projects_locations-federations-set-iam-policy.md'
+    - 'Locations Federations Test Iam Permissions': 'projects_locations-federations-test-iam-permissions.md'
+    - 'Locations Get': 'projects_locations-get.md'
+    - 'Locations List': 'projects_locations-list.md'
+    - 'Locations Operations Delete': 'projects_locations-operations-delete.md'
+    - 'Locations Operations Get': 'projects_locations-operations-get.md'
+    - 'Locations Operations List': 'projects_locations-operations-list.md'
+    - 'Locations Services Alter Location': 'projects_locations-services-alter-location.md'
+    - 'Locations Services Backups Create': 'projects_locations-services-backups-create.md'
+    - 'Locations Services Backups Delete': 'projects_locations-services-backups-delete.md'
+    - 'Locations Services Backups Get': 'projects_locations-services-backups-get.md'
+    - 'Locations Services Backups Get Iam Policy': 'projects_locations-services-backups-get-iam-policy.md'
+    - 'Locations Services Backups List': 'projects_locations-services-backups-list.md'
+    - 'Locations Services Backups Set Iam Policy': 'projects_locations-services-backups-set-iam-policy.md'
+    - 'Locations Services Backups Test Iam Permissions': 'projects_locations-services-backups-test-iam-permissions.md'
+    - 'Locations Services Create': 'projects_locations-services-create.md'
+    - 'Locations Services Databases Get Iam Policy': 'projects_locations-services-databases-get-iam-policy.md'
+    - 'Locations Services Databases Set Iam Policy': 'projects_locations-services-databases-set-iam-policy.md'
+    - 'Locations Services Databases Tables Get Iam Policy': 'projects_locations-services-databases-tables-get-iam-policy.md'
+    - 'Locations Services Databases Tables Set Iam Policy': 'projects_locations-services-databases-tables-set-iam-policy.md'
+    - 'Locations Services Databases Tables Test Iam Permissions': 'projects_locations-services-databases-tables-test-iam-permissions.md'
+    - 'Locations Services Databases Test Iam Permissions': 'projects_locations-services-databases-test-iam-permissions.md'
+    - 'Locations Services Delete': 'projects_locations-services-delete.md'
+    - 'Locations Services Export Metadata': 'projects_locations-services-export-metadata.md'
+    - 'Locations Services Get': 'projects_locations-services-get.md'
+    - 'Locations Services Get Iam Policy': 'projects_locations-services-get-iam-policy.md'
+    - 'Locations Services List': 'projects_locations-services-list.md'
+    - 'Locations Services Metadata Imports Create': 'projects_locations-services-metadata-imports-create.md'
+    - 'Locations Services Metadata Imports Get': 'projects_locations-services-metadata-imports-get.md'
+    - 'Locations Services Metadata Imports List': 'projects_locations-services-metadata-imports-list.md'
+    - 'Locations Services Metadata Imports Patch': 'projects_locations-services-metadata-imports-patch.md'
+    - 'Locations Services Move Table To Database': 'projects_locations-services-move-table-to-database.md'
+    - 'Locations Services Patch': 'projects_locations-services-patch.md'
+    - 'Locations Services Query Metadata': 'projects_locations-services-query-metadata.md'
+    - 'Locations Services Remove Iam Policy': 'projects_locations-services-remove-iam-policy.md'
+    - 'Locations Services Restore': 'projects_locations-services-restore.md'
+    - 'Locations Services Set Iam Policy': 'projects_locations-services-set-iam-policy.md'
+    - 'Locations Services Test Iam Permissions': 'projects_locations-services-test-iam-permissions.md'
 
 theme: readthedocs
 

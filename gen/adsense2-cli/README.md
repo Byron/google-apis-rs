@@ -25,28 +25,37 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *adsense* API at revision *20220304*. The CLI is at version *4.0.1*.
+This documentation was generated from the *adsense* API at revision *20230124*. The CLI is at version *5.0.2*.
 
 ```bash
 adsense2 [options]
         accounts
+                adclients-adunits-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 adclients-adunits-get <name> [-p <v>]... [-o <out>]
                 adclients-adunits-get-adcode <name> [-p <v>]... [-o <out>]
                 adclients-adunits-list <parent> [-p <v>]... [-o <out>]
                 adclients-adunits-list-linked-custom-channels <parent> [-p <v>]... [-o <out>]
+                adclients-adunits-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                adclients-customchannels-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                adclients-customchannels-delete <name> [-p <v>]... [-o <out>]
                 adclients-customchannels-get <name> [-p <v>]... [-o <out>]
                 adclients-customchannels-list <parent> [-p <v>]... [-o <out>]
                 adclients-customchannels-list-linked-ad-units <parent> [-p <v>]... [-o <out>]
+                adclients-customchannels-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                adclients-get <name> [-p <v>]... [-o <out>]
                 adclients-get-adcode <name> [-p <v>]... [-o <out>]
                 adclients-list <parent> [-p <v>]... [-o <out>]
+                adclients-urlchannels-get <name> [-p <v>]... [-o <out>]
                 adclients-urlchannels-list <parent> [-p <v>]... [-o <out>]
                 alerts-list <parent> [-p <v>]... [-o <out>]
                 get <name> [-p <v>]... [-o <out>]
+                get-ad-blocking-recovery-tag <name> [-p <v>]... [-o <out>]
                 list [-p <v>]... [-o <out>]
                 list-child-accounts <parent> [-p <v>]... [-o <out>]
                 payments-list <parent> [-p <v>]... [-o <out>]
                 reports-generate <account> [-p <v>]... [-o <out>]
                 reports-generate-csv <account> [-p <v>]... [-o <out>]
+                reports-get-saved <name> [-p <v>]... [-o <out>]
                 reports-saved-generate <name> [-p <v>]... [-o <out>]
                 reports-saved-generate-csv <name> [-p <v>]... [-o <out>]
                 reports-saved-list <parent> [-p <v>]... [-o <out>]

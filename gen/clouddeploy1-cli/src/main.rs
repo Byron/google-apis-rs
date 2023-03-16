@@ -3,8 +3,6 @@
 // DO NOT EDIT !
 #![allow(unused_variables, unused_imports, dead_code, unused_mut)]
 
-extern crate tokio;
-
 #[macro_use]
 extern crate clap;
 
@@ -12,9 +10,10 @@ use std::env;
 use std::io::{self, Write};
 use clap::{App, SubCommand, Arg};
 
-use google_clouddeploy1::{api, Error, oauth2};
+use google_clouddeploy1::{api, Error, oauth2, client::chrono, FieldMask};
 
-mod client;
+
+use google_clis_common as client;
 
 use client::{InvalidOptionsError, CLIError, arg_from_str, writer_from_opts, parse_kv_arg,
           input_file_from_opts, input_mime_from_opts, FieldCursor, FieldError, CallType, UploadProtocol,
@@ -80,15 +79,18 @@ where
                     "condition.targets-present-condition.missing-targets" => Some(("condition.targetsPresentCondition.missingTargets", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "condition.targets-present-condition.status" => Some(("condition.targetsPresentCondition.status", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "condition.targets-present-condition.update-time" => Some(("condition.targetsPresentCondition.updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "condition.targets-type-condition.error-details" => Some(("condition.targetsTypeCondition.errorDetails", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "condition.targets-type-condition.status" => Some(("condition.targetsTypeCondition.status", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "etag" => Some(("etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "suspended" => Some(("suspended", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "uid" => Some(("uid", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["annotations", "condition", "create-time", "description", "etag", "labels", "missing-targets", "name", "pipeline-ready-condition", "status", "targets-present-condition", "uid", "update-time"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["annotations", "condition", "create-time", "description", "error-details", "etag", "labels", "missing-targets", "name", "pipeline-ready-condition", "status", "suspended", "targets-present-condition", "targets-type-condition", "uid", "update-time"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -103,7 +105,7 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "validate-only" => {
-                    call = call.validate_only(arg_from_str(value.unwrap_or("false"), err, "validate-only", "boolean"));
+                    call = call.validate_only(        value.map(|v| arg_from_str(v, err, "validate-only", "boolean")).unwrap_or(false));
                 },
                 "request-id" => {
                     call = call.request_id(value.unwrap_or(""));
@@ -165,19 +167,19 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "validate-only" => {
-                    call = call.validate_only(arg_from_str(value.unwrap_or("false"), err, "validate-only", "boolean"));
+                    call = call.validate_only(        value.map(|v| arg_from_str(v, err, "validate-only", "boolean")).unwrap_or(false));
                 },
                 "request-id" => {
                     call = call.request_id(value.unwrap_or(""));
                 },
                 "force" => {
-                    call = call.force(arg_from_str(value.unwrap_or("false"), err, "force", "boolean"));
+                    call = call.force(        value.map(|v| arg_from_str(v, err, "force", "boolean")).unwrap_or(false));
                 },
                 "etag" => {
                     call = call.etag(value.unwrap_or(""));
                 },
                 "allow-missing" => {
-                    call = call.allow_missing(arg_from_str(value.unwrap_or("false"), err, "allow-missing", "boolean"));
+                    call = call.allow_missing(        value.map(|v| arg_from_str(v, err, "allow-missing", "boolean")).unwrap_or(false));
                 },
                 _ => {
                     let mut found = false;
@@ -285,7 +287,7 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "options-requested-policy-version" => {
-                    call = call.options_requested_policy_version(arg_from_str(value.unwrap_or("-0"), err, "options-requested-policy-version", "integer"));
+                    call = call.options_requested_policy_version(        value.map(|v| arg_from_str(v, err, "options-requested-policy-version", "int32")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -344,7 +346,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 "order-by" => {
                     call = call.order_by(value.unwrap_or(""));
@@ -428,15 +430,18 @@ where
                     "condition.targets-present-condition.missing-targets" => Some(("condition.targetsPresentCondition.missingTargets", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "condition.targets-present-condition.status" => Some(("condition.targetsPresentCondition.status", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "condition.targets-present-condition.update-time" => Some(("condition.targetsPresentCondition.updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "condition.targets-type-condition.error-details" => Some(("condition.targetsTypeCondition.errorDetails", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "condition.targets-type-condition.status" => Some(("condition.targetsTypeCondition.status", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "etag" => Some(("etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "suspended" => Some(("suspended", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "uid" => Some(("uid", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["annotations", "condition", "create-time", "description", "etag", "labels", "missing-targets", "name", "pipeline-ready-condition", "status", "targets-present-condition", "uid", "update-time"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["annotations", "condition", "create-time", "description", "error-details", "etag", "labels", "missing-targets", "name", "pipeline-ready-condition", "status", "suspended", "targets-present-condition", "targets-type-condition", "uid", "update-time"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -451,16 +456,16 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "validate-only" => {
-                    call = call.validate_only(arg_from_str(value.unwrap_or("false"), err, "validate-only", "boolean"));
+                    call = call.validate_only(        value.map(|v| arg_from_str(v, err, "validate-only", "boolean")).unwrap_or(false));
                 },
                 "update-mask" => {
-                    call = call.update_mask(value.unwrap_or(""));
+                    call = call.update_mask(        value.map(|v| arg_from_str(v, err, "update-mask", "google-fieldmask")).unwrap_or(FieldMask::default()));
                 },
                 "request-id" => {
                     call = call.request_id(value.unwrap_or(""));
                 },
                 "allow-missing" => {
-                    call = call.allow_missing(arg_from_str(value.unwrap_or("false"), err, "allow-missing", "boolean"));
+                    call = call.allow_missing(        value.map(|v| arg_from_str(v, err, "allow-missing", "boolean")).unwrap_or(false));
                 },
                 _ => {
                     let mut found = false;
@@ -476,6 +481,90 @@ where
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
                                                                            v.extend(["allow-missing", "request-id", "update-mask", "validate-only"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_locations_delivery_pipelines_releases_abandon(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec![]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::AbandonReleaseRequest = json::value::from_value(object).unwrap();
+        let mut call = self.hub.projects().locations_delivery_pipelines_releases_abandon(request, opt.value_of("name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -532,6 +621,7 @@ where
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
+                    "abandoned" => Some(("abandoned", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "annotations" => Some(("annotations", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "delivery-pipeline-snapshot.annotations" => Some(("deliveryPipelineSnapshot.annotations", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
@@ -540,11 +630,14 @@ where
                     "delivery-pipeline-snapshot.condition.targets-present-condition.missing-targets" => Some(("deliveryPipelineSnapshot.condition.targetsPresentCondition.missingTargets", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "delivery-pipeline-snapshot.condition.targets-present-condition.status" => Some(("deliveryPipelineSnapshot.condition.targetsPresentCondition.status", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "delivery-pipeline-snapshot.condition.targets-present-condition.update-time" => Some(("deliveryPipelineSnapshot.condition.targetsPresentCondition.updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "delivery-pipeline-snapshot.condition.targets-type-condition.error-details" => Some(("deliveryPipelineSnapshot.condition.targetsTypeCondition.errorDetails", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "delivery-pipeline-snapshot.condition.targets-type-condition.status" => Some(("deliveryPipelineSnapshot.condition.targetsTypeCondition.status", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "delivery-pipeline-snapshot.create-time" => Some(("deliveryPipelineSnapshot.createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "delivery-pipeline-snapshot.description" => Some(("deliveryPipelineSnapshot.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "delivery-pipeline-snapshot.etag" => Some(("deliveryPipelineSnapshot.etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "delivery-pipeline-snapshot.labels" => Some(("deliveryPipelineSnapshot.labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "delivery-pipeline-snapshot.name" => Some(("deliveryPipelineSnapshot.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "delivery-pipeline-snapshot.suspended" => Some(("deliveryPipelineSnapshot.suspended", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "delivery-pipeline-snapshot.uid" => Some(("deliveryPipelineSnapshot.uid", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "delivery-pipeline-snapshot.update-time" => Some(("deliveryPipelineSnapshot.updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -559,7 +652,7 @@ where
                     "skaffold-version" => Some(("skaffoldVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "uid" => Some(("uid", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["annotations", "condition", "create-time", "delivery-pipeline-snapshot", "description", "etag", "labels", "missing-targets", "name", "pipeline-ready-condition", "render-end-time", "render-start-time", "render-state", "skaffold-config-path", "skaffold-config-uri", "skaffold-version", "status", "targets-present-condition", "uid", "update-time"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["abandoned", "annotations", "condition", "create-time", "delivery-pipeline-snapshot", "description", "error-details", "etag", "labels", "missing-targets", "name", "pipeline-ready-condition", "render-end-time", "render-start-time", "render-state", "skaffold-config-path", "skaffold-config-uri", "skaffold-version", "status", "suspended", "targets-present-condition", "targets-type-condition", "uid", "update-time"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -574,7 +667,7 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "validate-only" => {
-                    call = call.validate_only(arg_from_str(value.unwrap_or("false"), err, "validate-only", "boolean"));
+                    call = call.validate_only(        value.map(|v| arg_from_str(v, err, "validate-only", "boolean")).unwrap_or(false));
                 },
                 "request-id" => {
                     call = call.request_id(value.unwrap_or(""));
@@ -691,7 +784,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 "order-by" => {
                     call = call.order_by(value.unwrap_or(""));
@@ -867,12 +960,15 @@ where
                     "etag" => Some(("etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "failure-reason" => Some(("failureReason", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "metadata.cloud-run.revision" => Some(("metadata.cloudRun.revision", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "metadata.cloud-run.service" => Some(("metadata.cloudRun.service", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "metadata.cloud-run.service-urls" => Some(("metadata.cloudRun.serviceUrls", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "state" => Some(("state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "target-id" => Some(("targetId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "uid" => Some(("uid", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["annotations", "approval-state", "approve-time", "create-time", "deploy-end-time", "deploy-failure-cause", "deploy-start-time", "deploying-build", "description", "enqueue-time", "etag", "failure-reason", "labels", "name", "state", "target-id", "uid"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["annotations", "approval-state", "approve-time", "cloud-run", "create-time", "deploy-end-time", "deploy-failure-cause", "deploy-start-time", "deploying-build", "description", "enqueue-time", "etag", "failure-reason", "labels", "metadata", "name", "revision", "service", "service-urls", "state", "target-id", "uid"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -887,7 +983,7 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "validate-only" => {
-                    call = call.validate_only(arg_from_str(value.unwrap_or("false"), err, "validate-only", "boolean"));
+                    call = call.validate_only(        value.map(|v| arg_from_str(v, err, "validate-only", "boolean")).unwrap_or(false));
                 },
                 "rollout-id" => {
                     call = call.rollout_id(value.unwrap_or(""));
@@ -994,9 +1090,61 @@ where
         }
     }
 
-    async fn _projects_locations_delivery_pipelines_releases_rollouts_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_locations_delivery_pipelines_releases_rollouts_job_runs_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
-        let mut call = self.hub.projects().locations_delivery_pipelines_releases_rollouts_list(opt.value_of("parent").unwrap_or(""));
+        let mut call = self.hub.projects().locations_delivery_pipelines_releases_rollouts_job_runs_get(opt.value_of("name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_locations_delivery_pipelines_releases_rollouts_job_runs_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.projects().locations_delivery_pipelines_releases_rollouts_job_runs_list(opt.value_of("parent").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
@@ -1004,7 +1152,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 "order-by" => {
                     call = call.order_by(value.unwrap_or(""));
@@ -1026,6 +1174,157 @@ where
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
                                                                            v.extend(["filter", "order-by", "page-size", "page-token"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_locations_delivery_pipelines_releases_rollouts_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.projects().locations_delivery_pipelines_releases_rollouts_list(opt.value_of("parent").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "page-token" => {
+                    call = call.page_token(value.unwrap_or(""));
+                },
+                "page-size" => {
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
+                },
+                "order-by" => {
+                    call = call.order_by(value.unwrap_or(""));
+                },
+                "filter" => {
+                    call = call.filter(value.unwrap_or(""));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["filter", "order-by", "page-size", "page-token"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_locations_delivery_pipelines_releases_rollouts_retry_job(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "job-id" => Some(("jobId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "phase-id" => Some(("phaseId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["job-id", "phase-id"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::RetryJobRequest = json::value::from_value(object).unwrap();
+        let mut call = self.hub.projects().locations_delivery_pipelines_releases_rollouts_retry_job(request, opt.value_of("rollout").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -1345,7 +1644,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 "filter" => {
                     call = call.filter(value.unwrap_or(""));
@@ -1595,7 +1894,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 "filter" => {
                     call = call.filter(value.unwrap_or(""));
@@ -1680,11 +1979,12 @@ where
                     "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "require-approval" => Some(("requireApproval", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "run.location" => Some(("run.location", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "target-id" => Some(("targetId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "uid" => Some(("uid", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["annotations", "anthos-cluster", "cluster", "create-time", "description", "etag", "gke", "internal-ip", "labels", "membership", "name", "require-approval", "target-id", "uid", "update-time"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["annotations", "anthos-cluster", "cluster", "create-time", "description", "etag", "gke", "internal-ip", "labels", "location", "membership", "name", "require-approval", "run", "target-id", "uid", "update-time"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1699,7 +1999,7 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "validate-only" => {
-                    call = call.validate_only(arg_from_str(value.unwrap_or("false"), err, "validate-only", "boolean"));
+                    call = call.validate_only(        value.map(|v| arg_from_str(v, err, "validate-only", "boolean")).unwrap_or(false));
                 },
                 "target-id" => {
                     call = call.target_id(value.unwrap_or(""));
@@ -1761,7 +2061,7 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "validate-only" => {
-                    call = call.validate_only(arg_from_str(value.unwrap_or("false"), err, "validate-only", "boolean"));
+                    call = call.validate_only(        value.map(|v| arg_from_str(v, err, "validate-only", "boolean")).unwrap_or(false));
                 },
                 "request-id" => {
                     call = call.request_id(value.unwrap_or(""));
@@ -1770,7 +2070,7 @@ where
                     call = call.etag(value.unwrap_or(""));
                 },
                 "allow-missing" => {
-                    call = call.allow_missing(arg_from_str(value.unwrap_or("false"), err, "allow-missing", "boolean"));
+                    call = call.allow_missing(        value.map(|v| arg_from_str(v, err, "allow-missing", "boolean")).unwrap_or(false));
                 },
                 _ => {
                     let mut found = false;
@@ -1878,7 +2178,7 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "options-requested-policy-version" => {
-                    call = call.options_requested_policy_version(arg_from_str(value.unwrap_or("-0"), err, "options-requested-policy-version", "integer"));
+                    call = call.options_requested_policy_version(        value.map(|v| arg_from_str(v, err, "options-requested-policy-version", "int32")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -1937,7 +2237,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 "order-by" => {
                     call = call.order_by(value.unwrap_or(""));
@@ -2025,11 +2325,12 @@ where
                     "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "require-approval" => Some(("requireApproval", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "run.location" => Some(("run.location", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "target-id" => Some(("targetId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "uid" => Some(("uid", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["annotations", "anthos-cluster", "cluster", "create-time", "description", "etag", "gke", "internal-ip", "labels", "membership", "name", "require-approval", "target-id", "uid", "update-time"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["annotations", "anthos-cluster", "cluster", "create-time", "description", "etag", "gke", "internal-ip", "labels", "location", "membership", "name", "require-approval", "run", "target-id", "uid", "update-time"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -2044,16 +2345,16 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "validate-only" => {
-                    call = call.validate_only(arg_from_str(value.unwrap_or("false"), err, "validate-only", "boolean"));
+                    call = call.validate_only(        value.map(|v| arg_from_str(v, err, "validate-only", "boolean")).unwrap_or(false));
                 },
                 "update-mask" => {
-                    call = call.update_mask(value.unwrap_or(""));
+                    call = call.update_mask(        value.map(|v| arg_from_str(v, err, "update-mask", "google-fieldmask")).unwrap_or(FieldMask::default()));
                 },
                 "request-id" => {
                     call = call.request_id(value.unwrap_or(""));
                 },
                 "allow-missing" => {
-                    call = call.allow_missing(arg_from_str(value.unwrap_or("false"), err, "allow-missing", "boolean"));
+                    call = call.allow_missing(        value.map(|v| arg_from_str(v, err, "allow-missing", "boolean")).unwrap_or(false));
                 },
                 _ => {
                     let mut found = false;
@@ -2299,6 +2600,9 @@ where
                     ("locations-delivery-pipelines-patch", Some(opt)) => {
                         call_result = self._projects_locations_delivery_pipelines_patch(opt, dry_run, &mut err).await;
                     },
+                    ("locations-delivery-pipelines-releases-abandon", Some(opt)) => {
+                        call_result = self._projects_locations_delivery_pipelines_releases_abandon(opt, dry_run, &mut err).await;
+                    },
                     ("locations-delivery-pipelines-releases-create", Some(opt)) => {
                         call_result = self._projects_locations_delivery_pipelines_releases_create(opt, dry_run, &mut err).await;
                     },
@@ -2317,8 +2621,17 @@ where
                     ("locations-delivery-pipelines-releases-rollouts-get", Some(opt)) => {
                         call_result = self._projects_locations_delivery_pipelines_releases_rollouts_get(opt, dry_run, &mut err).await;
                     },
+                    ("locations-delivery-pipelines-releases-rollouts-job-runs-get", Some(opt)) => {
+                        call_result = self._projects_locations_delivery_pipelines_releases_rollouts_job_runs_get(opt, dry_run, &mut err).await;
+                    },
+                    ("locations-delivery-pipelines-releases-rollouts-job-runs-list", Some(opt)) => {
+                        call_result = self._projects_locations_delivery_pipelines_releases_rollouts_job_runs_list(opt, dry_run, &mut err).await;
+                    },
                     ("locations-delivery-pipelines-releases-rollouts-list", Some(opt)) => {
                         call_result = self._projects_locations_delivery_pipelines_releases_rollouts_list(opt, dry_run, &mut err).await;
+                    },
+                    ("locations-delivery-pipelines-releases-rollouts-retry-job", Some(opt)) => {
+                        call_result = self._projects_locations_delivery_pipelines_releases_rollouts_retry_job(opt, dry_run, &mut err).await;
                     },
                     ("locations-delivery-pipelines-set-iam-policy", Some(opt)) => {
                         call_result = self._projects_locations_delivery_pipelines_set_iam_policy(opt, dry_run, &mut err).await;
@@ -2450,7 +2763,7 @@ where
 async fn main() {
     let mut exit_status = 0i32;
     let arg_data = [
-        ("projects", "methods: 'locations-delivery-pipelines-create', 'locations-delivery-pipelines-delete', 'locations-delivery-pipelines-get', 'locations-delivery-pipelines-get-iam-policy', 'locations-delivery-pipelines-list', 'locations-delivery-pipelines-patch', 'locations-delivery-pipelines-releases-create', 'locations-delivery-pipelines-releases-get', 'locations-delivery-pipelines-releases-list', 'locations-delivery-pipelines-releases-rollouts-approve', 'locations-delivery-pipelines-releases-rollouts-create', 'locations-delivery-pipelines-releases-rollouts-get', 'locations-delivery-pipelines-releases-rollouts-list', 'locations-delivery-pipelines-set-iam-policy', 'locations-delivery-pipelines-test-iam-permissions', 'locations-get', 'locations-get-config', 'locations-list', 'locations-operations-cancel', 'locations-operations-delete', 'locations-operations-get', 'locations-operations-list', 'locations-targets-create', 'locations-targets-delete', 'locations-targets-get', 'locations-targets-get-iam-policy', 'locations-targets-list', 'locations-targets-patch', 'locations-targets-set-iam-policy' and 'locations-targets-test-iam-permissions'", vec![
+        ("projects", "methods: 'locations-delivery-pipelines-create', 'locations-delivery-pipelines-delete', 'locations-delivery-pipelines-get', 'locations-delivery-pipelines-get-iam-policy', 'locations-delivery-pipelines-list', 'locations-delivery-pipelines-patch', 'locations-delivery-pipelines-releases-abandon', 'locations-delivery-pipelines-releases-create', 'locations-delivery-pipelines-releases-get', 'locations-delivery-pipelines-releases-list', 'locations-delivery-pipelines-releases-rollouts-approve', 'locations-delivery-pipelines-releases-rollouts-create', 'locations-delivery-pipelines-releases-rollouts-get', 'locations-delivery-pipelines-releases-rollouts-job-runs-get', 'locations-delivery-pipelines-releases-rollouts-job-runs-list', 'locations-delivery-pipelines-releases-rollouts-list', 'locations-delivery-pipelines-releases-rollouts-retry-job', 'locations-delivery-pipelines-set-iam-policy', 'locations-delivery-pipelines-test-iam-permissions', 'locations-get', 'locations-get-config', 'locations-list', 'locations-operations-cancel', 'locations-operations-delete', 'locations-operations-get', 'locations-operations-list', 'locations-targets-create', 'locations-targets-delete', 'locations-targets-get', 'locations-targets-get-iam-policy', 'locations-targets-list', 'locations-targets-patch', 'locations-targets-set-iam-policy' and 'locations-targets-test-iam-permissions'", vec![
             ("locations-delivery-pipelines-create",
                     Some(r##"Creates a new DeliveryPipeline in a given project and location."##),
                     "Details at http://byron.github.io/google-apis-rs/google_clouddeploy1_cli/projects_locations-delivery-pipelines-create",
@@ -2529,7 +2842,7 @@ async fn main() {
                   vec![
                     (Some(r##"resource"##),
                      None,
-                     Some(r##"REQUIRED: The resource for which the policy is being requested. See the operation documentation for the appropriate value for this field."##),
+                     Some(r##"REQUIRED: The resource for which the policy is being requested. See [Resource names](https://cloud.google.com/apis/design/resource_names) for the appropriate value for this field."##),
                      Some(true),
                      Some(false)),
         
@@ -2574,6 +2887,34 @@ async fn main() {
                     (Some(r##"name"##),
                      None,
                      Some(r##"Optional. Name of the `DeliveryPipeline`. Format is projects/{project}/ locations/{location}/deliveryPipelines/a-z{0,62}."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-delivery-pipelines-releases-abandon",
+                    Some(r##"Abandons a Release in the Delivery Pipeline."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_clouddeploy1_cli/projects_locations-delivery-pipelines-releases-abandon",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. Name of the Release. Format is projects/{project}/locations/{location}/deliveryPipelines/{deliveryPipeline}/ releases/{release}."##),
                      Some(true),
                      Some(false)),
         
@@ -2745,6 +3086,50 @@ async fn main() {
                      Some(false),
                      Some(false)),
                   ]),
+            ("locations-delivery-pipelines-releases-rollouts-job-runs-get",
+                    Some(r##"Gets details of a single JobRun."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_clouddeploy1_cli/projects_locations-delivery-pipelines-releases-rollouts-job-runs-get",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. Name of the `JobRun`. Format must be projects/{project_id}/locations/{location_name}/deliveryPipelines/{pipeline_name}/releases/{release_name}/rollouts/{rollout_name}/jobRuns/{job_run_name}."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-delivery-pipelines-releases-rollouts-job-runs-list",
+                    Some(r##"Lists JobRuns in a given project and location."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_clouddeploy1_cli/projects_locations-delivery-pipelines-releases-rollouts-job-runs-list",
+                  vec![
+                    (Some(r##"parent"##),
+                     None,
+                     Some(r##"Required. The `Rollout` which owns this collection of `JobRun` objects."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
             ("locations-delivery-pipelines-releases-rollouts-list",
                     Some(r##"Lists Rollouts in a given project and location."##),
                     "Details at http://byron.github.io/google-apis-rs/google_clouddeploy1_cli/projects_locations-delivery-pipelines-releases-rollouts-list",
@@ -2767,13 +3152,41 @@ async fn main() {
                      Some(false),
                      Some(false)),
                   ]),
+            ("locations-delivery-pipelines-releases-rollouts-retry-job",
+                    Some(r##"Retries the specified Job in a Rollout."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_clouddeploy1_cli/projects_locations-delivery-pipelines-releases-rollouts-retry-job",
+                  vec![
+                    (Some(r##"rollout"##),
+                     None,
+                     Some(r##"Required. Name of the Rollout. Format is projects/{project}/locations/{location}/deliveryPipelines/{deliveryPipeline}/ releases/{release}/rollouts/{rollout}."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
             ("locations-delivery-pipelines-set-iam-policy",
                     Some(r##"Sets the access control policy on the specified resource. Replaces any existing policy. Can return `NOT_FOUND`, `INVALID_ARGUMENT`, and `PERMISSION_DENIED` errors."##),
                     "Details at http://byron.github.io/google-apis-rs/google_clouddeploy1_cli/projects_locations-delivery-pipelines-set-iam-policy",
                   vec![
                     (Some(r##"resource"##),
                      None,
-                     Some(r##"REQUIRED: The resource for which the policy is being specified. See the operation documentation for the appropriate value for this field."##),
+                     Some(r##"REQUIRED: The resource for which the policy is being specified. See [Resource names](https://cloud.google.com/apis/design/resource_names) for the appropriate value for this field."##),
                      Some(true),
                      Some(false)),
         
@@ -2801,7 +3214,7 @@ async fn main() {
                   vec![
                     (Some(r##"resource"##),
                      None,
-                     Some(r##"REQUIRED: The resource for which the policy detail is being requested. See the operation documentation for the appropriate value for this field."##),
+                     Some(r##"REQUIRED: The resource for which the policy detail is being requested. See [Resource names](https://cloud.google.com/apis/design/resource_names) for the appropriate value for this field."##),
                      Some(true),
                      Some(false)),
         
@@ -3061,7 +3474,7 @@ async fn main() {
                   vec![
                     (Some(r##"resource"##),
                      None,
-                     Some(r##"REQUIRED: The resource for which the policy is being requested. See the operation documentation for the appropriate value for this field."##),
+                     Some(r##"REQUIRED: The resource for which the policy is being requested. See [Resource names](https://cloud.google.com/apis/design/resource_names) for the appropriate value for this field."##),
                      Some(true),
                      Some(false)),
         
@@ -3133,7 +3546,7 @@ async fn main() {
                   vec![
                     (Some(r##"resource"##),
                      None,
-                     Some(r##"REQUIRED: The resource for which the policy is being specified. See the operation documentation for the appropriate value for this field."##),
+                     Some(r##"REQUIRED: The resource for which the policy is being specified. See [Resource names](https://cloud.google.com/apis/design/resource_names) for the appropriate value for this field."##),
                      Some(true),
                      Some(false)),
         
@@ -3161,7 +3574,7 @@ async fn main() {
                   vec![
                     (Some(r##"resource"##),
                      None,
-                     Some(r##"REQUIRED: The resource for which the policy detail is being requested. See the operation documentation for the appropriate value for this field."##),
+                     Some(r##"REQUIRED: The resource for which the policy detail is being requested. See [Resource names](https://cloud.google.com/apis/design/resource_names) for the appropriate value for this field."##),
                      Some(true),
                      Some(false)),
         
@@ -3189,7 +3602,7 @@ async fn main() {
     
     let mut app = App::new("clouddeploy1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("4.0.1+20220223")
+           .version("5.0.2+20230105")
            .about("")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_clouddeploy1_cli")
            .arg(Arg::with_name("url")

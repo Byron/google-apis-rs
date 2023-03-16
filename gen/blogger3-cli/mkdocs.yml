@@ -1,4 +1,4 @@
-site_name: Blogger v4.0.1+20220305
+site_name: Blogger v5.0.2+20230124
 site_url: http://byron.github.io/google-apis-rs/google-blogger3-cli
 site_description: A complete library to interact with Blogger (protocol v3)
 
@@ -7,41 +7,49 @@ repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/blogger3-cli
 docs_dir: docs
 site_dir: build_html
 
-pages:
-- ['index.md', 'Home']
-- ['blog-user-infos_get.md', 'Blog User Infos', 'Get']
-- ['blogs_get.md', 'Blogs', 'Get']
-- ['blogs_get-by-url.md', 'Blogs', 'Get By Url']
-- ['blogs_list-by-user.md', 'Blogs', 'List By User']
-- ['comments_approve.md', 'Comments', 'Approve']
-- ['comments_delete.md', 'Comments', 'Delete']
-- ['comments_get.md', 'Comments', 'Get']
-- ['comments_list.md', 'Comments', 'List']
-- ['comments_list-by-blog.md', 'Comments', 'List By Blog']
-- ['comments_mark-as-spam.md', 'Comments', 'Mark As Spam']
-- ['comments_remove-content.md', 'Comments', 'Remove Content']
-- ['page-views_get.md', 'Page Views', 'Get']
-- ['pages_delete.md', 'Pages', 'Delete']
-- ['pages_get.md', 'Pages', 'Get']
-- ['pages_insert.md', 'Pages', 'Insert']
-- ['pages_list.md', 'Pages', 'List']
-- ['pages_patch.md', 'Pages', 'Patch']
-- ['pages_publish.md', 'Pages', 'Publish']
-- ['pages_revert.md', 'Pages', 'Revert']
-- ['pages_update.md', 'Pages', 'Update']
-- ['post-user-infos_get.md', 'Post User Infos', 'Get']
-- ['post-user-infos_list.md', 'Post User Infos', 'List']
-- ['posts_delete.md', 'Posts', 'Delete']
-- ['posts_get.md', 'Posts', 'Get']
-- ['posts_get-by-path.md', 'Posts', 'Get By Path']
-- ['posts_insert.md', 'Posts', 'Insert']
-- ['posts_list.md', 'Posts', 'List']
-- ['posts_patch.md', 'Posts', 'Patch']
-- ['posts_publish.md', 'Posts', 'Publish']
-- ['posts_revert.md', 'Posts', 'Revert']
-- ['posts_search.md', 'Posts', 'Search']
-- ['posts_update.md', 'Posts', 'Update']
-- ['users_get.md', 'Users', 'Get']
+nav:
+- Home: 'index.md'
+- 'Blog User Infos':
+    - 'Get': 'blog-user-infos_get.md'
+- 'Blogs':
+    - 'Get': 'blogs_get.md'
+    - 'Get By Url': 'blogs_get-by-url.md'
+    - 'List By User': 'blogs_list-by-user.md'
+- 'Comments':
+    - 'Approve': 'comments_approve.md'
+    - 'Delete': 'comments_delete.md'
+    - 'Get': 'comments_get.md'
+    - 'List': 'comments_list.md'
+    - 'List By Blog': 'comments_list-by-blog.md'
+    - 'Mark As Spam': 'comments_mark-as-spam.md'
+    - 'Remove Content': 'comments_remove-content.md'
+- 'Page Views':
+    - 'Get': 'page-views_get.md'
+- 'Pages':
+    - 'Delete': 'pages_delete.md'
+    - 'Get': 'pages_get.md'
+    - 'Insert': 'pages_insert.md'
+    - 'List': 'pages_list.md'
+    - 'Patch': 'pages_patch.md'
+    - 'Publish': 'pages_publish.md'
+    - 'Revert': 'pages_revert.md'
+    - 'Update': 'pages_update.md'
+- 'Post User Infos':
+    - 'Get': 'post-user-infos_get.md'
+    - 'List': 'post-user-infos_list.md'
+- 'Posts':
+    - 'Delete': 'posts_delete.md'
+    - 'Get': 'posts_get.md'
+    - 'Get By Path': 'posts_get-by-path.md'
+    - 'Insert': 'posts_insert.md'
+    - 'List': 'posts_list.md'
+    - 'Patch': 'posts_patch.md'
+    - 'Publish': 'posts_publish.md'
+    - 'Revert': 'posts_revert.md'
+    - 'Search': 'posts_search.md'
+    - 'Update': 'posts_update.md'
+- 'Users':
+    - 'Get': 'users_get.md'
 
 theme: readthedocs
 

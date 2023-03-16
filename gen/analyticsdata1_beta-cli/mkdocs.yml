@@ -1,4 +1,4 @@
-site_name: AnalyticsData v4.0.1+20220303
+site_name: AnalyticsData v5.0.2+20230123
 site_url: http://byron.github.io/google-apis-rs/google-analyticsdata1_beta-cli
 site_description: A complete library to interact with AnalyticsData (protocol v1beta)
 
@@ -7,15 +7,16 @@ repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/analyticsdata1_b
 docs_dir: docs
 site_dir: build_html
 
-pages:
-- ['index.md', 'Home']
-- ['properties_batch-run-pivot-reports.md', 'Properties', 'Batch Run Pivot Reports']
-- ['properties_batch-run-reports.md', 'Properties', 'Batch Run Reports']
-- ['properties_check-compatibility.md', 'Properties', 'Check Compatibility']
-- ['properties_get-metadata.md', 'Properties', 'Get Metadata']
-- ['properties_run-pivot-report.md', 'Properties', 'Run Pivot Report']
-- ['properties_run-realtime-report.md', 'Properties', 'Run Realtime Report']
-- ['properties_run-report.md', 'Properties', 'Run Report']
+nav:
+- Home: 'index.md'
+- 'Properties':
+    - 'Batch Run Pivot Reports': 'properties_batch-run-pivot-reports.md'
+    - 'Batch Run Reports': 'properties_batch-run-reports.md'
+    - 'Check Compatibility': 'properties_check-compatibility.md'
+    - 'Get Metadata': 'properties_get-metadata.md'
+    - 'Run Pivot Report': 'properties_run-pivot-report.md'
+    - 'Run Realtime Report': 'properties_run-realtime-report.md'
+    - 'Run Report': 'properties_run-report.md'
 
 theme: readthedocs
 

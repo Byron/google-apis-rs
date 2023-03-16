@@ -1,4 +1,4 @@
-site_name: DoubleClick Bid Manager v4.0.1+20220302
+site_name: DoubleClick Bid Manager v5.0.2+20230117
 site_url: http://byron.github.io/google-apis-rs/google-doubleclickbidmanager1d1-cli
 site_description: A complete library to interact with DoubleClick Bid Manager (protocol v1.1)
 
@@ -7,14 +7,16 @@ repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/doubleclickbidma
 docs_dir: docs
 site_dir: build_html
 
-pages:
-- ['index.md', 'Home']
-- ['queries_createquery.md', 'Queries', 'Createquery']
-- ['queries_deletequery.md', 'Queries', 'Deletequery']
-- ['queries_getquery.md', 'Queries', 'Getquery']
-- ['queries_listqueries.md', 'Queries', 'Listqueries']
-- ['queries_runquery.md', 'Queries', 'Runquery']
-- ['reports_listreports.md', 'Reports', 'Listreports']
+nav:
+- Home: 'index.md'
+- 'Queries':
+    - 'Createquery': 'queries_createquery.md'
+    - 'Deletequery': 'queries_deletequery.md'
+    - 'Getquery': 'queries_getquery.md'
+    - 'Listqueries': 'queries_listqueries.md'
+    - 'Runquery': 'queries_runquery.md'
+- 'Reports':
+    - 'Listreports': 'reports_listreports.md'
 
 theme: readthedocs
 

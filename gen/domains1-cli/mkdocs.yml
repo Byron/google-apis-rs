@@ -1,4 +1,4 @@
-site_name: Cloud Domains v4.0.1+20220128
+site_name: Cloud Domains v5.0.2+20230105
 site_url: http://byron.github.io/google-apis-rs/google-domains1-cli
 site_description: A complete library to interact with Cloud Domains (protocol v1)
 
@@ -7,30 +7,33 @@ repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/domains1-cli
 docs_dir: docs
 site_dir: build_html
 
-pages:
-- ['index.md', 'Home']
-- ['projects_locations-get.md', 'Projects', 'Locations Get']
-- ['projects_locations-list.md', 'Projects', 'Locations List']
-- ['projects_locations-operations-get.md', 'Projects', 'Locations Operations Get']
-- ['projects_locations-operations-list.md', 'Projects', 'Locations Operations List']
-- ['projects_locations-registrations-configure-contact-settings.md', 'Projects', 'Locations Registrations Configure Contact Settings']
-- ['projects_locations-registrations-configure-dns-settings.md', 'Projects', 'Locations Registrations Configure Dns Settings']
-- ['projects_locations-registrations-configure-management-settings.md', 'Projects', 'Locations Registrations Configure Management Settings']
-- ['projects_locations-registrations-delete.md', 'Projects', 'Locations Registrations Delete']
-- ['projects_locations-registrations-export.md', 'Projects', 'Locations Registrations Export']
-- ['projects_locations-registrations-get.md', 'Projects', 'Locations Registrations Get']
-- ['projects_locations-registrations-get-iam-policy.md', 'Projects', 'Locations Registrations Get Iam Policy']
-- ['projects_locations-registrations-list.md', 'Projects', 'Locations Registrations List']
-- ['projects_locations-registrations-patch.md', 'Projects', 'Locations Registrations Patch']
-- ['projects_locations-registrations-register.md', 'Projects', 'Locations Registrations Register']
-- ['projects_locations-registrations-reset-authorization-code.md', 'Projects', 'Locations Registrations Reset Authorization Code']
-- ['projects_locations-registrations-retrieve-authorization-code.md', 'Projects', 'Locations Registrations Retrieve Authorization Code']
-- ['projects_locations-registrations-retrieve-register-parameters.md', 'Projects', 'Locations Registrations Retrieve Register Parameters']
-- ['projects_locations-registrations-retrieve-transfer-parameters.md', 'Projects', 'Locations Registrations Retrieve Transfer Parameters']
-- ['projects_locations-registrations-search-domains.md', 'Projects', 'Locations Registrations Search Domains']
-- ['projects_locations-registrations-set-iam-policy.md', 'Projects', 'Locations Registrations Set Iam Policy']
-- ['projects_locations-registrations-test-iam-permissions.md', 'Projects', 'Locations Registrations Test Iam Permissions']
-- ['projects_locations-registrations-transfer.md', 'Projects', 'Locations Registrations Transfer']
+nav:
+- Home: 'index.md'
+- 'Projects':
+    - 'Locations Get': 'projects_locations-get.md'
+    - 'Locations List': 'projects_locations-list.md'
+    - 'Locations Operations Get': 'projects_locations-operations-get.md'
+    - 'Locations Operations List': 'projects_locations-operations-list.md'
+    - 'Locations Registrations Configure Contact Settings': 'projects_locations-registrations-configure-contact-settings.md'
+    - 'Locations Registrations Configure Dns Settings': 'projects_locations-registrations-configure-dns-settings.md'
+    - 'Locations Registrations Configure Management Settings': 'projects_locations-registrations-configure-management-settings.md'
+    - 'Locations Registrations Delete': 'projects_locations-registrations-delete.md'
+    - 'Locations Registrations Export': 'projects_locations-registrations-export.md'
+    - 'Locations Registrations Get': 'projects_locations-registrations-get.md'
+    - 'Locations Registrations Get Iam Policy': 'projects_locations-registrations-get-iam-policy.md'
+    - 'Locations Registrations Import': 'projects_locations-registrations-import.md'
+    - 'Locations Registrations List': 'projects_locations-registrations-list.md'
+    - 'Locations Registrations Patch': 'projects_locations-registrations-patch.md'
+    - 'Locations Registrations Register': 'projects_locations-registrations-register.md'
+    - 'Locations Registrations Reset Authorization Code': 'projects_locations-registrations-reset-authorization-code.md'
+    - 'Locations Registrations Retrieve Authorization Code': 'projects_locations-registrations-retrieve-authorization-code.md'
+    - 'Locations Registrations Retrieve Importable Domains': 'projects_locations-registrations-retrieve-importable-domains.md'
+    - 'Locations Registrations Retrieve Register Parameters': 'projects_locations-registrations-retrieve-register-parameters.md'
+    - 'Locations Registrations Retrieve Transfer Parameters': 'projects_locations-registrations-retrieve-transfer-parameters.md'
+    - 'Locations Registrations Search Domains': 'projects_locations-registrations-search-domains.md'
+    - 'Locations Registrations Set Iam Policy': 'projects_locations-registrations-set-iam-policy.md'
+    - 'Locations Registrations Test Iam Permissions': 'projects_locations-registrations-test-iam-permissions.md'
+    - 'Locations Registrations Transfer': 'projects_locations-registrations-transfer.md'
 
 theme: readthedocs
 

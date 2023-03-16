@@ -25,10 +25,12 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Cloud Tasks* API at revision *20220212*. The CLI is at version *4.0.1*.
+This documentation was generated from the *Cloud Tasks* API at revision *20230105*. The CLI is at version *5.0.2*.
 
 ```bash
 cloudtasks2-beta2 [options]
+        api
+                queue-update (-r <kv>)... [-p <v>]... [-o <out>]
         projects
                 locations-get <name> [-p <v>]... [-o <out>]
                 locations-list <name> [-p <v>]... [-o <out>]
@@ -43,6 +45,7 @@ cloudtasks2-beta2 [options]
                 locations-queues-resume <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-queues-set-iam-policy <resource> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-queues-tasks-acknowledge <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-queues-tasks-buffer <queue> <task-id> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-queues-tasks-cancel-lease <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-queues-tasks-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-queues-tasks-delete <name> [-p <v>]... [-o <out>]

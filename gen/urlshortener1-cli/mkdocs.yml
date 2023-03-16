@@ -1,4 +1,4 @@
-site_name: urlshortener v4.0.1+20150519
+site_name: urlshortener v5.0.2+20150519
 site_url: http://byron.github.io/google-apis-rs/google-urlshortener1-cli
 site_description: A complete library to interact with urlshortener (protocol v1)
 
@@ -7,11 +7,12 @@ repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/urlshortener1-cl
 docs_dir: docs
 site_dir: build_html
 
-pages:
-- ['index.md', 'Home']
-- ['url_get.md', 'Url', 'Get']
-- ['url_insert.md', 'Url', 'Insert']
-- ['url_list.md', 'Url', 'List']
+nav:
+- Home: 'index.md'
+- 'Url':
+    - 'Get': 'url_get.md'
+    - 'Insert': 'url_insert.md'
+    - 'List': 'url_list.md'
 
 theme: readthedocs
 

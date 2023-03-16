@@ -3,8 +3,6 @@
 // DO NOT EDIT !
 #![allow(unused_variables, unused_imports, dead_code, unused_mut)]
 
-extern crate tokio;
-
 #[macro_use]
 extern crate clap;
 
@@ -12,9 +10,10 @@ use std::env;
 use std::io::{self, Write};
 use clap::{App, SubCommand, Arg};
 
-use google_memcache1_beta2::{api, Error, oauth2};
+use google_memcache1_beta2::{api, Error, oauth2, client::chrono, FieldMask};
 
-mod client;
+
+use google_clis_common as client;
 
 use client::{InvalidOptionsError, CLIError, arg_from_str, writer_from_opts, parse_kv_arg,
           input_file_from_opts, input_mime_from_opts, FieldCursor, FieldError, CallType, UploadProtocol,
@@ -303,6 +302,12 @@ where
                     "discovery-endpoint" => Some(("discoveryEndpoint", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "display-name" => Some(("displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "maintenance-policy.create-time" => Some(("maintenancePolicy.createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "maintenance-policy.description" => Some(("maintenancePolicy.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "maintenance-policy.update-time" => Some(("maintenancePolicy.updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "maintenance-schedule.end-time" => Some(("maintenanceSchedule.endTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "maintenance-schedule.schedule-deadline-time" => Some(("maintenanceSchedule.scheduleDeadlineTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "maintenance-schedule.start-time" => Some(("maintenanceSchedule.startTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "memcache-full-version" => Some(("memcacheFullVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "memcache-version" => Some(("memcacheVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -316,7 +321,7 @@ where
                     "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "zones" => Some(("zones", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["authorized-network", "cpu-count", "create-time", "discovery-endpoint", "display-name", "id", "labels", "memcache-full-version", "memcache-version", "memory-size-mb", "name", "node-config", "node-count", "parameters", "params", "state", "update-available", "update-time", "zones"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["authorized-network", "cpu-count", "create-time", "description", "discovery-endpoint", "display-name", "end-time", "id", "labels", "maintenance-policy", "maintenance-schedule", "memcache-full-version", "memcache-version", "memory-size-mb", "name", "node-config", "node-count", "parameters", "params", "schedule-deadline-time", "start-time", "state", "update-available", "update-time", "zones"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -494,7 +499,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 "order-by" => {
                     call = call.order_by(value.unwrap_or(""));
@@ -577,6 +582,12 @@ where
                     "discovery-endpoint" => Some(("discoveryEndpoint", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "display-name" => Some(("displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "maintenance-policy.create-time" => Some(("maintenancePolicy.createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "maintenance-policy.description" => Some(("maintenancePolicy.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "maintenance-policy.update-time" => Some(("maintenancePolicy.updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "maintenance-schedule.end-time" => Some(("maintenanceSchedule.endTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "maintenance-schedule.schedule-deadline-time" => Some(("maintenanceSchedule.scheduleDeadlineTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "maintenance-schedule.start-time" => Some(("maintenanceSchedule.startTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "memcache-full-version" => Some(("memcacheFullVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "memcache-version" => Some(("memcacheVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -590,7 +601,7 @@ where
                     "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "zones" => Some(("zones", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["authorized-network", "cpu-count", "create-time", "discovery-endpoint", "display-name", "id", "labels", "memcache-full-version", "memcache-version", "memory-size-mb", "name", "node-config", "node-count", "parameters", "params", "state", "update-available", "update-time", "zones"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["authorized-network", "cpu-count", "create-time", "description", "discovery-endpoint", "display-name", "end-time", "id", "labels", "maintenance-policy", "maintenance-schedule", "memcache-full-version", "memcache-version", "memory-size-mb", "name", "node-config", "node-count", "parameters", "params", "schedule-deadline-time", "start-time", "state", "update-available", "update-time", "zones"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -605,7 +616,7 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "update-mask" => {
-                    call = call.update_mask(value.unwrap_or(""));
+                    call = call.update_mask(        value.map(|v| arg_from_str(v, err, "update-mask", "google-fieldmask")).unwrap_or(FieldMask::default()));
                 },
                 _ => {
                     let mut found = false;
@@ -621,6 +632,92 @@ where
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
                                                                            v.extend(["update-mask"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_locations_instances_reschedule_maintenance(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "reschedule-type" => Some(("rescheduleType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "schedule-time" => Some(("scheduleTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["reschedule-type", "schedule-time"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::RescheduleMaintenanceRequest = json::value::from_value(object).unwrap();
+        let mut call = self.hub.projects().locations_instances_reschedule_maintenance(request, opt.value_of("instance").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -751,7 +848,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 "filter" => {
                     call = call.filter(value.unwrap_or(""));
@@ -1001,7 +1098,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 "filter" => {
                     call = call.filter(value.unwrap_or(""));
@@ -1083,6 +1180,9 @@ where
                     },
                     ("locations-instances-patch", Some(opt)) => {
                         call_result = self._projects_locations_instances_patch(opt, dry_run, &mut err).await;
+                    },
+                    ("locations-instances-reschedule-maintenance", Some(opt)) => {
+                        call_result = self._projects_locations_instances_reschedule_maintenance(opt, dry_run, &mut err).await;
                     },
                     ("locations-instances-update-parameters", Some(opt)) => {
                         call_result = self._projects_locations_instances_update_parameters(opt, dry_run, &mut err).await;
@@ -1181,7 +1281,7 @@ where
 async fn main() {
     let mut exit_status = 0i32;
     let arg_data = [
-        ("projects", "methods: 'locations-get', 'locations-instances-apply-parameters', 'locations-instances-apply-software-update', 'locations-instances-create', 'locations-instances-delete', 'locations-instances-get', 'locations-instances-list', 'locations-instances-patch', 'locations-instances-update-parameters', 'locations-list', 'locations-operations-cancel', 'locations-operations-delete', 'locations-operations-get' and 'locations-operations-list'", vec![
+        ("projects", "methods: 'locations-get', 'locations-instances-apply-parameters', 'locations-instances-apply-software-update', 'locations-instances-create', 'locations-instances-delete', 'locations-instances-get', 'locations-instances-list', 'locations-instances-patch', 'locations-instances-reschedule-maintenance', 'locations-instances-update-parameters', 'locations-list', 'locations-operations-cancel', 'locations-operations-delete', 'locations-operations-get' and 'locations-operations-list'", vec![
             ("locations-get",
                     Some(r##"Gets information about a location."##),
                     "Details at http://byron.github.io/google-apis-rs/google_memcache1_beta2_cli/projects_locations-get",
@@ -1382,6 +1482,34 @@ async fn main() {
                      Some(false),
                      Some(false)),
                   ]),
+            ("locations-instances-reschedule-maintenance",
+                    Some(r##"Performs the apply phase of the RescheduleMaintenance verb."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_memcache1_beta2_cli/projects_locations-instances-reschedule-maintenance",
+                  vec![
+                    (Some(r##"instance"##),
+                     None,
+                     Some(r##"Required. Memcache instance resource name using the form: `projects/{project_id}/locations/{location_id}/instances/{instance_id}` where `location_id` refers to a GCP region."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
             ("locations-instances-update-parameters",
                     Some(r##"Updates the defined Memcached parameters for an existing instance. This method only stages the parameters, it must be followed by `ApplyParameters` to apply the parameters to nodes of the Memcached instance."##),
                     "Details at http://byron.github.io/google-apis-rs/google_memcache1_beta2_cli/projects_locations-instances-update-parameters",
@@ -1532,7 +1660,7 @@ async fn main() {
     
     let mut app = App::new("memcache1-beta2")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("4.0.1+20220224")
+           .version("5.0.2+20230103")
            .about("Google Cloud Memorystore for Memcached API is used for creating and managing Memcached instances in GCP.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_memcache1_beta2_cli")
            .arg(Arg::with_name("url")

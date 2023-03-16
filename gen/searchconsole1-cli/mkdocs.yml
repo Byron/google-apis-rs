@@ -1,4 +1,4 @@
-site_name: Search Console v4.0.1+20220305
+site_name: Search Console v5.0.2+20230123
 site_url: http://byron.github.io/google-apis-rs/google-searchconsole1-cli
 site_description: A complete library to interact with Search Console (protocol v1)
 
@@ -7,19 +7,24 @@ repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/searchconsole1-c
 docs_dir: docs
 site_dir: build_html
 
-pages:
-- ['index.md', 'Home']
-- ['searchanalytics_query.md', 'Searchanalytics', 'Query']
-- ['sitemaps_delete.md', 'Sitemaps', 'Delete']
-- ['sitemaps_get.md', 'Sitemaps', 'Get']
-- ['sitemaps_list.md', 'Sitemaps', 'List']
-- ['sitemaps_submit.md', 'Sitemaps', 'Submit']
-- ['sites_add.md', 'Sites', 'Add']
-- ['sites_delete.md', 'Sites', 'Delete']
-- ['sites_get.md', 'Sites', 'Get']
-- ['sites_list.md', 'Sites', 'List']
-- ['url-inspection_index-inspect.md', 'Url Inspection', 'Index Inspect']
-- ['url-testing-tools_mobile-friendly-test-run.md', 'Url Testing Tools', 'Mobile Friendly Test Run']
+nav:
+- Home: 'index.md'
+- 'Searchanalytics':
+    - 'Query': 'searchanalytics_query.md'
+- 'Sitemaps':
+    - 'Delete': 'sitemaps_delete.md'
+    - 'Get': 'sitemaps_get.md'
+    - 'List': 'sitemaps_list.md'
+    - 'Submit': 'sitemaps_submit.md'
+- 'Sites':
+    - 'Add': 'sites_add.md'
+    - 'Delete': 'sites_delete.md'
+    - 'Get': 'sites_get.md'
+    - 'List': 'sites_list.md'
+- 'Url Inspection':
+    - 'Index Inspect': 'url-inspection_index-inspect.md'
+- 'Url Testing Tools':
+    - 'Mobile Friendly Test Run': 'url-testing-tools_mobile-friendly-test-run.md'
 
 theme: readthedocs
 

@@ -4,12 +4,12 @@
 [package]
 
 name = "google-gkehub1"
-version = "5.0.2-beta-1+20230106"
+version = "5.0.2+20230106"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with GKE Hub (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/gkehub1"
 homepage = "https://cloud.google.com/anthos/multicluster-management/connect/registering-a-cluster"
-documentation = "https://docs.rs/google-gkehub1/5.0.2-beta-1+20230106"
+documentation = "https://docs.rs/google-gkehub1/5.0.2+20230106"
 license = "MIT"
 keywords = ["gkehub", "google", "protocol", "web", "api"]
 autobins = false

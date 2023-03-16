@@ -3,8 +3,6 @@
 // DO NOT EDIT !
 #![allow(unused_variables, unused_imports, dead_code, unused_mut)]
 
-extern crate tokio;
-
 #[macro_use]
 extern crate clap;
 
@@ -12,9 +10,10 @@ use std::env;
 use std::io::{self, Write};
 use clap::{App, SubCommand, Arg};
 
-use google_containeranalysis1::{api, Error, oauth2};
+use google_containeranalysis1::{api, Error, oauth2, client::chrono, FieldMask};
 
-mod client;
+
+use google_clis_common as client;
 
 use client::{InvalidOptionsError, CLIError, arg_from_str, writer_from_opts, parse_kv_arg,
           input_file_from_opts, input_mime_from_opts, FieldCursor, FieldError, CallType, UploadProtocol,
@@ -179,7 +178,21 @@ where
                     "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "long-description" => Some(("longDescription", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "package.architecture" => Some(("package.architecture", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "package.cpe-uri" => Some(("package.cpeUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "package.description" => Some(("package.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "package.license.comments" => Some(("package.license.comments", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "package.license.expression" => Some(("package.license.expression", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "package.maintainer" => Some(("package.maintainer", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "package.name" => Some(("package.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "package.package-type" => Some(("package.packageType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "package.url" => Some(("package.url", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "package.version.epoch" => Some(("package.version.epoch", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "package.version.full-name" => Some(("package.version.fullName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "package.version.inclusive" => Some(("package.version.inclusive", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "package.version.kind" => Some(("package.version.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "package.version.name" => Some(("package.version.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "package.version.revision" => Some(("package.version.revision", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "related-note-names" => Some(("relatedNoteNames", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "short-description" => Some(("shortDescription", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -209,10 +222,11 @@ where
                     "vulnerability.cvss-v3.privileges-required" => Some(("vulnerability.cvssV3.privilegesRequired", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "vulnerability.cvss-v3.scope" => Some(("vulnerability.cvssV3.scope", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "vulnerability.cvss-v3.user-interaction" => Some(("vulnerability.cvssV3.userInteraction", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "vulnerability.cvss-version" => Some(("vulnerability.cvssVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "vulnerability.severity" => Some(("vulnerability.severity", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "vulnerability.source-update-time" => Some(("vulnerability.sourceUpdateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["analysis-kind", "attack-complexity", "attack-vector", "attestation", "availability-impact", "base-score", "build", "builder-version", "cis-benchmark", "compliance", "confidentiality-impact", "create-time", "cvss-score", "cvss-v3", "deployment", "description", "discovery", "dsse-attestation", "epoch", "expiration-time", "exploitability-score", "fingerprint", "full-name", "hint", "human-readable-name", "identity", "image", "impact-score", "inclusive", "integrity-impact", "kb-article-ids", "kind", "last-published-timestamp", "long-description", "name", "package", "privileges-required", "profile-level", "rationale", "related-note-names", "remediation", "resource-uri", "resource-url", "revision", "scan-instructions", "scope", "severity", "short-description", "source-update-time", "support-url", "title", "update-id", "update-time", "upgrade", "user-interaction", "v1-name", "v2-blob", "v2-name", "version", "vulnerability", "windows-update"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["analysis-kind", "architecture", "attack-complexity", "attack-vector", "attestation", "availability-impact", "base-score", "build", "builder-version", "cis-benchmark", "comments", "compliance", "confidentiality-impact", "cpe-uri", "create-time", "cvss-score", "cvss-v3", "cvss-version", "deployment", "description", "discovery", "dsse-attestation", "epoch", "expiration-time", "exploitability-score", "expression", "fingerprint", "full-name", "hint", "human-readable-name", "identity", "image", "impact-score", "inclusive", "integrity-impact", "kb-article-ids", "kind", "last-published-timestamp", "license", "long-description", "maintainer", "name", "package", "package-type", "privileges-required", "profile-level", "rationale", "related-note-names", "remediation", "resource-uri", "resource-url", "revision", "scan-instructions", "scope", "severity", "short-description", "source-update-time", "support-url", "title", "update-id", "update-time", "upgrade", "url", "user-interaction", "v1-name", "v2-blob", "v2-name", "version", "vulnerability", "windows-update"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -475,7 +489,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 "filter" => {
                     call = call.filter(value.unwrap_or(""));
@@ -537,7 +551,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 "filter" => {
                     call = call.filter(value.unwrap_or(""));
@@ -633,7 +647,21 @@ where
                     "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "long-description" => Some(("longDescription", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "package.architecture" => Some(("package.architecture", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "package.cpe-uri" => Some(("package.cpeUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "package.description" => Some(("package.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "package.license.comments" => Some(("package.license.comments", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "package.license.expression" => Some(("package.license.expression", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "package.maintainer" => Some(("package.maintainer", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "package.name" => Some(("package.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "package.package-type" => Some(("package.packageType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "package.url" => Some(("package.url", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "package.version.epoch" => Some(("package.version.epoch", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "package.version.full-name" => Some(("package.version.fullName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "package.version.inclusive" => Some(("package.version.inclusive", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "package.version.kind" => Some(("package.version.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "package.version.name" => Some(("package.version.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "package.version.revision" => Some(("package.version.revision", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "related-note-names" => Some(("relatedNoteNames", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "short-description" => Some(("shortDescription", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -663,10 +691,11 @@ where
                     "vulnerability.cvss-v3.privileges-required" => Some(("vulnerability.cvssV3.privilegesRequired", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "vulnerability.cvss-v3.scope" => Some(("vulnerability.cvssV3.scope", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "vulnerability.cvss-v3.user-interaction" => Some(("vulnerability.cvssV3.userInteraction", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "vulnerability.cvss-version" => Some(("vulnerability.cvssVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "vulnerability.severity" => Some(("vulnerability.severity", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "vulnerability.source-update-time" => Some(("vulnerability.sourceUpdateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["analysis-kind", "attack-complexity", "attack-vector", "attestation", "availability-impact", "base-score", "build", "builder-version", "cis-benchmark", "compliance", "confidentiality-impact", "create-time", "cvss-score", "cvss-v3", "deployment", "description", "discovery", "dsse-attestation", "epoch", "expiration-time", "exploitability-score", "fingerprint", "full-name", "hint", "human-readable-name", "identity", "image", "impact-score", "inclusive", "integrity-impact", "kb-article-ids", "kind", "last-published-timestamp", "long-description", "name", "package", "privileges-required", "profile-level", "rationale", "related-note-names", "remediation", "resource-uri", "resource-url", "revision", "scan-instructions", "scope", "severity", "short-description", "source-update-time", "support-url", "title", "update-id", "update-time", "upgrade", "user-interaction", "v1-name", "v2-blob", "v2-name", "version", "vulnerability", "windows-update"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["analysis-kind", "architecture", "attack-complexity", "attack-vector", "attestation", "availability-impact", "base-score", "build", "builder-version", "cis-benchmark", "comments", "compliance", "confidentiality-impact", "cpe-uri", "create-time", "cvss-score", "cvss-v3", "cvss-version", "deployment", "description", "discovery", "dsse-attestation", "epoch", "expiration-time", "exploitability-score", "expression", "fingerprint", "full-name", "hint", "human-readable-name", "identity", "image", "impact-score", "inclusive", "integrity-impact", "kb-article-ids", "kind", "last-published-timestamp", "license", "long-description", "maintainer", "name", "package", "package-type", "privileges-required", "profile-level", "rationale", "related-note-names", "remediation", "resource-uri", "resource-url", "revision", "scan-instructions", "scope", "severity", "short-description", "source-update-time", "support-url", "title", "update-id", "update-time", "upgrade", "url", "user-interaction", "v1-name", "v2-blob", "v2-name", "version", "vulnerability", "windows-update"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -681,7 +710,7 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "update-mask" => {
-                    call = call.update_mask(value.unwrap_or(""));
+                    call = call.update_mask(        value.map(|v| arg_from_str(v, err, "update-mask", "google-fieldmask")).unwrap_or(FieldMask::default()));
                 },
                 _ => {
                     let mut found = false;
@@ -1046,6 +1075,18 @@ where
                     "build.intoto-statement.slsa-provenance.recipe.defined-in-material" => Some(("build.intotoStatement.slsaProvenance.recipe.definedInMaterial", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "build.intoto-statement.slsa-provenance.recipe.entry-point" => Some(("build.intotoStatement.slsaProvenance.recipe.entryPoint", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "build.intoto-statement.slsa-provenance.recipe.type" => Some(("build.intotoStatement.slsaProvenance.recipe.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "build.intoto-statement.slsa-provenance-zero-two.build-type" => Some(("build.intotoStatement.slsaProvenanceZeroTwo.buildType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "build.intoto-statement.slsa-provenance-zero-two.builder.id" => Some(("build.intotoStatement.slsaProvenanceZeroTwo.builder.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "build.intoto-statement.slsa-provenance-zero-two.invocation.config-source.digest" => Some(("build.intotoStatement.slsaProvenanceZeroTwo.invocation.configSource.digest", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "build.intoto-statement.slsa-provenance-zero-two.invocation.config-source.entry-point" => Some(("build.intotoStatement.slsaProvenanceZeroTwo.invocation.configSource.entryPoint", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "build.intoto-statement.slsa-provenance-zero-two.invocation.config-source.uri" => Some(("build.intotoStatement.slsaProvenanceZeroTwo.invocation.configSource.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "build.intoto-statement.slsa-provenance-zero-two.metadata.build-finished-on" => Some(("build.intotoStatement.slsaProvenanceZeroTwo.metadata.buildFinishedOn", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "build.intoto-statement.slsa-provenance-zero-two.metadata.build-invocation-id" => Some(("build.intotoStatement.slsaProvenanceZeroTwo.metadata.buildInvocationId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "build.intoto-statement.slsa-provenance-zero-two.metadata.build-started-on" => Some(("build.intotoStatement.slsaProvenanceZeroTwo.metadata.buildStartedOn", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "build.intoto-statement.slsa-provenance-zero-two.metadata.completeness.environment" => Some(("build.intotoStatement.slsaProvenanceZeroTwo.metadata.completeness.environment", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "build.intoto-statement.slsa-provenance-zero-two.metadata.completeness.materials" => Some(("build.intotoStatement.slsaProvenanceZeroTwo.metadata.completeness.materials", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "build.intoto-statement.slsa-provenance-zero-two.metadata.completeness.parameters" => Some(("build.intotoStatement.slsaProvenanceZeroTwo.metadata.completeness.parameters", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "build.intoto-statement.slsa-provenance-zero-two.metadata.reproducible" => Some(("build.intotoStatement.slsaProvenanceZeroTwo.metadata.reproducible", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "build.provenance.build-options" => Some(("build.provenance.buildOptions", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "build.provenance.builder-version" => Some(("build.provenance.builderVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "build.provenance.create-time" => Some(("build.provenance.createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -1081,6 +1122,7 @@ where
                     "deployment.resource-uri" => Some(("deployment.resourceUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "deployment.undeploy-time" => Some(("deployment.undeployTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "deployment.user-email" => Some(("deployment.userEmail", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "discovery.analysis-completed.analysis-type" => Some(("discovery.analysisCompleted.analysisType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "discovery.analysis-status" => Some(("discovery.analysisStatus", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "discovery.analysis-status-error.code" => Some(("discovery.analysisStatusError.code", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "discovery.analysis-status-error.message" => Some(("discovery.analysisStatusError.message", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -1115,6 +1157,18 @@ where
                     "dsse-attestation.statement.slsa-provenance.recipe.defined-in-material" => Some(("dsseAttestation.statement.slsaProvenance.recipe.definedInMaterial", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "dsse-attestation.statement.slsa-provenance.recipe.entry-point" => Some(("dsseAttestation.statement.slsaProvenance.recipe.entryPoint", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "dsse-attestation.statement.slsa-provenance.recipe.type" => Some(("dsseAttestation.statement.slsaProvenance.recipe.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "dsse-attestation.statement.slsa-provenance-zero-two.build-type" => Some(("dsseAttestation.statement.slsaProvenanceZeroTwo.buildType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "dsse-attestation.statement.slsa-provenance-zero-two.builder.id" => Some(("dsseAttestation.statement.slsaProvenanceZeroTwo.builder.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "dsse-attestation.statement.slsa-provenance-zero-two.invocation.config-source.digest" => Some(("dsseAttestation.statement.slsaProvenanceZeroTwo.invocation.configSource.digest", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "dsse-attestation.statement.slsa-provenance-zero-two.invocation.config-source.entry-point" => Some(("dsseAttestation.statement.slsaProvenanceZeroTwo.invocation.configSource.entryPoint", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "dsse-attestation.statement.slsa-provenance-zero-two.invocation.config-source.uri" => Some(("dsseAttestation.statement.slsaProvenanceZeroTwo.invocation.configSource.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "dsse-attestation.statement.slsa-provenance-zero-two.metadata.build-finished-on" => Some(("dsseAttestation.statement.slsaProvenanceZeroTwo.metadata.buildFinishedOn", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "dsse-attestation.statement.slsa-provenance-zero-two.metadata.build-invocation-id" => Some(("dsseAttestation.statement.slsaProvenanceZeroTwo.metadata.buildInvocationId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "dsse-attestation.statement.slsa-provenance-zero-two.metadata.build-started-on" => Some(("dsseAttestation.statement.slsaProvenanceZeroTwo.metadata.buildStartedOn", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "dsse-attestation.statement.slsa-provenance-zero-two.metadata.completeness.environment" => Some(("dsseAttestation.statement.slsaProvenanceZeroTwo.metadata.completeness.environment", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "dsse-attestation.statement.slsa-provenance-zero-two.metadata.completeness.materials" => Some(("dsseAttestation.statement.slsaProvenanceZeroTwo.metadata.completeness.materials", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "dsse-attestation.statement.slsa-provenance-zero-two.metadata.completeness.parameters" => Some(("dsseAttestation.statement.slsaProvenanceZeroTwo.metadata.completeness.parameters", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "dsse-attestation.statement.slsa-provenance-zero-two.metadata.reproducible" => Some(("dsseAttestation.statement.slsaProvenanceZeroTwo.metadata.reproducible", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "envelope.payload" => Some(("envelope.payload", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "envelope.payload-type" => Some(("envelope.payloadType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "image.base-resource-url" => Some(("image.baseResourceUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -1125,7 +1179,18 @@ where
                     "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "note-name" => Some(("noteName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "package.architecture" => Some(("package.architecture", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "package.cpe-uri" => Some(("package.cpeUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "package.license.comments" => Some(("package.license.comments", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "package.license.expression" => Some(("package.license.expression", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "package.name" => Some(("package.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "package.package-type" => Some(("package.packageType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "package.version.epoch" => Some(("package.version.epoch", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "package.version.full-name" => Some(("package.version.fullName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "package.version.inclusive" => Some(("package.version.inclusive", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "package.version.kind" => Some(("package.version.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "package.version.name" => Some(("package.version.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "package.version.revision" => Some(("package.version.revision", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "remediation" => Some(("remediation", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "resource-uri" => Some(("resourceUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -1148,6 +1213,7 @@ where
                     "upgrade.windows-update.support-url" => Some(("upgrade.windowsUpdate.supportUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "upgrade.windows-update.title" => Some(("upgrade.windowsUpdate.title", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "vulnerability.cvss-score" => Some(("vulnerability.cvssScore", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "vulnerability.cvss-version" => Some(("vulnerability.cvssVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "vulnerability.cvssv3.attack-complexity" => Some(("vulnerability.cvssv3.attackComplexity", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "vulnerability.cvssv3.attack-vector" => Some(("vulnerability.cvssv3.attackVector", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "vulnerability.cvssv3.authentication" => Some(("vulnerability.cvssv3.authentication", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -1167,7 +1233,7 @@ where
                     "vulnerability.short-description" => Some(("vulnerability.shortDescription", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "vulnerability.type" => Some(("vulnerability.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["-type", "address", "alias-context", "analysis-status", "analysis-status-error", "archive-time", "arguments", "artifact-storage-source-uri", "attack-complexity", "attack-vector", "attestation", "authentication", "availability-impact", "base-resource-url", "base-score", "build", "build-finished-on", "build-invocation-id", "build-options", "build-started-on", "builder", "builder-config", "builder-version", "classification", "cloud-repo", "code", "completeness", "compliance", "confidentiality-impact", "config", "context", "continuous-analysis", "cpe", "cpe-uri", "create-time", "creator", "cve", "cvss-score", "cvssv3", "defined-in-material", "deploy-time", "deployment", "description", "discovery", "distance", "distribution", "dsse-attestation", "effective-severity", "end-time", "entry-point", "envelope", "environment", "epoch", "exploitability-score", "fingerprint", "fix-available", "full-name", "gerrit", "gerrit-project", "git", "host-uri", "id", "identity", "image", "impact-score", "inclusive", "integrity-impact", "intoto-provenance", "intoto-statement", "kb-article-ids", "kind", "labels", "last-published-timestamp", "last-scan-time", "logs-uri", "long-description", "materials", "message", "metadata", "name", "non-compliance-reason", "note-name", "package", "parsed-version", "payload", "payload-type", "platform", "predicate-type", "privileges-required", "project-id", "project-repo-id", "provenance", "provenance-bytes", "recipe", "remediation", "repo-id", "repo-name", "reproducible", "resource-uri", "revision", "revision-id", "scope", "serialized-payload", "severity", "short-description", "slsa-provenance", "source-provenance", "start-time", "statement", "support-url", "title", "trigger-id", "type", "uid", "undeploy-time", "update-id", "update-time", "upgrade", "url", "user-email", "user-interaction", "v1-name", "v2-blob", "v2-name", "vulnerability", "windows-update"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["-type", "address", "alias-context", "analysis-completed", "analysis-status", "analysis-status-error", "analysis-type", "architecture", "archive-time", "arguments", "artifact-storage-source-uri", "attack-complexity", "attack-vector", "attestation", "authentication", "availability-impact", "base-resource-url", "base-score", "build", "build-finished-on", "build-invocation-id", "build-options", "build-started-on", "build-type", "builder", "builder-config", "builder-version", "classification", "cloud-repo", "code", "comments", "completeness", "compliance", "confidentiality-impact", "config", "config-source", "context", "continuous-analysis", "cpe", "cpe-uri", "create-time", "creator", "cve", "cvss-score", "cvss-version", "cvssv3", "defined-in-material", "deploy-time", "deployment", "description", "digest", "discovery", "distance", "distribution", "dsse-attestation", "effective-severity", "end-time", "entry-point", "envelope", "environment", "epoch", "exploitability-score", "expression", "fingerprint", "fix-available", "full-name", "gerrit", "gerrit-project", "git", "host-uri", "id", "identity", "image", "impact-score", "inclusive", "integrity-impact", "intoto-provenance", "intoto-statement", "invocation", "kb-article-ids", "kind", "labels", "last-published-timestamp", "last-scan-time", "license", "logs-uri", "long-description", "materials", "message", "metadata", "name", "non-compliance-reason", "note-name", "package", "package-type", "parameters", "parsed-version", "payload", "payload-type", "platform", "predicate-type", "privileges-required", "project-id", "project-repo-id", "provenance", "provenance-bytes", "recipe", "remediation", "repo-id", "repo-name", "reproducible", "resource-uri", "revision", "revision-id", "scope", "serialized-payload", "severity", "short-description", "slsa-provenance", "slsa-provenance-zero-two", "source-provenance", "start-time", "statement", "support-url", "title", "trigger-id", "type", "uid", "undeploy-time", "update-id", "update-time", "upgrade", "uri", "url", "user-email", "user-interaction", "v1-name", "v2-blob", "v2-name", "version", "vulnerability", "windows-update"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1534,7 +1600,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 "filter" => {
                     call = call.filter(value.unwrap_or(""));
@@ -1647,6 +1713,18 @@ where
                     "build.intoto-statement.slsa-provenance.recipe.defined-in-material" => Some(("build.intotoStatement.slsaProvenance.recipe.definedInMaterial", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "build.intoto-statement.slsa-provenance.recipe.entry-point" => Some(("build.intotoStatement.slsaProvenance.recipe.entryPoint", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "build.intoto-statement.slsa-provenance.recipe.type" => Some(("build.intotoStatement.slsaProvenance.recipe.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "build.intoto-statement.slsa-provenance-zero-two.build-type" => Some(("build.intotoStatement.slsaProvenanceZeroTwo.buildType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "build.intoto-statement.slsa-provenance-zero-two.builder.id" => Some(("build.intotoStatement.slsaProvenanceZeroTwo.builder.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "build.intoto-statement.slsa-provenance-zero-two.invocation.config-source.digest" => Some(("build.intotoStatement.slsaProvenanceZeroTwo.invocation.configSource.digest", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "build.intoto-statement.slsa-provenance-zero-two.invocation.config-source.entry-point" => Some(("build.intotoStatement.slsaProvenanceZeroTwo.invocation.configSource.entryPoint", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "build.intoto-statement.slsa-provenance-zero-two.invocation.config-source.uri" => Some(("build.intotoStatement.slsaProvenanceZeroTwo.invocation.configSource.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "build.intoto-statement.slsa-provenance-zero-two.metadata.build-finished-on" => Some(("build.intotoStatement.slsaProvenanceZeroTwo.metadata.buildFinishedOn", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "build.intoto-statement.slsa-provenance-zero-two.metadata.build-invocation-id" => Some(("build.intotoStatement.slsaProvenanceZeroTwo.metadata.buildInvocationId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "build.intoto-statement.slsa-provenance-zero-two.metadata.build-started-on" => Some(("build.intotoStatement.slsaProvenanceZeroTwo.metadata.buildStartedOn", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "build.intoto-statement.slsa-provenance-zero-two.metadata.completeness.environment" => Some(("build.intotoStatement.slsaProvenanceZeroTwo.metadata.completeness.environment", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "build.intoto-statement.slsa-provenance-zero-two.metadata.completeness.materials" => Some(("build.intotoStatement.slsaProvenanceZeroTwo.metadata.completeness.materials", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "build.intoto-statement.slsa-provenance-zero-two.metadata.completeness.parameters" => Some(("build.intotoStatement.slsaProvenanceZeroTwo.metadata.completeness.parameters", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "build.intoto-statement.slsa-provenance-zero-two.metadata.reproducible" => Some(("build.intotoStatement.slsaProvenanceZeroTwo.metadata.reproducible", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "build.provenance.build-options" => Some(("build.provenance.buildOptions", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "build.provenance.builder-version" => Some(("build.provenance.builderVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "build.provenance.create-time" => Some(("build.provenance.createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -1682,6 +1760,7 @@ where
                     "deployment.resource-uri" => Some(("deployment.resourceUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "deployment.undeploy-time" => Some(("deployment.undeployTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "deployment.user-email" => Some(("deployment.userEmail", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "discovery.analysis-completed.analysis-type" => Some(("discovery.analysisCompleted.analysisType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "discovery.analysis-status" => Some(("discovery.analysisStatus", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "discovery.analysis-status-error.code" => Some(("discovery.analysisStatusError.code", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "discovery.analysis-status-error.message" => Some(("discovery.analysisStatusError.message", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -1716,6 +1795,18 @@ where
                     "dsse-attestation.statement.slsa-provenance.recipe.defined-in-material" => Some(("dsseAttestation.statement.slsaProvenance.recipe.definedInMaterial", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "dsse-attestation.statement.slsa-provenance.recipe.entry-point" => Some(("dsseAttestation.statement.slsaProvenance.recipe.entryPoint", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "dsse-attestation.statement.slsa-provenance.recipe.type" => Some(("dsseAttestation.statement.slsaProvenance.recipe.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "dsse-attestation.statement.slsa-provenance-zero-two.build-type" => Some(("dsseAttestation.statement.slsaProvenanceZeroTwo.buildType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "dsse-attestation.statement.slsa-provenance-zero-two.builder.id" => Some(("dsseAttestation.statement.slsaProvenanceZeroTwo.builder.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "dsse-attestation.statement.slsa-provenance-zero-two.invocation.config-source.digest" => Some(("dsseAttestation.statement.slsaProvenanceZeroTwo.invocation.configSource.digest", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "dsse-attestation.statement.slsa-provenance-zero-two.invocation.config-source.entry-point" => Some(("dsseAttestation.statement.slsaProvenanceZeroTwo.invocation.configSource.entryPoint", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "dsse-attestation.statement.slsa-provenance-zero-two.invocation.config-source.uri" => Some(("dsseAttestation.statement.slsaProvenanceZeroTwo.invocation.configSource.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "dsse-attestation.statement.slsa-provenance-zero-two.metadata.build-finished-on" => Some(("dsseAttestation.statement.slsaProvenanceZeroTwo.metadata.buildFinishedOn", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "dsse-attestation.statement.slsa-provenance-zero-two.metadata.build-invocation-id" => Some(("dsseAttestation.statement.slsaProvenanceZeroTwo.metadata.buildInvocationId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "dsse-attestation.statement.slsa-provenance-zero-two.metadata.build-started-on" => Some(("dsseAttestation.statement.slsaProvenanceZeroTwo.metadata.buildStartedOn", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "dsse-attestation.statement.slsa-provenance-zero-two.metadata.completeness.environment" => Some(("dsseAttestation.statement.slsaProvenanceZeroTwo.metadata.completeness.environment", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "dsse-attestation.statement.slsa-provenance-zero-two.metadata.completeness.materials" => Some(("dsseAttestation.statement.slsaProvenanceZeroTwo.metadata.completeness.materials", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "dsse-attestation.statement.slsa-provenance-zero-two.metadata.completeness.parameters" => Some(("dsseAttestation.statement.slsaProvenanceZeroTwo.metadata.completeness.parameters", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "dsse-attestation.statement.slsa-provenance-zero-two.metadata.reproducible" => Some(("dsseAttestation.statement.slsaProvenanceZeroTwo.metadata.reproducible", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "envelope.payload" => Some(("envelope.payload", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "envelope.payload-type" => Some(("envelope.payloadType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "image.base-resource-url" => Some(("image.baseResourceUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -1726,7 +1817,18 @@ where
                     "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "note-name" => Some(("noteName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "package.architecture" => Some(("package.architecture", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "package.cpe-uri" => Some(("package.cpeUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "package.license.comments" => Some(("package.license.comments", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "package.license.expression" => Some(("package.license.expression", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "package.name" => Some(("package.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "package.package-type" => Some(("package.packageType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "package.version.epoch" => Some(("package.version.epoch", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "package.version.full-name" => Some(("package.version.fullName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "package.version.inclusive" => Some(("package.version.inclusive", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "package.version.kind" => Some(("package.version.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "package.version.name" => Some(("package.version.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "package.version.revision" => Some(("package.version.revision", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "remediation" => Some(("remediation", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "resource-uri" => Some(("resourceUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -1749,6 +1851,7 @@ where
                     "upgrade.windows-update.support-url" => Some(("upgrade.windowsUpdate.supportUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "upgrade.windows-update.title" => Some(("upgrade.windowsUpdate.title", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "vulnerability.cvss-score" => Some(("vulnerability.cvssScore", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "vulnerability.cvss-version" => Some(("vulnerability.cvssVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "vulnerability.cvssv3.attack-complexity" => Some(("vulnerability.cvssv3.attackComplexity", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "vulnerability.cvssv3.attack-vector" => Some(("vulnerability.cvssv3.attackVector", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "vulnerability.cvssv3.authentication" => Some(("vulnerability.cvssv3.authentication", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -1768,7 +1871,7 @@ where
                     "vulnerability.short-description" => Some(("vulnerability.shortDescription", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "vulnerability.type" => Some(("vulnerability.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["-type", "address", "alias-context", "analysis-status", "analysis-status-error", "archive-time", "arguments", "artifact-storage-source-uri", "attack-complexity", "attack-vector", "attestation", "authentication", "availability-impact", "base-resource-url", "base-score", "build", "build-finished-on", "build-invocation-id", "build-options", "build-started-on", "builder", "builder-config", "builder-version", "classification", "cloud-repo", "code", "completeness", "compliance", "confidentiality-impact", "config", "context", "continuous-analysis", "cpe", "cpe-uri", "create-time", "creator", "cve", "cvss-score", "cvssv3", "defined-in-material", "deploy-time", "deployment", "description", "discovery", "distance", "distribution", "dsse-attestation", "effective-severity", "end-time", "entry-point", "envelope", "environment", "epoch", "exploitability-score", "fingerprint", "fix-available", "full-name", "gerrit", "gerrit-project", "git", "host-uri", "id", "identity", "image", "impact-score", "inclusive", "integrity-impact", "intoto-provenance", "intoto-statement", "kb-article-ids", "kind", "labels", "last-published-timestamp", "last-scan-time", "logs-uri", "long-description", "materials", "message", "metadata", "name", "non-compliance-reason", "note-name", "package", "parsed-version", "payload", "payload-type", "platform", "predicate-type", "privileges-required", "project-id", "project-repo-id", "provenance", "provenance-bytes", "recipe", "remediation", "repo-id", "repo-name", "reproducible", "resource-uri", "revision", "revision-id", "scope", "serialized-payload", "severity", "short-description", "slsa-provenance", "source-provenance", "start-time", "statement", "support-url", "title", "trigger-id", "type", "uid", "undeploy-time", "update-id", "update-time", "upgrade", "url", "user-email", "user-interaction", "v1-name", "v2-blob", "v2-name", "vulnerability", "windows-update"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["-type", "address", "alias-context", "analysis-completed", "analysis-status", "analysis-status-error", "analysis-type", "architecture", "archive-time", "arguments", "artifact-storage-source-uri", "attack-complexity", "attack-vector", "attestation", "authentication", "availability-impact", "base-resource-url", "base-score", "build", "build-finished-on", "build-invocation-id", "build-options", "build-started-on", "build-type", "builder", "builder-config", "builder-version", "classification", "cloud-repo", "code", "comments", "completeness", "compliance", "confidentiality-impact", "config", "config-source", "context", "continuous-analysis", "cpe", "cpe-uri", "create-time", "creator", "cve", "cvss-score", "cvss-version", "cvssv3", "defined-in-material", "deploy-time", "deployment", "description", "digest", "discovery", "distance", "distribution", "dsse-attestation", "effective-severity", "end-time", "entry-point", "envelope", "environment", "epoch", "exploitability-score", "expression", "fingerprint", "fix-available", "full-name", "gerrit", "gerrit-project", "git", "host-uri", "id", "identity", "image", "impact-score", "inclusive", "integrity-impact", "intoto-provenance", "intoto-statement", "invocation", "kb-article-ids", "kind", "labels", "last-published-timestamp", "last-scan-time", "license", "logs-uri", "long-description", "materials", "message", "metadata", "name", "non-compliance-reason", "note-name", "package", "package-type", "parameters", "parsed-version", "payload", "payload-type", "platform", "predicate-type", "privileges-required", "project-id", "project-repo-id", "provenance", "provenance-bytes", "recipe", "remediation", "repo-id", "repo-name", "reproducible", "resource-uri", "revision", "revision-id", "scope", "serialized-payload", "severity", "short-description", "slsa-provenance", "slsa-provenance-zero-two", "source-provenance", "start-time", "statement", "support-url", "title", "trigger-id", "type", "uid", "undeploy-time", "update-id", "update-time", "upgrade", "uri", "url", "user-email", "user-interaction", "v1-name", "v2-blob", "v2-name", "version", "vulnerability", "windows-update"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1783,7 +1886,7 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "update-mask" => {
-                    call = call.update_mask(value.unwrap_or(""));
+                    call = call.update_mask(        value.map(|v| arg_from_str(v, err, "update-mask", "google-fieldmask")).unwrap_or(FieldMask::default()));
                 },
                 _ => {
                     let mut found = false;
@@ -2259,7 +2362,7 @@ async fn main() {
                   vec![
                     (Some(r##"resource"##),
                      None,
-                     Some(r##"REQUIRED: The resource for which the policy is being requested. See the operation documentation for the appropriate value for this field."##),
+                     Some(r##"REQUIRED: The resource for which the policy is being requested. See [Resource names](https://cloud.google.com/apis/design/resource_names) for the appropriate value for this field."##),
                      Some(true),
                      Some(false)),
         
@@ -2359,7 +2462,7 @@ async fn main() {
                   vec![
                     (Some(r##"resource"##),
                      None,
-                     Some(r##"REQUIRED: The resource for which the policy is being specified. See the operation documentation for the appropriate value for this field."##),
+                     Some(r##"REQUIRED: The resource for which the policy is being specified. See [Resource names](https://cloud.google.com/apis/design/resource_names) for the appropriate value for this field."##),
                      Some(true),
                      Some(false)),
         
@@ -2387,7 +2490,7 @@ async fn main() {
                   vec![
                     (Some(r##"resource"##),
                      None,
-                     Some(r##"REQUIRED: The resource for which the policy detail is being requested. See the operation documentation for the appropriate value for this field."##),
+                     Some(r##"REQUIRED: The resource for which the policy detail is being requested. See [Resource names](https://cloud.google.com/apis/design/resource_names) for the appropriate value for this field."##),
                      Some(true),
                      Some(false)),
         
@@ -2515,7 +2618,7 @@ async fn main() {
                   vec![
                     (Some(r##"resource"##),
                      None,
-                     Some(r##"REQUIRED: The resource for which the policy is being requested. See the operation documentation for the appropriate value for this field."##),
+                     Some(r##"REQUIRED: The resource for which the policy is being requested. See [Resource names](https://cloud.google.com/apis/design/resource_names) for the appropriate value for this field."##),
                      Some(true),
                      Some(false)),
         
@@ -2637,7 +2740,7 @@ async fn main() {
                   vec![
                     (Some(r##"resource"##),
                      None,
-                     Some(r##"REQUIRED: The resource for which the policy is being specified. See the operation documentation for the appropriate value for this field."##),
+                     Some(r##"REQUIRED: The resource for which the policy is being specified. See [Resource names](https://cloud.google.com/apis/design/resource_names) for the appropriate value for this field."##),
                      Some(true),
                      Some(false)),
         
@@ -2665,7 +2768,7 @@ async fn main() {
                   vec![
                     (Some(r##"resource"##),
                      None,
-                     Some(r##"REQUIRED: The resource for which the policy detail is being requested. See the operation documentation for the appropriate value for this field."##),
+                     Some(r##"REQUIRED: The resource for which the policy detail is being requested. See [Resource names](https://cloud.google.com/apis/design/resource_names) for the appropriate value for this field."##),
                      Some(true),
                      Some(false)),
         
@@ -2693,7 +2796,7 @@ async fn main() {
     
     let mut app = App::new("containeranalysis1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("4.0.1+20220225")
+           .version("5.0.2+20230106")
            .about("An implementation of the Grafeas API, which stores, and enables querying and retrieval of critical metadata about all of your software artifacts.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_containeranalysis1_cli")
            .arg(Arg::with_name("url")

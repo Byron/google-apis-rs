@@ -3,8 +3,6 @@
 // DO NOT EDIT !
 #![allow(unused_variables, unused_imports, dead_code, unused_mut)]
 
-extern crate tokio;
-
 #[macro_use]
 extern crate clap;
 
@@ -12,9 +10,10 @@ use std::env;
 use std::io::{self, Write};
 use clap::{App, SubCommand, Arg};
 
-use google_run1::{api, Error, oauth2};
+use google_run1::{api, Error, oauth2, client::chrono, FieldMask};
 
-mod client;
+
+use google_clis_common as client;
 
 use client::{InvalidOptionsError, CLIError, arg_from_str, writer_from_opts, parse_kv_arg,
           input_file_from_opts, input_mime_from_opts, FieldCursor, FieldError, CallType, UploadProtocol,
@@ -61,7 +60,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -169,19 +168,19 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "watch" => {
-                    call = call.watch(arg_from_str(value.unwrap_or("false"), err, "watch", "boolean"));
+                    call = call.watch(        value.map(|v| arg_from_str(v, err, "watch", "boolean")).unwrap_or(false));
                 },
                 "resource-version" => {
                     call = call.resource_version(value.unwrap_or(""));
                 },
                 "limit" => {
-                    call = call.limit(arg_from_str(value.unwrap_or("-0"), err, "limit", "integer"));
+                    call = call.limit(        value.map(|v| arg_from_str(v, err, "limit", "int32")).unwrap_or(-0));
                 },
                 "label-selector" => {
                     call = call.label_selector(value.unwrap_or(""));
                 },
                 "include-uninitialized" => {
-                    call = call.include_uninitialized(arg_from_str(value.unwrap_or("false"), err, "include-uninitialized", "boolean"));
+                    call = call.include_uninitialized(        value.map(|v| arg_from_str(v, err, "include-uninitialized", "boolean")).unwrap_or(false));
                 },
                 "field-selector" => {
                     call = call.field_selector(value.unwrap_or(""));
@@ -470,19 +469,19 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "watch" => {
-                    call = call.watch(arg_from_str(value.unwrap_or("false"), err, "watch", "boolean"));
+                    call = call.watch(        value.map(|v| arg_from_str(v, err, "watch", "boolean")).unwrap_or(false));
                 },
                 "resource-version" => {
                     call = call.resource_version(value.unwrap_or(""));
                 },
                 "limit" => {
-                    call = call.limit(arg_from_str(value.unwrap_or("-0"), err, "limit", "integer"));
+                    call = call.limit(        value.map(|v| arg_from_str(v, err, "limit", "int32")).unwrap_or(-0));
                 },
                 "label-selector" => {
                     call = call.label_selector(value.unwrap_or(""));
                 },
                 "include-uninitialized" => {
-                    call = call.include_uninitialized(arg_from_str(value.unwrap_or("false"), err, "include-uninitialized", "boolean"));
+                    call = call.include_uninitialized(        value.map(|v| arg_from_str(v, err, "include-uninitialized", "boolean")).unwrap_or(false));
                 },
                 "field-selector" => {
                     call = call.field_selector(value.unwrap_or(""));
@@ -504,6 +503,90 @@ where
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
                                                                            v.extend(["continue", "field-selector", "include-uninitialized", "label-selector", "limit", "resource-version", "watch"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _namespaces_executions_cancel(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec![]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::CancelExecutionRequest = json::value::from_value(object).unwrap();
+        let mut call = self.hub.namespaces().executions_cancel(request, opt.value_of("name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -658,19 +741,19 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "watch" => {
-                    call = call.watch(arg_from_str(value.unwrap_or("false"), err, "watch", "boolean"));
+                    call = call.watch(        value.map(|v| arg_from_str(v, err, "watch", "boolean")).unwrap_or(false));
                 },
                 "resource-version" => {
                     call = call.resource_version(value.unwrap_or(""));
                 },
                 "limit" => {
-                    call = call.limit(arg_from_str(value.unwrap_or("-0"), err, "limit", "integer"));
+                    call = call.limit(        value.map(|v| arg_from_str(v, err, "limit", "int32")).unwrap_or(-0));
                 },
                 "label-selector" => {
                     call = call.label_selector(value.unwrap_or(""));
                 },
                 "include-uninitialized" => {
-                    call = call.include_uninitialized(arg_from_str(value.unwrap_or("false"), err, "include-uninitialized", "boolean"));
+                    call = call.include_uninitialized(        value.map(|v| arg_from_str(v, err, "include-uninitialized", "boolean")).unwrap_or(false));
                 },
                 "field-selector" => {
                     call = call.field_selector(value.unwrap_or(""));
@@ -784,11 +867,12 @@ where
                     "spec.template.spec.template.spec.service-account-name" => Some(("spec.template.spec.template.spec.serviceAccountName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "spec.template.spec.template.spec.timeout-seconds" => Some(("spec.template.spec.template.spec.timeoutSeconds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "status.execution-count" => Some(("status.executionCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "status.latest-created-execution.completion-timestamp" => Some(("status.latestCreatedExecution.completionTimestamp", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "status.latest-created-execution.creation-timestamp" => Some(("status.latestCreatedExecution.creationTimestamp", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "status.latest-created-execution.name" => Some(("status.latestCreatedExecution.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "status.observed-generation" => Some(("status.observedGeneration", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["annotations", "api-version", "cluster-name", "creation-timestamp", "deletion-grace-period-seconds", "deletion-timestamp", "execution-count", "finalizers", "generate-name", "generation", "kind", "labels", "latest-created-execution", "max-retries", "metadata", "name", "namespace", "observed-generation", "parallelism", "resource-version", "self-link", "service-account-name", "spec", "status", "task-count", "template", "timeout-seconds", "uid"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["annotations", "api-version", "cluster-name", "completion-timestamp", "creation-timestamp", "deletion-grace-period-seconds", "deletion-timestamp", "execution-count", "finalizers", "generate-name", "generation", "kind", "labels", "latest-created-execution", "max-retries", "metadata", "name", "namespace", "observed-generation", "parallelism", "resource-version", "self-link", "service-account-name", "spec", "status", "task-count", "template", "timeout-seconds", "uid"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -969,19 +1053,19 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "watch" => {
-                    call = call.watch(arg_from_str(value.unwrap_or("false"), err, "watch", "boolean"));
+                    call = call.watch(        value.map(|v| arg_from_str(v, err, "watch", "boolean")).unwrap_or(false));
                 },
                 "resource-version" => {
                     call = call.resource_version(value.unwrap_or(""));
                 },
                 "limit" => {
-                    call = call.limit(arg_from_str(value.unwrap_or("-0"), err, "limit", "integer"));
+                    call = call.limit(        value.map(|v| arg_from_str(v, err, "limit", "int32")).unwrap_or(-0));
                 },
                 "label-selector" => {
                     call = call.label_selector(value.unwrap_or(""));
                 },
                 "include-uninitialized" => {
-                    call = call.include_uninitialized(arg_from_str(value.unwrap_or("false"), err, "include-uninitialized", "boolean"));
+                    call = call.include_uninitialized(        value.map(|v| arg_from_str(v, err, "include-uninitialized", "boolean")).unwrap_or(false));
                 },
                 "field-selector" => {
                     call = call.field_selector(value.unwrap_or(""));
@@ -1095,11 +1179,12 @@ where
                     "spec.template.spec.template.spec.service-account-name" => Some(("spec.template.spec.template.spec.serviceAccountName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "spec.template.spec.template.spec.timeout-seconds" => Some(("spec.template.spec.template.spec.timeoutSeconds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "status.execution-count" => Some(("status.executionCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "status.latest-created-execution.completion-timestamp" => Some(("status.latestCreatedExecution.completionTimestamp", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "status.latest-created-execution.creation-timestamp" => Some(("status.latestCreatedExecution.creationTimestamp", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "status.latest-created-execution.name" => Some(("status.latestCreatedExecution.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "status.observed-generation" => Some(("status.observedGeneration", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["annotations", "api-version", "cluster-name", "creation-timestamp", "deletion-grace-period-seconds", "deletion-timestamp", "execution-count", "finalizers", "generate-name", "generation", "kind", "labels", "latest-created-execution", "max-retries", "metadata", "name", "namespace", "observed-generation", "parallelism", "resource-version", "self-link", "service-account-name", "spec", "status", "task-count", "template", "timeout-seconds", "uid"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["annotations", "api-version", "cluster-name", "completion-timestamp", "creation-timestamp", "deletion-grace-period-seconds", "deletion-timestamp", "execution-count", "finalizers", "generate-name", "generation", "kind", "labels", "latest-created-execution", "max-retries", "metadata", "name", "namespace", "observed-generation", "parallelism", "resource-version", "self-link", "service-account-name", "spec", "status", "task-count", "template", "timeout-seconds", "uid"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1367,19 +1452,19 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "watch" => {
-                    call = call.watch(arg_from_str(value.unwrap_or("false"), err, "watch", "boolean"));
+                    call = call.watch(        value.map(|v| arg_from_str(v, err, "watch", "boolean")).unwrap_or(false));
                 },
                 "resource-version" => {
                     call = call.resource_version(value.unwrap_or(""));
                 },
                 "limit" => {
-                    call = call.limit(arg_from_str(value.unwrap_or("-0"), err, "limit", "integer"));
+                    call = call.limit(        value.map(|v| arg_from_str(v, err, "limit", "int32")).unwrap_or(-0));
                 },
                 "label-selector" => {
                     call = call.label_selector(value.unwrap_or(""));
                 },
                 "include-uninitialized" => {
-                    call = call.include_uninitialized(arg_from_str(value.unwrap_or("false"), err, "include-uninitialized", "boolean"));
+                    call = call.include_uninitialized(        value.map(|v| arg_from_str(v, err, "include-uninitialized", "boolean")).unwrap_or(false));
                 },
                 "field-selector" => {
                     call = call.field_selector(value.unwrap_or(""));
@@ -1493,19 +1578,19 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "watch" => {
-                    call = call.watch(arg_from_str(value.unwrap_or("false"), err, "watch", "boolean"));
+                    call = call.watch(        value.map(|v| arg_from_str(v, err, "watch", "boolean")).unwrap_or(false));
                 },
                 "resource-version" => {
                     call = call.resource_version(value.unwrap_or(""));
                 },
                 "limit" => {
-                    call = call.limit(arg_from_str(value.unwrap_or("-0"), err, "limit", "integer"));
+                    call = call.limit(        value.map(|v| arg_from_str(v, err, "limit", "int32")).unwrap_or(-0));
                 },
                 "label-selector" => {
                     call = call.label_selector(value.unwrap_or(""));
                 },
                 "include-uninitialized" => {
-                    call = call.include_uninitialized(arg_from_str(value.unwrap_or("false"), err, "include-uninitialized", "boolean"));
+                    call = call.include_uninitialized(        value.map(|v| arg_from_str(v, err, "include-uninitialized", "boolean")).unwrap_or(false));
                 },
                 "field-selector" => {
                     call = call.field_selector(value.unwrap_or(""));
@@ -1811,19 +1896,19 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "watch" => {
-                    call = call.watch(arg_from_str(value.unwrap_or("false"), err, "watch", "boolean"));
+                    call = call.watch(        value.map(|v| arg_from_str(v, err, "watch", "boolean")).unwrap_or(false));
                 },
                 "resource-version" => {
                     call = call.resource_version(value.unwrap_or(""));
                 },
                 "limit" => {
-                    call = call.limit(arg_from_str(value.unwrap_or("-0"), err, "limit", "integer"));
+                    call = call.limit(        value.map(|v| arg_from_str(v, err, "limit", "int32")).unwrap_or(-0));
                 },
                 "label-selector" => {
                     call = call.label_selector(value.unwrap_or(""));
                 },
                 "include-uninitialized" => {
-                    call = call.include_uninitialized(arg_from_str(value.unwrap_or("false"), err, "include-uninitialized", "boolean"));
+                    call = call.include_uninitialized(        value.map(|v| arg_from_str(v, err, "include-uninitialized", "boolean")).unwrap_or(false));
                 },
                 "field-selector" => {
                     call = call.field_selector(value.unwrap_or(""));
@@ -2064,19 +2149,19 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "watch" => {
-                    call = call.watch(arg_from_str(value.unwrap_or("false"), err, "watch", "boolean"));
+                    call = call.watch(        value.map(|v| arg_from_str(v, err, "watch", "boolean")).unwrap_or(false));
                 },
                 "resource-version" => {
                     call = call.resource_version(value.unwrap_or(""));
                 },
                 "limit" => {
-                    call = call.limit(arg_from_str(value.unwrap_or("-0"), err, "limit", "integer"));
+                    call = call.limit(        value.map(|v| arg_from_str(v, err, "limit", "int32")).unwrap_or(-0));
                 },
                 "label-selector" => {
                     call = call.label_selector(value.unwrap_or(""));
                 },
                 "include-uninitialized" => {
-                    call = call.include_uninitialized(arg_from_str(value.unwrap_or("false"), err, "include-uninitialized", "boolean"));
+                    call = call.include_uninitialized(        value.map(|v| arg_from_str(v, err, "include-uninitialized", "boolean")).unwrap_or(false));
                 },
                 "field-selector" => {
                     call = call.field_selector(value.unwrap_or(""));
@@ -2141,7 +2226,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -2200,7 +2285,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -2308,19 +2393,19 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "watch" => {
-                    call = call.watch(arg_from_str(value.unwrap_or("false"), err, "watch", "boolean"));
+                    call = call.watch(        value.map(|v| arg_from_str(v, err, "watch", "boolean")).unwrap_or(false));
                 },
                 "resource-version" => {
                     call = call.resource_version(value.unwrap_or(""));
                 },
                 "limit" => {
-                    call = call.limit(arg_from_str(value.unwrap_or("-0"), err, "limit", "integer"));
+                    call = call.limit(        value.map(|v| arg_from_str(v, err, "limit", "int32")).unwrap_or(-0));
                 },
                 "label-selector" => {
                     call = call.label_selector(value.unwrap_or(""));
                 },
                 "include-uninitialized" => {
-                    call = call.include_uninitialized(arg_from_str(value.unwrap_or("false"), err, "include-uninitialized", "boolean"));
+                    call = call.include_uninitialized(        value.map(|v| arg_from_str(v, err, "include-uninitialized", "boolean")).unwrap_or(false));
                 },
                 "field-selector" => {
                     call = call.field_selector(value.unwrap_or(""));
@@ -2609,19 +2694,19 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "watch" => {
-                    call = call.watch(arg_from_str(value.unwrap_or("false"), err, "watch", "boolean"));
+                    call = call.watch(        value.map(|v| arg_from_str(v, err, "watch", "boolean")).unwrap_or(false));
                 },
                 "resource-version" => {
                     call = call.resource_version(value.unwrap_or(""));
                 },
                 "limit" => {
-                    call = call.limit(arg_from_str(value.unwrap_or("-0"), err, "limit", "integer"));
+                    call = call.limit(        value.map(|v| arg_from_str(v, err, "limit", "int32")).unwrap_or(-0));
                 },
                 "label-selector" => {
                     call = call.label_selector(value.unwrap_or(""));
                 },
                 "include-uninitialized" => {
-                    call = call.include_uninitialized(arg_from_str(value.unwrap_or("false"), err, "include-uninitialized", "boolean"));
+                    call = call.include_uninitialized(        value.map(|v| arg_from_str(v, err, "include-uninitialized", "boolean")).unwrap_or(false));
                 },
                 "field-selector" => {
                     call = call.field_selector(value.unwrap_or(""));
@@ -2683,7 +2768,7 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "options-requested-policy-version" => {
-                    call = call.options_requested_policy_version(arg_from_str(value.unwrap_or("-0"), err, "options-requested-policy-version", "integer"));
+                    call = call.options_requested_policy_version(        value.map(|v| arg_from_str(v, err, "options-requested-policy-version", "int32")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -2914,7 +2999,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 "filter" => {
                     call = call.filter(value.unwrap_or(""));
@@ -3090,19 +3175,19 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "watch" => {
-                    call = call.watch(arg_from_str(value.unwrap_or("false"), err, "watch", "boolean"));
+                    call = call.watch(        value.map(|v| arg_from_str(v, err, "watch", "boolean")).unwrap_or(false));
                 },
                 "resource-version" => {
                     call = call.resource_version(value.unwrap_or(""));
                 },
                 "limit" => {
-                    call = call.limit(arg_from_str(value.unwrap_or("-0"), err, "limit", "integer"));
+                    call = call.limit(        value.map(|v| arg_from_str(v, err, "limit", "int32")).unwrap_or(-0));
                 },
                 "label-selector" => {
                     call = call.label_selector(value.unwrap_or(""));
                 },
                 "include-uninitialized" => {
-                    call = call.include_uninitialized(arg_from_str(value.unwrap_or("false"), err, "include-uninitialized", "boolean"));
+                    call = call.include_uninitialized(        value.map(|v| arg_from_str(v, err, "include-uninitialized", "boolean")).unwrap_or(false));
                 },
                 "field-selector" => {
                     call = call.field_selector(value.unwrap_or(""));
@@ -3216,19 +3301,19 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "watch" => {
-                    call = call.watch(arg_from_str(value.unwrap_or("false"), err, "watch", "boolean"));
+                    call = call.watch(        value.map(|v| arg_from_str(v, err, "watch", "boolean")).unwrap_or(false));
                 },
                 "resource-version" => {
                     call = call.resource_version(value.unwrap_or(""));
                 },
                 "limit" => {
-                    call = call.limit(arg_from_str(value.unwrap_or("-0"), err, "limit", "integer"));
+                    call = call.limit(        value.map(|v| arg_from_str(v, err, "limit", "int32")).unwrap_or(-0));
                 },
                 "label-selector" => {
                     call = call.label_selector(value.unwrap_or(""));
                 },
                 "include-uninitialized" => {
-                    call = call.include_uninitialized(arg_from_str(value.unwrap_or("false"), err, "include-uninitialized", "boolean"));
+                    call = call.include_uninitialized(        value.map(|v| arg_from_str(v, err, "include-uninitialized", "boolean")).unwrap_or(false));
                 },
                 "field-selector" => {
                     call = call.field_selector(value.unwrap_or(""));
@@ -3534,7 +3619,7 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "options-requested-policy-version" => {
-                    call = call.options_requested_policy_version(arg_from_str(value.unwrap_or("-0"), err, "options-requested-policy-version", "integer"));
+                    call = call.options_requested_policy_version(        value.map(|v| arg_from_str(v, err, "options-requested-policy-version", "int32")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -3590,19 +3675,19 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "watch" => {
-                    call = call.watch(arg_from_str(value.unwrap_or("false"), err, "watch", "boolean"));
+                    call = call.watch(        value.map(|v| arg_from_str(v, err, "watch", "boolean")).unwrap_or(false));
                 },
                 "resource-version" => {
                     call = call.resource_version(value.unwrap_or(""));
                 },
                 "limit" => {
-                    call = call.limit(arg_from_str(value.unwrap_or("-0"), err, "limit", "integer"));
+                    call = call.limit(        value.map(|v| arg_from_str(v, err, "limit", "int32")).unwrap_or(-0));
                 },
                 "label-selector" => {
                     call = call.label_selector(value.unwrap_or(""));
                 },
                 "include-uninitialized" => {
-                    call = call.include_uninitialized(arg_from_str(value.unwrap_or("false"), err, "include-uninitialized", "boolean"));
+                    call = call.include_uninitialized(        value.map(|v| arg_from_str(v, err, "include-uninitialized", "boolean")).unwrap_or(false));
                 },
                 "field-selector" => {
                     call = call.field_selector(value.unwrap_or(""));
@@ -3984,6 +4069,9 @@ where
                     ("domainmappings-list", Some(opt)) => {
                         call_result = self._namespaces_domainmappings_list(opt, dry_run, &mut err).await;
                     },
+                    ("executions-cancel", Some(opt)) => {
+                        call_result = self._namespaces_executions_cancel(opt, dry_run, &mut err).await;
+                    },
                     ("executions-delete", Some(opt)) => {
                         call_result = self._namespaces_executions_delete(opt, dry_run, &mut err).await;
                     },
@@ -4209,7 +4297,7 @@ where
 async fn main() {
     let mut exit_status = 0i32;
     let arg_data = [
-        ("namespaces", "methods: 'authorizeddomains-list', 'configurations-get', 'configurations-list', 'domainmappings-create', 'domainmappings-delete', 'domainmappings-get', 'domainmappings-list', 'executions-delete', 'executions-get', 'executions-list', 'jobs-create', 'jobs-delete', 'jobs-get', 'jobs-list', 'jobs-replace-job', 'jobs-run', 'revisions-delete', 'revisions-get', 'revisions-list', 'routes-get', 'routes-list', 'services-create', 'services-delete', 'services-get', 'services-list', 'services-replace-service', 'tasks-get' and 'tasks-list'", vec![
+        ("namespaces", "methods: 'authorizeddomains-list', 'configurations-get', 'configurations-list', 'domainmappings-create', 'domainmappings-delete', 'domainmappings-get', 'domainmappings-list', 'executions-cancel', 'executions-delete', 'executions-get', 'executions-list', 'jobs-create', 'jobs-delete', 'jobs-get', 'jobs-list', 'jobs-replace-job', 'jobs-run', 'revisions-delete', 'revisions-get', 'revisions-list', 'routes-get', 'routes-list', 'services-create', 'services-delete', 'services-get', 'services-list', 'services-replace-service', 'tasks-get' and 'tasks-list'", vec![
             ("authorizeddomains-list",
                     Some(r##"List authorized domains."##),
                     "Details at http://byron.github.io/google-apis-rs/google_run1_cli/namespaces_authorizeddomains-list",
@@ -4238,7 +4326,7 @@ async fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The name of the configuration to retrieve. For Cloud Run (fully managed), replace {namespace_id} with the project ID or number."##),
+                     Some(r##"The name of the configuration to retrieve. For Cloud Run, replace {namespace_id} with the project ID or number."##),
                      Some(true),
                      Some(false)),
         
@@ -4260,7 +4348,7 @@ async fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"The namespace from which the configurations should be listed. For Cloud Run (fully managed), replace {namespace_id} with the project ID or number."##),
+                     Some(r##"The namespace from which the configurations should be listed. For Cloud Run, replace {namespace_id} with the project ID or number."##),
                      Some(true),
                      Some(false)),
         
@@ -4282,7 +4370,7 @@ async fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"The namespace in which the domain mapping should be created. For Cloud Run (fully managed), replace {namespace_id} with the project ID or number."##),
+                     Some(r##"The namespace in which the domain mapping should be created. For Cloud Run (fully managed), replace {namespace} with the project ID or number. It takes the form namespaces/{namespace}. For example: namespaces/PROJECT_ID"##),
                      Some(true),
                      Some(false)),
         
@@ -4310,7 +4398,7 @@ async fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The name of the domain mapping to delete. For Cloud Run (fully managed), replace {namespace_id} with the project ID or number."##),
+                     Some(r##"The name of the domain mapping to delete. For Cloud Run (fully managed), replace {namespace} with the project ID or number. It takes the form namespaces/{namespace}. For example: namespaces/PROJECT_ID"##),
                      Some(true),
                      Some(false)),
         
@@ -4332,7 +4420,7 @@ async fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The name of the domain mapping to retrieve. For Cloud Run (fully managed), replace {namespace_id} with the project ID or number."##),
+                     Some(r##"The name of the domain mapping to retrieve. For Cloud Run (fully managed), replace {namespace} with the project ID or number. It takes the form namespaces/{namespace}. For example: namespaces/PROJECT_ID"##),
                      Some(true),
                      Some(false)),
         
@@ -4349,14 +4437,42 @@ async fn main() {
                      Some(false)),
                   ]),
             ("domainmappings-list",
-                    Some(r##"List domain mappings."##),
+                    Some(r##"List all domain mappings."##),
                     "Details at http://byron.github.io/google-apis-rs/google_run1_cli/namespaces_domainmappings-list",
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"The namespace from which the domain mappings should be listed. For Cloud Run (fully managed), replace {namespace_id} with the project ID or number."##),
+                     Some(r##"The namespace from which the domain mappings should be listed. For Cloud Run (fully managed), replace {namespace} with the project ID or number. It takes the form namespaces/{namespace}. For example: namespaces/PROJECT_ID"##),
                      Some(true),
                      Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("executions-cancel",
+                    Some(r##"Cancel an execution."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_run1_cli/namespaces_executions-cancel",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. The name of the execution to cancel. Replace {namespace} with the project ID or number. It takes the form namespaces/{namespace}. For example: namespaces/PROJECT_ID"##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
         
                     (Some(r##"v"##),
                      Some(r##"p"##),
@@ -4376,7 +4492,7 @@ async fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. The name of the execution to delete. Replace {namespace_id} with the project ID or number."##),
+                     Some(r##"Required. The name of the execution to delete. Replace {namespace} with the project ID or number. It takes the form namespaces/{namespace}. For example: namespaces/PROJECT_ID"##),
                      Some(true),
                      Some(false)),
         
@@ -4398,7 +4514,7 @@ async fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. The name of the execution to retrieve. Replace {namespace_id} with the project ID or number."##),
+                     Some(r##"Required. The name of the execution to retrieve. Replace {namespace} with the project ID or number. It takes the form namespaces/{namespace}. For example: namespaces/PROJECT_ID"##),
                      Some(true),
                      Some(false)),
         
@@ -4420,7 +4536,7 @@ async fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. The namespace from which the executions should be listed. Replace {namespace_id} with the project ID or number."##),
+                     Some(r##"Required. The namespace from which the executions should be listed. Replace {namespace} with the project ID or number. It takes the form namespaces/{namespace}. For example: namespaces/PROJECT_ID"##),
                      Some(true),
                      Some(false)),
         
@@ -4442,7 +4558,7 @@ async fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. The namespace in which the job should be created. Replace {namespace_id} with the project ID or number."##),
+                     Some(r##"Required. The namespace in which the job should be created. Replace {namespace} with the project ID or number. It takes the form namespaces/{namespace}. For example: namespaces/PROJECT_ID"##),
                      Some(true),
                      Some(false)),
         
@@ -4470,7 +4586,7 @@ async fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. The name of the job to delete. Replace {namespace_id} with the project ID or number."##),
+                     Some(r##"Required. The name of the job to delete. Replace {namespace} with the project ID or number. It takes the form namespaces/{namespace}. For example: namespaces/PROJECT_ID"##),
                      Some(true),
                      Some(false)),
         
@@ -4492,7 +4608,7 @@ async fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. The name of the job to retrieve. Replace {namespace_id} with the project ID or number."##),
+                     Some(r##"Required. The name of the job to retrieve. Replace {namespace} with the project ID or number. It takes the form namespaces/{namespace}. For example: namespaces/PROJECT_ID"##),
                      Some(true),
                      Some(false)),
         
@@ -4514,7 +4630,7 @@ async fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. The namespace from which the jobs should be listed. Replace {namespace_id} with the project ID or number."##),
+                     Some(r##"Required. The namespace from which the jobs should be listed. Replace {namespace} with the project ID or number. It takes the form namespaces/{namespace}. For example: namespaces/PROJECT_ID"##),
                      Some(true),
                      Some(false)),
         
@@ -4536,7 +4652,7 @@ async fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. The name of the service being replaced. Replace {namespace_id} with the project ID or number."##),
+                     Some(r##"Required. The name of the job being replaced. Replace {namespace} with the project ID or number. It takes the form namespaces/{namespace}. For example: namespaces/PROJECT_ID"##),
                      Some(true),
                      Some(false)),
         
@@ -4564,7 +4680,7 @@ async fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. The name of the job to run. Replace {namespace_id} with the project ID or number."##),
+                     Some(r##"Required. The name of the job to run. Replace {namespace} with the project ID or number. It takes the form namespaces/{namespace}. For example: namespaces/PROJECT_ID"##),
                      Some(true),
                      Some(false)),
         
@@ -4592,7 +4708,7 @@ async fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The name of the revision to delete. For Cloud Run (fully managed), replace {namespace_id} with the project ID or number."##),
+                     Some(r##"The name of the revision to delete. For Cloud Run (fully managed), replace {namespace} with the project ID or number. It takes the form namespaces/{namespace}. For example: namespaces/PROJECT_ID"##),
                      Some(true),
                      Some(false)),
         
@@ -4614,7 +4730,7 @@ async fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The name of the revision to retrieve. For Cloud Run (fully managed), replace {namespace_id} with the project ID or number."##),
+                     Some(r##"The name of the revision to retrieve. For Cloud Run (fully managed), replace {namespace} with the project ID or number. It takes the form namespaces/{namespace}. For example: namespaces/PROJECT_ID"##),
                      Some(true),
                      Some(false)),
         
@@ -4636,7 +4752,7 @@ async fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"The namespace from which the revisions should be listed. For Cloud Run (fully managed), replace {namespace_id} with the project ID or number."##),
+                     Some(r##"The namespace from which the revisions should be listed. For Cloud Run (fully managed), replace {namespace} with the project ID or number. It takes the form namespaces/{namespace}. For example: namespaces/PROJECT_ID"##),
                      Some(true),
                      Some(false)),
         
@@ -4658,7 +4774,7 @@ async fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The name of the route to retrieve. For Cloud Run (fully managed), replace {namespace_id} with the project ID or number."##),
+                     Some(r##"The name of the route to retrieve. For Cloud Run (fully managed), replace {namespace} with the project ID or number. It takes the form namespaces/{namespace}. For example: namespaces/PROJECT_ID"##),
                      Some(true),
                      Some(false)),
         
@@ -4680,7 +4796,7 @@ async fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"The namespace from which the routes should be listed. For Cloud Run (fully managed), replace {namespace_id} with the project ID or number."##),
+                     Some(r##"The namespace from which the routes should be listed. For Cloud Run (fully managed), replace {namespace} with the project ID or number. It takes the form namespaces/{namespace}. For example: namespaces/PROJECT_ID"##),
                      Some(true),
                      Some(false)),
         
@@ -4697,12 +4813,12 @@ async fn main() {
                      Some(false)),
                   ]),
             ("services-create",
-                    Some(r##"Create a service."##),
+                    Some(r##"Creates a new Service. Service creation will trigger a new deployment. Use GetService, and check service.status to determine if the Service is ready."##),
                     "Details at http://byron.github.io/google-apis-rs/google_run1_cli/namespaces_services-create",
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"The namespace in which the service should be created. For Cloud Run (fully managed), replace {namespace_id} with the project ID or number."##),
+                     Some(r##"Required. The resource's parent. In Cloud Run, it may be one of the following: * `{project_id_or_number}` * `namespaces/{project_id_or_number}` * `namespaces/{project_id_or_number}/services` * `projects/{project_id_or_number}/locations/{region}` * `projects/{project_id_or_number}/regions/{region}`"##),
                      Some(true),
                      Some(false)),
         
@@ -4725,12 +4841,12 @@ async fn main() {
                      Some(false)),
                   ]),
             ("services-delete",
-                    Some(r##"Delete a service. This will cause the Service to stop serving traffic and will delete the child entities like Routes, Configurations and Revisions."##),
+                    Some(r##"Deletes the provided service. This will cause the Service to stop serving traffic and will delete all associated Revisions."##),
                     "Details at http://byron.github.io/google-apis-rs/google_run1_cli/namespaces_services-delete",
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The name of the service to delete. For Cloud Run (fully managed), replace {namespace_id} with the project ID or number."##),
+                     Some(r##"Required. The fully qualified name of the service to delete. It can be any of the following forms: * `namespaces/{project_id_or_number}/services/{service_name}` (only when the `endpoint` is regional) * `projects/{project_id_or_number}/locations/{region}/services/{service_name}` * `projects/{project_id_or_number}/regions/{region}/services/{service_name}`"##),
                      Some(true),
                      Some(false)),
         
@@ -4747,12 +4863,12 @@ async fn main() {
                      Some(false)),
                   ]),
             ("services-get",
-                    Some(r##"Get information about a service."##),
+                    Some(r##"Gets information about a service."##),
                     "Details at http://byron.github.io/google-apis-rs/google_run1_cli/namespaces_services-get",
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The name of the service to retrieve. For Cloud Run (fully managed), replace {namespace_id} with the project ID or number."##),
+                     Some(r##"Required. The fully qualified name of the service to retrieve. It can be any of the following forms: * `namespaces/{project_id_or_number}/services/{service_name}` (only when the `endpoint` is regional) * `projects/{project_id_or_number}/locations/{region}/services/{service_name}` * `projects/{project_id_or_number}/regions/{region}/services/{service_name}`"##),
                      Some(true),
                      Some(false)),
         
@@ -4769,12 +4885,12 @@ async fn main() {
                      Some(false)),
                   ]),
             ("services-list",
-                    Some(r##"List services."##),
+                    Some(r##"Lists services for the given project and region."##),
                     "Details at http://byron.github.io/google-apis-rs/google_run1_cli/namespaces_services-list",
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"The namespace from which the services should be listed. For Cloud Run (fully managed), replace {namespace_id} with the project ID or number."##),
+                     Some(r##"Required. The parent from where the resources should be listed. In Cloud Run, it may be one of the following: * `{project_id_or_number}` * `namespaces/{project_id_or_number}` * `namespaces/{project_id_or_number}/services` * `projects/{project_id_or_number}/locations/{region}` * `projects/{project_id_or_number}/regions/{region}`"##),
                      Some(true),
                      Some(false)),
         
@@ -4791,12 +4907,12 @@ async fn main() {
                      Some(false)),
                   ]),
             ("services-replace-service",
-                    Some(r##"Replace a service. Only the spec and metadata labels and annotations are modifiable. After the Update request, Cloud Run will work to make the 'status' match the requested 'spec'. May provide metadata.resourceVersion to enforce update from last read for optimistic concurrency control."##),
+                    Some(r##"Replaces a service. Only the spec and metadata labels and annotations are modifiable. After the Update request, Cloud Run will work to make the 'status' match the requested 'spec'. May provide metadata.resourceVersion to enforce update from last read for optimistic concurrency control."##),
                     "Details at http://byron.github.io/google-apis-rs/google_run1_cli/namespaces_services-replace-service",
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The name of the service being replaced. For Cloud Run (fully managed), replace {namespace_id} with the project ID or number."##),
+                     Some(r##"Required. The fully qualified name of the service to replace. It can be any of the following forms: * `namespaces/{project_id_or_number}/services/{service_name}` (only when the `endpoint` is regional) * `projects/{project_id_or_number}/locations/{region}/services/{service_name}` * `projects/{project_id_or_number}/regions/{region}/services/{service_name}`"##),
                      Some(true),
                      Some(false)),
         
@@ -4824,7 +4940,7 @@ async fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. The name of the task to retrieve. Replace {namespace_id} with the project ID or number."##),
+                     Some(r##"Required. The name of the task to retrieve. Replace {namespace} with the project ID or number. It takes the form namespaces/{namespace}. For example: namespaces/PROJECT_ID"##),
                      Some(true),
                      Some(false)),
         
@@ -4846,7 +4962,7 @@ async fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. The namespace from which the tasks should be listed. Replace {namespace_id} with the project ID or number."##),
+                     Some(r##"Required. The namespace from which the tasks should be listed. Replace {namespace} with the project ID or number. It takes the form namespaces/{namespace}. For example: namespaces/PROJECT_ID"##),
                      Some(true),
                      Some(false)),
         
@@ -4915,7 +5031,7 @@ async fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The name of the configuration to retrieve. For Cloud Run (fully managed), replace {namespace_id} with the project ID or number."##),
+                     Some(r##"The name of the configuration to retrieve. For Cloud Run, replace {namespace_id} with the project ID or number."##),
                      Some(true),
                      Some(false)),
         
@@ -4937,7 +5053,7 @@ async fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"The namespace from which the configurations should be listed. For Cloud Run (fully managed), replace {namespace_id} with the project ID or number."##),
+                     Some(r##"The namespace from which the configurations should be listed. For Cloud Run, replace {namespace_id} with the project ID or number."##),
                      Some(true),
                      Some(false)),
         
@@ -4959,7 +5075,7 @@ async fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"The namespace in which the domain mapping should be created. For Cloud Run (fully managed), replace {namespace_id} with the project ID or number."##),
+                     Some(r##"The namespace in which the domain mapping should be created. For Cloud Run (fully managed), replace {namespace} with the project ID or number. It takes the form namespaces/{namespace}. For example: namespaces/PROJECT_ID"##),
                      Some(true),
                      Some(false)),
         
@@ -4987,7 +5103,7 @@ async fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The name of the domain mapping to delete. For Cloud Run (fully managed), replace {namespace_id} with the project ID or number."##),
+                     Some(r##"The name of the domain mapping to delete. For Cloud Run (fully managed), replace {namespace} with the project ID or number. It takes the form namespaces/{namespace}. For example: namespaces/PROJECT_ID"##),
                      Some(true),
                      Some(false)),
         
@@ -5009,7 +5125,7 @@ async fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The name of the domain mapping to retrieve. For Cloud Run (fully managed), replace {namespace_id} with the project ID or number."##),
+                     Some(r##"The name of the domain mapping to retrieve. For Cloud Run (fully managed), replace {namespace} with the project ID or number. It takes the form namespaces/{namespace}. For example: namespaces/PROJECT_ID"##),
                      Some(true),
                      Some(false)),
         
@@ -5026,12 +5142,12 @@ async fn main() {
                      Some(false)),
                   ]),
             ("locations-domainmappings-list",
-                    Some(r##"List domain mappings."##),
+                    Some(r##"List all domain mappings."##),
                     "Details at http://byron.github.io/google-apis-rs/google_run1_cli/projects_locations-domainmappings-list",
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"The namespace from which the domain mappings should be listed. For Cloud Run (fully managed), replace {namespace_id} with the project ID or number."##),
+                     Some(r##"The namespace from which the domain mappings should be listed. For Cloud Run (fully managed), replace {namespace} with the project ID or number. It takes the form namespaces/{namespace}. For example: namespaces/PROJECT_ID"##),
                      Some(true),
                      Some(false)),
         
@@ -5053,7 +5169,7 @@ async fn main() {
                   vec![
                     (Some(r##"resource"##),
                      None,
-                     Some(r##"REQUIRED: The resource for which the policy is being requested. See the operation documentation for the appropriate value for this field."##),
+                     Some(r##"REQUIRED: The resource for which the policy is being requested. See [Resource names](https://cloud.google.com/apis/design/resource_names) for the appropriate value for this field."##),
                      Some(true),
                      Some(false)),
         
@@ -5075,7 +5191,7 @@ async fn main() {
                   vec![
                     (Some(r##"resource"##),
                      None,
-                     Some(r##"REQUIRED: The resource for which the policy is being specified. See the operation documentation for the appropriate value for this field."##),
+                     Some(r##"REQUIRED: The resource for which the policy is being specified. See [Resource names](https://cloud.google.com/apis/design/resource_names) for the appropriate value for this field."##),
                      Some(true),
                      Some(false)),
         
@@ -5103,7 +5219,7 @@ async fn main() {
                   vec![
                     (Some(r##"resource"##),
                      None,
-                     Some(r##"REQUIRED: The resource for which the policy detail is being requested. See the operation documentation for the appropriate value for this field."##),
+                     Some(r##"REQUIRED: The resource for which the policy detail is being requested. See [Resource names](https://cloud.google.com/apis/design/resource_names) for the appropriate value for this field."##),
                      Some(true),
                      Some(false)),
         
@@ -5153,7 +5269,7 @@ async fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The name of the revision to delete. For Cloud Run (fully managed), replace {namespace_id} with the project ID or number."##),
+                     Some(r##"The name of the revision to delete. For Cloud Run (fully managed), replace {namespace} with the project ID or number. It takes the form namespaces/{namespace}. For example: namespaces/PROJECT_ID"##),
                      Some(true),
                      Some(false)),
         
@@ -5175,7 +5291,7 @@ async fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The name of the revision to retrieve. For Cloud Run (fully managed), replace {namespace_id} with the project ID or number."##),
+                     Some(r##"The name of the revision to retrieve. For Cloud Run (fully managed), replace {namespace} with the project ID or number. It takes the form namespaces/{namespace}. For example: namespaces/PROJECT_ID"##),
                      Some(true),
                      Some(false)),
         
@@ -5197,7 +5313,7 @@ async fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"The namespace from which the revisions should be listed. For Cloud Run (fully managed), replace {namespace_id} with the project ID or number."##),
+                     Some(r##"The namespace from which the revisions should be listed. For Cloud Run (fully managed), replace {namespace} with the project ID or number. It takes the form namespaces/{namespace}. For example: namespaces/PROJECT_ID"##),
                      Some(true),
                      Some(false)),
         
@@ -5219,7 +5335,7 @@ async fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The name of the route to retrieve. For Cloud Run (fully managed), replace {namespace_id} with the project ID or number."##),
+                     Some(r##"The name of the route to retrieve. For Cloud Run (fully managed), replace {namespace} with the project ID or number. It takes the form namespaces/{namespace}. For example: namespaces/PROJECT_ID"##),
                      Some(true),
                      Some(false)),
         
@@ -5241,7 +5357,7 @@ async fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"The namespace from which the routes should be listed. For Cloud Run (fully managed), replace {namespace_id} with the project ID or number."##),
+                     Some(r##"The namespace from which the routes should be listed. For Cloud Run (fully managed), replace {namespace} with the project ID or number. It takes the form namespaces/{namespace}. For example: namespaces/PROJECT_ID"##),
                      Some(true),
                      Some(false)),
         
@@ -5258,12 +5374,12 @@ async fn main() {
                      Some(false)),
                   ]),
             ("locations-services-create",
-                    Some(r##"Create a service."##),
+                    Some(r##"Creates a new Service. Service creation will trigger a new deployment. Use GetService, and check service.status to determine if the Service is ready."##),
                     "Details at http://byron.github.io/google-apis-rs/google_run1_cli/projects_locations-services-create",
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"The namespace in which the service should be created. For Cloud Run (fully managed), replace {namespace_id} with the project ID or number."##),
+                     Some(r##"Required. The resource's parent. In Cloud Run, it may be one of the following: * `{project_id_or_number}` * `namespaces/{project_id_or_number}` * `namespaces/{project_id_or_number}/services` * `projects/{project_id_or_number}/locations/{region}` * `projects/{project_id_or_number}/regions/{region}`"##),
                      Some(true),
                      Some(false)),
         
@@ -5286,12 +5402,12 @@ async fn main() {
                      Some(false)),
                   ]),
             ("locations-services-delete",
-                    Some(r##"Delete a service. This will cause the Service to stop serving traffic and will delete the child entities like Routes, Configurations and Revisions."##),
+                    Some(r##"Deletes the provided service. This will cause the Service to stop serving traffic and will delete all associated Revisions."##),
                     "Details at http://byron.github.io/google-apis-rs/google_run1_cli/projects_locations-services-delete",
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The name of the service to delete. For Cloud Run (fully managed), replace {namespace_id} with the project ID or number."##),
+                     Some(r##"Required. The fully qualified name of the service to delete. It can be any of the following forms: * `namespaces/{project_id_or_number}/services/{service_name}` (only when the `endpoint` is regional) * `projects/{project_id_or_number}/locations/{region}/services/{service_name}` * `projects/{project_id_or_number}/regions/{region}/services/{service_name}`"##),
                      Some(true),
                      Some(false)),
         
@@ -5308,12 +5424,12 @@ async fn main() {
                      Some(false)),
                   ]),
             ("locations-services-get",
-                    Some(r##"Get information about a service."##),
+                    Some(r##"Gets information about a service."##),
                     "Details at http://byron.github.io/google-apis-rs/google_run1_cli/projects_locations-services-get",
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The name of the service to retrieve. For Cloud Run (fully managed), replace {namespace_id} with the project ID or number."##),
+                     Some(r##"Required. The fully qualified name of the service to retrieve. It can be any of the following forms: * `namespaces/{project_id_or_number}/services/{service_name}` (only when the `endpoint` is regional) * `projects/{project_id_or_number}/locations/{region}/services/{service_name}` * `projects/{project_id_or_number}/regions/{region}/services/{service_name}`"##),
                      Some(true),
                      Some(false)),
         
@@ -5330,12 +5446,12 @@ async fn main() {
                      Some(false)),
                   ]),
             ("locations-services-get-iam-policy",
-                    Some(r##"Get the IAM Access Control policy currently in effect for the given Cloud Run service. This result does not include any inherited policies."##),
+                    Some(r##"Gets the IAM Access Control policy currently in effect for the given Cloud Run service. This result does not include any inherited policies."##),
                     "Details at http://byron.github.io/google-apis-rs/google_run1_cli/projects_locations-services-get-iam-policy",
                   vec![
                     (Some(r##"resource"##),
                      None,
-                     Some(r##"REQUIRED: The resource for which the policy is being requested. See the operation documentation for the appropriate value for this field."##),
+                     Some(r##"REQUIRED: The resource for which the policy is being requested. See [Resource names](https://cloud.google.com/apis/design/resource_names) for the appropriate value for this field."##),
                      Some(true),
                      Some(false)),
         
@@ -5352,12 +5468,12 @@ async fn main() {
                      Some(false)),
                   ]),
             ("locations-services-list",
-                    Some(r##"List services."##),
+                    Some(r##"Lists services for the given project and region."##),
                     "Details at http://byron.github.io/google-apis-rs/google_run1_cli/projects_locations-services-list",
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"The namespace from which the services should be listed. For Cloud Run (fully managed), replace {namespace_id} with the project ID or number."##),
+                     Some(r##"Required. The parent from where the resources should be listed. In Cloud Run, it may be one of the following: * `{project_id_or_number}` * `namespaces/{project_id_or_number}` * `namespaces/{project_id_or_number}/services` * `projects/{project_id_or_number}/locations/{region}` * `projects/{project_id_or_number}/regions/{region}`"##),
                      Some(true),
                      Some(false)),
         
@@ -5374,12 +5490,12 @@ async fn main() {
                      Some(false)),
                   ]),
             ("locations-services-replace-service",
-                    Some(r##"Replace a service. Only the spec and metadata labels and annotations are modifiable. After the Update request, Cloud Run will work to make the 'status' match the requested 'spec'. May provide metadata.resourceVersion to enforce update from last read for optimistic concurrency control."##),
+                    Some(r##"Replaces a service. Only the spec and metadata labels and annotations are modifiable. After the Update request, Cloud Run will work to make the 'status' match the requested 'spec'. May provide metadata.resourceVersion to enforce update from last read for optimistic concurrency control."##),
                     "Details at http://byron.github.io/google-apis-rs/google_run1_cli/projects_locations-services-replace-service",
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The name of the service being replaced. For Cloud Run (fully managed), replace {namespace_id} with the project ID or number."##),
+                     Some(r##"Required. The fully qualified name of the service to replace. It can be any of the following forms: * `namespaces/{project_id_or_number}/services/{service_name}` (only when the `endpoint` is regional) * `projects/{project_id_or_number}/locations/{region}/services/{service_name}` * `projects/{project_id_or_number}/regions/{region}/services/{service_name}`"##),
                      Some(true),
                      Some(false)),
         
@@ -5407,7 +5523,7 @@ async fn main() {
                   vec![
                     (Some(r##"resource"##),
                      None,
-                     Some(r##"REQUIRED: The resource for which the policy is being specified. See the operation documentation for the appropriate value for this field."##),
+                     Some(r##"REQUIRED: The resource for which the policy is being specified. See [Resource names](https://cloud.google.com/apis/design/resource_names) for the appropriate value for this field."##),
                      Some(true),
                      Some(false)),
         
@@ -5435,7 +5551,7 @@ async fn main() {
                   vec![
                     (Some(r##"resource"##),
                      None,
-                     Some(r##"REQUIRED: The resource for which the policy detail is being requested. See the operation documentation for the appropriate value for this field."##),
+                     Some(r##"REQUIRED: The resource for which the policy detail is being requested. See [Resource names](https://cloud.google.com/apis/design/resource_names) for the appropriate value for this field."##),
                      Some(true),
                      Some(false)),
         
@@ -5463,7 +5579,7 @@ async fn main() {
     
     let mut app = App::new("run1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("4.0.1+20220225")
+           .version("5.0.2+20230113")
            .about("Deploy and manage user provided container images that scale automatically based on incoming requests. The Cloud Run Admin API v1 follows the Knative Serving API specification, while v2 is aligned with Google Cloud AIP-based API standards, as described in https://google.aip.dev/.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_run1_cli")
            .arg(Arg::with_name("url")

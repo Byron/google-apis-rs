@@ -1,4 +1,4 @@
-site_name: Logging v4.0.1+20190325
+site_name: Logging v5.0.2+20190325
 site_url: http://byron.github.io/google-apis-rs/google-logging2_beta1-cli
 site_description: A complete library to interact with Logging (protocol v2beta1)
 
@@ -7,21 +7,24 @@ repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/logging2_beta1-c
 docs_dir: docs
 site_dir: build_html
 
-pages:
-- ['index.md', 'Home']
-- ['entries_list.md', 'Entries', 'List']
-- ['entries_write.md', 'Entries', 'Write']
-- ['monitored-resource-descriptors_list.md', 'Monitored Resource Descriptors', 'List']
-- ['projects_metrics-create.md', 'Projects', 'Metrics Create']
-- ['projects_metrics-delete.md', 'Projects', 'Metrics Delete']
-- ['projects_metrics-get.md', 'Projects', 'Metrics Get']
-- ['projects_metrics-list.md', 'Projects', 'Metrics List']
-- ['projects_metrics-update.md', 'Projects', 'Metrics Update']
-- ['projects_sinks-create.md', 'Projects', 'Sinks Create']
-- ['projects_sinks-delete.md', 'Projects', 'Sinks Delete']
-- ['projects_sinks-get.md', 'Projects', 'Sinks Get']
-- ['projects_sinks-list.md', 'Projects', 'Sinks List']
-- ['projects_sinks-update.md', 'Projects', 'Sinks Update']
+nav:
+- Home: 'index.md'
+- 'Entries':
+    - 'List': 'entries_list.md'
+    - 'Write': 'entries_write.md'
+- 'Monitored Resource Descriptors':
+    - 'List': 'monitored-resource-descriptors_list.md'
+- 'Projects':
+    - 'Metrics Create': 'projects_metrics-create.md'
+    - 'Metrics Delete': 'projects_metrics-delete.md'
+    - 'Metrics Get': 'projects_metrics-get.md'
+    - 'Metrics List': 'projects_metrics-list.md'
+    - 'Metrics Update': 'projects_metrics-update.md'
+    - 'Sinks Create': 'projects_sinks-create.md'
+    - 'Sinks Delete': 'projects_sinks-delete.md'
+    - 'Sinks Get': 'projects_sinks-get.md'
+    - 'Sinks List': 'projects_sinks-list.md'
+    - 'Sinks Update': 'projects_sinks-update.md'
 
 theme: readthedocs
 

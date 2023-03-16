@@ -3,8 +3,6 @@
 // DO NOT EDIT !
 #![allow(unused_variables, unused_imports, dead_code, unused_mut)]
 
-extern crate tokio;
-
 #[macro_use]
 extern crate clap;
 
@@ -12,9 +10,10 @@ use std::env;
 use std::io::{self, Write};
 use clap::{App, SubCommand, Arg};
 
-use google_games1::{api, Error, oauth2};
+use google_games1::{api, Error, oauth2, client::chrono, FieldMask};
 
-mod client;
+
+use google_clis_common as client;
 
 use client::{InvalidOptionsError, CLIError, arg_from_str, writer_from_opts, parse_kv_arg,
           input_file_from_opts, input_mime_from_opts, FieldCursor, FieldError, CallType, UploadProtocol,
@@ -61,7 +60,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "max-results" => {
-                    call = call.max_results(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
+                    call = call.max_results(        value.map(|v| arg_from_str(v, err, "max-results", "int32")).unwrap_or(-0));
                 },
                 "language" => {
                     call = call.language(value.unwrap_or(""));
@@ -121,7 +120,7 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "request-id" => {
-                    call = call.request_id(value.unwrap_or(""));
+                    call = call.request_id(        value.map(|v| arg_from_str(v, err, "request-id", "int64")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -183,7 +182,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "max-results" => {
-                    call = call.max_results(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
+                    call = call.max_results(        value.map(|v| arg_from_str(v, err, "max-results", "int32")).unwrap_or(-0));
                 },
                 "language" => {
                     call = call.language(value.unwrap_or(""));
@@ -701,7 +700,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "max-results" => {
-                    call = call.max_results(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
+                    call = call.max_results(        value.map(|v| arg_from_str(v, err, "max-results", "int32")).unwrap_or(-0));
                 },
                 "language" => {
                     call = call.language(value.unwrap_or(""));
@@ -763,7 +762,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "max-results" => {
-                    call = call.max_results(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
+                    call = call.max_results(        value.map(|v| arg_from_str(v, err, "max-results", "int32")).unwrap_or(-0));
                 },
                 "language" => {
                     call = call.language(value.unwrap_or(""));
@@ -972,7 +971,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "max-results" => {
-                    call = call.max_results(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
+                    call = call.max_results(        value.map(|v| arg_from_str(v, err, "max-results", "int32")).unwrap_or(-0));
                 },
                 "language" => {
                     call = call.language(value.unwrap_or(""));
@@ -1086,7 +1085,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "max-results" => {
-                    call = call.max_results(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
+                    call = call.max_results(        value.map(|v| arg_from_str(v, err, "max-results", "int32")).unwrap_or(-0));
                 },
                 "language" => {
                     call = call.language(value.unwrap_or(""));
@@ -1144,6 +1143,9 @@ where
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
+                "player-id-consistency-token" => {
+                    call = call.player_id_consistency_token(value.unwrap_or(""));
+                },
                 "language" => {
                     call = call.language(value.unwrap_or(""));
                 },
@@ -1160,7 +1162,59 @@ where
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["language"].iter().map(|v|*v));
+                                                                           v.extend(["language", "player-id-consistency-token"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _players_get_scoped_player_ids(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.players().get_scoped_player_ids();
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -1204,7 +1258,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "max-results" => {
-                    call = call.max_results(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
+                    call = call.max_results(        value.map(|v| arg_from_str(v, err, "max-results", "int32")).unwrap_or(-0));
                 },
                 "language" => {
                     call = call.language(value.unwrap_or(""));
@@ -1318,7 +1372,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "max-results" => {
-                    call = call.max_results(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
+                    call = call.max_results(        value.map(|v| arg_from_str(v, err, "max-results", "int32")).unwrap_or(-0));
                 },
                 "language" => {
                     call = call.language(value.unwrap_or(""));
@@ -1383,7 +1437,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "max-results" => {
-                    call = call.max_results(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
+                    call = call.max_results(        value.map(|v| arg_from_str(v, err, "max-results", "int32")).unwrap_or(-0));
                 },
                 "language" => {
                     call = call.language(value.unwrap_or(""));
@@ -1442,16 +1496,16 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "return-top-if-absent" => {
-                    call = call.return_top_if_absent(arg_from_str(value.unwrap_or("false"), err, "return-top-if-absent", "boolean"));
+                    call = call.return_top_if_absent(        value.map(|v| arg_from_str(v, err, "return-top-if-absent", "boolean")).unwrap_or(false));
                 },
                 "results-above" => {
-                    call = call.results_above(arg_from_str(value.unwrap_or("-0"), err, "results-above", "integer"));
+                    call = call.results_above(        value.map(|v| arg_from_str(v, err, "results-above", "int32")).unwrap_or(-0));
                 },
                 "page-token" => {
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "max-results" => {
-                    call = call.max_results(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
+                    call = call.max_results(        value.map(|v| arg_from_str(v, err, "max-results", "int32")).unwrap_or(-0));
                 },
                 "language" => {
                     call = call.language(value.unwrap_or(""));
@@ -1717,7 +1771,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "max-results" => {
-                    call = call.max_results(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
+                    call = call.max_results(        value.map(|v| arg_from_str(v, err, "max-results", "int32")).unwrap_or(-0));
                 },
                 "language" => {
                     call = call.language(value.unwrap_or(""));
@@ -1932,6 +1986,9 @@ where
                 match opt.subcommand() {
                     ("get", Some(opt)) => {
                         call_result = self._players_get(opt, dry_run, &mut err).await;
+                    },
+                    ("get-scoped-player-ids", Some(opt)) => {
+                        call_result = self._players_get_scoped_player_ids(opt, dry_run, &mut err).await;
                     },
                     ("list", Some(opt)) => {
                         call_result = self._players_list(opt, dry_run, &mut err).await;
@@ -2458,7 +2515,7 @@ async fn main() {
                   ]),
             ]),
         
-        ("players", "methods: 'get' and 'list'", vec![
+        ("players", "methods: 'get', 'get-scoped-player-ids' and 'list'", vec![
             ("get",
                     Some(r##"Retrieves the Player resource with the given ID. To retrieve the player for the currently authenticated user, set `playerId` to `me`."##),
                     "Details at http://byron.github.io/google-apis-rs/google_games1_cli/players_get",
@@ -2469,6 +2526,22 @@ async fn main() {
                      Some(true),
                      Some(false)),
         
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("get-scoped-player-ids",
+                    Some(r##"Retrieves scoped player identifiers for currently authenticated user."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_games1_cli/players_get-scoped-player-ids",
+                  vec![
                     (Some(r##"v"##),
                      Some(r##"p"##),
                      Some(r##"Set various optional parameters, matching the key=value form"##),
@@ -2755,7 +2828,7 @@ async fn main() {
     
     let mut app = App::new("games1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("4.0.1+20220217")
+           .version("5.0.2+20230112")
            .about("The Google Play games service allows developers to enhance games with social leaderboards, achievements, game state, sign-in with Google, and more.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_games1_cli")
            .arg(Arg::with_name("url")

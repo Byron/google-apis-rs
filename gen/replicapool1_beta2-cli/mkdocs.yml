@@ -1,4 +1,4 @@
-site_name: replicapool v4.0.1+20160512
+site_name: replicapool v5.0.2+20160512
 site_url: http://byron.github.io/google-apis-rs/google-replicapool1_beta2-cli
 site_description: A complete library to interact with replicapool (protocol v1beta2)
 
@@ -7,20 +7,22 @@ repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/replicapool1_bet
 docs_dir: docs
 site_dir: build_html
 
-pages:
-- ['index.md', 'Home']
-- ['instance-group-managers_abandon-instances.md', 'Instance Group Managers', 'Abandon Instances']
-- ['instance-group-managers_delete.md', 'Instance Group Managers', 'Delete']
-- ['instance-group-managers_delete-instances.md', 'Instance Group Managers', 'Delete Instances']
-- ['instance-group-managers_get.md', 'Instance Group Managers', 'Get']
-- ['instance-group-managers_insert.md', 'Instance Group Managers', 'Insert']
-- ['instance-group-managers_list.md', 'Instance Group Managers', 'List']
-- ['instance-group-managers_recreate-instances.md', 'Instance Group Managers', 'Recreate Instances']
-- ['instance-group-managers_resize.md', 'Instance Group Managers', 'Resize']
-- ['instance-group-managers_set-instance-template.md', 'Instance Group Managers', 'Set Instance Template']
-- ['instance-group-managers_set-target-pools.md', 'Instance Group Managers', 'Set Target Pools']
-- ['zone-operations_get.md', 'Zone Operations', 'Get']
-- ['zone-operations_list.md', 'Zone Operations', 'List']
+nav:
+- Home: 'index.md'
+- 'Instance Group Managers':
+    - 'Abandon Instances': 'instance-group-managers_abandon-instances.md'
+    - 'Delete': 'instance-group-managers_delete.md'
+    - 'Delete Instances': 'instance-group-managers_delete-instances.md'
+    - 'Get': 'instance-group-managers_get.md'
+    - 'Insert': 'instance-group-managers_insert.md'
+    - 'List': 'instance-group-managers_list.md'
+    - 'Recreate Instances': 'instance-group-managers_recreate-instances.md'
+    - 'Resize': 'instance-group-managers_resize.md'
+    - 'Set Instance Template': 'instance-group-managers_set-instance-template.md'
+    - 'Set Target Pools': 'instance-group-managers_set-target-pools.md'
+- 'Zone Operations':
+    - 'Get': 'zone-operations_get.md'
+    - 'List': 'zone-operations_list.md'
 
 theme: readthedocs
 

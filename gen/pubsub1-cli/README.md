@@ -25,16 +25,20 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Pubsub* API at revision *20220221*. The CLI is at version *4.0.1*.
+This documentation was generated from the *Pubsub* API at revision *20230119*. The CLI is at version *5.0.2*.
 
 ```bash
 pubsub1 [options]
         projects
+                schemas-commit <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 schemas-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 schemas-delete <name> [-p <v>]... [-o <out>]
+                schemas-delete-revision <name> [-p <v>]... [-o <out>]
                 schemas-get <name> [-p <v>]... [-o <out>]
                 schemas-get-iam-policy <resource> [-p <v>]... [-o <out>]
                 schemas-list <parent> [-p <v>]... [-o <out>]
+                schemas-list-revisions <name> [-p <v>]... [-o <out>]
+                schemas-rollback <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 schemas-set-iam-policy <resource> (-r <kv>)... [-p <v>]... [-o <out>]
                 schemas-test-iam-permissions <resource> (-r <kv>)... [-p <v>]... [-o <out>]
                 schemas-validate <parent> (-r <kv>)... [-p <v>]... [-o <out>]

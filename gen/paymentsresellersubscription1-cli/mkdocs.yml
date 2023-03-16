@@ -1,4 +1,4 @@
-site_name: Payments Reseller Subscription v4.0.1+20220307
+site_name: Payments Reseller Subscription v5.0.2+20230123
 site_url: http://byron.github.io/google-apis-rs/google-paymentsresellersubscription1-cli
 site_description: A complete library to interact with Payments Reseller Subscription (protocol v1)
 
@@ -7,17 +7,19 @@ repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/paymentsreseller
 docs_dir: docs
 site_dir: build_html
 
-pages:
-- ['index.md', 'Home']
-- ['partners_products-list.md', 'Partners', 'Products List']
-- ['partners_promotions-list.md', 'Partners', 'Promotions List']
-- ['partners_subscriptions-cancel.md', 'Partners', 'Subscriptions Cancel']
-- ['partners_subscriptions-create.md', 'Partners', 'Subscriptions Create']
-- ['partners_subscriptions-entitle.md', 'Partners', 'Subscriptions Entitle']
-- ['partners_subscriptions-extend.md', 'Partners', 'Subscriptions Extend']
-- ['partners_subscriptions-get.md', 'Partners', 'Subscriptions Get']
-- ['partners_subscriptions-provision.md', 'Partners', 'Subscriptions Provision']
-- ['partners_subscriptions-undo-cancel.md', 'Partners', 'Subscriptions Undo Cancel']
+nav:
+- Home: 'index.md'
+- 'Partners':
+    - 'Products List': 'partners_products-list.md'
+    - 'Promotions Find Eligible': 'partners_promotions-find-eligible.md'
+    - 'Promotions List': 'partners_promotions-list.md'
+    - 'Subscriptions Cancel': 'partners_subscriptions-cancel.md'
+    - 'Subscriptions Create': 'partners_subscriptions-create.md'
+    - 'Subscriptions Entitle': 'partners_subscriptions-entitle.md'
+    - 'Subscriptions Extend': 'partners_subscriptions-extend.md'
+    - 'Subscriptions Get': 'partners_subscriptions-get.md'
+    - 'Subscriptions Provision': 'partners_subscriptions-provision.md'
+    - 'Subscriptions Undo Cancel': 'partners_subscriptions-undo-cancel.md'
 
 theme: readthedocs
 

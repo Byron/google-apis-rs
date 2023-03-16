@@ -3,8 +3,6 @@
 // DO NOT EDIT !
 #![allow(unused_variables, unused_imports, dead_code, unused_mut)]
 
-extern crate tokio;
-
 #[macro_use]
 extern crate clap;
 
@@ -12,9 +10,10 @@ use std::env;
 use std::io::{self, Write};
 use clap::{App, SubCommand, Arg};
 
-use google_cloudsupport2_beta::{api, Error, oauth2};
+use google_cloudsupport2_beta::{api, Error, oauth2, client::chrono, FieldMask};
 
-mod client;
+
+use google_clis_common as client;
 
 use client::{InvalidOptionsError, CLIError, arg_from_str, writer_from_opts, parse_kv_arg,
           input_file_from_opts, input_mime_from_opts, FieldCursor, FieldError, CallType, UploadProtocol,
@@ -156,7 +155,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -215,7 +214,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -449,7 +448,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -530,6 +529,7 @@ where
                     "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "display-name" => Some(("displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "escalated" => Some(("escalated", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "language-code" => Some(("languageCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "priority" => Some(("priority", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "severity" => Some(("severity", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -539,7 +539,7 @@ where
                     "time-zone" => Some(("timeZone", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["classification", "create-time", "creator", "description", "display-name", "email", "escalated", "google-support", "id", "name", "priority", "severity", "state", "subscriber-email-addresses", "test-case", "time-zone", "update-time"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["classification", "create-time", "creator", "description", "display-name", "email", "escalated", "google-support", "id", "language-code", "name", "priority", "severity", "state", "subscriber-email-addresses", "test-case", "time-zone", "update-time"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -747,7 +747,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 "filter" => {
                     call = call.filter(value.unwrap_or(""));
@@ -831,6 +831,7 @@ where
                     "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "display-name" => Some(("displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "escalated" => Some(("escalated", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "language-code" => Some(("languageCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "priority" => Some(("priority", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "severity" => Some(("severity", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -840,7 +841,7 @@ where
                     "time-zone" => Some(("timeZone", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["classification", "create-time", "creator", "description", "display-name", "email", "escalated", "google-support", "id", "name", "priority", "severity", "state", "subscriber-email-addresses", "test-case", "time-zone", "update-time"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["classification", "create-time", "creator", "description", "display-name", "email", "escalated", "google-support", "id", "language-code", "name", "priority", "severity", "state", "subscriber-email-addresses", "test-case", "time-zone", "update-time"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -855,7 +856,7 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "update-mask" => {
-                    call = call.update_mask(value.unwrap_or(""));
+                    call = call.update_mask(        value.map(|v| arg_from_str(v, err, "update-mask", "google-fieldmask")).unwrap_or(FieldMask::default()));
                 },
                 _ => {
                     let mut found = false;
@@ -917,7 +918,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -1278,12 +1279,12 @@ async fn main() {
     let arg_data = [
         ("attachments", "methods: 'create'", vec![
             ("create",
-                    Some(r##"Create a file attachment on a case or Cloud resource."##),
+                    Some(r##"Create a file attachment on a case or Cloud resource. The attachment object must have the following fields set: filename."##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudsupport2_beta_cli/attachments_create",
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. The resource name of the case to which attachment should be attached."##),
+                     Some(r##"Required. The resource name of the case (or case parent) to which the attachment should be attached."##),
                      Some(true),
                      Some(false)),
         
@@ -1378,7 +1379,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("comments-create",
-                    Some(r##"Add a new comment to the specified Case."##),
+                    Some(r##"Add a new comment to the specified Case. The comment object must have the following fields set: body."##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudsupport2_beta_cli/cases_comments-create",
                   vec![
                     (Some(r##"parent"##),
@@ -1428,7 +1429,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("create",
-                    Some(r##"Create a new case and associate it with the given Cloud resource."##),
+                    Some(r##"Create a new case and associate it with the given Cloud resource. The case object must have the following fields set: display_name, description, classification, and severity."##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudsupport2_beta_cli/cases_create",
                   vec![
                     (Some(r##"parent"##),
@@ -1506,7 +1507,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("list",
-                    Some(r##"Retrieve all cases under the specified parent."##),
+                    Some(r##"Retrieve all cases under the specified parent. Note: Listing cases under an Organization returns only the cases directly parented by that organization. To retrieve all cases under an organization, including cases parented by projects under that organization, use `cases.search`."##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudsupport2_beta_cli/cases_list",
                   vec![
                     (Some(r##"parent"##),
@@ -1528,7 +1529,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("patch",
-                    Some(r##"Update the specified case. Only a subset of fields (display_name, description, time_zone, subscriber_email_addresses, related_resources, severity, priority, primary_contact, and labels) can be updated."##),
+                    Some(r##"Update the specified case. Only a subset of fields can be updated."##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudsupport2_beta_cli/cases_patch",
                   vec![
                     (Some(r##"name"##),
@@ -1597,12 +1598,12 @@ async fn main() {
                      Some(false)),
                   ]),
             ("upload",
-                    Some(r##"Create a file attachment on a case or Cloud resource."##),
+                    Some(r##"Create a file attachment on a case or Cloud resource. The attachment object must have the following fields set: filename."##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudsupport2_beta_cli/media_upload",
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. The resource name of the case to which attachment should be attached."##),
+                     Some(r##"Required. The resource name of the case (or case parent) to which the attachment should be attached."##),
                      Some(true),
                      Some(false)),
         
@@ -1636,7 +1637,7 @@ async fn main() {
     
     let mut app = App::new("cloudsupport2-beta")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("4.0.1+20220305")
+           .version("5.0.2+20230121")
            .about("Manages Google Cloud technical support cases for Customer Care support offerings. ")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_cloudsupport2_beta_cli")
            .arg(Arg::with_name("url")

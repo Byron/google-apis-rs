@@ -1,4 +1,4 @@
-site_name: Recommender v4.0.1+20220228
+site_name: Recommender v5.0.2+20230108
 site_url: http://byron.github.io/google-apis-rs/google-recommender1_beta1-cli
 site_description: A complete library to interact with Recommender (protocol v1beta1)
 
@@ -7,48 +7,60 @@ repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/recommender1_bet
 docs_dir: docs
 site_dir: build_html
 
-pages:
-- ['index.md', 'Home']
-- ['billing-accounts_locations-insight-types-insights-get.md', 'Billing Accounts', 'Locations Insight Types Insights Get']
-- ['billing-accounts_locations-insight-types-insights-list.md', 'Billing Accounts', 'Locations Insight Types Insights List']
-- ['billing-accounts_locations-insight-types-insights-mark-accepted.md', 'Billing Accounts', 'Locations Insight Types Insights Mark Accepted']
-- ['billing-accounts_locations-recommenders-recommendations-get.md', 'Billing Accounts', 'Locations Recommenders Recommendations Get']
-- ['billing-accounts_locations-recommenders-recommendations-list.md', 'Billing Accounts', 'Locations Recommenders Recommendations List']
-- ['billing-accounts_locations-recommenders-recommendations-mark-claimed.md', 'Billing Accounts', 'Locations Recommenders Recommendations Mark Claimed']
-- ['billing-accounts_locations-recommenders-recommendations-mark-failed.md', 'Billing Accounts', 'Locations Recommenders Recommendations Mark Failed']
-- ['billing-accounts_locations-recommenders-recommendations-mark-succeeded.md', 'Billing Accounts', 'Locations Recommenders Recommendations Mark Succeeded']
-- ['folders_locations-insight-types-insights-get.md', 'Folders', 'Locations Insight Types Insights Get']
-- ['folders_locations-insight-types-insights-list.md', 'Folders', 'Locations Insight Types Insights List']
-- ['folders_locations-insight-types-insights-mark-accepted.md', 'Folders', 'Locations Insight Types Insights Mark Accepted']
-- ['folders_locations-recommenders-recommendations-get.md', 'Folders', 'Locations Recommenders Recommendations Get']
-- ['folders_locations-recommenders-recommendations-list.md', 'Folders', 'Locations Recommenders Recommendations List']
-- ['folders_locations-recommenders-recommendations-mark-claimed.md', 'Folders', 'Locations Recommenders Recommendations Mark Claimed']
-- ['folders_locations-recommenders-recommendations-mark-failed.md', 'Folders', 'Locations Recommenders Recommendations Mark Failed']
-- ['folders_locations-recommenders-recommendations-mark-succeeded.md', 'Folders', 'Locations Recommenders Recommendations Mark Succeeded']
-- ['organizations_locations-insight-types-config.md', 'Organizations', 'Locations Insight Types Config']
-- ['organizations_locations-insight-types-get-config.md', 'Organizations', 'Locations Insight Types Get Config']
-- ['organizations_locations-insight-types-insights-get.md', 'Organizations', 'Locations Insight Types Insights Get']
-- ['organizations_locations-insight-types-insights-list.md', 'Organizations', 'Locations Insight Types Insights List']
-- ['organizations_locations-insight-types-insights-mark-accepted.md', 'Organizations', 'Locations Insight Types Insights Mark Accepted']
-- ['organizations_locations-recommenders-config.md', 'Organizations', 'Locations Recommenders Config']
-- ['organizations_locations-recommenders-get-config.md', 'Organizations', 'Locations Recommenders Get Config']
-- ['organizations_locations-recommenders-recommendations-get.md', 'Organizations', 'Locations Recommenders Recommendations Get']
-- ['organizations_locations-recommenders-recommendations-list.md', 'Organizations', 'Locations Recommenders Recommendations List']
-- ['organizations_locations-recommenders-recommendations-mark-claimed.md', 'Organizations', 'Locations Recommenders Recommendations Mark Claimed']
-- ['organizations_locations-recommenders-recommendations-mark-failed.md', 'Organizations', 'Locations Recommenders Recommendations Mark Failed']
-- ['organizations_locations-recommenders-recommendations-mark-succeeded.md', 'Organizations', 'Locations Recommenders Recommendations Mark Succeeded']
-- ['projects_locations-insight-types-get-config.md', 'Projects', 'Locations Insight Types Get Config']
-- ['projects_locations-insight-types-insights-get.md', 'Projects', 'Locations Insight Types Insights Get']
-- ['projects_locations-insight-types-insights-list.md', 'Projects', 'Locations Insight Types Insights List']
-- ['projects_locations-insight-types-insights-mark-accepted.md', 'Projects', 'Locations Insight Types Insights Mark Accepted']
-- ['projects_locations-insight-types-update-config.md', 'Projects', 'Locations Insight Types Update Config']
-- ['projects_locations-recommenders-get-config.md', 'Projects', 'Locations Recommenders Get Config']
-- ['projects_locations-recommenders-recommendations-get.md', 'Projects', 'Locations Recommenders Recommendations Get']
-- ['projects_locations-recommenders-recommendations-list.md', 'Projects', 'Locations Recommenders Recommendations List']
-- ['projects_locations-recommenders-recommendations-mark-claimed.md', 'Projects', 'Locations Recommenders Recommendations Mark Claimed']
-- ['projects_locations-recommenders-recommendations-mark-failed.md', 'Projects', 'Locations Recommenders Recommendations Mark Failed']
-- ['projects_locations-recommenders-recommendations-mark-succeeded.md', 'Projects', 'Locations Recommenders Recommendations Mark Succeeded']
-- ['projects_locations-recommenders-update-config.md', 'Projects', 'Locations Recommenders Update Config']
+nav:
+- Home: 'index.md'
+- 'Billing Accounts':
+    - 'Locations Insight Types Get Config': 'billing-accounts_locations-insight-types-get-config.md'
+    - 'Locations Insight Types Insights Get': 'billing-accounts_locations-insight-types-insights-get.md'
+    - 'Locations Insight Types Insights List': 'billing-accounts_locations-insight-types-insights-list.md'
+    - 'Locations Insight Types Insights Mark Accepted': 'billing-accounts_locations-insight-types-insights-mark-accepted.md'
+    - 'Locations Insight Types Update Config': 'billing-accounts_locations-insight-types-update-config.md'
+    - 'Locations Recommenders Get Config': 'billing-accounts_locations-recommenders-get-config.md'
+    - 'Locations Recommenders Recommendations Get': 'billing-accounts_locations-recommenders-recommendations-get.md'
+    - 'Locations Recommenders Recommendations List': 'billing-accounts_locations-recommenders-recommendations-list.md'
+    - 'Locations Recommenders Recommendations Mark Claimed': 'billing-accounts_locations-recommenders-recommendations-mark-claimed.md'
+    - 'Locations Recommenders Recommendations Mark Dismissed': 'billing-accounts_locations-recommenders-recommendations-mark-dismissed.md'
+    - 'Locations Recommenders Recommendations Mark Failed': 'billing-accounts_locations-recommenders-recommendations-mark-failed.md'
+    - 'Locations Recommenders Recommendations Mark Succeeded': 'billing-accounts_locations-recommenders-recommendations-mark-succeeded.md'
+    - 'Locations Recommenders Update Config': 'billing-accounts_locations-recommenders-update-config.md'
+- 'Folders':
+    - 'Locations Insight Types Insights Get': 'folders_locations-insight-types-insights-get.md'
+    - 'Locations Insight Types Insights List': 'folders_locations-insight-types-insights-list.md'
+    - 'Locations Insight Types Insights Mark Accepted': 'folders_locations-insight-types-insights-mark-accepted.md'
+    - 'Locations Recommenders Recommendations Get': 'folders_locations-recommenders-recommendations-get.md'
+    - 'Locations Recommenders Recommendations List': 'folders_locations-recommenders-recommendations-list.md'
+    - 'Locations Recommenders Recommendations Mark Claimed': 'folders_locations-recommenders-recommendations-mark-claimed.md'
+    - 'Locations Recommenders Recommendations Mark Dismissed': 'folders_locations-recommenders-recommendations-mark-dismissed.md'
+    - 'Locations Recommenders Recommendations Mark Failed': 'folders_locations-recommenders-recommendations-mark-failed.md'
+    - 'Locations Recommenders Recommendations Mark Succeeded': 'folders_locations-recommenders-recommendations-mark-succeeded.md'
+- 'Organizations':
+    - 'Locations Insight Types Get Config': 'organizations_locations-insight-types-get-config.md'
+    - 'Locations Insight Types Insights Get': 'organizations_locations-insight-types-insights-get.md'
+    - 'Locations Insight Types Insights List': 'organizations_locations-insight-types-insights-list.md'
+    - 'Locations Insight Types Insights Mark Accepted': 'organizations_locations-insight-types-insights-mark-accepted.md'
+    - 'Locations Insight Types Update Config': 'organizations_locations-insight-types-update-config.md'
+    - 'Locations Recommenders Get Config': 'organizations_locations-recommenders-get-config.md'
+    - 'Locations Recommenders Recommendations Get': 'organizations_locations-recommenders-recommendations-get.md'
+    - 'Locations Recommenders Recommendations List': 'organizations_locations-recommenders-recommendations-list.md'
+    - 'Locations Recommenders Recommendations Mark Claimed': 'organizations_locations-recommenders-recommendations-mark-claimed.md'
+    - 'Locations Recommenders Recommendations Mark Dismissed': 'organizations_locations-recommenders-recommendations-mark-dismissed.md'
+    - 'Locations Recommenders Recommendations Mark Failed': 'organizations_locations-recommenders-recommendations-mark-failed.md'
+    - 'Locations Recommenders Recommendations Mark Succeeded': 'organizations_locations-recommenders-recommendations-mark-succeeded.md'
+    - 'Locations Recommenders Update Config': 'organizations_locations-recommenders-update-config.md'
+- 'Projects':
+    - 'Locations Insight Types Get Config': 'projects_locations-insight-types-get-config.md'
+    - 'Locations Insight Types Insights Get': 'projects_locations-insight-types-insights-get.md'
+    - 'Locations Insight Types Insights List': 'projects_locations-insight-types-insights-list.md'
+    - 'Locations Insight Types Insights Mark Accepted': 'projects_locations-insight-types-insights-mark-accepted.md'
+    - 'Locations Insight Types Update Config': 'projects_locations-insight-types-update-config.md'
+    - 'Locations Recommenders Get Config': 'projects_locations-recommenders-get-config.md'
+    - 'Locations Recommenders Recommendations Get': 'projects_locations-recommenders-recommendations-get.md'
+    - 'Locations Recommenders Recommendations List': 'projects_locations-recommenders-recommendations-list.md'
+    - 'Locations Recommenders Recommendations Mark Claimed': 'projects_locations-recommenders-recommendations-mark-claimed.md'
+    - 'Locations Recommenders Recommendations Mark Dismissed': 'projects_locations-recommenders-recommendations-mark-dismissed.md'
+    - 'Locations Recommenders Recommendations Mark Failed': 'projects_locations-recommenders-recommendations-mark-failed.md'
+    - 'Locations Recommenders Recommendations Mark Succeeded': 'projects_locations-recommenders-recommendations-mark-succeeded.md'
+    - 'Locations Recommenders Update Config': 'projects_locations-recommenders-update-config.md'
 
 theme: readthedocs
 

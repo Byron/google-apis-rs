@@ -1,4 +1,4 @@
-site_name: Logging v4.0.1+20220225
+site_name: Logging v5.0.2+20230104
 site_url: http://byron.github.io/google-apis-rs/google-logging2-cli
 site_description: A complete library to interact with Logging (protocol v2)
 
@@ -7,177 +7,192 @@ repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/logging2-cli
 docs_dir: docs
 site_dir: build_html
 
-pages:
-- ['index.md', 'Home']
-- ['billing-accounts_buckets-get.md', 'Billing Accounts', 'Buckets Get']
-- ['billing-accounts_buckets-views-get.md', 'Billing Accounts', 'Buckets Views Get']
-- ['billing-accounts_exclusions-create.md', 'Billing Accounts', 'Exclusions Create']
-- ['billing-accounts_exclusions-delete.md', 'Billing Accounts', 'Exclusions Delete']
-- ['billing-accounts_exclusions-get.md', 'Billing Accounts', 'Exclusions Get']
-- ['billing-accounts_exclusions-list.md', 'Billing Accounts', 'Exclusions List']
-- ['billing-accounts_exclusions-patch.md', 'Billing Accounts', 'Exclusions Patch']
-- ['billing-accounts_get-cmek-settings.md', 'Billing Accounts', 'Get Cmek Settings']
-- ['billing-accounts_get-settings.md', 'Billing Accounts', 'Get Settings']
-- ['billing-accounts_locations-buckets-create.md', 'Billing Accounts', 'Locations Buckets Create']
-- ['billing-accounts_locations-buckets-delete.md', 'Billing Accounts', 'Locations Buckets Delete']
-- ['billing-accounts_locations-buckets-list.md', 'Billing Accounts', 'Locations Buckets List']
-- ['billing-accounts_locations-buckets-patch.md', 'Billing Accounts', 'Locations Buckets Patch']
-- ['billing-accounts_locations-buckets-undelete.md', 'Billing Accounts', 'Locations Buckets Undelete']
-- ['billing-accounts_locations-buckets-views-create.md', 'Billing Accounts', 'Locations Buckets Views Create']
-- ['billing-accounts_locations-buckets-views-delete.md', 'Billing Accounts', 'Locations Buckets Views Delete']
-- ['billing-accounts_locations-buckets-views-list.md', 'Billing Accounts', 'Locations Buckets Views List']
-- ['billing-accounts_locations-buckets-views-patch.md', 'Billing Accounts', 'Locations Buckets Views Patch']
-- ['billing-accounts_locations-get.md', 'Billing Accounts', 'Locations Get']
-- ['billing-accounts_locations-list.md', 'Billing Accounts', 'Locations List']
-- ['billing-accounts_locations-operations-cancel.md', 'Billing Accounts', 'Locations Operations Cancel']
-- ['billing-accounts_locations-operations-list.md', 'Billing Accounts', 'Locations Operations List']
-- ['billing-accounts_logs-delete.md', 'Billing Accounts', 'Logs Delete']
-- ['billing-accounts_logs-list.md', 'Billing Accounts', 'Logs List']
-- ['billing-accounts_operations-get.md', 'Billing Accounts', 'Operations Get']
-- ['billing-accounts_sinks-create.md', 'Billing Accounts', 'Sinks Create']
-- ['billing-accounts_sinks-delete.md', 'Billing Accounts', 'Sinks Delete']
-- ['billing-accounts_sinks-get.md', 'Billing Accounts', 'Sinks Get']
-- ['billing-accounts_sinks-list.md', 'Billing Accounts', 'Sinks List']
-- ['billing-accounts_sinks-patch.md', 'Billing Accounts', 'Sinks Patch']
-- ['billing-accounts_sinks-update.md', 'Billing Accounts', 'Sinks Update']
-- ['entries_copy.md', 'Entries', 'Copy']
-- ['entries_list.md', 'Entries', 'List']
-- ['entries_tail.md', 'Entries', 'Tail']
-- ['entries_write.md', 'Entries', 'Write']
-- ['exclusions_create.md', 'Exclusions', 'Create']
-- ['exclusions_delete.md', 'Exclusions', 'Delete']
-- ['exclusions_get.md', 'Exclusions', 'Get']
-- ['exclusions_list.md', 'Exclusions', 'List']
-- ['exclusions_patch.md', 'Exclusions', 'Patch']
-- ['folders_exclusions-create.md', 'Folders', 'Exclusions Create']
-- ['folders_exclusions-delete.md', 'Folders', 'Exclusions Delete']
-- ['folders_exclusions-get.md', 'Folders', 'Exclusions Get']
-- ['folders_exclusions-list.md', 'Folders', 'Exclusions List']
-- ['folders_exclusions-patch.md', 'Folders', 'Exclusions Patch']
-- ['folders_get-cmek-settings.md', 'Folders', 'Get Cmek Settings']
-- ['folders_get-settings.md', 'Folders', 'Get Settings']
-- ['folders_locations-buckets-create.md', 'Folders', 'Locations Buckets Create']
-- ['folders_locations-buckets-delete.md', 'Folders', 'Locations Buckets Delete']
-- ['folders_locations-buckets-get.md', 'Folders', 'Locations Buckets Get']
-- ['folders_locations-buckets-list.md', 'Folders', 'Locations Buckets List']
-- ['folders_locations-buckets-patch.md', 'Folders', 'Locations Buckets Patch']
-- ['folders_locations-buckets-undelete.md', 'Folders', 'Locations Buckets Undelete']
-- ['folders_locations-buckets-views-create.md', 'Folders', 'Locations Buckets Views Create']
-- ['folders_locations-buckets-views-delete.md', 'Folders', 'Locations Buckets Views Delete']
-- ['folders_locations-buckets-views-get.md', 'Folders', 'Locations Buckets Views Get']
-- ['folders_locations-buckets-views-list.md', 'Folders', 'Locations Buckets Views List']
-- ['folders_locations-buckets-views-patch.md', 'Folders', 'Locations Buckets Views Patch']
-- ['folders_locations-get.md', 'Folders', 'Locations Get']
-- ['folders_locations-list.md', 'Folders', 'Locations List']
-- ['folders_locations-operations-cancel.md', 'Folders', 'Locations Operations Cancel']
-- ['folders_locations-operations-get.md', 'Folders', 'Locations Operations Get']
-- ['folders_locations-operations-list.md', 'Folders', 'Locations Operations List']
-- ['folders_logs-delete.md', 'Folders', 'Logs Delete']
-- ['folders_logs-list.md', 'Folders', 'Logs List']
-- ['folders_sinks-create.md', 'Folders', 'Sinks Create']
-- ['folders_sinks-delete.md', 'Folders', 'Sinks Delete']
-- ['folders_sinks-get.md', 'Folders', 'Sinks Get']
-- ['folders_sinks-list.md', 'Folders', 'Sinks List']
-- ['folders_sinks-patch.md', 'Folders', 'Sinks Patch']
-- ['folders_sinks-update.md', 'Folders', 'Sinks Update']
-- ['folders_update-settings.md', 'Folders', 'Update Settings']
-- ['locations_buckets-create.md', 'Locations', 'Buckets Create']
-- ['locations_buckets-delete.md', 'Locations', 'Buckets Delete']
-- ['locations_buckets-get.md', 'Locations', 'Buckets Get']
-- ['locations_buckets-list.md', 'Locations', 'Buckets List']
-- ['locations_buckets-patch.md', 'Locations', 'Buckets Patch']
-- ['locations_buckets-undelete.md', 'Locations', 'Buckets Undelete']
-- ['locations_buckets-views-create.md', 'Locations', 'Buckets Views Create']
-- ['locations_buckets-views-delete.md', 'Locations', 'Buckets Views Delete']
-- ['locations_buckets-views-get.md', 'Locations', 'Buckets Views Get']
-- ['locations_buckets-views-list.md', 'Locations', 'Buckets Views List']
-- ['locations_buckets-views-patch.md', 'Locations', 'Buckets Views Patch']
-- ['locations_get.md', 'Locations', 'Get']
-- ['locations_list.md', 'Locations', 'List']
-- ['locations_operations-cancel.md', 'Locations', 'Operations Cancel']
-- ['locations_operations-get.md', 'Locations', 'Operations Get']
-- ['locations_operations-list.md', 'Locations', 'Operations List']
-- ['logs_delete.md', 'Logs', 'Delete']
-- ['logs_list.md', 'Logs', 'List']
-- ['methods_get-cmek-settings.md', 'Methods', 'Get Cmek Settings']
-- ['methods_get-settings.md', 'Methods', 'Get Settings']
-- ['methods_update-cmek-settings.md', 'Methods', 'Update Cmek Settings']
-- ['methods_update-settings.md', 'Methods', 'Update Settings']
-- ['monitored-resource-descriptors_list.md', 'Monitored Resource Descriptors', 'List']
-- ['organizations_exclusions-create.md', 'Organizations', 'Exclusions Create']
-- ['organizations_exclusions-delete.md', 'Organizations', 'Exclusions Delete']
-- ['organizations_exclusions-get.md', 'Organizations', 'Exclusions Get']
-- ['organizations_exclusions-list.md', 'Organizations', 'Exclusions List']
-- ['organizations_exclusions-patch.md', 'Organizations', 'Exclusions Patch']
-- ['organizations_get-cmek-settings.md', 'Organizations', 'Get Cmek Settings']
-- ['organizations_get-settings.md', 'Organizations', 'Get Settings']
-- ['organizations_locations-buckets-create.md', 'Organizations', 'Locations Buckets Create']
-- ['organizations_locations-buckets-delete.md', 'Organizations', 'Locations Buckets Delete']
-- ['organizations_locations-buckets-get.md', 'Organizations', 'Locations Buckets Get']
-- ['organizations_locations-buckets-list.md', 'Organizations', 'Locations Buckets List']
-- ['organizations_locations-buckets-patch.md', 'Organizations', 'Locations Buckets Patch']
-- ['organizations_locations-buckets-undelete.md', 'Organizations', 'Locations Buckets Undelete']
-- ['organizations_locations-buckets-views-create.md', 'Organizations', 'Locations Buckets Views Create']
-- ['organizations_locations-buckets-views-delete.md', 'Organizations', 'Locations Buckets Views Delete']
-- ['organizations_locations-buckets-views-get.md', 'Organizations', 'Locations Buckets Views Get']
-- ['organizations_locations-buckets-views-list.md', 'Organizations', 'Locations Buckets Views List']
-- ['organizations_locations-buckets-views-patch.md', 'Organizations', 'Locations Buckets Views Patch']
-- ['organizations_locations-get.md', 'Organizations', 'Locations Get']
-- ['organizations_locations-list.md', 'Organizations', 'Locations List']
-- ['organizations_locations-operations-cancel.md', 'Organizations', 'Locations Operations Cancel']
-- ['organizations_locations-operations-get.md', 'Organizations', 'Locations Operations Get']
-- ['organizations_locations-operations-list.md', 'Organizations', 'Locations Operations List']
-- ['organizations_logs-delete.md', 'Organizations', 'Logs Delete']
-- ['organizations_logs-list.md', 'Organizations', 'Logs List']
-- ['organizations_sinks-create.md', 'Organizations', 'Sinks Create']
-- ['organizations_sinks-delete.md', 'Organizations', 'Sinks Delete']
-- ['organizations_sinks-get.md', 'Organizations', 'Sinks Get']
-- ['organizations_sinks-list.md', 'Organizations', 'Sinks List']
-- ['organizations_sinks-patch.md', 'Organizations', 'Sinks Patch']
-- ['organizations_sinks-update.md', 'Organizations', 'Sinks Update']
-- ['organizations_update-cmek-settings.md', 'Organizations', 'Update Cmek Settings']
-- ['organizations_update-settings.md', 'Organizations', 'Update Settings']
-- ['projects_exclusions-create.md', 'Projects', 'Exclusions Create']
-- ['projects_exclusions-delete.md', 'Projects', 'Exclusions Delete']
-- ['projects_exclusions-get.md', 'Projects', 'Exclusions Get']
-- ['projects_exclusions-list.md', 'Projects', 'Exclusions List']
-- ['projects_exclusions-patch.md', 'Projects', 'Exclusions Patch']
-- ['projects_get-cmek-settings.md', 'Projects', 'Get Cmek Settings']
-- ['projects_get-settings.md', 'Projects', 'Get Settings']
-- ['projects_locations-buckets-create.md', 'Projects', 'Locations Buckets Create']
-- ['projects_locations-buckets-delete.md', 'Projects', 'Locations Buckets Delete']
-- ['projects_locations-buckets-get.md', 'Projects', 'Locations Buckets Get']
-- ['projects_locations-buckets-list.md', 'Projects', 'Locations Buckets List']
-- ['projects_locations-buckets-patch.md', 'Projects', 'Locations Buckets Patch']
-- ['projects_locations-buckets-undelete.md', 'Projects', 'Locations Buckets Undelete']
-- ['projects_locations-buckets-views-create.md', 'Projects', 'Locations Buckets Views Create']
-- ['projects_locations-buckets-views-delete.md', 'Projects', 'Locations Buckets Views Delete']
-- ['projects_locations-buckets-views-get.md', 'Projects', 'Locations Buckets Views Get']
-- ['projects_locations-buckets-views-list.md', 'Projects', 'Locations Buckets Views List']
-- ['projects_locations-buckets-views-patch.md', 'Projects', 'Locations Buckets Views Patch']
-- ['projects_locations-get.md', 'Projects', 'Locations Get']
-- ['projects_locations-list.md', 'Projects', 'Locations List']
-- ['projects_locations-operations-cancel.md', 'Projects', 'Locations Operations Cancel']
-- ['projects_locations-operations-get.md', 'Projects', 'Locations Operations Get']
-- ['projects_locations-operations-list.md', 'Projects', 'Locations Operations List']
-- ['projects_logs-delete.md', 'Projects', 'Logs Delete']
-- ['projects_logs-list.md', 'Projects', 'Logs List']
-- ['projects_metrics-create.md', 'Projects', 'Metrics Create']
-- ['projects_metrics-delete.md', 'Projects', 'Metrics Delete']
-- ['projects_metrics-get.md', 'Projects', 'Metrics Get']
-- ['projects_metrics-list.md', 'Projects', 'Metrics List']
-- ['projects_metrics-update.md', 'Projects', 'Metrics Update']
-- ['projects_sinks-create.md', 'Projects', 'Sinks Create']
-- ['projects_sinks-delete.md', 'Projects', 'Sinks Delete']
-- ['projects_sinks-get.md', 'Projects', 'Sinks Get']
-- ['projects_sinks-list.md', 'Projects', 'Sinks List']
-- ['projects_sinks-patch.md', 'Projects', 'Sinks Patch']
-- ['projects_sinks-update.md', 'Projects', 'Sinks Update']
-- ['sinks_create.md', 'Sinks', 'Create']
-- ['sinks_delete.md', 'Sinks', 'Delete']
-- ['sinks_get.md', 'Sinks', 'Get']
-- ['sinks_list.md', 'Sinks', 'List']
-- ['sinks_update.md', 'Sinks', 'Update']
+nav:
+- Home: 'index.md'
+- 'Billing Accounts':
+    - 'Exclusions Create': 'billing-accounts_exclusions-create.md'
+    - 'Exclusions Delete': 'billing-accounts_exclusions-delete.md'
+    - 'Exclusions Get': 'billing-accounts_exclusions-get.md'
+    - 'Exclusions List': 'billing-accounts_exclusions-list.md'
+    - 'Exclusions Patch': 'billing-accounts_exclusions-patch.md'
+    - 'Get Cmek Settings': 'billing-accounts_get-cmek-settings.md'
+    - 'Get Settings': 'billing-accounts_get-settings.md'
+    - 'Locations Buckets Create': 'billing-accounts_locations-buckets-create.md'
+    - 'Locations Buckets Delete': 'billing-accounts_locations-buckets-delete.md'
+    - 'Locations Buckets Get': 'billing-accounts_locations-buckets-get.md'
+    - 'Locations Buckets List': 'billing-accounts_locations-buckets-list.md'
+    - 'Locations Buckets Patch': 'billing-accounts_locations-buckets-patch.md'
+    - 'Locations Buckets Undelete': 'billing-accounts_locations-buckets-undelete.md'
+    - 'Locations Buckets Views Create': 'billing-accounts_locations-buckets-views-create.md'
+    - 'Locations Buckets Views Delete': 'billing-accounts_locations-buckets-views-delete.md'
+    - 'Locations Buckets Views Get': 'billing-accounts_locations-buckets-views-get.md'
+    - 'Locations Buckets Views List': 'billing-accounts_locations-buckets-views-list.md'
+    - 'Locations Buckets Views Logs List': 'billing-accounts_locations-buckets-views-logs-list.md'
+    - 'Locations Buckets Views Patch': 'billing-accounts_locations-buckets-views-patch.md'
+    - 'Locations Get': 'billing-accounts_locations-get.md'
+    - 'Locations List': 'billing-accounts_locations-list.md'
+    - 'Locations Operations Cancel': 'billing-accounts_locations-operations-cancel.md'
+    - 'Locations Operations Get': 'billing-accounts_locations-operations-get.md'
+    - 'Locations Operations List': 'billing-accounts_locations-operations-list.md'
+    - 'Logs Delete': 'billing-accounts_logs-delete.md'
+    - 'Logs List': 'billing-accounts_logs-list.md'
+    - 'Sinks Create': 'billing-accounts_sinks-create.md'
+    - 'Sinks Delete': 'billing-accounts_sinks-delete.md'
+    - 'Sinks Get': 'billing-accounts_sinks-get.md'
+    - 'Sinks List': 'billing-accounts_sinks-list.md'
+    - 'Sinks Patch': 'billing-accounts_sinks-patch.md'
+    - 'Sinks Update': 'billing-accounts_sinks-update.md'
+- 'Entries':
+    - 'Copy': 'entries_copy.md'
+    - 'List': 'entries_list.md'
+    - 'Tail': 'entries_tail.md'
+    - 'Write': 'entries_write.md'
+- 'Exclusions':
+    - 'Create': 'exclusions_create.md'
+    - 'Delete': 'exclusions_delete.md'
+    - 'Get': 'exclusions_get.md'
+    - 'List': 'exclusions_list.md'
+    - 'Patch': 'exclusions_patch.md'
+- 'Folders':
+    - 'Exclusions Create': 'folders_exclusions-create.md'
+    - 'Exclusions Delete': 'folders_exclusions-delete.md'
+    - 'Exclusions Get': 'folders_exclusions-get.md'
+    - 'Exclusions List': 'folders_exclusions-list.md'
+    - 'Exclusions Patch': 'folders_exclusions-patch.md'
+    - 'Get Cmek Settings': 'folders_get-cmek-settings.md'
+    - 'Get Settings': 'folders_get-settings.md'
+    - 'Locations Buckets Create': 'folders_locations-buckets-create.md'
+    - 'Locations Buckets Delete': 'folders_locations-buckets-delete.md'
+    - 'Locations Buckets Get': 'folders_locations-buckets-get.md'
+    - 'Locations Buckets List': 'folders_locations-buckets-list.md'
+    - 'Locations Buckets Patch': 'folders_locations-buckets-patch.md'
+    - 'Locations Buckets Undelete': 'folders_locations-buckets-undelete.md'
+    - 'Locations Buckets Views Create': 'folders_locations-buckets-views-create.md'
+    - 'Locations Buckets Views Delete': 'folders_locations-buckets-views-delete.md'
+    - 'Locations Buckets Views Get': 'folders_locations-buckets-views-get.md'
+    - 'Locations Buckets Views List': 'folders_locations-buckets-views-list.md'
+    - 'Locations Buckets Views Logs List': 'folders_locations-buckets-views-logs-list.md'
+    - 'Locations Buckets Views Patch': 'folders_locations-buckets-views-patch.md'
+    - 'Locations Get': 'folders_locations-get.md'
+    - 'Locations List': 'folders_locations-list.md'
+    - 'Locations Operations Cancel': 'folders_locations-operations-cancel.md'
+    - 'Locations Operations Get': 'folders_locations-operations-get.md'
+    - 'Locations Operations List': 'folders_locations-operations-list.md'
+    - 'Logs Delete': 'folders_logs-delete.md'
+    - 'Logs List': 'folders_logs-list.md'
+    - 'Sinks Create': 'folders_sinks-create.md'
+    - 'Sinks Delete': 'folders_sinks-delete.md'
+    - 'Sinks Get': 'folders_sinks-get.md'
+    - 'Sinks List': 'folders_sinks-list.md'
+    - 'Sinks Patch': 'folders_sinks-patch.md'
+    - 'Sinks Update': 'folders_sinks-update.md'
+    - 'Update Settings': 'folders_update-settings.md'
+- 'Locations':
+    - 'Buckets Create': 'locations_buckets-create.md'
+    - 'Buckets Delete': 'locations_buckets-delete.md'
+    - 'Buckets Get': 'locations_buckets-get.md'
+    - 'Buckets List': 'locations_buckets-list.md'
+    - 'Buckets Patch': 'locations_buckets-patch.md'
+    - 'Buckets Undelete': 'locations_buckets-undelete.md'
+    - 'Buckets Views Create': 'locations_buckets-views-create.md'
+    - 'Buckets Views Delete': 'locations_buckets-views-delete.md'
+    - 'Buckets Views Get': 'locations_buckets-views-get.md'
+    - 'Buckets Views List': 'locations_buckets-views-list.md'
+    - 'Buckets Views Patch': 'locations_buckets-views-patch.md'
+    - 'Get': 'locations_get.md'
+    - 'List': 'locations_list.md'
+    - 'Operations Cancel': 'locations_operations-cancel.md'
+    - 'Operations Get': 'locations_operations-get.md'
+    - 'Operations List': 'locations_operations-list.md'
+- 'Logs':
+    - 'Delete': 'logs_delete.md'
+    - 'List': 'logs_list.md'
+- 'Methods':
+    - 'Get Cmek Settings': 'methods_get-cmek-settings.md'
+    - 'Get Settings': 'methods_get-settings.md'
+    - 'Update Cmek Settings': 'methods_update-cmek-settings.md'
+    - 'Update Settings': 'methods_update-settings.md'
+- 'Monitored Resource Descriptors':
+    - 'List': 'monitored-resource-descriptors_list.md'
+- 'Organizations':
+    - 'Exclusions Create': 'organizations_exclusions-create.md'
+    - 'Exclusions Delete': 'organizations_exclusions-delete.md'
+    - 'Exclusions Get': 'organizations_exclusions-get.md'
+    - 'Exclusions List': 'organizations_exclusions-list.md'
+    - 'Exclusions Patch': 'organizations_exclusions-patch.md'
+    - 'Get Cmek Settings': 'organizations_get-cmek-settings.md'
+    - 'Get Settings': 'organizations_get-settings.md'
+    - 'Locations Buckets Create': 'organizations_locations-buckets-create.md'
+    - 'Locations Buckets Delete': 'organizations_locations-buckets-delete.md'
+    - 'Locations Buckets Get': 'organizations_locations-buckets-get.md'
+    - 'Locations Buckets List': 'organizations_locations-buckets-list.md'
+    - 'Locations Buckets Patch': 'organizations_locations-buckets-patch.md'
+    - 'Locations Buckets Undelete': 'organizations_locations-buckets-undelete.md'
+    - 'Locations Buckets Views Create': 'organizations_locations-buckets-views-create.md'
+    - 'Locations Buckets Views Delete': 'organizations_locations-buckets-views-delete.md'
+    - 'Locations Buckets Views Get': 'organizations_locations-buckets-views-get.md'
+    - 'Locations Buckets Views List': 'organizations_locations-buckets-views-list.md'
+    - 'Locations Buckets Views Logs List': 'organizations_locations-buckets-views-logs-list.md'
+    - 'Locations Buckets Views Patch': 'organizations_locations-buckets-views-patch.md'
+    - 'Locations Get': 'organizations_locations-get.md'
+    - 'Locations List': 'organizations_locations-list.md'
+    - 'Locations Operations Cancel': 'organizations_locations-operations-cancel.md'
+    - 'Locations Operations Get': 'organizations_locations-operations-get.md'
+    - 'Locations Operations List': 'organizations_locations-operations-list.md'
+    - 'Logs Delete': 'organizations_logs-delete.md'
+    - 'Logs List': 'organizations_logs-list.md'
+    - 'Sinks Create': 'organizations_sinks-create.md'
+    - 'Sinks Delete': 'organizations_sinks-delete.md'
+    - 'Sinks Get': 'organizations_sinks-get.md'
+    - 'Sinks List': 'organizations_sinks-list.md'
+    - 'Sinks Patch': 'organizations_sinks-patch.md'
+    - 'Sinks Update': 'organizations_sinks-update.md'
+    - 'Update Cmek Settings': 'organizations_update-cmek-settings.md'
+    - 'Update Settings': 'organizations_update-settings.md'
+- 'Projects':
+    - 'Exclusions Create': 'projects_exclusions-create.md'
+    - 'Exclusions Delete': 'projects_exclusions-delete.md'
+    - 'Exclusions Get': 'projects_exclusions-get.md'
+    - 'Exclusions List': 'projects_exclusions-list.md'
+    - 'Exclusions Patch': 'projects_exclusions-patch.md'
+    - 'Get Cmek Settings': 'projects_get-cmek-settings.md'
+    - 'Get Settings': 'projects_get-settings.md'
+    - 'Locations Buckets Create': 'projects_locations-buckets-create.md'
+    - 'Locations Buckets Delete': 'projects_locations-buckets-delete.md'
+    - 'Locations Buckets Get': 'projects_locations-buckets-get.md'
+    - 'Locations Buckets List': 'projects_locations-buckets-list.md'
+    - 'Locations Buckets Patch': 'projects_locations-buckets-patch.md'
+    - 'Locations Buckets Undelete': 'projects_locations-buckets-undelete.md'
+    - 'Locations Buckets Views Create': 'projects_locations-buckets-views-create.md'
+    - 'Locations Buckets Views Delete': 'projects_locations-buckets-views-delete.md'
+    - 'Locations Buckets Views Get': 'projects_locations-buckets-views-get.md'
+    - 'Locations Buckets Views List': 'projects_locations-buckets-views-list.md'
+    - 'Locations Buckets Views Logs List': 'projects_locations-buckets-views-logs-list.md'
+    - 'Locations Buckets Views Patch': 'projects_locations-buckets-views-patch.md'
+    - 'Locations Get': 'projects_locations-get.md'
+    - 'Locations List': 'projects_locations-list.md'
+    - 'Locations Operations Cancel': 'projects_locations-operations-cancel.md'
+    - 'Locations Operations Get': 'projects_locations-operations-get.md'
+    - 'Locations Operations List': 'projects_locations-operations-list.md'
+    - 'Logs Delete': 'projects_logs-delete.md'
+    - 'Logs List': 'projects_logs-list.md'
+    - 'Metrics Create': 'projects_metrics-create.md'
+    - 'Metrics Delete': 'projects_metrics-delete.md'
+    - 'Metrics Get': 'projects_metrics-get.md'
+    - 'Metrics List': 'projects_metrics-list.md'
+    - 'Metrics Update': 'projects_metrics-update.md'
+    - 'Sinks Create': 'projects_sinks-create.md'
+    - 'Sinks Delete': 'projects_sinks-delete.md'
+    - 'Sinks Get': 'projects_sinks-get.md'
+    - 'Sinks List': 'projects_sinks-list.md'
+    - 'Sinks Patch': 'projects_sinks-patch.md'
+    - 'Sinks Update': 'projects_sinks-update.md'
+- 'Sinks':
+    - 'Create': 'sinks_create.md'
+    - 'Delete': 'sinks_delete.md'
+    - 'Get': 'sinks_get.md'
+    - 'List': 'sinks_list.md'
+    - 'Update': 'sinks_update.md'
 
 theme: readthedocs
 

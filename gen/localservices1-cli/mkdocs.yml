@@ -1,4 +1,4 @@
-site_name: Localservices v4.0.1+20220305
+site_name: Localservices v5.0.2+20230123
 site_url: http://byron.github.io/google-apis-rs/google-localservices1-cli
 site_description: A complete library to interact with Localservices (protocol v1)
 
@@ -7,10 +7,12 @@ repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/localservices1-c
 docs_dir: docs
 site_dir: build_html
 
-pages:
-- ['index.md', 'Home']
-- ['account-reports_search.md', 'Account Reports', 'Search']
-- ['detailed-lead-reports_search.md', 'Detailed Lead Reports', 'Search']
+nav:
+- Home: 'index.md'
+- 'Account Reports':
+    - 'Search': 'account-reports_search.md'
+- 'Detailed Lead Reports':
+    - 'Search': 'detailed-lead-reports_search.md'
 
 theme: readthedocs
 

@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Cloud Run* API at revision *20220225*. The CLI is at version *4.0.1*.
+This documentation was generated from the *Cloud Run* API at revision *20230113*. The CLI is at version *5.0.2*.
 
 ```bash
 run1 [options]
@@ -37,6 +37,7 @@ run1 [options]
                 domainmappings-delete <name> [-p <v>]... [-o <out>]
                 domainmappings-get <name> [-p <v>]... [-o <out>]
                 domainmappings-list <parent> [-p <v>]... [-o <out>]
+                executions-cancel <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 executions-delete <name> [-p <v>]... [-o <out>]
                 executions-get <name> [-p <v>]... [-o <out>]
                 executions-list <parent> [-p <v>]... [-o <out>]

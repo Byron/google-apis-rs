@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/generator/templates/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *autoscaler* crate version *5.0.2-beta-1+20150629*, where *20150629* is the exact revision of the *autoscaler:v1beta2* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.2-beta-1*.
+//! This documentation was generated from *autoscaler* crate version *5.0.2+20150629*, where *20150629* is the exact revision of the *autoscaler:v1beta2* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.2*.
 //! 
 //! Everything else about the *autoscaler* *v1_beta2* API can be found at the
 //! [official documentation site](http://developers.google.com/compute/docs/autoscaler).

@@ -3,8 +3,6 @@
 // DO NOT EDIT !
 #![allow(unused_variables, unused_imports, dead_code, unused_mut)]
 
-extern crate tokio;
-
 #[macro_use]
 extern crate clap;
 
@@ -12,9 +10,10 @@ use std::env;
 use std::io::{self, Write};
 use clap::{App, SubCommand, Arg};
 
-use google_content2::{api, Error, oauth2};
+use google_content2::{api, Error, oauth2, client::chrono, FieldMask};
 
-mod client;
+
+use google_clis_common as client;
 
 use client::{InvalidOptionsError, CLIError, arg_from_str, writer_from_opts, parse_kv_arg,
           input_file_from_opts, input_mime_from_opts, FieldCursor, FieldError, CallType, UploadProtocol,
@@ -110,7 +109,7 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "overwrite" => {
-                    call = call.overwrite(arg_from_str(value.unwrap_or("false"), err, "overwrite", "boolean"));
+                    call = call.overwrite(        value.map(|v| arg_from_str(v, err, "overwrite", "boolean")).unwrap_or(false));
                 },
                 _ => {
                     let mut found = false;
@@ -198,7 +197,7 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "dry-run" => {
-                    call = call.dry_run(arg_from_str(value.unwrap_or("false"), err, "dry-run", "boolean"));
+                    call = call.dry_run(        value.map(|v| arg_from_str(v, err, "dry-run", "boolean")).unwrap_or(false));
                 },
                 _ => {
                     let mut found = false;
@@ -254,10 +253,10 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "force" => {
-                    call = call.force(arg_from_str(value.unwrap_or("false"), err, "force", "boolean"));
+                    call = call.force(        value.map(|v| arg_from_str(v, err, "force", "boolean")).unwrap_or(false));
                 },
                 "dry-run" => {
-                    call = call.dry_run(arg_from_str(value.unwrap_or("false"), err, "dry-run", "boolean"));
+                    call = call.dry_run(        value.map(|v| arg_from_str(v, err, "dry-run", "boolean")).unwrap_or(false));
                 },
                 _ => {
                     let mut found = false;
@@ -408,7 +407,7 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "dry-run" => {
-                    call = call.dry_run(arg_from_str(value.unwrap_or("false"), err, "dry-run", "boolean"));
+                    call = call.dry_run(        value.map(|v| arg_from_str(v, err, "dry-run", "boolean")).unwrap_or(false));
                 },
                 _ => {
                     let mut found = false;
@@ -554,7 +553,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "max-results" => {
-                    call = call.max_results(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
+                    call = call.max_results(        value.map(|v| arg_from_str(v, err, "max-results", "uint32")).unwrap_or(0));
                 },
                 _ => {
                     let mut found = false;
@@ -661,7 +660,7 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "dry-run" => {
-                    call = call.dry_run(arg_from_str(value.unwrap_or("false"), err, "dry-run", "boolean"));
+                    call = call.dry_run(        value.map(|v| arg_from_str(v, err, "dry-run", "boolean")).unwrap_or(false));
                 },
                 _ => {
                     let mut found = false;
@@ -860,7 +859,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "max-results" => {
-                    call = call.max_results(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
+                    call = call.max_results(        value.map(|v| arg_from_str(v, err, "max-results", "uint32")).unwrap_or(0));
                 },
                 "destinations" => {
                     call = call.add_destinations(value.unwrap_or(""));
@@ -951,7 +950,7 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "dry-run" => {
-                    call = call.dry_run(arg_from_str(value.unwrap_or("false"), err, "dry-run", "boolean"));
+                    call = call.dry_run(        value.map(|v| arg_from_str(v, err, "dry-run", "boolean")).unwrap_or(false));
                 },
                 _ => {
                     let mut found = false;
@@ -1062,7 +1061,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "max-results" => {
-                    call = call.max_results(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
+                    call = call.max_results(        value.map(|v| arg_from_str(v, err, "max-results", "uint32")).unwrap_or(0));
                 },
                 _ => {
                     let mut found = false;
@@ -1152,7 +1151,7 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "dry-run" => {
-                    call = call.dry_run(arg_from_str(value.unwrap_or("false"), err, "dry-run", "boolean"));
+                    call = call.dry_run(        value.map(|v| arg_from_str(v, err, "dry-run", "boolean")).unwrap_or(false));
                 },
                 _ => {
                     let mut found = false;
@@ -1240,7 +1239,7 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "dry-run" => {
-                    call = call.dry_run(arg_from_str(value.unwrap_or("false"), err, "dry-run", "boolean"));
+                    call = call.dry_run(        value.map(|v| arg_from_str(v, err, "dry-run", "boolean")).unwrap_or(false));
                 },
                 _ => {
                     let mut found = false;
@@ -1296,7 +1295,7 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "dry-run" => {
-                    call = call.dry_run(arg_from_str(value.unwrap_or("false"), err, "dry-run", "boolean"));
+                    call = call.dry_run(        value.map(|v| arg_from_str(v, err, "dry-run", "boolean")).unwrap_or(false));
                 },
                 _ => {
                     let mut found = false;
@@ -1344,7 +1343,7 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "dry-run" => {
-                    call = call.dry_run(arg_from_str(value.unwrap_or("false"), err, "dry-run", "boolean"));
+                    call = call.dry_run(        value.map(|v| arg_from_str(v, err, "dry-run", "boolean")).unwrap_or(false));
                 },
                 _ => {
                     let mut found = false;
@@ -1505,7 +1504,7 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "dry-run" => {
-                    call = call.dry_run(arg_from_str(value.unwrap_or("false"), err, "dry-run", "boolean"));
+                    call = call.dry_run(        value.map(|v| arg_from_str(v, err, "dry-run", "boolean")).unwrap_or(false));
                 },
                 _ => {
                     let mut found = false;
@@ -1564,7 +1563,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "max-results" => {
-                    call = call.max_results(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
+                    call = call.max_results(        value.map(|v| arg_from_str(v, err, "max-results", "uint32")).unwrap_or(0));
                 },
                 _ => {
                     let mut found = false;
@@ -1673,7 +1672,7 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "dry-run" => {
-                    call = call.dry_run(arg_from_str(value.unwrap_or("false"), err, "dry-run", "boolean"));
+                    call = call.dry_run(        value.map(|v| arg_from_str(v, err, "dry-run", "boolean")).unwrap_or(false));
                 },
                 _ => {
                     let mut found = false;
@@ -1875,7 +1874,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "max-results" => {
-                    call = call.max_results(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
+                    call = call.max_results(        value.map(|v| arg_from_str(v, err, "max-results", "uint32")).unwrap_or(0));
                 },
                 _ => {
                     let mut found = false;
@@ -1963,7 +1962,7 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "dry-run" => {
-                    call = call.dry_run(arg_from_str(value.unwrap_or("false"), err, "dry-run", "boolean"));
+                    call = call.dry_run(        value.map(|v| arg_from_str(v, err, "dry-run", "boolean")).unwrap_or(false));
                 },
                 _ => {
                     let mut found = false;
@@ -2073,7 +2072,7 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "dry-run" => {
-                    call = call.dry_run(arg_from_str(value.unwrap_or("false"), err, "dry-run", "boolean"));
+                    call = call.dry_run(        value.map(|v| arg_from_str(v, err, "dry-run", "boolean")).unwrap_or(false));
                 },
                 _ => {
                     let mut found = false;
@@ -2161,7 +2160,7 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "dry-run" => {
-                    call = call.dry_run(arg_from_str(value.unwrap_or("false"), err, "dry-run", "boolean"));
+                    call = call.dry_run(        value.map(|v| arg_from_str(v, err, "dry-run", "boolean")).unwrap_or(false));
                 },
                 _ => {
                     let mut found = false;
@@ -2324,7 +2323,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "max-results" => {
-                    call = call.max_results(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
+                    call = call.max_results(        value.map(|v| arg_from_str(v, err, "max-results", "uint32")).unwrap_or(0));
                 },
                 _ => {
                     let mut found = false;
@@ -2591,7 +2590,7 @@ where
                     call = call.pos_external_account_id(value.unwrap_or(""));
                 },
                 "pos-data-provider-id" => {
-                    call = call.pos_data_provider_id(value.unwrap_or(""));
+                    call = call.pos_data_provider_id(        value.map(|v| arg_from_str(v, err, "pos-data-provider-id", "uint64")).unwrap_or(0));
                 },
                 _ => {
                     let mut found = false;
@@ -2681,7 +2680,7 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "dry-run" => {
-                    call = call.dry_run(arg_from_str(value.unwrap_or("false"), err, "dry-run", "boolean"));
+                    call = call.dry_run(        value.map(|v| arg_from_str(v, err, "dry-run", "boolean")).unwrap_or(false));
                 },
                 _ => {
                     let mut found = false;
@@ -2933,7 +2932,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "max-results" => {
-                    call = call.max_results(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
+                    call = call.max_results(        value.map(|v| arg_from_str(v, err, "max-results", "uint32")).unwrap_or(0));
                 },
                 "disbursement-start-date" => {
                     call = call.disbursement_start_date(value.unwrap_or(""));
@@ -3004,7 +3003,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "max-results" => {
-                    call = call.max_results(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
+                    call = call.max_results(        value.map(|v| arg_from_str(v, err, "max-results", "uint32")).unwrap_or(0));
                 },
                 _ => {
                     let mut found = false;
@@ -3118,7 +3117,7 @@ where
                     call = call.order_by(value.unwrap_or(""));
                 },
                 "max-results" => {
-                    call = call.max_results(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
+                    call = call.max_results(        value.map(|v| arg_from_str(v, err, "max-results", "uint32")).unwrap_or(0));
                 },
                 "created-start-date" => {
                     call = call.created_start_date(value.unwrap_or(""));
@@ -4128,10 +4127,10 @@ where
                     call = call.order_by(value.unwrap_or(""));
                 },
                 "max-results" => {
-                    call = call.max_results(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
+                    call = call.max_results(        value.map(|v| arg_from_str(v, err, "max-results", "uint32")).unwrap_or(0));
                 },
                 "acknowledged" => {
-                    call = call.acknowledged(arg_from_str(value.unwrap_or("false"), err, "acknowledged", "boolean"));
+                    call = call.acknowledged(        value.map(|v| arg_from_str(v, err, "acknowledged", "boolean")).unwrap_or(false));
                 },
                 _ => {
                     let mut found = false;
@@ -5027,7 +5026,7 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "dry-run" => {
-                    call = call.dry_run(arg_from_str(value.unwrap_or("false"), err, "dry-run", "boolean"));
+                    call = call.dry_run(        value.map(|v| arg_from_str(v, err, "dry-run", "boolean")).unwrap_or(false));
                 },
                 _ => {
                     let mut found = false;
@@ -5083,7 +5082,7 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "dry-run" => {
-                    call = call.dry_run(arg_from_str(value.unwrap_or("false"), err, "dry-run", "boolean"));
+                    call = call.dry_run(        value.map(|v| arg_from_str(v, err, "dry-run", "boolean")).unwrap_or(false));
                 },
                 _ => {
                     let mut found = false;
@@ -5223,7 +5222,7 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "dry-run" => {
-                    call = call.dry_run(arg_from_str(value.unwrap_or("false"), err, "dry-run", "boolean"));
+                    call = call.dry_run(        value.map(|v| arg_from_str(v, err, "dry-run", "boolean")).unwrap_or(false));
                 },
                 _ => {
                     let mut found = false;
@@ -5320,7 +5319,7 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "dry-run" => {
-                    call = call.dry_run(arg_from_str(value.unwrap_or("false"), err, "dry-run", "boolean"));
+                    call = call.dry_run(        value.map(|v| arg_from_str(v, err, "dry-run", "boolean")).unwrap_or(false));
                 },
                 _ => {
                     let mut found = false;
@@ -5470,7 +5469,7 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "dry-run" => {
-                    call = call.dry_run(arg_from_str(value.unwrap_or("false"), err, "dry-run", "boolean"));
+                    call = call.dry_run(        value.map(|v| arg_from_str(v, err, "dry-run", "boolean")).unwrap_or(false));
                 },
                 _ => {
                     let mut found = false;
@@ -5558,7 +5557,7 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "dry-run" => {
-                    call = call.dry_run(arg_from_str(value.unwrap_or("false"), err, "dry-run", "boolean"));
+                    call = call.dry_run(        value.map(|v| arg_from_str(v, err, "dry-run", "boolean")).unwrap_or(false));
                 },
                 _ => {
                     let mut found = false;
@@ -5614,7 +5613,7 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "dry-run" => {
-                    call = call.dry_run(arg_from_str(value.unwrap_or("false"), err, "dry-run", "boolean"));
+                    call = call.dry_run(        value.map(|v| arg_from_str(v, err, "dry-run", "boolean")).unwrap_or(false));
                 },
                 _ => {
                     let mut found = false;
@@ -5831,7 +5830,7 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "dry-run" => {
-                    call = call.dry_run(arg_from_str(value.unwrap_or("false"), err, "dry-run", "boolean"));
+                    call = call.dry_run(        value.map(|v| arg_from_str(v, err, "dry-run", "boolean")).unwrap_or(false));
                 },
                 _ => {
                     let mut found = false;
@@ -5890,10 +5889,10 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "max-results" => {
-                    call = call.max_results(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
+                    call = call.max_results(        value.map(|v| arg_from_str(v, err, "max-results", "uint32")).unwrap_or(0));
                 },
                 "include-invalid-inserted-items" => {
-                    call = call.include_invalid_inserted_items(arg_from_str(value.unwrap_or("false"), err, "include-invalid-inserted-items", "boolean"));
+                    call = call.include_invalid_inserted_items(        value.map(|v| arg_from_str(v, err, "include-invalid-inserted-items", "boolean")).unwrap_or(false));
                 },
                 _ => {
                     let mut found = false;
@@ -5981,7 +5980,7 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "include-attributes" => {
-                    call = call.include_attributes(arg_from_str(value.unwrap_or("false"), err, "include-attributes", "boolean"));
+                    call = call.include_attributes(        value.map(|v| arg_from_str(v, err, "include-attributes", "boolean")).unwrap_or(false));
                 },
                 _ => {
                     let mut found = false;
@@ -6037,7 +6036,7 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "include-attributes" => {
-                    call = call.include_attributes(arg_from_str(value.unwrap_or("false"), err, "include-attributes", "boolean"));
+                    call = call.include_attributes(        value.map(|v| arg_from_str(v, err, "include-attributes", "boolean")).unwrap_or(false));
                 },
                 "destinations" => {
                     call = call.add_destinations(value.unwrap_or(""));
@@ -6099,13 +6098,13 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "max-results" => {
-                    call = call.max_results(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
+                    call = call.max_results(        value.map(|v| arg_from_str(v, err, "max-results", "uint32")).unwrap_or(0));
                 },
                 "include-invalid-inserted-items" => {
-                    call = call.include_invalid_inserted_items(arg_from_str(value.unwrap_or("false"), err, "include-invalid-inserted-items", "boolean"));
+                    call = call.include_invalid_inserted_items(        value.map(|v| arg_from_str(v, err, "include-invalid-inserted-items", "boolean")).unwrap_or(false));
                 },
                 "include-attributes" => {
-                    call = call.include_attributes(arg_from_str(value.unwrap_or("false"), err, "include-attributes", "boolean"));
+                    call = call.include_attributes(        value.map(|v| arg_from_str(v, err, "include-attributes", "boolean")).unwrap_or(false));
                 },
                 "destinations" => {
                     call = call.add_destinations(value.unwrap_or(""));
@@ -6196,7 +6195,7 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "dry-run" => {
-                    call = call.dry_run(arg_from_str(value.unwrap_or("false"), err, "dry-run", "boolean"));
+                    call = call.dry_run(        value.map(|v| arg_from_str(v, err, "dry-run", "boolean")).unwrap_or(false));
                 },
                 _ => {
                     let mut found = false;
@@ -6463,7 +6462,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "max-results" => {
-                    call = call.max_results(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
+                    call = call.max_results(        value.map(|v| arg_from_str(v, err, "max-results", "uint32")).unwrap_or(0));
                 },
                 _ => {
                     let mut found = false;
@@ -6552,7 +6551,7 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "dry-run" => {
-                    call = call.dry_run(arg_from_str(value.unwrap_or("false"), err, "dry-run", "boolean"));
+                    call = call.dry_run(        value.map(|v| arg_from_str(v, err, "dry-run", "boolean")).unwrap_or(false));
                 },
                 _ => {
                     let mut found = false;
@@ -9588,7 +9587,7 @@ async fn main() {
     
     let mut app = App::new("content2")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("4.0.1+20220303")
+           .version("5.0.2+20220303")
            .about("Manage your product listings and accounts for Google Shopping")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_content2_cli")
            .arg(Arg::with_name("url")

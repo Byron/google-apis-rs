@@ -1,4 +1,4 @@
-site_name: Doubleclicksearch v4.0.1+20220301
+site_name: Doubleclicksearch v5.0.2+20230118
 site_url: http://byron.github.io/google-apis-rs/google-doubleclicksearch2-cli
 site_description: A complete library to interact with Doubleclicksearch (protocol v2)
 
@@ -7,17 +7,22 @@ repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/doubleclicksearc
 docs_dir: docs
 site_dir: build_html
 
-pages:
-- ['index.md', 'Home']
-- ['conversion_get.md', 'Conversion', 'Get']
-- ['conversion_insert.md', 'Conversion', 'Insert']
-- ['conversion_update.md', 'Conversion', 'Update']
-- ['conversion_update-availability.md', 'Conversion', 'Update Availability']
-- ['reports_generate.md', 'Reports', 'Generate']
-- ['reports_get.md', 'Reports', 'Get']
-- ['reports_get-file.md', 'Reports', 'Get File']
-- ['reports_request.md', 'Reports', 'Request']
-- ['saved-columns_list.md', 'Saved Columns', 'List']
+nav:
+- Home: 'index.md'
+- 'Conversion':
+    - 'Get': 'conversion_get.md'
+    - 'Get By Customer Id': 'conversion_get-by-customer-id.md'
+    - 'Insert': 'conversion_insert.md'
+    - 'Update': 'conversion_update.md'
+    - 'Update Availability': 'conversion_update-availability.md'
+- 'Reports':
+    - 'Generate': 'reports_generate.md'
+    - 'Get': 'reports_get.md'
+    - 'Get File': 'reports_get-file.md'
+    - 'Get Id Mapping File': 'reports_get-id-mapping-file.md'
+    - 'Request': 'reports_request.md'
+- 'Saved Columns':
+    - 'List': 'saved-columns_list.md'
 
 theme: readthedocs
 

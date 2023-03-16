@@ -1,4 +1,4 @@
-site_name: replicapoolupdater v4.0.1+20161003
+site_name: replicapoolupdater v5.0.2+20161003
 site_url: http://byron.github.io/google-apis-rs/google-replicapoolupdater1_beta1-cli
 site_description: A complete library to interact with replicapoolupdater (protocol v1beta1)
 
@@ -7,18 +7,20 @@ repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/replicapoolupdat
 docs_dir: docs
 site_dir: build_html
 
-pages:
-- ['index.md', 'Home']
-- ['rolling-updates_cancel.md', 'Rolling Updates', 'Cancel']
-- ['rolling-updates_get.md', 'Rolling Updates', 'Get']
-- ['rolling-updates_insert.md', 'Rolling Updates', 'Insert']
-- ['rolling-updates_list.md', 'Rolling Updates', 'List']
-- ['rolling-updates_list-instance-updates.md', 'Rolling Updates', 'List Instance Updates']
-- ['rolling-updates_pause.md', 'Rolling Updates', 'Pause']
-- ['rolling-updates_resume.md', 'Rolling Updates', 'Resume']
-- ['rolling-updates_rollback.md', 'Rolling Updates', 'Rollback']
-- ['zone-operations_get.md', 'Zone Operations', 'Get']
-- ['zone-operations_list.md', 'Zone Operations', 'List']
+nav:
+- Home: 'index.md'
+- 'Rolling Updates':
+    - 'Cancel': 'rolling-updates_cancel.md'
+    - 'Get': 'rolling-updates_get.md'
+    - 'Insert': 'rolling-updates_insert.md'
+    - 'List': 'rolling-updates_list.md'
+    - 'List Instance Updates': 'rolling-updates_list-instance-updates.md'
+    - 'Pause': 'rolling-updates_pause.md'
+    - 'Resume': 'rolling-updates_resume.md'
+    - 'Rollback': 'rolling-updates_rollback.md'
+- 'Zone Operations':
+    - 'Get': 'zone-operations_get.md'
+    - 'List': 'zone-operations_list.md'
 
 theme: readthedocs
 

@@ -1,4 +1,4 @@
-site_name: TPU v4.0.1+20220301
+site_name: TPU v5.0.2+20230105
 site_url: http://byron.github.io/google-apis-rs/google-tpu1_alpha1-cli
 site_description: A complete library to interact with TPU (protocol v1alpha1)
 
@@ -7,25 +7,26 @@ repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/tpu1_alpha1-cli
 docs_dir: docs
 site_dir: build_html
 
-pages:
-- ['index.md', 'Home']
-- ['projects_locations-accelerator-types-get.md', 'Projects', 'Locations Accelerator Types Get']
-- ['projects_locations-accelerator-types-list.md', 'Projects', 'Locations Accelerator Types List']
-- ['projects_locations-get.md', 'Projects', 'Locations Get']
-- ['projects_locations-list.md', 'Projects', 'Locations List']
-- ['projects_locations-nodes-create.md', 'Projects', 'Locations Nodes Create']
-- ['projects_locations-nodes-delete.md', 'Projects', 'Locations Nodes Delete']
-- ['projects_locations-nodes-get.md', 'Projects', 'Locations Nodes Get']
-- ['projects_locations-nodes-list.md', 'Projects', 'Locations Nodes List']
-- ['projects_locations-nodes-reimage.md', 'Projects', 'Locations Nodes Reimage']
-- ['projects_locations-nodes-start.md', 'Projects', 'Locations Nodes Start']
-- ['projects_locations-nodes-stop.md', 'Projects', 'Locations Nodes Stop']
-- ['projects_locations-operations-cancel.md', 'Projects', 'Locations Operations Cancel']
-- ['projects_locations-operations-delete.md', 'Projects', 'Locations Operations Delete']
-- ['projects_locations-operations-get.md', 'Projects', 'Locations Operations Get']
-- ['projects_locations-operations-list.md', 'Projects', 'Locations Operations List']
-- ['projects_locations-tensorflow-versions-get.md', 'Projects', 'Locations Tensorflow Versions Get']
-- ['projects_locations-tensorflow-versions-list.md', 'Projects', 'Locations Tensorflow Versions List']
+nav:
+- Home: 'index.md'
+- 'Projects':
+    - 'Locations Accelerator Types Get': 'projects_locations-accelerator-types-get.md'
+    - 'Locations Accelerator Types List': 'projects_locations-accelerator-types-list.md'
+    - 'Locations Get': 'projects_locations-get.md'
+    - 'Locations List': 'projects_locations-list.md'
+    - 'Locations Nodes Create': 'projects_locations-nodes-create.md'
+    - 'Locations Nodes Delete': 'projects_locations-nodes-delete.md'
+    - 'Locations Nodes Get': 'projects_locations-nodes-get.md'
+    - 'Locations Nodes List': 'projects_locations-nodes-list.md'
+    - 'Locations Nodes Reimage': 'projects_locations-nodes-reimage.md'
+    - 'Locations Nodes Start': 'projects_locations-nodes-start.md'
+    - 'Locations Nodes Stop': 'projects_locations-nodes-stop.md'
+    - 'Locations Operations Cancel': 'projects_locations-operations-cancel.md'
+    - 'Locations Operations Delete': 'projects_locations-operations-delete.md'
+    - 'Locations Operations Get': 'projects_locations-operations-get.md'
+    - 'Locations Operations List': 'projects_locations-operations-list.md'
+    - 'Locations Tensorflow Versions Get': 'projects_locations-tensorflow-versions-get.md'
+    - 'Locations Tensorflow Versions List': 'projects_locations-tensorflow-versions-list.md'
 
 theme: readthedocs
 

@@ -3,8 +3,6 @@
 // DO NOT EDIT !
 #![allow(unused_variables, unused_imports, dead_code, unused_mut)]
 
-extern crate tokio;
-
 #[macro_use]
 extern crate clap;
 
@@ -12,9 +10,10 @@ use std::env;
 use std::io::{self, Write};
 use clap::{App, SubCommand, Arg};
 
-use google_bigquery2::{api, Error, oauth2};
+use google_bigquery2::{api, Error, oauth2, client::chrono, FieldMask};
 
-mod client;
+
+use google_clis_common as client;
 
 use client::{InvalidOptionsError, CLIError, arg_from_str, writer_from_opts, parse_kv_arg,
           input_file_from_opts, input_mime_from_opts, FieldCursor, FieldError, CallType, UploadProtocol,
@@ -58,7 +57,7 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "delete-contents" => {
-                    call = call.delete_contents(arg_from_str(value.unwrap_or("false"), err, "delete-contents", "boolean"));
+                    call = call.delete_contents(        value.map(|v| arg_from_str(v, err, "delete-contents", "boolean")).unwrap_or(false));
                 },
                 _ => {
                     let mut found = false;
@@ -190,10 +189,12 @@ where
                     "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "last-modified-time" => Some(("lastModifiedTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "location" => Some(("location", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "satisfies-pzs" => Some(("satisfiesPZS", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "max-time-travel-hours" => Some(("maxTimeTravelHours", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "satisfies-pzs" => Some(("satisfiesPzs", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "self-link" => Some(("selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "storage-billing-model" => Some(("storageBillingModel", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["creation-time", "dataset-id", "dataset-reference", "default-collation", "default-encryption-configuration", "default-partition-expiration-ms", "default-table-expiration-ms", "description", "etag", "friendly-name", "id", "is-case-insensitive", "kind", "kms-key-name", "labels", "last-modified-time", "location", "project-id", "satisfies-pzs", "self-link"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["creation-time", "dataset-id", "dataset-reference", "default-collation", "default-encryption-configuration", "default-partition-expiration-ms", "default-table-expiration-ms", "description", "etag", "friendly-name", "id", "is-case-insensitive", "kind", "kms-key-name", "labels", "last-modified-time", "location", "max-time-travel-hours", "project-id", "satisfies-pzs", "self-link", "storage-billing-model"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -263,13 +264,13 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "max-results" => {
-                    call = call.max_results(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
+                    call = call.max_results(        value.map(|v| arg_from_str(v, err, "max-results", "uint32")).unwrap_or(0));
                 },
                 "filter" => {
                     call = call.filter(value.unwrap_or(""));
                 },
                 "all" => {
-                    call = call.all(arg_from_str(value.unwrap_or("false"), err, "all", "boolean"));
+                    call = call.all(        value.map(|v| arg_from_str(v, err, "all", "boolean")).unwrap_or(false));
                 },
                 _ => {
                     let mut found = false;
@@ -357,10 +358,12 @@ where
                     "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "last-modified-time" => Some(("lastModifiedTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "location" => Some(("location", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "satisfies-pzs" => Some(("satisfiesPZS", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "max-time-travel-hours" => Some(("maxTimeTravelHours", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "satisfies-pzs" => Some(("satisfiesPzs", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "self-link" => Some(("selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "storage-billing-model" => Some(("storageBillingModel", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["creation-time", "dataset-id", "dataset-reference", "default-collation", "default-encryption-configuration", "default-partition-expiration-ms", "default-table-expiration-ms", "description", "etag", "friendly-name", "id", "is-case-insensitive", "kind", "kms-key-name", "labels", "last-modified-time", "location", "project-id", "satisfies-pzs", "self-link"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["creation-time", "dataset-id", "dataset-reference", "default-collation", "default-encryption-configuration", "default-partition-expiration-ms", "default-table-expiration-ms", "description", "etag", "friendly-name", "id", "is-case-insensitive", "kind", "kms-key-name", "labels", "last-modified-time", "location", "max-time-travel-hours", "project-id", "satisfies-pzs", "self-link", "storage-billing-model"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -459,10 +462,12 @@ where
                     "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "last-modified-time" => Some(("lastModifiedTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "location" => Some(("location", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "satisfies-pzs" => Some(("satisfiesPZS", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "max-time-travel-hours" => Some(("maxTimeTravelHours", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "satisfies-pzs" => Some(("satisfiesPzs", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "self-link" => Some(("selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "storage-billing-model" => Some(("storageBillingModel", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["creation-time", "dataset-id", "dataset-reference", "default-collation", "default-encryption-configuration", "default-partition-expiration-ms", "default-table-expiration-ms", "description", "etag", "friendly-name", "id", "is-case-insensitive", "kind", "kms-key-name", "labels", "last-modified-time", "location", "project-id", "satisfies-pzs", "self-link"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["creation-time", "dataset-id", "dataset-reference", "default-collation", "default-encryption-configuration", "default-partition-expiration-ms", "default-table-expiration-ms", "description", "etag", "friendly-name", "id", "is-case-insensitive", "kind", "kms-key-name", "labels", "last-modified-time", "location", "max-time-travel-hours", "project-id", "satisfies-pzs", "self-link", "storage-billing-model"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -689,16 +694,16 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "timeout-ms" => {
-                    call = call.timeout_ms(arg_from_str(value.unwrap_or("-0"), err, "timeout-ms", "integer"));
+                    call = call.timeout_ms(        value.map(|v| arg_from_str(v, err, "timeout-ms", "uint32")).unwrap_or(0));
                 },
                 "start-index" => {
-                    call = call.start_index(value.unwrap_or(""));
+                    call = call.start_index(        value.map(|v| arg_from_str(v, err, "start-index", "uint64")).unwrap_or(0));
                 },
                 "page-token" => {
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "max-results" => {
-                    call = call.max_results(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
+                    call = call.max_results(        value.map(|v| arg_from_str(v, err, "max-results", "uint32")).unwrap_or(0));
                 },
                 "location" => {
                     call = call.location(value.unwrap_or(""));
@@ -805,6 +810,7 @@ where
                     "configuration.load.autodetect" => Some(("configuration.load.autodetect", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "configuration.load.clustering.fields" => Some(("configuration.load.clustering.fields", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "configuration.load.create-disposition" => Some(("configuration.load.createDisposition", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "configuration.load.create-session" => Some(("configuration.load.createSession", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "configuration.load.decimal-target-types" => Some(("configuration.load.decimalTargetTypes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "configuration.load.destination-encryption-configuration.kms-key-name" => Some(("configuration.load.destinationEncryptionConfiguration.kmsKeyName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "configuration.load.destination-table.dataset-id" => Some(("configuration.load.destinationTable.datasetId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -832,6 +838,7 @@ where
                     "configuration.load.range-partitioning.range.end" => Some(("configuration.load.rangePartitioning.range.end", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "configuration.load.range-partitioning.range.interval" => Some(("configuration.load.rangePartitioning.range.interval", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "configuration.load.range-partitioning.range.start" => Some(("configuration.load.rangePartitioning.range.start", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "configuration.load.reference-file-schema-uri" => Some(("configuration.load.referenceFileSchemaUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "configuration.load.schema-inline" => Some(("configuration.load.schemaInline", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "configuration.load.schema-inline-format" => Some(("configuration.load.schemaInlineFormat", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "configuration.load.schema-update-options" => Some(("configuration.load.schemaUpdateOptions", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
@@ -881,7 +888,10 @@ where
                     "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "self-link" => Some(("selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "statistics.completion-ratio" => Some(("statistics.completionRatio", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "statistics.copy.copied-logical-bytes" => Some(("statistics.copy.copied_logical_bytes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "statistics.copy.copied-rows" => Some(("statistics.copy.copied_rows", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "statistics.creation-time" => Some(("statistics.creationTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "statistics.data-masking-statistics.data-masking-applied" => Some(("statistics.dataMaskingStatistics.dataMaskingApplied", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "statistics.end-time" => Some(("statistics.endTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "statistics.extract.destination-uri-file-counts" => Some(("statistics.extract.destinationUriFileCounts", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "statistics.extract.input-bytes" => Some(("statistics.extract.inputBytes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -892,6 +902,7 @@ where
                     "statistics.load.output-rows" => Some(("statistics.load.outputRows", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "statistics.num-child-jobs" => Some(("statistics.numChildJobs", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "statistics.parent-job-id" => Some(("statistics.parentJobId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "statistics.query.bi-engine-statistics.acceleration-mode" => Some(("statistics.query.biEngineStatistics.accelerationMode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "statistics.query.bi-engine-statistics.bi-engine-mode" => Some(("statistics.query.biEngineStatistics.biEngineMode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "statistics.query.billing-tier" => Some(("statistics.query.billingTier", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "statistics.query.cache-hit" => Some(("statistics.query.cacheHit", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
@@ -922,12 +933,19 @@ where
                     "statistics.query.model-training-current-iteration" => Some(("statistics.query.modelTrainingCurrentIteration", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "statistics.query.model-training-expected-total-iteration" => Some(("statistics.query.modelTrainingExpectedTotalIteration", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "statistics.query.num-dml-affected-rows" => Some(("statistics.query.numDmlAffectedRows", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "statistics.query.search-statistics.index-usage-mode" => Some(("statistics.query.searchStatistics.indexUsageMode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "statistics.query.spark-statistics.endpoints" => Some(("statistics.query.sparkStatistics.endpoints", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "statistics.query.spark-statistics.logging-info.project-id" => Some(("statistics.query.sparkStatistics.logging_info.project_id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "statistics.query.spark-statistics.logging-info.resource-type" => Some(("statistics.query.sparkStatistics.logging_info.resource_type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "statistics.query.spark-statistics.spark-job-id" => Some(("statistics.query.sparkStatistics.spark_job_id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "statistics.query.spark-statistics.spark-job-location" => Some(("statistics.query.sparkStatistics.spark_job_location", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "statistics.query.statement-type" => Some(("statistics.query.statementType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "statistics.query.total-bytes-billed" => Some(("statistics.query.totalBytesBilled", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "statistics.query.total-bytes-processed" => Some(("statistics.query.totalBytesProcessed", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "statistics.query.total-bytes-processed-accuracy" => Some(("statistics.query.totalBytesProcessedAccuracy", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "statistics.query.total-partitions-processed" => Some(("statistics.query.totalPartitionsProcessed", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "statistics.query.total-slot-ms" => Some(("statistics.query.totalSlotMs", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "statistics.query.transferred-bytes" => Some(("statistics.query.transferredBytes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "statistics.quota-deferments" => Some(("statistics.quotaDeferments", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "statistics.reservation-id" => Some(("statistics.reservation_id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "statistics.row-level-security-statistics.row-level-security-applied" => Some(("statistics.rowLevelSecurityStatistics.rowLevelSecurityApplied", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
@@ -944,7 +962,7 @@ where
                     "status.state" => Some(("status.state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "user-email" => Some(("user_email", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["allow-jagged-rows", "allow-large-results", "allow-quoted-newlines", "autodetect", "bad-records", "bi-engine-mode", "bi-engine-statistics", "billing-tier", "cache-hit", "clustering", "completion-ratio", "compression", "configuration", "copy", "create-disposition", "create-session", "creation-time", "current-iteration", "dataset-id", "ddl-affected-row-access-policy-count", "ddl-destination-table", "ddl-operation-performed", "ddl-target-dataset", "ddl-target-routine", "ddl-target-row-access-policy", "ddl-target-table", "debug-info", "decimal-target-types", "default-dataset", "deleted-row-count", "description", "destination-encryption-configuration", "destination-format", "destination-table", "destination-table-properties", "destination-uri", "destination-uri-file-counts", "destination-uris", "dml-stats", "dry-run", "enable-list-inference", "encoding", "end", "end-time", "enum-as-string", "error-result", "estimated-bytes-processed", "etag", "evaluation-kind", "expected-total-iterations", "expiration-ms", "expiration-time", "extract", "field", "field-delimiter", "fields", "flatten-results", "friendly-name", "hive-partitioning-options", "id", "ignore-unknown-values", "input-bytes", "input-file-bytes", "input-files", "inserted-row-count", "interval", "job-id", "job-reference", "job-timeout-ms", "job-type", "json-extension", "kind", "kms-key-name", "labels", "load", "location", "max-bad-records", "max-iterations", "maximum-billing-tier", "maximum-bytes-billed", "message", "ml-statistics", "mode", "model-id", "model-training", "model-training-current-iteration", "model-training-expected-total-iteration", "null-marker", "num-child-jobs", "num-dml-affected-rows", "operation-type", "output-bytes", "output-rows", "parameter-mode", "parent-job-id", "parquet-options", "policy-id", "preserve-ascii-control-characters", "preserve-nulls", "print-header", "priority", "project-id", "projection-fields", "query", "quota-deferments", "quote", "range", "range-partitioning", "reason", "require-partition-filter", "reservation-id", "routine-id", "row-level-security-applied", "row-level-security-statistics", "schema-inline", "schema-inline-format", "schema-update-options", "script-statistics", "self-link", "session-id", "session-info", "skip-leading-rows", "source-format", "source-model", "source-table", "source-uri-prefix", "source-uris", "start", "start-time", "state", "statement-type", "statistics", "status", "table-id", "time-partitioning", "total-bytes-billed", "total-bytes-processed", "total-bytes-processed-accuracy", "total-partitions-processed", "total-slot-ms", "transaction-id", "transaction-info", "type", "updated-row-count", "use-avro-logical-types", "use-legacy-sql", "use-query-cache", "user-email", "write-disposition"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["acceleration-mode", "allow-jagged-rows", "allow-large-results", "allow-quoted-newlines", "autodetect", "bad-records", "bi-engine-mode", "bi-engine-statistics", "billing-tier", "cache-hit", "clustering", "completion-ratio", "compression", "configuration", "copied-logical-bytes", "copied-rows", "copy", "create-disposition", "create-session", "creation-time", "current-iteration", "data-masking-applied", "data-masking-statistics", "dataset-id", "ddl-affected-row-access-policy-count", "ddl-destination-table", "ddl-operation-performed", "ddl-target-dataset", "ddl-target-routine", "ddl-target-row-access-policy", "ddl-target-table", "debug-info", "decimal-target-types", "default-dataset", "deleted-row-count", "description", "destination-encryption-configuration", "destination-format", "destination-table", "destination-table-properties", "destination-uri", "destination-uri-file-counts", "destination-uris", "dml-stats", "dry-run", "enable-list-inference", "encoding", "end", "end-time", "endpoints", "enum-as-string", "error-result", "estimated-bytes-processed", "etag", "evaluation-kind", "expected-total-iterations", "expiration-ms", "expiration-time", "extract", "field", "field-delimiter", "fields", "flatten-results", "friendly-name", "hive-partitioning-options", "id", "ignore-unknown-values", "index-usage-mode", "input-bytes", "input-file-bytes", "input-files", "inserted-row-count", "interval", "job-id", "job-reference", "job-timeout-ms", "job-type", "json-extension", "kind", "kms-key-name", "labels", "load", "location", "logging-info", "max-bad-records", "max-iterations", "maximum-billing-tier", "maximum-bytes-billed", "message", "ml-statistics", "mode", "model-id", "model-training", "model-training-current-iteration", "model-training-expected-total-iteration", "null-marker", "num-child-jobs", "num-dml-affected-rows", "operation-type", "output-bytes", "output-rows", "parameter-mode", "parent-job-id", "parquet-options", "policy-id", "preserve-ascii-control-characters", "preserve-nulls", "print-header", "priority", "project-id", "project-id", "projection-fields", "query", "quota-deferments", "quote", "range", "range-partitioning", "reason", "reference-file-schema-uri", "require-partition-filter", "reservation-id", "resource-type", "routine-id", "row-level-security-applied", "row-level-security-statistics", "schema-inline", "schema-inline-format", "schema-update-options", "script-statistics", "search-statistics", "self-link", "session-id", "session-info", "skip-leading-rows", "source-format", "source-model", "source-table", "source-uri-prefix", "source-uris", "spark-statistics", "spark-job-id", "spark-job-location", "start", "start-time", "state", "statement-type", "statistics", "status", "table-id", "time-partitioning", "total-bytes-billed", "total-bytes-processed", "total-bytes-processed-accuracy", "total-partitions-processed", "total-slot-ms", "transaction-id", "transaction-info", "transferred-bytes", "type", "updated-row-count", "use-avro-logical-types", "use-legacy-sql", "use-query-cache", "user-email", "write-disposition"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1026,16 +1044,16 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "min-creation-time" => {
-                    call = call.min_creation_time(value.unwrap_or(""));
+                    call = call.min_creation_time(        value.map(|v| arg_from_str(v, err, "min-creation-time", "uint64")).unwrap_or(0));
                 },
                 "max-results" => {
-                    call = call.max_results(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
+                    call = call.max_results(        value.map(|v| arg_from_str(v, err, "max-results", "uint32")).unwrap_or(0));
                 },
                 "max-creation-time" => {
-                    call = call.max_creation_time(value.unwrap_or(""));
+                    call = call.max_creation_time(        value.map(|v| arg_from_str(v, err, "max-creation-time", "uint64")).unwrap_or(0));
                 },
                 "all-users" => {
-                    call = call.all_users(arg_from_str(value.unwrap_or("false"), err, "all-users", "boolean"));
+                    call = call.all_users(        value.map(|v| arg_from_str(v, err, "all-users", "boolean")).unwrap_or(false));
                 },
                 _ => {
                     let mut found = false;
@@ -1290,7 +1308,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "max-results" => {
-                    call = call.max_results(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
+                    call = call.max_results(        value.map(|v| arg_from_str(v, err, "max-results", "uint32")).unwrap_or(0));
                 },
                 _ => {
                     let mut found = false;
@@ -1364,11 +1382,65 @@ where
                 match &temp_cursor.to_string()[..] {
                     "best-trial-id" => Some(("bestTrialId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "creation-time" => Some(("creationTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "default-trial-id" => Some(("defaultTrialId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "encryption-configuration.kms-key-name" => Some(("encryptionConfiguration.kmsKeyName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "etag" => Some(("etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "expiration-time" => Some(("expirationTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "friendly-name" => Some(("friendlyName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "hparam-search-spaces.activation-fn.candidates" => Some(("hparamSearchSpaces.activationFn.candidates", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "hparam-search-spaces.batch-size.candidates.candidates" => Some(("hparamSearchSpaces.batchSize.candidates.candidates", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "hparam-search-spaces.batch-size.range.max" => Some(("hparamSearchSpaces.batchSize.range.max", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "hparam-search-spaces.batch-size.range.min" => Some(("hparamSearchSpaces.batchSize.range.min", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "hparam-search-spaces.booster-type.candidates" => Some(("hparamSearchSpaces.boosterType.candidates", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "hparam-search-spaces.colsample-bylevel.candidates.candidates" => Some(("hparamSearchSpaces.colsampleBylevel.candidates.candidates", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Vec })),
+                    "hparam-search-spaces.colsample-bylevel.range.max" => Some(("hparamSearchSpaces.colsampleBylevel.range.max", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "hparam-search-spaces.colsample-bylevel.range.min" => Some(("hparamSearchSpaces.colsampleBylevel.range.min", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "hparam-search-spaces.colsample-bynode.candidates.candidates" => Some(("hparamSearchSpaces.colsampleBynode.candidates.candidates", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Vec })),
+                    "hparam-search-spaces.colsample-bynode.range.max" => Some(("hparamSearchSpaces.colsampleBynode.range.max", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "hparam-search-spaces.colsample-bynode.range.min" => Some(("hparamSearchSpaces.colsampleBynode.range.min", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "hparam-search-spaces.colsample-bytree.candidates.candidates" => Some(("hparamSearchSpaces.colsampleBytree.candidates.candidates", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Vec })),
+                    "hparam-search-spaces.colsample-bytree.range.max" => Some(("hparamSearchSpaces.colsampleBytree.range.max", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "hparam-search-spaces.colsample-bytree.range.min" => Some(("hparamSearchSpaces.colsampleBytree.range.min", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "hparam-search-spaces.dart-normalize-type.candidates" => Some(("hparamSearchSpaces.dartNormalizeType.candidates", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "hparam-search-spaces.dropout.candidates.candidates" => Some(("hparamSearchSpaces.dropout.candidates.candidates", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Vec })),
+                    "hparam-search-spaces.dropout.range.max" => Some(("hparamSearchSpaces.dropout.range.max", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "hparam-search-spaces.dropout.range.min" => Some(("hparamSearchSpaces.dropout.range.min", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "hparam-search-spaces.l1-reg.candidates.candidates" => Some(("hparamSearchSpaces.l1Reg.candidates.candidates", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Vec })),
+                    "hparam-search-spaces.l1-reg.range.max" => Some(("hparamSearchSpaces.l1Reg.range.max", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "hparam-search-spaces.l1-reg.range.min" => Some(("hparamSearchSpaces.l1Reg.range.min", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "hparam-search-spaces.l2-reg.candidates.candidates" => Some(("hparamSearchSpaces.l2Reg.candidates.candidates", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Vec })),
+                    "hparam-search-spaces.l2-reg.range.max" => Some(("hparamSearchSpaces.l2Reg.range.max", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "hparam-search-spaces.l2-reg.range.min" => Some(("hparamSearchSpaces.l2Reg.range.min", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "hparam-search-spaces.learn-rate.candidates.candidates" => Some(("hparamSearchSpaces.learnRate.candidates.candidates", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Vec })),
+                    "hparam-search-spaces.learn-rate.range.max" => Some(("hparamSearchSpaces.learnRate.range.max", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "hparam-search-spaces.learn-rate.range.min" => Some(("hparamSearchSpaces.learnRate.range.min", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "hparam-search-spaces.max-tree-depth.candidates.candidates" => Some(("hparamSearchSpaces.maxTreeDepth.candidates.candidates", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "hparam-search-spaces.max-tree-depth.range.max" => Some(("hparamSearchSpaces.maxTreeDepth.range.max", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "hparam-search-spaces.max-tree-depth.range.min" => Some(("hparamSearchSpaces.maxTreeDepth.range.min", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "hparam-search-spaces.min-split-loss.candidates.candidates" => Some(("hparamSearchSpaces.minSplitLoss.candidates.candidates", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Vec })),
+                    "hparam-search-spaces.min-split-loss.range.max" => Some(("hparamSearchSpaces.minSplitLoss.range.max", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "hparam-search-spaces.min-split-loss.range.min" => Some(("hparamSearchSpaces.minSplitLoss.range.min", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "hparam-search-spaces.min-tree-child-weight.candidates.candidates" => Some(("hparamSearchSpaces.minTreeChildWeight.candidates.candidates", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "hparam-search-spaces.min-tree-child-weight.range.max" => Some(("hparamSearchSpaces.minTreeChildWeight.range.max", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "hparam-search-spaces.min-tree-child-weight.range.min" => Some(("hparamSearchSpaces.minTreeChildWeight.range.min", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "hparam-search-spaces.num-clusters.candidates.candidates" => Some(("hparamSearchSpaces.numClusters.candidates.candidates", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "hparam-search-spaces.num-clusters.range.max" => Some(("hparamSearchSpaces.numClusters.range.max", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "hparam-search-spaces.num-clusters.range.min" => Some(("hparamSearchSpaces.numClusters.range.min", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "hparam-search-spaces.num-factors.candidates.candidates" => Some(("hparamSearchSpaces.numFactors.candidates.candidates", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "hparam-search-spaces.num-factors.range.max" => Some(("hparamSearchSpaces.numFactors.range.max", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "hparam-search-spaces.num-factors.range.min" => Some(("hparamSearchSpaces.numFactors.range.min", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "hparam-search-spaces.num-parallel-tree.candidates.candidates" => Some(("hparamSearchSpaces.numParallelTree.candidates.candidates", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "hparam-search-spaces.num-parallel-tree.range.max" => Some(("hparamSearchSpaces.numParallelTree.range.max", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "hparam-search-spaces.num-parallel-tree.range.min" => Some(("hparamSearchSpaces.numParallelTree.range.min", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "hparam-search-spaces.optimizer.candidates" => Some(("hparamSearchSpaces.optimizer.candidates", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "hparam-search-spaces.subsample.candidates.candidates" => Some(("hparamSearchSpaces.subsample.candidates.candidates", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Vec })),
+                    "hparam-search-spaces.subsample.range.max" => Some(("hparamSearchSpaces.subsample.range.max", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "hparam-search-spaces.subsample.range.min" => Some(("hparamSearchSpaces.subsample.range.min", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "hparam-search-spaces.tree-method.candidates" => Some(("hparamSearchSpaces.treeMethod.candidates", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "hparam-search-spaces.wals-alpha.candidates.candidates" => Some(("hparamSearchSpaces.walsAlpha.candidates.candidates", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Vec })),
+                    "hparam-search-spaces.wals-alpha.range.max" => Some(("hparamSearchSpaces.walsAlpha.range.max", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "hparam-search-spaces.wals-alpha.range.min" => Some(("hparamSearchSpaces.walsAlpha.range.min", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "last-modified-time" => Some(("lastModifiedTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "location" => Some(("location", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -1376,8 +1448,9 @@ where
                     "model-reference.model-id" => Some(("modelReference.modelId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "model-reference.project-id" => Some(("modelReference.projectId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "model-type" => Some(("modelType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "optimal-trial-ids" => Some(("optimalTrialIds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["best-trial-id", "creation-time", "dataset-id", "description", "encryption-configuration", "etag", "expiration-time", "friendly-name", "kms-key-name", "labels", "last-modified-time", "location", "model-id", "model-reference", "model-type", "project-id"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["activation-fn", "batch-size", "best-trial-id", "booster-type", "candidates", "colsample-bylevel", "colsample-bynode", "colsample-bytree", "creation-time", "dart-normalize-type", "dataset-id", "default-trial-id", "description", "dropout", "encryption-configuration", "etag", "expiration-time", "friendly-name", "hparam-search-spaces", "kms-key-name", "l1-reg", "l2-reg", "labels", "last-modified-time", "learn-rate", "location", "max", "max-tree-depth", "min", "min-split-loss", "min-tree-child-weight", "model-id", "model-reference", "model-type", "num-clusters", "num-factors", "num-parallel-tree", "optimal-trial-ids", "optimizer", "project-id", "range", "subsample", "tree-method", "wals-alpha"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1499,7 +1572,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "max-results" => {
-                    call = call.max_results(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
+                    call = call.max_results(        value.map(|v| arg_from_str(v, err, "max-results", "uint32")).unwrap_or(0));
                 },
                 _ => {
                     let mut found = false;
@@ -1599,7 +1672,7 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "read-mask" => {
-                    call = call.read_mask(value.unwrap_or(""));
+                    call = call.read_mask(        value.map(|v| arg_from_str(v, err, "read-mask", "google-fieldmask")).unwrap_or(FieldMask::default()));
                 },
                 _ => {
                     let mut found = false;
@@ -1679,14 +1752,27 @@ where
                     "imported-libraries" => Some(("importedLibraries", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "language" => Some(("language", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "last-modified-time" => Some(("lastModifiedTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "remote-function-options.connection" => Some(("remoteFunctionOptions.connection", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "remote-function-options.endpoint" => Some(("remoteFunctionOptions.endpoint", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "remote-function-options.max-batching-rows" => Some(("remoteFunctionOptions.maxBatchingRows", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "remote-function-options.user-defined-context" => Some(("remoteFunctionOptions.userDefinedContext", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "return-type.type-kind" => Some(("returnType.typeKind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "routine-reference.dataset-id" => Some(("routineReference.datasetId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "routine-reference.project-id" => Some(("routineReference.projectId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "routine-reference.routine-id" => Some(("routineReference.routineId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "routine-type" => Some(("routineType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "spark-options.archive-uris" => Some(("sparkOptions.archiveUris", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "spark-options.connection" => Some(("sparkOptions.connection", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "spark-options.container-image" => Some(("sparkOptions.containerImage", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "spark-options.file-uris" => Some(("sparkOptions.fileUris", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "spark-options.jar-uris" => Some(("sparkOptions.jarUris", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "spark-options.main-file-uri" => Some(("sparkOptions.mainFileUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "spark-options.properties" => Some(("sparkOptions.properties", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "spark-options.py-file-uris" => Some(("sparkOptions.pyFileUris", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "spark-options.runtime-version" => Some(("sparkOptions.runtimeVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "strict-mode" => Some(("strictMode", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["creation-time", "dataset-id", "definition-body", "description", "determinism-level", "etag", "imported-libraries", "language", "last-modified-time", "project-id", "return-type", "routine-id", "routine-reference", "routine-type", "strict-mode", "type-kind"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["archive-uris", "connection", "container-image", "creation-time", "dataset-id", "definition-body", "description", "determinism-level", "endpoint", "etag", "file-uris", "imported-libraries", "jar-uris", "language", "last-modified-time", "main-file-uri", "max-batching-rows", "project-id", "properties", "py-file-uris", "remote-function-options", "return-type", "routine-id", "routine-reference", "routine-type", "runtime-version", "spark-options", "strict-mode", "type-kind", "user-defined-context"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1753,13 +1839,13 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "read-mask" => {
-                    call = call.read_mask(value.unwrap_or(""));
+                    call = call.read_mask(        value.map(|v| arg_from_str(v, err, "read-mask", "google-fieldmask")).unwrap_or(FieldMask::default()));
                 },
                 "page-token" => {
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "max-results" => {
-                    call = call.max_results(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
+                    call = call.max_results(        value.map(|v| arg_from_str(v, err, "max-results", "uint32")).unwrap_or(0));
                 },
                 "filter" => {
                     call = call.filter(value.unwrap_or(""));
@@ -1842,14 +1928,27 @@ where
                     "imported-libraries" => Some(("importedLibraries", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "language" => Some(("language", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "last-modified-time" => Some(("lastModifiedTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "remote-function-options.connection" => Some(("remoteFunctionOptions.connection", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "remote-function-options.endpoint" => Some(("remoteFunctionOptions.endpoint", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "remote-function-options.max-batching-rows" => Some(("remoteFunctionOptions.maxBatchingRows", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "remote-function-options.user-defined-context" => Some(("remoteFunctionOptions.userDefinedContext", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "return-type.type-kind" => Some(("returnType.typeKind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "routine-reference.dataset-id" => Some(("routineReference.datasetId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "routine-reference.project-id" => Some(("routineReference.projectId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "routine-reference.routine-id" => Some(("routineReference.routineId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "routine-type" => Some(("routineType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "spark-options.archive-uris" => Some(("sparkOptions.archiveUris", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "spark-options.connection" => Some(("sparkOptions.connection", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "spark-options.container-image" => Some(("sparkOptions.containerImage", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "spark-options.file-uris" => Some(("sparkOptions.fileUris", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "spark-options.jar-uris" => Some(("sparkOptions.jarUris", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "spark-options.main-file-uri" => Some(("sparkOptions.mainFileUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "spark-options.properties" => Some(("sparkOptions.properties", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "spark-options.py-file-uris" => Some(("sparkOptions.pyFileUris", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "spark-options.runtime-version" => Some(("sparkOptions.runtimeVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "strict-mode" => Some(("strictMode", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["creation-time", "dataset-id", "definition-body", "description", "determinism-level", "etag", "imported-libraries", "language", "last-modified-time", "project-id", "return-type", "routine-id", "routine-reference", "routine-type", "strict-mode", "type-kind"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["archive-uris", "connection", "container-image", "creation-time", "dataset-id", "definition-body", "description", "determinism-level", "endpoint", "etag", "file-uris", "imported-libraries", "jar-uris", "language", "last-modified-time", "main-file-uri", "max-batching-rows", "project-id", "properties", "py-file-uris", "remote-function-options", "return-type", "routine-id", "routine-reference", "routine-type", "runtime-version", "spark-options", "strict-mode", "type-kind", "user-defined-context"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -2004,7 +2103,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -2320,7 +2419,7 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "start-index" => {
-                    call = call.start_index(value.unwrap_or(""));
+                    call = call.start_index(        value.map(|v| arg_from_str(v, err, "start-index", "uint64")).unwrap_or(0));
                 },
                 "selected-fields" => {
                     call = call.selected_fields(value.unwrap_or(""));
@@ -2329,7 +2428,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "max-results" => {
-                    call = call.max_results(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
+                    call = call.max_results(        value.map(|v| arg_from_str(v, err, "max-results", "uint32")).unwrap_or(0));
                 },
                 _ => {
                     let mut found = false;
@@ -2428,6 +2527,9 @@ where
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
+                "view" => {
+                    call = call.view(value.unwrap_or(""));
+                },
                 "selected-fields" => {
                     call = call.selected_fields(value.unwrap_or(""));
                 },
@@ -2444,7 +2546,7 @@ where
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["selected-fields"].iter().map(|v|*v));
+                                                                           v.extend(["selected-fields", "view"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -2586,6 +2688,10 @@ where
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
+                    "clone-definition.base-table-reference.dataset-id" => Some(("cloneDefinition.baseTableReference.datasetId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "clone-definition.base-table-reference.project-id" => Some(("cloneDefinition.baseTableReference.projectId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "clone-definition.base-table-reference.table-id" => Some(("cloneDefinition.baseTableReference.tableId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "clone-definition.clone-time" => Some(("cloneDefinition.cloneTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "clustering.fields" => Some(("clustering.fields", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "creation-time" => Some(("creationTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "default-collation" => Some(("defaultCollation", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -2604,6 +2710,7 @@ where
                     "external-data-configuration.csv-options.encoding" => Some(("externalDataConfiguration.csvOptions.encoding", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "external-data-configuration.csv-options.field-delimiter" => Some(("externalDataConfiguration.csvOptions.fieldDelimiter", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "external-data-configuration.csv-options.null-marker" => Some(("externalDataConfiguration.csvOptions.null_marker", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "external-data-configuration.csv-options.preserve-ascii-control-characters" => Some(("externalDataConfiguration.csvOptions.preserveAsciiControlCharacters", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "external-data-configuration.csv-options.quote" => Some(("externalDataConfiguration.csvOptions.quote", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "external-data-configuration.csv-options.skip-leading-rows" => Some(("externalDataConfiguration.csvOptions.skipLeadingRows", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "external-data-configuration.decimal-target-types" => Some(("externalDataConfiguration.decimalTargetTypes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
@@ -2614,8 +2721,11 @@ where
                     "external-data-configuration.hive-partitioning-options.source-uri-prefix" => Some(("externalDataConfiguration.hivePartitioningOptions.sourceUriPrefix", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "external-data-configuration.ignore-unknown-values" => Some(("externalDataConfiguration.ignoreUnknownValues", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "external-data-configuration.max-bad-records" => Some(("externalDataConfiguration.maxBadRecords", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "external-data-configuration.metadata-cache-mode" => Some(("externalDataConfiguration.metadataCacheMode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "external-data-configuration.object-metadata" => Some(("externalDataConfiguration.objectMetadata", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "external-data-configuration.parquet-options.enable-list-inference" => Some(("externalDataConfiguration.parquetOptions.enableListInference", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "external-data-configuration.parquet-options.enum-as-string" => Some(("externalDataConfiguration.parquetOptions.enumAsString", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "external-data-configuration.reference-file-schema-uri" => Some(("externalDataConfiguration.referenceFileSchemaUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "external-data-configuration.source-format" => Some(("externalDataConfiguration.sourceFormat", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "external-data-configuration.source-uris" => Some(("externalDataConfiguration.sourceUris", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "friendly-name" => Some(("friendlyName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -2624,10 +2734,13 @@ where
                     "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "last-modified-time" => Some(("lastModifiedTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "location" => Some(("location", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "materialized-view.allow-non-incremental-definition" => Some(("materializedView.allow_non_incremental_definition", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "materialized-view.enable-refresh" => Some(("materializedView.enableRefresh", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "materialized-view.last-refresh-time" => Some(("materializedView.lastRefreshTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "materialized-view.max-staleness" => Some(("materializedView.maxStaleness", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "materialized-view.query" => Some(("materializedView.query", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "materialized-view.refresh-interval-ms" => Some(("materializedView.refreshIntervalMs", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "max-staleness" => Some(("maxStaleness", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "model.model-options.labels" => Some(("model.modelOptions.labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "model.model-options.loss-type" => Some(("model.modelOptions.lossType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "model.model-options.model-type" => Some(("model.modelOptions.modelType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -2635,6 +2748,14 @@ where
                     "num-long-term-bytes" => Some(("numLongTermBytes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "num-physical-bytes" => Some(("numPhysicalBytes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "num-rows" => Some(("numRows", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "num-active-logical-bytes" => Some(("num_active_logical_bytes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "num-active-physical-bytes" => Some(("num_active_physical_bytes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "num-long-term-logical-bytes" => Some(("num_long_term_logical_bytes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "num-long-term-physical-bytes" => Some(("num_long_term_physical_bytes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "num-partitions" => Some(("num_partitions", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "num-time-travel-physical-bytes" => Some(("num_time_travel_physical_bytes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "num-total-logical-bytes" => Some(("num_total_logical_bytes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "num-total-physical-bytes" => Some(("num_total_physical_bytes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "range-partitioning.field" => Some(("rangePartitioning.field", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "range-partitioning.range.end" => Some(("rangePartitioning.range.end", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "range-partitioning.range.interval" => Some(("rangePartitioning.range.interval", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -2660,7 +2781,7 @@ where
                     "view.use-explicit-column-names" => Some(("view.useExplicitColumnNames", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "view.use-legacy-sql" => Some(("view.useLegacySql", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["allow-jagged-rows", "allow-quoted-newlines", "autodetect", "avro-options", "base-table-reference", "bigtable-options", "clustering", "compression", "connection-id", "creation-time", "csv-options", "dataset-id", "decimal-target-types", "default-collation", "description", "enable-list-inference", "enable-refresh", "encoding", "encryption-configuration", "end", "enum-as-string", "estimated-bytes", "estimated-rows", "etag", "expiration-ms", "expiration-time", "external-data-configuration", "field", "field-delimiter", "fields", "friendly-name", "google-sheets-options", "hive-partitioning-options", "id", "ignore-unknown-values", "ignore-unspecified-column-families", "interval", "kind", "kms-key-name", "labels", "last-modified-time", "last-refresh-time", "location", "loss-type", "materialized-view", "max-bad-records", "mode", "model", "model-options", "model-type", "null-marker", "num-bytes", "num-long-term-bytes", "num-physical-bytes", "num-rows", "oldest-entry-time", "parquet-options", "project-id", "query", "quote", "range", "range-partitioning", "read-rowkey-as-string", "refresh-interval-ms", "require-partition-filter", "self-link", "skip-leading-rows", "snapshot-definition", "snapshot-time", "source-format", "source-uri-prefix", "source-uris", "start", "streaming-buffer", "table-id", "table-reference", "time-partitioning", "type", "use-avro-logical-types", "use-explicit-column-names", "use-legacy-sql", "view"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["allow-jagged-rows", "allow-quoted-newlines", "allow-non-incremental-definition", "autodetect", "avro-options", "base-table-reference", "bigtable-options", "clone-definition", "clone-time", "clustering", "compression", "connection-id", "creation-time", "csv-options", "dataset-id", "decimal-target-types", "default-collation", "description", "enable-list-inference", "enable-refresh", "encoding", "encryption-configuration", "end", "enum-as-string", "estimated-bytes", "estimated-rows", "etag", "expiration-ms", "expiration-time", "external-data-configuration", "field", "field-delimiter", "fields", "friendly-name", "google-sheets-options", "hive-partitioning-options", "id", "ignore-unknown-values", "ignore-unspecified-column-families", "interval", "kind", "kms-key-name", "labels", "last-modified-time", "last-refresh-time", "location", "loss-type", "materialized-view", "max-bad-records", "max-staleness", "metadata-cache-mode", "mode", "model", "model-options", "model-type", "null-marker", "num-bytes", "num-long-term-bytes", "num-physical-bytes", "num-rows", "num-active-logical-bytes", "num-active-physical-bytes", "num-long-term-logical-bytes", "num-long-term-physical-bytes", "num-partitions", "num-time-travel-physical-bytes", "num-total-logical-bytes", "num-total-physical-bytes", "object-metadata", "oldest-entry-time", "parquet-options", "preserve-ascii-control-characters", "project-id", "query", "quote", "range", "range-partitioning", "read-rowkey-as-string", "reference-file-schema-uri", "refresh-interval-ms", "require-partition-filter", "self-link", "skip-leading-rows", "snapshot-definition", "snapshot-time", "source-format", "source-uri-prefix", "source-uris", "start", "streaming-buffer", "table-id", "table-reference", "time-partitioning", "type", "use-avro-logical-types", "use-explicit-column-names", "use-legacy-sql", "view"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -2730,7 +2851,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "max-results" => {
-                    call = call.max_results(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
+                    call = call.max_results(        value.map(|v| arg_from_str(v, err, "max-results", "uint32")).unwrap_or(0));
                 },
                 _ => {
                     let mut found = false;
@@ -2802,6 +2923,10 @@ where
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
+                    "clone-definition.base-table-reference.dataset-id" => Some(("cloneDefinition.baseTableReference.datasetId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "clone-definition.base-table-reference.project-id" => Some(("cloneDefinition.baseTableReference.projectId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "clone-definition.base-table-reference.table-id" => Some(("cloneDefinition.baseTableReference.tableId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "clone-definition.clone-time" => Some(("cloneDefinition.cloneTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "clustering.fields" => Some(("clustering.fields", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "creation-time" => Some(("creationTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "default-collation" => Some(("defaultCollation", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -2820,6 +2945,7 @@ where
                     "external-data-configuration.csv-options.encoding" => Some(("externalDataConfiguration.csvOptions.encoding", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "external-data-configuration.csv-options.field-delimiter" => Some(("externalDataConfiguration.csvOptions.fieldDelimiter", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "external-data-configuration.csv-options.null-marker" => Some(("externalDataConfiguration.csvOptions.null_marker", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "external-data-configuration.csv-options.preserve-ascii-control-characters" => Some(("externalDataConfiguration.csvOptions.preserveAsciiControlCharacters", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "external-data-configuration.csv-options.quote" => Some(("externalDataConfiguration.csvOptions.quote", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "external-data-configuration.csv-options.skip-leading-rows" => Some(("externalDataConfiguration.csvOptions.skipLeadingRows", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "external-data-configuration.decimal-target-types" => Some(("externalDataConfiguration.decimalTargetTypes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
@@ -2830,8 +2956,11 @@ where
                     "external-data-configuration.hive-partitioning-options.source-uri-prefix" => Some(("externalDataConfiguration.hivePartitioningOptions.sourceUriPrefix", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "external-data-configuration.ignore-unknown-values" => Some(("externalDataConfiguration.ignoreUnknownValues", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "external-data-configuration.max-bad-records" => Some(("externalDataConfiguration.maxBadRecords", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "external-data-configuration.metadata-cache-mode" => Some(("externalDataConfiguration.metadataCacheMode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "external-data-configuration.object-metadata" => Some(("externalDataConfiguration.objectMetadata", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "external-data-configuration.parquet-options.enable-list-inference" => Some(("externalDataConfiguration.parquetOptions.enableListInference", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "external-data-configuration.parquet-options.enum-as-string" => Some(("externalDataConfiguration.parquetOptions.enumAsString", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "external-data-configuration.reference-file-schema-uri" => Some(("externalDataConfiguration.referenceFileSchemaUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "external-data-configuration.source-format" => Some(("externalDataConfiguration.sourceFormat", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "external-data-configuration.source-uris" => Some(("externalDataConfiguration.sourceUris", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "friendly-name" => Some(("friendlyName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -2840,10 +2969,13 @@ where
                     "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "last-modified-time" => Some(("lastModifiedTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "location" => Some(("location", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "materialized-view.allow-non-incremental-definition" => Some(("materializedView.allow_non_incremental_definition", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "materialized-view.enable-refresh" => Some(("materializedView.enableRefresh", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "materialized-view.last-refresh-time" => Some(("materializedView.lastRefreshTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "materialized-view.max-staleness" => Some(("materializedView.maxStaleness", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "materialized-view.query" => Some(("materializedView.query", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "materialized-view.refresh-interval-ms" => Some(("materializedView.refreshIntervalMs", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "max-staleness" => Some(("maxStaleness", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "model.model-options.labels" => Some(("model.modelOptions.labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "model.model-options.loss-type" => Some(("model.modelOptions.lossType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "model.model-options.model-type" => Some(("model.modelOptions.modelType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -2851,6 +2983,14 @@ where
                     "num-long-term-bytes" => Some(("numLongTermBytes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "num-physical-bytes" => Some(("numPhysicalBytes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "num-rows" => Some(("numRows", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "num-active-logical-bytes" => Some(("num_active_logical_bytes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "num-active-physical-bytes" => Some(("num_active_physical_bytes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "num-long-term-logical-bytes" => Some(("num_long_term_logical_bytes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "num-long-term-physical-bytes" => Some(("num_long_term_physical_bytes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "num-partitions" => Some(("num_partitions", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "num-time-travel-physical-bytes" => Some(("num_time_travel_physical_bytes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "num-total-logical-bytes" => Some(("num_total_logical_bytes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "num-total-physical-bytes" => Some(("num_total_physical_bytes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "range-partitioning.field" => Some(("rangePartitioning.field", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "range-partitioning.range.end" => Some(("rangePartitioning.range.end", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "range-partitioning.range.interval" => Some(("rangePartitioning.range.interval", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -2876,7 +3016,7 @@ where
                     "view.use-explicit-column-names" => Some(("view.useExplicitColumnNames", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "view.use-legacy-sql" => Some(("view.useLegacySql", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["allow-jagged-rows", "allow-quoted-newlines", "autodetect", "avro-options", "base-table-reference", "bigtable-options", "clustering", "compression", "connection-id", "creation-time", "csv-options", "dataset-id", "decimal-target-types", "default-collation", "description", "enable-list-inference", "enable-refresh", "encoding", "encryption-configuration", "end", "enum-as-string", "estimated-bytes", "estimated-rows", "etag", "expiration-ms", "expiration-time", "external-data-configuration", "field", "field-delimiter", "fields", "friendly-name", "google-sheets-options", "hive-partitioning-options", "id", "ignore-unknown-values", "ignore-unspecified-column-families", "interval", "kind", "kms-key-name", "labels", "last-modified-time", "last-refresh-time", "location", "loss-type", "materialized-view", "max-bad-records", "mode", "model", "model-options", "model-type", "null-marker", "num-bytes", "num-long-term-bytes", "num-physical-bytes", "num-rows", "oldest-entry-time", "parquet-options", "project-id", "query", "quote", "range", "range-partitioning", "read-rowkey-as-string", "refresh-interval-ms", "require-partition-filter", "self-link", "skip-leading-rows", "snapshot-definition", "snapshot-time", "source-format", "source-uri-prefix", "source-uris", "start", "streaming-buffer", "table-id", "table-reference", "time-partitioning", "type", "use-avro-logical-types", "use-explicit-column-names", "use-legacy-sql", "view"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["allow-jagged-rows", "allow-quoted-newlines", "allow-non-incremental-definition", "autodetect", "avro-options", "base-table-reference", "bigtable-options", "clone-definition", "clone-time", "clustering", "compression", "connection-id", "creation-time", "csv-options", "dataset-id", "decimal-target-types", "default-collation", "description", "enable-list-inference", "enable-refresh", "encoding", "encryption-configuration", "end", "enum-as-string", "estimated-bytes", "estimated-rows", "etag", "expiration-ms", "expiration-time", "external-data-configuration", "field", "field-delimiter", "fields", "friendly-name", "google-sheets-options", "hive-partitioning-options", "id", "ignore-unknown-values", "ignore-unspecified-column-families", "interval", "kind", "kms-key-name", "labels", "last-modified-time", "last-refresh-time", "location", "loss-type", "materialized-view", "max-bad-records", "max-staleness", "metadata-cache-mode", "mode", "model", "model-options", "model-type", "null-marker", "num-bytes", "num-long-term-bytes", "num-physical-bytes", "num-rows", "num-active-logical-bytes", "num-active-physical-bytes", "num-long-term-logical-bytes", "num-long-term-physical-bytes", "num-partitions", "num-time-travel-physical-bytes", "num-total-logical-bytes", "num-total-physical-bytes", "object-metadata", "oldest-entry-time", "parquet-options", "preserve-ascii-control-characters", "project-id", "query", "quote", "range", "range-partitioning", "read-rowkey-as-string", "reference-file-schema-uri", "refresh-interval-ms", "require-partition-filter", "self-link", "skip-leading-rows", "snapshot-definition", "snapshot-time", "source-format", "source-uri-prefix", "source-uris", "start", "streaming-buffer", "table-id", "table-reference", "time-partitioning", "type", "use-avro-logical-types", "use-explicit-column-names", "use-legacy-sql", "view"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -2891,7 +3031,7 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "autodetect-schema" => {
-                    call = call.autodetect_schema(arg_from_str(value.unwrap_or("false"), err, "autodetect-schema", "boolean"));
+                    call = call.autodetect_schema(        value.map(|v| arg_from_str(v, err, "autodetect-schema", "boolean")).unwrap_or(false));
                 },
                 _ => {
                     let mut found = false;
@@ -3135,6 +3275,10 @@ where
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
+                    "clone-definition.base-table-reference.dataset-id" => Some(("cloneDefinition.baseTableReference.datasetId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "clone-definition.base-table-reference.project-id" => Some(("cloneDefinition.baseTableReference.projectId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "clone-definition.base-table-reference.table-id" => Some(("cloneDefinition.baseTableReference.tableId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "clone-definition.clone-time" => Some(("cloneDefinition.cloneTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "clustering.fields" => Some(("clustering.fields", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "creation-time" => Some(("creationTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "default-collation" => Some(("defaultCollation", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -3153,6 +3297,7 @@ where
                     "external-data-configuration.csv-options.encoding" => Some(("externalDataConfiguration.csvOptions.encoding", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "external-data-configuration.csv-options.field-delimiter" => Some(("externalDataConfiguration.csvOptions.fieldDelimiter", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "external-data-configuration.csv-options.null-marker" => Some(("externalDataConfiguration.csvOptions.null_marker", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "external-data-configuration.csv-options.preserve-ascii-control-characters" => Some(("externalDataConfiguration.csvOptions.preserveAsciiControlCharacters", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "external-data-configuration.csv-options.quote" => Some(("externalDataConfiguration.csvOptions.quote", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "external-data-configuration.csv-options.skip-leading-rows" => Some(("externalDataConfiguration.csvOptions.skipLeadingRows", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "external-data-configuration.decimal-target-types" => Some(("externalDataConfiguration.decimalTargetTypes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
@@ -3163,8 +3308,11 @@ where
                     "external-data-configuration.hive-partitioning-options.source-uri-prefix" => Some(("externalDataConfiguration.hivePartitioningOptions.sourceUriPrefix", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "external-data-configuration.ignore-unknown-values" => Some(("externalDataConfiguration.ignoreUnknownValues", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "external-data-configuration.max-bad-records" => Some(("externalDataConfiguration.maxBadRecords", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "external-data-configuration.metadata-cache-mode" => Some(("externalDataConfiguration.metadataCacheMode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "external-data-configuration.object-metadata" => Some(("externalDataConfiguration.objectMetadata", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "external-data-configuration.parquet-options.enable-list-inference" => Some(("externalDataConfiguration.parquetOptions.enableListInference", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "external-data-configuration.parquet-options.enum-as-string" => Some(("externalDataConfiguration.parquetOptions.enumAsString", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "external-data-configuration.reference-file-schema-uri" => Some(("externalDataConfiguration.referenceFileSchemaUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "external-data-configuration.source-format" => Some(("externalDataConfiguration.sourceFormat", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "external-data-configuration.source-uris" => Some(("externalDataConfiguration.sourceUris", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "friendly-name" => Some(("friendlyName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -3173,10 +3321,13 @@ where
                     "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "last-modified-time" => Some(("lastModifiedTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "location" => Some(("location", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "materialized-view.allow-non-incremental-definition" => Some(("materializedView.allow_non_incremental_definition", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "materialized-view.enable-refresh" => Some(("materializedView.enableRefresh", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "materialized-view.last-refresh-time" => Some(("materializedView.lastRefreshTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "materialized-view.max-staleness" => Some(("materializedView.maxStaleness", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "materialized-view.query" => Some(("materializedView.query", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "materialized-view.refresh-interval-ms" => Some(("materializedView.refreshIntervalMs", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "max-staleness" => Some(("maxStaleness", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "model.model-options.labels" => Some(("model.modelOptions.labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "model.model-options.loss-type" => Some(("model.modelOptions.lossType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "model.model-options.model-type" => Some(("model.modelOptions.modelType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -3184,6 +3335,14 @@ where
                     "num-long-term-bytes" => Some(("numLongTermBytes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "num-physical-bytes" => Some(("numPhysicalBytes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "num-rows" => Some(("numRows", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "num-active-logical-bytes" => Some(("num_active_logical_bytes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "num-active-physical-bytes" => Some(("num_active_physical_bytes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "num-long-term-logical-bytes" => Some(("num_long_term_logical_bytes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "num-long-term-physical-bytes" => Some(("num_long_term_physical_bytes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "num-partitions" => Some(("num_partitions", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "num-time-travel-physical-bytes" => Some(("num_time_travel_physical_bytes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "num-total-logical-bytes" => Some(("num_total_logical_bytes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "num-total-physical-bytes" => Some(("num_total_physical_bytes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "range-partitioning.field" => Some(("rangePartitioning.field", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "range-partitioning.range.end" => Some(("rangePartitioning.range.end", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "range-partitioning.range.interval" => Some(("rangePartitioning.range.interval", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -3209,7 +3368,7 @@ where
                     "view.use-explicit-column-names" => Some(("view.useExplicitColumnNames", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "view.use-legacy-sql" => Some(("view.useLegacySql", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["allow-jagged-rows", "allow-quoted-newlines", "autodetect", "avro-options", "base-table-reference", "bigtable-options", "clustering", "compression", "connection-id", "creation-time", "csv-options", "dataset-id", "decimal-target-types", "default-collation", "description", "enable-list-inference", "enable-refresh", "encoding", "encryption-configuration", "end", "enum-as-string", "estimated-bytes", "estimated-rows", "etag", "expiration-ms", "expiration-time", "external-data-configuration", "field", "field-delimiter", "fields", "friendly-name", "google-sheets-options", "hive-partitioning-options", "id", "ignore-unknown-values", "ignore-unspecified-column-families", "interval", "kind", "kms-key-name", "labels", "last-modified-time", "last-refresh-time", "location", "loss-type", "materialized-view", "max-bad-records", "mode", "model", "model-options", "model-type", "null-marker", "num-bytes", "num-long-term-bytes", "num-physical-bytes", "num-rows", "oldest-entry-time", "parquet-options", "project-id", "query", "quote", "range", "range-partitioning", "read-rowkey-as-string", "refresh-interval-ms", "require-partition-filter", "self-link", "skip-leading-rows", "snapshot-definition", "snapshot-time", "source-format", "source-uri-prefix", "source-uris", "start", "streaming-buffer", "table-id", "table-reference", "time-partitioning", "type", "use-avro-logical-types", "use-explicit-column-names", "use-legacy-sql", "view"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["allow-jagged-rows", "allow-quoted-newlines", "allow-non-incremental-definition", "autodetect", "avro-options", "base-table-reference", "bigtable-options", "clone-definition", "clone-time", "clustering", "compression", "connection-id", "creation-time", "csv-options", "dataset-id", "decimal-target-types", "default-collation", "description", "enable-list-inference", "enable-refresh", "encoding", "encryption-configuration", "end", "enum-as-string", "estimated-bytes", "estimated-rows", "etag", "expiration-ms", "expiration-time", "external-data-configuration", "field", "field-delimiter", "fields", "friendly-name", "google-sheets-options", "hive-partitioning-options", "id", "ignore-unknown-values", "ignore-unspecified-column-families", "interval", "kind", "kms-key-name", "labels", "last-modified-time", "last-refresh-time", "location", "loss-type", "materialized-view", "max-bad-records", "max-staleness", "metadata-cache-mode", "mode", "model", "model-options", "model-type", "null-marker", "num-bytes", "num-long-term-bytes", "num-physical-bytes", "num-rows", "num-active-logical-bytes", "num-active-physical-bytes", "num-long-term-logical-bytes", "num-long-term-physical-bytes", "num-partitions", "num-time-travel-physical-bytes", "num-total-logical-bytes", "num-total-physical-bytes", "object-metadata", "oldest-entry-time", "parquet-options", "preserve-ascii-control-characters", "project-id", "query", "quote", "range", "range-partitioning", "read-rowkey-as-string", "reference-file-schema-uri", "refresh-interval-ms", "require-partition-filter", "self-link", "skip-leading-rows", "snapshot-definition", "snapshot-time", "source-format", "source-uri-prefix", "source-uris", "start", "streaming-buffer", "table-id", "table-reference", "time-partitioning", "type", "use-avro-logical-types", "use-explicit-column-names", "use-legacy-sql", "view"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -3224,7 +3383,7 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "autodetect-schema" => {
-                    call = call.autodetect_schema(arg_from_str(value.unwrap_or("false"), err, "autodetect-schema", "boolean"));
+                    call = call.autodetect_schema(        value.map(|v| arg_from_str(v, err, "autodetect-schema", "boolean")).unwrap_or(false));
                 },
                 _ => {
                     let mut found = false;
@@ -4242,7 +4401,7 @@ async fn main() {
                   vec![
                     (Some(r##"resource"##),
                      None,
-                     Some(r##"REQUIRED: The resource for which the policy is being requested. See the operation documentation for the appropriate value for this field."##),
+                     Some(r##"REQUIRED: The resource for which the policy is being requested. See [Resource names](https://cloud.google.com/apis/design/resource_names) for the appropriate value for this field."##),
                      Some(true),
                      Some(false)),
         
@@ -4304,7 +4463,7 @@ async fn main() {
                   vec![
                     (Some(r##"resource"##),
                      None,
-                     Some(r##"REQUIRED: The resource for which the policy is being specified. See the operation documentation for the appropriate value for this field."##),
+                     Some(r##"REQUIRED: The resource for which the policy is being specified. See [Resource names](https://cloud.google.com/apis/design/resource_names) for the appropriate value for this field."##),
                      Some(true),
                      Some(false)),
         
@@ -4332,7 +4491,7 @@ async fn main() {
                   vec![
                     (Some(r##"resource"##),
                      None,
-                     Some(r##"REQUIRED: The resource for which the policy detail is being requested. See the operation documentation for the appropriate value for this field."##),
+                     Some(r##"REQUIRED: The resource for which the policy detail is being requested. See [Resource names](https://cloud.google.com/apis/design/resource_names) for the appropriate value for this field."##),
                      Some(true),
                      Some(false)),
         
@@ -4502,7 +4661,7 @@ async fn main() {
                   vec![
                     (Some(r##"resource"##),
                      None,
-                     Some(r##"REQUIRED: The resource for which the policy is being requested. See the operation documentation for the appropriate value for this field."##),
+                     Some(r##"REQUIRED: The resource for which the policy is being requested. See [Resource names](https://cloud.google.com/apis/design/resource_names) for the appropriate value for this field."##),
                      Some(true),
                      Some(false)),
         
@@ -4632,7 +4791,7 @@ async fn main() {
                   vec![
                     (Some(r##"resource"##),
                      None,
-                     Some(r##"REQUIRED: The resource for which the policy is being specified. See the operation documentation for the appropriate value for this field."##),
+                     Some(r##"REQUIRED: The resource for which the policy is being specified. See [Resource names](https://cloud.google.com/apis/design/resource_names) for the appropriate value for this field."##),
                      Some(true),
                      Some(false)),
         
@@ -4660,7 +4819,7 @@ async fn main() {
                   vec![
                     (Some(r##"resource"##),
                      None,
-                     Some(r##"REQUIRED: The resource for which the policy detail is being requested. See the operation documentation for the appropriate value for this field."##),
+                     Some(r##"REQUIRED: The resource for which the policy detail is being requested. See [Resource names](https://cloud.google.com/apis/design/resource_names) for the appropriate value for this field."##),
                      Some(true),
                      Some(false)),
         
@@ -4728,7 +4887,7 @@ async fn main() {
     
     let mut app = App::new("bigquery2")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("4.0.1+20220222")
+           .version("5.0.2+20230114")
            .about("A data platform for customers to create, manage, share and query data.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_bigquery2_cli")
            .arg(Arg::with_name("url")

@@ -3,8 +3,6 @@
 // DO NOT EDIT !
 #![allow(unused_variables, unused_imports, dead_code, unused_mut)]
 
-extern crate tokio;
-
 #[macro_use]
 extern crate clap;
 
@@ -12,9 +10,10 @@ use std::env;
 use std::io::{self, Write};
 use clap::{App, SubCommand, Arg};
 
-use google_authorizedbuyersmarketplace1::{api, Error, oauth2};
+use google_authorizedbuyersmarketplace1::{api, Error, oauth2, client::chrono, FieldMask};
 
-mod client;
+
+use google_clis_common as client;
 
 use client::{InvalidOptionsError, CLIError, arg_from_str, writer_from_opts, parse_kv_arg,
           input_file_from_opts, input_mime_from_opts, FieldCursor, FieldError, CallType, UploadProtocol,
@@ -61,7 +60,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 "order-by" => {
                     call = call.order_by(value.unwrap_or(""));
@@ -178,7 +177,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -885,7 +884,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 "filter" => {
                     call = call.filter(value.unwrap_or(""));
@@ -982,7 +981,7 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "update-mask" => {
-                    call = call.update_mask(value.unwrap_or(""));
+                    call = call.update_mask(        value.map(|v| arg_from_str(v, err, "update-mask", "google-fieldmask")).unwrap_or(FieldMask::default()));
                 },
                 _ => {
                     let mut found = false;
@@ -1400,7 +1399,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -1596,7 +1595,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 "order-by" => {
                     call = call.order_by(value.unwrap_or(""));
@@ -2306,7 +2305,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -2426,6 +2425,7 @@ where
                     "targeting.daypart-targeting.time-zone-type" => Some(("targeting.daypartTargeting.timeZoneType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "targeting.geo-targeting.excluded-criteria-ids" => Some(("targeting.geoTargeting.excludedCriteriaIds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "targeting.geo-targeting.targeted-criteria-ids" => Some(("targeting.geoTargeting.targetedCriteriaIds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "targeting.inventory-type-targeting.inventory-types" => Some(("targeting.inventoryTypeTargeting.inventoryTypes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "targeting.placement-targeting.mobile-application-targeting.first-party-targeting.excluded-app-ids" => Some(("targeting.placementTargeting.mobileApplicationTargeting.firstPartyTargeting.excludedAppIds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "targeting.placement-targeting.mobile-application-targeting.first-party-targeting.targeted-app-ids" => Some(("targeting.placementTargeting.mobileApplicationTargeting.firstPartyTargeting.targetedAppIds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "targeting.placement-targeting.uri-targeting.excluded-uris" => Some(("targeting.placementTargeting.uriTargeting.excludedUris", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
@@ -2444,7 +2444,7 @@ where
                     "targeting.video-targeting.targeted-position-types" => Some(("targeting.videoTargeting.targetedPositionTypes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["amount", "billed-buyer", "buyer", "client", "companion-delivery-type", "create-time", "creative-format", "creative-pre-approval-policy", "creative-requirements", "creative-rotation-type", "creative-safe-frame-compatibility", "currency-code", "daypart-targeting", "deal-type", "delivery-control", "delivery-rate-type", "description", "device-capability-targeting", "device-category-targeting", "display-name", "estimated-gross-spend", "excluded-app-ids", "excluded-criteria-ids", "excluded-position-types", "excluded-uris", "first-party-targeting", "fixed-price", "flight-end-time", "flight-start-time", "floor-price", "geo-targeting", "guaranteed-looks", "id", "impression-cap", "max-ad-duration-ms", "minimum-daily-looks", "mobile-application-targeting", "name", "nanos", "open-auction-allowed", "operating-system-criteria", "operating-system-targeting", "operating-system-version-criteria", "percent-share-of-voice", "placement-targeting", "preferred-deal-terms", "private-auction-terms", "programmatic-creative-source", "programmatic-guaranteed-terms", "proposal-revision", "publisher-profile", "reservation-type", "roadblocking-type", "seller-time-zone", "skippable-ad-type", "targeted-app-ids", "targeted-criteria-ids", "targeted-position-types", "targeted-uris", "targeting", "technology-targeting", "time-zone-type", "type", "units", "update-time", "uri-targeting", "user-list-targeting", "version", "video-targeting"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["amount", "billed-buyer", "buyer", "client", "companion-delivery-type", "create-time", "creative-format", "creative-pre-approval-policy", "creative-requirements", "creative-rotation-type", "creative-safe-frame-compatibility", "currency-code", "daypart-targeting", "deal-type", "delivery-control", "delivery-rate-type", "description", "device-capability-targeting", "device-category-targeting", "display-name", "estimated-gross-spend", "excluded-app-ids", "excluded-criteria-ids", "excluded-position-types", "excluded-uris", "first-party-targeting", "fixed-price", "flight-end-time", "flight-start-time", "floor-price", "geo-targeting", "guaranteed-looks", "id", "impression-cap", "inventory-type-targeting", "inventory-types", "max-ad-duration-ms", "minimum-daily-looks", "mobile-application-targeting", "name", "nanos", "open-auction-allowed", "operating-system-criteria", "operating-system-targeting", "operating-system-version-criteria", "percent-share-of-voice", "placement-targeting", "preferred-deal-terms", "private-auction-terms", "programmatic-creative-source", "programmatic-guaranteed-terms", "proposal-revision", "publisher-profile", "reservation-type", "roadblocking-type", "seller-time-zone", "skippable-ad-type", "targeted-app-ids", "targeted-criteria-ids", "targeted-position-types", "targeted-uris", "targeting", "technology-targeting", "time-zone-type", "type", "units", "update-time", "uri-targeting", "user-list-targeting", "version", "video-targeting"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -2459,7 +2459,7 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "update-mask" => {
-                    call = call.update_mask(value.unwrap_or(""));
+                    call = call.update_mask(        value.map(|v| arg_from_str(v, err, "update-mask", "google-fieldmask")).unwrap_or(FieldMask::default()));
                 },
                 _ => {
                     let mut found = false;
@@ -2570,7 +2570,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 "filter" => {
                     call = call.filter(value.unwrap_or(""));
@@ -2677,7 +2677,7 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "update-mask" => {
-                    call = call.update_mask(value.unwrap_or(""));
+                    call = call.update_mask(        value.map(|v| arg_from_str(v, err, "update-mask", "google-fieldmask")).unwrap_or(FieldMask::default()));
                 },
                 _ => {
                     let mut found = false;
@@ -2896,7 +2896,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 "filter" => {
                     call = call.filter(value.unwrap_or(""));
@@ -3773,7 +3773,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("finalized-deals-set-ready-to-serve",
-                    Some(r##"Sets the given finalized deal as ready to serve. By default, deals are ready to serve as soon as they're finalized. A bidder can opt out of this feature by asking to be included in an allowlist. Once opted out, finalized deals belonging to the bidder and its child seats will not start serving until this method is called. This method is useful to the bidders who prefer to not receive bid requests before the creative is ready. This method only applies to programmatic guaranteed deals."##),
+                    Some(r##"Sets the given finalized deal as ready to serve. By default, deals are set as ready to serve as soon as they're finalized. If you want to opt out of the default behavior, and manually indicate that deals are ready to serve, ask your Technical Account Manager to add you to the allowlist. If you choose to use this method, finalized deals belonging to the bidder and its child seats don't start serving until after you call `setReadyToServe`, and after the deals become active. For example, you can use this method to delay receiving bid requests until your creative is ready. This method only applies to programmatic guaranteed deals."##),
                     "Details at http://byron.github.io/google-apis-rs/google_authorizedbuyersmarketplace1_cli/buyers_finalized-deals-set-ready-to-serve",
                   vec![
                     (Some(r##"deal"##),
@@ -3957,7 +3957,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("proposals-deals-patch",
-                    Some(r##"Updates the given deal at the buyer known revision number. If the server revision has advanced since the passed-in proposal.proposal_revision an ABORTED error message will be returned. The revision number is incremented by the server whenever the proposal or its constituent deals are updated. Note: The revision number is kept at a proposal level. The buyer of the API is expected to keep track of the revision number after the last update operation and send it in as part of the next update request. This way, if there are further changes on the server (e.g., seller making new updates), then the server can detect conflicts and reject the proposed changes."##),
+                    Some(r##"Updates the given deal at the buyer known revision number. If the server revision has advanced since the passed-in proposal.proposal_revision an ABORTED error message will be returned. The revision number is incremented by the server whenever the proposal or its constituent deals are updated. Note: The revision number is kept at a proposal level. The buyer of the API is expected to keep track of the revision number after the last update operation and send it in as part of the next update request. This way, if there are further changes on the server (for example, seller making new updates), then the server can detect conflicts and reject the proposed changes."##),
                     "Details at http://byron.github.io/google-apis-rs/google_authorizedbuyersmarketplace1_cli/buyers_proposals-deals-patch",
                   vec![
                     (Some(r##"name"##),
@@ -4107,7 +4107,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("publisher-profiles-list",
-                    Some(r##"Lists publisher profiles"##),
+                    Some(r##"Lists publisher profiles. The returned publisher profiles aren't in any defined order. The order of the results might change. A new publisher profile can appear in any place in the list of returned results."##),
                     "Details at http://byron.github.io/google-apis-rs/google_authorizedbuyersmarketplace1_cli/buyers_publisher-profiles-list",
                   vec![
                     (Some(r##"parent"##),
@@ -4134,8 +4134,8 @@ async fn main() {
     
     let mut app = App::new("authorizedbuyersmarketplace1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("4.0.1+20220307")
-           .about("The Authorized Buyers Marketplace API allows buyers programmatically discover inventory; propose, retrieve and negotiate deals with publishers.")
+           .version("5.0.2+20230124")
+           .about("The Authorized Buyers Marketplace API lets buyers programmatically discover inventory; propose, retrieve and negotiate deals with publishers.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_authorizedbuyersmarketplace1_cli")
            .arg(Arg::with_name("url")
                    .long("scope")

@@ -1,4 +1,4 @@
-site_name: Access Context Manager v4.0.1+20220301
+site_name: Access Context Manager v5.0.2+20230123
 site_url: http://byron.github.io/google-apis-rs/google-accesscontextmanager1_beta-cli
 site_description: A complete library to interact with Access Context Manager (protocol v1beta)
 
@@ -7,24 +7,26 @@ repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/accesscontextman
 docs_dir: docs
 site_dir: build_html
 
-pages:
-- ['index.md', 'Home']
-- ['access-policies_access-levels-create.md', 'Access Policies', 'Access Levels Create']
-- ['access-policies_access-levels-delete.md', 'Access Policies', 'Access Levels Delete']
-- ['access-policies_access-levels-get.md', 'Access Policies', 'Access Levels Get']
-- ['access-policies_access-levels-list.md', 'Access Policies', 'Access Levels List']
-- ['access-policies_access-levels-patch.md', 'Access Policies', 'Access Levels Patch']
-- ['access-policies_create.md', 'Access Policies', 'Create']
-- ['access-policies_delete.md', 'Access Policies', 'Delete']
-- ['access-policies_get.md', 'Access Policies', 'Get']
-- ['access-policies_list.md', 'Access Policies', 'List']
-- ['access-policies_patch.md', 'Access Policies', 'Patch']
-- ['access-policies_service-perimeters-create.md', 'Access Policies', 'Service Perimeters Create']
-- ['access-policies_service-perimeters-delete.md', 'Access Policies', 'Service Perimeters Delete']
-- ['access-policies_service-perimeters-get.md', 'Access Policies', 'Service Perimeters Get']
-- ['access-policies_service-perimeters-list.md', 'Access Policies', 'Service Perimeters List']
-- ['access-policies_service-perimeters-patch.md', 'Access Policies', 'Service Perimeters Patch']
-- ['operations_get.md', 'Operations', 'Get']
+nav:
+- Home: 'index.md'
+- 'Access Policies':
+    - 'Access Levels Create': 'access-policies_access-levels-create.md'
+    - 'Access Levels Delete': 'access-policies_access-levels-delete.md'
+    - 'Access Levels Get': 'access-policies_access-levels-get.md'
+    - 'Access Levels List': 'access-policies_access-levels-list.md'
+    - 'Access Levels Patch': 'access-policies_access-levels-patch.md'
+    - 'Create': 'access-policies_create.md'
+    - 'Delete': 'access-policies_delete.md'
+    - 'Get': 'access-policies_get.md'
+    - 'List': 'access-policies_list.md'
+    - 'Patch': 'access-policies_patch.md'
+    - 'Service Perimeters Create': 'access-policies_service-perimeters-create.md'
+    - 'Service Perimeters Delete': 'access-policies_service-perimeters-delete.md'
+    - 'Service Perimeters Get': 'access-policies_service-perimeters-get.md'
+    - 'Service Perimeters List': 'access-policies_service-perimeters-list.md'
+    - 'Service Perimeters Patch': 'access-policies_service-perimeters-patch.md'
+- 'Operations':
+    - 'Get': 'operations_get.md'
 
 theme: readthedocs
 

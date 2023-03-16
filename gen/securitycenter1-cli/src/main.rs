@@ -3,8 +3,6 @@
 // DO NOT EDIT !
 #![allow(unused_variables, unused_imports, dead_code, unused_mut)]
 
-extern crate tokio;
-
 #[macro_use]
 extern crate clap;
 
@@ -12,9 +10,10 @@ use std::env;
 use std::io::{self, Write};
 use clap::{App, SubCommand, Arg};
 
-use google_securitycenter1::{api, Error, oauth2};
+use google_securitycenter1::{api, Error, oauth2, client::chrono, FieldMask};
 
-mod client;
+
+use google_clis_common as client;
 
 use client::{InvalidOptionsError, CLIError, arg_from_str, writer_from_opts, parse_kv_arg,
           input_file_from_opts, input_mime_from_opts, FieldCursor, FieldError, CallType, UploadProtocol,
@@ -148,13 +147,13 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "read-time" => {
-                    call = call.read_time(value.unwrap_or(""));
+                    call = call.read_time(        value.map(|v| arg_from_str(v, err, "read-time", "google-datetime")).unwrap_or(chrono::Utc::now()));
                 },
                 "page-token" => {
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 "order-by" => {
                     call = call.order_by(value.unwrap_or(""));
@@ -163,10 +162,10 @@ where
                     call = call.filter(value.unwrap_or(""));
                 },
                 "field-mask" => {
-                    call = call.field_mask(value.unwrap_or(""));
+                    call = call.field_mask(        value.map(|v| arg_from_str(v, err, "field-mask", "google-fieldmask")).unwrap_or(FieldMask::default()));
                 },
                 "compare-duration" => {
-                    call = call.compare_duration(value.unwrap_or(""));
+                    call = call.compare_duration(        value.map(|v| arg_from_str(v, err, "compare-duration", "google-duration")).unwrap_or(chrono::Duration::seconds(0)));
                 },
                 _ => {
                     let mut found = false;
@@ -257,10 +256,10 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "update-mask" => {
-                    call = call.update_mask(value.unwrap_or(""));
+                    call = call.update_mask(        value.map(|v| arg_from_str(v, err, "update-mask", "google-fieldmask")).unwrap_or(FieldMask::default()));
                 },
                 "start-time" => {
-                    call = call.start_time(value.unwrap_or(""));
+                    call = call.start_time(        value.map(|v| arg_from_str(v, err, "start-time", "google-datetime")).unwrap_or(chrono::Utc::now()));
                 },
                 _ => {
                     let mut found = false;
@@ -519,7 +518,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -615,7 +614,7 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "update-mask" => {
-                    call = call.update_mask(value.unwrap_or(""));
+                    call = call.update_mask(        value.map(|v| arg_from_str(v, err, "update-mask", "google-fieldmask")).unwrap_or(FieldMask::default()));
                 },
                 _ => {
                     let mut found = false;
@@ -959,7 +958,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -1054,7 +1053,356 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "update-mask" => {
-                    call = call.update_mask(value.unwrap_or(""));
+                    call = call.update_mask(        value.map(|v| arg_from_str(v, err, "update-mask", "google-fieldmask")).unwrap_or(FieldMask::default()));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["update-mask"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _folders_notification_configs_create(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "pubsub-topic" => Some(("pubsubTopic", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "service-account" => Some(("serviceAccount", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "streaming-config.filter" => Some(("streamingConfig.filter", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["description", "filter", "name", "pubsub-topic", "service-account", "streaming-config"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::NotificationConfig = json::value::from_value(object).unwrap();
+        let mut call = self.hub.folders().notification_configs_create(request, opt.value_of("parent").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "config-id" => {
+                    call = call.config_id(value.unwrap_or(""));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["config-id"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _folders_notification_configs_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.folders().notification_configs_delete(opt.value_of("name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _folders_notification_configs_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.folders().notification_configs_get(opt.value_of("name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _folders_notification_configs_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.folders().notification_configs_list(opt.value_of("parent").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "page-token" => {
+                    call = call.page_token(value.unwrap_or(""));
+                },
+                "page-size" => {
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["page-size", "page-token"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _folders_notification_configs_patch(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "pubsub-topic" => Some(("pubsubTopic", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "service-account" => Some(("serviceAccount", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "streaming-config.filter" => Some(("streamingConfig.filter", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["description", "filter", "name", "pubsub-topic", "service-account", "streaming-config"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::NotificationConfig = json::value::from_value(object).unwrap();
+        let mut call = self.hub.folders().notification_configs_patch(request, opt.value_of("name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "update-mask" => {
+                    call = call.update_mask(        value.map(|v| arg_from_str(v, err, "update-mask", "google-fieldmask")).unwrap_or(FieldMask::default()));
                 },
                 _ => {
                     let mut found = false;
@@ -1147,7 +1495,7 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "update-mask" => {
-                    call = call.update_mask(value.unwrap_or(""));
+                    call = call.update_mask(        value.map(|v| arg_from_str(v, err, "update-mask", "google-fieldmask")).unwrap_or(FieldMask::default()));
                 },
                 _ => {
                     let mut found = false;
@@ -1293,13 +1641,13 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "read-time" => {
-                    call = call.read_time(value.unwrap_or(""));
+                    call = call.read_time(        value.map(|v| arg_from_str(v, err, "read-time", "google-datetime")).unwrap_or(chrono::Utc::now()));
                 },
                 "page-token" => {
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 "order-by" => {
                     call = call.order_by(value.unwrap_or(""));
@@ -1308,10 +1656,10 @@ where
                     call = call.filter(value.unwrap_or(""));
                 },
                 "field-mask" => {
-                    call = call.field_mask(value.unwrap_or(""));
+                    call = call.field_mask(        value.map(|v| arg_from_str(v, err, "field-mask", "google-fieldmask")).unwrap_or(FieldMask::default()));
                 },
                 "compare-duration" => {
-                    call = call.compare_duration(value.unwrap_or(""));
+                    call = call.compare_duration(        value.map(|v| arg_from_str(v, err, "compare-duration", "google-duration")).unwrap_or(chrono::Duration::seconds(0)));
                 },
                 _ => {
                     let mut found = false;
@@ -1387,16 +1735,35 @@ where
                     "access.caller-ip-geo.region-code" => Some(("access.callerIpGeo.regionCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "access.method-name" => Some(("access.methodName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "access.principal-email" => Some(("access.principalEmail", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "access.principal-subject" => Some(("access.principalSubject", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "access.service-account-key-name" => Some(("access.serviceAccountKeyName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "access.service-name" => Some(("access.serviceName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "access.user-agent-family" => Some(("access.userAgentFamily", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "access.user-name" => Some(("access.userName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "canonical-name" => Some(("canonicalName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "category" => Some(("category", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "database.display-name" => Some(("database.displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "database.grantees" => Some(("database.grantees", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "database.name" => Some(("database.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "database.query" => Some(("database.query", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "database.user-name" => Some(("database.userName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "event-time" => Some(("eventTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "external-uri" => Some(("externalUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "finding-class" => Some(("findingClass", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "indicator.domains" => Some(("indicator.domains", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "indicator.ip-addresses" => Some(("indicator.ipAddresses", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "indicator.uris" => Some(("indicator.uris", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "kernel-rootkit.name" => Some(("kernelRootkit.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "kernel-rootkit.unexpected-code-modification" => Some(("kernelRootkit.unexpectedCodeModification", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "kernel-rootkit.unexpected-ftrace-handler" => Some(("kernelRootkit.unexpectedFtraceHandler", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "kernel-rootkit.unexpected-interrupt-handler" => Some(("kernelRootkit.unexpectedInterruptHandler", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "kernel-rootkit.unexpected-kernel-code-pages" => Some(("kernelRootkit.unexpectedKernelCodePages", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "kernel-rootkit.unexpected-kprobe-handler" => Some(("kernelRootkit.unexpectedKprobeHandler", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "kernel-rootkit.unexpected-processes-in-runqueue" => Some(("kernelRootkit.unexpectedProcessesInRunqueue", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "kernel-rootkit.unexpected-read-only-data-modification" => Some(("kernelRootkit.unexpectedReadOnlyDataModification", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "kernel-rootkit.unexpected-system-call-handler" => Some(("kernelRootkit.unexpectedSystemCallHandler", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "mitre-attack.additional-tactics" => Some(("mitreAttack.additionalTactics", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "mitre-attack.additional-techniques" => Some(("mitreAttack.additionalTechniques", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "mitre-attack.primary-tactic" => Some(("mitreAttack.primaryTactic", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -1406,7 +1773,9 @@ where
                     "mute-initiator" => Some(("muteInitiator", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "mute-update-time" => Some(("muteUpdateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "next-steps" => Some(("nextSteps", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "parent" => Some(("parent", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "parent-display-name" => Some(("parentDisplayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "resource-name" => Some(("resourceName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "security-marks.canonical-name" => Some(("securityMarks.canonicalName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "security-marks.marks" => Some(("securityMarks.marks", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
@@ -1425,7 +1794,7 @@ where
                     "vulnerability.cve.id" => Some(("vulnerability.cve.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "vulnerability.cve.upstream-fix-available" => Some(("vulnerability.cve.upstreamFixAvailable", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["access", "additional-tactics", "additional-techniques", "attack-complexity", "attack-vector", "availability-impact", "base-score", "caller-ip", "caller-ip-geo", "canonical-name", "category", "confidentiality-impact", "create-time", "cve", "cvssv3", "domains", "event-time", "external-uri", "finding-class", "id", "indicator", "integrity-impact", "ip-addresses", "marks", "method-name", "mitre-attack", "mute", "mute-initiator", "mute-update-time", "name", "parent", "primary-tactic", "primary-techniques", "principal-email", "privileges-required", "region-code", "resource-name", "scope", "security-marks", "service-name", "severity", "state", "upstream-fix-available", "user-agent-family", "user-interaction", "version", "vulnerability"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["access", "additional-tactics", "additional-techniques", "attack-complexity", "attack-vector", "availability-impact", "base-score", "caller-ip", "caller-ip-geo", "canonical-name", "category", "confidentiality-impact", "create-time", "cve", "cvssv3", "database", "description", "display-name", "domains", "event-time", "external-uri", "finding-class", "grantees", "id", "indicator", "integrity-impact", "ip-addresses", "kernel-rootkit", "marks", "method-name", "mitre-attack", "mute", "mute-initiator", "mute-update-time", "name", "next-steps", "parent", "parent-display-name", "primary-tactic", "primary-techniques", "principal-email", "principal-subject", "privileges-required", "query", "region-code", "resource-name", "scope", "security-marks", "service-account-key-name", "service-name", "severity", "state", "unexpected-code-modification", "unexpected-ftrace-handler", "unexpected-interrupt-handler", "unexpected-kernel-code-pages", "unexpected-kprobe-handler", "unexpected-processes-in-runqueue", "unexpected-read-only-data-modification", "unexpected-system-call-handler", "upstream-fix-available", "uris", "user-agent-family", "user-interaction", "user-name", "version", "vulnerability"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1440,7 +1809,7 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "update-mask" => {
-                    call = call.update_mask(value.unwrap_or(""));
+                    call = call.update_mask(        value.map(|v| arg_from_str(v, err, "update-mask", "google-fieldmask")).unwrap_or(FieldMask::default()));
                 },
                 _ => {
                     let mut found = false;
@@ -1702,10 +2071,10 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "update-mask" => {
-                    call = call.update_mask(value.unwrap_or(""));
+                    call = call.update_mask(        value.map(|v| arg_from_str(v, err, "update-mask", "google-fieldmask")).unwrap_or(FieldMask::default()));
                 },
                 "start-time" => {
-                    call = call.start_time(value.unwrap_or(""));
+                    call = call.start_time(        value.map(|v| arg_from_str(v, err, "start-time", "google-datetime")).unwrap_or(chrono::Utc::now()));
                 },
                 _ => {
                     let mut found = false;
@@ -1764,7 +2133,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -1910,13 +2279,13 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "read-time" => {
-                    call = call.read_time(value.unwrap_or(""));
+                    call = call.read_time(        value.map(|v| arg_from_str(v, err, "read-time", "google-datetime")).unwrap_or(chrono::Utc::now()));
                 },
                 "page-token" => {
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 "order-by" => {
                     call = call.order_by(value.unwrap_or(""));
@@ -1925,10 +2294,10 @@ where
                     call = call.filter(value.unwrap_or(""));
                 },
                 "field-mask" => {
-                    call = call.field_mask(value.unwrap_or(""));
+                    call = call.field_mask(        value.map(|v| arg_from_str(v, err, "field-mask", "google-fieldmask")).unwrap_or(FieldMask::default()));
                 },
                 "compare-duration" => {
-                    call = call.compare_duration(value.unwrap_or(""));
+                    call = call.compare_duration(        value.map(|v| arg_from_str(v, err, "compare-duration", "google-duration")).unwrap_or(chrono::Duration::seconds(0)));
                 },
                 _ => {
                     let mut found = false;
@@ -2103,10 +2472,10 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "update-mask" => {
-                    call = call.update_mask(value.unwrap_or(""));
+                    call = call.update_mask(        value.map(|v| arg_from_str(v, err, "update-mask", "google-fieldmask")).unwrap_or(FieldMask::default()));
                 },
                 "start-time" => {
-                    call = call.start_time(value.unwrap_or(""));
+                    call = call.start_time(        value.map(|v| arg_from_str(v, err, "start-time", "google-datetime")).unwrap_or(chrono::Utc::now()));
                 },
                 _ => {
                     let mut found = false;
@@ -2365,7 +2734,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -2461,7 +2830,7 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "update-mask" => {
-                    call = call.update_mask(value.unwrap_or(""));
+                    call = call.update_mask(        value.map(|v| arg_from_str(v, err, "update-mask", "google-fieldmask")).unwrap_or(FieldMask::default()));
                 },
                 _ => {
                     let mut found = false;
@@ -2857,7 +3226,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -2952,7 +3321,7 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "update-mask" => {
-                    call = call.update_mask(value.unwrap_or(""));
+                    call = call.update_mask(        value.map(|v| arg_from_str(v, err, "update-mask", "google-fieldmask")).unwrap_or(FieldMask::default()));
                 },
                 _ => {
                     let mut found = false;
@@ -3208,7 +3577,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -3301,7 +3670,7 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "update-mask" => {
-                    call = call.update_mask(value.unwrap_or(""));
+                    call = call.update_mask(        value.map(|v| arg_from_str(v, err, "update-mask", "google-fieldmask")).unwrap_or(FieldMask::default()));
                 },
                 _ => {
                     let mut found = false;
@@ -3516,7 +3885,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 "filter" => {
                     call = call.filter(value.unwrap_or(""));
@@ -3683,16 +4052,35 @@ where
                     "access.caller-ip-geo.region-code" => Some(("access.callerIpGeo.regionCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "access.method-name" => Some(("access.methodName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "access.principal-email" => Some(("access.principalEmail", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "access.principal-subject" => Some(("access.principalSubject", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "access.service-account-key-name" => Some(("access.serviceAccountKeyName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "access.service-name" => Some(("access.serviceName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "access.user-agent-family" => Some(("access.userAgentFamily", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "access.user-name" => Some(("access.userName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "canonical-name" => Some(("canonicalName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "category" => Some(("category", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "database.display-name" => Some(("database.displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "database.grantees" => Some(("database.grantees", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "database.name" => Some(("database.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "database.query" => Some(("database.query", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "database.user-name" => Some(("database.userName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "event-time" => Some(("eventTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "external-uri" => Some(("externalUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "finding-class" => Some(("findingClass", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "indicator.domains" => Some(("indicator.domains", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "indicator.ip-addresses" => Some(("indicator.ipAddresses", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "indicator.uris" => Some(("indicator.uris", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "kernel-rootkit.name" => Some(("kernelRootkit.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "kernel-rootkit.unexpected-code-modification" => Some(("kernelRootkit.unexpectedCodeModification", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "kernel-rootkit.unexpected-ftrace-handler" => Some(("kernelRootkit.unexpectedFtraceHandler", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "kernel-rootkit.unexpected-interrupt-handler" => Some(("kernelRootkit.unexpectedInterruptHandler", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "kernel-rootkit.unexpected-kernel-code-pages" => Some(("kernelRootkit.unexpectedKernelCodePages", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "kernel-rootkit.unexpected-kprobe-handler" => Some(("kernelRootkit.unexpectedKprobeHandler", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "kernel-rootkit.unexpected-processes-in-runqueue" => Some(("kernelRootkit.unexpectedProcessesInRunqueue", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "kernel-rootkit.unexpected-read-only-data-modification" => Some(("kernelRootkit.unexpectedReadOnlyDataModification", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "kernel-rootkit.unexpected-system-call-handler" => Some(("kernelRootkit.unexpectedSystemCallHandler", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "mitre-attack.additional-tactics" => Some(("mitreAttack.additionalTactics", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "mitre-attack.additional-techniques" => Some(("mitreAttack.additionalTechniques", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "mitre-attack.primary-tactic" => Some(("mitreAttack.primaryTactic", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -3702,7 +4090,9 @@ where
                     "mute-initiator" => Some(("muteInitiator", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "mute-update-time" => Some(("muteUpdateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "next-steps" => Some(("nextSteps", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "parent" => Some(("parent", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "parent-display-name" => Some(("parentDisplayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "resource-name" => Some(("resourceName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "security-marks.canonical-name" => Some(("securityMarks.canonicalName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "security-marks.marks" => Some(("securityMarks.marks", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
@@ -3721,7 +4111,7 @@ where
                     "vulnerability.cve.id" => Some(("vulnerability.cve.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "vulnerability.cve.upstream-fix-available" => Some(("vulnerability.cve.upstreamFixAvailable", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["access", "additional-tactics", "additional-techniques", "attack-complexity", "attack-vector", "availability-impact", "base-score", "caller-ip", "caller-ip-geo", "canonical-name", "category", "confidentiality-impact", "create-time", "cve", "cvssv3", "domains", "event-time", "external-uri", "finding-class", "id", "indicator", "integrity-impact", "ip-addresses", "marks", "method-name", "mitre-attack", "mute", "mute-initiator", "mute-update-time", "name", "parent", "primary-tactic", "primary-techniques", "principal-email", "privileges-required", "region-code", "resource-name", "scope", "security-marks", "service-name", "severity", "state", "upstream-fix-available", "user-agent-family", "user-interaction", "version", "vulnerability"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["access", "additional-tactics", "additional-techniques", "attack-complexity", "attack-vector", "availability-impact", "base-score", "caller-ip", "caller-ip-geo", "canonical-name", "category", "confidentiality-impact", "create-time", "cve", "cvssv3", "database", "description", "display-name", "domains", "event-time", "external-uri", "finding-class", "grantees", "id", "indicator", "integrity-impact", "ip-addresses", "kernel-rootkit", "marks", "method-name", "mitre-attack", "mute", "mute-initiator", "mute-update-time", "name", "next-steps", "parent", "parent-display-name", "primary-tactic", "primary-techniques", "principal-email", "principal-subject", "privileges-required", "query", "region-code", "resource-name", "scope", "security-marks", "service-account-key-name", "service-name", "severity", "state", "unexpected-code-modification", "unexpected-ftrace-handler", "unexpected-interrupt-handler", "unexpected-kernel-code-pages", "unexpected-kprobe-handler", "unexpected-processes-in-runqueue", "unexpected-read-only-data-modification", "unexpected-system-call-handler", "upstream-fix-available", "uris", "user-agent-family", "user-interaction", "user-name", "version", "vulnerability"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -3829,7 +4219,7 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "update-mask" => {
-                    call = call.update_mask(value.unwrap_or(""));
+                    call = call.update_mask(        value.map(|v| arg_from_str(v, err, "update-mask", "google-fieldmask")).unwrap_or(FieldMask::default()));
                 },
                 _ => {
                     let mut found = false;
@@ -3975,13 +4365,13 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "read-time" => {
-                    call = call.read_time(value.unwrap_or(""));
+                    call = call.read_time(        value.map(|v| arg_from_str(v, err, "read-time", "google-datetime")).unwrap_or(chrono::Utc::now()));
                 },
                 "page-token" => {
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 "order-by" => {
                     call = call.order_by(value.unwrap_or(""));
@@ -3990,10 +4380,10 @@ where
                     call = call.filter(value.unwrap_or(""));
                 },
                 "field-mask" => {
-                    call = call.field_mask(value.unwrap_or(""));
+                    call = call.field_mask(        value.map(|v| arg_from_str(v, err, "field-mask", "google-fieldmask")).unwrap_or(FieldMask::default()));
                 },
                 "compare-duration" => {
-                    call = call.compare_duration(value.unwrap_or(""));
+                    call = call.compare_duration(        value.map(|v| arg_from_str(v, err, "compare-duration", "google-duration")).unwrap_or(chrono::Duration::seconds(0)));
                 },
                 _ => {
                     let mut found = false;
@@ -4069,16 +4459,35 @@ where
                     "access.caller-ip-geo.region-code" => Some(("access.callerIpGeo.regionCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "access.method-name" => Some(("access.methodName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "access.principal-email" => Some(("access.principalEmail", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "access.principal-subject" => Some(("access.principalSubject", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "access.service-account-key-name" => Some(("access.serviceAccountKeyName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "access.service-name" => Some(("access.serviceName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "access.user-agent-family" => Some(("access.userAgentFamily", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "access.user-name" => Some(("access.userName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "canonical-name" => Some(("canonicalName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "category" => Some(("category", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "database.display-name" => Some(("database.displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "database.grantees" => Some(("database.grantees", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "database.name" => Some(("database.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "database.query" => Some(("database.query", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "database.user-name" => Some(("database.userName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "event-time" => Some(("eventTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "external-uri" => Some(("externalUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "finding-class" => Some(("findingClass", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "indicator.domains" => Some(("indicator.domains", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "indicator.ip-addresses" => Some(("indicator.ipAddresses", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "indicator.uris" => Some(("indicator.uris", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "kernel-rootkit.name" => Some(("kernelRootkit.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "kernel-rootkit.unexpected-code-modification" => Some(("kernelRootkit.unexpectedCodeModification", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "kernel-rootkit.unexpected-ftrace-handler" => Some(("kernelRootkit.unexpectedFtraceHandler", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "kernel-rootkit.unexpected-interrupt-handler" => Some(("kernelRootkit.unexpectedInterruptHandler", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "kernel-rootkit.unexpected-kernel-code-pages" => Some(("kernelRootkit.unexpectedKernelCodePages", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "kernel-rootkit.unexpected-kprobe-handler" => Some(("kernelRootkit.unexpectedKprobeHandler", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "kernel-rootkit.unexpected-processes-in-runqueue" => Some(("kernelRootkit.unexpectedProcessesInRunqueue", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "kernel-rootkit.unexpected-read-only-data-modification" => Some(("kernelRootkit.unexpectedReadOnlyDataModification", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "kernel-rootkit.unexpected-system-call-handler" => Some(("kernelRootkit.unexpectedSystemCallHandler", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "mitre-attack.additional-tactics" => Some(("mitreAttack.additionalTactics", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "mitre-attack.additional-techniques" => Some(("mitreAttack.additionalTechniques", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "mitre-attack.primary-tactic" => Some(("mitreAttack.primaryTactic", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -4088,7 +4497,9 @@ where
                     "mute-initiator" => Some(("muteInitiator", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "mute-update-time" => Some(("muteUpdateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "next-steps" => Some(("nextSteps", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "parent" => Some(("parent", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "parent-display-name" => Some(("parentDisplayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "resource-name" => Some(("resourceName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "security-marks.canonical-name" => Some(("securityMarks.canonicalName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "security-marks.marks" => Some(("securityMarks.marks", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
@@ -4107,7 +4518,7 @@ where
                     "vulnerability.cve.id" => Some(("vulnerability.cve.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "vulnerability.cve.upstream-fix-available" => Some(("vulnerability.cve.upstreamFixAvailable", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["access", "additional-tactics", "additional-techniques", "attack-complexity", "attack-vector", "availability-impact", "base-score", "caller-ip", "caller-ip-geo", "canonical-name", "category", "confidentiality-impact", "create-time", "cve", "cvssv3", "domains", "event-time", "external-uri", "finding-class", "id", "indicator", "integrity-impact", "ip-addresses", "marks", "method-name", "mitre-attack", "mute", "mute-initiator", "mute-update-time", "name", "parent", "primary-tactic", "primary-techniques", "principal-email", "privileges-required", "region-code", "resource-name", "scope", "security-marks", "service-name", "severity", "state", "upstream-fix-available", "user-agent-family", "user-interaction", "version", "vulnerability"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["access", "additional-tactics", "additional-techniques", "attack-complexity", "attack-vector", "availability-impact", "base-score", "caller-ip", "caller-ip-geo", "canonical-name", "category", "confidentiality-impact", "create-time", "cve", "cvssv3", "database", "description", "display-name", "domains", "event-time", "external-uri", "finding-class", "grantees", "id", "indicator", "integrity-impact", "ip-addresses", "kernel-rootkit", "marks", "method-name", "mitre-attack", "mute", "mute-initiator", "mute-update-time", "name", "next-steps", "parent", "parent-display-name", "primary-tactic", "primary-techniques", "principal-email", "principal-subject", "privileges-required", "query", "region-code", "resource-name", "scope", "security-marks", "service-account-key-name", "service-name", "severity", "state", "unexpected-code-modification", "unexpected-ftrace-handler", "unexpected-interrupt-handler", "unexpected-kernel-code-pages", "unexpected-kprobe-handler", "unexpected-processes-in-runqueue", "unexpected-read-only-data-modification", "unexpected-system-call-handler", "upstream-fix-available", "uris", "user-agent-family", "user-interaction", "user-name", "version", "vulnerability"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -4122,7 +4533,7 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "update-mask" => {
-                    call = call.update_mask(value.unwrap_or(""));
+                    call = call.update_mask(        value.map(|v| arg_from_str(v, err, "update-mask", "google-fieldmask")).unwrap_or(FieldMask::default()));
                 },
                 _ => {
                     let mut found = false;
@@ -4384,10 +4795,10 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "update-mask" => {
-                    call = call.update_mask(value.unwrap_or(""));
+                    call = call.update_mask(        value.map(|v| arg_from_str(v, err, "update-mask", "google-fieldmask")).unwrap_or(FieldMask::default()));
                 },
                 "start-time" => {
-                    call = call.start_time(value.unwrap_or(""));
+                    call = call.start_time(        value.map(|v| arg_from_str(v, err, "start-time", "google-datetime")).unwrap_or(chrono::Utc::now()));
                 },
                 _ => {
                     let mut found = false;
@@ -4583,7 +4994,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -4675,7 +5086,7 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "update-mask" => {
-                    call = call.update_mask(value.unwrap_or(""));
+                    call = call.update_mask(        value.map(|v| arg_from_str(v, err, "update-mask", "google-fieldmask")).unwrap_or(FieldMask::default()));
                 },
                 _ => {
                     let mut found = false;
@@ -4940,7 +5351,7 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "update-mask" => {
-                    call = call.update_mask(value.unwrap_or(""));
+                    call = call.update_mask(        value.map(|v| arg_from_str(v, err, "update-mask", "google-fieldmask")).unwrap_or(FieldMask::default()));
                 },
                 _ => {
                     let mut found = false;
@@ -5086,13 +5497,13 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "read-time" => {
-                    call = call.read_time(value.unwrap_or(""));
+                    call = call.read_time(        value.map(|v| arg_from_str(v, err, "read-time", "google-datetime")).unwrap_or(chrono::Utc::now()));
                 },
                 "page-token" => {
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 "order-by" => {
                     call = call.order_by(value.unwrap_or(""));
@@ -5101,10 +5512,10 @@ where
                     call = call.filter(value.unwrap_or(""));
                 },
                 "field-mask" => {
-                    call = call.field_mask(value.unwrap_or(""));
+                    call = call.field_mask(        value.map(|v| arg_from_str(v, err, "field-mask", "google-fieldmask")).unwrap_or(FieldMask::default()));
                 },
                 "compare-duration" => {
-                    call = call.compare_duration(value.unwrap_or(""));
+                    call = call.compare_duration(        value.map(|v| arg_from_str(v, err, "compare-duration", "google-duration")).unwrap_or(chrono::Duration::seconds(0)));
                 },
                 _ => {
                     let mut found = false;
@@ -5195,10 +5606,10 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "update-mask" => {
-                    call = call.update_mask(value.unwrap_or(""));
+                    call = call.update_mask(        value.map(|v| arg_from_str(v, err, "update-mask", "google-fieldmask")).unwrap_or(FieldMask::default()));
                 },
                 "start-time" => {
-                    call = call.start_time(value.unwrap_or(""));
+                    call = call.start_time(        value.map(|v| arg_from_str(v, err, "start-time", "google-datetime")).unwrap_or(chrono::Utc::now()));
                 },
                 _ => {
                     let mut found = false;
@@ -5457,7 +5868,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -5553,7 +5964,7 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "update-mask" => {
-                    call = call.update_mask(value.unwrap_or(""));
+                    call = call.update_mask(        value.map(|v| arg_from_str(v, err, "update-mask", "google-fieldmask")).unwrap_or(FieldMask::default()));
                 },
                 _ => {
                     let mut found = false;
@@ -5897,7 +6308,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -5992,7 +6403,356 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "update-mask" => {
-                    call = call.update_mask(value.unwrap_or(""));
+                    call = call.update_mask(        value.map(|v| arg_from_str(v, err, "update-mask", "google-fieldmask")).unwrap_or(FieldMask::default()));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["update-mask"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_notification_configs_create(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "pubsub-topic" => Some(("pubsubTopic", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "service-account" => Some(("serviceAccount", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "streaming-config.filter" => Some(("streamingConfig.filter", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["description", "filter", "name", "pubsub-topic", "service-account", "streaming-config"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::NotificationConfig = json::value::from_value(object).unwrap();
+        let mut call = self.hub.projects().notification_configs_create(request, opt.value_of("parent").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "config-id" => {
+                    call = call.config_id(value.unwrap_or(""));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["config-id"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_notification_configs_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.projects().notification_configs_delete(opt.value_of("name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_notification_configs_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.projects().notification_configs_get(opt.value_of("name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_notification_configs_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.projects().notification_configs_list(opt.value_of("parent").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "page-token" => {
+                    call = call.page_token(value.unwrap_or(""));
+                },
+                "page-size" => {
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["page-size", "page-token"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_notification_configs_patch(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "pubsub-topic" => Some(("pubsubTopic", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "service-account" => Some(("serviceAccount", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "streaming-config.filter" => Some(("streamingConfig.filter", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["description", "filter", "name", "pubsub-topic", "service-account", "streaming-config"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::NotificationConfig = json::value::from_value(object).unwrap();
+        let mut call = self.hub.projects().notification_configs_patch(request, opt.value_of("name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "update-mask" => {
+                    call = call.update_mask(        value.map(|v| arg_from_str(v, err, "update-mask", "google-fieldmask")).unwrap_or(FieldMask::default()));
                 },
                 _ => {
                     let mut found = false;
@@ -6085,7 +6845,7 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "update-mask" => {
-                    call = call.update_mask(value.unwrap_or(""));
+                    call = call.update_mask(        value.map(|v| arg_from_str(v, err, "update-mask", "google-fieldmask")).unwrap_or(FieldMask::default()));
                 },
                 _ => {
                     let mut found = false;
@@ -6231,13 +6991,13 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "read-time" => {
-                    call = call.read_time(value.unwrap_or(""));
+                    call = call.read_time(        value.map(|v| arg_from_str(v, err, "read-time", "google-datetime")).unwrap_or(chrono::Utc::now()));
                 },
                 "page-token" => {
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 "order-by" => {
                     call = call.order_by(value.unwrap_or(""));
@@ -6246,10 +7006,10 @@ where
                     call = call.filter(value.unwrap_or(""));
                 },
                 "field-mask" => {
-                    call = call.field_mask(value.unwrap_or(""));
+                    call = call.field_mask(        value.map(|v| arg_from_str(v, err, "field-mask", "google-fieldmask")).unwrap_or(FieldMask::default()));
                 },
                 "compare-duration" => {
-                    call = call.compare_duration(value.unwrap_or(""));
+                    call = call.compare_duration(        value.map(|v| arg_from_str(v, err, "compare-duration", "google-duration")).unwrap_or(chrono::Duration::seconds(0)));
                 },
                 _ => {
                     let mut found = false;
@@ -6325,16 +7085,35 @@ where
                     "access.caller-ip-geo.region-code" => Some(("access.callerIpGeo.regionCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "access.method-name" => Some(("access.methodName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "access.principal-email" => Some(("access.principalEmail", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "access.principal-subject" => Some(("access.principalSubject", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "access.service-account-key-name" => Some(("access.serviceAccountKeyName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "access.service-name" => Some(("access.serviceName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "access.user-agent-family" => Some(("access.userAgentFamily", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "access.user-name" => Some(("access.userName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "canonical-name" => Some(("canonicalName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "category" => Some(("category", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "database.display-name" => Some(("database.displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "database.grantees" => Some(("database.grantees", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "database.name" => Some(("database.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "database.query" => Some(("database.query", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "database.user-name" => Some(("database.userName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "event-time" => Some(("eventTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "external-uri" => Some(("externalUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "finding-class" => Some(("findingClass", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "indicator.domains" => Some(("indicator.domains", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "indicator.ip-addresses" => Some(("indicator.ipAddresses", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "indicator.uris" => Some(("indicator.uris", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "kernel-rootkit.name" => Some(("kernelRootkit.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "kernel-rootkit.unexpected-code-modification" => Some(("kernelRootkit.unexpectedCodeModification", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "kernel-rootkit.unexpected-ftrace-handler" => Some(("kernelRootkit.unexpectedFtraceHandler", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "kernel-rootkit.unexpected-interrupt-handler" => Some(("kernelRootkit.unexpectedInterruptHandler", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "kernel-rootkit.unexpected-kernel-code-pages" => Some(("kernelRootkit.unexpectedKernelCodePages", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "kernel-rootkit.unexpected-kprobe-handler" => Some(("kernelRootkit.unexpectedKprobeHandler", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "kernel-rootkit.unexpected-processes-in-runqueue" => Some(("kernelRootkit.unexpectedProcessesInRunqueue", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "kernel-rootkit.unexpected-read-only-data-modification" => Some(("kernelRootkit.unexpectedReadOnlyDataModification", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "kernel-rootkit.unexpected-system-call-handler" => Some(("kernelRootkit.unexpectedSystemCallHandler", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "mitre-attack.additional-tactics" => Some(("mitreAttack.additionalTactics", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "mitre-attack.additional-techniques" => Some(("mitreAttack.additionalTechniques", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "mitre-attack.primary-tactic" => Some(("mitreAttack.primaryTactic", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -6344,7 +7123,9 @@ where
                     "mute-initiator" => Some(("muteInitiator", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "mute-update-time" => Some(("muteUpdateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "next-steps" => Some(("nextSteps", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "parent" => Some(("parent", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "parent-display-name" => Some(("parentDisplayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "resource-name" => Some(("resourceName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "security-marks.canonical-name" => Some(("securityMarks.canonicalName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "security-marks.marks" => Some(("securityMarks.marks", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
@@ -6363,7 +7144,7 @@ where
                     "vulnerability.cve.id" => Some(("vulnerability.cve.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "vulnerability.cve.upstream-fix-available" => Some(("vulnerability.cve.upstreamFixAvailable", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["access", "additional-tactics", "additional-techniques", "attack-complexity", "attack-vector", "availability-impact", "base-score", "caller-ip", "caller-ip-geo", "canonical-name", "category", "confidentiality-impact", "create-time", "cve", "cvssv3", "domains", "event-time", "external-uri", "finding-class", "id", "indicator", "integrity-impact", "ip-addresses", "marks", "method-name", "mitre-attack", "mute", "mute-initiator", "mute-update-time", "name", "parent", "primary-tactic", "primary-techniques", "principal-email", "privileges-required", "region-code", "resource-name", "scope", "security-marks", "service-name", "severity", "state", "upstream-fix-available", "user-agent-family", "user-interaction", "version", "vulnerability"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["access", "additional-tactics", "additional-techniques", "attack-complexity", "attack-vector", "availability-impact", "base-score", "caller-ip", "caller-ip-geo", "canonical-name", "category", "confidentiality-impact", "create-time", "cve", "cvssv3", "database", "description", "display-name", "domains", "event-time", "external-uri", "finding-class", "grantees", "id", "indicator", "integrity-impact", "ip-addresses", "kernel-rootkit", "marks", "method-name", "mitre-attack", "mute", "mute-initiator", "mute-update-time", "name", "next-steps", "parent", "parent-display-name", "primary-tactic", "primary-techniques", "principal-email", "principal-subject", "privileges-required", "query", "region-code", "resource-name", "scope", "security-marks", "service-account-key-name", "service-name", "severity", "state", "unexpected-code-modification", "unexpected-ftrace-handler", "unexpected-interrupt-handler", "unexpected-kernel-code-pages", "unexpected-kprobe-handler", "unexpected-processes-in-runqueue", "unexpected-read-only-data-modification", "unexpected-system-call-handler", "upstream-fix-available", "uris", "user-agent-family", "user-interaction", "user-name", "version", "vulnerability"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -6378,7 +7159,7 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "update-mask" => {
-                    call = call.update_mask(value.unwrap_or(""));
+                    call = call.update_mask(        value.map(|v| arg_from_str(v, err, "update-mask", "google-fieldmask")).unwrap_or(FieldMask::default()));
                 },
                 _ => {
                     let mut found = false;
@@ -6640,10 +7421,10 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "update-mask" => {
-                    call = call.update_mask(value.unwrap_or(""));
+                    call = call.update_mask(        value.map(|v| arg_from_str(v, err, "update-mask", "google-fieldmask")).unwrap_or(FieldMask::default()));
                 },
                 "start-time" => {
-                    call = call.start_time(value.unwrap_or(""));
+                    call = call.start_time(        value.map(|v| arg_from_str(v, err, "start-time", "google-datetime")).unwrap_or(chrono::Utc::now()));
                 },
                 _ => {
                     let mut found = false;
@@ -6702,7 +7483,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -6799,6 +7580,21 @@ where
                     },
                     ("mute-configs-patch", Some(opt)) => {
                         call_result = self._folders_mute_configs_patch(opt, dry_run, &mut err).await;
+                    },
+                    ("notification-configs-create", Some(opt)) => {
+                        call_result = self._folders_notification_configs_create(opt, dry_run, &mut err).await;
+                    },
+                    ("notification-configs-delete", Some(opt)) => {
+                        call_result = self._folders_notification_configs_delete(opt, dry_run, &mut err).await;
+                    },
+                    ("notification-configs-get", Some(opt)) => {
+                        call_result = self._folders_notification_configs_get(opt, dry_run, &mut err).await;
+                    },
+                    ("notification-configs-list", Some(opt)) => {
+                        call_result = self._folders_notification_configs_list(opt, dry_run, &mut err).await;
+                    },
+                    ("notification-configs-patch", Some(opt)) => {
+                        call_result = self._folders_notification_configs_patch(opt, dry_run, &mut err).await;
                     },
                     ("sources-findings-external-systems-patch", Some(opt)) => {
                         call_result = self._folders_sources_findings_external_systems_patch(opt, dry_run, &mut err).await;
@@ -7005,6 +7801,21 @@ where
                     ("mute-configs-patch", Some(opt)) => {
                         call_result = self._projects_mute_configs_patch(opt, dry_run, &mut err).await;
                     },
+                    ("notification-configs-create", Some(opt)) => {
+                        call_result = self._projects_notification_configs_create(opt, dry_run, &mut err).await;
+                    },
+                    ("notification-configs-delete", Some(opt)) => {
+                        call_result = self._projects_notification_configs_delete(opt, dry_run, &mut err).await;
+                    },
+                    ("notification-configs-get", Some(opt)) => {
+                        call_result = self._projects_notification_configs_get(opt, dry_run, &mut err).await;
+                    },
+                    ("notification-configs-list", Some(opt)) => {
+                        call_result = self._projects_notification_configs_list(opt, dry_run, &mut err).await;
+                    },
+                    ("notification-configs-patch", Some(opt)) => {
+                        call_result = self._projects_notification_configs_patch(opt, dry_run, &mut err).await;
+                    },
                     ("sources-findings-external-systems-patch", Some(opt)) => {
                         call_result = self._projects_sources_findings_external_systems_patch(opt, dry_run, &mut err).await;
                     },
@@ -7108,14 +7919,14 @@ where
 async fn main() {
     let mut exit_status = 0i32;
     let arg_data = [
-        ("folders", "methods: 'assets-group', 'assets-list', 'assets-update-security-marks', 'big-query-exports-create', 'big-query-exports-delete', 'big-query-exports-get', 'big-query-exports-list', 'big-query-exports-patch', 'findings-bulk-mute', 'mute-configs-create', 'mute-configs-delete', 'mute-configs-get', 'mute-configs-list', 'mute-configs-patch', 'sources-findings-external-systems-patch', 'sources-findings-group', 'sources-findings-list', 'sources-findings-patch', 'sources-findings-set-mute', 'sources-findings-set-state', 'sources-findings-update-security-marks' and 'sources-list'", vec![
+        ("folders", "methods: 'assets-group', 'assets-list', 'assets-update-security-marks', 'big-query-exports-create', 'big-query-exports-delete', 'big-query-exports-get', 'big-query-exports-list', 'big-query-exports-patch', 'findings-bulk-mute', 'mute-configs-create', 'mute-configs-delete', 'mute-configs-get', 'mute-configs-list', 'mute-configs-patch', 'notification-configs-create', 'notification-configs-delete', 'notification-configs-get', 'notification-configs-list', 'notification-configs-patch', 'sources-findings-external-systems-patch', 'sources-findings-group', 'sources-findings-list', 'sources-findings-patch', 'sources-findings-set-mute', 'sources-findings-set-state', 'sources-findings-update-security-marks' and 'sources-list'", vec![
             ("assets-group",
                     Some(r##"Filters an organization's assets and groups them by their specified properties."##),
                     "Details at http://byron.github.io/google-apis-rs/google_securitycenter1_cli/folders_assets-group",
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. Name of the organization to groupBy. Its format is "organizations/[organization_id], folders/[folder_id], or projects/[project_id]"."##),
+                     Some(r##"Required. The name of the parent to group the assets by. Its format is "organizations/[organization_id]", "folders/[folder_id]", or "projects/[project_id]"."##),
                      Some(true),
                      Some(false)),
         
@@ -7143,7 +7954,7 @@ async fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. Name of the organization assets should belong to. Its format is "organizations/[organization_id], folders/[folder_id], or projects/[project_id]"."##),
+                     Some(r##"Required. The name of the parent resource that contains the assets. The value that you can specify on parent depends on the method in which you specify parent. You can specify one of the following values: "organizations/[organization_id]", "folders/[folder_id]", or "projects/[project_id]"."##),
                      Some(true),
                      Some(false)),
         
@@ -7188,12 +7999,12 @@ async fn main() {
                      Some(false)),
                   ]),
             ("big-query-exports-create",
-                    Some(r##"Creates a big query export."##),
+                    Some(r##"Creates a BigQuery export."##),
                     "Details at http://byron.github.io/google-apis-rs/google_securitycenter1_cli/folders_big-query-exports-create",
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. Resource name of the new big query export's parent. Its format is "organizations/[organization_id]", "folders/[folder_id]", or "projects/[project_id]"."##),
+                     Some(r##"Required. The name of the parent resource of the new BigQuery export. Its format is "organizations/[organization_id]", "folders/[folder_id]", or "projects/[project_id]"."##),
                      Some(true),
                      Some(false)),
         
@@ -7216,12 +8027,12 @@ async fn main() {
                      Some(false)),
                   ]),
             ("big-query-exports-delete",
-                    Some(r##"Deletes an existing big query export."##),
+                    Some(r##"Deletes an existing BigQuery export."##),
                     "Details at http://byron.github.io/google-apis-rs/google_securitycenter1_cli/folders_big-query-exports-delete",
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. Name of the big query export to delete. Its format is organizations/{organization}/bigQueryExports/{export_id}, folders/{folder}/bigQueryExports/{export_id}, or projects/{project}/bigQueryExports/{export_id}"##),
+                     Some(r##"Required. The name of the BigQuery export to delete. Its format is organizations/{organization}/bigQueryExports/{export_id}, folders/{folder}/bigQueryExports/{export_id}, or projects/{project}/bigQueryExports/{export_id}"##),
                      Some(true),
                      Some(false)),
         
@@ -7238,12 +8049,12 @@ async fn main() {
                      Some(false)),
                   ]),
             ("big-query-exports-get",
-                    Some(r##"Gets a big query export."##),
+                    Some(r##"Gets a BigQuery export."##),
                     "Details at http://byron.github.io/google-apis-rs/google_securitycenter1_cli/folders_big-query-exports-get",
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. Name of the big query export to retrieve. Its format is organizations/{organization}/bigQueryExports/{export_id}, folders/{folder}/bigQueryExports/{export_id}, or projects/{project}/bigQueryExports/{export_id}"##),
+                     Some(r##"Required. Name of the BigQuery export to retrieve. Its format is organizations/{organization}/bigQueryExports/{export_id}, folders/{folder}/bigQueryExports/{export_id}, or projects/{project}/bigQueryExports/{export_id}"##),
                      Some(true),
                      Some(false)),
         
@@ -7459,13 +8270,135 @@ async fn main() {
                      Some(false),
                      Some(false)),
                   ]),
+            ("notification-configs-create",
+                    Some(r##"Creates a notification config."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_securitycenter1_cli/folders_notification-configs-create",
+                  vec![
+                    (Some(r##"parent"##),
+                     None,
+                     Some(r##"Required. Resource name of the new notification config's parent. Its format is "organizations/[organization_id]", "folders/[folder_id]", or "projects/[project_id]"."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("notification-configs-delete",
+                    Some(r##"Deletes a notification config."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_securitycenter1_cli/folders_notification-configs-delete",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. Name of the notification config to delete. Its format is "organizations/[organization_id]/notificationConfigs/[config_id]", "folders/[folder_id]/notificationConfigs/[config_id]", or "projects/[project_id]/notificationConfigs/[config_id]"."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("notification-configs-get",
+                    Some(r##"Gets a notification config."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_securitycenter1_cli/folders_notification-configs-get",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. Name of the notification config to get. Its format is "organizations/[organization_id]/notificationConfigs/[config_id]", "folders/[folder_id]/notificationConfigs/[config_id]", or "projects/[project_id]/notificationConfigs/[config_id]"."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("notification-configs-list",
+                    Some(r##"Lists notification configs."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_securitycenter1_cli/folders_notification-configs-list",
+                  vec![
+                    (Some(r##"parent"##),
+                     None,
+                     Some(r##"Required. The name of the parent in which to list the notification configurations. Its format is "organizations/[organization_id]", "folders/[folder_id]", or "projects/[project_id]"."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("notification-configs-patch",
+                    Some(r##" Updates a notification config. The following update fields are allowed: description, pubsub_topic, streaming_config.filter"##),
+                    "Details at http://byron.github.io/google-apis-rs/google_securitycenter1_cli/folders_notification-configs-patch",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"The relative resource name of this notification config. See: https://cloud.google.com/apis/design/resource_names#relative_resource_name Example: "organizations/{organization_id}/notificationConfigs/notify_public_bucket", "folders/{folder_id}/notificationConfigs/notify_public_bucket", or "projects/{project_id}/notificationConfigs/notify_public_bucket"."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
             ("sources-findings-external-systems-patch",
                     Some(r##"Updates external system. This is for a given finding."##),
                     "Details at http://byron.github.io/google-apis-rs/google_securitycenter1_cli/folders_sources-findings-external-systems-patch",
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"External System Name e.g. jira, demisto, etc. e.g.: organizations/1234/sources/5678/findings/123456/externalSystems/jira folders/1234/sources/5678/findings/123456/externalSystems/jira projects/1234/sources/5678/findings/123456/externalSystems/jira"##),
+                     Some(r##"Full resource name of the external system, for example: "organizations/1234/sources/5678/findings/123456/externalSystems/jira", "folders/1234/sources/5678/findings/123456/externalSystems/jira", "projects/1234/sources/5678/findings/123456/externalSystems/jira""##),
                      Some(true),
                      Some(false)),
         
@@ -7571,7 +8504,7 @@ async fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. The relative resource name of the finding. See: https://cloud.google.com/apis/design/resource_names#relative_resource_name Example: "organizations/{organization_id}/sources/{source_id}/finding/{finding_id}", "folders/{folder_id}/sources/{source_id}/finding/{finding_id}", "projects/{project_id}/sources/{source_id}/finding/{finding_id}"."##),
+                     Some(r##"Required. The [relative resource name](https://cloud.google.com/apis/design/resource_names#relative_resource_name) of the finding. Example: "organizations/{organization_id}/sources/{source_id}/findings/{finding_id}", "folders/{folder_id}/sources/{source_id}/findings/{finding_id}", "projects/{project_id}/sources/{source_id}/findings/{finding_id}"."##),
                      Some(true),
                      Some(false)),
         
@@ -7599,7 +8532,7 @@ async fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. The relative resource name of the finding. See: https://cloud.google.com/apis/design/resource_names#relative_resource_name Example: "organizations/{organization_id}/sources/{source_id}/finding/{finding_id}"."##),
+                     Some(r##"Required. The [relative resource name](https://cloud.google.com/apis/design/resource_names#relative_resource_name) of the finding. Example: "organizations/{organization_id}/sources/{source_id}/findings/{finding_id}", "folders/{folder_id}/sources/{source_id}/findings/{finding_id}", "projects/{project_id}/sources/{source_id}/findings/{finding_id}"."##),
                      Some(true),
                      Some(false)),
         
@@ -7655,7 +8588,7 @@ async fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. Resource name of the parent of sources to list. Its format should be "organizations/[organization_id], folders/[folder_id], or projects/[project_id]"."##),
+                     Some(r##"Required. Resource name of the parent of sources to list. Its format should be "organizations/[organization_id]", "folders/[folder_id]", or "projects/[project_id]"."##),
                      Some(true),
                      Some(false)),
         
@@ -7680,7 +8613,7 @@ async fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. Name of the organization to groupBy. Its format is "organizations/[organization_id], folders/[folder_id], or projects/[project_id]"."##),
+                     Some(r##"Required. The name of the parent to group the assets by. Its format is "organizations/[organization_id]", "folders/[folder_id]", or "projects/[project_id]"."##),
                      Some(true),
                      Some(false)),
         
@@ -7708,7 +8641,7 @@ async fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. Name of the organization assets should belong to. Its format is "organizations/[organization_id], folders/[folder_id], or projects/[project_id]"."##),
+                     Some(r##"Required. The name of the parent resource that contains the assets. The value that you can specify on parent depends on the method in which you specify parent. You can specify one of the following values: "organizations/[organization_id]", "folders/[folder_id]", or "projects/[project_id]"."##),
                      Some(true),
                      Some(false)),
         
@@ -7781,12 +8714,12 @@ async fn main() {
                      Some(false)),
                   ]),
             ("big-query-exports-create",
-                    Some(r##"Creates a big query export."##),
+                    Some(r##"Creates a BigQuery export."##),
                     "Details at http://byron.github.io/google-apis-rs/google_securitycenter1_cli/organizations_big-query-exports-create",
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. Resource name of the new big query export's parent. Its format is "organizations/[organization_id]", "folders/[folder_id]", or "projects/[project_id]"."##),
+                     Some(r##"Required. The name of the parent resource of the new BigQuery export. Its format is "organizations/[organization_id]", "folders/[folder_id]", or "projects/[project_id]"."##),
                      Some(true),
                      Some(false)),
         
@@ -7809,12 +8742,12 @@ async fn main() {
                      Some(false)),
                   ]),
             ("big-query-exports-delete",
-                    Some(r##"Deletes an existing big query export."##),
+                    Some(r##"Deletes an existing BigQuery export."##),
                     "Details at http://byron.github.io/google-apis-rs/google_securitycenter1_cli/organizations_big-query-exports-delete",
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. Name of the big query export to delete. Its format is organizations/{organization}/bigQueryExports/{export_id}, folders/{folder}/bigQueryExports/{export_id}, or projects/{project}/bigQueryExports/{export_id}"##),
+                     Some(r##"Required. The name of the BigQuery export to delete. Its format is organizations/{organization}/bigQueryExports/{export_id}, folders/{folder}/bigQueryExports/{export_id}, or projects/{project}/bigQueryExports/{export_id}"##),
                      Some(true),
                      Some(false)),
         
@@ -7831,12 +8764,12 @@ async fn main() {
                      Some(false)),
                   ]),
             ("big-query-exports-get",
-                    Some(r##"Gets a big query export."##),
+                    Some(r##"Gets a BigQuery export."##),
                     "Details at http://byron.github.io/google-apis-rs/google_securitycenter1_cli/organizations_big-query-exports-get",
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. Name of the big query export to retrieve. Its format is organizations/{organization}/bigQueryExports/{export_id}, folders/{folder}/bigQueryExports/{export_id}, or projects/{project}/bigQueryExports/{export_id}"##),
+                     Some(r##"Required. Name of the BigQuery export to retrieve. Its format is organizations/{organization}/bigQueryExports/{export_id}, folders/{folder}/bigQueryExports/{export_id}, or projects/{project}/bigQueryExports/{export_id}"##),
                      Some(true),
                      Some(false)),
         
@@ -8080,7 +9013,7 @@ async fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. Resource name of the new notification config's parent. Its format is "organizations/[organization_id]"."##),
+                     Some(r##"Required. Resource name of the new notification config's parent. Its format is "organizations/[organization_id]", "folders/[folder_id]", or "projects/[project_id]"."##),
                      Some(true),
                      Some(false)),
         
@@ -8108,7 +9041,7 @@ async fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. Name of the notification config to delete. Its format is "organizations/[organization_id]/notificationConfigs/[config_id]"."##),
+                     Some(r##"Required. Name of the notification config to delete. Its format is "organizations/[organization_id]/notificationConfigs/[config_id]", "folders/[folder_id]/notificationConfigs/[config_id]", or "projects/[project_id]/notificationConfigs/[config_id]"."##),
                      Some(true),
                      Some(false)),
         
@@ -8130,7 +9063,7 @@ async fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. Name of the notification config to get. Its format is "organizations/[organization_id]/notificationConfigs/[config_id]"."##),
+                     Some(r##"Required. Name of the notification config to get. Its format is "organizations/[organization_id]/notificationConfigs/[config_id]", "folders/[folder_id]/notificationConfigs/[config_id]", or "projects/[project_id]/notificationConfigs/[config_id]"."##),
                      Some(true),
                      Some(false)),
         
@@ -8152,7 +9085,7 @@ async fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. Name of the organization to list notification configs. Its format is "organizations/[organization_id]"."##),
+                     Some(r##"Required. The name of the parent in which to list the notification configurations. Its format is "organizations/[organization_id]", "folders/[folder_id]", or "projects/[project_id]"."##),
                      Some(true),
                      Some(false)),
         
@@ -8174,7 +9107,7 @@ async fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The relative resource name of this notification config. See: https://cloud.google.com/apis/design/resource_names#relative_resource_name Example: "organizations/{organization_id}/notificationConfigs/notify_public_bucket"."##),
+                     Some(r##"The relative resource name of this notification config. See: https://cloud.google.com/apis/design/resource_names#relative_resource_name Example: "organizations/{organization_id}/notificationConfigs/notify_public_bucket", "folders/{folder_id}/notificationConfigs/notify_public_bucket", or "projects/{project_id}/notificationConfigs/notify_public_bucket"."##),
                      Some(true),
                      Some(false)),
         
@@ -8346,7 +9279,7 @@ async fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"External System Name e.g. jira, demisto, etc. e.g.: organizations/1234/sources/5678/findings/123456/externalSystems/jira folders/1234/sources/5678/findings/123456/externalSystems/jira projects/1234/sources/5678/findings/123456/externalSystems/jira"##),
+                     Some(r##"Full resource name of the external system, for example: "organizations/1234/sources/5678/findings/123456/externalSystems/jira", "folders/1234/sources/5678/findings/123456/externalSystems/jira", "projects/1234/sources/5678/findings/123456/externalSystems/jira""##),
                      Some(true),
                      Some(false)),
         
@@ -8452,7 +9385,7 @@ async fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. The relative resource name of the finding. See: https://cloud.google.com/apis/design/resource_names#relative_resource_name Example: "organizations/{organization_id}/sources/{source_id}/finding/{finding_id}", "folders/{folder_id}/sources/{source_id}/finding/{finding_id}", "projects/{project_id}/sources/{source_id}/finding/{finding_id}"."##),
+                     Some(r##"Required. The [relative resource name](https://cloud.google.com/apis/design/resource_names#relative_resource_name) of the finding. Example: "organizations/{organization_id}/sources/{source_id}/findings/{finding_id}", "folders/{folder_id}/sources/{source_id}/findings/{finding_id}", "projects/{project_id}/sources/{source_id}/findings/{finding_id}"."##),
                      Some(true),
                      Some(false)),
         
@@ -8480,7 +9413,7 @@ async fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. The relative resource name of the finding. See: https://cloud.google.com/apis/design/resource_names#relative_resource_name Example: "organizations/{organization_id}/sources/{source_id}/finding/{finding_id}"."##),
+                     Some(r##"Required. The [relative resource name](https://cloud.google.com/apis/design/resource_names#relative_resource_name) of the finding. Example: "organizations/{organization_id}/sources/{source_id}/findings/{finding_id}", "folders/{folder_id}/sources/{source_id}/findings/{finding_id}", "projects/{project_id}/sources/{source_id}/findings/{finding_id}"."##),
                      Some(true),
                      Some(false)),
         
@@ -8558,7 +9491,7 @@ async fn main() {
                   vec![
                     (Some(r##"resource"##),
                      None,
-                     Some(r##"REQUIRED: The resource for which the policy is being requested. See the operation documentation for the appropriate value for this field."##),
+                     Some(r##"REQUIRED: The resource for which the policy is being requested. See [Resource names](https://cloud.google.com/apis/design/resource_names) for the appropriate value for this field."##),
                      Some(true),
                      Some(false)),
         
@@ -8586,7 +9519,7 @@ async fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. Resource name of the parent of sources to list. Its format should be "organizations/[organization_id], folders/[folder_id], or projects/[project_id]"."##),
+                     Some(r##"Required. Resource name of the parent of sources to list. Its format should be "organizations/[organization_id]", "folders/[folder_id]", or "projects/[project_id]"."##),
                      Some(true),
                      Some(false)),
         
@@ -8636,7 +9569,7 @@ async fn main() {
                   vec![
                     (Some(r##"resource"##),
                      None,
-                     Some(r##"REQUIRED: The resource for which the policy is being specified. See the operation documentation for the appropriate value for this field."##),
+                     Some(r##"REQUIRED: The resource for which the policy is being specified. See [Resource names](https://cloud.google.com/apis/design/resource_names) for the appropriate value for this field."##),
                      Some(true),
                      Some(false)),
         
@@ -8664,7 +9597,7 @@ async fn main() {
                   vec![
                     (Some(r##"resource"##),
                      None,
-                     Some(r##"REQUIRED: The resource for which the policy detail is being requested. See the operation documentation for the appropriate value for this field."##),
+                     Some(r##"REQUIRED: The resource for which the policy detail is being requested. See [Resource names](https://cloud.google.com/apis/design/resource_names) for the appropriate value for this field."##),
                      Some(true),
                      Some(false)),
         
@@ -8716,14 +9649,14 @@ async fn main() {
                   ]),
             ]),
         
-        ("projects", "methods: 'assets-group', 'assets-list', 'assets-update-security-marks', 'big-query-exports-create', 'big-query-exports-delete', 'big-query-exports-get', 'big-query-exports-list', 'big-query-exports-patch', 'findings-bulk-mute', 'mute-configs-create', 'mute-configs-delete', 'mute-configs-get', 'mute-configs-list', 'mute-configs-patch', 'sources-findings-external-systems-patch', 'sources-findings-group', 'sources-findings-list', 'sources-findings-patch', 'sources-findings-set-mute', 'sources-findings-set-state', 'sources-findings-update-security-marks' and 'sources-list'", vec![
+        ("projects", "methods: 'assets-group', 'assets-list', 'assets-update-security-marks', 'big-query-exports-create', 'big-query-exports-delete', 'big-query-exports-get', 'big-query-exports-list', 'big-query-exports-patch', 'findings-bulk-mute', 'mute-configs-create', 'mute-configs-delete', 'mute-configs-get', 'mute-configs-list', 'mute-configs-patch', 'notification-configs-create', 'notification-configs-delete', 'notification-configs-get', 'notification-configs-list', 'notification-configs-patch', 'sources-findings-external-systems-patch', 'sources-findings-group', 'sources-findings-list', 'sources-findings-patch', 'sources-findings-set-mute', 'sources-findings-set-state', 'sources-findings-update-security-marks' and 'sources-list'", vec![
             ("assets-group",
                     Some(r##"Filters an organization's assets and groups them by their specified properties."##),
                     "Details at http://byron.github.io/google-apis-rs/google_securitycenter1_cli/projects_assets-group",
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. Name of the organization to groupBy. Its format is "organizations/[organization_id], folders/[folder_id], or projects/[project_id]"."##),
+                     Some(r##"Required. The name of the parent to group the assets by. Its format is "organizations/[organization_id]", "folders/[folder_id]", or "projects/[project_id]"."##),
                      Some(true),
                      Some(false)),
         
@@ -8751,7 +9684,7 @@ async fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. Name of the organization assets should belong to. Its format is "organizations/[organization_id], folders/[folder_id], or projects/[project_id]"."##),
+                     Some(r##"Required. The name of the parent resource that contains the assets. The value that you can specify on parent depends on the method in which you specify parent. You can specify one of the following values: "organizations/[organization_id]", "folders/[folder_id]", or "projects/[project_id]"."##),
                      Some(true),
                      Some(false)),
         
@@ -8796,12 +9729,12 @@ async fn main() {
                      Some(false)),
                   ]),
             ("big-query-exports-create",
-                    Some(r##"Creates a big query export."##),
+                    Some(r##"Creates a BigQuery export."##),
                     "Details at http://byron.github.io/google-apis-rs/google_securitycenter1_cli/projects_big-query-exports-create",
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. Resource name of the new big query export's parent. Its format is "organizations/[organization_id]", "folders/[folder_id]", or "projects/[project_id]"."##),
+                     Some(r##"Required. The name of the parent resource of the new BigQuery export. Its format is "organizations/[organization_id]", "folders/[folder_id]", or "projects/[project_id]"."##),
                      Some(true),
                      Some(false)),
         
@@ -8824,12 +9757,12 @@ async fn main() {
                      Some(false)),
                   ]),
             ("big-query-exports-delete",
-                    Some(r##"Deletes an existing big query export."##),
+                    Some(r##"Deletes an existing BigQuery export."##),
                     "Details at http://byron.github.io/google-apis-rs/google_securitycenter1_cli/projects_big-query-exports-delete",
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. Name of the big query export to delete. Its format is organizations/{organization}/bigQueryExports/{export_id}, folders/{folder}/bigQueryExports/{export_id}, or projects/{project}/bigQueryExports/{export_id}"##),
+                     Some(r##"Required. The name of the BigQuery export to delete. Its format is organizations/{organization}/bigQueryExports/{export_id}, folders/{folder}/bigQueryExports/{export_id}, or projects/{project}/bigQueryExports/{export_id}"##),
                      Some(true),
                      Some(false)),
         
@@ -8846,12 +9779,12 @@ async fn main() {
                      Some(false)),
                   ]),
             ("big-query-exports-get",
-                    Some(r##"Gets a big query export."##),
+                    Some(r##"Gets a BigQuery export."##),
                     "Details at http://byron.github.io/google-apis-rs/google_securitycenter1_cli/projects_big-query-exports-get",
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. Name of the big query export to retrieve. Its format is organizations/{organization}/bigQueryExports/{export_id}, folders/{folder}/bigQueryExports/{export_id}, or projects/{project}/bigQueryExports/{export_id}"##),
+                     Some(r##"Required. Name of the BigQuery export to retrieve. Its format is organizations/{organization}/bigQueryExports/{export_id}, folders/{folder}/bigQueryExports/{export_id}, or projects/{project}/bigQueryExports/{export_id}"##),
                      Some(true),
                      Some(false)),
         
@@ -9067,13 +10000,135 @@ async fn main() {
                      Some(false),
                      Some(false)),
                   ]),
+            ("notification-configs-create",
+                    Some(r##"Creates a notification config."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_securitycenter1_cli/projects_notification-configs-create",
+                  vec![
+                    (Some(r##"parent"##),
+                     None,
+                     Some(r##"Required. Resource name of the new notification config's parent. Its format is "organizations/[organization_id]", "folders/[folder_id]", or "projects/[project_id]"."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("notification-configs-delete",
+                    Some(r##"Deletes a notification config."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_securitycenter1_cli/projects_notification-configs-delete",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. Name of the notification config to delete. Its format is "organizations/[organization_id]/notificationConfigs/[config_id]", "folders/[folder_id]/notificationConfigs/[config_id]", or "projects/[project_id]/notificationConfigs/[config_id]"."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("notification-configs-get",
+                    Some(r##"Gets a notification config."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_securitycenter1_cli/projects_notification-configs-get",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. Name of the notification config to get. Its format is "organizations/[organization_id]/notificationConfigs/[config_id]", "folders/[folder_id]/notificationConfigs/[config_id]", or "projects/[project_id]/notificationConfigs/[config_id]"."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("notification-configs-list",
+                    Some(r##"Lists notification configs."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_securitycenter1_cli/projects_notification-configs-list",
+                  vec![
+                    (Some(r##"parent"##),
+                     None,
+                     Some(r##"Required. The name of the parent in which to list the notification configurations. Its format is "organizations/[organization_id]", "folders/[folder_id]", or "projects/[project_id]"."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("notification-configs-patch",
+                    Some(r##" Updates a notification config. The following update fields are allowed: description, pubsub_topic, streaming_config.filter"##),
+                    "Details at http://byron.github.io/google-apis-rs/google_securitycenter1_cli/projects_notification-configs-patch",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"The relative resource name of this notification config. See: https://cloud.google.com/apis/design/resource_names#relative_resource_name Example: "organizations/{organization_id}/notificationConfigs/notify_public_bucket", "folders/{folder_id}/notificationConfigs/notify_public_bucket", or "projects/{project_id}/notificationConfigs/notify_public_bucket"."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
             ("sources-findings-external-systems-patch",
                     Some(r##"Updates external system. This is for a given finding."##),
                     "Details at http://byron.github.io/google-apis-rs/google_securitycenter1_cli/projects_sources-findings-external-systems-patch",
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"External System Name e.g. jira, demisto, etc. e.g.: organizations/1234/sources/5678/findings/123456/externalSystems/jira folders/1234/sources/5678/findings/123456/externalSystems/jira projects/1234/sources/5678/findings/123456/externalSystems/jira"##),
+                     Some(r##"Full resource name of the external system, for example: "organizations/1234/sources/5678/findings/123456/externalSystems/jira", "folders/1234/sources/5678/findings/123456/externalSystems/jira", "projects/1234/sources/5678/findings/123456/externalSystems/jira""##),
                      Some(true),
                      Some(false)),
         
@@ -9179,7 +10234,7 @@ async fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. The relative resource name of the finding. See: https://cloud.google.com/apis/design/resource_names#relative_resource_name Example: "organizations/{organization_id}/sources/{source_id}/finding/{finding_id}", "folders/{folder_id}/sources/{source_id}/finding/{finding_id}", "projects/{project_id}/sources/{source_id}/finding/{finding_id}"."##),
+                     Some(r##"Required. The [relative resource name](https://cloud.google.com/apis/design/resource_names#relative_resource_name) of the finding. Example: "organizations/{organization_id}/sources/{source_id}/findings/{finding_id}", "folders/{folder_id}/sources/{source_id}/findings/{finding_id}", "projects/{project_id}/sources/{source_id}/findings/{finding_id}"."##),
                      Some(true),
                      Some(false)),
         
@@ -9207,7 +10262,7 @@ async fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. The relative resource name of the finding. See: https://cloud.google.com/apis/design/resource_names#relative_resource_name Example: "organizations/{organization_id}/sources/{source_id}/finding/{finding_id}"."##),
+                     Some(r##"Required. The [relative resource name](https://cloud.google.com/apis/design/resource_names#relative_resource_name) of the finding. Example: "organizations/{organization_id}/sources/{source_id}/findings/{finding_id}", "folders/{folder_id}/sources/{source_id}/findings/{finding_id}", "projects/{project_id}/sources/{source_id}/findings/{finding_id}"."##),
                      Some(true),
                      Some(false)),
         
@@ -9263,7 +10318,7 @@ async fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. Resource name of the parent of sources to list. Its format should be "organizations/[organization_id], folders/[folder_id], or projects/[project_id]"."##),
+                     Some(r##"Required. Resource name of the parent of sources to list. Its format should be "organizations/[organization_id]", "folders/[folder_id]", or "projects/[project_id]"."##),
                      Some(true),
                      Some(false)),
         
@@ -9285,7 +10340,7 @@ async fn main() {
     
     let mut app = App::new("securitycenter1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("4.0.1+20220224")
+           .version("5.0.2+20230123")
            .about("Security Command Center API provides access to temporal views of assets and findings within an organization.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_securitycenter1_cli")
            .arg(Arg::with_name("url")

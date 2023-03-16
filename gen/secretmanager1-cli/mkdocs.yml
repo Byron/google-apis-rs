@@ -1,4 +1,4 @@
-site_name: Secret Manager v4.0.1+20220226
+site_name: Secret Manager v5.0.2+20230114
 site_url: http://byron.github.io/google-apis-rs/google-secretmanager1-cli
 site_description: A complete library to interact with Secret Manager (protocol v1)
 
@@ -7,25 +7,26 @@ repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/secretmanager1-c
 docs_dir: docs
 site_dir: build_html
 
-pages:
-- ['index.md', 'Home']
-- ['projects_locations-get.md', 'Projects', 'Locations Get']
-- ['projects_locations-list.md', 'Projects', 'Locations List']
-- ['projects_secrets-add-version.md', 'Projects', 'Secrets Add Version']
-- ['projects_secrets-create.md', 'Projects', 'Secrets Create']
-- ['projects_secrets-delete.md', 'Projects', 'Secrets Delete']
-- ['projects_secrets-get.md', 'Projects', 'Secrets Get']
-- ['projects_secrets-get-iam-policy.md', 'Projects', 'Secrets Get Iam Policy']
-- ['projects_secrets-list.md', 'Projects', 'Secrets List']
-- ['projects_secrets-patch.md', 'Projects', 'Secrets Patch']
-- ['projects_secrets-set-iam-policy.md', 'Projects', 'Secrets Set Iam Policy']
-- ['projects_secrets-test-iam-permissions.md', 'Projects', 'Secrets Test Iam Permissions']
-- ['projects_secrets-versions-access.md', 'Projects', 'Secrets Versions Access']
-- ['projects_secrets-versions-destroy.md', 'Projects', 'Secrets Versions Destroy']
-- ['projects_secrets-versions-disable.md', 'Projects', 'Secrets Versions Disable']
-- ['projects_secrets-versions-enable.md', 'Projects', 'Secrets Versions Enable']
-- ['projects_secrets-versions-get.md', 'Projects', 'Secrets Versions Get']
-- ['projects_secrets-versions-list.md', 'Projects', 'Secrets Versions List']
+nav:
+- Home: 'index.md'
+- 'Projects':
+    - 'Locations Get': 'projects_locations-get.md'
+    - 'Locations List': 'projects_locations-list.md'
+    - 'Secrets Add Version': 'projects_secrets-add-version.md'
+    - 'Secrets Create': 'projects_secrets-create.md'
+    - 'Secrets Delete': 'projects_secrets-delete.md'
+    - 'Secrets Get': 'projects_secrets-get.md'
+    - 'Secrets Get Iam Policy': 'projects_secrets-get-iam-policy.md'
+    - 'Secrets List': 'projects_secrets-list.md'
+    - 'Secrets Patch': 'projects_secrets-patch.md'
+    - 'Secrets Set Iam Policy': 'projects_secrets-set-iam-policy.md'
+    - 'Secrets Test Iam Permissions': 'projects_secrets-test-iam-permissions.md'
+    - 'Secrets Versions Access': 'projects_secrets-versions-access.md'
+    - 'Secrets Versions Destroy': 'projects_secrets-versions-destroy.md'
+    - 'Secrets Versions Disable': 'projects_secrets-versions-disable.md'
+    - 'Secrets Versions Enable': 'projects_secrets-versions-enable.md'
+    - 'Secrets Versions Get': 'projects_secrets-versions-get.md'
+    - 'Secrets Versions List': 'projects_secrets-versions-list.md'
 
 theme: readthedocs
 

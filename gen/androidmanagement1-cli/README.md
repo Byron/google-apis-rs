@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Android Management* API at revision *20220302*. The CLI is at version *4.0.1*.
+This documentation was generated from the *Android Management* API at revision *20230119*. The CLI is at version *5.0.2*.
 
 ```bash
 androidmanagement1 [options]
@@ -44,6 +44,8 @@ androidmanagement1 [options]
                 devices-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 enrollment-tokens-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 enrollment-tokens-delete <name> [-p <v>]... [-o <out>]
+                enrollment-tokens-get <name> [-p <v>]... [-o <out>]
+                enrollment-tokens-list <parent> [-p <v>]... [-o <out>]
                 get <name> [-p <v>]... [-o <out>]
                 list [-p <v>]... [-o <out>]
                 patch <name> (-r <kv>)... [-p <v>]... [-o <out>]

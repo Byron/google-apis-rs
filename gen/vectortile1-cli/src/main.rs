@@ -3,8 +3,6 @@
 // DO NOT EDIT !
 #![allow(unused_variables, unused_imports, dead_code, unused_mut)]
 
-extern crate tokio;
-
 #[macro_use]
 extern crate clap;
 
@@ -12,9 +10,10 @@ use std::env;
 use std::io::{self, Write};
 use clap::{App, SubCommand, Arg};
 
-use google_vectortile1::{api, Error, oauth2};
+use google_vectortile1::{api, Error, oauth2, client::chrono, FieldMask};
 
-mod client;
+
+use google_clis_common as client;
 
 use client::{InvalidOptionsError, CLIError, arg_from_str, writer_from_opts, parse_kv_arg,
           input_file_from_opts, input_mime_from_opts, FieldCursor, FieldError, CallType, UploadProtocol,
@@ -64,22 +63,22 @@ where
                     call = call.language_code(value.unwrap_or(""));
                 },
                 "enable-unclipped-buildings" => {
-                    call = call.enable_unclipped_buildings(arg_from_str(value.unwrap_or("false"), err, "enable-unclipped-buildings", "boolean"));
+                    call = call.enable_unclipped_buildings(        value.map(|v| arg_from_str(v, err, "enable-unclipped-buildings", "boolean")).unwrap_or(false));
                 },
                 "enable-private-roads" => {
-                    call = call.enable_private_roads(arg_from_str(value.unwrap_or("false"), err, "enable-private-roads", "boolean"));
+                    call = call.enable_private_roads(        value.map(|v| arg_from_str(v, err, "enable-private-roads", "boolean")).unwrap_or(false));
                 },
                 "enable-political-features" => {
-                    call = call.enable_political_features(arg_from_str(value.unwrap_or("false"), err, "enable-political-features", "boolean"));
+                    call = call.enable_political_features(        value.map(|v| arg_from_str(v, err, "enable-political-features", "boolean")).unwrap_or(false));
                 },
                 "enable-modeled-volumes" => {
-                    call = call.enable_modeled_volumes(arg_from_str(value.unwrap_or("false"), err, "enable-modeled-volumes", "boolean"));
+                    call = call.enable_modeled_volumes(        value.map(|v| arg_from_str(v, err, "enable-modeled-volumes", "boolean")).unwrap_or(false));
                 },
                 "enable-feature-names" => {
-                    call = call.enable_feature_names(arg_from_str(value.unwrap_or("false"), err, "enable-feature-names", "boolean"));
+                    call = call.enable_feature_names(        value.map(|v| arg_from_str(v, err, "enable-feature-names", "boolean")).unwrap_or(false));
                 },
                 "enable-detailed-highway-types" => {
-                    call = call.enable_detailed_highway_types(arg_from_str(value.unwrap_or("false"), err, "enable-detailed-highway-types", "boolean"));
+                    call = call.enable_detailed_highway_types(        value.map(|v| arg_from_str(v, err, "enable-detailed-highway-types", "boolean")).unwrap_or(false));
                 },
                 "client-tile-version-id" => {
                     call = call.client_tile_version_id(value.unwrap_or(""));
@@ -106,7 +105,7 @@ where
                     call = call.client_info_api_client(value.unwrap_or(""));
                 },
                 "always-include-building-footprints" => {
-                    call = call.always_include_building_footprints(arg_from_str(value.unwrap_or("false"), err, "always-include-building-footprints", "boolean"));
+                    call = call.always_include_building_footprints(        value.map(|v| arg_from_str(v, err, "always-include-building-footprints", "boolean")).unwrap_or(false));
                 },
                 _ => {
                     let mut found = false;
@@ -162,10 +161,10 @@ where
                     call = call.add_terrain_formats(value.unwrap_or(""));
                 },
                 "min-elevation-resolution-cells" => {
-                    call = call.min_elevation_resolution_cells(arg_from_str(value.unwrap_or("-0"), err, "min-elevation-resolution-cells", "integer"));
+                    call = call.min_elevation_resolution_cells(        value.map(|v| arg_from_str(v, err, "min-elevation-resolution-cells", "int32")).unwrap_or(-0));
                 },
                 "max-elevation-resolution-cells" => {
-                    call = call.max_elevation_resolution_cells(arg_from_str(value.unwrap_or("-0"), err, "max-elevation-resolution-cells", "integer"));
+                    call = call.max_elevation_resolution_cells(        value.map(|v| arg_from_str(v, err, "max-elevation-resolution-cells", "int32")).unwrap_or(-0));
                 },
                 "client-info-user-id" => {
                     call = call.client_info_user_id(value.unwrap_or(""));
@@ -189,7 +188,7 @@ where
                     call = call.client_info_api_client(value.unwrap_or(""));
                 },
                 "altitude-precision-centimeters" => {
-                    call = call.altitude_precision_centimeters(arg_from_str(value.unwrap_or("-0"), err, "altitude-precision-centimeters", "integer"));
+                    call = call.altitude_precision_centimeters(        value.map(|v| arg_from_str(v, err, "altitude-precision-centimeters", "int32")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -389,7 +388,7 @@ async fn main() {
     
     let mut app = App::new("vectortile1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("4.0.1+20210331")
+           .version("5.0.2+20210331")
            .about("Serves vector tiles containing geospatial data. ")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_vectortile1_cli")
            .arg(Arg::with_name("folder")

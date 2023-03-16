@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Workflow Executions* API at revision *20220222*. The CLI is at version *4.0.1*.
+This documentation was generated from the *Workflow Executions* API at revision *20230110*. The CLI is at version *5.0.2*.
 
 ```bash
 workflowexecutions1 [options]
@@ -34,6 +34,7 @@ workflowexecutions1 [options]
                 locations-workflows-executions-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-workflows-executions-get <name> [-p <v>]... [-o <out>]
                 locations-workflows-executions-list <parent> [-p <v>]... [-o <out>]
+                locations-workflows-trigger-pubsub-execution <workflow> (-r <kv>)... [-p <v>]... [-o <out>]
   workflowexecutions1 --help
 
 Configuration:

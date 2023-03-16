@@ -1,4 +1,4 @@
-site_name: Cloud Machine Learning Engine v4.0.1+20220212
+site_name: Cloud Machine Learning Engine v5.0.2+20230106
 site_url: http://byron.github.io/google-apis-rs/google-ml1-cli
 site_description: A complete library to interact with Cloud Machine Learning Engine (protocol v1)
 
@@ -7,54 +7,55 @@ repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/ml1-cli
 docs_dir: docs
 site_dir: build_html
 
-pages:
-- ['index.md', 'Home']
-- ['projects_explain.md', 'Projects', 'Explain']
-- ['projects_get-config.md', 'Projects', 'Get Config']
-- ['projects_jobs-cancel.md', 'Projects', 'Jobs Cancel']
-- ['projects_jobs-create.md', 'Projects', 'Jobs Create']
-- ['projects_jobs-get.md', 'Projects', 'Jobs Get']
-- ['projects_jobs-get-iam-policy.md', 'Projects', 'Jobs Get Iam Policy']
-- ['projects_jobs-list.md', 'Projects', 'Jobs List']
-- ['projects_jobs-patch.md', 'Projects', 'Jobs Patch']
-- ['projects_jobs-set-iam-policy.md', 'Projects', 'Jobs Set Iam Policy']
-- ['projects_jobs-test-iam-permissions.md', 'Projects', 'Jobs Test Iam Permissions']
-- ['projects_locations-get.md', 'Projects', 'Locations Get']
-- ['projects_locations-list.md', 'Projects', 'Locations List']
-- ['projects_locations-operations-cancel.md', 'Projects', 'Locations Operations Cancel']
-- ['projects_locations-operations-get.md', 'Projects', 'Locations Operations Get']
-- ['projects_locations-studies-create.md', 'Projects', 'Locations Studies Create']
-- ['projects_locations-studies-delete.md', 'Projects', 'Locations Studies Delete']
-- ['projects_locations-studies-get.md', 'Projects', 'Locations Studies Get']
-- ['projects_locations-studies-list.md', 'Projects', 'Locations Studies List']
-- ['projects_locations-studies-trials-add-measurement.md', 'Projects', 'Locations Studies Trials Add Measurement']
-- ['projects_locations-studies-trials-check-early-stopping-state.md', 'Projects', 'Locations Studies Trials Check Early Stopping State']
-- ['projects_locations-studies-trials-complete.md', 'Projects', 'Locations Studies Trials Complete']
-- ['projects_locations-studies-trials-create.md', 'Projects', 'Locations Studies Trials Create']
-- ['projects_locations-studies-trials-delete.md', 'Projects', 'Locations Studies Trials Delete']
-- ['projects_locations-studies-trials-get.md', 'Projects', 'Locations Studies Trials Get']
-- ['projects_locations-studies-trials-list.md', 'Projects', 'Locations Studies Trials List']
-- ['projects_locations-studies-trials-list-optimal-trials.md', 'Projects', 'Locations Studies Trials List Optimal Trials']
-- ['projects_locations-studies-trials-stop.md', 'Projects', 'Locations Studies Trials Stop']
-- ['projects_locations-studies-trials-suggest.md', 'Projects', 'Locations Studies Trials Suggest']
-- ['projects_models-create.md', 'Projects', 'Models Create']
-- ['projects_models-delete.md', 'Projects', 'Models Delete']
-- ['projects_models-get.md', 'Projects', 'Models Get']
-- ['projects_models-get-iam-policy.md', 'Projects', 'Models Get Iam Policy']
-- ['projects_models-list.md', 'Projects', 'Models List']
-- ['projects_models-patch.md', 'Projects', 'Models Patch']
-- ['projects_models-set-iam-policy.md', 'Projects', 'Models Set Iam Policy']
-- ['projects_models-test-iam-permissions.md', 'Projects', 'Models Test Iam Permissions']
-- ['projects_models-versions-create.md', 'Projects', 'Models Versions Create']
-- ['projects_models-versions-delete.md', 'Projects', 'Models Versions Delete']
-- ['projects_models-versions-get.md', 'Projects', 'Models Versions Get']
-- ['projects_models-versions-list.md', 'Projects', 'Models Versions List']
-- ['projects_models-versions-patch.md', 'Projects', 'Models Versions Patch']
-- ['projects_models-versions-set-default.md', 'Projects', 'Models Versions Set Default']
-- ['projects_operations-cancel.md', 'Projects', 'Operations Cancel']
-- ['projects_operations-get.md', 'Projects', 'Operations Get']
-- ['projects_operations-list.md', 'Projects', 'Operations List']
-- ['projects_predict.md', 'Projects', 'Predict']
+nav:
+- Home: 'index.md'
+- 'Projects':
+    - 'Explain': 'projects_explain.md'
+    - 'Get Config': 'projects_get-config.md'
+    - 'Jobs Cancel': 'projects_jobs-cancel.md'
+    - 'Jobs Create': 'projects_jobs-create.md'
+    - 'Jobs Get': 'projects_jobs-get.md'
+    - 'Jobs Get Iam Policy': 'projects_jobs-get-iam-policy.md'
+    - 'Jobs List': 'projects_jobs-list.md'
+    - 'Jobs Patch': 'projects_jobs-patch.md'
+    - 'Jobs Set Iam Policy': 'projects_jobs-set-iam-policy.md'
+    - 'Jobs Test Iam Permissions': 'projects_jobs-test-iam-permissions.md'
+    - 'Locations Get': 'projects_locations-get.md'
+    - 'Locations List': 'projects_locations-list.md'
+    - 'Locations Operations Cancel': 'projects_locations-operations-cancel.md'
+    - 'Locations Operations Get': 'projects_locations-operations-get.md'
+    - 'Locations Studies Create': 'projects_locations-studies-create.md'
+    - 'Locations Studies Delete': 'projects_locations-studies-delete.md'
+    - 'Locations Studies Get': 'projects_locations-studies-get.md'
+    - 'Locations Studies List': 'projects_locations-studies-list.md'
+    - 'Locations Studies Trials Add Measurement': 'projects_locations-studies-trials-add-measurement.md'
+    - 'Locations Studies Trials Check Early Stopping State': 'projects_locations-studies-trials-check-early-stopping-state.md'
+    - 'Locations Studies Trials Complete': 'projects_locations-studies-trials-complete.md'
+    - 'Locations Studies Trials Create': 'projects_locations-studies-trials-create.md'
+    - 'Locations Studies Trials Delete': 'projects_locations-studies-trials-delete.md'
+    - 'Locations Studies Trials Get': 'projects_locations-studies-trials-get.md'
+    - 'Locations Studies Trials List': 'projects_locations-studies-trials-list.md'
+    - 'Locations Studies Trials List Optimal Trials': 'projects_locations-studies-trials-list-optimal-trials.md'
+    - 'Locations Studies Trials Stop': 'projects_locations-studies-trials-stop.md'
+    - 'Locations Studies Trials Suggest': 'projects_locations-studies-trials-suggest.md'
+    - 'Models Create': 'projects_models-create.md'
+    - 'Models Delete': 'projects_models-delete.md'
+    - 'Models Get': 'projects_models-get.md'
+    - 'Models Get Iam Policy': 'projects_models-get-iam-policy.md'
+    - 'Models List': 'projects_models-list.md'
+    - 'Models Patch': 'projects_models-patch.md'
+    - 'Models Set Iam Policy': 'projects_models-set-iam-policy.md'
+    - 'Models Test Iam Permissions': 'projects_models-test-iam-permissions.md'
+    - 'Models Versions Create': 'projects_models-versions-create.md'
+    - 'Models Versions Delete': 'projects_models-versions-delete.md'
+    - 'Models Versions Get': 'projects_models-versions-get.md'
+    - 'Models Versions List': 'projects_models-versions-list.md'
+    - 'Models Versions Patch': 'projects_models-versions-patch.md'
+    - 'Models Versions Set Default': 'projects_models-versions-set-default.md'
+    - 'Operations Cancel': 'projects_operations-cancel.md'
+    - 'Operations Get': 'projects_operations-get.md'
+    - 'Operations List': 'projects_operations-list.md'
+    - 'Predict': 'projects_predict.md'
 
 theme: readthedocs
 

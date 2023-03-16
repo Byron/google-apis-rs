@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Translate* API at revision *20220121*. The CLI is at version *4.0.1*.
+This documentation was generated from the *Translate* API at revision *20230106*. The CLI is at version *5.0.2*.
 
 ```bash
 translate3 [options]
@@ -34,14 +34,31 @@ translate3 [options]
                 get-supported-languages <parent> [-p <v>]... [-o <out>]
                 locations-batch-translate-document <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-batch-translate-text <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-datasets-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-datasets-delete <name> [-p <v>]... [-o <out>]
+                locations-datasets-examples-list <parent> [-p <v>]... [-o <out>]
+                locations-datasets-export-data <dataset> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-datasets-get <name> [-p <v>]... [-o <out>]
+                locations-datasets-import-data <dataset> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-datasets-list <parent> [-p <v>]... [-o <out>]
                 locations-detect-language <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-get <name> [-p <v>]... [-o <out>]
                 locations-get-supported-languages <parent> [-p <v>]... [-o <out>]
                 locations-glossaries-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-glossaries-delete <name> [-p <v>]... [-o <out>]
                 locations-glossaries-get <name> [-p <v>]... [-o <out>]
+                locations-glossaries-glossary-entries-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-glossaries-glossary-entries-delete <name> [-p <v>]... [-o <out>]
+                locations-glossaries-glossary-entries-get <name> [-p <v>]... [-o <out>]
+                locations-glossaries-glossary-entries-list <parent> [-p <v>]... [-o <out>]
+                locations-glossaries-glossary-entries-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-glossaries-list <parent> [-p <v>]... [-o <out>]
+                locations-glossaries-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-list <name> [-p <v>]... [-o <out>]
+                locations-models-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-models-delete <name> [-p <v>]... [-o <out>]
+                locations-models-get <name> [-p <v>]... [-o <out>]
+                locations-models-list <parent> [-p <v>]... [-o <out>]
                 locations-operations-cancel <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-operations-delete <name> [-p <v>]... [-o <out>]
                 locations-operations-get <name> [-p <v>]... [-o <out>]

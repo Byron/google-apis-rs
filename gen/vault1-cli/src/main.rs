@@ -3,8 +3,6 @@
 // DO NOT EDIT !
 #![allow(unused_variables, unused_imports, dead_code, unused_mut)]
 
-extern crate tokio;
-
 #[macro_use]
 extern crate clap;
 
@@ -12,9 +10,10 @@ use std::env;
 use std::io::{self, Write};
 use clap::{App, SubCommand, Arg};
 
-use google_vault1::{api, Error, oauth2};
+use google_vault1::{api, Error, oauth2, client::chrono, FieldMask};
 
-mod client;
+
+use google_clis_common as client;
 
 use client::{InvalidOptionsError, CLIError, arg_from_str, writer_from_opts, parse_kv_arg,
           input_file_from_opts, input_mime_from_opts, FieldCursor, FieldError, CallType, UploadProtocol,
@@ -249,6 +248,7 @@ where
                     "query.account-info.emails" => Some(("query.accountInfo.emails", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "query.corpus" => Some(("query.corpus", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "query.data-scope" => Some(("query.dataScope", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "query.drive-options.client-side-encrypted-option" => Some(("query.driveOptions.clientSideEncryptedOption", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "query.drive-options.include-shared-drives" => Some(("query.driveOptions.includeSharedDrives", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "query.drive-options.include-team-drives" => Some(("query.driveOptions.includeTeamDrives", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "query.drive-options.version-date" => Some(("query.driveOptions.versionDate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -260,6 +260,7 @@ where
                     "query.org-unit-info.org-unit-id" => Some(("query.orgUnitInfo.orgUnitId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "query.search-method" => Some(("query.searchMethod", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "query.shared-drive-info.shared-drive-ids" => Some(("query.sharedDriveInfo.sharedDriveIds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "query.sites-url-info.urls" => Some(("query.sitesUrlInfo.urls", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "query.start-time" => Some(("query.startTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "query.team-drive-info.team-drive-ids" => Some(("query.teamDriveInfo.teamDriveIds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "query.terms" => Some(("query.terms", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -267,7 +268,7 @@ where
                     "query.voice-options.covered-data" => Some(("query.voiceOptions.coveredData", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "view" => Some(("view", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account-info", "corpus", "covered-data", "data-scope", "drive-options", "emails", "end-time", "exclude-drafts", "hangouts-chat-info", "hangouts-chat-options", "include-rooms", "include-shared-drives", "include-team-drives", "mail-options", "method", "org-unit-id", "org-unit-info", "query", "room-id", "search-method", "shared-drive-ids", "shared-drive-info", "start-time", "team-drive-ids", "team-drive-info", "terms", "time-zone", "version-date", "view", "voice-options"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account-info", "client-side-encrypted-option", "corpus", "covered-data", "data-scope", "drive-options", "emails", "end-time", "exclude-drafts", "hangouts-chat-info", "hangouts-chat-options", "include-rooms", "include-shared-drives", "include-team-drives", "mail-options", "method", "org-unit-id", "org-unit-info", "query", "room-id", "search-method", "shared-drive-ids", "shared-drive-info", "sites-url-info", "start-time", "team-drive-ids", "team-drive-info", "terms", "time-zone", "urls", "version-date", "view", "voice-options"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -505,6 +506,7 @@ where
                     "query.account-info.emails" => Some(("query.accountInfo.emails", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "query.corpus" => Some(("query.corpus", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "query.data-scope" => Some(("query.dataScope", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "query.drive-options.client-side-encrypted-option" => Some(("query.driveOptions.clientSideEncryptedOption", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "query.drive-options.include-shared-drives" => Some(("query.driveOptions.includeSharedDrives", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "query.drive-options.include-team-drives" => Some(("query.driveOptions.includeTeamDrives", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "query.drive-options.version-date" => Some(("query.driveOptions.versionDate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -516,6 +518,7 @@ where
                     "query.org-unit-info.org-unit-id" => Some(("query.orgUnitInfo.orgUnitId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "query.search-method" => Some(("query.searchMethod", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "query.shared-drive-info.shared-drive-ids" => Some(("query.sharedDriveInfo.sharedDriveIds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "query.sites-url-info.urls" => Some(("query.sitesUrlInfo.urls", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "query.start-time" => Some(("query.startTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "query.team-drive-info.team-drive-ids" => Some(("query.teamDriveInfo.teamDriveIds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "query.terms" => Some(("query.terms", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -528,7 +531,7 @@ where
                     "stats.total-artifact-count" => Some(("stats.totalArtifactCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "status" => Some(("status", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account-info", "corpus", "covered-data", "create-time", "data-scope", "display-name", "drive-options", "email", "emails", "end-time", "exclude-drafts", "export-format", "export-options", "exported-artifact-count", "groups-options", "hangouts-chat-info", "hangouts-chat-options", "id", "include-access-info", "include-rooms", "include-shared-drives", "include-team-drives", "mail-options", "matter-id", "method", "name", "org-unit-id", "org-unit-info", "query", "region", "requester", "room-id", "search-method", "shared-drive-ids", "shared-drive-info", "show-confidential-mode-content", "size-in-bytes", "start-time", "stats", "status", "team-drive-ids", "team-drive-info", "terms", "time-zone", "total-artifact-count", "use-new-export", "version-date", "voice-options"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account-info", "client-side-encrypted-option", "corpus", "covered-data", "create-time", "data-scope", "display-name", "drive-options", "email", "emails", "end-time", "exclude-drafts", "export-format", "export-options", "exported-artifact-count", "groups-options", "hangouts-chat-info", "hangouts-chat-options", "id", "include-access-info", "include-rooms", "include-shared-drives", "include-team-drives", "mail-options", "matter-id", "method", "name", "org-unit-id", "org-unit-info", "query", "region", "requester", "room-id", "search-method", "shared-drive-ids", "shared-drive-info", "show-confidential-mode-content", "sites-url-info", "size-in-bytes", "start-time", "stats", "status", "team-drive-ids", "team-drive-info", "terms", "time-zone", "total-artifact-count", "urls", "use-new-export", "version-date", "voice-options"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -702,7 +705,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -1307,7 +1310,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -1557,7 +1560,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -1804,6 +1807,7 @@ where
                     "query.account-info.emails" => Some(("query.accountInfo.emails", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "query.corpus" => Some(("query.corpus", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "query.data-scope" => Some(("query.dataScope", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "query.drive-options.client-side-encrypted-option" => Some(("query.driveOptions.clientSideEncryptedOption", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "query.drive-options.include-shared-drives" => Some(("query.driveOptions.includeSharedDrives", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "query.drive-options.include-team-drives" => Some(("query.driveOptions.includeTeamDrives", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "query.drive-options.version-date" => Some(("query.driveOptions.versionDate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -1815,6 +1819,7 @@ where
                     "query.org-unit-info.org-unit-id" => Some(("query.orgUnitInfo.orgUnitId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "query.search-method" => Some(("query.searchMethod", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "query.shared-drive-info.shared-drive-ids" => Some(("query.sharedDriveInfo.sharedDriveIds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "query.sites-url-info.urls" => Some(("query.sitesUrlInfo.urls", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "query.start-time" => Some(("query.startTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "query.team-drive-info.team-drive-ids" => Some(("query.teamDriveInfo.teamDriveIds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "query.terms" => Some(("query.terms", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -1822,7 +1827,7 @@ where
                     "query.voice-options.covered-data" => Some(("query.voiceOptions.coveredData", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "saved-query-id" => Some(("savedQueryId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account-info", "corpus", "covered-data", "create-time", "data-scope", "display-name", "drive-options", "emails", "end-time", "exclude-drafts", "hangouts-chat-info", "hangouts-chat-options", "include-rooms", "include-shared-drives", "include-team-drives", "mail-options", "matter-id", "method", "org-unit-id", "org-unit-info", "query", "room-id", "saved-query-id", "search-method", "shared-drive-ids", "shared-drive-info", "start-time", "team-drive-ids", "team-drive-info", "terms", "time-zone", "version-date", "voice-options"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account-info", "client-side-encrypted-option", "corpus", "covered-data", "create-time", "data-scope", "display-name", "drive-options", "emails", "end-time", "exclude-drafts", "hangouts-chat-info", "hangouts-chat-options", "include-rooms", "include-shared-drives", "include-team-drives", "mail-options", "matter-id", "method", "org-unit-id", "org-unit-info", "query", "room-id", "saved-query-id", "search-method", "shared-drive-ids", "shared-drive-info", "sites-url-info", "start-time", "team-drive-ids", "team-drive-info", "terms", "time-zone", "urls", "version-date", "voice-options"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1996,7 +2001,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -2409,7 +2414,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 "filter" => {
                     call = call.filter(value.unwrap_or(""));
@@ -3549,7 +3554,7 @@ async fn main() {
     
     let mut app = App::new("vault1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("4.0.1+20220222")
+           .version("5.0.2+20230123")
            .about("Retention and eDiscovery for Google Workspace. To work with Vault resources, the account must have the [required Vault privileges](https://support.google.com/vault/answer/2799699) and access to the matter. To access a matter, the account must have created the matter, have the matter shared with them, or have the **View All Matters** privilege. For example, to download an export, an account needs the **Manage Exports** privilege and the matter shared with them. ")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_vault1_cli")
            .arg(Arg::with_name("url")

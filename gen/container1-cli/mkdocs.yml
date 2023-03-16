@@ -1,4 +1,4 @@
-site_name: Container v4.0.1+20220215
+site_name: Container v5.0.2+20230104
 site_url: http://byron.github.io/google-apis-rs/google-container1-cli
 site_description: A complete library to interact with Container (protocol v1)
 
@@ -7,71 +7,73 @@ repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/container1-cli
 docs_dir: docs
 site_dir: build_html
 
-pages:
-- ['index.md', 'Home']
-- ['projects_aggregated-usable-subnetworks-list.md', 'Projects', 'Aggregated Usable Subnetworks List']
-- ['projects_locations-clusters-complete-ip-rotation.md', 'Projects', 'Locations Clusters Complete Ip Rotation']
-- ['projects_locations-clusters-create.md', 'Projects', 'Locations Clusters Create']
-- ['projects_locations-clusters-delete.md', 'Projects', 'Locations Clusters Delete']
-- ['projects_locations-clusters-get.md', 'Projects', 'Locations Clusters Get']
-- ['projects_locations-clusters-get-jwks.md', 'Projects', 'Locations Clusters Get Jwks']
-- ['projects_locations-clusters-list.md', 'Projects', 'Locations Clusters List']
-- ['projects_locations-clusters-node-pools-create.md', 'Projects', 'Locations Clusters Node Pools Create']
-- ['projects_locations-clusters-node-pools-delete.md', 'Projects', 'Locations Clusters Node Pools Delete']
-- ['projects_locations-clusters-node-pools-get.md', 'Projects', 'Locations Clusters Node Pools Get']
-- ['projects_locations-clusters-node-pools-list.md', 'Projects', 'Locations Clusters Node Pools List']
-- ['projects_locations-clusters-node-pools-rollback.md', 'Projects', 'Locations Clusters Node Pools Rollback']
-- ['projects_locations-clusters-node-pools-set-autoscaling.md', 'Projects', 'Locations Clusters Node Pools Set Autoscaling']
-- ['projects_locations-clusters-node-pools-set-management.md', 'Projects', 'Locations Clusters Node Pools Set Management']
-- ['projects_locations-clusters-node-pools-set-size.md', 'Projects', 'Locations Clusters Node Pools Set Size']
-- ['projects_locations-clusters-node-pools-update.md', 'Projects', 'Locations Clusters Node Pools Update']
-- ['projects_locations-clusters-set-addons.md', 'Projects', 'Locations Clusters Set Addons']
-- ['projects_locations-clusters-set-legacy-abac.md', 'Projects', 'Locations Clusters Set Legacy Abac']
-- ['projects_locations-clusters-set-locations.md', 'Projects', 'Locations Clusters Set Locations']
-- ['projects_locations-clusters-set-logging.md', 'Projects', 'Locations Clusters Set Logging']
-- ['projects_locations-clusters-set-maintenance-policy.md', 'Projects', 'Locations Clusters Set Maintenance Policy']
-- ['projects_locations-clusters-set-master-auth.md', 'Projects', 'Locations Clusters Set Master Auth']
-- ['projects_locations-clusters-set-monitoring.md', 'Projects', 'Locations Clusters Set Monitoring']
-- ['projects_locations-clusters-set-network-policy.md', 'Projects', 'Locations Clusters Set Network Policy']
-- ['projects_locations-clusters-set-resource-labels.md', 'Projects', 'Locations Clusters Set Resource Labels']
-- ['projects_locations-clusters-start-ip-rotation.md', 'Projects', 'Locations Clusters Start Ip Rotation']
-- ['projects_locations-clusters-update.md', 'Projects', 'Locations Clusters Update']
-- ['projects_locations-clusters-update-master.md', 'Projects', 'Locations Clusters Update Master']
-- ['projects_locations-clusters-well-known-get-openid-configuration.md', 'Projects', 'Locations Clusters Well Known Get Openid Configuration']
-- ['projects_locations-get-server-config.md', 'Projects', 'Locations Get Server Config']
-- ['projects_locations-operations-cancel.md', 'Projects', 'Locations Operations Cancel']
-- ['projects_locations-operations-get.md', 'Projects', 'Locations Operations Get']
-- ['projects_locations-operations-list.md', 'Projects', 'Locations Operations List']
-- ['projects_zones-clusters-addons.md', 'Projects', 'Zones Clusters Addons']
-- ['projects_zones-clusters-complete-ip-rotation.md', 'Projects', 'Zones Clusters Complete Ip Rotation']
-- ['projects_zones-clusters-create.md', 'Projects', 'Zones Clusters Create']
-- ['projects_zones-clusters-delete.md', 'Projects', 'Zones Clusters Delete']
-- ['projects_zones-clusters-get.md', 'Projects', 'Zones Clusters Get']
-- ['projects_zones-clusters-legacy-abac.md', 'Projects', 'Zones Clusters Legacy Abac']
-- ['projects_zones-clusters-list.md', 'Projects', 'Zones Clusters List']
-- ['projects_zones-clusters-locations.md', 'Projects', 'Zones Clusters Locations']
-- ['projects_zones-clusters-logging.md', 'Projects', 'Zones Clusters Logging']
-- ['projects_zones-clusters-master.md', 'Projects', 'Zones Clusters Master']
-- ['projects_zones-clusters-monitoring.md', 'Projects', 'Zones Clusters Monitoring']
-- ['projects_zones-clusters-node-pools-autoscaling.md', 'Projects', 'Zones Clusters Node Pools Autoscaling']
-- ['projects_zones-clusters-node-pools-create.md', 'Projects', 'Zones Clusters Node Pools Create']
-- ['projects_zones-clusters-node-pools-delete.md', 'Projects', 'Zones Clusters Node Pools Delete']
-- ['projects_zones-clusters-node-pools-get.md', 'Projects', 'Zones Clusters Node Pools Get']
-- ['projects_zones-clusters-node-pools-list.md', 'Projects', 'Zones Clusters Node Pools List']
-- ['projects_zones-clusters-node-pools-rollback.md', 'Projects', 'Zones Clusters Node Pools Rollback']
-- ['projects_zones-clusters-node-pools-set-management.md', 'Projects', 'Zones Clusters Node Pools Set Management']
-- ['projects_zones-clusters-node-pools-set-size.md', 'Projects', 'Zones Clusters Node Pools Set Size']
-- ['projects_zones-clusters-node-pools-update.md', 'Projects', 'Zones Clusters Node Pools Update']
-- ['projects_zones-clusters-resource-labels.md', 'Projects', 'Zones Clusters Resource Labels']
-- ['projects_zones-clusters-set-maintenance-policy.md', 'Projects', 'Zones Clusters Set Maintenance Policy']
-- ['projects_zones-clusters-set-master-auth.md', 'Projects', 'Zones Clusters Set Master Auth']
-- ['projects_zones-clusters-set-network-policy.md', 'Projects', 'Zones Clusters Set Network Policy']
-- ['projects_zones-clusters-start-ip-rotation.md', 'Projects', 'Zones Clusters Start Ip Rotation']
-- ['projects_zones-clusters-update.md', 'Projects', 'Zones Clusters Update']
-- ['projects_zones-get-serverconfig.md', 'Projects', 'Zones Get Serverconfig']
-- ['projects_zones-operations-cancel.md', 'Projects', 'Zones Operations Cancel']
-- ['projects_zones-operations-get.md', 'Projects', 'Zones Operations Get']
-- ['projects_zones-operations-list.md', 'Projects', 'Zones Operations List']
+nav:
+- Home: 'index.md'
+- 'Projects':
+    - 'Aggregated Usable Subnetworks List': 'projects_aggregated-usable-subnetworks-list.md'
+    - 'Locations Clusters Complete Ip Rotation': 'projects_locations-clusters-complete-ip-rotation.md'
+    - 'Locations Clusters Create': 'projects_locations-clusters-create.md'
+    - 'Locations Clusters Delete': 'projects_locations-clusters-delete.md'
+    - 'Locations Clusters Get': 'projects_locations-clusters-get.md'
+    - 'Locations Clusters Get Jwks': 'projects_locations-clusters-get-jwks.md'
+    - 'Locations Clusters List': 'projects_locations-clusters-list.md'
+    - 'Locations Clusters Node Pools Complete Upgrade': 'projects_locations-clusters-node-pools-complete-upgrade.md'
+    - 'Locations Clusters Node Pools Create': 'projects_locations-clusters-node-pools-create.md'
+    - 'Locations Clusters Node Pools Delete': 'projects_locations-clusters-node-pools-delete.md'
+    - 'Locations Clusters Node Pools Get': 'projects_locations-clusters-node-pools-get.md'
+    - 'Locations Clusters Node Pools List': 'projects_locations-clusters-node-pools-list.md'
+    - 'Locations Clusters Node Pools Rollback': 'projects_locations-clusters-node-pools-rollback.md'
+    - 'Locations Clusters Node Pools Set Autoscaling': 'projects_locations-clusters-node-pools-set-autoscaling.md'
+    - 'Locations Clusters Node Pools Set Management': 'projects_locations-clusters-node-pools-set-management.md'
+    - 'Locations Clusters Node Pools Set Size': 'projects_locations-clusters-node-pools-set-size.md'
+    - 'Locations Clusters Node Pools Update': 'projects_locations-clusters-node-pools-update.md'
+    - 'Locations Clusters Set Addons': 'projects_locations-clusters-set-addons.md'
+    - 'Locations Clusters Set Legacy Abac': 'projects_locations-clusters-set-legacy-abac.md'
+    - 'Locations Clusters Set Locations': 'projects_locations-clusters-set-locations.md'
+    - 'Locations Clusters Set Logging': 'projects_locations-clusters-set-logging.md'
+    - 'Locations Clusters Set Maintenance Policy': 'projects_locations-clusters-set-maintenance-policy.md'
+    - 'Locations Clusters Set Master Auth': 'projects_locations-clusters-set-master-auth.md'
+    - 'Locations Clusters Set Monitoring': 'projects_locations-clusters-set-monitoring.md'
+    - 'Locations Clusters Set Network Policy': 'projects_locations-clusters-set-network-policy.md'
+    - 'Locations Clusters Set Resource Labels': 'projects_locations-clusters-set-resource-labels.md'
+    - 'Locations Clusters Start Ip Rotation': 'projects_locations-clusters-start-ip-rotation.md'
+    - 'Locations Clusters Update': 'projects_locations-clusters-update.md'
+    - 'Locations Clusters Update Master': 'projects_locations-clusters-update-master.md'
+    - 'Locations Clusters Well Known Get Openid Configuration': 'projects_locations-clusters-well-known-get-openid-configuration.md'
+    - 'Locations Get Server Config': 'projects_locations-get-server-config.md'
+    - 'Locations Operations Cancel': 'projects_locations-operations-cancel.md'
+    - 'Locations Operations Get': 'projects_locations-operations-get.md'
+    - 'Locations Operations List': 'projects_locations-operations-list.md'
+    - 'Zones Clusters Addons': 'projects_zones-clusters-addons.md'
+    - 'Zones Clusters Complete Ip Rotation': 'projects_zones-clusters-complete-ip-rotation.md'
+    - 'Zones Clusters Create': 'projects_zones-clusters-create.md'
+    - 'Zones Clusters Delete': 'projects_zones-clusters-delete.md'
+    - 'Zones Clusters Get': 'projects_zones-clusters-get.md'
+    - 'Zones Clusters Legacy Abac': 'projects_zones-clusters-legacy-abac.md'
+    - 'Zones Clusters List': 'projects_zones-clusters-list.md'
+    - 'Zones Clusters Locations': 'projects_zones-clusters-locations.md'
+    - 'Zones Clusters Logging': 'projects_zones-clusters-logging.md'
+    - 'Zones Clusters Master': 'projects_zones-clusters-master.md'
+    - 'Zones Clusters Monitoring': 'projects_zones-clusters-monitoring.md'
+    - 'Zones Clusters Node Pools Autoscaling': 'projects_zones-clusters-node-pools-autoscaling.md'
+    - 'Zones Clusters Node Pools Create': 'projects_zones-clusters-node-pools-create.md'
+    - 'Zones Clusters Node Pools Delete': 'projects_zones-clusters-node-pools-delete.md'
+    - 'Zones Clusters Node Pools Get': 'projects_zones-clusters-node-pools-get.md'
+    - 'Zones Clusters Node Pools List': 'projects_zones-clusters-node-pools-list.md'
+    - 'Zones Clusters Node Pools Rollback': 'projects_zones-clusters-node-pools-rollback.md'
+    - 'Zones Clusters Node Pools Set Management': 'projects_zones-clusters-node-pools-set-management.md'
+    - 'Zones Clusters Node Pools Set Size': 'projects_zones-clusters-node-pools-set-size.md'
+    - 'Zones Clusters Node Pools Update': 'projects_zones-clusters-node-pools-update.md'
+    - 'Zones Clusters Resource Labels': 'projects_zones-clusters-resource-labels.md'
+    - 'Zones Clusters Set Maintenance Policy': 'projects_zones-clusters-set-maintenance-policy.md'
+    - 'Zones Clusters Set Master Auth': 'projects_zones-clusters-set-master-auth.md'
+    - 'Zones Clusters Set Network Policy': 'projects_zones-clusters-set-network-policy.md'
+    - 'Zones Clusters Start Ip Rotation': 'projects_zones-clusters-start-ip-rotation.md'
+    - 'Zones Clusters Update': 'projects_zones-clusters-update.md'
+    - 'Zones Get Serverconfig': 'projects_zones-get-serverconfig.md'
+    - 'Zones Operations Cancel': 'projects_zones-operations-cancel.md'
+    - 'Zones Operations Get': 'projects_zones-operations-get.md'
+    - 'Zones Operations List': 'projects_zones-operations-list.md'
 
 theme: readthedocs
 

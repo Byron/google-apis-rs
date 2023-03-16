@@ -1,4 +1,4 @@
-site_name: licensing v4.0.1+20220305
+site_name: licensing v5.0.2+20230121
 site_url: http://byron.github.io/google-apis-rs/google-licensing1-cli
 site_description: A complete library to interact with licensing (protocol v1)
 
@@ -7,15 +7,16 @@ repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/licensing1-cli
 docs_dir: docs
 site_dir: build_html
 
-pages:
-- ['index.md', 'Home']
-- ['license-assignments_delete.md', 'License Assignments', 'Delete']
-- ['license-assignments_get.md', 'License Assignments', 'Get']
-- ['license-assignments_insert.md', 'License Assignments', 'Insert']
-- ['license-assignments_list-for-product.md', 'License Assignments', 'List For Product']
-- ['license-assignments_list-for-product-and-sku.md', 'License Assignments', 'List For Product And Sku']
-- ['license-assignments_patch.md', 'License Assignments', 'Patch']
-- ['license-assignments_update.md', 'License Assignments', 'Update']
+nav:
+- Home: 'index.md'
+- 'License Assignments':
+    - 'Delete': 'license-assignments_delete.md'
+    - 'Get': 'license-assignments_get.md'
+    - 'Insert': 'license-assignments_insert.md'
+    - 'List For Product': 'license-assignments_list-for-product.md'
+    - 'List For Product And Sku': 'license-assignments_list-for-product-and-sku.md'
+    - 'Patch': 'license-assignments_patch.md'
+    - 'Update': 'license-assignments_update.md'
 
 theme: readthedocs
 

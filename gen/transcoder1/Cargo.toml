@@ -4,12 +4,12 @@
 [package]
 
 name = "google-transcoder1"
-version = "5.0.2-beta-1+20230105"
+version = "5.0.2+20230105"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Transcoder (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/transcoder1"
 homepage = "https://cloud.google.com/transcoder/docs/"
-documentation = "https://docs.rs/google-transcoder1/5.0.2-beta-1+20230105"
+documentation = "https://docs.rs/google-transcoder1/5.0.2+20230105"
 license = "MIT"
 keywords = ["transcoder", "google", "protocol", "web", "api"]
 autobins = false

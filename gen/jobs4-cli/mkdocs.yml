@@ -1,4 +1,4 @@
-site_name: Cloud Talent Solution v4.0.1+20220211
+site_name: Cloud Talent Solution v5.0.2+20230120
 site_url: http://byron.github.io/google-apis-rs/google-jobs4-cli
 site_description: A complete library to interact with Cloud Talent Solution (protocol v4)
 
@@ -7,31 +7,32 @@ repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/jobs4-cli
 docs_dir: docs
 site_dir: build_html
 
-pages:
-- ['index.md', 'Home']
-- ['projects_operations-get.md', 'Projects', 'Operations Get']
-- ['projects_tenants-client-events-create.md', 'Projects', 'Tenants Client Events Create']
-- ['projects_tenants-companies-create.md', 'Projects', 'Tenants Companies Create']
-- ['projects_tenants-companies-delete.md', 'Projects', 'Tenants Companies Delete']
-- ['projects_tenants-companies-get.md', 'Projects', 'Tenants Companies Get']
-- ['projects_tenants-companies-list.md', 'Projects', 'Tenants Companies List']
-- ['projects_tenants-companies-patch.md', 'Projects', 'Tenants Companies Patch']
-- ['projects_tenants-complete-query.md', 'Projects', 'Tenants Complete Query']
-- ['projects_tenants-create.md', 'Projects', 'Tenants Create']
-- ['projects_tenants-delete.md', 'Projects', 'Tenants Delete']
-- ['projects_tenants-get.md', 'Projects', 'Tenants Get']
-- ['projects_tenants-jobs-batch-create.md', 'Projects', 'Tenants Jobs Batch Create']
-- ['projects_tenants-jobs-batch-delete.md', 'Projects', 'Tenants Jobs Batch Delete']
-- ['projects_tenants-jobs-batch-update.md', 'Projects', 'Tenants Jobs Batch Update']
-- ['projects_tenants-jobs-create.md', 'Projects', 'Tenants Jobs Create']
-- ['projects_tenants-jobs-delete.md', 'Projects', 'Tenants Jobs Delete']
-- ['projects_tenants-jobs-get.md', 'Projects', 'Tenants Jobs Get']
-- ['projects_tenants-jobs-list.md', 'Projects', 'Tenants Jobs List']
-- ['projects_tenants-jobs-patch.md', 'Projects', 'Tenants Jobs Patch']
-- ['projects_tenants-jobs-search.md', 'Projects', 'Tenants Jobs Search']
-- ['projects_tenants-jobs-search-for-alert.md', 'Projects', 'Tenants Jobs Search For Alert']
-- ['projects_tenants-list.md', 'Projects', 'Tenants List']
-- ['projects_tenants-patch.md', 'Projects', 'Tenants Patch']
+nav:
+- Home: 'index.md'
+- 'Projects':
+    - 'Operations Get': 'projects_operations-get.md'
+    - 'Tenants Client Events Create': 'projects_tenants-client-events-create.md'
+    - 'Tenants Companies Create': 'projects_tenants-companies-create.md'
+    - 'Tenants Companies Delete': 'projects_tenants-companies-delete.md'
+    - 'Tenants Companies Get': 'projects_tenants-companies-get.md'
+    - 'Tenants Companies List': 'projects_tenants-companies-list.md'
+    - 'Tenants Companies Patch': 'projects_tenants-companies-patch.md'
+    - 'Tenants Complete Query': 'projects_tenants-complete-query.md'
+    - 'Tenants Create': 'projects_tenants-create.md'
+    - 'Tenants Delete': 'projects_tenants-delete.md'
+    - 'Tenants Get': 'projects_tenants-get.md'
+    - 'Tenants Jobs Batch Create': 'projects_tenants-jobs-batch-create.md'
+    - 'Tenants Jobs Batch Delete': 'projects_tenants-jobs-batch-delete.md'
+    - 'Tenants Jobs Batch Update': 'projects_tenants-jobs-batch-update.md'
+    - 'Tenants Jobs Create': 'projects_tenants-jobs-create.md'
+    - 'Tenants Jobs Delete': 'projects_tenants-jobs-delete.md'
+    - 'Tenants Jobs Get': 'projects_tenants-jobs-get.md'
+    - 'Tenants Jobs List': 'projects_tenants-jobs-list.md'
+    - 'Tenants Jobs Patch': 'projects_tenants-jobs-patch.md'
+    - 'Tenants Jobs Search': 'projects_tenants-jobs-search.md'
+    - 'Tenants Jobs Search For Alert': 'projects_tenants-jobs-search-for-alert.md'
+    - 'Tenants List': 'projects_tenants-list.md'
+    - 'Tenants Patch': 'projects_tenants-patch.md'
 
 theme: readthedocs
 

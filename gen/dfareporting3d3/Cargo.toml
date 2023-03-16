@@ -4,12 +4,12 @@
 [package]
 
 name = "google-dfareporting3d3"
-version = "5.0.2-beta-1+20220104"
+version = "5.0.2+20220104"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Dfareporting (protocol v3.3)"
 repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/dfareporting3d3"
 homepage = "https://developers.google.com/doubleclick-advertisers/"
-documentation = "https://docs.rs/google-dfareporting3d3/5.0.2-beta-1+20220104"
+documentation = "https://docs.rs/google-dfareporting3d3/5.0.2+20220104"
 license = "MIT"
 keywords = ["dfareporting", "google", "protocol", "web", "api"]
 autobins = false

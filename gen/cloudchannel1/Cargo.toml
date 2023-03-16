@@ -4,12 +4,12 @@
 [package]
 
 name = "google-cloudchannel1"
-version = "5.0.2-beta-1+20230123"
+version = "5.0.2+20230123"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Cloudchannel (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/cloudchannel1"
 homepage = "https://cloud.google.com/channel"
-documentation = "https://docs.rs/google-cloudchannel1/5.0.2-beta-1+20230123"
+documentation = "https://docs.rs/google-cloudchannel1/5.0.2+20230123"
 license = "MIT"
 keywords = ["cloudchannel", "google", "protocol", "web", "api"]
 autobins = false

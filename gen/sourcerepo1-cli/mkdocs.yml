@@ -1,4 +1,4 @@
-site_name: Cloud Source Repositories v4.0.1+20220217
+site_name: Cloud Source Repositories v5.0.2+20230123
 site_url: http://byron.github.io/google-apis-rs/google-sourcerepo1-cli
 site_description: A complete library to interact with Cloud Source Repositories (protocol v1)
 
@@ -7,19 +7,20 @@ repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/sourcerepo1-cli
 docs_dir: docs
 site_dir: build_html
 
-pages:
-- ['index.md', 'Home']
-- ['projects_get-config.md', 'Projects', 'Get Config']
-- ['projects_repos-create.md', 'Projects', 'Repos Create']
-- ['projects_repos-delete.md', 'Projects', 'Repos Delete']
-- ['projects_repos-get.md', 'Projects', 'Repos Get']
-- ['projects_repos-get-iam-policy.md', 'Projects', 'Repos Get Iam Policy']
-- ['projects_repos-list.md', 'Projects', 'Repos List']
-- ['projects_repos-patch.md', 'Projects', 'Repos Patch']
-- ['projects_repos-set-iam-policy.md', 'Projects', 'Repos Set Iam Policy']
-- ['projects_repos-sync.md', 'Projects', 'Repos Sync']
-- ['projects_repos-test-iam-permissions.md', 'Projects', 'Repos Test Iam Permissions']
-- ['projects_update-config.md', 'Projects', 'Update Config']
+nav:
+- Home: 'index.md'
+- 'Projects':
+    - 'Get Config': 'projects_get-config.md'
+    - 'Repos Create': 'projects_repos-create.md'
+    - 'Repos Delete': 'projects_repos-delete.md'
+    - 'Repos Get': 'projects_repos-get.md'
+    - 'Repos Get Iam Policy': 'projects_repos-get-iam-policy.md'
+    - 'Repos List': 'projects_repos-list.md'
+    - 'Repos Patch': 'projects_repos-patch.md'
+    - 'Repos Set Iam Policy': 'projects_repos-set-iam-policy.md'
+    - 'Repos Sync': 'projects_repos-sync.md'
+    - 'Repos Test Iam Permissions': 'projects_repos-test-iam-permissions.md'
+    - 'Update Config': 'projects_update-config.md'
 
 theme: readthedocs
 

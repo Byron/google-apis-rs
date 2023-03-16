@@ -3,8 +3,6 @@
 // DO NOT EDIT !
 #![allow(unused_variables, unused_imports, dead_code, unused_mut)]
 
-extern crate tokio;
-
 #[macro_use]
 extern crate clap;
 
@@ -12,9 +10,10 @@ use std::env;
 use std::io::{self, Write};
 use clap::{App, SubCommand, Arg};
 
-use google_drive2::{api, Error, oauth2};
+use google_drive2::{api, Error, oauth2, client::chrono, FieldMask};
 
-mod client;
+
+use google_clis_common as client;
 
 use client::{InvalidOptionsError, CLIError, arg_from_str, writer_from_opts, parse_kv_arg,
           input_file_from_opts, input_mime_from_opts, FieldCursor, FieldError, CallType, UploadProtocol,
@@ -58,13 +57,13 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "start-change-id" => {
-                    call = call.start_change_id(value.unwrap_or(""));
+                    call = call.start_change_id(        value.map(|v| arg_from_str(v, err, "start-change-id", "int64")).unwrap_or(-0));
                 },
                 "max-change-id-count" => {
-                    call = call.max_change_id_count(value.unwrap_or(""));
+                    call = call.max_change_id_count(        value.map(|v| arg_from_str(v, err, "max-change-id-count", "int64")).unwrap_or(-0));
                 },
                 "include-subscribed" => {
-                    call = call.include_subscribed(arg_from_str(value.unwrap_or("false"), err, "include-subscribed", "boolean"));
+                    call = call.include_subscribed(        value.map(|v| arg_from_str(v, err, "include-subscribed", "boolean")).unwrap_or(false));
                 },
                 _ => {
                     let mut found = false;
@@ -237,10 +236,10 @@ where
                     call = call.team_drive_id(value.unwrap_or(""));
                 },
                 "supports-team-drives" => {
-                    call = call.supports_team_drives(arg_from_str(value.unwrap_or("false"), err, "supports-team-drives", "boolean"));
+                    call = call.supports_team_drives(        value.map(|v| arg_from_str(v, err, "supports-team-drives", "boolean")).unwrap_or(false));
                 },
                 "supports-all-drives" => {
-                    call = call.supports_all_drives(arg_from_str(value.unwrap_or("false"), err, "supports-all-drives", "boolean"));
+                    call = call.supports_all_drives(        value.map(|v| arg_from_str(v, err, "supports-all-drives", "boolean")).unwrap_or(false));
                 },
                 "drive-id" => {
                     call = call.drive_id(value.unwrap_or(""));
@@ -302,10 +301,10 @@ where
                     call = call.team_drive_id(value.unwrap_or(""));
                 },
                 "supports-team-drives" => {
-                    call = call.supports_team_drives(arg_from_str(value.unwrap_or("false"), err, "supports-team-drives", "boolean"));
+                    call = call.supports_team_drives(        value.map(|v| arg_from_str(v, err, "supports-team-drives", "boolean")).unwrap_or(false));
                 },
                 "supports-all-drives" => {
-                    call = call.supports_all_drives(arg_from_str(value.unwrap_or("false"), err, "supports-all-drives", "boolean"));
+                    call = call.supports_all_drives(        value.map(|v| arg_from_str(v, err, "supports-all-drives", "boolean")).unwrap_or(false));
                 },
                 "drive-id" => {
                     call = call.drive_id(value.unwrap_or(""));
@@ -367,13 +366,13 @@ where
                     call = call.team_drive_id(value.unwrap_or(""));
                 },
                 "supports-team-drives" => {
-                    call = call.supports_team_drives(arg_from_str(value.unwrap_or("false"), err, "supports-team-drives", "boolean"));
+                    call = call.supports_team_drives(        value.map(|v| arg_from_str(v, err, "supports-team-drives", "boolean")).unwrap_or(false));
                 },
                 "supports-all-drives" => {
-                    call = call.supports_all_drives(arg_from_str(value.unwrap_or("false"), err, "supports-all-drives", "boolean"));
+                    call = call.supports_all_drives(        value.map(|v| arg_from_str(v, err, "supports-all-drives", "boolean")).unwrap_or(false));
                 },
                 "start-change-id" => {
-                    call = call.start_change_id(value.unwrap_or(""));
+                    call = call.start_change_id(        value.map(|v| arg_from_str(v, err, "start-change-id", "int64")).unwrap_or(-0));
                 },
                 "spaces" => {
                     call = call.spaces(value.unwrap_or(""));
@@ -382,25 +381,28 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "max-results" => {
-                    call = call.max_results(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
+                    call = call.max_results(        value.map(|v| arg_from_str(v, err, "max-results", "int32")).unwrap_or(-0));
                 },
                 "include-team-drive-items" => {
-                    call = call.include_team_drive_items(arg_from_str(value.unwrap_or("false"), err, "include-team-drive-items", "boolean"));
+                    call = call.include_team_drive_items(        value.map(|v| arg_from_str(v, err, "include-team-drive-items", "boolean")).unwrap_or(false));
                 },
                 "include-subscribed" => {
-                    call = call.include_subscribed(arg_from_str(value.unwrap_or("false"), err, "include-subscribed", "boolean"));
+                    call = call.include_subscribed(        value.map(|v| arg_from_str(v, err, "include-subscribed", "boolean")).unwrap_or(false));
                 },
                 "include-permissions-for-view" => {
                     call = call.include_permissions_for_view(value.unwrap_or(""));
                 },
+                "include-labels" => {
+                    call = call.include_labels(value.unwrap_or(""));
+                },
                 "include-items-from-all-drives" => {
-                    call = call.include_items_from_all_drives(arg_from_str(value.unwrap_or("false"), err, "include-items-from-all-drives", "boolean"));
+                    call = call.include_items_from_all_drives(        value.map(|v| arg_from_str(v, err, "include-items-from-all-drives", "boolean")).unwrap_or(false));
                 },
                 "include-deleted" => {
-                    call = call.include_deleted(arg_from_str(value.unwrap_or("false"), err, "include-deleted", "boolean"));
+                    call = call.include_deleted(        value.map(|v| arg_from_str(v, err, "include-deleted", "boolean")).unwrap_or(false));
                 },
                 "include-corpus-removals" => {
-                    call = call.include_corpus_removals(arg_from_str(value.unwrap_or("false"), err, "include-corpus-removals", "boolean"));
+                    call = call.include_corpus_removals(        value.map(|v| arg_from_str(v, err, "include-corpus-removals", "boolean")).unwrap_or(false));
                 },
                 "drive-id" => {
                     call = call.drive_id(value.unwrap_or(""));
@@ -418,7 +420,7 @@ where
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["drive-id", "include-corpus-removals", "include-deleted", "include-items-from-all-drives", "include-permissions-for-view", "include-subscribed", "include-team-drive-items", "max-results", "page-token", "spaces", "start-change-id", "supports-all-drives", "supports-team-drives", "team-drive-id"].iter().map(|v|*v));
+                                                                           v.extend(["drive-id", "include-corpus-removals", "include-deleted", "include-items-from-all-drives", "include-labels", "include-permissions-for-view", "include-subscribed", "include-team-drive-items", "max-results", "page-token", "spaces", "start-change-id", "supports-all-drives", "supports-team-drives", "team-drive-id"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -504,13 +506,13 @@ where
                     call = call.team_drive_id(value.unwrap_or(""));
                 },
                 "supports-team-drives" => {
-                    call = call.supports_team_drives(arg_from_str(value.unwrap_or("false"), err, "supports-team-drives", "boolean"));
+                    call = call.supports_team_drives(        value.map(|v| arg_from_str(v, err, "supports-team-drives", "boolean")).unwrap_or(false));
                 },
                 "supports-all-drives" => {
-                    call = call.supports_all_drives(arg_from_str(value.unwrap_or("false"), err, "supports-all-drives", "boolean"));
+                    call = call.supports_all_drives(        value.map(|v| arg_from_str(v, err, "supports-all-drives", "boolean")).unwrap_or(false));
                 },
                 "start-change-id" => {
-                    call = call.start_change_id(value.unwrap_or(""));
+                    call = call.start_change_id(        value.map(|v| arg_from_str(v, err, "start-change-id", "int64")).unwrap_or(-0));
                 },
                 "spaces" => {
                     call = call.spaces(value.unwrap_or(""));
@@ -519,25 +521,28 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "max-results" => {
-                    call = call.max_results(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
+                    call = call.max_results(        value.map(|v| arg_from_str(v, err, "max-results", "int32")).unwrap_or(-0));
                 },
                 "include-team-drive-items" => {
-                    call = call.include_team_drive_items(arg_from_str(value.unwrap_or("false"), err, "include-team-drive-items", "boolean"));
+                    call = call.include_team_drive_items(        value.map(|v| arg_from_str(v, err, "include-team-drive-items", "boolean")).unwrap_or(false));
                 },
                 "include-subscribed" => {
-                    call = call.include_subscribed(arg_from_str(value.unwrap_or("false"), err, "include-subscribed", "boolean"));
+                    call = call.include_subscribed(        value.map(|v| arg_from_str(v, err, "include-subscribed", "boolean")).unwrap_or(false));
                 },
                 "include-permissions-for-view" => {
                     call = call.include_permissions_for_view(value.unwrap_or(""));
                 },
+                "include-labels" => {
+                    call = call.include_labels(value.unwrap_or(""));
+                },
                 "include-items-from-all-drives" => {
-                    call = call.include_items_from_all_drives(arg_from_str(value.unwrap_or("false"), err, "include-items-from-all-drives", "boolean"));
+                    call = call.include_items_from_all_drives(        value.map(|v| arg_from_str(v, err, "include-items-from-all-drives", "boolean")).unwrap_or(false));
                 },
                 "include-deleted" => {
-                    call = call.include_deleted(arg_from_str(value.unwrap_or("false"), err, "include-deleted", "boolean"));
+                    call = call.include_deleted(        value.map(|v| arg_from_str(v, err, "include-deleted", "boolean")).unwrap_or(false));
                 },
                 "include-corpus-removals" => {
-                    call = call.include_corpus_removals(arg_from_str(value.unwrap_or("false"), err, "include-corpus-removals", "boolean"));
+                    call = call.include_corpus_removals(        value.map(|v| arg_from_str(v, err, "include-corpus-removals", "boolean")).unwrap_or(false));
                 },
                 "drive-id" => {
                     call = call.drive_id(value.unwrap_or(""));
@@ -555,7 +560,7 @@ where
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["drive-id", "include-corpus-removals", "include-deleted", "include-items-from-all-drives", "include-permissions-for-view", "include-subscribed", "include-team-drive-items", "max-results", "page-token", "spaces", "start-change-id", "supports-all-drives", "supports-team-drives", "team-drive-id"].iter().map(|v|*v));
+                                                                           v.extend(["drive-id", "include-corpus-removals", "include-deleted", "include-items-from-all-drives", "include-labels", "include-permissions-for-view", "include-subscribed", "include-team-drive-items", "max-results", "page-token", "spaces", "start-change-id", "supports-all-drives", "supports-team-drives", "team-drive-id"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -682,7 +687,7 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "enforce-single-parent" => {
-                    call = call.enforce_single_parent(arg_from_str(value.unwrap_or("false"), err, "enforce-single-parent", "boolean"));
+                    call = call.enforce_single_parent(        value.map(|v| arg_from_str(v, err, "enforce-single-parent", "boolean")).unwrap_or(false));
                 },
                 _ => {
                     let mut found = false;
@@ -818,13 +823,13 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "supports-team-drives" => {
-                    call = call.supports_team_drives(arg_from_str(value.unwrap_or("false"), err, "supports-team-drives", "boolean"));
+                    call = call.supports_team_drives(        value.map(|v| arg_from_str(v, err, "supports-team-drives", "boolean")).unwrap_or(false));
                 },
                 "supports-all-drives" => {
-                    call = call.supports_all_drives(arg_from_str(value.unwrap_or("false"), err, "supports-all-drives", "boolean"));
+                    call = call.supports_all_drives(        value.map(|v| arg_from_str(v, err, "supports-all-drives", "boolean")).unwrap_or(false));
                 },
                 "enforce-single-parent" => {
-                    call = call.enforce_single_parent(arg_from_str(value.unwrap_or("false"), err, "enforce-single-parent", "boolean"));
+                    call = call.enforce_single_parent(        value.map(|v| arg_from_str(v, err, "enforce-single-parent", "boolean")).unwrap_or(false));
                 },
                 _ => {
                     let mut found = false;
@@ -889,7 +894,7 @@ where
                     call = call.order_by(value.unwrap_or(""));
                 },
                 "max-results" => {
-                    call = call.max_results(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
+                    call = call.max_results(        value.map(|v| arg_from_str(v, err, "max-results", "int32")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -989,7 +994,7 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "include-deleted" => {
-                    call = call.include_deleted(arg_from_str(value.unwrap_or("false"), err, "include-deleted", "boolean"));
+                    call = call.include_deleted(        value.map(|v| arg_from_str(v, err, "include-deleted", "boolean")).unwrap_or(false));
                 },
                 _ => {
                     let mut found = false;
@@ -1155,10 +1160,10 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "max-results" => {
-                    call = call.max_results(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
+                    call = call.max_results(        value.map(|v| arg_from_str(v, err, "max-results", "int32")).unwrap_or(-0));
                 },
                 "include-deleted" => {
-                    call = call.include_deleted(arg_from_str(value.unwrap_or("false"), err, "include-deleted", "boolean"));
+                    call = call.include_deleted(        value.map(|v| arg_from_str(v, err, "include-deleted", "boolean")).unwrap_or(false));
                 },
                 _ => {
                     let mut found = false;
@@ -1421,6 +1426,12 @@ where
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
+                "use-domain-admin-access" => {
+                    call = call.use_domain_admin_access(        value.map(|v| arg_from_str(v, err, "use-domain-admin-access", "boolean")).unwrap_or(false));
+                },
+                "allow-item-deletion" => {
+                    call = call.allow_item_deletion(        value.map(|v| arg_from_str(v, err, "allow-item-deletion", "boolean")).unwrap_or(false));
+                },
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -1434,6 +1445,7 @@ where
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["allow-item-deletion", "use-domain-admin-access"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -1466,7 +1478,7 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "use-domain-admin-access" => {
-                    call = call.use_domain_admin_access(arg_from_str(value.unwrap_or("false"), err, "use-domain-admin-access", "boolean"));
+                    call = call.use_domain_admin_access(        value.map(|v| arg_from_str(v, err, "use-domain-admin-access", "boolean")).unwrap_or(false));
                 },
                 _ => {
                     let mut found = false;
@@ -1611,6 +1623,7 @@ where
                     "capabilities.can-read-revisions" => Some(("capabilities.canReadRevisions", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-rename" => Some(("capabilities.canRename", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-rename-drive" => Some(("capabilities.canRenameDrive", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-reset-drive-restrictions" => Some(("capabilities.canResetDriveRestrictions", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-share" => Some(("capabilities.canShare", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-trash-children" => Some(("capabilities.canTrashChildren", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "color-rgb" => Some(("colorRgb", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -1626,7 +1639,7 @@ where
                     "restrictions.drive-members-only" => Some(("restrictions.driveMembersOnly", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "theme-id" => Some(("themeId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["admin-managed-restrictions", "background-image-file", "background-image-link", "can-add-children", "can-change-copy-requires-writer-permission-restriction", "can-change-domain-users-only-restriction", "can-change-drive-background", "can-change-drive-members-only-restriction", "can-comment", "can-copy", "can-delete-children", "can-delete-drive", "can-download", "can-edit", "can-list-children", "can-manage-members", "can-read-revisions", "can-rename", "can-rename-drive", "can-share", "can-trash-children", "capabilities", "color-rgb", "copy-requires-writer-permission", "created-date", "domain-users-only", "drive-members-only", "hidden", "id", "kind", "name", "org-unit-id", "restrictions", "theme-id", "width", "x-coordinate", "y-coordinate"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["admin-managed-restrictions", "background-image-file", "background-image-link", "can-add-children", "can-change-copy-requires-writer-permission-restriction", "can-change-domain-users-only-restriction", "can-change-drive-background", "can-change-drive-members-only-restriction", "can-comment", "can-copy", "can-delete-children", "can-delete-drive", "can-download", "can-edit", "can-list-children", "can-manage-members", "can-read-revisions", "can-rename", "can-rename-drive", "can-reset-drive-restrictions", "can-share", "can-trash-children", "capabilities", "color-rgb", "copy-requires-writer-permission", "created-date", "domain-users-only", "drive-members-only", "hidden", "id", "kind", "name", "org-unit-id", "restrictions", "theme-id", "width", "x-coordinate", "y-coordinate"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1693,7 +1706,7 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "use-domain-admin-access" => {
-                    call = call.use_domain_admin_access(arg_from_str(value.unwrap_or("false"), err, "use-domain-admin-access", "boolean"));
+                    call = call.use_domain_admin_access(        value.map(|v| arg_from_str(v, err, "use-domain-admin-access", "boolean")).unwrap_or(false));
                 },
                 "q" => {
                     call = call.q(value.unwrap_or(""));
@@ -1702,7 +1715,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "max-results" => {
-                    call = call.max_results(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
+                    call = call.max_results(        value.map(|v| arg_from_str(v, err, "max-results", "int32")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -1847,6 +1860,7 @@ where
                     "capabilities.can-read-revisions" => Some(("capabilities.canReadRevisions", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-rename" => Some(("capabilities.canRename", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-rename-drive" => Some(("capabilities.canRenameDrive", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-reset-drive-restrictions" => Some(("capabilities.canResetDriveRestrictions", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-share" => Some(("capabilities.canShare", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-trash-children" => Some(("capabilities.canTrashChildren", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "color-rgb" => Some(("colorRgb", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -1862,7 +1876,7 @@ where
                     "restrictions.drive-members-only" => Some(("restrictions.driveMembersOnly", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "theme-id" => Some(("themeId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["admin-managed-restrictions", "background-image-file", "background-image-link", "can-add-children", "can-change-copy-requires-writer-permission-restriction", "can-change-domain-users-only-restriction", "can-change-drive-background", "can-change-drive-members-only-restriction", "can-comment", "can-copy", "can-delete-children", "can-delete-drive", "can-download", "can-edit", "can-list-children", "can-manage-members", "can-read-revisions", "can-rename", "can-rename-drive", "can-share", "can-trash-children", "capabilities", "color-rgb", "copy-requires-writer-permission", "created-date", "domain-users-only", "drive-members-only", "hidden", "id", "kind", "name", "org-unit-id", "restrictions", "theme-id", "width", "x-coordinate", "y-coordinate"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["admin-managed-restrictions", "background-image-file", "background-image-link", "can-add-children", "can-change-copy-requires-writer-permission-restriction", "can-change-domain-users-only-restriction", "can-change-drive-background", "can-change-drive-members-only-restriction", "can-comment", "can-copy", "can-delete-children", "can-delete-drive", "can-download", "can-edit", "can-list-children", "can-manage-members", "can-read-revisions", "can-rename", "can-rename-drive", "can-reset-drive-restrictions", "can-share", "can-trash-children", "capabilities", "color-rgb", "copy-requires-writer-permission", "created-date", "domain-users-only", "drive-members-only", "hidden", "id", "kind", "name", "org-unit-id", "restrictions", "theme-id", "width", "x-coordinate", "y-coordinate"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1877,7 +1891,7 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "use-domain-admin-access" => {
-                    call = call.use_domain_admin_access(arg_from_str(value.unwrap_or("false"), err, "use-domain-admin-access", "boolean"));
+                    call = call.use_domain_admin_access(        value.map(|v| arg_from_str(v, err, "use-domain-admin-access", "boolean")).unwrap_or(false));
                 },
                 _ => {
                     let mut found = false;
@@ -1969,6 +1983,7 @@ where
                     "capabilities.can-list-children" => Some(("capabilities.canListChildren", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-modify-content" => Some(("capabilities.canModifyContent", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-modify-content-restriction" => Some(("capabilities.canModifyContentRestriction", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-modify-labels" => Some(("capabilities.canModifyLabels", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-move-children-out-of-drive" => Some(("capabilities.canMoveChildrenOutOfDrive", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-move-children-out-of-team-drive" => Some(("capabilities.canMoveChildrenOutOfTeamDrive", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-move-children-within-drive" => Some(("capabilities.canMoveChildrenWithinDrive", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
@@ -1980,6 +1995,7 @@ where
                     "capabilities.can-move-item-within-team-drive" => Some(("capabilities.canMoveItemWithinTeamDrive", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-move-team-drive-item" => Some(("capabilities.canMoveTeamDriveItem", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-read-drive" => Some(("capabilities.canReadDrive", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-read-labels" => Some(("capabilities.canReadLabels", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-read-revisions" => Some(("capabilities.canReadRevisions", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-read-team-drive" => Some(("capabilities.canReadTeamDrive", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-remove-children" => Some(("capabilities.canRemoveChildren", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
@@ -2065,6 +2081,8 @@ where
                     "quota-bytes-used" => Some(("quotaBytesUsed", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "resource-key" => Some(("resourceKey", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "self-link" => Some(("selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "sha1-checksum" => Some(("sha1Checksum", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "sha256-checksum" => Some(("sha256Checksum", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "shareable" => Some(("shareable", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "shared" => Some(("shared", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "shared-with-me-date" => Some(("sharedWithMeDate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -2117,7 +2135,7 @@ where
                     "web-view-link" => Some(("webViewLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "writers-can-share" => Some(("writersCanShare", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["additional-roles", "alternate-link", "altitude", "aperture", "app-data-contents", "auth-key", "camera-make", "camera-model", "can-accept-ownership", "can-add-children", "can-add-folder-from-another-drive", "can-add-my-drive-parent", "can-change-copy-requires-writer-permission", "can-change-restricted-download", "can-change-security-update-enabled", "can-comment", "can-copy", "can-delete", "can-delete-children", "can-download", "can-edit", "can-list-children", "can-modify-content", "can-modify-content-restriction", "can-move-children-out-of-drive", "can-move-children-out-of-team-drive", "can-move-children-within-drive", "can-move-children-within-team-drive", "can-move-item-into-team-drive", "can-move-item-out-of-drive", "can-move-item-out-of-team-drive", "can-move-item-within-drive", "can-move-item-within-team-drive", "can-move-team-drive-item", "can-read-drive", "can-read-revisions", "can-read-team-drive", "can-remove-children", "can-remove-my-drive-parent", "can-rename", "can-share", "can-trash", "can-trash-children", "can-untrash", "capabilities", "color-space", "copy-requires-writer-permission", "copyable", "created-date", "date", "default-open-with-link", "deleted", "description", "display-name", "domain", "download-url", "drive-id", "duration-millis", "editable", "email-address", "embed-link", "etag", "expiration-date", "explicitly-trashed", "export-links", "exposure-bias", "exposure-mode", "exposure-time", "file-extension", "file-size", "flash-used", "focal-length", "folder-color-rgb", "full-file-extension", "has-augmented-permissions", "has-thumbnail", "head-revision-id", "height", "hidden", "icon-link", "id", "image", "image-media-metadata", "indexable-text", "is-app-authorized", "is-authenticated-user", "iso-speed", "kind", "labels", "last-modifying-user", "last-modifying-user-name", "last-viewed-by-me-date", "latitude", "lens", "link-share-metadata", "location", "longitude", "marked-viewed-by-me-date", "max-aperture-value", "md5-checksum", "metering-mode", "mime-type", "modified", "modified-by-me-date", "modified-date", "name", "open-with-links", "original-filename", "owned-by-me", "owner-names", "pending-owner", "permission-id", "permission-ids", "photo-link", "picture", "quota-bytes-used", "resource-key", "restricted", "role", "rotation", "security-update-eligible", "security-update-enabled", "self-link", "sensor", "shareable", "shared", "shared-with-me-date", "sharing-user", "shortcut-details", "spaces", "starred", "subject-distance", "target-id", "target-mime-type", "target-resource-key", "team-drive-id", "text", "thumbnail", "thumbnail-link", "thumbnail-version", "title", "trashed", "trashed-date", "trashing-user", "type", "url", "user-permission", "value", "version", "video-media-metadata", "view", "viewed", "web-content-link", "web-view-link", "white-balance", "width", "with-link", "writers-can-share"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["additional-roles", "alternate-link", "altitude", "aperture", "app-data-contents", "auth-key", "camera-make", "camera-model", "can-accept-ownership", "can-add-children", "can-add-folder-from-another-drive", "can-add-my-drive-parent", "can-change-copy-requires-writer-permission", "can-change-restricted-download", "can-change-security-update-enabled", "can-comment", "can-copy", "can-delete", "can-delete-children", "can-download", "can-edit", "can-list-children", "can-modify-content", "can-modify-content-restriction", "can-modify-labels", "can-move-children-out-of-drive", "can-move-children-out-of-team-drive", "can-move-children-within-drive", "can-move-children-within-team-drive", "can-move-item-into-team-drive", "can-move-item-out-of-drive", "can-move-item-out-of-team-drive", "can-move-item-within-drive", "can-move-item-within-team-drive", "can-move-team-drive-item", "can-read-drive", "can-read-labels", "can-read-revisions", "can-read-team-drive", "can-remove-children", "can-remove-my-drive-parent", "can-rename", "can-share", "can-trash", "can-trash-children", "can-untrash", "capabilities", "color-space", "copy-requires-writer-permission", "copyable", "created-date", "date", "default-open-with-link", "deleted", "description", "display-name", "domain", "download-url", "drive-id", "duration-millis", "editable", "email-address", "embed-link", "etag", "expiration-date", "explicitly-trashed", "export-links", "exposure-bias", "exposure-mode", "exposure-time", "file-extension", "file-size", "flash-used", "focal-length", "folder-color-rgb", "full-file-extension", "has-augmented-permissions", "has-thumbnail", "head-revision-id", "height", "hidden", "icon-link", "id", "image", "image-media-metadata", "indexable-text", "is-app-authorized", "is-authenticated-user", "iso-speed", "kind", "labels", "last-modifying-user", "last-modifying-user-name", "last-viewed-by-me-date", "latitude", "lens", "link-share-metadata", "location", "longitude", "marked-viewed-by-me-date", "max-aperture-value", "md5-checksum", "metering-mode", "mime-type", "modified", "modified-by-me-date", "modified-date", "name", "open-with-links", "original-filename", "owned-by-me", "owner-names", "pending-owner", "permission-id", "permission-ids", "photo-link", "picture", "quota-bytes-used", "resource-key", "restricted", "role", "rotation", "security-update-eligible", "security-update-enabled", "self-link", "sensor", "sha1-checksum", "sha256-checksum", "shareable", "shared", "shared-with-me-date", "sharing-user", "shortcut-details", "spaces", "starred", "subject-distance", "target-id", "target-mime-type", "target-resource-key", "team-drive-id", "text", "thumbnail", "thumbnail-link", "thumbnail-version", "title", "trashed", "trashed-date", "trashing-user", "type", "url", "user-permission", "value", "version", "video-media-metadata", "view", "viewed", "web-content-link", "web-view-link", "white-balance", "width", "with-link", "writers-can-share"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -2141,28 +2159,31 @@ where
                     call = call.timed_text_language(value.unwrap_or(""));
                 },
                 "supports-team-drives" => {
-                    call = call.supports_team_drives(arg_from_str(value.unwrap_or("false"), err, "supports-team-drives", "boolean"));
+                    call = call.supports_team_drives(        value.map(|v| arg_from_str(v, err, "supports-team-drives", "boolean")).unwrap_or(false));
                 },
                 "supports-all-drives" => {
-                    call = call.supports_all_drives(arg_from_str(value.unwrap_or("false"), err, "supports-all-drives", "boolean"));
+                    call = call.supports_all_drives(        value.map(|v| arg_from_str(v, err, "supports-all-drives", "boolean")).unwrap_or(false));
                 },
                 "pinned" => {
-                    call = call.pinned(arg_from_str(value.unwrap_or("false"), err, "pinned", "boolean"));
+                    call = call.pinned(        value.map(|v| arg_from_str(v, err, "pinned", "boolean")).unwrap_or(false));
                 },
                 "ocr-language" => {
                     call = call.ocr_language(value.unwrap_or(""));
                 },
                 "ocr" => {
-                    call = call.ocr(arg_from_str(value.unwrap_or("false"), err, "ocr", "boolean"));
+                    call = call.ocr(        value.map(|v| arg_from_str(v, err, "ocr", "boolean")).unwrap_or(false));
                 },
                 "include-permissions-for-view" => {
                     call = call.include_permissions_for_view(value.unwrap_or(""));
                 },
+                "include-labels" => {
+                    call = call.include_labels(value.unwrap_or(""));
+                },
                 "enforce-single-parent" => {
-                    call = call.enforce_single_parent(arg_from_str(value.unwrap_or("false"), err, "enforce-single-parent", "boolean"));
+                    call = call.enforce_single_parent(        value.map(|v| arg_from_str(v, err, "enforce-single-parent", "boolean")).unwrap_or(false));
                 },
                 "convert" => {
-                    call = call.convert(arg_from_str(value.unwrap_or("false"), err, "convert", "boolean"));
+                    call = call.convert(        value.map(|v| arg_from_str(v, err, "convert", "boolean")).unwrap_or(false));
                 },
                 _ => {
                     let mut found = false;
@@ -2177,7 +2198,7 @@ where
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["convert", "enforce-single-parent", "include-permissions-for-view", "ocr", "ocr-language", "pinned", "supports-all-drives", "supports-team-drives", "timed-text-language", "timed-text-track-name", "visibility"].iter().map(|v|*v));
+                                                                           v.extend(["convert", "enforce-single-parent", "include-labels", "include-permissions-for-view", "ocr", "ocr-language", "pinned", "supports-all-drives", "supports-team-drives", "timed-text-language", "timed-text-track-name", "visibility"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -2218,13 +2239,13 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "supports-team-drives" => {
-                    call = call.supports_team_drives(arg_from_str(value.unwrap_or("false"), err, "supports-team-drives", "boolean"));
+                    call = call.supports_team_drives(        value.map(|v| arg_from_str(v, err, "supports-team-drives", "boolean")).unwrap_or(false));
                 },
                 "supports-all-drives" => {
-                    call = call.supports_all_drives(arg_from_str(value.unwrap_or("false"), err, "supports-all-drives", "boolean"));
+                    call = call.supports_all_drives(        value.map(|v| arg_from_str(v, err, "supports-all-drives", "boolean")).unwrap_or(false));
                 },
                 "enforce-single-parent" => {
-                    call = call.enforce_single_parent(arg_from_str(value.unwrap_or("false"), err, "enforce-single-parent", "boolean"));
+                    call = call.enforce_single_parent(        value.map(|v| arg_from_str(v, err, "enforce-single-parent", "boolean")).unwrap_or(false));
                 },
                 _ => {
                     let mut found = false;
@@ -2272,7 +2293,7 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "enforce-single-parent" => {
-                    call = call.enforce_single_parent(arg_from_str(value.unwrap_or("false"), err, "enforce-single-parent", "boolean"));
+                    call = call.enforce_single_parent(        value.map(|v| arg_from_str(v, err, "enforce-single-parent", "boolean")).unwrap_or(false));
                 },
                 _ => {
                     let mut found = false;
@@ -2384,7 +2405,7 @@ where
                     call = call.space(value.unwrap_or(""));
                 },
                 "max-results" => {
-                    call = call.max_results(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
+                    call = call.max_results(        value.map(|v| arg_from_str(v, err, "max-results", "int32")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -2441,13 +2462,13 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "update-viewed-date" => {
-                    call = call.update_viewed_date(arg_from_str(value.unwrap_or("false"), err, "update-viewed-date", "boolean"));
+                    call = call.update_viewed_date(        value.map(|v| arg_from_str(v, err, "update-viewed-date", "boolean")).unwrap_or(false));
                 },
                 "supports-team-drives" => {
-                    call = call.supports_team_drives(arg_from_str(value.unwrap_or("false"), err, "supports-team-drives", "boolean"));
+                    call = call.supports_team_drives(        value.map(|v| arg_from_str(v, err, "supports-team-drives", "boolean")).unwrap_or(false));
                 },
                 "supports-all-drives" => {
-                    call = call.supports_all_drives(arg_from_str(value.unwrap_or("false"), err, "supports-all-drives", "boolean"));
+                    call = call.supports_all_drives(        value.map(|v| arg_from_str(v, err, "supports-all-drives", "boolean")).unwrap_or(false));
                 },
                 "revision-id" => {
                     call = call.revision_id(value.unwrap_or(""));
@@ -2458,8 +2479,11 @@ where
                 "include-permissions-for-view" => {
                     call = call.include_permissions_for_view(value.unwrap_or(""));
                 },
+                "include-labels" => {
+                    call = call.include_labels(value.unwrap_or(""));
+                },
                 "acknowledge-abuse" => {
-                    call = call.acknowledge_abuse(arg_from_str(value.unwrap_or("false"), err, "acknowledge-abuse", "boolean"));
+                    call = call.acknowledge_abuse(        value.map(|v| arg_from_str(v, err, "acknowledge-abuse", "boolean")).unwrap_or(false));
                 },
                 _ => {
                     let mut found = false;
@@ -2477,7 +2501,7 @@ where
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["acknowledge-abuse", "include-permissions-for-view", "projection", "revision-id", "supports-all-drives", "supports-team-drives", "update-viewed-date"].iter().map(|v|*v));
+                                                                           v.extend(["acknowledge-abuse", "include-labels", "include-permissions-for-view", "projection", "revision-id", "supports-all-drives", "supports-team-drives", "update-viewed-date"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -2560,6 +2584,7 @@ where
                     "capabilities.can-list-children" => Some(("capabilities.canListChildren", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-modify-content" => Some(("capabilities.canModifyContent", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-modify-content-restriction" => Some(("capabilities.canModifyContentRestriction", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-modify-labels" => Some(("capabilities.canModifyLabels", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-move-children-out-of-drive" => Some(("capabilities.canMoveChildrenOutOfDrive", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-move-children-out-of-team-drive" => Some(("capabilities.canMoveChildrenOutOfTeamDrive", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-move-children-within-drive" => Some(("capabilities.canMoveChildrenWithinDrive", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
@@ -2571,6 +2596,7 @@ where
                     "capabilities.can-move-item-within-team-drive" => Some(("capabilities.canMoveItemWithinTeamDrive", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-move-team-drive-item" => Some(("capabilities.canMoveTeamDriveItem", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-read-drive" => Some(("capabilities.canReadDrive", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-read-labels" => Some(("capabilities.canReadLabels", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-read-revisions" => Some(("capabilities.canReadRevisions", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-read-team-drive" => Some(("capabilities.canReadTeamDrive", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-remove-children" => Some(("capabilities.canRemoveChildren", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
@@ -2656,6 +2682,8 @@ where
                     "quota-bytes-used" => Some(("quotaBytesUsed", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "resource-key" => Some(("resourceKey", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "self-link" => Some(("selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "sha1-checksum" => Some(("sha1Checksum", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "sha256-checksum" => Some(("sha256Checksum", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "shareable" => Some(("shareable", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "shared" => Some(("shared", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "shared-with-me-date" => Some(("sharedWithMeDate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -2708,7 +2736,7 @@ where
                     "web-view-link" => Some(("webViewLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "writers-can-share" => Some(("writersCanShare", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["additional-roles", "alternate-link", "altitude", "aperture", "app-data-contents", "auth-key", "camera-make", "camera-model", "can-accept-ownership", "can-add-children", "can-add-folder-from-another-drive", "can-add-my-drive-parent", "can-change-copy-requires-writer-permission", "can-change-restricted-download", "can-change-security-update-enabled", "can-comment", "can-copy", "can-delete", "can-delete-children", "can-download", "can-edit", "can-list-children", "can-modify-content", "can-modify-content-restriction", "can-move-children-out-of-drive", "can-move-children-out-of-team-drive", "can-move-children-within-drive", "can-move-children-within-team-drive", "can-move-item-into-team-drive", "can-move-item-out-of-drive", "can-move-item-out-of-team-drive", "can-move-item-within-drive", "can-move-item-within-team-drive", "can-move-team-drive-item", "can-read-drive", "can-read-revisions", "can-read-team-drive", "can-remove-children", "can-remove-my-drive-parent", "can-rename", "can-share", "can-trash", "can-trash-children", "can-untrash", "capabilities", "color-space", "copy-requires-writer-permission", "copyable", "created-date", "date", "default-open-with-link", "deleted", "description", "display-name", "domain", "download-url", "drive-id", "duration-millis", "editable", "email-address", "embed-link", "etag", "expiration-date", "explicitly-trashed", "export-links", "exposure-bias", "exposure-mode", "exposure-time", "file-extension", "file-size", "flash-used", "focal-length", "folder-color-rgb", "full-file-extension", "has-augmented-permissions", "has-thumbnail", "head-revision-id", "height", "hidden", "icon-link", "id", "image", "image-media-metadata", "indexable-text", "is-app-authorized", "is-authenticated-user", "iso-speed", "kind", "labels", "last-modifying-user", "last-modifying-user-name", "last-viewed-by-me-date", "latitude", "lens", "link-share-metadata", "location", "longitude", "marked-viewed-by-me-date", "max-aperture-value", "md5-checksum", "metering-mode", "mime-type", "modified", "modified-by-me-date", "modified-date", "name", "open-with-links", "original-filename", "owned-by-me", "owner-names", "pending-owner", "permission-id", "permission-ids", "photo-link", "picture", "quota-bytes-used", "resource-key", "restricted", "role", "rotation", "security-update-eligible", "security-update-enabled", "self-link", "sensor", "shareable", "shared", "shared-with-me-date", "sharing-user", "shortcut-details", "spaces", "starred", "subject-distance", "target-id", "target-mime-type", "target-resource-key", "team-drive-id", "text", "thumbnail", "thumbnail-link", "thumbnail-version", "title", "trashed", "trashed-date", "trashing-user", "type", "url", "user-permission", "value", "version", "video-media-metadata", "view", "viewed", "web-content-link", "web-view-link", "white-balance", "width", "with-link", "writers-can-share"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["additional-roles", "alternate-link", "altitude", "aperture", "app-data-contents", "auth-key", "camera-make", "camera-model", "can-accept-ownership", "can-add-children", "can-add-folder-from-another-drive", "can-add-my-drive-parent", "can-change-copy-requires-writer-permission", "can-change-restricted-download", "can-change-security-update-enabled", "can-comment", "can-copy", "can-delete", "can-delete-children", "can-download", "can-edit", "can-list-children", "can-modify-content", "can-modify-content-restriction", "can-modify-labels", "can-move-children-out-of-drive", "can-move-children-out-of-team-drive", "can-move-children-within-drive", "can-move-children-within-team-drive", "can-move-item-into-team-drive", "can-move-item-out-of-drive", "can-move-item-out-of-team-drive", "can-move-item-within-drive", "can-move-item-within-team-drive", "can-move-team-drive-item", "can-read-drive", "can-read-labels", "can-read-revisions", "can-read-team-drive", "can-remove-children", "can-remove-my-drive-parent", "can-rename", "can-share", "can-trash", "can-trash-children", "can-untrash", "capabilities", "color-space", "copy-requires-writer-permission", "copyable", "created-date", "date", "default-open-with-link", "deleted", "description", "display-name", "domain", "download-url", "drive-id", "duration-millis", "editable", "email-address", "embed-link", "etag", "expiration-date", "explicitly-trashed", "export-links", "exposure-bias", "exposure-mode", "exposure-time", "file-extension", "file-size", "flash-used", "focal-length", "folder-color-rgb", "full-file-extension", "has-augmented-permissions", "has-thumbnail", "head-revision-id", "height", "hidden", "icon-link", "id", "image", "image-media-metadata", "indexable-text", "is-app-authorized", "is-authenticated-user", "iso-speed", "kind", "labels", "last-modifying-user", "last-modifying-user-name", "last-viewed-by-me-date", "latitude", "lens", "link-share-metadata", "location", "longitude", "marked-viewed-by-me-date", "max-aperture-value", "md5-checksum", "metering-mode", "mime-type", "modified", "modified-by-me-date", "modified-date", "name", "open-with-links", "original-filename", "owned-by-me", "owner-names", "pending-owner", "permission-id", "permission-ids", "photo-link", "picture", "quota-bytes-used", "resource-key", "restricted", "role", "rotation", "security-update-eligible", "security-update-enabled", "self-link", "sensor", "sha1-checksum", "sha256-checksum", "shareable", "shared", "shared-with-me-date", "sharing-user", "shortcut-details", "spaces", "starred", "subject-distance", "target-id", "target-mime-type", "target-resource-key", "team-drive-id", "text", "thumbnail", "thumbnail-link", "thumbnail-version", "title", "trashed", "trashed-date", "trashing-user", "type", "url", "user-permission", "value", "version", "video-media-metadata", "view", "viewed", "web-content-link", "web-view-link", "white-balance", "width", "with-link", "writers-can-share"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -2726,7 +2754,7 @@ where
                     call = call.visibility(value.unwrap_or(""));
                 },
                 "use-content-as-indexable-text" => {
-                    call = call.use_content_as_indexable_text(arg_from_str(value.unwrap_or("false"), err, "use-content-as-indexable-text", "boolean"));
+                    call = call.use_content_as_indexable_text(        value.map(|v| arg_from_str(v, err, "use-content-as-indexable-text", "boolean")).unwrap_or(false));
                 },
                 "timed-text-track-name" => {
                     call = call.timed_text_track_name(value.unwrap_or(""));
@@ -2735,28 +2763,31 @@ where
                     call = call.timed_text_language(value.unwrap_or(""));
                 },
                 "supports-team-drives" => {
-                    call = call.supports_team_drives(arg_from_str(value.unwrap_or("false"), err, "supports-team-drives", "boolean"));
+                    call = call.supports_team_drives(        value.map(|v| arg_from_str(v, err, "supports-team-drives", "boolean")).unwrap_or(false));
                 },
                 "supports-all-drives" => {
-                    call = call.supports_all_drives(arg_from_str(value.unwrap_or("false"), err, "supports-all-drives", "boolean"));
+                    call = call.supports_all_drives(        value.map(|v| arg_from_str(v, err, "supports-all-drives", "boolean")).unwrap_or(false));
                 },
                 "pinned" => {
-                    call = call.pinned(arg_from_str(value.unwrap_or("false"), err, "pinned", "boolean"));
+                    call = call.pinned(        value.map(|v| arg_from_str(v, err, "pinned", "boolean")).unwrap_or(false));
                 },
                 "ocr-language" => {
                     call = call.ocr_language(value.unwrap_or(""));
                 },
                 "ocr" => {
-                    call = call.ocr(arg_from_str(value.unwrap_or("false"), err, "ocr", "boolean"));
+                    call = call.ocr(        value.map(|v| arg_from_str(v, err, "ocr", "boolean")).unwrap_or(false));
                 },
                 "include-permissions-for-view" => {
                     call = call.include_permissions_for_view(value.unwrap_or(""));
                 },
+                "include-labels" => {
+                    call = call.include_labels(value.unwrap_or(""));
+                },
                 "enforce-single-parent" => {
-                    call = call.enforce_single_parent(arg_from_str(value.unwrap_or("false"), err, "enforce-single-parent", "boolean"));
+                    call = call.enforce_single_parent(        value.map(|v| arg_from_str(v, err, "enforce-single-parent", "boolean")).unwrap_or(false));
                 },
                 "convert" => {
-                    call = call.convert(arg_from_str(value.unwrap_or("false"), err, "convert", "boolean"));
+                    call = call.convert(        value.map(|v| arg_from_str(v, err, "convert", "boolean")).unwrap_or(false));
                 },
                 _ => {
                     let mut found = false;
@@ -2771,7 +2802,7 @@ where
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["convert", "enforce-single-parent", "include-permissions-for-view", "ocr", "ocr-language", "pinned", "supports-all-drives", "supports-team-drives", "timed-text-language", "timed-text-track-name", "use-content-as-indexable-text", "visibility"].iter().map(|v|*v));
+                                                                           v.extend(["convert", "enforce-single-parent", "include-labels", "include-permissions-for-view", "ocr", "ocr-language", "pinned", "supports-all-drives", "supports-team-drives", "timed-text-language", "timed-text-track-name", "use-content-as-indexable-text", "visibility"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -2818,10 +2849,10 @@ where
                     call = call.team_drive_id(value.unwrap_or(""));
                 },
                 "supports-team-drives" => {
-                    call = call.supports_team_drives(arg_from_str(value.unwrap_or("false"), err, "supports-team-drives", "boolean"));
+                    call = call.supports_team_drives(        value.map(|v| arg_from_str(v, err, "supports-team-drives", "boolean")).unwrap_or(false));
                 },
                 "supports-all-drives" => {
-                    call = call.supports_all_drives(arg_from_str(value.unwrap_or("false"), err, "supports-all-drives", "boolean"));
+                    call = call.supports_all_drives(        value.map(|v| arg_from_str(v, err, "supports-all-drives", "boolean")).unwrap_or(false));
                 },
                 "spaces" => {
                     call = call.spaces(value.unwrap_or(""));
@@ -2839,16 +2870,19 @@ where
                     call = call.order_by(value.unwrap_or(""));
                 },
                 "max-results" => {
-                    call = call.max_results(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
+                    call = call.max_results(        value.map(|v| arg_from_str(v, err, "max-results", "int32")).unwrap_or(-0));
                 },
                 "include-team-drive-items" => {
-                    call = call.include_team_drive_items(arg_from_str(value.unwrap_or("false"), err, "include-team-drive-items", "boolean"));
+                    call = call.include_team_drive_items(        value.map(|v| arg_from_str(v, err, "include-team-drive-items", "boolean")).unwrap_or(false));
                 },
                 "include-permissions-for-view" => {
                     call = call.include_permissions_for_view(value.unwrap_or(""));
                 },
+                "include-labels" => {
+                    call = call.include_labels(value.unwrap_or(""));
+                },
                 "include-items-from-all-drives" => {
-                    call = call.include_items_from_all_drives(arg_from_str(value.unwrap_or("false"), err, "include-items-from-all-drives", "boolean"));
+                    call = call.include_items_from_all_drives(        value.map(|v| arg_from_str(v, err, "include-items-from-all-drives", "boolean")).unwrap_or(false));
                 },
                 "drive-id" => {
                     call = call.drive_id(value.unwrap_or(""));
@@ -2872,7 +2906,151 @@ where
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["corpora", "corpus", "drive-id", "include-items-from-all-drives", "include-permissions-for-view", "include-team-drive-items", "max-results", "order-by", "page-token", "projection", "q", "spaces", "supports-all-drives", "supports-team-drives", "team-drive-id"].iter().map(|v|*v));
+                                                                           v.extend(["corpora", "corpus", "drive-id", "include-items-from-all-drives", "include-labels", "include-permissions-for-view", "include-team-drive-items", "max-results", "order-by", "page-token", "projection", "q", "spaces", "supports-all-drives", "supports-team-drives", "team-drive-id"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _files_list_labels(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.files().list_labels(opt.value_of("file-id").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "page-token" => {
+                    call = call.page_token(value.unwrap_or(""));
+                },
+                "max-results" => {
+                    call = call.max_results(        value.map(|v| arg_from_str(v, err, "max-results", "int32")).unwrap_or(-0));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["max-results", "page-token"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _files_modify_labels(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["kind"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::ModifyLabelsRequest = json::value::from_value(object).unwrap();
+        let mut call = self.hub.files().modify_labels(request, opt.value_of("file-id").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -2949,6 +3127,7 @@ where
                     "capabilities.can-list-children" => Some(("capabilities.canListChildren", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-modify-content" => Some(("capabilities.canModifyContent", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-modify-content-restriction" => Some(("capabilities.canModifyContentRestriction", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-modify-labels" => Some(("capabilities.canModifyLabels", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-move-children-out-of-drive" => Some(("capabilities.canMoveChildrenOutOfDrive", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-move-children-out-of-team-drive" => Some(("capabilities.canMoveChildrenOutOfTeamDrive", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-move-children-within-drive" => Some(("capabilities.canMoveChildrenWithinDrive", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
@@ -2960,6 +3139,7 @@ where
                     "capabilities.can-move-item-within-team-drive" => Some(("capabilities.canMoveItemWithinTeamDrive", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-move-team-drive-item" => Some(("capabilities.canMoveTeamDriveItem", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-read-drive" => Some(("capabilities.canReadDrive", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-read-labels" => Some(("capabilities.canReadLabels", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-read-revisions" => Some(("capabilities.canReadRevisions", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-read-team-drive" => Some(("capabilities.canReadTeamDrive", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-remove-children" => Some(("capabilities.canRemoveChildren", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
@@ -3045,6 +3225,8 @@ where
                     "quota-bytes-used" => Some(("quotaBytesUsed", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "resource-key" => Some(("resourceKey", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "self-link" => Some(("selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "sha1-checksum" => Some(("sha1Checksum", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "sha256-checksum" => Some(("sha256Checksum", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "shareable" => Some(("shareable", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "shared" => Some(("shared", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "shared-with-me-date" => Some(("sharedWithMeDate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -3097,7 +3279,7 @@ where
                     "web-view-link" => Some(("webViewLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "writers-can-share" => Some(("writersCanShare", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["additional-roles", "alternate-link", "altitude", "aperture", "app-data-contents", "auth-key", "camera-make", "camera-model", "can-accept-ownership", "can-add-children", "can-add-folder-from-another-drive", "can-add-my-drive-parent", "can-change-copy-requires-writer-permission", "can-change-restricted-download", "can-change-security-update-enabled", "can-comment", "can-copy", "can-delete", "can-delete-children", "can-download", "can-edit", "can-list-children", "can-modify-content", "can-modify-content-restriction", "can-move-children-out-of-drive", "can-move-children-out-of-team-drive", "can-move-children-within-drive", "can-move-children-within-team-drive", "can-move-item-into-team-drive", "can-move-item-out-of-drive", "can-move-item-out-of-team-drive", "can-move-item-within-drive", "can-move-item-within-team-drive", "can-move-team-drive-item", "can-read-drive", "can-read-revisions", "can-read-team-drive", "can-remove-children", "can-remove-my-drive-parent", "can-rename", "can-share", "can-trash", "can-trash-children", "can-untrash", "capabilities", "color-space", "copy-requires-writer-permission", "copyable", "created-date", "date", "default-open-with-link", "deleted", "description", "display-name", "domain", "download-url", "drive-id", "duration-millis", "editable", "email-address", "embed-link", "etag", "expiration-date", "explicitly-trashed", "export-links", "exposure-bias", "exposure-mode", "exposure-time", "file-extension", "file-size", "flash-used", "focal-length", "folder-color-rgb", "full-file-extension", "has-augmented-permissions", "has-thumbnail", "head-revision-id", "height", "hidden", "icon-link", "id", "image", "image-media-metadata", "indexable-text", "is-app-authorized", "is-authenticated-user", "iso-speed", "kind", "labels", "last-modifying-user", "last-modifying-user-name", "last-viewed-by-me-date", "latitude", "lens", "link-share-metadata", "location", "longitude", "marked-viewed-by-me-date", "max-aperture-value", "md5-checksum", "metering-mode", "mime-type", "modified", "modified-by-me-date", "modified-date", "name", "open-with-links", "original-filename", "owned-by-me", "owner-names", "pending-owner", "permission-id", "permission-ids", "photo-link", "picture", "quota-bytes-used", "resource-key", "restricted", "role", "rotation", "security-update-eligible", "security-update-enabled", "self-link", "sensor", "shareable", "shared", "shared-with-me-date", "sharing-user", "shortcut-details", "spaces", "starred", "subject-distance", "target-id", "target-mime-type", "target-resource-key", "team-drive-id", "text", "thumbnail", "thumbnail-link", "thumbnail-version", "title", "trashed", "trashed-date", "trashing-user", "type", "url", "user-permission", "value", "version", "video-media-metadata", "view", "viewed", "web-content-link", "web-view-link", "white-balance", "width", "with-link", "writers-can-share"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["additional-roles", "alternate-link", "altitude", "aperture", "app-data-contents", "auth-key", "camera-make", "camera-model", "can-accept-ownership", "can-add-children", "can-add-folder-from-another-drive", "can-add-my-drive-parent", "can-change-copy-requires-writer-permission", "can-change-restricted-download", "can-change-security-update-enabled", "can-comment", "can-copy", "can-delete", "can-delete-children", "can-download", "can-edit", "can-list-children", "can-modify-content", "can-modify-content-restriction", "can-modify-labels", "can-move-children-out-of-drive", "can-move-children-out-of-team-drive", "can-move-children-within-drive", "can-move-children-within-team-drive", "can-move-item-into-team-drive", "can-move-item-out-of-drive", "can-move-item-out-of-team-drive", "can-move-item-within-drive", "can-move-item-within-team-drive", "can-move-team-drive-item", "can-read-drive", "can-read-labels", "can-read-revisions", "can-read-team-drive", "can-remove-children", "can-remove-my-drive-parent", "can-rename", "can-share", "can-trash", "can-trash-children", "can-untrash", "capabilities", "color-space", "copy-requires-writer-permission", "copyable", "created-date", "date", "default-open-with-link", "deleted", "description", "display-name", "domain", "download-url", "drive-id", "duration-millis", "editable", "email-address", "embed-link", "etag", "expiration-date", "explicitly-trashed", "export-links", "exposure-bias", "exposure-mode", "exposure-time", "file-extension", "file-size", "flash-used", "focal-length", "folder-color-rgb", "full-file-extension", "has-augmented-permissions", "has-thumbnail", "head-revision-id", "height", "hidden", "icon-link", "id", "image", "image-media-metadata", "indexable-text", "is-app-authorized", "is-authenticated-user", "iso-speed", "kind", "labels", "last-modifying-user", "last-modifying-user-name", "last-viewed-by-me-date", "latitude", "lens", "link-share-metadata", "location", "longitude", "marked-viewed-by-me-date", "max-aperture-value", "md5-checksum", "metering-mode", "mime-type", "modified", "modified-by-me-date", "modified-date", "name", "open-with-links", "original-filename", "owned-by-me", "owner-names", "pending-owner", "permission-id", "permission-ids", "photo-link", "picture", "quota-bytes-used", "resource-key", "restricted", "role", "rotation", "security-update-eligible", "security-update-enabled", "self-link", "sensor", "sha1-checksum", "sha256-checksum", "shareable", "shared", "shared-with-me-date", "sharing-user", "shortcut-details", "spaces", "starred", "subject-distance", "target-id", "target-mime-type", "target-resource-key", "team-drive-id", "text", "thumbnail", "thumbnail-link", "thumbnail-version", "title", "trashed", "trashed-date", "trashing-user", "type", "url", "user-permission", "value", "version", "video-media-metadata", "view", "viewed", "web-content-link", "web-view-link", "white-balance", "width", "with-link", "writers-can-share"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -3112,10 +3294,10 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "use-content-as-indexable-text" => {
-                    call = call.use_content_as_indexable_text(arg_from_str(value.unwrap_or("false"), err, "use-content-as-indexable-text", "boolean"));
+                    call = call.use_content_as_indexable_text(        value.map(|v| arg_from_str(v, err, "use-content-as-indexable-text", "boolean")).unwrap_or(false));
                 },
                 "update-viewed-date" => {
-                    call = call.update_viewed_date(arg_from_str(value.unwrap_or("false"), err, "update-viewed-date", "boolean"));
+                    call = call.update_viewed_date(        value.map(|v| arg_from_str(v, err, "update-viewed-date", "boolean")).unwrap_or(false));
                 },
                 "timed-text-track-name" => {
                     call = call.timed_text_track_name(value.unwrap_or(""));
@@ -3124,28 +3306,28 @@ where
                     call = call.timed_text_language(value.unwrap_or(""));
                 },
                 "supports-team-drives" => {
-                    call = call.supports_team_drives(arg_from_str(value.unwrap_or("false"), err, "supports-team-drives", "boolean"));
+                    call = call.supports_team_drives(        value.map(|v| arg_from_str(v, err, "supports-team-drives", "boolean")).unwrap_or(false));
                 },
                 "supports-all-drives" => {
-                    call = call.supports_all_drives(arg_from_str(value.unwrap_or("false"), err, "supports-all-drives", "boolean"));
+                    call = call.supports_all_drives(        value.map(|v| arg_from_str(v, err, "supports-all-drives", "boolean")).unwrap_or(false));
                 },
                 "set-modified-date" => {
-                    call = call.set_modified_date(arg_from_str(value.unwrap_or("false"), err, "set-modified-date", "boolean"));
+                    call = call.set_modified_date(        value.map(|v| arg_from_str(v, err, "set-modified-date", "boolean")).unwrap_or(false));
                 },
                 "remove-parents" => {
                     call = call.remove_parents(value.unwrap_or(""));
                 },
                 "pinned" => {
-                    call = call.pinned(arg_from_str(value.unwrap_or("false"), err, "pinned", "boolean"));
+                    call = call.pinned(        value.map(|v| arg_from_str(v, err, "pinned", "boolean")).unwrap_or(false));
                 },
                 "ocr-language" => {
                     call = call.ocr_language(value.unwrap_or(""));
                 },
                 "ocr" => {
-                    call = call.ocr(arg_from_str(value.unwrap_or("false"), err, "ocr", "boolean"));
+                    call = call.ocr(        value.map(|v| arg_from_str(v, err, "ocr", "boolean")).unwrap_or(false));
                 },
                 "new-revision" => {
-                    call = call.new_revision(arg_from_str(value.unwrap_or("false"), err, "new-revision", "boolean"));
+                    call = call.new_revision(        value.map(|v| arg_from_str(v, err, "new-revision", "boolean")).unwrap_or(false));
                 },
                 "modified-date-behavior" => {
                     call = call.modified_date_behavior(value.unwrap_or(""));
@@ -3153,11 +3335,14 @@ where
                 "include-permissions-for-view" => {
                     call = call.include_permissions_for_view(value.unwrap_or(""));
                 },
+                "include-labels" => {
+                    call = call.include_labels(value.unwrap_or(""));
+                },
                 "enforce-single-parent" => {
-                    call = call.enforce_single_parent(arg_from_str(value.unwrap_or("false"), err, "enforce-single-parent", "boolean"));
+                    call = call.enforce_single_parent(        value.map(|v| arg_from_str(v, err, "enforce-single-parent", "boolean")).unwrap_or(false));
                 },
                 "convert" => {
-                    call = call.convert(arg_from_str(value.unwrap_or("false"), err, "convert", "boolean"));
+                    call = call.convert(        value.map(|v| arg_from_str(v, err, "convert", "boolean")).unwrap_or(false));
                 },
                 "add-parents" => {
                     call = call.add_parents(value.unwrap_or(""));
@@ -3175,7 +3360,7 @@ where
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["add-parents", "convert", "enforce-single-parent", "include-permissions-for-view", "modified-date-behavior", "new-revision", "ocr", "ocr-language", "pinned", "remove-parents", "set-modified-date", "supports-all-drives", "supports-team-drives", "timed-text-language", "timed-text-track-name", "update-viewed-date", "use-content-as-indexable-text"].iter().map(|v|*v));
+                                                                           v.extend(["add-parents", "convert", "enforce-single-parent", "include-labels", "include-permissions-for-view", "modified-date-behavior", "new-revision", "ocr", "ocr-language", "pinned", "remove-parents", "set-modified-date", "supports-all-drives", "supports-team-drives", "timed-text-language", "timed-text-track-name", "update-viewed-date", "use-content-as-indexable-text"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -3216,13 +3401,16 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "supports-team-drives" => {
-                    call = call.supports_team_drives(arg_from_str(value.unwrap_or("false"), err, "supports-team-drives", "boolean"));
+                    call = call.supports_team_drives(        value.map(|v| arg_from_str(v, err, "supports-team-drives", "boolean")).unwrap_or(false));
                 },
                 "supports-all-drives" => {
-                    call = call.supports_all_drives(arg_from_str(value.unwrap_or("false"), err, "supports-all-drives", "boolean"));
+                    call = call.supports_all_drives(        value.map(|v| arg_from_str(v, err, "supports-all-drives", "boolean")).unwrap_or(false));
                 },
                 "include-permissions-for-view" => {
                     call = call.include_permissions_for_view(value.unwrap_or(""));
+                },
+                "include-labels" => {
+                    call = call.include_labels(value.unwrap_or(""));
                 },
                 _ => {
                     let mut found = false;
@@ -3237,7 +3425,7 @@ where
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["include-permissions-for-view", "supports-all-drives", "supports-team-drives"].iter().map(|v|*v));
+                                                                           v.extend(["include-labels", "include-permissions-for-view", "supports-all-drives", "supports-team-drives"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -3278,13 +3466,16 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "supports-team-drives" => {
-                    call = call.supports_team_drives(arg_from_str(value.unwrap_or("false"), err, "supports-team-drives", "boolean"));
+                    call = call.supports_team_drives(        value.map(|v| arg_from_str(v, err, "supports-team-drives", "boolean")).unwrap_or(false));
                 },
                 "supports-all-drives" => {
-                    call = call.supports_all_drives(arg_from_str(value.unwrap_or("false"), err, "supports-all-drives", "boolean"));
+                    call = call.supports_all_drives(        value.map(|v| arg_from_str(v, err, "supports-all-drives", "boolean")).unwrap_or(false));
                 },
                 "include-permissions-for-view" => {
                     call = call.include_permissions_for_view(value.unwrap_or(""));
+                },
+                "include-labels" => {
+                    call = call.include_labels(value.unwrap_or(""));
                 },
                 _ => {
                     let mut found = false;
@@ -3299,7 +3490,7 @@ where
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["include-permissions-for-view", "supports-all-drives", "supports-team-drives"].iter().map(|v|*v));
+                                                                           v.extend(["include-labels", "include-permissions-for-view", "supports-all-drives", "supports-team-drives"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -3340,13 +3531,16 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "supports-team-drives" => {
-                    call = call.supports_team_drives(arg_from_str(value.unwrap_or("false"), err, "supports-team-drives", "boolean"));
+                    call = call.supports_team_drives(        value.map(|v| arg_from_str(v, err, "supports-team-drives", "boolean")).unwrap_or(false));
                 },
                 "supports-all-drives" => {
-                    call = call.supports_all_drives(arg_from_str(value.unwrap_or("false"), err, "supports-all-drives", "boolean"));
+                    call = call.supports_all_drives(        value.map(|v| arg_from_str(v, err, "supports-all-drives", "boolean")).unwrap_or(false));
                 },
                 "include-permissions-for-view" => {
                     call = call.include_permissions_for_view(value.unwrap_or(""));
+                },
+                "include-labels" => {
+                    call = call.include_labels(value.unwrap_or(""));
                 },
                 _ => {
                     let mut found = false;
@@ -3361,7 +3555,7 @@ where
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["include-permissions-for-view", "supports-all-drives", "supports-team-drives"].iter().map(|v|*v));
+                                                                           v.extend(["include-labels", "include-permissions-for-view", "supports-all-drives", "supports-team-drives"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -3438,6 +3632,7 @@ where
                     "capabilities.can-list-children" => Some(("capabilities.canListChildren", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-modify-content" => Some(("capabilities.canModifyContent", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-modify-content-restriction" => Some(("capabilities.canModifyContentRestriction", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-modify-labels" => Some(("capabilities.canModifyLabels", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-move-children-out-of-drive" => Some(("capabilities.canMoveChildrenOutOfDrive", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-move-children-out-of-team-drive" => Some(("capabilities.canMoveChildrenOutOfTeamDrive", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-move-children-within-drive" => Some(("capabilities.canMoveChildrenWithinDrive", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
@@ -3449,6 +3644,7 @@ where
                     "capabilities.can-move-item-within-team-drive" => Some(("capabilities.canMoveItemWithinTeamDrive", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-move-team-drive-item" => Some(("capabilities.canMoveTeamDriveItem", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-read-drive" => Some(("capabilities.canReadDrive", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-read-labels" => Some(("capabilities.canReadLabels", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-read-revisions" => Some(("capabilities.canReadRevisions", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-read-team-drive" => Some(("capabilities.canReadTeamDrive", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-remove-children" => Some(("capabilities.canRemoveChildren", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
@@ -3534,6 +3730,8 @@ where
                     "quota-bytes-used" => Some(("quotaBytesUsed", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "resource-key" => Some(("resourceKey", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "self-link" => Some(("selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "sha1-checksum" => Some(("sha1Checksum", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "sha256-checksum" => Some(("sha256Checksum", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "shareable" => Some(("shareable", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "shared" => Some(("shared", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "shared-with-me-date" => Some(("sharedWithMeDate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -3586,7 +3784,7 @@ where
                     "web-view-link" => Some(("webViewLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "writers-can-share" => Some(("writersCanShare", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["additional-roles", "alternate-link", "altitude", "aperture", "app-data-contents", "auth-key", "camera-make", "camera-model", "can-accept-ownership", "can-add-children", "can-add-folder-from-another-drive", "can-add-my-drive-parent", "can-change-copy-requires-writer-permission", "can-change-restricted-download", "can-change-security-update-enabled", "can-comment", "can-copy", "can-delete", "can-delete-children", "can-download", "can-edit", "can-list-children", "can-modify-content", "can-modify-content-restriction", "can-move-children-out-of-drive", "can-move-children-out-of-team-drive", "can-move-children-within-drive", "can-move-children-within-team-drive", "can-move-item-into-team-drive", "can-move-item-out-of-drive", "can-move-item-out-of-team-drive", "can-move-item-within-drive", "can-move-item-within-team-drive", "can-move-team-drive-item", "can-read-drive", "can-read-revisions", "can-read-team-drive", "can-remove-children", "can-remove-my-drive-parent", "can-rename", "can-share", "can-trash", "can-trash-children", "can-untrash", "capabilities", "color-space", "copy-requires-writer-permission", "copyable", "created-date", "date", "default-open-with-link", "deleted", "description", "display-name", "domain", "download-url", "drive-id", "duration-millis", "editable", "email-address", "embed-link", "etag", "expiration-date", "explicitly-trashed", "export-links", "exposure-bias", "exposure-mode", "exposure-time", "file-extension", "file-size", "flash-used", "focal-length", "folder-color-rgb", "full-file-extension", "has-augmented-permissions", "has-thumbnail", "head-revision-id", "height", "hidden", "icon-link", "id", "image", "image-media-metadata", "indexable-text", "is-app-authorized", "is-authenticated-user", "iso-speed", "kind", "labels", "last-modifying-user", "last-modifying-user-name", "last-viewed-by-me-date", "latitude", "lens", "link-share-metadata", "location", "longitude", "marked-viewed-by-me-date", "max-aperture-value", "md5-checksum", "metering-mode", "mime-type", "modified", "modified-by-me-date", "modified-date", "name", "open-with-links", "original-filename", "owned-by-me", "owner-names", "pending-owner", "permission-id", "permission-ids", "photo-link", "picture", "quota-bytes-used", "resource-key", "restricted", "role", "rotation", "security-update-eligible", "security-update-enabled", "self-link", "sensor", "shareable", "shared", "shared-with-me-date", "sharing-user", "shortcut-details", "spaces", "starred", "subject-distance", "target-id", "target-mime-type", "target-resource-key", "team-drive-id", "text", "thumbnail", "thumbnail-link", "thumbnail-version", "title", "trashed", "trashed-date", "trashing-user", "type", "url", "user-permission", "value", "version", "video-media-metadata", "view", "viewed", "web-content-link", "web-view-link", "white-balance", "width", "with-link", "writers-can-share"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["additional-roles", "alternate-link", "altitude", "aperture", "app-data-contents", "auth-key", "camera-make", "camera-model", "can-accept-ownership", "can-add-children", "can-add-folder-from-another-drive", "can-add-my-drive-parent", "can-change-copy-requires-writer-permission", "can-change-restricted-download", "can-change-security-update-enabled", "can-comment", "can-copy", "can-delete", "can-delete-children", "can-download", "can-edit", "can-list-children", "can-modify-content", "can-modify-content-restriction", "can-modify-labels", "can-move-children-out-of-drive", "can-move-children-out-of-team-drive", "can-move-children-within-drive", "can-move-children-within-team-drive", "can-move-item-into-team-drive", "can-move-item-out-of-drive", "can-move-item-out-of-team-drive", "can-move-item-within-drive", "can-move-item-within-team-drive", "can-move-team-drive-item", "can-read-drive", "can-read-labels", "can-read-revisions", "can-read-team-drive", "can-remove-children", "can-remove-my-drive-parent", "can-rename", "can-share", "can-trash", "can-trash-children", "can-untrash", "capabilities", "color-space", "copy-requires-writer-permission", "copyable", "created-date", "date", "default-open-with-link", "deleted", "description", "display-name", "domain", "download-url", "drive-id", "duration-millis", "editable", "email-address", "embed-link", "etag", "expiration-date", "explicitly-trashed", "export-links", "exposure-bias", "exposure-mode", "exposure-time", "file-extension", "file-size", "flash-used", "focal-length", "folder-color-rgb", "full-file-extension", "has-augmented-permissions", "has-thumbnail", "head-revision-id", "height", "hidden", "icon-link", "id", "image", "image-media-metadata", "indexable-text", "is-app-authorized", "is-authenticated-user", "iso-speed", "kind", "labels", "last-modifying-user", "last-modifying-user-name", "last-viewed-by-me-date", "latitude", "lens", "link-share-metadata", "location", "longitude", "marked-viewed-by-me-date", "max-aperture-value", "md5-checksum", "metering-mode", "mime-type", "modified", "modified-by-me-date", "modified-date", "name", "open-with-links", "original-filename", "owned-by-me", "owner-names", "pending-owner", "permission-id", "permission-ids", "photo-link", "picture", "quota-bytes-used", "resource-key", "restricted", "role", "rotation", "security-update-eligible", "security-update-enabled", "self-link", "sensor", "sha1-checksum", "sha256-checksum", "shareable", "shared", "shared-with-me-date", "sharing-user", "shortcut-details", "spaces", "starred", "subject-distance", "target-id", "target-mime-type", "target-resource-key", "team-drive-id", "text", "thumbnail", "thumbnail-link", "thumbnail-version", "title", "trashed", "trashed-date", "trashing-user", "type", "url", "user-permission", "value", "version", "video-media-metadata", "view", "viewed", "web-content-link", "web-view-link", "white-balance", "width", "with-link", "writers-can-share"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -3601,10 +3799,10 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "use-content-as-indexable-text" => {
-                    call = call.use_content_as_indexable_text(arg_from_str(value.unwrap_or("false"), err, "use-content-as-indexable-text", "boolean"));
+                    call = call.use_content_as_indexable_text(        value.map(|v| arg_from_str(v, err, "use-content-as-indexable-text", "boolean")).unwrap_or(false));
                 },
                 "update-viewed-date" => {
-                    call = call.update_viewed_date(arg_from_str(value.unwrap_or("false"), err, "update-viewed-date", "boolean"));
+                    call = call.update_viewed_date(        value.map(|v| arg_from_str(v, err, "update-viewed-date", "boolean")).unwrap_or(false));
                 },
                 "timed-text-track-name" => {
                     call = call.timed_text_track_name(value.unwrap_or(""));
@@ -3613,28 +3811,28 @@ where
                     call = call.timed_text_language(value.unwrap_or(""));
                 },
                 "supports-team-drives" => {
-                    call = call.supports_team_drives(arg_from_str(value.unwrap_or("false"), err, "supports-team-drives", "boolean"));
+                    call = call.supports_team_drives(        value.map(|v| arg_from_str(v, err, "supports-team-drives", "boolean")).unwrap_or(false));
                 },
                 "supports-all-drives" => {
-                    call = call.supports_all_drives(arg_from_str(value.unwrap_or("false"), err, "supports-all-drives", "boolean"));
+                    call = call.supports_all_drives(        value.map(|v| arg_from_str(v, err, "supports-all-drives", "boolean")).unwrap_or(false));
                 },
                 "set-modified-date" => {
-                    call = call.set_modified_date(arg_from_str(value.unwrap_or("false"), err, "set-modified-date", "boolean"));
+                    call = call.set_modified_date(        value.map(|v| arg_from_str(v, err, "set-modified-date", "boolean")).unwrap_or(false));
                 },
                 "remove-parents" => {
                     call = call.remove_parents(value.unwrap_or(""));
                 },
                 "pinned" => {
-                    call = call.pinned(arg_from_str(value.unwrap_or("false"), err, "pinned", "boolean"));
+                    call = call.pinned(        value.map(|v| arg_from_str(v, err, "pinned", "boolean")).unwrap_or(false));
                 },
                 "ocr-language" => {
                     call = call.ocr_language(value.unwrap_or(""));
                 },
                 "ocr" => {
-                    call = call.ocr(arg_from_str(value.unwrap_or("false"), err, "ocr", "boolean"));
+                    call = call.ocr(        value.map(|v| arg_from_str(v, err, "ocr", "boolean")).unwrap_or(false));
                 },
                 "new-revision" => {
-                    call = call.new_revision(arg_from_str(value.unwrap_or("false"), err, "new-revision", "boolean"));
+                    call = call.new_revision(        value.map(|v| arg_from_str(v, err, "new-revision", "boolean")).unwrap_or(false));
                 },
                 "modified-date-behavior" => {
                     call = call.modified_date_behavior(value.unwrap_or(""));
@@ -3642,11 +3840,14 @@ where
                 "include-permissions-for-view" => {
                     call = call.include_permissions_for_view(value.unwrap_or(""));
                 },
+                "include-labels" => {
+                    call = call.include_labels(value.unwrap_or(""));
+                },
                 "enforce-single-parent" => {
-                    call = call.enforce_single_parent(arg_from_str(value.unwrap_or("false"), err, "enforce-single-parent", "boolean"));
+                    call = call.enforce_single_parent(        value.map(|v| arg_from_str(v, err, "enforce-single-parent", "boolean")).unwrap_or(false));
                 },
                 "convert" => {
-                    call = call.convert(arg_from_str(value.unwrap_or("false"), err, "convert", "boolean"));
+                    call = call.convert(        value.map(|v| arg_from_str(v, err, "convert", "boolean")).unwrap_or(false));
                 },
                 "add-parents" => {
                     call = call.add_parents(value.unwrap_or(""));
@@ -3664,7 +3865,7 @@ where
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["add-parents", "convert", "enforce-single-parent", "include-permissions-for-view", "modified-date-behavior", "new-revision", "ocr", "ocr-language", "pinned", "remove-parents", "set-modified-date", "supports-all-drives", "supports-team-drives", "timed-text-language", "timed-text-track-name", "update-viewed-date", "use-content-as-indexable-text"].iter().map(|v|*v));
+                                                                           v.extend(["add-parents", "convert", "enforce-single-parent", "include-labels", "include-permissions-for-view", "modified-date-behavior", "new-revision", "ocr", "ocr-language", "pinned", "remove-parents", "set-modified-date", "supports-all-drives", "supports-team-drives", "timed-text-language", "timed-text-track-name", "update-viewed-date", "use-content-as-indexable-text"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -3751,13 +3952,13 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "update-viewed-date" => {
-                    call = call.update_viewed_date(arg_from_str(value.unwrap_or("false"), err, "update-viewed-date", "boolean"));
+                    call = call.update_viewed_date(        value.map(|v| arg_from_str(v, err, "update-viewed-date", "boolean")).unwrap_or(false));
                 },
                 "supports-team-drives" => {
-                    call = call.supports_team_drives(arg_from_str(value.unwrap_or("false"), err, "supports-team-drives", "boolean"));
+                    call = call.supports_team_drives(        value.map(|v| arg_from_str(v, err, "supports-team-drives", "boolean")).unwrap_or(false));
                 },
                 "supports-all-drives" => {
-                    call = call.supports_all_drives(arg_from_str(value.unwrap_or("false"), err, "supports-all-drives", "boolean"));
+                    call = call.supports_all_drives(        value.map(|v| arg_from_str(v, err, "supports-all-drives", "boolean")).unwrap_or(false));
                 },
                 "revision-id" => {
                     call = call.revision_id(value.unwrap_or(""));
@@ -3768,8 +3969,11 @@ where
                 "include-permissions-for-view" => {
                     call = call.include_permissions_for_view(value.unwrap_or(""));
                 },
+                "include-labels" => {
+                    call = call.include_labels(value.unwrap_or(""));
+                },
                 "acknowledge-abuse" => {
-                    call = call.acknowledge_abuse(arg_from_str(value.unwrap_or("false"), err, "acknowledge-abuse", "boolean"));
+                    call = call.acknowledge_abuse(        value.map(|v| arg_from_str(v, err, "acknowledge-abuse", "boolean")).unwrap_or(false));
                 },
                 _ => {
                     let mut found = false;
@@ -3787,7 +3991,7 @@ where
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["acknowledge-abuse", "include-permissions-for-view", "projection", "revision-id", "supports-all-drives", "supports-team-drives", "update-viewed-date"].iter().map(|v|*v));
+                                                                           v.extend(["acknowledge-abuse", "include-labels", "include-permissions-for-view", "projection", "revision-id", "supports-all-drives", "supports-team-drives", "update-viewed-date"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -3834,7 +4038,7 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "enforce-single-parent" => {
-                    call = call.enforce_single_parent(arg_from_str(value.unwrap_or("false"), err, "enforce-single-parent", "boolean"));
+                    call = call.enforce_single_parent(        value.map(|v| arg_from_str(v, err, "enforce-single-parent", "boolean")).unwrap_or(false));
                 },
                 _ => {
                     let mut found = false;
@@ -3971,13 +4175,13 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "supports-team-drives" => {
-                    call = call.supports_team_drives(arg_from_str(value.unwrap_or("false"), err, "supports-team-drives", "boolean"));
+                    call = call.supports_team_drives(        value.map(|v| arg_from_str(v, err, "supports-team-drives", "boolean")).unwrap_or(false));
                 },
                 "supports-all-drives" => {
-                    call = call.supports_all_drives(arg_from_str(value.unwrap_or("false"), err, "supports-all-drives", "boolean"));
+                    call = call.supports_all_drives(        value.map(|v| arg_from_str(v, err, "supports-all-drives", "boolean")).unwrap_or(false));
                 },
                 "enforce-single-parent" => {
-                    call = call.enforce_single_parent(arg_from_str(value.unwrap_or("false"), err, "enforce-single-parent", "boolean"));
+                    call = call.enforce_single_parent(        value.map(|v| arg_from_str(v, err, "enforce-single-parent", "boolean")).unwrap_or(false));
                 },
                 _ => {
                     let mut found = false;
@@ -4085,13 +4289,13 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "use-domain-admin-access" => {
-                    call = call.use_domain_admin_access(arg_from_str(value.unwrap_or("false"), err, "use-domain-admin-access", "boolean"));
+                    call = call.use_domain_admin_access(        value.map(|v| arg_from_str(v, err, "use-domain-admin-access", "boolean")).unwrap_or(false));
                 },
                 "supports-team-drives" => {
-                    call = call.supports_team_drives(arg_from_str(value.unwrap_or("false"), err, "supports-team-drives", "boolean"));
+                    call = call.supports_team_drives(        value.map(|v| arg_from_str(v, err, "supports-team-drives", "boolean")).unwrap_or(false));
                 },
                 "supports-all-drives" => {
-                    call = call.supports_all_drives(arg_from_str(value.unwrap_or("false"), err, "supports-all-drives", "boolean"));
+                    call = call.supports_all_drives(        value.map(|v| arg_from_str(v, err, "supports-all-drives", "boolean")).unwrap_or(false));
                 },
                 _ => {
                     let mut found = false;
@@ -4139,13 +4343,13 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "use-domain-admin-access" => {
-                    call = call.use_domain_admin_access(arg_from_str(value.unwrap_or("false"), err, "use-domain-admin-access", "boolean"));
+                    call = call.use_domain_admin_access(        value.map(|v| arg_from_str(v, err, "use-domain-admin-access", "boolean")).unwrap_or(false));
                 },
                 "supports-team-drives" => {
-                    call = call.supports_team_drives(arg_from_str(value.unwrap_or("false"), err, "supports-team-drives", "boolean"));
+                    call = call.supports_team_drives(        value.map(|v| arg_from_str(v, err, "supports-team-drives", "boolean")).unwrap_or(false));
                 },
                 "supports-all-drives" => {
-                    call = call.supports_all_drives(arg_from_str(value.unwrap_or("false"), err, "supports-all-drives", "boolean"));
+                    call = call.supports_all_drives(        value.map(|v| arg_from_str(v, err, "supports-all-drives", "boolean")).unwrap_or(false));
                 },
                 _ => {
                     let mut found = false;
@@ -4303,22 +4507,22 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "use-domain-admin-access" => {
-                    call = call.use_domain_admin_access(arg_from_str(value.unwrap_or("false"), err, "use-domain-admin-access", "boolean"));
+                    call = call.use_domain_admin_access(        value.map(|v| arg_from_str(v, err, "use-domain-admin-access", "boolean")).unwrap_or(false));
                 },
                 "supports-team-drives" => {
-                    call = call.supports_team_drives(arg_from_str(value.unwrap_or("false"), err, "supports-team-drives", "boolean"));
+                    call = call.supports_team_drives(        value.map(|v| arg_from_str(v, err, "supports-team-drives", "boolean")).unwrap_or(false));
                 },
                 "supports-all-drives" => {
-                    call = call.supports_all_drives(arg_from_str(value.unwrap_or("false"), err, "supports-all-drives", "boolean"));
+                    call = call.supports_all_drives(        value.map(|v| arg_from_str(v, err, "supports-all-drives", "boolean")).unwrap_or(false));
                 },
                 "send-notification-emails" => {
-                    call = call.send_notification_emails(arg_from_str(value.unwrap_or("false"), err, "send-notification-emails", "boolean"));
+                    call = call.send_notification_emails(        value.map(|v| arg_from_str(v, err, "send-notification-emails", "boolean")).unwrap_or(false));
                 },
                 "move-to-new-owners-root" => {
-                    call = call.move_to_new_owners_root(arg_from_str(value.unwrap_or("false"), err, "move-to-new-owners-root", "boolean"));
+                    call = call.move_to_new_owners_root(        value.map(|v| arg_from_str(v, err, "move-to-new-owners-root", "boolean")).unwrap_or(false));
                 },
                 "enforce-single-parent" => {
-                    call = call.enforce_single_parent(arg_from_str(value.unwrap_or("false"), err, "enforce-single-parent", "boolean"));
+                    call = call.enforce_single_parent(        value.map(|v| arg_from_str(v, err, "enforce-single-parent", "boolean")).unwrap_or(false));
                 },
                 "email-message" => {
                     call = call.email_message(value.unwrap_or(""));
@@ -4377,19 +4581,19 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "use-domain-admin-access" => {
-                    call = call.use_domain_admin_access(arg_from_str(value.unwrap_or("false"), err, "use-domain-admin-access", "boolean"));
+                    call = call.use_domain_admin_access(        value.map(|v| arg_from_str(v, err, "use-domain-admin-access", "boolean")).unwrap_or(false));
                 },
                 "supports-team-drives" => {
-                    call = call.supports_team_drives(arg_from_str(value.unwrap_or("false"), err, "supports-team-drives", "boolean"));
+                    call = call.supports_team_drives(        value.map(|v| arg_from_str(v, err, "supports-team-drives", "boolean")).unwrap_or(false));
                 },
                 "supports-all-drives" => {
-                    call = call.supports_all_drives(arg_from_str(value.unwrap_or("false"), err, "supports-all-drives", "boolean"));
+                    call = call.supports_all_drives(        value.map(|v| arg_from_str(v, err, "supports-all-drives", "boolean")).unwrap_or(false));
                 },
                 "page-token" => {
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "max-results" => {
-                    call = call.max_results(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
+                    call = call.max_results(        value.map(|v| arg_from_str(v, err, "max-results", "int32")).unwrap_or(-0));
                 },
                 "include-permissions-for-view" => {
                     call = call.include_permissions_for_view(value.unwrap_or(""));
@@ -4498,19 +4702,19 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "use-domain-admin-access" => {
-                    call = call.use_domain_admin_access(arg_from_str(value.unwrap_or("false"), err, "use-domain-admin-access", "boolean"));
+                    call = call.use_domain_admin_access(        value.map(|v| arg_from_str(v, err, "use-domain-admin-access", "boolean")).unwrap_or(false));
                 },
                 "transfer-ownership" => {
-                    call = call.transfer_ownership(arg_from_str(value.unwrap_or("false"), err, "transfer-ownership", "boolean"));
+                    call = call.transfer_ownership(        value.map(|v| arg_from_str(v, err, "transfer-ownership", "boolean")).unwrap_or(false));
                 },
                 "supports-team-drives" => {
-                    call = call.supports_team_drives(arg_from_str(value.unwrap_or("false"), err, "supports-team-drives", "boolean"));
+                    call = call.supports_team_drives(        value.map(|v| arg_from_str(v, err, "supports-team-drives", "boolean")).unwrap_or(false));
                 },
                 "supports-all-drives" => {
-                    call = call.supports_all_drives(arg_from_str(value.unwrap_or("false"), err, "supports-all-drives", "boolean"));
+                    call = call.supports_all_drives(        value.map(|v| arg_from_str(v, err, "supports-all-drives", "boolean")).unwrap_or(false));
                 },
                 "remove-expiration" => {
-                    call = call.remove_expiration(arg_from_str(value.unwrap_or("false"), err, "remove-expiration", "boolean"));
+                    call = call.remove_expiration(        value.map(|v| arg_from_str(v, err, "remove-expiration", "boolean")).unwrap_or(false));
                 },
                 _ => {
                     let mut found = false;
@@ -4616,19 +4820,19 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "use-domain-admin-access" => {
-                    call = call.use_domain_admin_access(arg_from_str(value.unwrap_or("false"), err, "use-domain-admin-access", "boolean"));
+                    call = call.use_domain_admin_access(        value.map(|v| arg_from_str(v, err, "use-domain-admin-access", "boolean")).unwrap_or(false));
                 },
                 "transfer-ownership" => {
-                    call = call.transfer_ownership(arg_from_str(value.unwrap_or("false"), err, "transfer-ownership", "boolean"));
+                    call = call.transfer_ownership(        value.map(|v| arg_from_str(v, err, "transfer-ownership", "boolean")).unwrap_or(false));
                 },
                 "supports-team-drives" => {
-                    call = call.supports_team_drives(arg_from_str(value.unwrap_or("false"), err, "supports-team-drives", "boolean"));
+                    call = call.supports_team_drives(        value.map(|v| arg_from_str(v, err, "supports-team-drives", "boolean")).unwrap_or(false));
                 },
                 "supports-all-drives" => {
-                    call = call.supports_all_drives(arg_from_str(value.unwrap_or("false"), err, "supports-all-drives", "boolean"));
+                    call = call.supports_all_drives(        value.map(|v| arg_from_str(v, err, "supports-all-drives", "boolean")).unwrap_or(false));
                 },
                 "remove-expiration" => {
-                    call = call.remove_expiration(arg_from_str(value.unwrap_or("false"), err, "remove-expiration", "boolean"));
+                    call = call.remove_expiration(        value.map(|v| arg_from_str(v, err, "remove-expiration", "boolean")).unwrap_or(false));
                 },
                 _ => {
                     let mut found = false;
@@ -5162,7 +5366,7 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "include-deleted" => {
-                    call = call.include_deleted(arg_from_str(value.unwrap_or("false"), err, "include-deleted", "boolean"));
+                    call = call.include_deleted(        value.map(|v| arg_from_str(v, err, "include-deleted", "boolean")).unwrap_or(false));
                 },
                 _ => {
                     let mut found = false;
@@ -5319,10 +5523,10 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "max-results" => {
-                    call = call.max_results(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
+                    call = call.max_results(        value.map(|v| arg_from_str(v, err, "max-results", "int32")).unwrap_or(-0));
                 },
                 "include-deleted" => {
-                    call = call.include_deleted(arg_from_str(value.unwrap_or("false"), err, "include-deleted", "boolean"));
+                    call = call.include_deleted(        value.map(|v| arg_from_str(v, err, "include-deleted", "boolean")).unwrap_or(false));
                 },
                 _ => {
                     let mut found = false;
@@ -5673,7 +5877,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "max-results" => {
-                    call = call.max_results(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
+                    call = call.max_results(        value.map(|v| arg_from_str(v, err, "max-results", "int32")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -5987,7 +6191,7 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "use-domain-admin-access" => {
-                    call = call.use_domain_admin_access(arg_from_str(value.unwrap_or("false"), err, "use-domain-admin-access", "boolean"));
+                    call = call.use_domain_admin_access(        value.map(|v| arg_from_str(v, err, "use-domain-admin-access", "boolean")).unwrap_or(false));
                 },
                 _ => {
                     let mut found = false;
@@ -6081,6 +6285,7 @@ where
                     "capabilities.can-remove-children" => Some(("capabilities.canRemoveChildren", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-rename" => Some(("capabilities.canRename", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-rename-team-drive" => Some(("capabilities.canRenameTeamDrive", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-reset-team-drive-restrictions" => Some(("capabilities.canResetTeamDriveRestrictions", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-share" => Some(("capabilities.canShare", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-trash-children" => Some(("capabilities.canTrashChildren", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "color-rgb" => Some(("colorRgb", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -6095,7 +6300,7 @@ where
                     "restrictions.team-members-only" => Some(("restrictions.teamMembersOnly", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "theme-id" => Some(("themeId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["admin-managed-restrictions", "background-image-file", "background-image-link", "can-add-children", "can-change-copy-requires-writer-permission-restriction", "can-change-domain-users-only-restriction", "can-change-team-drive-background", "can-change-team-members-only-restriction", "can-comment", "can-copy", "can-delete-children", "can-delete-team-drive", "can-download", "can-edit", "can-list-children", "can-manage-members", "can-read-revisions", "can-remove-children", "can-rename", "can-rename-team-drive", "can-share", "can-trash-children", "capabilities", "color-rgb", "copy-requires-writer-permission", "created-date", "domain-users-only", "id", "kind", "name", "org-unit-id", "restrictions", "team-members-only", "theme-id", "width", "x-coordinate", "y-coordinate"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["admin-managed-restrictions", "background-image-file", "background-image-link", "can-add-children", "can-change-copy-requires-writer-permission-restriction", "can-change-domain-users-only-restriction", "can-change-team-drive-background", "can-change-team-members-only-restriction", "can-comment", "can-copy", "can-delete-children", "can-delete-team-drive", "can-download", "can-edit", "can-list-children", "can-manage-members", "can-read-revisions", "can-remove-children", "can-rename", "can-rename-team-drive", "can-reset-team-drive-restrictions", "can-share", "can-trash-children", "capabilities", "color-rgb", "copy-requires-writer-permission", "created-date", "domain-users-only", "id", "kind", "name", "org-unit-id", "restrictions", "team-members-only", "theme-id", "width", "x-coordinate", "y-coordinate"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -6162,7 +6367,7 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "use-domain-admin-access" => {
-                    call = call.use_domain_admin_access(arg_from_str(value.unwrap_or("false"), err, "use-domain-admin-access", "boolean"));
+                    call = call.use_domain_admin_access(        value.map(|v| arg_from_str(v, err, "use-domain-admin-access", "boolean")).unwrap_or(false));
                 },
                 "q" => {
                     call = call.q(value.unwrap_or(""));
@@ -6171,7 +6376,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "max-results" => {
-                    call = call.max_results(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
+                    call = call.max_results(        value.map(|v| arg_from_str(v, err, "max-results", "int32")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -6265,6 +6470,7 @@ where
                     "capabilities.can-remove-children" => Some(("capabilities.canRemoveChildren", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-rename" => Some(("capabilities.canRename", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-rename-team-drive" => Some(("capabilities.canRenameTeamDrive", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-reset-team-drive-restrictions" => Some(("capabilities.canResetTeamDriveRestrictions", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-share" => Some(("capabilities.canShare", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-trash-children" => Some(("capabilities.canTrashChildren", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "color-rgb" => Some(("colorRgb", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -6279,7 +6485,7 @@ where
                     "restrictions.team-members-only" => Some(("restrictions.teamMembersOnly", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "theme-id" => Some(("themeId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["admin-managed-restrictions", "background-image-file", "background-image-link", "can-add-children", "can-change-copy-requires-writer-permission-restriction", "can-change-domain-users-only-restriction", "can-change-team-drive-background", "can-change-team-members-only-restriction", "can-comment", "can-copy", "can-delete-children", "can-delete-team-drive", "can-download", "can-edit", "can-list-children", "can-manage-members", "can-read-revisions", "can-remove-children", "can-rename", "can-rename-team-drive", "can-share", "can-trash-children", "capabilities", "color-rgb", "copy-requires-writer-permission", "created-date", "domain-users-only", "id", "kind", "name", "org-unit-id", "restrictions", "team-members-only", "theme-id", "width", "x-coordinate", "y-coordinate"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["admin-managed-restrictions", "background-image-file", "background-image-link", "can-add-children", "can-change-copy-requires-writer-permission-restriction", "can-change-domain-users-only-restriction", "can-change-team-drive-background", "can-change-team-members-only-restriction", "can-comment", "can-copy", "can-delete-children", "can-delete-team-drive", "can-download", "can-edit", "can-list-children", "can-manage-members", "can-read-revisions", "can-remove-children", "can-rename", "can-rename-team-drive", "can-reset-team-drive-restrictions", "can-share", "can-trash-children", "capabilities", "color-rgb", "copy-requires-writer-permission", "created-date", "domain-users-only", "id", "kind", "name", "org-unit-id", "restrictions", "team-members-only", "theme-id", "width", "x-coordinate", "y-coordinate"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -6294,7 +6500,7 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "use-domain-admin-access" => {
-                    call = call.use_domain_admin_access(arg_from_str(value.unwrap_or("false"), err, "use-domain-admin-access", "boolean"));
+                    call = call.use_domain_admin_access(        value.map(|v| arg_from_str(v, err, "use-domain-admin-access", "boolean")).unwrap_or(false));
                 },
                 _ => {
                     let mut found = false;
@@ -6504,6 +6710,12 @@ where
                     },
                     ("list", Some(opt)) => {
                         call_result = self._files_list(opt, dry_run, &mut err).await;
+                    },
+                    ("list-labels", Some(opt)) => {
+                        call_result = self._files_list_labels(opt, dry_run, &mut err).await;
+                    },
+                    ("modify-labels", Some(opt)) => {
+                        call_result = self._files_modify_labels(opt, dry_run, &mut err).await;
                     },
                     ("patch", Some(opt)) => {
                         call_result = self._files_patch(opt, dry_run, &mut err).await;
@@ -7336,7 +7548,7 @@ async fn main() {
                   ]),
             ]),
         
-        ("files", "methods: 'copy', 'delete', 'empty-trash', 'export', 'generate-ids', 'get', 'insert', 'list', 'patch', 'touch', 'trash', 'untrash', 'update' and 'watch'", vec![
+        ("files", "methods: 'copy', 'delete', 'empty-trash', 'export', 'generate-ids', 'get', 'insert', 'list', 'list-labels', 'modify-labels', 'patch', 'touch', 'trash', 'untrash', 'update' and 'watch'", vec![
             ("copy",
                     Some(r##"Creates a copy of the specified file. Folders cannot be copied."##),
                     "Details at http://byron.github.io/google-apis-rs/google_drive2_cli/files_copy",
@@ -7501,6 +7713,56 @@ async fn main() {
                      Some(false),
                      Some(false)),
                   ]),
+            ("list-labels",
+                    Some(r##"Lists the labels on a file."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_drive2_cli/files_list-labels",
+                  vec![
+                    (Some(r##"file-id"##),
+                     None,
+                     Some(r##"The ID of the file."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("modify-labels",
+                    Some(r##"Modifies the set of labels on a file."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_drive2_cli/files_modify-labels",
+                  vec![
+                    (Some(r##"file-id"##),
+                     None,
+                     Some(r##"The ID of the file for which the labels are modified."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
             ("patch",
                     Some(r##"Updates a file's metadata and/or content. When calling this method, only populate fields in the request that you want to modify. When updating fields, some fields might change automatically, such as modifiedDate. This method supports patch semantics."##),
                     "Details at http://byron.github.io/google-apis-rs/google_drive2_cli/files_patch",
@@ -7630,7 +7892,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("watch",
-                    Some(r##"Subscribe to changes on a file"##),
+                    Some(r##"Subscribes to changes to a file. While you can establish a channel for changes to a file on a shared drive, a change to a shared drive file won't create a notification."##),
                     "Details at http://byron.github.io/google-apis-rs/google_drive2_cli/files_watch",
                   vec![
                     (Some(r##"file-id"##),
@@ -8593,7 +8855,7 @@ async fn main() {
     
     let mut app = App::new("drive2")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("4.0.1+20220225")
+           .version("5.0.2+20230115")
            .about("Manages files in Drive including uploading, downloading, searching, detecting changes, and updating sharing permissions.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_drive2_cli")
            .arg(Arg::with_name("url")

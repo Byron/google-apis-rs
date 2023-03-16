@@ -1,4 +1,4 @@
-site_name: Cloud IAP v4.0.1+20220225
+site_name: Cloud IAP v5.0.2+20230118
 site_url: http://byron.github.io/google-apis-rs/google-iap1-cli
 site_description: A complete library to interact with Cloud IAP (protocol v1)
 
@@ -7,21 +7,28 @@ repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/iap1-cli
 docs_dir: docs
 site_dir: build_html
 
-pages:
-- ['index.md', 'Home']
-- ['methods_get-iam-policy.md', 'Methods', 'Get Iam Policy']
-- ['methods_get-iap-settings.md', 'Methods', 'Get Iap Settings']
-- ['methods_set-iam-policy.md', 'Methods', 'Set Iam Policy']
-- ['methods_test-iam-permissions.md', 'Methods', 'Test Iam Permissions']
-- ['methods_update-iap-settings.md', 'Methods', 'Update Iap Settings']
-- ['projects_brands-create.md', 'Projects', 'Brands Create']
-- ['projects_brands-get.md', 'Projects', 'Brands Get']
-- ['projects_brands-identity-aware-proxy-clients-create.md', 'Projects', 'Brands Identity Aware Proxy Clients Create']
-- ['projects_brands-identity-aware-proxy-clients-delete.md', 'Projects', 'Brands Identity Aware Proxy Clients Delete']
-- ['projects_brands-identity-aware-proxy-clients-get.md', 'Projects', 'Brands Identity Aware Proxy Clients Get']
-- ['projects_brands-identity-aware-proxy-clients-list.md', 'Projects', 'Brands Identity Aware Proxy Clients List']
-- ['projects_brands-identity-aware-proxy-clients-reset-secret.md', 'Projects', 'Brands Identity Aware Proxy Clients Reset Secret']
-- ['projects_brands-list.md', 'Projects', 'Brands List']
+nav:
+- Home: 'index.md'
+- 'Methods':
+    - 'Get Iam Policy': 'methods_get-iam-policy.md'
+    - 'Get Iap Settings': 'methods_get-iap-settings.md'
+    - 'Set Iam Policy': 'methods_set-iam-policy.md'
+    - 'Test Iam Permissions': 'methods_test-iam-permissions.md'
+    - 'Update Iap Settings': 'methods_update-iap-settings.md'
+- 'Projects':
+    - 'Brands Create': 'projects_brands-create.md'
+    - 'Brands Get': 'projects_brands-get.md'
+    - 'Brands Identity Aware Proxy Clients Create': 'projects_brands-identity-aware-proxy-clients-create.md'
+    - 'Brands Identity Aware Proxy Clients Delete': 'projects_brands-identity-aware-proxy-clients-delete.md'
+    - 'Brands Identity Aware Proxy Clients Get': 'projects_brands-identity-aware-proxy-clients-get.md'
+    - 'Brands Identity Aware Proxy Clients List': 'projects_brands-identity-aware-proxy-clients-list.md'
+    - 'Brands Identity Aware Proxy Clients Reset Secret': 'projects_brands-identity-aware-proxy-clients-reset-secret.md'
+    - 'Brands List': 'projects_brands-list.md'
+    - 'Iap Tunnel Locations Dest Groups Create': 'projects_iap-tunnel-locations-dest-groups-create.md'
+    - 'Iap Tunnel Locations Dest Groups Delete': 'projects_iap-tunnel-locations-dest-groups-delete.md'
+    - 'Iap Tunnel Locations Dest Groups Get': 'projects_iap-tunnel-locations-dest-groups-get.md'
+    - 'Iap Tunnel Locations Dest Groups List': 'projects_iap-tunnel-locations-dest-groups-list.md'
+    - 'Iap Tunnel Locations Dest Groups Patch': 'projects_iap-tunnel-locations-dest-groups-patch.md'
 
 theme: readthedocs
 

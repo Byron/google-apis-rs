@@ -25,12 +25,14 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Artifact Registry* API at revision *20220225*. The CLI is at version *4.0.1*.
+This documentation was generated from the *Artifact Registry* API at revision *20230113*. The CLI is at version *5.0.2*.
 
 ```bash
 artifactregistry1 [options]
         projects
                 get-project-settings <name> [-p <v>]... [-o <out>]
+                locations-get <name> [-p <v>]... [-o <out>]
+                locations-list <name> [-p <v>]... [-o <out>]
                 locations-operations-get <name> [-p <v>]... [-o <out>]
                 locations-repositories-apt-artifacts-import <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-repositories-apt-artifacts-upload <parent> (-r <kv>)... (-u simple -f <file> [-m <mime>]) [-p <v>]... [-o <out>]
@@ -42,9 +44,12 @@ artifactregistry1 [options]
                 locations-repositories-files-list <parent> [-p <v>]... [-o <out>]
                 locations-repositories-get <name> [-p <v>]... [-o <out>]
                 locations-repositories-get-iam-policy <resource> [-p <v>]... [-o <out>]
-                locations-repositories-goo-get-artifacts-import <parent> (-r <kv>)... [-p <v>]... [-o <out>]
-                locations-repositories-googet-artifacts-upload <parent> (-r <kv>)... (-u simple -f <file> [-m <mime>]) [-p <v>]... [-o <out>]
+                locations-repositories-kfp-artifacts-upload <parent> (-r <kv>)... (-u simple -f <file> [-m <mime>]) [-p <v>]... [-o <out>]
                 locations-repositories-list <parent> [-p <v>]... [-o <out>]
+                locations-repositories-maven-artifacts-get <name> [-p <v>]... [-o <out>]
+                locations-repositories-maven-artifacts-list <parent> [-p <v>]... [-o <out>]
+                locations-repositories-npm-packages-get <name> [-p <v>]... [-o <out>]
+                locations-repositories-npm-packages-list <parent> [-p <v>]... [-o <out>]
                 locations-repositories-packages-delete <name> [-p <v>]... [-o <out>]
                 locations-repositories-packages-get <name> [-p <v>]... [-o <out>]
                 locations-repositories-packages-list <parent> [-p <v>]... [-o <out>]
@@ -57,6 +62,8 @@ artifactregistry1 [options]
                 locations-repositories-packages-versions-get <name> [-p <v>]... [-o <out>]
                 locations-repositories-packages-versions-list <parent> [-p <v>]... [-o <out>]
                 locations-repositories-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-repositories-python-packages-get <name> [-p <v>]... [-o <out>]
+                locations-repositories-python-packages-list <parent> [-p <v>]... [-o <out>]
                 locations-repositories-set-iam-policy <resource> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-repositories-test-iam-permissions <resource> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-repositories-yum-artifacts-import <parent> (-r <kv>)... [-p <v>]... [-o <out>]

@@ -1,4 +1,4 @@
-site_name: Bigtable Admin v4.0.1+20220222
+site_name: Bigtable Admin v5.0.2+20230110
 site_url: http://byron.github.io/google-apis-rs/google-bigtableadmin2-cli
 site_description: A complete library to interact with Bigtable Admin (protocol v2)
 
@@ -7,54 +7,60 @@ repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/bigtableadmin2-c
 docs_dir: docs
 site_dir: build_html
 
-pages:
-- ['index.md', 'Home']
-- ['operations_cancel.md', 'Operations', 'Cancel']
-- ['operations_delete.md', 'Operations', 'Delete']
-- ['operations_get.md', 'Operations', 'Get']
-- ['operations_projects-operations-list.md', 'Operations', 'Projects Operations List']
-- ['projects_instances-app-profiles-create.md', 'Projects', 'Instances App Profiles Create']
-- ['projects_instances-app-profiles-delete.md', 'Projects', 'Instances App Profiles Delete']
-- ['projects_instances-app-profiles-get.md', 'Projects', 'Instances App Profiles Get']
-- ['projects_instances-app-profiles-list.md', 'Projects', 'Instances App Profiles List']
-- ['projects_instances-app-profiles-patch.md', 'Projects', 'Instances App Profiles Patch']
-- ['projects_instances-clusters-backups-create.md', 'Projects', 'Instances Clusters Backups Create']
-- ['projects_instances-clusters-backups-delete.md', 'Projects', 'Instances Clusters Backups Delete']
-- ['projects_instances-clusters-backups-get.md', 'Projects', 'Instances Clusters Backups Get']
-- ['projects_instances-clusters-backups-get-iam-policy.md', 'Projects', 'Instances Clusters Backups Get Iam Policy']
-- ['projects_instances-clusters-backups-list.md', 'Projects', 'Instances Clusters Backups List']
-- ['projects_instances-clusters-backups-patch.md', 'Projects', 'Instances Clusters Backups Patch']
-- ['projects_instances-clusters-backups-set-iam-policy.md', 'Projects', 'Instances Clusters Backups Set Iam Policy']
-- ['projects_instances-clusters-backups-test-iam-permissions.md', 'Projects', 'Instances Clusters Backups Test Iam Permissions']
-- ['projects_instances-clusters-create.md', 'Projects', 'Instances Clusters Create']
-- ['projects_instances-clusters-delete.md', 'Projects', 'Instances Clusters Delete']
-- ['projects_instances-clusters-get.md', 'Projects', 'Instances Clusters Get']
-- ['projects_instances-clusters-list.md', 'Projects', 'Instances Clusters List']
-- ['projects_instances-clusters-partial-update-cluster.md', 'Projects', 'Instances Clusters Partial Update Cluster']
-- ['projects_instances-clusters-update.md', 'Projects', 'Instances Clusters Update']
-- ['projects_instances-create.md', 'Projects', 'Instances Create']
-- ['projects_instances-delete.md', 'Projects', 'Instances Delete']
-- ['projects_instances-get.md', 'Projects', 'Instances Get']
-- ['projects_instances-get-iam-policy.md', 'Projects', 'Instances Get Iam Policy']
-- ['projects_instances-list.md', 'Projects', 'Instances List']
-- ['projects_instances-partial-update-instance.md', 'Projects', 'Instances Partial Update Instance']
-- ['projects_instances-set-iam-policy.md', 'Projects', 'Instances Set Iam Policy']
-- ['projects_instances-tables-check-consistency.md', 'Projects', 'Instances Tables Check Consistency']
-- ['projects_instances-tables-create.md', 'Projects', 'Instances Tables Create']
-- ['projects_instances-tables-delete.md', 'Projects', 'Instances Tables Delete']
-- ['projects_instances-tables-drop-row-range.md', 'Projects', 'Instances Tables Drop Row Range']
-- ['projects_instances-tables-generate-consistency-token.md', 'Projects', 'Instances Tables Generate Consistency Token']
-- ['projects_instances-tables-get.md', 'Projects', 'Instances Tables Get']
-- ['projects_instances-tables-get-iam-policy.md', 'Projects', 'Instances Tables Get Iam Policy']
-- ['projects_instances-tables-list.md', 'Projects', 'Instances Tables List']
-- ['projects_instances-tables-modify-column-families.md', 'Projects', 'Instances Tables Modify Column Families']
-- ['projects_instances-tables-restore.md', 'Projects', 'Instances Tables Restore']
-- ['projects_instances-tables-set-iam-policy.md', 'Projects', 'Instances Tables Set Iam Policy']
-- ['projects_instances-tables-test-iam-permissions.md', 'Projects', 'Instances Tables Test Iam Permissions']
-- ['projects_instances-test-iam-permissions.md', 'Projects', 'Instances Test Iam Permissions']
-- ['projects_instances-update.md', 'Projects', 'Instances Update']
-- ['projects_locations-get.md', 'Projects', 'Locations Get']
-- ['projects_locations-list.md', 'Projects', 'Locations List']
+nav:
+- Home: 'index.md'
+- 'Operations':
+    - 'Cancel': 'operations_cancel.md'
+    - 'Delete': 'operations_delete.md'
+    - 'Get': 'operations_get.md'
+    - 'Projects Operations List': 'operations_projects-operations-list.md'
+- 'Projects':
+    - 'Instances App Profiles Create': 'projects_instances-app-profiles-create.md'
+    - 'Instances App Profiles Delete': 'projects_instances-app-profiles-delete.md'
+    - 'Instances App Profiles Get': 'projects_instances-app-profiles-get.md'
+    - 'Instances App Profiles List': 'projects_instances-app-profiles-list.md'
+    - 'Instances App Profiles Patch': 'projects_instances-app-profiles-patch.md'
+    - 'Instances Clusters Backups Copy': 'projects_instances-clusters-backups-copy.md'
+    - 'Instances Clusters Backups Create': 'projects_instances-clusters-backups-create.md'
+    - 'Instances Clusters Backups Delete': 'projects_instances-clusters-backups-delete.md'
+    - 'Instances Clusters Backups Get': 'projects_instances-clusters-backups-get.md'
+    - 'Instances Clusters Backups Get Iam Policy': 'projects_instances-clusters-backups-get-iam-policy.md'
+    - 'Instances Clusters Backups List': 'projects_instances-clusters-backups-list.md'
+    - 'Instances Clusters Backups Patch': 'projects_instances-clusters-backups-patch.md'
+    - 'Instances Clusters Backups Set Iam Policy': 'projects_instances-clusters-backups-set-iam-policy.md'
+    - 'Instances Clusters Backups Test Iam Permissions': 'projects_instances-clusters-backups-test-iam-permissions.md'
+    - 'Instances Clusters Create': 'projects_instances-clusters-create.md'
+    - 'Instances Clusters Delete': 'projects_instances-clusters-delete.md'
+    - 'Instances Clusters Get': 'projects_instances-clusters-get.md'
+    - 'Instances Clusters Hot Tablets List': 'projects_instances-clusters-hot-tablets-list.md'
+    - 'Instances Clusters List': 'projects_instances-clusters-list.md'
+    - 'Instances Clusters Partial Update Cluster': 'projects_instances-clusters-partial-update-cluster.md'
+    - 'Instances Clusters Update': 'projects_instances-clusters-update.md'
+    - 'Instances Create': 'projects_instances-create.md'
+    - 'Instances Delete': 'projects_instances-delete.md'
+    - 'Instances Get': 'projects_instances-get.md'
+    - 'Instances Get Iam Policy': 'projects_instances-get-iam-policy.md'
+    - 'Instances List': 'projects_instances-list.md'
+    - 'Instances Partial Update Instance': 'projects_instances-partial-update-instance.md'
+    - 'Instances Set Iam Policy': 'projects_instances-set-iam-policy.md'
+    - 'Instances Tables Check Consistency': 'projects_instances-tables-check-consistency.md'
+    - 'Instances Tables Create': 'projects_instances-tables-create.md'
+    - 'Instances Tables Delete': 'projects_instances-tables-delete.md'
+    - 'Instances Tables Drop Row Range': 'projects_instances-tables-drop-row-range.md'
+    - 'Instances Tables Generate Consistency Token': 'projects_instances-tables-generate-consistency-token.md'
+    - 'Instances Tables Get': 'projects_instances-tables-get.md'
+    - 'Instances Tables Get Iam Policy': 'projects_instances-tables-get-iam-policy.md'
+    - 'Instances Tables List': 'projects_instances-tables-list.md'
+    - 'Instances Tables Modify Column Families': 'projects_instances-tables-modify-column-families.md'
+    - 'Instances Tables Patch': 'projects_instances-tables-patch.md'
+    - 'Instances Tables Restore': 'projects_instances-tables-restore.md'
+    - 'Instances Tables Set Iam Policy': 'projects_instances-tables-set-iam-policy.md'
+    - 'Instances Tables Test Iam Permissions': 'projects_instances-tables-test-iam-permissions.md'
+    - 'Instances Tables Undelete': 'projects_instances-tables-undelete.md'
+    - 'Instances Test Iam Permissions': 'projects_instances-test-iam-permissions.md'
+    - 'Instances Update': 'projects_instances-update.md'
+    - 'Locations Get': 'projects_locations-get.md'
+    - 'Locations List': 'projects_locations-list.md'
 
 theme: readthedocs
 

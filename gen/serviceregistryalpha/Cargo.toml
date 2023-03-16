@@ -4,12 +4,12 @@
 [package]
 
 name = "google-serviceregistryalpha"
-version = "5.0.2-beta-1+20160401"
+version = "5.0.2+20160401"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Service Registry (protocol alpha)"
 repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/serviceregistryalpha"
 homepage = "https://developers.google.com/cloud-serviceregistry/"
-documentation = "https://docs.rs/google-serviceregistryalpha/5.0.2-beta-1+20160401"
+documentation = "https://docs.rs/google-serviceregistryalpha/5.0.2+20160401"
 license = "MIT"
 keywords = ["serviceregistry", "google", "protocol", "web", "api"]
 autobins = false

@@ -25,11 +25,16 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Cloudchannel* API at revision *20220303*. The CLI is at version *4.0.1*.
+This documentation was generated from the *Cloudchannel* API at revision *20230123*. The CLI is at version *5.0.2*.
 
 ```bash
 cloudchannel1 [options]
         accounts
+                channel-partner-links-channel-partner-repricing-configs-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                channel-partner-links-channel-partner-repricing-configs-delete <name> [-p <v>]... [-o <out>]
+                channel-partner-links-channel-partner-repricing-configs-get <name> [-p <v>]... [-o <out>]
+                channel-partner-links-channel-partner-repricing-configs-list <parent> [-p <v>]... [-o <out>]
+                channel-partner-links-channel-partner-repricing-configs-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 channel-partner-links-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 channel-partner-links-customers-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 channel-partner-links-customers-delete <name> [-p <v>]... [-o <out>]
@@ -42,6 +47,11 @@ cloudchannel1 [options]
                 channel-partner-links-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 check-cloud-identity-accounts-exist <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 customers-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                customers-customer-repricing-configs-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                customers-customer-repricing-configs-delete <name> [-p <v>]... [-o <out>]
+                customers-customer-repricing-configs-get <name> [-p <v>]... [-o <out>]
+                customers-customer-repricing-configs-list <parent> [-p <v>]... [-o <out>]
+                customers-customer-repricing-configs-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 customers-delete <name> [-p <v>]... [-o <out>]
                 customers-entitlements-activate <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 customers-entitlements-cancel <name> (-r <kv>)... [-p <v>]... [-o <out>]
@@ -68,6 +78,9 @@ cloudchannel1 [options]
                 list-transferable-skus <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 offers-list <parent> [-p <v>]... [-o <out>]
                 register <account> (-r <kv>)... [-p <v>]... [-o <out>]
+                report-jobs-fetch-report-results <report-job> (-r <kv>)... [-p <v>]... [-o <out>]
+                reports-list <parent> [-p <v>]... [-o <out>]
+                reports-run <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 unregister <account> (-r <kv>)... [-p <v>]... [-o <out>]
         operations
                 cancel <name> (-r <kv>)... [-p <v>]... [-o <out>]

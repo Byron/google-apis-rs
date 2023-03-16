@@ -3,8 +3,6 @@
 // DO NOT EDIT !
 #![allow(unused_variables, unused_imports, dead_code, unused_mut)]
 
-extern crate tokio;
-
 #[macro_use]
 extern crate clap;
 
@@ -12,9 +10,10 @@ use std::env;
 use std::io::{self, Write};
 use clap::{App, SubCommand, Arg};
 
-use google_domains1_beta1::{api, Error, oauth2};
+use google_domains1_beta1::{api, Error, oauth2, client::chrono, FieldMask};
 
-mod client;
+
+use google_clis_common as client;
 
 use client::{InvalidOptionsError, CLIError, arg_from_str, writer_from_opts, parse_kv_arg,
           input_file_from_opts, input_mime_from_opts, FieldCursor, FieldError, CallType, UploadProtocol,
@@ -113,7 +112,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 "filter" => {
                     call = call.filter(value.unwrap_or(""));
@@ -227,7 +226,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 "filter" => {
                     call = call.filter(value.unwrap_or(""));
@@ -780,7 +779,7 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "options-requested-policy-version" => {
-                    call = call.options_requested_policy_version(arg_from_str(value.unwrap_or("-0"), err, "options-requested-policy-version", "integer"));
+                    call = call.options_requested_policy_version(        value.map(|v| arg_from_str(v, err, "options-requested-policy-version", "int32")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -829,6 +828,92 @@ where
         }
     }
 
+    async fn _projects_locations_registrations_import(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "domain-name" => Some(("domainName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["domain-name", "labels"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::ImportDomainRequest = json::value::from_value(object).unwrap();
+        let mut call = self.hub.projects().locations_registrations_import(request, opt.value_of("parent").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
     async fn _projects_locations_registrations_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.projects().locations_registrations_list(opt.value_of("parent").unwrap_or(""));
@@ -839,7 +924,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 "filter" => {
                     call = call.filter(value.unwrap_or(""));
@@ -1011,10 +1096,12 @@ where
                     "pending-contact-settings.technical-contact.postal-address.revision" => Some(("pendingContactSettings.technicalContact.postalAddress.revision", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "pending-contact-settings.technical-contact.postal-address.sorting-code" => Some(("pendingContactSettings.technicalContact.postalAddress.sortingCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "pending-contact-settings.technical-contact.postal-address.sublocality" => Some(("pendingContactSettings.technicalContact.postalAddress.sublocality", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "register-failure-reason" => Some(("registerFailureReason", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "state" => Some(("state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "supported-privacy" => Some(("supportedPrivacy", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "transfer-failure-reason" => Some(("transferFailureReason", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["address-lines", "admin-contact", "administrative-area", "contact-settings", "create-time", "custom-dns", "dns-settings", "domain-name", "ds-state", "email", "expire-time", "fax-number", "google-domains-dns", "issues", "labels", "language-code", "locality", "management-settings", "name", "name-servers", "organization", "pending-contact-settings", "phone-number", "postal-address", "postal-code", "privacy", "recipients", "region-code", "registrant-contact", "renewal-method", "revision", "sorting-code", "state", "sublocality", "supported-privacy", "technical-contact", "transfer-lock-state"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["address-lines", "admin-contact", "administrative-area", "contact-settings", "create-time", "custom-dns", "dns-settings", "domain-name", "ds-state", "email", "expire-time", "fax-number", "google-domains-dns", "issues", "labels", "language-code", "locality", "management-settings", "name", "name-servers", "organization", "pending-contact-settings", "phone-number", "postal-address", "postal-code", "privacy", "recipients", "region-code", "register-failure-reason", "registrant-contact", "renewal-method", "revision", "sorting-code", "state", "sublocality", "supported-privacy", "technical-contact", "transfer-failure-reason", "transfer-lock-state"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1029,7 +1116,7 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "update-mask" => {
-                    call = call.update_mask(value.unwrap_or(""));
+                    call = call.update_mask(        value.map(|v| arg_from_str(v, err, "update-mask", "google-fieldmask")).unwrap_or(FieldMask::default()));
                 },
                 _ => {
                     let mut found = false;
@@ -1200,14 +1287,16 @@ where
                     "registration.pending-contact-settings.technical-contact.postal-address.revision" => Some(("registration.pendingContactSettings.technicalContact.postalAddress.revision", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "registration.pending-contact-settings.technical-contact.postal-address.sorting-code" => Some(("registration.pendingContactSettings.technicalContact.postalAddress.sortingCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "registration.pending-contact-settings.technical-contact.postal-address.sublocality" => Some(("registration.pendingContactSettings.technicalContact.postalAddress.sublocality", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "registration.register-failure-reason" => Some(("registration.registerFailureReason", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "registration.state" => Some(("registration.state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "registration.supported-privacy" => Some(("registration.supportedPrivacy", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "registration.transfer-failure-reason" => Some(("registration.transferFailureReason", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "validate-only" => Some(("validateOnly", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "yearly-price.currency-code" => Some(("yearlyPrice.currencyCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "yearly-price.nanos" => Some(("yearlyPrice.nanos", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "yearly-price.units" => Some(("yearlyPrice.units", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["address-lines", "admin-contact", "administrative-area", "contact-notices", "contact-settings", "create-time", "currency-code", "custom-dns", "dns-settings", "domain-name", "domain-notices", "ds-state", "email", "expire-time", "fax-number", "google-domains-dns", "issues", "labels", "language-code", "locality", "management-settings", "name", "name-servers", "nanos", "organization", "pending-contact-settings", "phone-number", "postal-address", "postal-code", "privacy", "recipients", "region-code", "registrant-contact", "registration", "renewal-method", "revision", "sorting-code", "state", "sublocality", "supported-privacy", "technical-contact", "transfer-lock-state", "units", "validate-only", "yearly-price"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["address-lines", "admin-contact", "administrative-area", "contact-notices", "contact-settings", "create-time", "currency-code", "custom-dns", "dns-settings", "domain-name", "domain-notices", "ds-state", "email", "expire-time", "fax-number", "google-domains-dns", "issues", "labels", "language-code", "locality", "management-settings", "name", "name-servers", "nanos", "organization", "pending-contact-settings", "phone-number", "postal-address", "postal-code", "privacy", "recipients", "region-code", "register-failure-reason", "registrant-contact", "registration", "renewal-method", "revision", "sorting-code", "state", "sublocality", "supported-privacy", "technical-contact", "transfer-failure-reason", "transfer-lock-state", "units", "validate-only", "yearly-price"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1370,6 +1459,65 @@ where
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_locations_registrations_retrieve_importable_domains(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.projects().locations_registrations_retrieve_importable_domains(opt.value_of("location").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "page-token" => {
+                    call = call.page_token(value.unwrap_or(""));
+                },
+                "page-size" => {
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["page-size", "page-token"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -1865,14 +2013,16 @@ where
                     "registration.pending-contact-settings.technical-contact.postal-address.revision" => Some(("registration.pendingContactSettings.technicalContact.postalAddress.revision", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "registration.pending-contact-settings.technical-contact.postal-address.sorting-code" => Some(("registration.pendingContactSettings.technicalContact.postalAddress.sortingCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "registration.pending-contact-settings.technical-contact.postal-address.sublocality" => Some(("registration.pendingContactSettings.technicalContact.postalAddress.sublocality", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "registration.register-failure-reason" => Some(("registration.registerFailureReason", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "registration.state" => Some(("registration.state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "registration.supported-privacy" => Some(("registration.supportedPrivacy", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "registration.transfer-failure-reason" => Some(("registration.transferFailureReason", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "validate-only" => Some(("validateOnly", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "yearly-price.currency-code" => Some(("yearlyPrice.currencyCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "yearly-price.nanos" => Some(("yearlyPrice.nanos", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "yearly-price.units" => Some(("yearlyPrice.units", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["address-lines", "admin-contact", "administrative-area", "authorization-code", "code", "contact-notices", "contact-settings", "create-time", "currency-code", "custom-dns", "dns-settings", "domain-name", "ds-state", "email", "expire-time", "fax-number", "google-domains-dns", "issues", "labels", "language-code", "locality", "management-settings", "name", "name-servers", "nanos", "organization", "pending-contact-settings", "phone-number", "postal-address", "postal-code", "privacy", "recipients", "region-code", "registrant-contact", "registration", "renewal-method", "revision", "sorting-code", "state", "sublocality", "supported-privacy", "technical-contact", "transfer-lock-state", "units", "validate-only", "yearly-price"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["address-lines", "admin-contact", "administrative-area", "authorization-code", "code", "contact-notices", "contact-settings", "create-time", "currency-code", "custom-dns", "dns-settings", "domain-name", "ds-state", "email", "expire-time", "fax-number", "google-domains-dns", "issues", "labels", "language-code", "locality", "management-settings", "name", "name-servers", "nanos", "organization", "pending-contact-settings", "phone-number", "postal-address", "postal-code", "privacy", "recipients", "region-code", "register-failure-reason", "registrant-contact", "registration", "renewal-method", "revision", "sorting-code", "state", "sublocality", "supported-privacy", "technical-contact", "transfer-failure-reason", "transfer-lock-state", "units", "validate-only", "yearly-price"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1972,6 +2122,9 @@ where
                     ("locations-registrations-get-iam-policy", Some(opt)) => {
                         call_result = self._projects_locations_registrations_get_iam_policy(opt, dry_run, &mut err).await;
                     },
+                    ("locations-registrations-import", Some(opt)) => {
+                        call_result = self._projects_locations_registrations_import(opt, dry_run, &mut err).await;
+                    },
                     ("locations-registrations-list", Some(opt)) => {
                         call_result = self._projects_locations_registrations_list(opt, dry_run, &mut err).await;
                     },
@@ -1986,6 +2139,9 @@ where
                     },
                     ("locations-registrations-retrieve-authorization-code", Some(opt)) => {
                         call_result = self._projects_locations_registrations_retrieve_authorization_code(opt, dry_run, &mut err).await;
+                    },
+                    ("locations-registrations-retrieve-importable-domains", Some(opt)) => {
+                        call_result = self._projects_locations_registrations_retrieve_importable_domains(opt, dry_run, &mut err).await;
                     },
                     ("locations-registrations-retrieve-register-parameters", Some(opt)) => {
                         call_result = self._projects_locations_registrations_retrieve_register_parameters(opt, dry_run, &mut err).await;
@@ -2084,7 +2240,7 @@ where
 async fn main() {
     let mut exit_status = 0i32;
     let arg_data = [
-        ("projects", "methods: 'locations-get', 'locations-list', 'locations-operations-get', 'locations-operations-list', 'locations-registrations-configure-contact-settings', 'locations-registrations-configure-dns-settings', 'locations-registrations-configure-management-settings', 'locations-registrations-delete', 'locations-registrations-export', 'locations-registrations-get', 'locations-registrations-get-iam-policy', 'locations-registrations-list', 'locations-registrations-patch', 'locations-registrations-register', 'locations-registrations-reset-authorization-code', 'locations-registrations-retrieve-authorization-code', 'locations-registrations-retrieve-register-parameters', 'locations-registrations-retrieve-transfer-parameters', 'locations-registrations-search-domains', 'locations-registrations-set-iam-policy', 'locations-registrations-test-iam-permissions' and 'locations-registrations-transfer'", vec![
+        ("projects", "methods: 'locations-get', 'locations-list', 'locations-operations-get', 'locations-operations-list', 'locations-registrations-configure-contact-settings', 'locations-registrations-configure-dns-settings', 'locations-registrations-configure-management-settings', 'locations-registrations-delete', 'locations-registrations-export', 'locations-registrations-get', 'locations-registrations-get-iam-policy', 'locations-registrations-import', 'locations-registrations-list', 'locations-registrations-patch', 'locations-registrations-register', 'locations-registrations-reset-authorization-code', 'locations-registrations-retrieve-authorization-code', 'locations-registrations-retrieve-importable-domains', 'locations-registrations-retrieve-register-parameters', 'locations-registrations-retrieve-transfer-parameters', 'locations-registrations-search-domains', 'locations-registrations-set-iam-policy', 'locations-registrations-test-iam-permissions' and 'locations-registrations-transfer'", vec![
             ("locations-get",
                     Some(r##"Gets information about a location."##),
                     "Details at http://byron.github.io/google-apis-rs/google_domains1_beta1_cli/projects_locations-get",
@@ -2335,9 +2491,37 @@ async fn main() {
                   vec![
                     (Some(r##"resource"##),
                      None,
-                     Some(r##"REQUIRED: The resource for which the policy is being requested. See the operation documentation for the appropriate value for this field."##),
+                     Some(r##"REQUIRED: The resource for which the policy is being requested. See [Resource names](https://cloud.google.com/apis/design/resource_names) for the appropriate value for this field."##),
                      Some(true),
                      Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-registrations-import",
+                    Some(r##"Imports a domain name from [Google Domains](https://domains.google/) for use in Cloud Domains. To transfer a domain from another registrar, use the `TransferDomain` method instead. Since individual users can own domains in Google Domains, the calling user must have ownership permission on the domain."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_domains1_beta1_cli/projects_locations-registrations-import",
+                  vec![
+                    (Some(r##"parent"##),
+                     None,
+                     Some(r##"Required. The parent resource of the Registration. Must be in the format `projects/*/locations/*`."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
         
                     (Some(r##"v"##),
                      Some(r##"p"##),
@@ -2479,6 +2663,28 @@ async fn main() {
                      Some(false),
                      Some(false)),
                   ]),
+            ("locations-registrations-retrieve-importable-domains",
+                    Some(r##"Lists domain names from [Google Domains](https://domains.google/) that can be imported to Cloud Domains using the `ImportDomain` method. Since individual users can own domains in Google Domains, the list of domains returned depends on the individual user making the call. Domains already managed by Cloud Domains are not returned."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_domains1_beta1_cli/projects_locations-registrations-retrieve-importable-domains",
+                  vec![
+                    (Some(r##"location"##),
+                     None,
+                     Some(r##"Required. The location. Must be in the format `projects/*/locations/*`."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
             ("locations-registrations-retrieve-register-parameters",
                     Some(r##"Gets parameters needed to register a new domain name, including price and up-to-date availability. Use the returned values to call `RegisterDomain`."##),
                     "Details at http://byron.github.io/google-apis-rs/google_domains1_beta1_cli/projects_locations-registrations-retrieve-register-parameters",
@@ -2502,7 +2708,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("locations-registrations-retrieve-transfer-parameters",
-                    Some(r##"Gets parameters needed to transfer a domain name from another registrar to Cloud Domains. For domains managed by Google Domains, transferring to Cloud Domains is not supported. Use the returned values to call `TransferDomain`."##),
+                    Some(r##"Gets parameters needed to transfer a domain name from another registrar to Cloud Domains. For domains already managed by [Google Domains](https://domains.google/), use `ImportDomain` instead. Use the returned values to call `TransferDomain`."##),
                     "Details at http://byron.github.io/google-apis-rs/google_domains1_beta1_cli/projects_locations-registrations-retrieve-transfer-parameters",
                   vec![
                     (Some(r##"location"##),
@@ -2551,7 +2757,7 @@ async fn main() {
                   vec![
                     (Some(r##"resource"##),
                      None,
-                     Some(r##"REQUIRED: The resource for which the policy is being specified. See the operation documentation for the appropriate value for this field."##),
+                     Some(r##"REQUIRED: The resource for which the policy is being specified. See [Resource names](https://cloud.google.com/apis/design/resource_names) for the appropriate value for this field."##),
                      Some(true),
                      Some(false)),
         
@@ -2579,7 +2785,7 @@ async fn main() {
                   vec![
                     (Some(r##"resource"##),
                      None,
-                     Some(r##"REQUIRED: The resource for which the policy detail is being requested. See the operation documentation for the appropriate value for this field."##),
+                     Some(r##"REQUIRED: The resource for which the policy detail is being requested. See [Resource names](https://cloud.google.com/apis/design/resource_names) for the appropriate value for this field."##),
                      Some(true),
                      Some(false)),
         
@@ -2602,7 +2808,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("locations-registrations-transfer",
-                    Some(r##"Transfers a domain name from another registrar to Cloud Domains. For domains managed by Google Domains, transferring to Cloud Domains is not supported. Before calling this method, go to the domain's current registrar to unlock the domain for transfer and retrieve the domain's transfer authorization code. Then call `RetrieveTransferParameters` to confirm that the domain is unlocked and to get values needed to build a call to this method. A successful call creates a `Registration` resource in state `TRANSFER_PENDING`. It can take several days to complete the transfer process. The registrant can often speed up this process by approving the transfer through the current registrar, either by clicking a link in an email from the registrar or by visiting the registrar's website. A few minutes after transfer approval, the resource transitions to state `ACTIVE`, indicating that the transfer was successful. If the transfer is rejected or the request expires without being approved, the resource can end up in state `TRANSFER_FAILED`. If transfer fails, you can safely delete the resource and retry the transfer."##),
+                    Some(r##"Transfers a domain name from another registrar to Cloud Domains. For domains already managed by [Google Domains](https://domains.google/), use `ImportDomain` instead. Before calling this method, go to the domain's current registrar to unlock the domain for transfer and retrieve the domain's transfer authorization code. Then call `RetrieveTransferParameters` to confirm that the domain is unlocked and to get values needed to build a call to this method. A successful call creates a `Registration` resource in state `TRANSFER_PENDING`. It can take several days to complete the transfer process. The registrant can often speed up this process by approving the transfer through the current registrar, either by clicking a link in an email from the registrar or by visiting the registrar's website. A few minutes after transfer approval, the resource transitions to state `ACTIVE`, indicating that the transfer was successful. If the transfer is rejected or the request expires without being approved, the resource can end up in state `TRANSFER_FAILED`. If transfer fails, you can safely delete the resource and retry the transfer."##),
                     "Details at http://byron.github.io/google-apis-rs/google_domains1_beta1_cli/projects_locations-registrations-transfer",
                   vec![
                     (Some(r##"parent"##),
@@ -2635,7 +2841,7 @@ async fn main() {
     
     let mut app = App::new("domains1-beta1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("4.0.1+20220128")
+           .version("5.0.2+20230105")
            .about("Enables management and configuration of domain names.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_domains1_beta1_cli")
            .arg(Arg::with_name("url")

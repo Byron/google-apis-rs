@@ -1,4 +1,4 @@
-site_name: adsense v4.0.1+20220304
+site_name: adsense v5.0.2+20230124
 site_url: http://byron.github.io/google-apis-rs/google-adsense2-cli
 site_description: A complete library to interact with adsense (protocol v2)
 
@@ -7,30 +7,40 @@ repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/adsense2-cli
 docs_dir: docs
 site_dir: build_html
 
-pages:
-- ['index.md', 'Home']
-- ['accounts_adclients-adunits-get.md', 'Accounts', 'Adclients Adunits Get']
-- ['accounts_adclients-adunits-get-adcode.md', 'Accounts', 'Adclients Adunits Get Adcode']
-- ['accounts_adclients-adunits-list.md', 'Accounts', 'Adclients Adunits List']
-- ['accounts_adclients-adunits-list-linked-custom-channels.md', 'Accounts', 'Adclients Adunits List Linked Custom Channels']
-- ['accounts_adclients-customchannels-get.md', 'Accounts', 'Adclients Customchannels Get']
-- ['accounts_adclients-customchannels-list.md', 'Accounts', 'Adclients Customchannels List']
-- ['accounts_adclients-customchannels-list-linked-ad-units.md', 'Accounts', 'Adclients Customchannels List Linked Ad Units']
-- ['accounts_adclients-get-adcode.md', 'Accounts', 'Adclients Get Adcode']
-- ['accounts_adclients-list.md', 'Accounts', 'Adclients List']
-- ['accounts_adclients-urlchannels-list.md', 'Accounts', 'Adclients Urlchannels List']
-- ['accounts_alerts-list.md', 'Accounts', 'Alerts List']
-- ['accounts_get.md', 'Accounts', 'Get']
-- ['accounts_list.md', 'Accounts', 'List']
-- ['accounts_list-child-accounts.md', 'Accounts', 'List Child Accounts']
-- ['accounts_payments-list.md', 'Accounts', 'Payments List']
-- ['accounts_reports-generate.md', 'Accounts', 'Reports Generate']
-- ['accounts_reports-generate-csv.md', 'Accounts', 'Reports Generate Csv']
-- ['accounts_reports-saved-generate.md', 'Accounts', 'Reports Saved Generate']
-- ['accounts_reports-saved-generate-csv.md', 'Accounts', 'Reports Saved Generate Csv']
-- ['accounts_reports-saved-list.md', 'Accounts', 'Reports Saved List']
-- ['accounts_sites-get.md', 'Accounts', 'Sites Get']
-- ['accounts_sites-list.md', 'Accounts', 'Sites List']
+nav:
+- Home: 'index.md'
+- 'Accounts':
+    - 'Adclients Adunits Create': 'accounts_adclients-adunits-create.md'
+    - 'Adclients Adunits Get': 'accounts_adclients-adunits-get.md'
+    - 'Adclients Adunits Get Adcode': 'accounts_adclients-adunits-get-adcode.md'
+    - 'Adclients Adunits List': 'accounts_adclients-adunits-list.md'
+    - 'Adclients Adunits List Linked Custom Channels': 'accounts_adclients-adunits-list-linked-custom-channels.md'
+    - 'Adclients Adunits Patch': 'accounts_adclients-adunits-patch.md'
+    - 'Adclients Customchannels Create': 'accounts_adclients-customchannels-create.md'
+    - 'Adclients Customchannels Delete': 'accounts_adclients-customchannels-delete.md'
+    - 'Adclients Customchannels Get': 'accounts_adclients-customchannels-get.md'
+    - 'Adclients Customchannels List': 'accounts_adclients-customchannels-list.md'
+    - 'Adclients Customchannels List Linked Ad Units': 'accounts_adclients-customchannels-list-linked-ad-units.md'
+    - 'Adclients Customchannels Patch': 'accounts_adclients-customchannels-patch.md'
+    - 'Adclients Get': 'accounts_adclients-get.md'
+    - 'Adclients Get Adcode': 'accounts_adclients-get-adcode.md'
+    - 'Adclients List': 'accounts_adclients-list.md'
+    - 'Adclients Urlchannels Get': 'accounts_adclients-urlchannels-get.md'
+    - 'Adclients Urlchannels List': 'accounts_adclients-urlchannels-list.md'
+    - 'Alerts List': 'accounts_alerts-list.md'
+    - 'Get': 'accounts_get.md'
+    - 'Get Ad Blocking Recovery Tag': 'accounts_get-ad-blocking-recovery-tag.md'
+    - 'List': 'accounts_list.md'
+    - 'List Child Accounts': 'accounts_list-child-accounts.md'
+    - 'Payments List': 'accounts_payments-list.md'
+    - 'Reports Generate': 'accounts_reports-generate.md'
+    - 'Reports Generate Csv': 'accounts_reports-generate-csv.md'
+    - 'Reports Get Saved': 'accounts_reports-get-saved.md'
+    - 'Reports Saved Generate': 'accounts_reports-saved-generate.md'
+    - 'Reports Saved Generate Csv': 'accounts_reports-saved-generate-csv.md'
+    - 'Reports Saved List': 'accounts_reports-saved-list.md'
+    - 'Sites Get': 'accounts_sites-get.md'
+    - 'Sites List': 'accounts_sites-list.md'
 
 theme: readthedocs
 

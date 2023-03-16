@@ -4,12 +4,12 @@
 [package]
 
 name = "google-smartdevicemanagement1"
-version = "5.0.2-beta-1+20230112"
+version = "5.0.2+20230112"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Smart Device Management (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/smartdevicemanagement1"
 homepage = "https://developers.google.com/nest/device-access"
-documentation = "https://docs.rs/google-smartdevicemanagement1/5.0.2-beta-1+20230112"
+documentation = "https://docs.rs/google-smartdevicemanagement1/5.0.2+20230112"
 license = "MIT"
 keywords = ["smartdevicemanagemen", "google", "protocol", "web", "api"]
 autobins = false

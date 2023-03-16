@@ -1,4 +1,4 @@
-site_name: Web Risk v4.0.1+20220226
+site_name: Web Risk v5.0.2+20230121
 site_url: http://byron.github.io/google-apis-rs/google-webrisk1-cli
 site_description: A complete library to interact with Web Risk (protocol v1)
 
@@ -7,17 +7,21 @@ repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/webrisk1-cli
 docs_dir: docs
 site_dir: build_html
 
-pages:
-- ['index.md', 'Home']
-- ['hashes_search.md', 'Hashes', 'Search']
-- ['projects_operations-cancel.md', 'Projects', 'Operations Cancel']
-- ['projects_operations-delete.md', 'Projects', 'Operations Delete']
-- ['projects_operations-get.md', 'Projects', 'Operations Get']
-- ['projects_operations-list.md', 'Projects', 'Operations List']
-- ['projects_submissions-create.md', 'Projects', 'Submissions Create']
-- ['projects_uris-submit.md', 'Projects', 'Uris Submit']
-- ['threat-lists_compute-diff.md', 'Threat Lists', 'Compute Diff']
-- ['uris_search.md', 'Uris', 'Search']
+nav:
+- Home: 'index.md'
+- 'Hashes':
+    - 'Search': 'hashes_search.md'
+- 'Projects':
+    - 'Operations Cancel': 'projects_operations-cancel.md'
+    - 'Operations Delete': 'projects_operations-delete.md'
+    - 'Operations Get': 'projects_operations-get.md'
+    - 'Operations List': 'projects_operations-list.md'
+    - 'Submissions Create': 'projects_submissions-create.md'
+    - 'Uris Submit': 'projects_uris-submit.md'
+- 'Threat Lists':
+    - 'Compute Diff': 'threat-lists_compute-diff.md'
+- 'Uris':
+    - 'Search': 'uris_search.md'
 
 theme: readthedocs
 

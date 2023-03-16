@@ -4,12 +4,12 @@
 [package]
 
 name = "google-iamcredentials1"
-version = "5.0.2-beta-1+20230113"
+version = "5.0.2+20230113"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with IAM Credentials (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/iamcredentials1"
 homepage = "https://cloud.google.com/iam/docs/creating-short-lived-service-account-credentials"
-documentation = "https://docs.rs/google-iamcredentials1/5.0.2-beta-1+20230113"
+documentation = "https://docs.rs/google-iamcredentials1/5.0.2+20230113"
 license = "MIT"
 keywords = ["iamcredentials", "google", "protocol", "web", "api"]
 autobins = false

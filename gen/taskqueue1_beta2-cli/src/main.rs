@@ -3,8 +3,6 @@
 // DO NOT EDIT !
 #![allow(unused_variables, unused_imports, dead_code, unused_mut)]
 
-extern crate tokio;
-
 #[macro_use]
 extern crate clap;
 
@@ -12,9 +10,10 @@ use std::env;
 use std::io::{self, Write};
 use clap::{App, SubCommand, Arg};
 
-use google_taskqueue1_beta2::{api, Error, oauth2};
+use google_taskqueue1_beta2::{api, Error, oauth2, client::chrono, FieldMask};
 
-mod client;
+
+use google_clis_common as client;
 
 use client::{InvalidOptionsError, CLIError, arg_from_str, writer_from_opts, parse_kv_arg,
           input_file_from_opts, input_mime_from_opts, FieldCursor, FieldError, CallType, UploadProtocol,
@@ -58,7 +57,7 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "get-stats" => {
-                    call = call.get_stats(arg_from_str(value.unwrap_or("false"), err, "get-stats", "boolean"));
+                    call = call.get_stats(        value.map(|v| arg_from_str(v, err, "get-stats", "boolean")).unwrap_or(false));
                 },
                 _ => {
                     let mut found = false;
@@ -307,7 +306,7 @@ where
                     call = call.tag(value.unwrap_or(""));
                 },
                 "group-by-tag" => {
-                    call = call.group_by_tag(arg_from_str(value.unwrap_or("false"), err, "group-by-tag", "boolean"));
+                    call = call.group_by_tag(        value.map(|v| arg_from_str(v, err, "group-by-tag", "boolean")).unwrap_or(false));
                 },
                 _ => {
                     let mut found = false;
@@ -1003,7 +1002,7 @@ async fn main() {
     
     let mut app = App::new("taskqueue1-beta2")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("4.0.1+20160428")
+           .version("5.0.2+20160428")
            .about("Accesses a Google App Engine Pull Task Queue over REST.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_taskqueue1_beta2_cli")
            .arg(Arg::with_name("url")

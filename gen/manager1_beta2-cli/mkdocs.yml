@@ -1,4 +1,4 @@
-site_name: manager v4.0.1+20140915
+site_name: manager v5.0.2+20140915
 site_url: http://byron.github.io/google-apis-rs/google-manager1_beta2-cli
 site_description: A complete library to interact with manager (protocol v1beta2)
 
@@ -7,16 +7,18 @@ repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/manager1_beta2-c
 docs_dir: docs
 site_dir: build_html
 
-pages:
-- ['index.md', 'Home']
-- ['deployments_delete.md', 'Deployments', 'Delete']
-- ['deployments_get.md', 'Deployments', 'Get']
-- ['deployments_insert.md', 'Deployments', 'Insert']
-- ['deployments_list.md', 'Deployments', 'List']
-- ['templates_delete.md', 'Templates', 'Delete']
-- ['templates_get.md', 'Templates', 'Get']
-- ['templates_insert.md', 'Templates', 'Insert']
-- ['templates_list.md', 'Templates', 'List']
+nav:
+- Home: 'index.md'
+- 'Deployments':
+    - 'Delete': 'deployments_delete.md'
+    - 'Get': 'deployments_get.md'
+    - 'Insert': 'deployments_insert.md'
+    - 'List': 'deployments_list.md'
+- 'Templates':
+    - 'Delete': 'templates_delete.md'
+    - 'Get': 'templates_get.md'
+    - 'Insert': 'templates_insert.md'
+    - 'List': 'templates_list.md'
 
 theme: readthedocs
 

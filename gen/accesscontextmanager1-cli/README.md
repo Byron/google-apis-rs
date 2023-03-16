@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Access Context Manager* API at revision *20220301*. The CLI is at version *4.0.1*.
+This documentation was generated from the *Access Context Manager* API at revision *20230123*. The CLI is at version *5.0.2*.
 
 ```bash
 accesscontextmanager1 [options]
@@ -37,6 +37,11 @@ accesscontextmanager1 [options]
                 access-levels-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 access-levels-replace-all <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 access-levels-test-iam-permissions <resource> (-r <kv>)... [-p <v>]... [-o <out>]
+                authorized-orgs-descs-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                authorized-orgs-descs-delete <name> [-p <v>]... [-o <out>]
+                authorized-orgs-descs-get <name> [-p <v>]... [-o <out>]
+                authorized-orgs-descs-list <parent> [-p <v>]... [-o <out>]
+                authorized-orgs-descs-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 create (-r <kv>)... [-p <v>]... [-o <out>]
                 delete <name> [-p <v>]... [-o <out>]
                 get <name> [-p <v>]... [-o <out>]

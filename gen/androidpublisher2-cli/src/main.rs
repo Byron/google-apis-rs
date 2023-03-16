@@ -3,8 +3,6 @@
 // DO NOT EDIT !
 #![allow(unused_variables, unused_imports, dead_code, unused_mut)]
 
-extern crate tokio;
-
 #[macro_use]
 extern crate clap;
 
@@ -12,9 +10,10 @@ use std::env;
 use std::io::{self, Write};
 use clap::{App, SubCommand, Arg};
 
-use google_androidpublisher2::{api, Error, oauth2};
+use google_androidpublisher2::{api, Error, oauth2, client::chrono, FieldMask};
 
-mod client;
+
+use google_clis_common as client;
 
 use client::{InvalidOptionsError, CLIError, arg_from_str, writer_from_opts, parse_kv_arg,
           input_file_from_opts, input_mime_from_opts, FieldCursor, FieldError, CallType, UploadProtocol,
@@ -685,7 +684,7 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "ack-bundle-installation-warning" => {
-                    call = call.ack_bundle_installation_warning(arg_from_str(value.unwrap_or("false"), err, "ack-bundle-installation-warning", "boolean"));
+                    call = call.ack_bundle_installation_warning(        value.map(|v| arg_from_str(v, err, "ack-bundle-installation-warning", "boolean")).unwrap_or(false));
                 },
                 _ => {
                     let mut found = false;
@@ -2808,7 +2807,7 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "auto-convert-missing-prices" => {
-                    call = call.auto_convert_missing_prices(arg_from_str(value.unwrap_or("false"), err, "auto-convert-missing-prices", "boolean"));
+                    call = call.auto_convert_missing_prices(        value.map(|v| arg_from_str(v, err, "auto-convert-missing-prices", "boolean")).unwrap_or(false));
                 },
                 _ => {
                     let mut found = false;
@@ -2867,10 +2866,10 @@ where
                     call = call.token(value.unwrap_or(""));
                 },
                 "start-index" => {
-                    call = call.start_index(arg_from_str(value.unwrap_or("-0"), err, "start-index", "integer"));
+                    call = call.start_index(        value.map(|v| arg_from_str(v, err, "start-index", "uint32")).unwrap_or(0));
                 },
                 "max-results" => {
-                    call = call.max_results(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
+                    call = call.max_results(        value.map(|v| arg_from_str(v, err, "max-results", "uint32")).unwrap_or(0));
                 },
                 _ => {
                     let mut found = false;
@@ -2968,7 +2967,7 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "auto-convert-missing-prices" => {
-                    call = call.auto_convert_missing_prices(arg_from_str(value.unwrap_or("false"), err, "auto-convert-missing-prices", "boolean"));
+                    call = call.auto_convert_missing_prices(        value.map(|v| arg_from_str(v, err, "auto-convert-missing-prices", "boolean")).unwrap_or(false));
                 },
                 _ => {
                     let mut found = false;
@@ -3066,7 +3065,7 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "auto-convert-missing-prices" => {
-                    call = call.auto_convert_missing_prices(arg_from_str(value.unwrap_or("false"), err, "auto-convert-missing-prices", "boolean"));
+                    call = call.auto_convert_missing_prices(        value.map(|v| arg_from_str(v, err, "auto-convert-missing-prices", "boolean")).unwrap_or(false));
                 },
                 _ => {
                     let mut found = false;
@@ -3122,7 +3121,7 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "revoke" => {
-                    call = call.revoke(arg_from_str(value.unwrap_or("false"), err, "revoke", "boolean"));
+                    call = call.revoke(        value.map(|v| arg_from_str(v, err, "revoke", "boolean")).unwrap_or(false));
                 },
                 _ => {
                     let mut found = false;
@@ -3495,16 +3494,16 @@ where
                     call = call.token(value.unwrap_or(""));
                 },
                 "start-time" => {
-                    call = call.start_time(value.unwrap_or(""));
+                    call = call.start_time(        value.map(|v| arg_from_str(v, err, "start-time", "int64")).unwrap_or(-0));
                 },
                 "start-index" => {
-                    call = call.start_index(arg_from_str(value.unwrap_or("-0"), err, "start-index", "integer"));
+                    call = call.start_index(        value.map(|v| arg_from_str(v, err, "start-index", "uint32")).unwrap_or(0));
                 },
                 "max-results" => {
-                    call = call.max_results(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
+                    call = call.max_results(        value.map(|v| arg_from_str(v, err, "max-results", "uint32")).unwrap_or(0));
                 },
                 "end-time" => {
-                    call = call.end_time(value.unwrap_or(""));
+                    call = call.end_time(        value.map(|v| arg_from_str(v, err, "end-time", "int64")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -3622,10 +3621,10 @@ where
                     call = call.token(value.unwrap_or(""));
                 },
                 "start-index" => {
-                    call = call.start_index(arg_from_str(value.unwrap_or("-0"), err, "start-index", "integer"));
+                    call = call.start_index(        value.map(|v| arg_from_str(v, err, "start-index", "uint32")).unwrap_or(0));
                 },
                 "max-results" => {
-                    call = call.max_results(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
+                    call = call.max_results(        value.map(|v| arg_from_str(v, err, "max-results", "uint32")).unwrap_or(0));
                 },
                 _ => {
                     let mut found = false;
@@ -6010,7 +6009,7 @@ async fn main() {
     
     let mut app = App::new("androidpublisher2")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("4.0.1+20200331")
+           .version("5.0.2+20200331")
            .about("Accesses Android application developers' Google Play accounts.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_androidpublisher2_cli")
            .arg(Arg::with_name("url")

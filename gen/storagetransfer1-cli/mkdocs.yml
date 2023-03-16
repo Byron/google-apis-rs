@@ -1,4 +1,4 @@
-site_name: storagetransfer v4.0.1+20220223
+site_name: storagetransfer v5.0.2+20230111
 site_url: http://byron.github.io/google-apis-rs/google-storagetransfer1-cli
 site_description: A complete library to interact with storagetransfer (protocol v1)
 
@@ -7,24 +7,29 @@ repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/storagetransfer1
 docs_dir: docs
 site_dir: build_html
 
-pages:
-- ['index.md', 'Home']
-- ['google-service-accounts_get.md', 'Google Service Accounts', 'Get']
-- ['projects_agent-pools-create.md', 'Projects', 'Agent Pools Create']
-- ['projects_agent-pools-delete.md', 'Projects', 'Agent Pools Delete']
-- ['projects_agent-pools-get.md', 'Projects', 'Agent Pools Get']
-- ['projects_agent-pools-list.md', 'Projects', 'Agent Pools List']
-- ['projects_agent-pools-patch.md', 'Projects', 'Agent Pools Patch']
-- ['transfer-jobs_create.md', 'Transfer Jobs', 'Create']
-- ['transfer-jobs_get.md', 'Transfer Jobs', 'Get']
-- ['transfer-jobs_list.md', 'Transfer Jobs', 'List']
-- ['transfer-jobs_patch.md', 'Transfer Jobs', 'Patch']
-- ['transfer-jobs_run.md', 'Transfer Jobs', 'Run']
-- ['transfer-operations_cancel.md', 'Transfer Operations', 'Cancel']
-- ['transfer-operations_get.md', 'Transfer Operations', 'Get']
-- ['transfer-operations_list.md', 'Transfer Operations', 'List']
-- ['transfer-operations_pause.md', 'Transfer Operations', 'Pause']
-- ['transfer-operations_resume.md', 'Transfer Operations', 'Resume']
+nav:
+- Home: 'index.md'
+- 'Google Service Accounts':
+    - 'Get': 'google-service-accounts_get.md'
+- 'Projects':
+    - 'Agent Pools Create': 'projects_agent-pools-create.md'
+    - 'Agent Pools Delete': 'projects_agent-pools-delete.md'
+    - 'Agent Pools Get': 'projects_agent-pools-get.md'
+    - 'Agent Pools List': 'projects_agent-pools-list.md'
+    - 'Agent Pools Patch': 'projects_agent-pools-patch.md'
+- 'Transfer Jobs':
+    - 'Create': 'transfer-jobs_create.md'
+    - 'Delete': 'transfer-jobs_delete.md'
+    - 'Get': 'transfer-jobs_get.md'
+    - 'List': 'transfer-jobs_list.md'
+    - 'Patch': 'transfer-jobs_patch.md'
+    - 'Run': 'transfer-jobs_run.md'
+- 'Transfer Operations':
+    - 'Cancel': 'transfer-operations_cancel.md'
+    - 'Get': 'transfer-operations_get.md'
+    - 'List': 'transfer-operations_list.md'
+    - 'Pause': 'transfer-operations_pause.md'
+    - 'Resume': 'transfer-operations_resume.md'
 
 theme: readthedocs
 

@@ -3,8 +3,6 @@
 // DO NOT EDIT !
 #![allow(unused_variables, unused_imports, dead_code, unused_mut)]
 
-extern crate tokio;
-
 #[macro_use]
 extern crate clap;
 
@@ -12,9 +10,10 @@ use std::env;
 use std::io::{self, Write};
 use clap::{App, SubCommand, Arg};
 
-use google_recaptchaenterprise1::{api, Error, oauth2};
+use google_recaptchaenterprise1::{api, Error, oauth2, client::chrono, FieldMask};
 
-mod client;
+
+use google_clis_common as client;
 
 use client::{InvalidOptionsError, CLIError, arg_from_str, writer_from_opts, parse_kv_arg,
           input_file_from_opts, input_mime_from_opts, FieldCursor, FieldError, CallType, UploadProtocol,
@@ -162,6 +161,9 @@ where
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
                     "account-defender-assessment.labels" => Some(("accountDefenderAssessment.labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "account-verification.language-code" => Some(("accountVerification.languageCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "account-verification.latest-verification-result" => Some(("accountVerification.latestVerificationResult", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "account-verification.username" => Some(("accountVerification.username", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "event.expected-action" => Some(("event.expectedAction", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "event.hashed-account-id" => Some(("event.hashedAccountId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "event.site-key" => Some(("event.siteKey", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -169,15 +171,21 @@ where
                     "event.user-agent" => Some(("event.userAgent", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "event.user-ip-address" => Some(("event.userIpAddress", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "private-password-leak-verification.encrypted-leak-match-prefixes" => Some(("privatePasswordLeakVerification.encryptedLeakMatchPrefixes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "private-password-leak-verification.encrypted-user-credentials-hash" => Some(("privatePasswordLeakVerification.encryptedUserCredentialsHash", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "private-password-leak-verification.lookup-hash-prefix" => Some(("privatePasswordLeakVerification.lookupHashPrefix", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "private-password-leak-verification.reencrypted-user-credentials-hash" => Some(("privatePasswordLeakVerification.reencryptedUserCredentialsHash", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "risk-analysis.reasons" => Some(("riskAnalysis.reasons", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "risk-analysis.score" => Some(("riskAnalysis.score", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "token-properties.action" => Some(("tokenProperties.action", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "token-properties.android-package-name" => Some(("tokenProperties.androidPackageName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "token-properties.create-time" => Some(("tokenProperties.createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "token-properties.hostname" => Some(("tokenProperties.hostname", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "token-properties.invalid-reason" => Some(("tokenProperties.invalidReason", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "token-properties.ios-bundle-id" => Some(("tokenProperties.iosBundleId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "token-properties.valid" => Some(("tokenProperties.valid", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account-defender-assessment", "action", "create-time", "event", "expected-action", "hashed-account-id", "hostname", "invalid-reason", "labels", "name", "reasons", "risk-analysis", "score", "site-key", "token", "token-properties", "user-agent", "user-ip-address", "valid"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account-defender-assessment", "account-verification", "action", "android-package-name", "create-time", "encrypted-leak-match-prefixes", "encrypted-user-credentials-hash", "event", "expected-action", "hashed-account-id", "hostname", "invalid-reason", "ios-bundle-id", "labels", "language-code", "latest-verification-result", "lookup-hash-prefix", "name", "private-password-leak-verification", "reasons", "reencrypted-user-credentials-hash", "risk-analysis", "score", "site-key", "token", "token-properties", "user-agent", "user-ip-address", "username", "valid"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -504,7 +512,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -576,8 +584,9 @@ where
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
+                    "skip-billing-check" => Some(("skipBillingCheck", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec![]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["skip-billing-check"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -693,7 +702,7 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "update-mask" => {
-                    call = call.update_mask(value.unwrap_or(""));
+                    call = call.update_mask(        value.map(|v| arg_from_str(v, err, "update-mask", "google-fieldmask")).unwrap_or(FieldMask::default()));
                 },
                 _ => {
                     let mut found = false;
@@ -709,6 +718,58 @@ where
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
                                                                            v.extend(["update-mask"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_keys_retrieve_legacy_secret_key(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.projects().keys_retrieve_legacy_secret_key(opt.value_of("key").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -839,7 +900,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -898,7 +959,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -980,6 +1041,9 @@ where
                     },
                     ("keys-patch", Some(opt)) => {
                         call_result = self._projects_keys_patch(opt, dry_run, &mut err).await;
+                    },
+                    ("keys-retrieve-legacy-secret-key", Some(opt)) => {
+                        call_result = self._projects_keys_retrieve_legacy_secret_key(opt, dry_run, &mut err).await;
                     },
                     ("relatedaccountgroupmemberships-search", Some(opt)) => {
                         call_result = self._projects_relatedaccountgroupmemberships_search(opt, dry_run, &mut err).await;
@@ -1069,7 +1133,7 @@ where
 async fn main() {
     let mut exit_status = 0i32;
     let arg_data = [
-        ("projects", "methods: 'assessments-annotate', 'assessments-create', 'keys-create', 'keys-delete', 'keys-get', 'keys-get-metrics', 'keys-list', 'keys-migrate', 'keys-patch', 'relatedaccountgroupmemberships-search', 'relatedaccountgroups-list' and 'relatedaccountgroups-memberships-list'", vec![
+        ("projects", "methods: 'assessments-annotate', 'assessments-create', 'keys-create', 'keys-delete', 'keys-get', 'keys-get-metrics', 'keys-list', 'keys-migrate', 'keys-patch', 'keys-retrieve-legacy-secret-key', 'relatedaccountgroupmemberships-search', 'relatedaccountgroups-list' and 'relatedaccountgroups-memberships-list'", vec![
             ("assessments-annotate",
                     Some(r##"Annotates a previously created Assessment to provide additional information on whether the event turned out to be authentic or fraudulent."##),
                     "Details at http://byron.github.io/google-apis-rs/google_recaptchaenterprise1_cli/projects_assessments-annotate",
@@ -1298,13 +1362,35 @@ async fn main() {
                      Some(false),
                      Some(false)),
                   ]),
+            ("keys-retrieve-legacy-secret-key",
+                    Some(r##"Returns the secret key related to the specified public key. You must use the legacy secret key only in a 3rd party integration with legacy reCAPTCHA."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_recaptchaenterprise1_cli/projects_keys-retrieve-legacy-secret-key",
+                  vec![
+                    (Some(r##"key"##),
+                     None,
+                     Some(r##"Required. The public key name linked to the requested secret key in the format "projects/{project}/keys/{key}"."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
             ("relatedaccountgroupmemberships-search",
                     Some(r##"Search group memberships related to a given account."##),
                     "Details at http://byron.github.io/google-apis-rs/google_recaptchaenterprise1_cli/projects_relatedaccountgroupmemberships-search",
                   vec![
                     (Some(r##"project"##),
                      None,
-                     Some(r##"Required. The name of the project to search related account group memberships from, in the format "projects/{project}"."##),
+                     Some(r##"Required. The name of the project to search related account group memberships from. Specify the project name in the following format: "projects/{project}"."##),
                      Some(true),
                      Some(false)),
         
@@ -1349,7 +1435,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("relatedaccountgroups-memberships-list",
-                    Some(r##"Get the memberships in a group of related accounts."##),
+                    Some(r##"Get memberships in a group of related accounts."##),
                     "Details at http://byron.github.io/google-apis-rs/google_recaptchaenterprise1_cli/projects_relatedaccountgroups-memberships-list",
                   vec![
                     (Some(r##"parent"##),
@@ -1376,8 +1462,8 @@ async fn main() {
     
     let mut app = App::new("recaptchaenterprise1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("4.0.1+20220226")
-           .about("")
+           .version("5.0.2+20230115")
+           .about("Help protect your website from fraudulent activity, spam, and abuse without creating friction.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_recaptchaenterprise1_cli")
            .arg(Arg::with_name("url")
                    .long("scope")

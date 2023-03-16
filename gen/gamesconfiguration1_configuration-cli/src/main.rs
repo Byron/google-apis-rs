@@ -3,8 +3,6 @@
 // DO NOT EDIT !
 #![allow(unused_variables, unused_imports, dead_code, unused_mut)]
 
-extern crate tokio;
-
 #[macro_use]
 extern crate clap;
 
@@ -12,9 +10,10 @@ use std::env;
 use std::io::{self, Write};
 use clap::{App, SubCommand, Arg};
 
-use google_gamesconfiguration1_configuration::{api, Error, oauth2};
+use google_gamesconfiguration1_configuration::{api, Error, oauth2, client::chrono, FieldMask};
 
-mod client;
+
+use google_clis_common as client;
 
 use client::{InvalidOptionsError, CLIError, arg_from_str, writer_from_opts, parse_kv_arg,
           input_file_from_opts, input_mime_from_opts, FieldCursor, FieldError, CallType, UploadProtocol,
@@ -259,7 +258,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "max-results" => {
-                    call = call.max_results(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
+                    call = call.max_results(        value.map(|v| arg_from_str(v, err, "max-results", "int32")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -397,61 +396,6 @@ where
             match match protocol {
                 CallType::Standard => call.doit().await,
                 _ => unreachable!()
-            } {
-                Err(api_err) => Err(DoitError::ApiError(api_err)),
-                Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
-                    remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
-                    ostream.flush().unwrap();
-                    Ok(())
-                }
-            }
-        }
-    }
-
-    async fn _image_configurations_upload(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        let mut call = self.hub.image_configurations().upload(opt.value_of("resource-id").unwrap_or(""), opt.value_of("image-type").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-            let (key, value) = parse_kv_arg(&*parg, err, false);
-            match key {
-                _ => {
-                    let mut found = false;
-                    for param in &self.gp {
-                        if key == *param {
-                            found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
-                            break;
-                        }
-                    }
-                    if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v } ));
-                    }
-                }
-            }
-        }
-        let vals = opt.values_of("mode").unwrap().collect::<Vec<&str>>();
-        let protocol = calltype_from_str(vals[0], ["simple"].iter().map(|&v| v.to_string()).collect(), err);
-        let mut input_file = input_file_from_opts(vals[1], err);
-        let mime_type = input_mime_from_opts(opt.value_of("mime").unwrap_or("application/octet-stream"), err);
-        if dry_run {
-            Ok(())
-        } else {
-            assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-                call = call.add_scope(scope);
-            }
-            let mut ostream = match writer_from_opts(opt.value_of("out")) {
-                Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
-            };
-            match match protocol {
-                CallType::Upload(UploadProtocol::Simple) => call.upload(input_file.unwrap(), mime_type.unwrap()).await,
-                CallType::Standard => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
@@ -687,7 +631,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "max-results" => {
-                    call = call.max_results(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
+                    call = call.max_results(        value.map(|v| arg_from_str(v, err, "max-results", "int32")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -880,17 +824,6 @@ where
                     }
                 }
             },
-            ("image-configurations", Some(opt)) => {
-                match opt.subcommand() {
-                    ("upload", Some(opt)) => {
-                        call_result = self._image_configurations_upload(opt, dry_run, &mut err).await;
-                    },
-                    _ => {
-                        err.issues.push(CLIError::MissingMethodError("image-configurations".to_string()));
-                        writeln!(io::stderr(), "{}\n", opt.usage()).ok();
-                    }
-                }
-            },
             ("leaderboard-configurations", Some(opt)) => {
                 match opt.subcommand() {
                     ("delete", Some(opt)) => {
@@ -986,7 +919,6 @@ where
 #[tokio::main]
 async fn main() {
     let mut exit_status = 0i32;
-    let upload_value_names = ["mode", "file"];
     let arg_data = [
         ("achievement-configurations", "methods: 'delete', 'get', 'insert', 'list' and 'update'", vec![
             ("delete",
@@ -1090,43 +1022,6 @@ async fn main() {
                     (Some(r##"kv"##),
                      Some(r##"r"##),
                      Some(r##"Set various fields of the request structure, matching the key=value form"##),
-                     Some(true),
-                     Some(true)),
-        
-                    (Some(r##"v"##),
-                     Some(r##"p"##),
-                     Some(r##"Set various optional parameters, matching the key=value form"##),
-                     Some(false),
-                     Some(true)),
-        
-                    (Some(r##"out"##),
-                     Some(r##"o"##),
-                     Some(r##"Specify the file into which to write the program's output"##),
-                     Some(false),
-                     Some(false)),
-                  ]),
-            ]),
-        
-        ("image-configurations", "methods: 'upload'", vec![
-            ("upload",
-                    Some(r##"Uploads an image for a resource with the given ID and image type."##),
-                    "Details at http://byron.github.io/google-apis-rs/google_gamesconfiguration1_configuration_cli/image-configurations_upload",
-                  vec![
-                    (Some(r##"resource-id"##),
-                     None,
-                     Some(r##"The ID of the resource used by this method."##),
-                     Some(true),
-                     Some(false)),
-        
-                    (Some(r##"image-type"##),
-                     None,
-                     Some(r##"Selects which image in a resource for this method."##),
-                     Some(true),
-                     Some(false)),
-        
-                    (Some(r##"mode"##),
-                     Some(r##"u"##),
-                     Some(r##"Specify the upload protocol (simple) and the file to upload"##),
                      Some(true),
                      Some(true)),
         
@@ -1267,7 +1162,7 @@ async fn main() {
     
     let mut app = App::new("gamesconfiguration1-configuration")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("4.0.1+20220217")
+           .version("5.0.2+20230112")
            .about("The Google Play Game Services Publishing API allows developers to configure their games in Game Services.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_gamesconfiguration1_configuration_cli")
            .arg(Arg::with_name("url")
@@ -1319,17 +1214,6 @@ async fn main() {
                        }
                        if let &Some(multi) = multi {
                            arg = arg.multiple(multi);
-                       }
-                       if arg_name_str == "mode" {
-                           arg = arg.number_of_values(2);
-                           arg = arg.value_names(&upload_value_names);
-           
-                           scmd = scmd.arg(Arg::with_name("mime")
-                                               .short("m")
-                                               .requires("mode")
-                                               .required(false)
-                                               .help("The file's mime time, like 'application/octet-stream'")
-                                               .takes_value(true));
                        }
                        scmd = scmd.arg(arg);
                    }

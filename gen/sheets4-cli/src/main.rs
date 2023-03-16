@@ -3,8 +3,6 @@
 // DO NOT EDIT !
 #![allow(unused_variables, unused_imports, dead_code, unused_mut)]
 
-extern crate tokio;
-
 #[macro_use]
 extern crate clap;
 
@@ -12,9 +10,10 @@ use std::env;
 use std::io::{self, Write};
 use clap::{App, SubCommand, Arg};
 
-use google_sheets4::{api, Error, oauth2};
+use google_sheets4::{api, Error, oauth2, client::chrono, FieldMask};
 
-mod client;
+
+use google_clis_common as client;
 
 use client::{InvalidOptionsError, CLIError, arg_from_str, writer_from_opts, parse_kv_arg,
           input_file_from_opts, input_mime_from_opts, FieldCursor, FieldError, CallType, UploadProtocol,
@@ -460,7 +459,7 @@ where
                     call = call.add_ranges(value.unwrap_or(""));
                 },
                 "include-grid-data" => {
-                    call = call.include_grid_data(arg_from_str(value.unwrap_or("false"), err, "include-grid-data", "boolean"));
+                    call = call.include_grid_data(        value.map(|v| arg_from_str(v, err, "include-grid-data", "boolean")).unwrap_or(false));
                 },
                 _ => {
                     let mut found = false;
@@ -733,7 +732,7 @@ where
                     call = call.insert_data_option(value.unwrap_or(""));
                 },
                 "include-values-in-response" => {
-                    call = call.include_values_in_response(arg_from_str(value.unwrap_or("false"), err, "include-values-in-response", "boolean"));
+                    call = call.include_values_in_response(        value.map(|v| arg_from_str(v, err, "include-values-in-response", "boolean")).unwrap_or(false));
                 },
                 _ => {
                     let mut found = false;
@@ -1475,7 +1474,7 @@ where
                     call = call.response_date_time_render_option(value.unwrap_or(""));
                 },
                 "include-values-in-response" => {
-                    call = call.include_values_in_response(arg_from_str(value.unwrap_or("false"), err, "include-values-in-response", "boolean"));
+                    call = call.include_values_in_response(        value.map(|v| arg_from_str(v, err, "include-values-in-response", "boolean")).unwrap_or(false));
                 },
                 _ => {
                     let mut found = false;
@@ -1769,7 +1768,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("get",
-                    Some(r##"Returns the spreadsheet at the given ID. The caller must specify the spreadsheet ID. By default, data within grids will not be returned. You can include grid data one of two ways: * Specify a field mask listing your desired fields using the `fields` URL parameter in HTTP * Set the includeGridData URL parameter to true. If a field mask is set, the `includeGridData` parameter is ignored For large spreadsheets, it is recommended to retrieve only the specific fields of the spreadsheet that you want. To retrieve only subsets of the spreadsheet, use the ranges URL parameter. Multiple ranges can be specified. Limiting the range will return only the portions of the spreadsheet that intersect the requested ranges. Ranges are specified using A1 notation."##),
+                    Some(r##"Returns the spreadsheet at the given ID. The caller must specify the spreadsheet ID. By default, data within grids is not returned. You can include grid data in one of 2 ways: * Specify a [field mask](https://developers.google.com/sheets/api/guides/field-masks) listing your desired fields using the `fields` URL parameter in HTTP * Set the includeGridData URL parameter to true. If a field mask is set, the `includeGridData` parameter is ignored For large spreadsheets, as a best practice, retrieve only the specific spreadsheet fields that you want. To retrieve only subsets of spreadsheet data, use the ranges URL parameter. Ranges are specified using [A1 notation](/sheets/api/guides/concepts#cell). You can define a single cell (for example, `A1`) or multiple cells (for example, `A1:D5`). You can also get cells from other sheets within the same spreadsheet (for example, `Sheet2!A1:C4`) or retrieve multiple ranges at once (for example, `?ranges=A1:D5&ranges=Sheet2!A1:C4`). Limiting the range returns only the portions of the spreadsheet that intersect the requested ranges."##),
                     "Details at http://byron.github.io/google-apis-rs/google_sheets4_cli/spreadsheets_get",
                   vec![
                     (Some(r##"spreadsheet-id"##),
@@ -1791,7 +1790,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("get-by-data-filter",
-                    Some(r##"Returns the spreadsheet at the given ID. The caller must specify the spreadsheet ID. This method differs from GetSpreadsheet in that it allows selecting which subsets of spreadsheet data to return by specifying a dataFilters parameter. Multiple DataFilters can be specified. Specifying one or more data filters will return the portions of the spreadsheet that intersect ranges matched by any of the filters. By default, data within grids will not be returned. You can include grid data one of two ways: * Specify a field mask listing your desired fields using the `fields` URL parameter in HTTP * Set the includeGridData parameter to true. If a field mask is set, the `includeGridData` parameter is ignored For large spreadsheets, it is recommended to retrieve only the specific fields of the spreadsheet that you want."##),
+                    Some(r##"Returns the spreadsheet at the given ID. The caller must specify the spreadsheet ID. This method differs from GetSpreadsheet in that it allows selecting which subsets of spreadsheet data to return by specifying a dataFilters parameter. Multiple DataFilters can be specified. Specifying one or more data filters returns the portions of the spreadsheet that intersect ranges matched by any of the filters. By default, data within grids is not returned. You can include grid data one of 2 ways: * Specify a [field mask](https://developers.google.com/sheets/api/guides/field-masks) listing your desired fields using the `fields` URL parameter in HTTP * Set the includeGridData parameter to true. If a field mask is set, the `includeGridData` parameter is ignored For large spreadsheets, as a best practice, retrieve only the specific spreadsheet fields that you want."##),
                     "Details at http://byron.github.io/google-apis-rs/google_sheets4_cli/spreadsheets_get-by-data-filter",
                   vec![
                     (Some(r##"spreadsheet-id"##),
@@ -1864,7 +1863,7 @@ async fn main() {
         
                     (Some(r##"range"##),
                      None,
-                     Some(r##"The A1 notation of a range to search for a logical table of data. Values are appended after the last row of the table."##),
+                     Some(r##"The [A1 notation](/sheets/api/guides/concepts#cell) of a range to search for a logical table of data. Values are appended after the last row of the table."##),
                      Some(true),
                      Some(false)),
         
@@ -1887,7 +1886,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("values-batch-clear",
-                    Some(r##"Clears one or more ranges of values from a spreadsheet. The caller must specify the spreadsheet ID and one or more ranges. Only values are cleared -- all other properties of the cell (such as formatting, data validation, etc..) are kept."##),
+                    Some(r##"Clears one or more ranges of values from a spreadsheet. The caller must specify the spreadsheet ID and one or more ranges. Only values are cleared -- all other properties of the cell (such as formatting and data validation) are kept."##),
                     "Details at http://byron.github.io/google-apis-rs/google_sheets4_cli/spreadsheets_values-batch-clear",
                   vec![
                     (Some(r##"spreadsheet-id"##),
@@ -2060,7 +2059,7 @@ async fn main() {
         
                     (Some(r##"range"##),
                      None,
-                     Some(r##"The A1 notation or R1C1 notation of the values to clear."##),
+                     Some(r##"The [A1 notation or R1C1 notation](/sheets/api/guides/concepts#cell) of the values to clear."##),
                      Some(true),
                      Some(false)),
         
@@ -2094,7 +2093,7 @@ async fn main() {
         
                     (Some(r##"range"##),
                      None,
-                     Some(r##"The A1 notation or R1C1 notation of the range to retrieve values from."##),
+                     Some(r##"The [A1 notation or R1C1 notation](/sheets/api/guides/concepts#cell) of the range to retrieve values from."##),
                      Some(true),
                      Some(false)),
         
@@ -2122,7 +2121,7 @@ async fn main() {
         
                     (Some(r##"range"##),
                      None,
-                     Some(r##"The A1 notation of the values to update."##),
+                     Some(r##"The [A1 notation](/sheets/api/guides/concepts#cell) of the values to update."##),
                      Some(true),
                      Some(false)),
         
@@ -2150,7 +2149,7 @@ async fn main() {
     
     let mut app = App::new("sheets4")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("4.0.1+20220221")
+           .version("5.0.2+20230119")
            .about("Reads and writes Google Sheets.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_sheets4_cli")
            .arg(Arg::with_name("url")

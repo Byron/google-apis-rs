@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Data Fusion* API at revision *20211028*. The CLI is at version *4.0.1*.
+This documentation was generated from the *Data Fusion* API at revision *20221213*. The CLI is at version *5.0.2*.
 
 ```bash
 datafusion1 [options]
@@ -33,6 +33,9 @@ datafusion1 [options]
                 locations-get <name> [-p <v>]... [-o <out>]
                 locations-instances-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-instances-delete <name> [-p <v>]... [-o <out>]
+                locations-instances-dns-peerings-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-instances-dns-peerings-delete <name> [-p <v>]... [-o <out>]
+                locations-instances-dns-peerings-list <parent> [-p <v>]... [-o <out>]
                 locations-instances-get <name> [-p <v>]... [-o <out>]
                 locations-instances-get-iam-policy <resource> [-p <v>]... [-o <out>]
                 locations-instances-list <parent> [-p <v>]... [-o <out>]

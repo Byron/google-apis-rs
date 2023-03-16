@@ -4,12 +4,12 @@
 [package]
 
 name = "google-logging2_beta1"
-version = "5.0.2-beta-1+20190325"
+version = "5.0.2+20190325"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Logging (protocol v2beta1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/logging2_beta1"
 homepage = "https://cloud.google.com/logging/docs/"
-documentation = "https://docs.rs/google-logging2_beta1/5.0.2-beta-1+20190325"
+documentation = "https://docs.rs/google-logging2_beta1/5.0.2+20190325"
 license = "MIT"
 keywords = ["logging", "google", "protocol", "web", "api"]
 autobins = false

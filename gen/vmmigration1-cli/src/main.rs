@@ -3,8 +3,6 @@
 // DO NOT EDIT !
 #![allow(unused_variables, unused_imports, dead_code, unused_mut)]
 
-extern crate tokio;
-
 #[macro_use]
 extern crate clap;
 
@@ -12,9 +10,10 @@ use std::env;
 use std::io::{self, Write};
 use clap::{App, SubCommand, Arg};
 
-use google_vmmigration1::{api, Error, oauth2};
+use google_vmmigration1::{api, Error, oauth2, client::chrono, FieldMask};
 
-mod client;
+
+use google_clis_common as client;
 
 use client::{InvalidOptionsError, CLIError, arg_from_str, writer_from_opts, parse_kv_arg,
           input_file_from_opts, input_mime_from_opts, FieldCursor, FieldError, CallType, UploadProtocol,
@@ -402,7 +401,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 "order-by" => {
                     call = call.order_by(value.unwrap_or(""));
@@ -501,7 +500,7 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "update-mask" => {
-                    call = call.update_mask(value.unwrap_or(""));
+                    call = call.update_mask(        value.map(|v| arg_from_str(v, err, "update-mask", "google-fieldmask")).unwrap_or(FieldMask::default()));
                 },
                 "request-id" => {
                     call = call.request_id(value.unwrap_or(""));
@@ -648,7 +647,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 "filter" => {
                     call = call.filter(value.unwrap_or(""));
@@ -898,7 +897,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 "filter" => {
                     call = call.filter(value.unwrap_or(""));
@@ -973,6 +972,15 @@ where
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
+                    "aws.access-key-creds.access-key-id" => Some(("aws.accessKeyCreds.accessKeyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "aws.access-key-creds.secret-access-key" => Some(("aws.accessKeyCreds.secretAccessKey", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "aws.aws-region" => Some(("aws.awsRegion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "aws.error.code" => Some(("aws.error.code", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "aws.error.message" => Some(("aws.error.message", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "aws.inventory-security-group-names" => Some(("aws.inventorySecurityGroupNames", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "aws.migration-resources-user-tags" => Some(("aws.migrationResourcesUserTags", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "aws.public-ip" => Some(("aws.publicIp", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "aws.state" => Some(("aws.state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
@@ -983,7 +991,7 @@ where
                     "vmware.username" => Some(("vmware.username", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "vmware.vcenter-ip" => Some(("vmware.vcenterIp", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["create-time", "description", "labels", "name", "password", "thumbprint", "update-time", "username", "vcenter-ip", "vmware"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["access-key-creds", "access-key-id", "aws", "aws-region", "code", "create-time", "description", "error", "inventory-security-group-names", "labels", "message", "migration-resources-user-tags", "name", "password", "public-ip", "secret-access-key", "state", "thumbprint", "update-time", "username", "vcenter-ip", "vmware"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1286,7 +1294,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 "order-by" => {
                     call = call.order_by(value.unwrap_or(""));
@@ -1488,8 +1496,14 @@ where
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
+                "page-token" => {
+                    call = call.page_token(value.unwrap_or(""));
+                },
+                "page-size" => {
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
+                },
                 "force-refresh" => {
-                    call = call.force_refresh(arg_from_str(value.unwrap_or("false"), err, "force-refresh", "boolean"));
+                    call = call.force_refresh(        value.map(|v| arg_from_str(v, err, "force-refresh", "boolean")).unwrap_or(false));
                 },
                 _ => {
                     let mut found = false;
@@ -1504,7 +1518,7 @@ where
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["force-refresh"].iter().map(|v|*v));
+                                                                           v.extend(["force-refresh", "page-size", "page-token"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -1600,7 +1614,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 "order-by" => {
                     call = call.order_by(value.unwrap_or(""));
@@ -1770,6 +1784,7 @@ where
                     "compute-engine-target-details.compute-scheduling.on-host-maintenance" => Some(("computeEngineTargetDetails.computeScheduling.onHostMaintenance", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "compute-engine-target-details.compute-scheduling.restart-type" => Some(("computeEngineTargetDetails.computeScheduling.restartType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "compute-engine-target-details.disk-type" => Some(("computeEngineTargetDetails.diskType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "compute-engine-target-details.hostname" => Some(("computeEngineTargetDetails.hostname", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "compute-engine-target-details.labels" => Some(("computeEngineTargetDetails.labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "compute-engine-target-details.license-type" => Some(("computeEngineTargetDetails.licenseType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "compute-engine-target-details.machine-type" => Some(("computeEngineTargetDetails.machineType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -1782,13 +1797,14 @@ where
                     "compute-engine-target-details.vm-name" => Some(("computeEngineTargetDetails.vmName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "compute-engine-target-details.zone" => Some(("computeEngineTargetDetails.zone", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "end-time" => Some(("endTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "error.code" => Some(("error.code", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "error.message" => Some(("error.message", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "state" => Some(("state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "state-time" => Some(("stateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["additional-licenses", "applied-license", "boot-option", "code", "compute-engine-target-details", "compute-scheduling", "create-time", "disk-type", "error", "labels", "license-type", "machine-type", "machine-type-series", "message", "metadata", "min-node-cpus", "name", "network-tags", "on-host-maintenance", "os-license", "project", "restart-type", "secure-boot", "service-account", "state", "state-time", "type", "vm-name", "zone"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["additional-licenses", "applied-license", "boot-option", "code", "compute-engine-target-details", "compute-scheduling", "create-time", "disk-type", "end-time", "error", "hostname", "labels", "license-type", "machine-type", "machine-type-series", "message", "metadata", "min-node-cpus", "name", "network-tags", "on-host-maintenance", "os-license", "project", "restart-type", "secure-boot", "service-account", "state", "state-time", "type", "vm-name", "zone"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1917,7 +1933,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 "order-by" => {
                     call = call.order_by(value.unwrap_or(""));
@@ -1995,6 +2011,8 @@ where
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
+                    "aws-source-vm-details.committed-storage-bytes" => Some(("awsSourceVmDetails.committedStorageBytes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "aws-source-vm-details.firmware" => Some(("awsSourceVmDetails.firmware", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "compute-engine-target-defaults.additional-licenses" => Some(("computeEngineTargetDefaults.additionalLicenses", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "compute-engine-target-defaults.applied-license.os-license" => Some(("computeEngineTargetDefaults.appliedLicense.osLicense", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "compute-engine-target-defaults.applied-license.type" => Some(("computeEngineTargetDefaults.appliedLicense.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -2003,6 +2021,7 @@ where
                     "compute-engine-target-defaults.compute-scheduling.on-host-maintenance" => Some(("computeEngineTargetDefaults.computeScheduling.onHostMaintenance", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "compute-engine-target-defaults.compute-scheduling.restart-type" => Some(("computeEngineTargetDefaults.computeScheduling.restartType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "compute-engine-target-defaults.disk-type" => Some(("computeEngineTargetDefaults.diskType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "compute-engine-target-defaults.hostname" => Some(("computeEngineTargetDefaults.hostname", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "compute-engine-target-defaults.labels" => Some(("computeEngineTargetDefaults.labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "compute-engine-target-defaults.license-type" => Some(("computeEngineTargetDefaults.licenseType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "compute-engine-target-defaults.machine-type" => Some(("computeEngineTargetDefaults.machineType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -2015,8 +2034,15 @@ where
                     "compute-engine-target-defaults.vm-name" => Some(("computeEngineTargetDefaults.vmName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "compute-engine-target-defaults.zone" => Some(("computeEngineTargetDefaults.zone", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "current-sync-info.cycle-number" => Some(("currentSyncInfo.cycleNumber", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "current-sync-info.end-time" => Some(("currentSyncInfo.endTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "current-sync-info.error.code" => Some(("currentSyncInfo.error.code", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "current-sync-info.error.message" => Some(("currentSyncInfo.error.message", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "current-sync-info.name" => Some(("currentSyncInfo.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "current-sync-info.progress-percent" => Some(("currentSyncInfo.progressPercent", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "current-sync-info.start-time" => Some(("currentSyncInfo.startTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "current-sync-info.state" => Some(("currentSyncInfo.state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "current-sync-info.total-pause-duration" => Some(("currentSyncInfo.totalPauseDuration", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "display-name" => Some(("displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "error.code" => Some(("error.code", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
@@ -2032,7 +2058,7 @@ where
                     "state-time" => Some(("stateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["additional-licenses", "applied-license", "boot-option", "code", "compute-engine-target-defaults", "compute-scheduling", "create-time", "current-sync-info", "description", "disk-type", "display-name", "error", "group", "idle-duration", "labels", "last-sync", "last-sync-time", "license-type", "machine-type", "machine-type-series", "message", "metadata", "min-node-cpus", "name", "network-tags", "on-host-maintenance", "os-license", "policy", "progress-percent", "restart-type", "secure-boot", "service-account", "skip-os-adaptation", "source-vm-id", "start-time", "state", "state-time", "target-project", "type", "update-time", "vm-name", "zone"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["additional-licenses", "applied-license", "aws-source-vm-details", "boot-option", "code", "committed-storage-bytes", "compute-engine-target-defaults", "compute-scheduling", "create-time", "current-sync-info", "cycle-number", "description", "disk-type", "display-name", "end-time", "error", "firmware", "group", "hostname", "idle-duration", "labels", "last-sync", "last-sync-time", "license-type", "machine-type", "machine-type-series", "message", "metadata", "min-node-cpus", "name", "network-tags", "on-host-maintenance", "os-license", "policy", "progress-percent", "restart-type", "secure-boot", "service-account", "skip-os-adaptation", "source-vm-id", "start-time", "state", "state-time", "target-project", "total-pause-duration", "type", "update-time", "vm-name", "zone"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -2214,6 +2240,7 @@ where
                     "compute-engine-target-details.compute-scheduling.on-host-maintenance" => Some(("computeEngineTargetDetails.computeScheduling.onHostMaintenance", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "compute-engine-target-details.compute-scheduling.restart-type" => Some(("computeEngineTargetDetails.computeScheduling.restartType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "compute-engine-target-details.disk-type" => Some(("computeEngineTargetDetails.diskType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "compute-engine-target-details.hostname" => Some(("computeEngineTargetDetails.hostname", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "compute-engine-target-details.labels" => Some(("computeEngineTargetDetails.labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "compute-engine-target-details.license-type" => Some(("computeEngineTargetDetails.licenseType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "compute-engine-target-details.machine-type" => Some(("computeEngineTargetDetails.machineType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -2226,6 +2253,7 @@ where
                     "compute-engine-target-details.vm-name" => Some(("computeEngineTargetDetails.vmName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "compute-engine-target-details.zone" => Some(("computeEngineTargetDetails.zone", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "end-time" => Some(("endTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "error.code" => Some(("error.code", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "error.message" => Some(("error.message", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -2234,7 +2262,7 @@ where
                     "state-message" => Some(("stateMessage", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "state-time" => Some(("stateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["additional-licenses", "applied-license", "boot-option", "code", "compute-engine-target-details", "compute-scheduling", "create-time", "disk-type", "error", "labels", "license-type", "machine-type", "machine-type-series", "message", "metadata", "min-node-cpus", "name", "network-tags", "on-host-maintenance", "os-license", "progress-percent", "project", "restart-type", "secure-boot", "service-account", "state", "state-message", "state-time", "type", "vm-name", "zone"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["additional-licenses", "applied-license", "boot-option", "code", "compute-engine-target-details", "compute-scheduling", "create-time", "disk-type", "end-time", "error", "hostname", "labels", "license-type", "machine-type", "machine-type-series", "message", "metadata", "min-node-cpus", "name", "network-tags", "on-host-maintenance", "os-license", "progress-percent", "project", "restart-type", "secure-boot", "service-account", "state", "state-message", "state-time", "type", "vm-name", "zone"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -2363,7 +2391,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 "order-by" => {
                     call = call.order_by(value.unwrap_or(""));
@@ -2623,7 +2651,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 "order-by" => {
                     call = call.order_by(value.unwrap_or(""));
@@ -2701,6 +2729,8 @@ where
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
+                    "aws-source-vm-details.committed-storage-bytes" => Some(("awsSourceVmDetails.committedStorageBytes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "aws-source-vm-details.firmware" => Some(("awsSourceVmDetails.firmware", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "compute-engine-target-defaults.additional-licenses" => Some(("computeEngineTargetDefaults.additionalLicenses", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "compute-engine-target-defaults.applied-license.os-license" => Some(("computeEngineTargetDefaults.appliedLicense.osLicense", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "compute-engine-target-defaults.applied-license.type" => Some(("computeEngineTargetDefaults.appliedLicense.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -2709,6 +2739,7 @@ where
                     "compute-engine-target-defaults.compute-scheduling.on-host-maintenance" => Some(("computeEngineTargetDefaults.computeScheduling.onHostMaintenance", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "compute-engine-target-defaults.compute-scheduling.restart-type" => Some(("computeEngineTargetDefaults.computeScheduling.restartType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "compute-engine-target-defaults.disk-type" => Some(("computeEngineTargetDefaults.diskType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "compute-engine-target-defaults.hostname" => Some(("computeEngineTargetDefaults.hostname", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "compute-engine-target-defaults.labels" => Some(("computeEngineTargetDefaults.labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "compute-engine-target-defaults.license-type" => Some(("computeEngineTargetDefaults.licenseType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "compute-engine-target-defaults.machine-type" => Some(("computeEngineTargetDefaults.machineType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -2721,8 +2752,15 @@ where
                     "compute-engine-target-defaults.vm-name" => Some(("computeEngineTargetDefaults.vmName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "compute-engine-target-defaults.zone" => Some(("computeEngineTargetDefaults.zone", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "current-sync-info.cycle-number" => Some(("currentSyncInfo.cycleNumber", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "current-sync-info.end-time" => Some(("currentSyncInfo.endTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "current-sync-info.error.code" => Some(("currentSyncInfo.error.code", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "current-sync-info.error.message" => Some(("currentSyncInfo.error.message", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "current-sync-info.name" => Some(("currentSyncInfo.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "current-sync-info.progress-percent" => Some(("currentSyncInfo.progressPercent", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "current-sync-info.start-time" => Some(("currentSyncInfo.startTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "current-sync-info.state" => Some(("currentSyncInfo.state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "current-sync-info.total-pause-duration" => Some(("currentSyncInfo.totalPauseDuration", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "display-name" => Some(("displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "error.code" => Some(("error.code", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
@@ -2738,7 +2776,7 @@ where
                     "state-time" => Some(("stateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["additional-licenses", "applied-license", "boot-option", "code", "compute-engine-target-defaults", "compute-scheduling", "create-time", "current-sync-info", "description", "disk-type", "display-name", "error", "group", "idle-duration", "labels", "last-sync", "last-sync-time", "license-type", "machine-type", "machine-type-series", "message", "metadata", "min-node-cpus", "name", "network-tags", "on-host-maintenance", "os-license", "policy", "progress-percent", "restart-type", "secure-boot", "service-account", "skip-os-adaptation", "source-vm-id", "start-time", "state", "state-time", "target-project", "type", "update-time", "vm-name", "zone"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["additional-licenses", "applied-license", "aws-source-vm-details", "boot-option", "code", "committed-storage-bytes", "compute-engine-target-defaults", "compute-scheduling", "create-time", "current-sync-info", "cycle-number", "description", "disk-type", "display-name", "end-time", "error", "firmware", "group", "hostname", "idle-duration", "labels", "last-sync", "last-sync-time", "license-type", "machine-type", "machine-type-series", "message", "metadata", "min-node-cpus", "name", "network-tags", "on-host-maintenance", "os-license", "policy", "progress-percent", "restart-type", "secure-boot", "service-account", "skip-os-adaptation", "source-vm-id", "start-time", "state", "state-time", "target-project", "total-pause-duration", "type", "update-time", "vm-name", "zone"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -2753,7 +2791,7 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "update-mask" => {
-                    call = call.update_mask(value.unwrap_or(""));
+                    call = call.update_mask(        value.map(|v| arg_from_str(v, err, "update-mask", "google-fieldmask")).unwrap_or(FieldMask::default()));
                 },
                 "request-id" => {
                     call = call.request_id(value.unwrap_or(""));
@@ -2856,6 +2894,123 @@ where
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_locations_sources_migrating_vms_replication_cycles_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.projects().locations_sources_migrating_vms_replication_cycles_get(opt.value_of("name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_locations_sources_migrating_vms_replication_cycles_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.projects().locations_sources_migrating_vms_replication_cycles_list(opt.value_of("parent").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "page-token" => {
+                    call = call.page_token(value.unwrap_or(""));
+                },
+                "page-size" => {
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
+                },
+                "order-by" => {
+                    call = call.order_by(value.unwrap_or(""));
+                },
+                "filter" => {
+                    call = call.filter(value.unwrap_or(""));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["filter", "order-by", "page-size", "page-token"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -3080,6 +3235,15 @@ where
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
+                    "aws.access-key-creds.access-key-id" => Some(("aws.accessKeyCreds.accessKeyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "aws.access-key-creds.secret-access-key" => Some(("aws.accessKeyCreds.secretAccessKey", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "aws.aws-region" => Some(("aws.awsRegion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "aws.error.code" => Some(("aws.error.code", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "aws.error.message" => Some(("aws.error.message", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "aws.inventory-security-group-names" => Some(("aws.inventorySecurityGroupNames", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "aws.migration-resources-user-tags" => Some(("aws.migrationResourcesUserTags", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "aws.public-ip" => Some(("aws.publicIp", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "aws.state" => Some(("aws.state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
@@ -3090,7 +3254,7 @@ where
                     "vmware.username" => Some(("vmware.username", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "vmware.vcenter-ip" => Some(("vmware.vcenterIp", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["create-time", "description", "labels", "name", "password", "thumbprint", "update-time", "username", "vcenter-ip", "vmware"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["access-key-creds", "access-key-id", "aws", "aws-region", "code", "create-time", "description", "error", "inventory-security-group-names", "labels", "message", "migration-resources-user-tags", "name", "password", "public-ip", "secret-access-key", "state", "thumbprint", "update-time", "username", "vcenter-ip", "vmware"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -3105,7 +3269,7 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "update-mask" => {
-                    call = call.update_mask(value.unwrap_or(""));
+                    call = call.update_mask(        value.map(|v| arg_from_str(v, err, "update-mask", "google-fieldmask")).unwrap_or(FieldMask::default()));
                 },
                 "request-id" => {
                     call = call.request_id(value.unwrap_or(""));
@@ -3383,7 +3547,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 "order-by" => {
                     call = call.order_by(value.unwrap_or(""));
@@ -3652,7 +3816,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 "order-by" => {
                     call = call.order_by(value.unwrap_or(""));
@@ -3751,7 +3915,7 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "update-mask" => {
-                    call = call.update_mask(value.unwrap_or(""));
+                    call = call.update_mask(        value.map(|v| arg_from_str(v, err, "update-mask", "google-fieldmask")).unwrap_or(FieldMask::default()));
                 },
                 "request-id" => {
                     call = call.request_id(value.unwrap_or(""));
@@ -3924,6 +4088,12 @@ where
                     ("locations-sources-migrating-vms-pause-migration", Some(opt)) => {
                         call_result = self._projects_locations_sources_migrating_vms_pause_migration(opt, dry_run, &mut err).await;
                     },
+                    ("locations-sources-migrating-vms-replication-cycles-get", Some(opt)) => {
+                        call_result = self._projects_locations_sources_migrating_vms_replication_cycles_get(opt, dry_run, &mut err).await;
+                    },
+                    ("locations-sources-migrating-vms-replication-cycles-list", Some(opt)) => {
+                        call_result = self._projects_locations_sources_migrating_vms_replication_cycles_list(opt, dry_run, &mut err).await;
+                    },
                     ("locations-sources-migrating-vms-resume-migration", Some(opt)) => {
                         call_result = self._projects_locations_sources_migrating_vms_resume_migration(opt, dry_run, &mut err).await;
                     },
@@ -4039,7 +4209,7 @@ where
 async fn main() {
     let mut exit_status = 0i32;
     let arg_data = [
-        ("projects", "methods: 'locations-get', 'locations-groups-add-group-migration', 'locations-groups-create', 'locations-groups-delete', 'locations-groups-get', 'locations-groups-list', 'locations-groups-patch', 'locations-groups-remove-group-migration', 'locations-list', 'locations-operations-cancel', 'locations-operations-delete', 'locations-operations-get', 'locations-operations-list', 'locations-sources-create', 'locations-sources-datacenter-connectors-create', 'locations-sources-datacenter-connectors-delete', 'locations-sources-datacenter-connectors-get', 'locations-sources-datacenter-connectors-list', 'locations-sources-datacenter-connectors-upgrade-appliance', 'locations-sources-delete', 'locations-sources-fetch-inventory', 'locations-sources-get', 'locations-sources-list', 'locations-sources-migrating-vms-clone-jobs-cancel', 'locations-sources-migrating-vms-clone-jobs-create', 'locations-sources-migrating-vms-clone-jobs-get', 'locations-sources-migrating-vms-clone-jobs-list', 'locations-sources-migrating-vms-create', 'locations-sources-migrating-vms-cutover-jobs-cancel', 'locations-sources-migrating-vms-cutover-jobs-create', 'locations-sources-migrating-vms-cutover-jobs-get', 'locations-sources-migrating-vms-cutover-jobs-list', 'locations-sources-migrating-vms-delete', 'locations-sources-migrating-vms-finalize-migration', 'locations-sources-migrating-vms-get', 'locations-sources-migrating-vms-list', 'locations-sources-migrating-vms-patch', 'locations-sources-migrating-vms-pause-migration', 'locations-sources-migrating-vms-resume-migration', 'locations-sources-migrating-vms-start-migration', 'locations-sources-patch', 'locations-sources-utilization-reports-create', 'locations-sources-utilization-reports-delete', 'locations-sources-utilization-reports-get', 'locations-sources-utilization-reports-list', 'locations-target-projects-create', 'locations-target-projects-delete', 'locations-target-projects-get', 'locations-target-projects-list' and 'locations-target-projects-patch'", vec![
+        ("projects", "methods: 'locations-get', 'locations-groups-add-group-migration', 'locations-groups-create', 'locations-groups-delete', 'locations-groups-get', 'locations-groups-list', 'locations-groups-patch', 'locations-groups-remove-group-migration', 'locations-list', 'locations-operations-cancel', 'locations-operations-delete', 'locations-operations-get', 'locations-operations-list', 'locations-sources-create', 'locations-sources-datacenter-connectors-create', 'locations-sources-datacenter-connectors-delete', 'locations-sources-datacenter-connectors-get', 'locations-sources-datacenter-connectors-list', 'locations-sources-datacenter-connectors-upgrade-appliance', 'locations-sources-delete', 'locations-sources-fetch-inventory', 'locations-sources-get', 'locations-sources-list', 'locations-sources-migrating-vms-clone-jobs-cancel', 'locations-sources-migrating-vms-clone-jobs-create', 'locations-sources-migrating-vms-clone-jobs-get', 'locations-sources-migrating-vms-clone-jobs-list', 'locations-sources-migrating-vms-create', 'locations-sources-migrating-vms-cutover-jobs-cancel', 'locations-sources-migrating-vms-cutover-jobs-create', 'locations-sources-migrating-vms-cutover-jobs-get', 'locations-sources-migrating-vms-cutover-jobs-list', 'locations-sources-migrating-vms-delete', 'locations-sources-migrating-vms-finalize-migration', 'locations-sources-migrating-vms-get', 'locations-sources-migrating-vms-list', 'locations-sources-migrating-vms-patch', 'locations-sources-migrating-vms-pause-migration', 'locations-sources-migrating-vms-replication-cycles-get', 'locations-sources-migrating-vms-replication-cycles-list', 'locations-sources-migrating-vms-resume-migration', 'locations-sources-migrating-vms-start-migration', 'locations-sources-patch', 'locations-sources-utilization-reports-create', 'locations-sources-utilization-reports-delete', 'locations-sources-utilization-reports-get', 'locations-sources-utilization-reports-list', 'locations-target-projects-create', 'locations-target-projects-delete', 'locations-target-projects-get', 'locations-target-projects-list' and 'locations-target-projects-patch'", vec![
             ("locations-get",
                     Some(r##"Gets information about a location."##),
                     "Details at http://byron.github.io/google-apis-rs/google_vmmigration1_cli/projects_locations-get",
@@ -4972,6 +5142,50 @@ async fn main() {
                      Some(false),
                      Some(false)),
                   ]),
+            ("locations-sources-migrating-vms-replication-cycles-get",
+                    Some(r##"Gets details of a single ReplicationCycle."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_vmmigration1_cli/projects_locations-sources-migrating-vms-replication-cycles-get",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. The name of the ReplicationCycle."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-sources-migrating-vms-replication-cycles-list",
+                    Some(r##"Lists ReplicationCycles in a given MigratingVM."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_vmmigration1_cli/projects_locations-sources-migrating-vms-replication-cycles-list",
+                  vec![
+                    (Some(r##"parent"##),
+                     None,
+                     Some(r##"Required. The parent, which owns this collection of ReplicationCycles."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
             ("locations-sources-migrating-vms-resume-migration",
                     Some(r##"Resumes a migration for a VM. When called on a paused migration, will start the process of uploading data and creating snapshots; when called on a completed cut-over migration, will update the migration to active state and start the process of uploading data and creating snapshots."##),
                     "Details at http://byron.github.io/google-apis-rs/google_vmmigration1_cli/projects_locations-sources-migrating-vms-resume-migration",
@@ -5278,8 +5492,8 @@ async fn main() {
     
     let mut app = App::new("vmmigration1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("4.0.1+20220225")
-           .about("Use the Migrate for Compute Engine API to programmatically migrate workloads. ")
+           .version("5.0.2+20230119")
+           .about("Use the Migrate to Virtual Machines API to programmatically migrate workloads. ")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_vmmigration1_cli")
            .arg(Arg::with_name("url")
                    .long("scope")

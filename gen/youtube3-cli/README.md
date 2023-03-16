@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *YouTube* API at revision *20220303*. The CLI is at version *4.0.1*.
+This documentation was generated from the *YouTube* API at revision *20230123*. The CLI is at version *5.0.2*.
 
 ```bash
 youtube3 [options]
@@ -67,6 +67,7 @@ youtube3 [options]
                 bind <id> <part>... [-p <v>]... [-o <out>]
                 delete <id> [-p <v>]...
                 insert (-r <kv>)... [-p <v>]... [-o <out>]
+                insert-cuepoint (-r <kv>)... [-p <v>]... [-o <out>]
                 list <part>... [-p <v>]... [-o <out>]
                 transition <broadcast-status> <id> <part>... [-p <v>]... [-o <out>]
                 update (-r <kv>)... [-p <v>]... [-o <out>]

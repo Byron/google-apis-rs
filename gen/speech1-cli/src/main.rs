@@ -3,8 +3,6 @@
 // DO NOT EDIT !
 #![allow(unused_variables, unused_imports, dead_code, unused_mut)]
 
-extern crate tokio;
-
 #[macro_use]
 extern crate clap;
 
@@ -12,9 +10,10 @@ use std::env;
 use std::io::{self, Write};
 use clap::{App, SubCommand, Arg};
 
-use google_speech1::{api, Error, oauth2};
+use google_speech1::{api, Error, oauth2, client::chrono, FieldMask};
 
-mod client;
+
+use google_clis_common as client;
 
 use client::{InvalidOptionsError, CLIError, arg_from_str, writer_from_opts, parse_kv_arg,
           input_file_from_opts, input_mime_from_opts, FieldCursor, FieldError, CallType, UploadProtocol,
@@ -113,7 +112,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 "name" => {
                     call = call.name(value.unwrap_or(""));
@@ -369,7 +368,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -459,7 +458,7 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "update-mask" => {
-                    call = call.update_mask(value.unwrap_or(""));
+                    call = call.update_mask(        value.map(|v| arg_from_str(v, err, "update-mask", "google-fieldmask")).unwrap_or(FieldMask::default()));
                 },
                 _ => {
                     let mut found = false;
@@ -709,7 +708,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -799,7 +798,7 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "update-mask" => {
-                    call = call.update_mask(value.unwrap_or(""));
+                    call = call.update_mask(        value.map(|v| arg_from_str(v, err, "update-mask", "google-fieldmask")).unwrap_or(FieldMask::default()));
                 },
                 _ => {
                     let mut found = false;
@@ -873,6 +872,7 @@ where
                 match &temp_cursor.to_string()[..] {
                     "audio.content" => Some(("audio.content", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "audio.uri" => Some(("audio.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "config.adaptation.abnf-grammar.abnf-strings" => Some(("config.adaptation.abnfGrammar.abnfStrings", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "config.adaptation.phrase-set-references" => Some(("config.adaptation.phraseSetReferences", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "config.alternative-language-codes" => Some(("config.alternativeLanguageCodes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "config.audio-channel-count" => Some(("config.audioChannelCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
@@ -903,7 +903,7 @@ where
                     "config.use-enhanced" => Some(("config.useEnhanced", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "output-config.gcs-uri" => Some(("outputConfig.gcsUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["adaptation", "alternative-language-codes", "audio", "audio-channel-count", "audio-topic", "config", "content", "diarization-config", "enable-automatic-punctuation", "enable-separate-recognition-per-channel", "enable-speaker-diarization", "enable-spoken-emojis", "enable-spoken-punctuation", "enable-word-confidence", "enable-word-time-offsets", "encoding", "gcs-uri", "industry-naics-code-of-audio", "interaction-type", "language-code", "max-alternatives", "max-speaker-count", "metadata", "microphone-distance", "min-speaker-count", "model", "original-media-type", "original-mime-type", "output-config", "phrase-set-references", "profanity-filter", "recording-device-name", "recording-device-type", "sample-rate-hertz", "speaker-tag", "uri", "use-enhanced"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["abnf-grammar", "abnf-strings", "adaptation", "alternative-language-codes", "audio", "audio-channel-count", "audio-topic", "config", "content", "diarization-config", "enable-automatic-punctuation", "enable-separate-recognition-per-channel", "enable-speaker-diarization", "enable-spoken-emojis", "enable-spoken-punctuation", "enable-word-confidence", "enable-word-time-offsets", "encoding", "gcs-uri", "industry-naics-code-of-audio", "interaction-type", "language-code", "max-alternatives", "max-speaker-count", "metadata", "microphone-distance", "min-speaker-count", "model", "original-media-type", "original-mime-type", "output-config", "phrase-set-references", "profanity-filter", "recording-device-name", "recording-device-type", "sample-rate-hertz", "speaker-tag", "uri", "use-enhanced"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -988,6 +988,7 @@ where
                 match &temp_cursor.to_string()[..] {
                     "audio.content" => Some(("audio.content", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "audio.uri" => Some(("audio.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "config.adaptation.abnf-grammar.abnf-strings" => Some(("config.adaptation.abnfGrammar.abnfStrings", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "config.adaptation.phrase-set-references" => Some(("config.adaptation.phraseSetReferences", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "config.alternative-language-codes" => Some(("config.alternativeLanguageCodes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "config.audio-channel-count" => Some(("config.audioChannelCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
@@ -1017,7 +1018,7 @@ where
                     "config.sample-rate-hertz" => Some(("config.sampleRateHertz", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "config.use-enhanced" => Some(("config.useEnhanced", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["adaptation", "alternative-language-codes", "audio", "audio-channel-count", "audio-topic", "config", "content", "diarization-config", "enable-automatic-punctuation", "enable-separate-recognition-per-channel", "enable-speaker-diarization", "enable-spoken-emojis", "enable-spoken-punctuation", "enable-word-confidence", "enable-word-time-offsets", "encoding", "industry-naics-code-of-audio", "interaction-type", "language-code", "max-alternatives", "max-speaker-count", "metadata", "microphone-distance", "min-speaker-count", "model", "original-media-type", "original-mime-type", "phrase-set-references", "profanity-filter", "recording-device-name", "recording-device-type", "sample-rate-hertz", "speaker-tag", "uri", "use-enhanced"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["abnf-grammar", "abnf-strings", "adaptation", "alternative-language-codes", "audio", "audio-channel-count", "audio-topic", "config", "content", "diarization-config", "enable-automatic-punctuation", "enable-separate-recognition-per-channel", "enable-speaker-diarization", "enable-spoken-emojis", "enable-spoken-punctuation", "enable-word-confidence", "enable-word-time-offsets", "encoding", "industry-naics-code-of-audio", "interaction-type", "language-code", "max-alternatives", "max-speaker-count", "metadata", "microphone-distance", "min-speaker-count", "model", "original-media-type", "original-mime-type", "phrase-set-references", "profanity-filter", "recording-device-name", "recording-device-type", "sample-rate-hertz", "speaker-tag", "uri", "use-enhanced"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1269,7 +1270,7 @@ async fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. The parent resource where this custom class will be created. Format: `projects/{project}/locations/{location}/customClasses` Speech-to-Text supports three locations: `global`, `us` (US North America), and `eu` (Europe). If you are calling the `speech.googleapis.com` endpoint, use the `global` location. To specify a region, use a [regional endpoint](/speech-to-text/docs/endpoints) with matching `us` or `eu` location value."##),
+                     Some(r##"Required. The parent resource where this custom class will be created. Format: `projects/{project}/locations/{location}/customClasses` Speech-to-Text supports three locations: `global`, `us` (US North America), and `eu` (Europe). If you are calling the `speech.googleapis.com` endpoint, use the `global` location. To specify a region, use a [regional endpoint](https://cloud.google.com/speech-to-text/docs/endpoints) with matching `us` or `eu` location value."##),
                      Some(true),
                      Some(false)),
         
@@ -1297,7 +1298,7 @@ async fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. The name of the custom class to delete. Format: `projects/{project}/locations/{location}/customClasses/{custom_class}` Speech-to-Text supports three locations: `global`, `us` (US North America), and `eu` (Europe). If you are calling the `speech.googleapis.com` endpoint, use the `global` location. To specify a region, use a [regional endpoint](/speech-to-text/docs/endpoints) with matching `us` or `eu` location value."##),
+                     Some(r##"Required. The name of the custom class to delete. Format: `projects/{project}/locations/{location}/customClasses/{custom_class}` Speech-to-Text supports three locations: `global`, `us` (US North America), and `eu` (Europe). If you are calling the `speech.googleapis.com` endpoint, use the `global` location. To specify a region, use a [regional endpoint](https://cloud.google.com/speech-to-text/docs/endpoints) with matching `us` or `eu` location value."##),
                      Some(true),
                      Some(false)),
         
@@ -1341,7 +1342,7 @@ async fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. The parent, which owns this collection of custom classes. Format: `projects/{project}/locations/{location}/customClasses` Speech-to-Text supports three locations: `global`, `us` (US North America), and `eu` (Europe). If you are calling the `speech.googleapis.com` endpoint, use the `global` location. To specify a region, use a [regional endpoint](/speech-to-text/docs/endpoints) with matching `us` or `eu` location value."##),
+                     Some(r##"Required. The parent, which owns this collection of custom classes. Format: `projects/{project}/locations/{location}/customClasses` Speech-to-Text supports three locations: `global`, `us` (US North America), and `eu` (Europe). If you are calling the `speech.googleapis.com` endpoint, use the `global` location. To specify a region, use a [regional endpoint](https://cloud.google.com/speech-to-text/docs/endpoints) with matching `us` or `eu` location value."##),
                      Some(true),
                      Some(false)),
         
@@ -1391,7 +1392,7 @@ async fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. The parent resource where this phrase set will be created. Format: `projects/{project}/locations/{location}/phraseSets` Speech-to-Text supports three locations: `global`, `us` (US North America), and `eu` (Europe). If you are calling the `speech.googleapis.com` endpoint, use the `global` location. To specify a region, use a [regional endpoint](/speech-to-text/docs/endpoints) with matching `us` or `eu` location value."##),
+                     Some(r##"Required. The parent resource where this phrase set will be created. Format: `projects/{project}/locations/{location}/phraseSets` Speech-to-Text supports three locations: `global`, `us` (US North America), and `eu` (Europe). If you are calling the `speech.googleapis.com` endpoint, use the `global` location. To specify a region, use a [regional endpoint](https://cloud.google.com/speech-to-text/docs/endpoints) with matching `us` or `eu` location value."##),
                      Some(true),
                      Some(false)),
         
@@ -1441,7 +1442,7 @@ async fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. The name of the phrase set to retrieve. Format: `projects/{project}/locations/{location}/phraseSets/{phrase_set}` Speech-to-Text supports three locations: `global`, `us` (US North America), and `eu` (Europe). If you are calling the `speech.googleapis.com` endpoint, use the `global` location. To specify a region, use a [regional endpoint](/speech-to-text/docs/endpoints) with matching `us` or `eu` location value."##),
+                     Some(r##"Required. The name of the phrase set to retrieve. Format: `projects/{project}/locations/{location}/phraseSets/{phrase_set}` Speech-to-Text supports three locations: `global`, `us` (US North America), and `eu` (Europe). If you are calling the `speech.googleapis.com` endpoint, use the `global` location. To specify a region, use a [regional endpoint](https://cloud.google.com/speech-to-text/docs/endpoints) with matching `us` or `eu` location value."##),
                      Some(true),
                      Some(false)),
         
@@ -1463,7 +1464,7 @@ async fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. The parent, which owns this collection of phrase set. Format: `projects/{project}/locations/{location}` Speech-to-Text supports three locations: `global`, `us` (US North America), and `eu` (Europe). If you are calling the `speech.googleapis.com` endpoint, use the `global` location. To specify a region, use a [regional endpoint](/speech-to-text/docs/endpoints) with matching `us` or `eu` location value."##),
+                     Some(r##"Required. The parent, which owns this collection of phrase set. Format: `projects/{project}/locations/{location}` Speech-to-Text supports three locations: `global`, `us` (US North America), and `eu` (Europe). If you are calling the `speech.googleapis.com` endpoint, use the `global` location. To specify a region, use a [regional endpoint](https://cloud.google.com/speech-to-text/docs/endpoints) with matching `us` or `eu` location value."##),
                      Some(true),
                      Some(false)),
         
@@ -1560,7 +1561,7 @@ async fn main() {
     
     let mut app = App::new("speech1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("4.0.1+20220221")
+           .version("5.0.2+20230119")
            .about("Converts audio to text by applying powerful neural network models.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_speech1_cli")
            .arg(Arg::with_name("url")

@@ -3,8 +3,6 @@
 // DO NOT EDIT !
 #![allow(unused_variables, unused_imports, dead_code, unused_mut)]
 
-extern crate tokio;
-
 #[macro_use]
 extern crate clap;
 
@@ -12,9 +10,10 @@ use std::env;
 use std::io::{self, Write};
 use clap::{App, SubCommand, Arg};
 
-use google_displayvideo1::{api, Error, oauth2};
+use google_displayvideo1::{api, Error, oauth2, client::chrono, FieldMask};
 
-mod client;
+
+use google_clis_common as client;
 
 use client::{InvalidOptionsError, CLIError, arg_from_str, writer_from_opts, parse_kv_arg,
           input_file_from_opts, input_mime_from_opts, FieldCursor, FieldError, CallType, UploadProtocol,
@@ -146,7 +145,7 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "read-mask" => {
-                    call = call.read_mask(value.unwrap_or(""));
+                    call = call.read_mask(        value.map(|v| arg_from_str(v, err, "read-mask", "google-fieldmask")).unwrap_or(FieldMask::default()));
                 },
                 _ => {
                     let mut found = false;
@@ -289,7 +288,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 "order-by" => {
                     call = call.order_by(value.unwrap_or(""));
@@ -354,7 +353,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 "order-by" => {
                     call = call.order_by(value.unwrap_or(""));
@@ -629,7 +628,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 "order-by" => {
                     call = call.order_by(value.unwrap_or(""));
@@ -745,7 +744,7 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "update-mask" => {
-                    call = call.update_mask(value.unwrap_or(""));
+                    call = call.update_mask(        value.map(|v| arg_from_str(v, err, "update-mask", "google-fieldmask")).unwrap_or(FieldMask::default()));
                 },
                 _ => {
                     let mut found = false;
@@ -856,7 +855,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 "order-by" => {
                     call = call.order_by(value.unwrap_or(""));
@@ -957,7 +956,7 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "partner-id" => {
-                    call = call.partner_id(value.unwrap_or(""));
+                    call = call.partner_id(        value.map(|v| arg_from_str(v, err, "partner-id", "int64")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -1013,7 +1012,7 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "partner-id" => {
-                    call = call.partner_id(value.unwrap_or(""));
+                    call = call.partner_id(        value.map(|v| arg_from_str(v, err, "partner-id", "int64")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -1069,13 +1068,13 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "partner-id" => {
-                    call = call.partner_id(value.unwrap_or(""));
+                    call = call.partner_id(        value.map(|v| arg_from_str(v, err, "partner-id", "int64")).unwrap_or(-0));
                 },
                 "page-token" => {
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 "order-by" => {
                     call = call.order_by(value.unwrap_or(""));
@@ -1176,10 +1175,10 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "update-mask" => {
-                    call = call.update_mask(value.unwrap_or(""));
+                    call = call.update_mask(        value.map(|v| arg_from_str(v, err, "update-mask", "google-fieldmask")).unwrap_or(FieldMask::default()));
                 },
                 "partner-id" => {
-                    call = call.partner_id(value.unwrap_or(""));
+                    call = call.partner_id(        value.map(|v| arg_from_str(v, err, "partner-id", "int64")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -1356,7 +1355,7 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "partner-id" => {
-                    call = call.partner_id(value.unwrap_or(""));
+                    call = call.partner_id(        value.map(|v| arg_from_str(v, err, "partner-id", "int64")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -1412,7 +1411,7 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "partner-id" => {
-                    call = call.partner_id(value.unwrap_or(""));
+                    call = call.partner_id(        value.map(|v| arg_from_str(v, err, "partner-id", "int64")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -1468,13 +1467,13 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "partner-id" => {
-                    call = call.partner_id(value.unwrap_or(""));
+                    call = call.partner_id(        value.map(|v| arg_from_str(v, err, "partner-id", "int64")).unwrap_or(-0));
                 },
                 "page-token" => {
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 "order-by" => {
                     call = call.order_by(value.unwrap_or(""));
@@ -1980,7 +1979,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 "order-by" => {
                     call = call.order_by(value.unwrap_or(""));
@@ -2130,7 +2129,7 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "update-mask" => {
-                    call = call.update_mask(value.unwrap_or(""));
+                    call = call.update_mask(        value.map(|v| arg_from_str(v, err, "update-mask", "google-fieldmask")).unwrap_or(FieldMask::default()));
                 },
                 _ => {
                     let mut found = false;
@@ -2293,7 +2292,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 "order-by" => {
                     call = call.order_by(value.unwrap_or(""));
@@ -2381,6 +2380,7 @@ where
                     "bid-strategy.performance-goal-auto-bid.max-average-cpm-bid-amount-micros" => Some(("bidStrategy.performanceGoalAutoBid.maxAverageCpmBidAmountMicros", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "bid-strategy.performance-goal-auto-bid.performance-goal-amount-micros" => Some(("bidStrategy.performanceGoalAutoBid.performanceGoalAmountMicros", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "bid-strategy.performance-goal-auto-bid.performance-goal-type" => Some(("bidStrategy.performanceGoalAutoBid.performanceGoalType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "billable-outcome" => Some(("billableOutcome", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "budget.automation-type" => Some(("budget.automationType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "budget.budget-unit" => Some(("budget.budgetUnit", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "campaign-id" => Some(("campaignId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -2406,7 +2406,7 @@ where
                     "reservation-type" => Some(("reservationType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["advertiser-id", "automation-type", "bid-amount-micros", "bid-strategy", "budget", "budget-unit", "campaign-id", "custom-bidding-algorithm-id", "daily-max-impressions", "daily-max-micros", "details", "display-name", "entity-status", "fixed-bid", "frequency-cap", "insertion-order-id", "insertion-order-type", "integration-code", "integration-details", "max-average-cpm-bid-amount-micros", "max-impressions", "maximize-spend-auto-bid", "name", "pacing", "pacing-period", "pacing-type", "performance-goal", "performance-goal-amount-micros", "performance-goal-auto-bid", "performance-goal-percentage-micros", "performance-goal-string", "performance-goal-type", "raise-bid-for-deals", "reservation-type", "time-unit", "time-unit-count", "unlimited", "update-time"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["advertiser-id", "automation-type", "bid-amount-micros", "bid-strategy", "billable-outcome", "budget", "budget-unit", "campaign-id", "custom-bidding-algorithm-id", "daily-max-impressions", "daily-max-micros", "details", "display-name", "entity-status", "fixed-bid", "frequency-cap", "insertion-order-id", "insertion-order-type", "integration-code", "integration-details", "max-average-cpm-bid-amount-micros", "max-impressions", "maximize-spend-auto-bid", "name", "pacing", "pacing-period", "pacing-type", "performance-goal", "performance-goal-amount-micros", "performance-goal-auto-bid", "performance-goal-percentage-micros", "performance-goal-string", "performance-goal-type", "raise-bid-for-deals", "reservation-type", "time-unit", "time-unit-count", "unlimited", "update-time"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -2580,7 +2580,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 "order-by" => {
                     call = call.order_by(value.unwrap_or(""));
@@ -2668,6 +2668,7 @@ where
                     "bid-strategy.performance-goal-auto-bid.max-average-cpm-bid-amount-micros" => Some(("bidStrategy.performanceGoalAutoBid.maxAverageCpmBidAmountMicros", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "bid-strategy.performance-goal-auto-bid.performance-goal-amount-micros" => Some(("bidStrategy.performanceGoalAutoBid.performanceGoalAmountMicros", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "bid-strategy.performance-goal-auto-bid.performance-goal-type" => Some(("bidStrategy.performanceGoalAutoBid.performanceGoalType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "billable-outcome" => Some(("billableOutcome", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "budget.automation-type" => Some(("budget.automationType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "budget.budget-unit" => Some(("budget.budgetUnit", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "campaign-id" => Some(("campaignId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -2693,7 +2694,7 @@ where
                     "reservation-type" => Some(("reservationType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["advertiser-id", "automation-type", "bid-amount-micros", "bid-strategy", "budget", "budget-unit", "campaign-id", "custom-bidding-algorithm-id", "daily-max-impressions", "daily-max-micros", "details", "display-name", "entity-status", "fixed-bid", "frequency-cap", "insertion-order-id", "insertion-order-type", "integration-code", "integration-details", "max-average-cpm-bid-amount-micros", "max-impressions", "maximize-spend-auto-bid", "name", "pacing", "pacing-period", "pacing-type", "performance-goal", "performance-goal-amount-micros", "performance-goal-auto-bid", "performance-goal-percentage-micros", "performance-goal-string", "performance-goal-type", "raise-bid-for-deals", "reservation-type", "time-unit", "time-unit-count", "unlimited", "update-time"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["advertiser-id", "automation-type", "bid-amount-micros", "bid-strategy", "billable-outcome", "budget", "budget-unit", "campaign-id", "custom-bidding-algorithm-id", "daily-max-impressions", "daily-max-micros", "details", "display-name", "entity-status", "fixed-bid", "frequency-cap", "insertion-order-id", "insertion-order-type", "integration-code", "integration-details", "max-average-cpm-bid-amount-micros", "max-impressions", "maximize-spend-auto-bid", "name", "pacing", "pacing-period", "pacing-type", "performance-goal", "performance-goal-amount-micros", "performance-goal-auto-bid", "performance-goal-percentage-micros", "performance-goal-string", "performance-goal-type", "raise-bid-for-deals", "reservation-type", "time-unit", "time-unit-count", "unlimited", "update-time"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -2708,7 +2709,7 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "update-mask" => {
-                    call = call.update_mask(value.unwrap_or(""));
+                    call = call.update_mask(        value.map(|v| arg_from_str(v, err, "update-mask", "google-fieldmask")).unwrap_or(FieldMask::default()));
                 },
                 _ => {
                     let mut found = false;
@@ -2819,7 +2820,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 "order-by" => {
                     call = call.order_by(value.unwrap_or(""));
@@ -2884,7 +2885,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 "loi-sapin-invoice-type" => {
                     call = call.loi_sapin_invoice_type(value.unwrap_or(""));
@@ -3089,7 +3090,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 "order-by" => {
                     call = call.order_by(value.unwrap_or(""));
@@ -3486,7 +3487,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 "order-by" => {
                     call = call.order_by(value.unwrap_or(""));
@@ -3633,7 +3634,7 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "update-mask" => {
-                    call = call.update_mask(value.unwrap_or(""));
+                    call = call.update_mask(        value.map(|v| arg_from_str(v, err, "update-mask", "google-fieldmask")).unwrap_or(FieldMask::default()));
                 },
                 _ => {
                     let mut found = false;
@@ -3734,12 +3735,19 @@ where
                     "category-details.targeting-option-id" => Some(("categoryDetails.targetingOptionId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "channel-details.channel-id" => Some(("channelDetails.channelId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "channel-details.negative" => Some(("channelDetails.negative", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "content-duration-details.content-duration" => Some(("contentDurationDetails.contentDuration", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-duration-details.targeting-option-id" => Some(("contentDurationDetails.targetingOptionId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-genre-details.display-name" => Some(("contentGenreDetails.displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-genre-details.negative" => Some(("contentGenreDetails.negative", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "content-genre-details.targeting-option-id" => Some(("contentGenreDetails.targetingOptionId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "content-instream-position-details.ad-type" => Some(("contentInstreamPositionDetails.adType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "content-instream-position-details.content-instream-position" => Some(("contentInstreamPositionDetails.contentInstreamPosition", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "content-instream-position-details.targeting-option-id" => Some(("contentInstreamPositionDetails.targetingOptionId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "content-outstream-position-details.ad-type" => Some(("contentOutstreamPositionDetails.adType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "content-outstream-position-details.content-outstream-position" => Some(("contentOutstreamPositionDetails.contentOutstreamPosition", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "content-outstream-position-details.targeting-option-id" => Some(("contentOutstreamPositionDetails.targetingOptionId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-stream-type-details.content-stream-type" => Some(("contentStreamTypeDetails.contentStreamType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-stream-type-details.targeting-option-id" => Some(("contentStreamTypeDetails.targetingOptionId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "day-and-time-details.day-of-week" => Some(("dayAndTimeDetails.dayOfWeek", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "day-and-time-details.end-hour" => Some(("dayAndTimeDetails.endHour", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "day-and-time-details.start-hour" => Some(("dayAndTimeDetails.startHour", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
@@ -3836,7 +3844,7 @@ where
                     "viewability-details.targeting-option-id" => Some(("viewabilityDetails.targetingOptionId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "viewability-details.viewability" => Some(("viewabilityDetails.viewability", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["ad-type", "adloox", "age-range", "age-range-details", "app-category-details", "app-details", "app-id", "app-platform", "app-star-rating", "assigned-targeting-option-id", "audio-content-type", "audio-content-type-details", "authorized-seller-status", "authorized-seller-status-details", "avoid-insufficient-option", "avoid-insufficient-star-rating", "avoid-unknown-brand-safety-category", "avoided-age-ratings", "avoided-fraud-option", "avoided-high-severity-categories", "avoided-medium-severity-categories", "avoided-star-rating", "brand-safety-categories", "browser-details", "business-chain-details", "carrier-and-isp-details", "category-details", "channel-details", "channel-id", "content-instream-position", "content-instream-position-details", "content-outstream-position", "content-outstream-position-details", "content-position", "content-rating-tier", "custom-segment-id", "day-and-time-details", "day-of-week", "device-make-model-details", "device-type", "device-type-details", "digital-content-label-exclusion-details", "display-name", "display-viewability", "double-verify", "end-hour", "environment", "environment-details", "exchange-details", "exclude-unrateable", "excluded-ad-fraud-risk", "excluded-adloox-categories", "excluded-adult-risk", "excluded-alcohol-risk", "excluded-drugs-risk", "excluded-gambling-risk", "excluded-hate-speech-risk", "excluded-illegal-downloads-risk", "excluded-offensive-language-risk", "excluded-targeting-option-id", "excluded-violence-risk", "fraud-invalid-traffic", "gender", "gender-details", "geo-region-details", "geo-region-type", "household-income", "household-income-details", "iab", "inheritance", "integral-ad-science", "inventory-source-details", "inventory-source-group-details", "inventory-source-group-id", "inventory-source-id", "keyword", "keyword-details", "language-details", "latitude", "longitude", "name", "native-content-position-details", "negative", "negative-keyword-list-details", "negative-keyword-list-id", "omid", "omid-details", "on-screen-position", "on-screen-position-details", "operating-system-details", "parental-status", "parental-status-details", "player-impression-rate", "poi-details", "proximity-location-list-details", "proximity-location-list-id", "proximity-radius-amount", "proximity-radius-range", "proximity-radius-unit", "regional-location-list-details", "regional-location-list-id", "sensitive-category", "sensitive-category-exclusion-details", "start-hour", "sub-exchange-details", "targeting-option-id", "targeting-type", "third-party-verifier-details", "time-zone-resolution", "traq-score-option", "url", "url-details", "user-rewarded-content", "user-rewarded-content-details", "video-iab", "video-player-size", "video-player-size-details", "video-viewability", "video-viewable-rate", "viewability", "viewability-details", "viewable-during"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["ad-type", "adloox", "age-range", "age-range-details", "app-category-details", "app-details", "app-id", "app-platform", "app-star-rating", "assigned-targeting-option-id", "audio-content-type", "audio-content-type-details", "authorized-seller-status", "authorized-seller-status-details", "avoid-insufficient-option", "avoid-insufficient-star-rating", "avoid-unknown-brand-safety-category", "avoided-age-ratings", "avoided-fraud-option", "avoided-high-severity-categories", "avoided-medium-severity-categories", "avoided-star-rating", "brand-safety-categories", "browser-details", "business-chain-details", "carrier-and-isp-details", "category-details", "channel-details", "channel-id", "content-duration", "content-duration-details", "content-genre-details", "content-instream-position", "content-instream-position-details", "content-outstream-position", "content-outstream-position-details", "content-position", "content-rating-tier", "content-stream-type", "content-stream-type-details", "custom-segment-id", "day-and-time-details", "day-of-week", "device-make-model-details", "device-type", "device-type-details", "digital-content-label-exclusion-details", "display-name", "display-viewability", "double-verify", "end-hour", "environment", "environment-details", "exchange-details", "exclude-unrateable", "excluded-ad-fraud-risk", "excluded-adloox-categories", "excluded-adult-risk", "excluded-alcohol-risk", "excluded-drugs-risk", "excluded-gambling-risk", "excluded-hate-speech-risk", "excluded-illegal-downloads-risk", "excluded-offensive-language-risk", "excluded-targeting-option-id", "excluded-violence-risk", "fraud-invalid-traffic", "gender", "gender-details", "geo-region-details", "geo-region-type", "household-income", "household-income-details", "iab", "inheritance", "integral-ad-science", "inventory-source-details", "inventory-source-group-details", "inventory-source-group-id", "inventory-source-id", "keyword", "keyword-details", "language-details", "latitude", "longitude", "name", "native-content-position-details", "negative", "negative-keyword-list-details", "negative-keyword-list-id", "omid", "omid-details", "on-screen-position", "on-screen-position-details", "operating-system-details", "parental-status", "parental-status-details", "player-impression-rate", "poi-details", "proximity-location-list-details", "proximity-location-list-id", "proximity-radius-amount", "proximity-radius-range", "proximity-radius-unit", "regional-location-list-details", "regional-location-list-id", "sensitive-category", "sensitive-category-exclusion-details", "start-hour", "sub-exchange-details", "targeting-option-id", "targeting-type", "third-party-verifier-details", "time-zone-resolution", "traq-score-option", "url", "url-details", "user-rewarded-content", "user-rewarded-content-details", "video-iab", "video-player-size", "video-player-size-details", "video-viewability", "video-viewable-rate", "viewability", "viewability-details", "viewable-during"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -4010,7 +4018,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 "order-by" => {
                     call = call.order_by(value.unwrap_or(""));
@@ -4072,13 +4080,13 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "partner-id" => {
-                    call = call.partner_id(value.unwrap_or(""));
+                    call = call.partner_id(        value.map(|v| arg_from_str(v, err, "partner-id", "int64")).unwrap_or(-0));
                 },
                 "page-token" => {
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 "order-by" => {
                     call = call.order_by(value.unwrap_or(""));
@@ -4367,7 +4375,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 "order-by" => {
                     call = call.order_by(value.unwrap_or(""));
@@ -4573,7 +4581,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 "order-by" => {
                     call = call.order_by(value.unwrap_or(""));
@@ -4672,7 +4680,7 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "update-mask" => {
-                    call = call.update_mask(value.unwrap_or(""));
+                    call = call.update_mask(        value.map(|v| arg_from_str(v, err, "update-mask", "google-fieldmask")).unwrap_or(FieldMask::default()));
                 },
                 _ => {
                     let mut found = false;
@@ -5042,7 +5050,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 "order-by" => {
                     call = call.order_by(value.unwrap_or(""));
@@ -5143,7 +5151,7 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "update-mask" => {
-                    call = call.update_mask(value.unwrap_or(""));
+                    call = call.update_mask(        value.map(|v| arg_from_str(v, err, "update-mask", "google-fieldmask")).unwrap_or(FieldMask::default()));
                 },
                 _ => {
                     let mut found = false;
@@ -5395,7 +5403,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -5677,7 +5685,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 "order-by" => {
                     call = call.order_by(value.unwrap_or(""));
@@ -5860,7 +5868,7 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "update-mask" => {
-                    call = call.update_mask(value.unwrap_or(""));
+                    call = call.update_mask(        value.map(|v| arg_from_str(v, err, "update-mask", "google-fieldmask")).unwrap_or(FieldMask::default()));
                 },
                 _ => {
                     let mut found = false;
@@ -5975,7 +5983,7 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "update-mask" => {
-                    call = call.update_mask(value.unwrap_or(""));
+                    call = call.update_mask(        value.map(|v| arg_from_str(v, err, "update-mask", "google-fieldmask")).unwrap_or(FieldMask::default()));
                 },
                 _ => {
                     let mut found = false;
@@ -6076,12 +6084,19 @@ where
                     "category-details.targeting-option-id" => Some(("categoryDetails.targetingOptionId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "channel-details.channel-id" => Some(("channelDetails.channelId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "channel-details.negative" => Some(("channelDetails.negative", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "content-duration-details.content-duration" => Some(("contentDurationDetails.contentDuration", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-duration-details.targeting-option-id" => Some(("contentDurationDetails.targetingOptionId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-genre-details.display-name" => Some(("contentGenreDetails.displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-genre-details.negative" => Some(("contentGenreDetails.negative", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "content-genre-details.targeting-option-id" => Some(("contentGenreDetails.targetingOptionId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "content-instream-position-details.ad-type" => Some(("contentInstreamPositionDetails.adType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "content-instream-position-details.content-instream-position" => Some(("contentInstreamPositionDetails.contentInstreamPosition", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "content-instream-position-details.targeting-option-id" => Some(("contentInstreamPositionDetails.targetingOptionId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "content-outstream-position-details.ad-type" => Some(("contentOutstreamPositionDetails.adType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "content-outstream-position-details.content-outstream-position" => Some(("contentOutstreamPositionDetails.contentOutstreamPosition", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "content-outstream-position-details.targeting-option-id" => Some(("contentOutstreamPositionDetails.targetingOptionId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-stream-type-details.content-stream-type" => Some(("contentStreamTypeDetails.contentStreamType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-stream-type-details.targeting-option-id" => Some(("contentStreamTypeDetails.targetingOptionId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "day-and-time-details.day-of-week" => Some(("dayAndTimeDetails.dayOfWeek", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "day-and-time-details.end-hour" => Some(("dayAndTimeDetails.endHour", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "day-and-time-details.start-hour" => Some(("dayAndTimeDetails.startHour", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
@@ -6178,7 +6193,7 @@ where
                     "viewability-details.targeting-option-id" => Some(("viewabilityDetails.targetingOptionId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "viewability-details.viewability" => Some(("viewabilityDetails.viewability", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["ad-type", "adloox", "age-range", "age-range-details", "app-category-details", "app-details", "app-id", "app-platform", "app-star-rating", "assigned-targeting-option-id", "audio-content-type", "audio-content-type-details", "authorized-seller-status", "authorized-seller-status-details", "avoid-insufficient-option", "avoid-insufficient-star-rating", "avoid-unknown-brand-safety-category", "avoided-age-ratings", "avoided-fraud-option", "avoided-high-severity-categories", "avoided-medium-severity-categories", "avoided-star-rating", "brand-safety-categories", "browser-details", "business-chain-details", "carrier-and-isp-details", "category-details", "channel-details", "channel-id", "content-instream-position", "content-instream-position-details", "content-outstream-position", "content-outstream-position-details", "content-position", "content-rating-tier", "custom-segment-id", "day-and-time-details", "day-of-week", "device-make-model-details", "device-type", "device-type-details", "digital-content-label-exclusion-details", "display-name", "display-viewability", "double-verify", "end-hour", "environment", "environment-details", "exchange-details", "exclude-unrateable", "excluded-ad-fraud-risk", "excluded-adloox-categories", "excluded-adult-risk", "excluded-alcohol-risk", "excluded-drugs-risk", "excluded-gambling-risk", "excluded-hate-speech-risk", "excluded-illegal-downloads-risk", "excluded-offensive-language-risk", "excluded-targeting-option-id", "excluded-violence-risk", "fraud-invalid-traffic", "gender", "gender-details", "geo-region-details", "geo-region-type", "household-income", "household-income-details", "iab", "inheritance", "integral-ad-science", "inventory-source-details", "inventory-source-group-details", "inventory-source-group-id", "inventory-source-id", "keyword", "keyword-details", "language-details", "latitude", "longitude", "name", "native-content-position-details", "negative", "negative-keyword-list-details", "negative-keyword-list-id", "omid", "omid-details", "on-screen-position", "on-screen-position-details", "operating-system-details", "parental-status", "parental-status-details", "player-impression-rate", "poi-details", "proximity-location-list-details", "proximity-location-list-id", "proximity-radius-amount", "proximity-radius-range", "proximity-radius-unit", "regional-location-list-details", "regional-location-list-id", "sensitive-category", "sensitive-category-exclusion-details", "start-hour", "sub-exchange-details", "targeting-option-id", "targeting-type", "third-party-verifier-details", "time-zone-resolution", "traq-score-option", "url", "url-details", "user-rewarded-content", "user-rewarded-content-details", "video-iab", "video-player-size", "video-player-size-details", "video-viewability", "video-viewable-rate", "viewability", "viewability-details", "viewable-during"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["ad-type", "adloox", "age-range", "age-range-details", "app-category-details", "app-details", "app-id", "app-platform", "app-star-rating", "assigned-targeting-option-id", "audio-content-type", "audio-content-type-details", "authorized-seller-status", "authorized-seller-status-details", "avoid-insufficient-option", "avoid-insufficient-star-rating", "avoid-unknown-brand-safety-category", "avoided-age-ratings", "avoided-fraud-option", "avoided-high-severity-categories", "avoided-medium-severity-categories", "avoided-star-rating", "brand-safety-categories", "browser-details", "business-chain-details", "carrier-and-isp-details", "category-details", "channel-details", "channel-id", "content-duration", "content-duration-details", "content-genre-details", "content-instream-position", "content-instream-position-details", "content-outstream-position", "content-outstream-position-details", "content-position", "content-rating-tier", "content-stream-type", "content-stream-type-details", "custom-segment-id", "day-and-time-details", "day-of-week", "device-make-model-details", "device-type", "device-type-details", "digital-content-label-exclusion-details", "display-name", "display-viewability", "double-verify", "end-hour", "environment", "environment-details", "exchange-details", "exclude-unrateable", "excluded-ad-fraud-risk", "excluded-adloox-categories", "excluded-adult-risk", "excluded-alcohol-risk", "excluded-drugs-risk", "excluded-gambling-risk", "excluded-hate-speech-risk", "excluded-illegal-downloads-risk", "excluded-offensive-language-risk", "excluded-targeting-option-id", "excluded-violence-risk", "fraud-invalid-traffic", "gender", "gender-details", "geo-region-details", "geo-region-type", "household-income", "household-income-details", "iab", "inheritance", "integral-ad-science", "inventory-source-details", "inventory-source-group-details", "inventory-source-group-id", "inventory-source-id", "keyword", "keyword-details", "language-details", "latitude", "longitude", "name", "native-content-position-details", "negative", "negative-keyword-list-details", "negative-keyword-list-id", "omid", "omid-details", "on-screen-position", "on-screen-position-details", "operating-system-details", "parental-status", "parental-status-details", "player-impression-rate", "poi-details", "proximity-location-list-details", "proximity-location-list-id", "proximity-radius-amount", "proximity-radius-range", "proximity-radius-unit", "regional-location-list-details", "regional-location-list-id", "sensitive-category", "sensitive-category-exclusion-details", "start-hour", "sub-exchange-details", "targeting-option-id", "targeting-type", "third-party-verifier-details", "time-zone-resolution", "traq-score-option", "url", "url-details", "user-rewarded-content", "user-rewarded-content-details", "video-iab", "video-player-size", "video-player-size-details", "video-viewability", "video-viewable-rate", "viewability", "viewability-details", "viewable-during"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -6352,7 +6367,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 "order-by" => {
                     call = call.order_by(value.unwrap_or(""));
@@ -6414,10 +6429,10 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "partner-id" => {
-                    call = call.partner_id(value.unwrap_or(""));
+                    call = call.partner_id(        value.map(|v| arg_from_str(v, err, "partner-id", "int64")).unwrap_or(-0));
                 },
                 "advertiser-id" => {
-                    call = call.advertiser_id(value.unwrap_or(""));
+                    call = call.advertiser_id(        value.map(|v| arg_from_str(v, err, "advertiser-id", "int64")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -6473,13 +6488,13 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "partner-id" => {
-                    call = call.partner_id(value.unwrap_or(""));
+                    call = call.partner_id(        value.map(|v| arg_from_str(v, err, "partner-id", "int64")).unwrap_or(-0));
                 },
                 "page-token" => {
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 "order-by" => {
                     call = call.order_by(value.unwrap_or(""));
@@ -6488,7 +6503,7 @@ where
                     call = call.filter(value.unwrap_or(""));
                 },
                 "advertiser-id" => {
-                    call = call.advertiser_id(value.unwrap_or(""));
+                    call = call.advertiser_id(        value.map(|v| arg_from_str(v, err, "advertiser-id", "int64")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -6637,10 +6652,10 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "partner-id" => {
-                    call = call.partner_id(value.unwrap_or(""));
+                    call = call.partner_id(        value.map(|v| arg_from_str(v, err, "partner-id", "int64")).unwrap_or(-0));
                 },
                 "advertiser-id" => {
-                    call = call.advertiser_id(value.unwrap_or(""));
+                    call = call.advertiser_id(        value.map(|v| arg_from_str(v, err, "advertiser-id", "int64")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -6696,13 +6711,13 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "partner-id" => {
-                    call = call.partner_id(value.unwrap_or(""));
+                    call = call.partner_id(        value.map(|v| arg_from_str(v, err, "partner-id", "int64")).unwrap_or(-0));
                 },
                 "page-token" => {
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 "order-by" => {
                     call = call.order_by(value.unwrap_or(""));
@@ -6711,7 +6726,7 @@ where
                     call = call.filter(value.unwrap_or(""));
                 },
                 "advertiser-id" => {
-                    call = call.advertiser_id(value.unwrap_or(""));
+                    call = call.advertiser_id(        value.map(|v| arg_from_str(v, err, "advertiser-id", "int64")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -6808,7 +6823,7 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "update-mask" => {
-                    call = call.update_mask(value.unwrap_or(""));
+                    call = call.update_mask(        value.map(|v| arg_from_str(v, err, "update-mask", "google-fieldmask")).unwrap_or(FieldMask::default()));
                 },
                 _ => {
                     let mut found = false;
@@ -6903,10 +6918,10 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "partner-id" => {
-                    call = call.partner_id(value.unwrap_or(""));
+                    call = call.partner_id(        value.map(|v| arg_from_str(v, err, "partner-id", "int64")).unwrap_or(-0));
                 },
                 "advertiser-id" => {
-                    call = call.advertiser_id(value.unwrap_or(""));
+                    call = call.advertiser_id(        value.map(|v| arg_from_str(v, err, "advertiser-id", "int64")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -6962,10 +6977,10 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "partner-id" => {
-                    call = call.partner_id(value.unwrap_or(""));
+                    call = call.partner_id(        value.map(|v| arg_from_str(v, err, "partner-id", "int64")).unwrap_or(-0));
                 },
                 "advertiser-id" => {
-                    call = call.advertiser_id(value.unwrap_or(""));
+                    call = call.advertiser_id(        value.map(|v| arg_from_str(v, err, "advertiser-id", "int64")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -7021,19 +7036,19 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "partner-id" => {
-                    call = call.partner_id(value.unwrap_or(""));
+                    call = call.partner_id(        value.map(|v| arg_from_str(v, err, "partner-id", "int64")).unwrap_or(-0));
                 },
                 "page-token" => {
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 "order-by" => {
                     call = call.order_by(value.unwrap_or(""));
                 },
                 "advertiser-id" => {
-                    call = call.advertiser_id(value.unwrap_or(""));
+                    call = call.advertiser_id(        value.map(|v| arg_from_str(v, err, "advertiser-id", "int64")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -7089,10 +7104,10 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "partner-id" => {
-                    call = call.partner_id(value.unwrap_or(""));
+                    call = call.partner_id(        value.map(|v| arg_from_str(v, err, "partner-id", "int64")).unwrap_or(-0));
                 },
                 "advertiser-id" => {
-                    call = call.advertiser_id(value.unwrap_or(""));
+                    call = call.advertiser_id(        value.map(|v| arg_from_str(v, err, "advertiser-id", "int64")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -7148,7 +7163,7 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "advertiser-id" => {
-                    call = call.advertiser_id(value.unwrap_or(""));
+                    call = call.advertiser_id(        value.map(|v| arg_from_str(v, err, "advertiser-id", "int64")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -7207,7 +7222,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 "order-by" => {
                     call = call.order_by(value.unwrap_or(""));
@@ -7216,7 +7231,7 @@ where
                     call = call.filter(value.unwrap_or(""));
                 },
                 "advertiser-id" => {
-                    call = call.advertiser_id(value.unwrap_or(""));
+                    call = call.advertiser_id(        value.map(|v| arg_from_str(v, err, "advertiser-id", "int64")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -7321,7 +7336,7 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "advertiser-id" => {
-                    call = call.advertiser_id(value.unwrap_or(""));
+                    call = call.advertiser_id(        value.map(|v| arg_from_str(v, err, "advertiser-id", "int64")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -7463,10 +7478,10 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "partner-id" => {
-                    call = call.partner_id(value.unwrap_or(""));
+                    call = call.partner_id(        value.map(|v| arg_from_str(v, err, "partner-id", "int64")).unwrap_or(-0));
                 },
                 "advertiser-id" => {
-                    call = call.advertiser_id(value.unwrap_or(""));
+                    call = call.advertiser_id(        value.map(|v| arg_from_str(v, err, "advertiser-id", "int64")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -7522,13 +7537,13 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "partner-id" => {
-                    call = call.partner_id(value.unwrap_or(""));
+                    call = call.partner_id(        value.map(|v| arg_from_str(v, err, "partner-id", "int64")).unwrap_or(-0));
                 },
                 "page-token" => {
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 "order-by" => {
                     call = call.order_by(value.unwrap_or(""));
@@ -7537,7 +7552,7 @@ where
                     call = call.filter(value.unwrap_or(""));
                 },
                 "advertiser-id" => {
-                    call = call.advertiser_id(value.unwrap_or(""));
+                    call = call.advertiser_id(        value.map(|v| arg_from_str(v, err, "advertiser-id", "int64")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -7642,10 +7657,10 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "update-mask" => {
-                    call = call.update_mask(value.unwrap_or(""));
+                    call = call.update_mask(        value.map(|v| arg_from_str(v, err, "update-mask", "google-fieldmask")).unwrap_or(FieldMask::default()));
                 },
                 "advertiser-id" => {
-                    call = call.advertiser_id(value.unwrap_or(""));
+                    call = call.advertiser_id(        value.map(|v| arg_from_str(v, err, "advertiser-id", "int64")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -7701,7 +7716,7 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "partner-id" => {
-                    call = call.partner_id(value.unwrap_or(""));
+                    call = call.partner_id(        value.map(|v| arg_from_str(v, err, "partner-id", "int64")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -7800,10 +7815,10 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "update-mask" => {
-                    call = call.update_mask(value.unwrap_or(""));
+                    call = call.update_mask(        value.map(|v| arg_from_str(v, err, "update-mask", "google-fieldmask")).unwrap_or(FieldMask::default()));
                 },
                 "partner-id" => {
-                    call = call.partner_id(value.unwrap_or(""));
+                    call = call.partner_id(        value.map(|v| arg_from_str(v, err, "partner-id", "int64")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -7859,10 +7874,10 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "partner-id" => {
-                    call = call.partner_id(value.unwrap_or(""));
+                    call = call.partner_id(        value.map(|v| arg_from_str(v, err, "partner-id", "int64")).unwrap_or(-0));
                 },
                 "advertiser-id" => {
-                    call = call.advertiser_id(value.unwrap_or(""));
+                    call = call.advertiser_id(        value.map(|v| arg_from_str(v, err, "advertiser-id", "int64")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -7918,13 +7933,13 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "partner-id" => {
-                    call = call.partner_id(value.unwrap_or(""));
+                    call = call.partner_id(        value.map(|v| arg_from_str(v, err, "partner-id", "int64")).unwrap_or(-0));
                 },
                 "page-token" => {
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 "order-by" => {
                     call = call.order_by(value.unwrap_or(""));
@@ -7933,7 +7948,7 @@ where
                     call = call.filter(value.unwrap_or(""));
                 },
                 "advertiser-id" => {
-                    call = call.advertiser_id(value.unwrap_or(""));
+                    call = call.advertiser_id(        value.map(|v| arg_from_str(v, err, "advertiser-id", "int64")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -7949,6 +7964,441 @@ where
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
                                                                            v.extend(["advertiser-id", "filter", "order-by", "page-size", "page-token", "partner-id"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _guaranteed_orders_create(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "default-advertiser-id" => Some(("defaultAdvertiserId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "default-campaign-id" => Some(("defaultCampaignId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "display-name" => Some(("displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "exchange" => Some(("exchange", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "guaranteed-order-id" => Some(("guaranteedOrderId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "legacy-guaranteed-order-id" => Some(("legacyGuaranteedOrderId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "publisher-name" => Some(("publisherName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "read-access-inherited" => Some(("readAccessInherited", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "read-advertiser-ids" => Some(("readAdvertiserIds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "read-write-advertiser-id" => Some(("readWriteAdvertiserId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "read-write-partner-id" => Some(("readWritePartnerId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "status.config-status" => Some(("status.configStatus", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "status.entity-pause-reason" => Some(("status.entityPauseReason", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "status.entity-status" => Some(("status.entityStatus", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["config-status", "default-advertiser-id", "default-campaign-id", "display-name", "entity-pause-reason", "entity-status", "exchange", "guaranteed-order-id", "legacy-guaranteed-order-id", "name", "publisher-name", "read-access-inherited", "read-advertiser-ids", "read-write-advertiser-id", "read-write-partner-id", "status", "update-time"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::GuaranteedOrder = json::value::from_value(object).unwrap();
+        let mut call = self.hub.guaranteed_orders().create(request);
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "partner-id" => {
+                    call = call.partner_id(        value.map(|v| arg_from_str(v, err, "partner-id", "int64")).unwrap_or(-0));
+                },
+                "advertiser-id" => {
+                    call = call.advertiser_id(        value.map(|v| arg_from_str(v, err, "advertiser-id", "int64")).unwrap_or(-0));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["advertiser-id", "partner-id"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _guaranteed_orders_edit_guaranteed_order_read_accessors(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "added-advertisers" => Some(("addedAdvertisers", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "partner-id" => Some(("partnerId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "read-access-inherited" => Some(("readAccessInherited", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "removed-advertisers" => Some(("removedAdvertisers", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["added-advertisers", "partner-id", "read-access-inherited", "removed-advertisers"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::EditGuaranteedOrderReadAccessorsRequest = json::value::from_value(object).unwrap();
+        let mut call = self.hub.guaranteed_orders().edit_guaranteed_order_read_accessors(request, opt.value_of("guaranteed-order-id").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _guaranteed_orders_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.guaranteed_orders().get(opt.value_of("guaranteed-order-id").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "partner-id" => {
+                    call = call.partner_id(        value.map(|v| arg_from_str(v, err, "partner-id", "int64")).unwrap_or(-0));
+                },
+                "advertiser-id" => {
+                    call = call.advertiser_id(        value.map(|v| arg_from_str(v, err, "advertiser-id", "int64")).unwrap_or(-0));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["advertiser-id", "partner-id"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _guaranteed_orders_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.guaranteed_orders().list();
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "partner-id" => {
+                    call = call.partner_id(        value.map(|v| arg_from_str(v, err, "partner-id", "int64")).unwrap_or(-0));
+                },
+                "page-token" => {
+                    call = call.page_token(value.unwrap_or(""));
+                },
+                "page-size" => {
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
+                },
+                "order-by" => {
+                    call = call.order_by(value.unwrap_or(""));
+                },
+                "filter" => {
+                    call = call.filter(value.unwrap_or(""));
+                },
+                "advertiser-id" => {
+                    call = call.advertiser_id(        value.map(|v| arg_from_str(v, err, "advertiser-id", "int64")).unwrap_or(-0));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["advertiser-id", "filter", "order-by", "page-size", "page-token", "partner-id"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _guaranteed_orders_patch(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "default-advertiser-id" => Some(("defaultAdvertiserId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "default-campaign-id" => Some(("defaultCampaignId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "display-name" => Some(("displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "exchange" => Some(("exchange", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "guaranteed-order-id" => Some(("guaranteedOrderId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "legacy-guaranteed-order-id" => Some(("legacyGuaranteedOrderId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "publisher-name" => Some(("publisherName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "read-access-inherited" => Some(("readAccessInherited", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "read-advertiser-ids" => Some(("readAdvertiserIds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "read-write-advertiser-id" => Some(("readWriteAdvertiserId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "read-write-partner-id" => Some(("readWritePartnerId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "status.config-status" => Some(("status.configStatus", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "status.entity-pause-reason" => Some(("status.entityPauseReason", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "status.entity-status" => Some(("status.entityStatus", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["config-status", "default-advertiser-id", "default-campaign-id", "display-name", "entity-pause-reason", "entity-status", "exchange", "guaranteed-order-id", "legacy-guaranteed-order-id", "name", "publisher-name", "read-access-inherited", "read-advertiser-ids", "read-write-advertiser-id", "read-write-partner-id", "status", "update-time"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::GuaranteedOrder = json::value::from_value(object).unwrap();
+        let mut call = self.hub.guaranteed_orders().patch(request, opt.value_of("guaranteed-order-id").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "update-mask" => {
+                    call = call.update_mask(        value.map(|v| arg_from_str(v, err, "update-mask", "google-fieldmask")).unwrap_or(FieldMask::default()));
+                },
+                "partner-id" => {
+                    call = call.partner_id(        value.map(|v| arg_from_str(v, err, "partner-id", "int64")).unwrap_or(-0));
+                },
+                "advertiser-id" => {
+                    call = call.advertiser_id(        value.map(|v| arg_from_str(v, err, "advertiser-id", "int64")).unwrap_or(-0));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["advertiser-id", "partner-id", "update-mask"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -8111,10 +8561,10 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "partner-id" => {
-                    call = call.partner_id(value.unwrap_or(""));
+                    call = call.partner_id(        value.map(|v| arg_from_str(v, err, "partner-id", "int64")).unwrap_or(-0));
                 },
                 "advertiser-id" => {
-                    call = call.advertiser_id(value.unwrap_or(""));
+                    call = call.advertiser_id(        value.map(|v| arg_from_str(v, err, "advertiser-id", "int64")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -8170,10 +8620,10 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "partner-id" => {
-                    call = call.partner_id(value.unwrap_or(""));
+                    call = call.partner_id(        value.map(|v| arg_from_str(v, err, "partner-id", "int64")).unwrap_or(-0));
                 },
                 "advertiser-id" => {
-                    call = call.advertiser_id(value.unwrap_or(""));
+                    call = call.advertiser_id(        value.map(|v| arg_from_str(v, err, "advertiser-id", "int64")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -8229,13 +8679,13 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "partner-id" => {
-                    call = call.partner_id(value.unwrap_or(""));
+                    call = call.partner_id(        value.map(|v| arg_from_str(v, err, "partner-id", "int64")).unwrap_or(-0));
                 },
                 "page-token" => {
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 "order-by" => {
                     call = call.order_by(value.unwrap_or(""));
@@ -8244,7 +8694,7 @@ where
                     call = call.filter(value.unwrap_or(""));
                 },
                 "advertiser-id" => {
-                    call = call.advertiser_id(value.unwrap_or(""));
+                    call = call.advertiser_id(        value.map(|v| arg_from_str(v, err, "advertiser-id", "int64")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -8335,10 +8785,10 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "partner-id" => {
-                    call = call.partner_id(value.unwrap_or(""));
+                    call = call.partner_id(        value.map(|v| arg_from_str(v, err, "partner-id", "int64")).unwrap_or(-0));
                 },
                 "advertiser-id" => {
-                    call = call.advertiser_id(value.unwrap_or(""));
+                    call = call.advertiser_id(        value.map(|v| arg_from_str(v, err, "advertiser-id", "int64")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -8394,10 +8844,10 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "partner-id" => {
-                    call = call.partner_id(value.unwrap_or(""));
+                    call = call.partner_id(        value.map(|v| arg_from_str(v, err, "partner-id", "int64")).unwrap_or(-0));
                 },
                 "advertiser-id" => {
-                    call = call.advertiser_id(value.unwrap_or(""));
+                    call = call.advertiser_id(        value.map(|v| arg_from_str(v, err, "advertiser-id", "int64")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -8453,10 +8903,10 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "partner-id" => {
-                    call = call.partner_id(value.unwrap_or(""));
+                    call = call.partner_id(        value.map(|v| arg_from_str(v, err, "partner-id", "int64")).unwrap_or(-0));
                 },
                 "advertiser-id" => {
-                    call = call.advertiser_id(value.unwrap_or(""));
+                    call = call.advertiser_id(        value.map(|v| arg_from_str(v, err, "advertiser-id", "int64")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -8512,13 +8962,13 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "partner-id" => {
-                    call = call.partner_id(value.unwrap_or(""));
+                    call = call.partner_id(        value.map(|v| arg_from_str(v, err, "partner-id", "int64")).unwrap_or(-0));
                 },
                 "page-token" => {
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 "order-by" => {
                     call = call.order_by(value.unwrap_or(""));
@@ -8527,7 +8977,7 @@ where
                     call = call.filter(value.unwrap_or(""));
                 },
                 "advertiser-id" => {
-                    call = call.advertiser_id(value.unwrap_or(""));
+                    call = call.advertiser_id(        value.map(|v| arg_from_str(v, err, "advertiser-id", "int64")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -8618,13 +9068,13 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "update-mask" => {
-                    call = call.update_mask(value.unwrap_or(""));
+                    call = call.update_mask(        value.map(|v| arg_from_str(v, err, "update-mask", "google-fieldmask")).unwrap_or(FieldMask::default()));
                 },
                 "partner-id" => {
-                    call = call.partner_id(value.unwrap_or(""));
+                    call = call.partner_id(        value.map(|v| arg_from_str(v, err, "partner-id", "int64")).unwrap_or(-0));
                 },
                 "advertiser-id" => {
-                    call = call.advertiser_id(value.unwrap_or(""));
+                    call = call.advertiser_id(        value.map(|v| arg_from_str(v, err, "advertiser-id", "int64")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -8673,6 +9123,217 @@ where
         }
     }
 
+    async fn _inventory_sources_create(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "commitment" => Some(("commitment", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "deal-id" => Some(("dealId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "delivery-method" => Some(("deliveryMethod", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "display-name" => Some(("displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "exchange" => Some(("exchange", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "guaranteed-order-id" => Some(("guaranteedOrderId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "inventory-source-id" => Some(("inventorySourceId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "inventory-source-product-type" => Some(("inventorySourceProductType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "inventory-source-type" => Some(("inventorySourceType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "publisher-name" => Some(("publisherName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "rate-details.inventory-source-rate-type" => Some(("rateDetails.inventorySourceRateType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "rate-details.minimum-spend.currency-code" => Some(("rateDetails.minimumSpend.currencyCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "rate-details.minimum-spend.nanos" => Some(("rateDetails.minimumSpend.nanos", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "rate-details.minimum-spend.units" => Some(("rateDetails.minimumSpend.units", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "rate-details.rate.currency-code" => Some(("rateDetails.rate.currencyCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "rate-details.rate.nanos" => Some(("rateDetails.rate.nanos", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "rate-details.rate.units" => Some(("rateDetails.rate.units", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "rate-details.units-purchased" => Some(("rateDetails.unitsPurchased", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "read-advertiser-ids" => Some(("readAdvertiserIds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "read-partner-ids" => Some(("readPartnerIds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "read-write-accessors.advertisers.advertiser-ids" => Some(("readWriteAccessors.advertisers.advertiserIds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "read-write-accessors.partner.partner-id" => Some(("readWriteAccessors.partner.partnerId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "status.config-status" => Some(("status.configStatus", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "status.entity-pause-reason" => Some(("status.entityPauseReason", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "status.entity-status" => Some(("status.entityStatus", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "status.seller-pause-reason" => Some(("status.sellerPauseReason", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "status.seller-status" => Some(("status.sellerStatus", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "sub-site-property-id" => Some(("subSitePropertyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "time-range.end-time" => Some(("timeRange.endTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "time-range.start-time" => Some(("timeRange.startTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["advertiser-ids", "advertisers", "commitment", "config-status", "currency-code", "deal-id", "delivery-method", "display-name", "end-time", "entity-pause-reason", "entity-status", "exchange", "guaranteed-order-id", "inventory-source-id", "inventory-source-product-type", "inventory-source-rate-type", "inventory-source-type", "minimum-spend", "name", "nanos", "partner", "partner-id", "publisher-name", "rate", "rate-details", "read-advertiser-ids", "read-partner-ids", "read-write-accessors", "seller-pause-reason", "seller-status", "start-time", "status", "sub-site-property-id", "time-range", "units", "units-purchased", "update-time"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::InventorySource = json::value::from_value(object).unwrap();
+        let mut call = self.hub.inventory_sources().create(request);
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "partner-id" => {
+                    call = call.partner_id(        value.map(|v| arg_from_str(v, err, "partner-id", "int64")).unwrap_or(-0));
+                },
+                "advertiser-id" => {
+                    call = call.advertiser_id(        value.map(|v| arg_from_str(v, err, "advertiser-id", "int64")).unwrap_or(-0));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["advertiser-id", "partner-id"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _inventory_sources_edit_inventory_source_read_write_accessors(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "advertisers-update.added-advertisers" => Some(("advertisersUpdate.addedAdvertisers", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "advertisers-update.removed-advertisers" => Some(("advertisersUpdate.removedAdvertisers", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "assign-partner" => Some(("assignPartner", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "partner-id" => Some(("partnerId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["added-advertisers", "advertisers-update", "assign-partner", "partner-id", "removed-advertisers"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::EditInventorySourceReadWriteAccessorsRequest = json::value::from_value(object).unwrap();
+        let mut call = self.hub.inventory_sources().edit_inventory_source_read_write_accessors(request, opt.value_of("inventory-source-id").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
     async fn _inventory_sources_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.inventory_sources().get(opt.value_of("inventory-source-id").unwrap_or(""));
@@ -8680,7 +9341,7 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "partner-id" => {
-                    call = call.partner_id(value.unwrap_or(""));
+                    call = call.partner_id(        value.map(|v| arg_from_str(v, err, "partner-id", "int64")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -8736,13 +9397,13 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "partner-id" => {
-                    call = call.partner_id(value.unwrap_or(""));
+                    call = call.partner_id(        value.map(|v| arg_from_str(v, err, "partner-id", "int64")).unwrap_or(-0));
                 },
                 "page-token" => {
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 "order-by" => {
                     call = call.order_by(value.unwrap_or(""));
@@ -8751,7 +9412,7 @@ where
                     call = call.filter(value.unwrap_or(""));
                 },
                 "advertiser-id" => {
-                    call = call.advertiser_id(value.unwrap_or(""));
+                    call = call.advertiser_id(        value.map(|v| arg_from_str(v, err, "advertiser-id", "int64")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -8767,6 +9428,132 @@ where
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
                                                                            v.extend(["advertiser-id", "filter", "order-by", "page-size", "page-token", "partner-id"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _inventory_sources_patch(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "commitment" => Some(("commitment", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "deal-id" => Some(("dealId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "delivery-method" => Some(("deliveryMethod", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "display-name" => Some(("displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "exchange" => Some(("exchange", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "guaranteed-order-id" => Some(("guaranteedOrderId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "inventory-source-id" => Some(("inventorySourceId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "inventory-source-product-type" => Some(("inventorySourceProductType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "inventory-source-type" => Some(("inventorySourceType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "publisher-name" => Some(("publisherName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "rate-details.inventory-source-rate-type" => Some(("rateDetails.inventorySourceRateType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "rate-details.minimum-spend.currency-code" => Some(("rateDetails.minimumSpend.currencyCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "rate-details.minimum-spend.nanos" => Some(("rateDetails.minimumSpend.nanos", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "rate-details.minimum-spend.units" => Some(("rateDetails.minimumSpend.units", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "rate-details.rate.currency-code" => Some(("rateDetails.rate.currencyCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "rate-details.rate.nanos" => Some(("rateDetails.rate.nanos", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "rate-details.rate.units" => Some(("rateDetails.rate.units", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "rate-details.units-purchased" => Some(("rateDetails.unitsPurchased", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "read-advertiser-ids" => Some(("readAdvertiserIds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "read-partner-ids" => Some(("readPartnerIds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "read-write-accessors.advertisers.advertiser-ids" => Some(("readWriteAccessors.advertisers.advertiserIds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "read-write-accessors.partner.partner-id" => Some(("readWriteAccessors.partner.partnerId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "status.config-status" => Some(("status.configStatus", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "status.entity-pause-reason" => Some(("status.entityPauseReason", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "status.entity-status" => Some(("status.entityStatus", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "status.seller-pause-reason" => Some(("status.sellerPauseReason", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "status.seller-status" => Some(("status.sellerStatus", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "sub-site-property-id" => Some(("subSitePropertyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "time-range.end-time" => Some(("timeRange.endTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "time-range.start-time" => Some(("timeRange.startTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["advertiser-ids", "advertisers", "commitment", "config-status", "currency-code", "deal-id", "delivery-method", "display-name", "end-time", "entity-pause-reason", "entity-status", "exchange", "guaranteed-order-id", "inventory-source-id", "inventory-source-product-type", "inventory-source-rate-type", "inventory-source-type", "minimum-spend", "name", "nanos", "partner", "partner-id", "publisher-name", "rate", "rate-details", "read-advertiser-ids", "read-partner-ids", "read-write-accessors", "seller-pause-reason", "seller-status", "start-time", "status", "sub-site-property-id", "time-range", "units", "units-purchased", "update-time"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::InventorySource = json::value::from_value(object).unwrap();
+        let mut call = self.hub.inventory_sources().patch(request, opt.value_of("inventory-source-id").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "update-mask" => {
+                    call = call.update_mask(        value.map(|v| arg_from_str(v, err, "update-mask", "google-fieldmask")).unwrap_or(FieldMask::default()));
+                },
+                "partner-id" => {
+                    call = call.partner_id(        value.map(|v| arg_from_str(v, err, "partner-id", "int64")).unwrap_or(-0));
+                },
+                "advertiser-id" => {
+                    call = call.advertiser_id(        value.map(|v| arg_from_str(v, err, "advertiser-id", "int64")).unwrap_or(-0));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["advertiser-id", "partner-id", "update-mask"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -9080,7 +9867,7 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "advertiser-id" => {
-                    call = call.advertiser_id(value.unwrap_or(""));
+                    call = call.advertiser_id(        value.map(|v| arg_from_str(v, err, "advertiser-id", "int64")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -9136,7 +9923,7 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "advertiser-id" => {
-                    call = call.advertiser_id(value.unwrap_or(""));
+                    call = call.advertiser_id(        value.map(|v| arg_from_str(v, err, "advertiser-id", "int64")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -9195,7 +9982,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 "order-by" => {
                     call = call.order_by(value.unwrap_or(""));
@@ -9204,7 +9991,7 @@ where
                     call = call.filter(value.unwrap_or(""));
                 },
                 "advertiser-id" => {
-                    call = call.advertiser_id(value.unwrap_or(""));
+                    call = call.advertiser_id(        value.map(|v| arg_from_str(v, err, "advertiser-id", "int64")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -9299,10 +10086,10 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "update-mask" => {
-                    call = call.update_mask(value.unwrap_or(""));
+                    call = call.update_mask(        value.map(|v| arg_from_str(v, err, "update-mask", "google-fieldmask")).unwrap_or(FieldMask::default()));
                 },
                 "advertiser-id" => {
-                    call = call.advertiser_id(value.unwrap_or(""));
+                    call = call.advertiser_id(        value.map(|v| arg_from_str(v, err, "advertiser-id", "int64")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -9479,7 +10266,7 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "advertiser-id" => {
-                    call = call.advertiser_id(value.unwrap_or(""));
+                    call = call.advertiser_id(        value.map(|v| arg_from_str(v, err, "advertiser-id", "int64")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -9535,7 +10322,7 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "advertiser-id" => {
-                    call = call.advertiser_id(value.unwrap_or(""));
+                    call = call.advertiser_id(        value.map(|v| arg_from_str(v, err, "advertiser-id", "int64")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -9594,7 +10381,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 "order-by" => {
                     call = call.order_by(value.unwrap_or(""));
@@ -9603,7 +10390,7 @@ where
                     call = call.filter(value.unwrap_or(""));
                 },
                 "advertiser-id" => {
-                    call = call.advertiser_id(value.unwrap_or(""));
+                    call = call.advertiser_id(        value.map(|v| arg_from_str(v, err, "advertiser-id", "int64")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -9800,7 +10587,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 "order-by" => {
                     call = call.order_by(value.unwrap_or(""));
@@ -9907,12 +10694,19 @@ where
                     "category-details.targeting-option-id" => Some(("categoryDetails.targetingOptionId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "channel-details.channel-id" => Some(("channelDetails.channelId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "channel-details.negative" => Some(("channelDetails.negative", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "content-duration-details.content-duration" => Some(("contentDurationDetails.contentDuration", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-duration-details.targeting-option-id" => Some(("contentDurationDetails.targetingOptionId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-genre-details.display-name" => Some(("contentGenreDetails.displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-genre-details.negative" => Some(("contentGenreDetails.negative", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "content-genre-details.targeting-option-id" => Some(("contentGenreDetails.targetingOptionId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "content-instream-position-details.ad-type" => Some(("contentInstreamPositionDetails.adType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "content-instream-position-details.content-instream-position" => Some(("contentInstreamPositionDetails.contentInstreamPosition", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "content-instream-position-details.targeting-option-id" => Some(("contentInstreamPositionDetails.targetingOptionId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "content-outstream-position-details.ad-type" => Some(("contentOutstreamPositionDetails.adType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "content-outstream-position-details.content-outstream-position" => Some(("contentOutstreamPositionDetails.contentOutstreamPosition", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "content-outstream-position-details.targeting-option-id" => Some(("contentOutstreamPositionDetails.targetingOptionId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-stream-type-details.content-stream-type" => Some(("contentStreamTypeDetails.contentStreamType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-stream-type-details.targeting-option-id" => Some(("contentStreamTypeDetails.targetingOptionId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "day-and-time-details.day-of-week" => Some(("dayAndTimeDetails.dayOfWeek", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "day-and-time-details.end-hour" => Some(("dayAndTimeDetails.endHour", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "day-and-time-details.start-hour" => Some(("dayAndTimeDetails.startHour", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
@@ -10009,7 +10803,7 @@ where
                     "viewability-details.targeting-option-id" => Some(("viewabilityDetails.targetingOptionId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "viewability-details.viewability" => Some(("viewabilityDetails.viewability", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["ad-type", "adloox", "age-range", "age-range-details", "app-category-details", "app-details", "app-id", "app-platform", "app-star-rating", "assigned-targeting-option-id", "audio-content-type", "audio-content-type-details", "authorized-seller-status", "authorized-seller-status-details", "avoid-insufficient-option", "avoid-insufficient-star-rating", "avoid-unknown-brand-safety-category", "avoided-age-ratings", "avoided-fraud-option", "avoided-high-severity-categories", "avoided-medium-severity-categories", "avoided-star-rating", "brand-safety-categories", "browser-details", "business-chain-details", "carrier-and-isp-details", "category-details", "channel-details", "channel-id", "content-instream-position", "content-instream-position-details", "content-outstream-position", "content-outstream-position-details", "content-position", "content-rating-tier", "custom-segment-id", "day-and-time-details", "day-of-week", "device-make-model-details", "device-type", "device-type-details", "digital-content-label-exclusion-details", "display-name", "display-viewability", "double-verify", "end-hour", "environment", "environment-details", "exchange-details", "exclude-unrateable", "excluded-ad-fraud-risk", "excluded-adloox-categories", "excluded-adult-risk", "excluded-alcohol-risk", "excluded-drugs-risk", "excluded-gambling-risk", "excluded-hate-speech-risk", "excluded-illegal-downloads-risk", "excluded-offensive-language-risk", "excluded-targeting-option-id", "excluded-violence-risk", "fraud-invalid-traffic", "gender", "gender-details", "geo-region-details", "geo-region-type", "household-income", "household-income-details", "iab", "inheritance", "integral-ad-science", "inventory-source-details", "inventory-source-group-details", "inventory-source-group-id", "inventory-source-id", "keyword", "keyword-details", "language-details", "latitude", "longitude", "name", "native-content-position-details", "negative", "negative-keyword-list-details", "negative-keyword-list-id", "omid", "omid-details", "on-screen-position", "on-screen-position-details", "operating-system-details", "parental-status", "parental-status-details", "player-impression-rate", "poi-details", "proximity-location-list-details", "proximity-location-list-id", "proximity-radius-amount", "proximity-radius-range", "proximity-radius-unit", "regional-location-list-details", "regional-location-list-id", "sensitive-category", "sensitive-category-exclusion-details", "start-hour", "sub-exchange-details", "targeting-option-id", "targeting-type", "third-party-verifier-details", "time-zone-resolution", "traq-score-option", "url", "url-details", "user-rewarded-content", "user-rewarded-content-details", "video-iab", "video-player-size", "video-player-size-details", "video-viewability", "video-viewable-rate", "viewability", "viewability-details", "viewable-during"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["ad-type", "adloox", "age-range", "age-range-details", "app-category-details", "app-details", "app-id", "app-platform", "app-star-rating", "assigned-targeting-option-id", "audio-content-type", "audio-content-type-details", "authorized-seller-status", "authorized-seller-status-details", "avoid-insufficient-option", "avoid-insufficient-star-rating", "avoid-unknown-brand-safety-category", "avoided-age-ratings", "avoided-fraud-option", "avoided-high-severity-categories", "avoided-medium-severity-categories", "avoided-star-rating", "brand-safety-categories", "browser-details", "business-chain-details", "carrier-and-isp-details", "category-details", "channel-details", "channel-id", "content-duration", "content-duration-details", "content-genre-details", "content-instream-position", "content-instream-position-details", "content-outstream-position", "content-outstream-position-details", "content-position", "content-rating-tier", "content-stream-type", "content-stream-type-details", "custom-segment-id", "day-and-time-details", "day-of-week", "device-make-model-details", "device-type", "device-type-details", "digital-content-label-exclusion-details", "display-name", "display-viewability", "double-verify", "end-hour", "environment", "environment-details", "exchange-details", "exclude-unrateable", "excluded-ad-fraud-risk", "excluded-adloox-categories", "excluded-adult-risk", "excluded-alcohol-risk", "excluded-drugs-risk", "excluded-gambling-risk", "excluded-hate-speech-risk", "excluded-illegal-downloads-risk", "excluded-offensive-language-risk", "excluded-targeting-option-id", "excluded-violence-risk", "fraud-invalid-traffic", "gender", "gender-details", "geo-region-details", "geo-region-type", "household-income", "household-income-details", "iab", "inheritance", "integral-ad-science", "inventory-source-details", "inventory-source-group-details", "inventory-source-group-id", "inventory-source-id", "keyword", "keyword-details", "language-details", "latitude", "longitude", "name", "native-content-position-details", "negative", "negative-keyword-list-details", "negative-keyword-list-id", "omid", "omid-details", "on-screen-position", "on-screen-position-details", "operating-system-details", "parental-status", "parental-status-details", "player-impression-rate", "poi-details", "proximity-location-list-details", "proximity-location-list-id", "proximity-radius-amount", "proximity-radius-range", "proximity-radius-unit", "regional-location-list-details", "regional-location-list-id", "sensitive-category", "sensitive-category-exclusion-details", "start-hour", "sub-exchange-details", "targeting-option-id", "targeting-type", "third-party-verifier-details", "time-zone-resolution", "traq-score-option", "url", "url-details", "user-rewarded-content", "user-rewarded-content-details", "video-iab", "video-player-size", "video-player-size-details", "video-viewability", "video-viewable-rate", "viewability", "viewability-details", "viewable-during"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -10183,7 +10977,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 "order-by" => {
                     call = call.order_by(value.unwrap_or(""));
@@ -10394,7 +11188,7 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "advertiser-id" => {
-                    call = call.advertiser_id(value.unwrap_or(""));
+                    call = call.advertiser_id(        value.map(|v| arg_from_str(v, err, "advertiser-id", "int64")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -10453,7 +11247,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 "order-by" => {
                     call = call.order_by(value.unwrap_or(""));
@@ -10462,7 +11256,7 @@ where
                     call = call.filter(value.unwrap_or(""));
                 },
                 "advertiser-id" => {
-                    call = call.advertiser_id(value.unwrap_or(""));
+                    call = call.advertiser_id(        value.map(|v| arg_from_str(v, err, "advertiser-id", "int64")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -10889,7 +11683,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 "order-by" => {
                     call = call.order_by(value.unwrap_or(""));
@@ -10987,7 +11781,7 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "update-mask" => {
-                    call = call.update_mask(value.unwrap_or(""));
+                    call = call.update_mask(        value.map(|v| arg_from_str(v, err, "update-mask", "google-fieldmask")).unwrap_or(FieldMask::default()));
                 },
                 _ => {
                     let mut found = false;
@@ -11403,6 +12197,29 @@ where
                     }
                 }
             },
+            ("guaranteed-orders", Some(opt)) => {
+                match opt.subcommand() {
+                    ("create", Some(opt)) => {
+                        call_result = self._guaranteed_orders_create(opt, dry_run, &mut err).await;
+                    },
+                    ("edit-guaranteed-order-read-accessors", Some(opt)) => {
+                        call_result = self._guaranteed_orders_edit_guaranteed_order_read_accessors(opt, dry_run, &mut err).await;
+                    },
+                    ("get", Some(opt)) => {
+                        call_result = self._guaranteed_orders_get(opt, dry_run, &mut err).await;
+                    },
+                    ("list", Some(opt)) => {
+                        call_result = self._guaranteed_orders_list(opt, dry_run, &mut err).await;
+                    },
+                    ("patch", Some(opt)) => {
+                        call_result = self._guaranteed_orders_patch(opt, dry_run, &mut err).await;
+                    },
+                    _ => {
+                        err.issues.push(CLIError::MissingMethodError("guaranteed-orders".to_string()));
+                        writeln!(io::stderr(), "{}\n", opt.usage()).ok();
+                    }
+                }
+            },
             ("inventory-source-groups", Some(opt)) => {
                 match opt.subcommand() {
                     ("assigned-inventory-sources-bulk-edit", Some(opt)) => {
@@ -11440,11 +12257,20 @@ where
             },
             ("inventory-sources", Some(opt)) => {
                 match opt.subcommand() {
+                    ("create", Some(opt)) => {
+                        call_result = self._inventory_sources_create(opt, dry_run, &mut err).await;
+                    },
+                    ("edit-inventory-source-read-write-accessors", Some(opt)) => {
+                        call_result = self._inventory_sources_edit_inventory_source_read_write_accessors(opt, dry_run, &mut err).await;
+                    },
                     ("get", Some(opt)) => {
                         call_result = self._inventory_sources_get(opt, dry_run, &mut err).await;
                     },
                     ("list", Some(opt)) => {
                         call_result = self._inventory_sources_list(opt, dry_run, &mut err).await;
+                    },
+                    ("patch", Some(opt)) => {
+                        call_result = self._inventory_sources_patch(opt, dry_run, &mut err).await;
                     },
                     _ => {
                         err.issues.push(CLIError::MissingMethodError("inventory-sources".to_string()));
@@ -12552,7 +13378,7 @@ async fn main() {
         
                     (Some(r##"insertion-order-id"##),
                      None,
-                     Some(r##"The ID of the insertion order we need to delete."##),
+                     Some(r##"The ID of the insertion order to delete."##),
                      Some(true),
                      Some(false)),
         
@@ -12771,7 +13597,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("line-items-bulk-edit-line-item-assigned-targeting-options",
-                    Some(r##"Bulk edits targeting options under a single line item. The operation will delete the assigned targeting options provided in BulkEditLineItemAssignedTargetingOptionsRequest.delete_requests and then create the assigned targeting options provided in BulkEditLineItemAssignedTargetingOptionsRequest.create_requests. Requests to this endpoint cannot be made concurrently with the following requests updating the same line item: * BulkEditLineItemAssignedTargetingOptions * UpdateLineItem * CreateLineItemAssignedTargetingOption * DeleteLineItemAssignedTargetingOption"##),
+                    Some(r##"Bulk edits targeting options under a single line item. The operation will delete the assigned targeting options provided in BulkEditLineItemAssignedTargetingOptionsRequest.delete_requests and then create the assigned targeting options provided in BulkEditLineItemAssignedTargetingOptionsRequest.create_requests. Requests to this endpoint cannot be made concurrently with the following requests updating the same line item: * UpdateLineItem * CreateLineItemAssignedTargetingOption * DeleteLineItemAssignedTargetingOption"##),
                     "Details at http://byron.github.io/google-apis-rs/google_displayvideo1_cli/advertisers_line-items-bulk-edit-line-item-assigned-targeting-options",
                   vec![
                     (Some(r##"advertiser-id"##),
@@ -12872,7 +13698,7 @@ async fn main() {
         
                     (Some(r##"line-item-id"##),
                      None,
-                     Some(r##"The ID of the line item we need to fetch."##),
+                     Some(r##"The ID of the line item to delete."##),
                      Some(true),
                      Some(false)),
         
@@ -12967,7 +13793,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("line-items-patch",
-                    Some(r##"Updates an existing line item. Returns the updated line item if successful. Requests to this endpoint cannot be made concurrently with the following requests updating the same line item: * BulkEditLineItemAssignedTargetingOptions * UpdateLineItem * CreateLineItemAssignedTargetingOption * DeleteLineItemAssignedTargetingOption"##),
+                    Some(r##"Updates an existing line item. Returns the updated line item if successful. Requests to this endpoint cannot be made concurrently with the following requests updating the same line item: * BulkEditAssignedTargetingOptions * BulkUpdateLineItems * CreateLineItemAssignedTargetingOption * DeleteLineItemAssignedTargetingOption"##),
                     "Details at http://byron.github.io/google-apis-rs/google_displayvideo1_cli/advertisers_line-items-patch",
                   vec![
                     (Some(r##"advertiser-id"##),
@@ -13001,7 +13827,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("line-items-targeting-types-assigned-targeting-options-create",
-                    Some(r##"Assigns a targeting option to a line item. Returns the assigned targeting option if successful. Requests to this endpoint cannot be made concurrently with the following requests updating the same line item: * BulkEditLineItemAssignedTargetingOptions * UpdateLineItem * CreateLineItemAssignedTargetingOption * DeleteLineItemAssignedTargetingOption"##),
+                    Some(r##"Assigns a targeting option to a line item. Returns the assigned targeting option if successful. Requests to this endpoint cannot be made concurrently with the following requests updating the same line item: * BulkEditAssignedTargetingOptions * BulkUpdate * UpdateLineItem * DeleteLineItemAssignedTargetingOption"##),
                     "Details at http://byron.github.io/google-apis-rs/google_displayvideo1_cli/advertisers_line-items-targeting-types-assigned-targeting-options-create",
                   vec![
                     (Some(r##"advertiser-id"##),
@@ -13041,7 +13867,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("line-items-targeting-types-assigned-targeting-options-delete",
-                    Some(r##"Deletes an assigned targeting option from a line item. Requests to this endpoint cannot be made concurrently with the following requests updating the same line item: * BulkEditLineItemAssignedTargetingOptions * UpdateLineItem * CreateLineItemAssignedTargetingOption * DeleteLineItemAssignedTargetingOption"##),
+                    Some(r##"Deletes an assigned targeting option from a line item. Requests to this endpoint cannot be made concurrently with the following requests updating the same line item: * BulkEditAssignedTargetingOptions * BulkUpdate * UpdateLineItem * CreateLineItemAssignedTargetingOption"##),
                     "Details at http://byron.github.io/google-apis-rs/google_displayvideo1_cli/advertisers_line-items-targeting-types-assigned-targeting-options-delete",
                   vec![
                     (Some(r##"advertiser-id"##),
@@ -14542,6 +15368,125 @@ async fn main() {
                   ]),
             ]),
         
+        ("guaranteed-orders", "methods: 'create', 'edit-guaranteed-order-read-accessors', 'get', 'list' and 'patch'", vec![
+            ("create",
+                    Some(r##"Creates a new guaranteed order. Returns the newly created guaranteed order if successful."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_displayvideo1_cli/guaranteed-orders_create",
+                  vec![
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("edit-guaranteed-order-read-accessors",
+                    Some(r##"Edits read advertisers of a guaranteed order."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_displayvideo1_cli/guaranteed-orders_edit-guaranteed-order-read-accessors",
+                  vec![
+                    (Some(r##"guaranteed-order-id"##),
+                     None,
+                     Some(r##"Required. The ID of the guaranteed order to edit. The ID is of the format `{exchange}-{legacy_guaranteed_order_id}`"##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("get",
+                    Some(r##"Gets a guaranteed order."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_displayvideo1_cli/guaranteed-orders_get",
+                  vec![
+                    (Some(r##"guaranteed-order-id"##),
+                     None,
+                     Some(r##"Required. The ID of the guaranteed order to fetch. The ID is of the format `{exchange}-{legacy_guaranteed_order_id}`"##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("list",
+                    Some(r##"Lists guaranteed orders that are accessible to the current user. The order is defined by the order_by parameter. If a filter by entity_status is not specified, guaranteed orders with entity status `ENTITY_STATUS_ARCHIVED` will not be included in the results."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_displayvideo1_cli/guaranteed-orders_list",
+                  vec![
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("patch",
+                    Some(r##"Updates an existing guaranteed order. Returns the updated guaranteed order if successful."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_displayvideo1_cli/guaranteed-orders_patch",
+                  vec![
+                    (Some(r##"guaranteed-order-id"##),
+                     None,
+                     Some(r##"Output only. The unique identifier of the guaranteed order. The guaranteed order IDs have the format `{exchange}-{legacy_guaranteed_order_id}`."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ]),
+        
         ("inventory-source-groups", "methods: 'assigned-inventory-sources-bulk-edit', 'assigned-inventory-sources-create', 'assigned-inventory-sources-delete', 'assigned-inventory-sources-list', 'create', 'delete', 'get', 'list' and 'patch'", vec![
             ("assigned-inventory-sources-bulk-edit",
                     Some(r##"Bulk edits multiple assignments between inventory sources and a single inventory source group. The operation will delete the assigned inventory sources provided in BulkEditAssignedInventorySourcesRequest.deleted_assigned_inventory_sources and then create the assigned inventory sources provided in BulkEditAssignedInventorySourcesRequest.created_assigned_inventory_sources."##),
@@ -14761,7 +15706,57 @@ async fn main() {
                   ]),
             ]),
         
-        ("inventory-sources", "methods: 'get' and 'list'", vec![
+        ("inventory-sources", "methods: 'create', 'edit-inventory-source-read-write-accessors', 'get', 'list' and 'patch'", vec![
+            ("create",
+                    Some(r##"Creates a new inventory source. Returns the newly created inventory source if successful."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_displayvideo1_cli/inventory-sources_create",
+                  vec![
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("edit-inventory-source-read-write-accessors",
+                    Some(r##"Edits read/write accessors of an inventory source. Returns the updated read_write_accessors for the inventory source."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_displayvideo1_cli/inventory-sources_edit-inventory-source-read-write-accessors",
+                  vec![
+                    (Some(r##"inventory-source-id"##),
+                     None,
+                     Some(r##"Required. The ID of inventory source to update."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
             ("get",
                     Some(r##"Gets an inventory source."##),
                     "Details at http://byron.github.io/google-apis-rs/google_displayvideo1_cli/inventory-sources_get",
@@ -14788,6 +15783,34 @@ async fn main() {
                     Some(r##"Lists inventory sources that are accessible to the current user. The order is defined by the order_by parameter. If a filter by entity_status is not specified, inventory sources with entity status `ENTITY_STATUS_ARCHIVED` will not be included in the results."##),
                     "Details at http://byron.github.io/google-apis-rs/google_displayvideo1_cli/inventory-sources_list",
                   vec![
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("patch",
+                    Some(r##"Updates an existing inventory source. Returns the updated inventory source if successful."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_displayvideo1_cli/inventory-sources_patch",
+                  vec![
+                    (Some(r##"inventory-source-id"##),
+                     None,
+                     Some(r##"Output only. The unique ID of the inventory source. Assigned by the system."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
                     (Some(r##"v"##),
                      Some(r##"p"##),
                      Some(r##"Set various optional parameters, matching the key=value form"##),
@@ -15609,7 +16632,7 @@ async fn main() {
     
     let mut app = App::new("displayvideo1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("4.0.1+20220303")
+           .version("5.0.2+20230119")
            .about("Display & Video 360 API allows users to automate complex Display & Video 360 workflows, such as creating insertion orders and setting targeting options for individual line items.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_displayvideo1_cli")
            .arg(Arg::with_name("url")

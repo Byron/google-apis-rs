@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *OrgPolicy API* API at revision *20220305*. The CLI is at version *4.0.1*.
+This documentation was generated from the *OrgPolicy API* API at revision *20230123*. The CLI is at version *5.0.2*.
 
 ```bash
 orgpolicy2 [options]
@@ -39,6 +39,11 @@ orgpolicy2 [options]
                 policies-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
         organizations
                 constraints-list <parent> [-p <v>]... [-o <out>]
+                custom-constraints-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                custom-constraints-delete <name> [-p <v>]... [-o <out>]
+                custom-constraints-get <name> [-p <v>]... [-o <out>]
+                custom-constraints-list <parent> [-p <v>]... [-o <out>]
+                custom-constraints-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 policies-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 policies-delete <name> [-p <v>]... [-o <out>]
                 policies-get <name> [-p <v>]... [-o <out>]

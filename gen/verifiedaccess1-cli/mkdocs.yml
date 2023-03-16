@@ -1,4 +1,4 @@
-site_name: verifiedaccess v4.0.1+20220215
+site_name: verifiedaccess v5.0.2+20230117
 site_url: http://byron.github.io/google-apis-rs/google-verifiedaccess1-cli
 site_description: A complete library to interact with verifiedaccess (protocol v1)
 
@@ -7,10 +7,11 @@ repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/verifiedaccess1-
 docs_dir: docs
 site_dir: build_html
 
-pages:
-- ['index.md', 'Home']
-- ['challenge_create.md', 'Challenge', 'Create']
-- ['challenge_verify.md', 'Challenge', 'Verify']
+nav:
+- Home: 'index.md'
+- 'Challenge':
+    - 'Create': 'challenge_create.md'
+    - 'Verify': 'challenge_verify.md'
 
 theme: readthedocs
 

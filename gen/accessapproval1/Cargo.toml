@@ -4,12 +4,12 @@
 [package]
 
 name = "google-accessapproval1"
-version = "5.0.2-beta-1+20230120"
+version = "5.0.2+20230120"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Access Approval (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/accessapproval1"
 homepage = "https://cloud.google.com/cloud-provider-access-management/access-approval/docs"
-documentation = "https://docs.rs/google-accessapproval1/5.0.2-beta-1+20230120"
+documentation = "https://docs.rs/google-accessapproval1/5.0.2+20230120"
 license = "MIT"
 keywords = ["accessapproval", "google", "protocol", "web", "api"]
 autobins = false

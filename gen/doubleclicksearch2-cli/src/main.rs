@@ -3,8 +3,6 @@
 // DO NOT EDIT !
 #![allow(unused_variables, unused_imports, dead_code, unused_mut)]
 
-extern crate tokio;
-
 #[macro_use]
 extern crate clap;
 
@@ -12,9 +10,10 @@ use std::env;
 use std::io::{self, Write};
 use clap::{App, SubCommand, Arg};
 
-use google_doubleclicksearch2::{api, Error, oauth2};
+use google_doubleclicksearch2::{api, Error, oauth2, client::chrono, FieldMask};
 
-mod client;
+
+use google_clis_common as client;
 
 use client::{InvalidOptionsError, CLIError, arg_from_str, writer_from_opts, parse_kv_arg,
           input_file_from_opts, input_mime_from_opts, FieldCursor, FieldError, CallType, UploadProtocol,
@@ -61,17 +60,20 @@ where
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
+                "customer-id" => {
+                    call = call.customer_id(value.unwrap_or(""));
+                },
                 "criterion-id" => {
-                    call = call.criterion_id(value.unwrap_or(""));
+                    call = call.criterion_id(        value.map(|v| arg_from_str(v, err, "criterion-id", "int64")).unwrap_or(-0));
                 },
                 "campaign-id" => {
-                    call = call.campaign_id(value.unwrap_or(""));
+                    call = call.campaign_id(        value.map(|v| arg_from_str(v, err, "campaign-id", "int64")).unwrap_or(-0));
                 },
                 "ad-id" => {
-                    call = call.ad_id(value.unwrap_or(""));
+                    call = call.ad_id(        value.map(|v| arg_from_str(v, err, "ad-id", "int64")).unwrap_or(-0));
                 },
                 "ad-group-id" => {
-                    call = call.ad_group_id(value.unwrap_or(""));
+                    call = call.ad_group_id(        value.map(|v| arg_from_str(v, err, "ad-group-id", "int64")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -86,7 +88,85 @@ where
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["ad-group-id", "ad-id", "campaign-id", "criterion-id"].iter().map(|v|*v));
+                                                                           v.extend(["ad-group-id", "ad-id", "campaign-id", "criterion-id", "customer-id"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _conversion_get_by_customer_id(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let end_date: i32 = arg_from_str(&opt.value_of("end-date").unwrap_or(""), err, "<end-date>", "integer");
+        let row_count: i32 = arg_from_str(&opt.value_of("row-count").unwrap_or(""), err, "<row-count>", "integer");
+        let start_date: i32 = arg_from_str(&opt.value_of("start-date").unwrap_or(""), err, "<start-date>", "integer");
+        let start_row: u32 = arg_from_str(&opt.value_of("start-row").unwrap_or(""), err, "<start-row>", "integer");
+        let mut call = self.hub.conversion().get_by_customer_id(opt.value_of("customer-id").unwrap_or(""), end_date, row_count, start_date, start_row);
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "engine-account-id" => {
+                    call = call.engine_account_id(        value.map(|v| arg_from_str(v, err, "engine-account-id", "int64")).unwrap_or(-0));
+                },
+                "criterion-id" => {
+                    call = call.criterion_id(        value.map(|v| arg_from_str(v, err, "criterion-id", "int64")).unwrap_or(-0));
+                },
+                "campaign-id" => {
+                    call = call.campaign_id(        value.map(|v| arg_from_str(v, err, "campaign-id", "int64")).unwrap_or(-0));
+                },
+                "agency-id" => {
+                    call = call.agency_id(        value.map(|v| arg_from_str(v, err, "agency-id", "int64")).unwrap_or(-0));
+                },
+                "advertiser-id" => {
+                    call = call.advertiser_id(        value.map(|v| arg_from_str(v, err, "advertiser-id", "int64")).unwrap_or(-0));
+                },
+                "ad-id" => {
+                    call = call.ad_id(        value.map(|v| arg_from_str(v, err, "ad-id", "int64")).unwrap_or(-0));
+                },
+                "ad-group-id" => {
+                    call = call.ad_group_id(        value.map(|v| arg_from_str(v, err, "ad-group-id", "int64")).unwrap_or(-0));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["ad-group-id", "ad-id", "advertiser-id", "agency-id", "campaign-id", "criterion-id", "engine-account-id"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -589,6 +669,68 @@ where
         }
     }
 
+    async fn _reports_get_id_mapping_file(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut download_mode = false;
+        let mut call = self.hub.reports().get_id_mapping_file(opt.value_of("agency-id").unwrap_or(""), opt.value_of("advertiser-id").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            if key == "alt" && value.unwrap_or("unset") == "media" {
+                                download_mode = true;
+                            }
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    if !download_mode {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    } else {
+                    let bytes = hyper::body::to_bytes(response.into_body()).await.expect("a string as API currently is inefficient").to_vec();
+                    ostream.write_all(&bytes).expect("write to be complete");
+                    ostream.flush().expect("io to never fail which should really be fixed one day");
+                    }
+                    Ok(())
+                }
+            }
+        }
+    }
+
     async fn _reports_request(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
@@ -755,6 +897,9 @@ where
                     ("get", Some(opt)) => {
                         call_result = self._conversion_get(opt, dry_run, &mut err).await;
                     },
+                    ("get-by-customer-id", Some(opt)) => {
+                        call_result = self._conversion_get_by_customer_id(opt, dry_run, &mut err).await;
+                    },
                     ("insert", Some(opt)) => {
                         call_result = self._conversion_insert(opt, dry_run, &mut err).await;
                     },
@@ -780,6 +925,9 @@ where
                     },
                     ("get-file", Some(opt)) => {
                         call_result = self._reports_get_file(opt, dry_run, &mut err).await;
+                    },
+                    ("get-id-mapping-file", Some(opt)) => {
+                        call_result = self._reports_get_id_mapping_file(opt, dry_run, &mut err).await;
                     },
                     ("request", Some(opt)) => {
                         call_result = self._reports_request(opt, dry_run, &mut err).await;
@@ -874,7 +1022,7 @@ where
 async fn main() {
     let mut exit_status = 0i32;
     let arg_data = [
-        ("conversion", "methods: 'get', 'insert', 'update' and 'update-availability'", vec![
+        ("conversion", "methods: 'get', 'get-by-customer-id', 'insert', 'update' and 'update-availability'", vec![
             ("get",
                     Some(r##"Retrieves a list of conversions from a DoubleClick Search engine account."##),
                     "Details at http://byron.github.io/google-apis-rs/google_doubleclicksearch2_cli/conversion_get",
@@ -894,6 +1042,52 @@ async fn main() {
                     (Some(r##"engine-account-id"##),
                      None,
                      Some(r##"Numeric ID of the engine account."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"end-date"##),
+                     None,
+                     Some(r##"Last date (inclusive) on which to retrieve conversions. Format is yyyymmdd."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"row-count"##),
+                     None,
+                     Some(r##"The number of conversions to return per call."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"start-date"##),
+                     None,
+                     Some(r##"First date (inclusive) on which to retrieve conversions. Format is yyyymmdd."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"start-row"##),
+                     None,
+                     Some(r##"The 0-based starting index for retrieving conversions results."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("get-by-customer-id",
+                    Some(r##"Retrieves a list of conversions from a DoubleClick Search engine account."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_doubleclicksearch2_cli/conversion_get-by-customer-id",
+                  vec![
+                    (Some(r##"customer-id"##),
+                     None,
+                     Some(r##"Customer ID of a client account in the new Search Ads 360 experience."##),
                      Some(true),
                      Some(false)),
         
@@ -1001,7 +1195,7 @@ async fn main() {
                   ]),
             ]),
         
-        ("reports", "methods: 'generate', 'get', 'get-file' and 'request'", vec![
+        ("reports", "methods: 'generate', 'get', 'get-file', 'get-id-mapping-file' and 'request'", vec![
             ("generate",
                     Some(r##"Generates and returns a report immediately."##),
                     "Details at http://byron.github.io/google-apis-rs/google_doubleclicksearch2_cli/reports_generate",
@@ -1059,6 +1253,34 @@ async fn main() {
                     (Some(r##"report-fragment"##),
                      None,
                      Some(r##"The index of the report fragment to download."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("get-id-mapping-file",
+                    Some(r##"Downloads a csv file(encoded in UTF-8) that contains ID mappings between legacy SA360 and new SA360. The file includes all children entities of the given advertiser(e.g. engine accounts, campaigns, ad groups, etc.) that exist in both legacy SA360 and new SA360."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_doubleclicksearch2_cli/reports_get-id-mapping-file",
+                  vec![
+                    (Some(r##"agency-id"##),
+                     None,
+                     Some(r##"Legacy SA360 agency ID."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"advertiser-id"##),
+                     None,
+                     Some(r##"Legacy SA360 advertiser ID."##),
                      Some(true),
                      Some(false)),
         
@@ -1133,7 +1355,7 @@ async fn main() {
     
     let mut app = App::new("doubleclicksearch2")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("4.0.1+20220301")
+           .version("5.0.2+20230118")
            .about("The Search Ads 360 API allows developers to automate uploading conversions and downloading reports from Search Ads 360.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_doubleclicksearch2_cli")
            .arg(Arg::with_name("url")

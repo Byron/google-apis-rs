@@ -1,4 +1,4 @@
-site_name: DoubleClick Bid Manager v4.0.1+20210323
+site_name: DoubleClick Bid Manager v5.0.2+20210323
 site_url: http://byron.github.io/google-apis-rs/google-doubleclickbidmanager1-cli
 site_description: A complete library to interact with DoubleClick Bid Manager (protocol v1)
 
@@ -7,17 +7,21 @@ repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/doubleclickbidma
 docs_dir: docs
 site_dir: build_html
 
-pages:
-- ['index.md', 'Home']
-- ['lineitems_downloadlineitems.md', 'Lineitems', 'Downloadlineitems']
-- ['lineitems_uploadlineitems.md', 'Lineitems', 'Uploadlineitems']
-- ['queries_createquery.md', 'Queries', 'Createquery']
-- ['queries_deletequery.md', 'Queries', 'Deletequery']
-- ['queries_getquery.md', 'Queries', 'Getquery']
-- ['queries_listqueries.md', 'Queries', 'Listqueries']
-- ['queries_runquery.md', 'Queries', 'Runquery']
-- ['reports_listreports.md', 'Reports', 'Listreports']
-- ['sdf_download.md', 'Sdf', 'Download']
+nav:
+- Home: 'index.md'
+- 'Lineitems':
+    - 'Downloadlineitems': 'lineitems_downloadlineitems.md'
+    - 'Uploadlineitems': 'lineitems_uploadlineitems.md'
+- 'Queries':
+    - 'Createquery': 'queries_createquery.md'
+    - 'Deletequery': 'queries_deletequery.md'
+    - 'Getquery': 'queries_getquery.md'
+    - 'Listqueries': 'queries_listqueries.md'
+    - 'Runquery': 'queries_runquery.md'
+- 'Reports':
+    - 'Listreports': 'reports_listreports.md'
+- 'Sdf':
+    - 'Download': 'sdf_download.md'
 
 theme: readthedocs
 

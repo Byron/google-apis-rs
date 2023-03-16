@@ -1,4 +1,4 @@
-site_name: Security Command Center v4.0.1+20220224
+site_name: Security Command Center v5.0.2+20230123
 site_url: http://byron.github.io/google-apis-rs/google-securitycenter1-cli
 site_description: A complete library to interact with Security Command Center (protocol v1)
 
@@ -7,93 +7,106 @@ repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/securitycenter1-
 docs_dir: docs
 site_dir: build_html
 
-pages:
-- ['index.md', 'Home']
-- ['folders_assets-group.md', 'Folders', 'Assets Group']
-- ['folders_assets-list.md', 'Folders', 'Assets List']
-- ['folders_assets-update-security-marks.md', 'Folders', 'Assets Update Security Marks']
-- ['folders_big-query-exports-create.md', 'Folders', 'Big Query Exports Create']
-- ['folders_big-query-exports-delete.md', 'Folders', 'Big Query Exports Delete']
-- ['folders_big-query-exports-get.md', 'Folders', 'Big Query Exports Get']
-- ['folders_big-query-exports-list.md', 'Folders', 'Big Query Exports List']
-- ['folders_big-query-exports-patch.md', 'Folders', 'Big Query Exports Patch']
-- ['folders_findings-bulk-mute.md', 'Folders', 'Findings Bulk Mute']
-- ['folders_mute-configs-create.md', 'Folders', 'Mute Configs Create']
-- ['folders_mute-configs-delete.md', 'Folders', 'Mute Configs Delete']
-- ['folders_mute-configs-get.md', 'Folders', 'Mute Configs Get']
-- ['folders_mute-configs-list.md', 'Folders', 'Mute Configs List']
-- ['folders_mute-configs-patch.md', 'Folders', 'Mute Configs Patch']
-- ['folders_sources-findings-external-systems-patch.md', 'Folders', 'Sources Findings External Systems Patch']
-- ['folders_sources-findings-group.md', 'Folders', 'Sources Findings Group']
-- ['folders_sources-findings-list.md', 'Folders', 'Sources Findings List']
-- ['folders_sources-findings-patch.md', 'Folders', 'Sources Findings Patch']
-- ['folders_sources-findings-set-mute.md', 'Folders', 'Sources Findings Set Mute']
-- ['folders_sources-findings-set-state.md', 'Folders', 'Sources Findings Set State']
-- ['folders_sources-findings-update-security-marks.md', 'Folders', 'Sources Findings Update Security Marks']
-- ['folders_sources-list.md', 'Folders', 'Sources List']
-- ['organizations_assets-group.md', 'Organizations', 'Assets Group']
-- ['organizations_assets-list.md', 'Organizations', 'Assets List']
-- ['organizations_assets-run-discovery.md', 'Organizations', 'Assets Run Discovery']
-- ['organizations_assets-update-security-marks.md', 'Organizations', 'Assets Update Security Marks']
-- ['organizations_big-query-exports-create.md', 'Organizations', 'Big Query Exports Create']
-- ['organizations_big-query-exports-delete.md', 'Organizations', 'Big Query Exports Delete']
-- ['organizations_big-query-exports-get.md', 'Organizations', 'Big Query Exports Get']
-- ['organizations_big-query-exports-list.md', 'Organizations', 'Big Query Exports List']
-- ['organizations_big-query-exports-patch.md', 'Organizations', 'Big Query Exports Patch']
-- ['organizations_findings-bulk-mute.md', 'Organizations', 'Findings Bulk Mute']
-- ['organizations_get-organization-settings.md', 'Organizations', 'Get Organization Settings']
-- ['organizations_mute-configs-create.md', 'Organizations', 'Mute Configs Create']
-- ['organizations_mute-configs-delete.md', 'Organizations', 'Mute Configs Delete']
-- ['organizations_mute-configs-get.md', 'Organizations', 'Mute Configs Get']
-- ['organizations_mute-configs-list.md', 'Organizations', 'Mute Configs List']
-- ['organizations_mute-configs-patch.md', 'Organizations', 'Mute Configs Patch']
-- ['organizations_notification-configs-create.md', 'Organizations', 'Notification Configs Create']
-- ['organizations_notification-configs-delete.md', 'Organizations', 'Notification Configs Delete']
-- ['organizations_notification-configs-get.md', 'Organizations', 'Notification Configs Get']
-- ['organizations_notification-configs-list.md', 'Organizations', 'Notification Configs List']
-- ['organizations_notification-configs-patch.md', 'Organizations', 'Notification Configs Patch']
-- ['organizations_operations-cancel.md', 'Organizations', 'Operations Cancel']
-- ['organizations_operations-delete.md', 'Organizations', 'Operations Delete']
-- ['organizations_operations-get.md', 'Organizations', 'Operations Get']
-- ['organizations_operations-list.md', 'Organizations', 'Operations List']
-- ['organizations_sources-create.md', 'Organizations', 'Sources Create']
-- ['organizations_sources-findings-create.md', 'Organizations', 'Sources Findings Create']
-- ['organizations_sources-findings-external-systems-patch.md', 'Organizations', 'Sources Findings External Systems Patch']
-- ['organizations_sources-findings-group.md', 'Organizations', 'Sources Findings Group']
-- ['organizations_sources-findings-list.md', 'Organizations', 'Sources Findings List']
-- ['organizations_sources-findings-patch.md', 'Organizations', 'Sources Findings Patch']
-- ['organizations_sources-findings-set-mute.md', 'Organizations', 'Sources Findings Set Mute']
-- ['organizations_sources-findings-set-state.md', 'Organizations', 'Sources Findings Set State']
-- ['organizations_sources-findings-update-security-marks.md', 'Organizations', 'Sources Findings Update Security Marks']
-- ['organizations_sources-get.md', 'Organizations', 'Sources Get']
-- ['organizations_sources-get-iam-policy.md', 'Organizations', 'Sources Get Iam Policy']
-- ['organizations_sources-list.md', 'Organizations', 'Sources List']
-- ['organizations_sources-patch.md', 'Organizations', 'Sources Patch']
-- ['organizations_sources-set-iam-policy.md', 'Organizations', 'Sources Set Iam Policy']
-- ['organizations_sources-test-iam-permissions.md', 'Organizations', 'Sources Test Iam Permissions']
-- ['organizations_update-organization-settings.md', 'Organizations', 'Update Organization Settings']
-- ['projects_assets-group.md', 'Projects', 'Assets Group']
-- ['projects_assets-list.md', 'Projects', 'Assets List']
-- ['projects_assets-update-security-marks.md', 'Projects', 'Assets Update Security Marks']
-- ['projects_big-query-exports-create.md', 'Projects', 'Big Query Exports Create']
-- ['projects_big-query-exports-delete.md', 'Projects', 'Big Query Exports Delete']
-- ['projects_big-query-exports-get.md', 'Projects', 'Big Query Exports Get']
-- ['projects_big-query-exports-list.md', 'Projects', 'Big Query Exports List']
-- ['projects_big-query-exports-patch.md', 'Projects', 'Big Query Exports Patch']
-- ['projects_findings-bulk-mute.md', 'Projects', 'Findings Bulk Mute']
-- ['projects_mute-configs-create.md', 'Projects', 'Mute Configs Create']
-- ['projects_mute-configs-delete.md', 'Projects', 'Mute Configs Delete']
-- ['projects_mute-configs-get.md', 'Projects', 'Mute Configs Get']
-- ['projects_mute-configs-list.md', 'Projects', 'Mute Configs List']
-- ['projects_mute-configs-patch.md', 'Projects', 'Mute Configs Patch']
-- ['projects_sources-findings-external-systems-patch.md', 'Projects', 'Sources Findings External Systems Patch']
-- ['projects_sources-findings-group.md', 'Projects', 'Sources Findings Group']
-- ['projects_sources-findings-list.md', 'Projects', 'Sources Findings List']
-- ['projects_sources-findings-patch.md', 'Projects', 'Sources Findings Patch']
-- ['projects_sources-findings-set-mute.md', 'Projects', 'Sources Findings Set Mute']
-- ['projects_sources-findings-set-state.md', 'Projects', 'Sources Findings Set State']
-- ['projects_sources-findings-update-security-marks.md', 'Projects', 'Sources Findings Update Security Marks']
-- ['projects_sources-list.md', 'Projects', 'Sources List']
+nav:
+- Home: 'index.md'
+- 'Folders':
+    - 'Assets Group': 'folders_assets-group.md'
+    - 'Assets List': 'folders_assets-list.md'
+    - 'Assets Update Security Marks': 'folders_assets-update-security-marks.md'
+    - 'Big Query Exports Create': 'folders_big-query-exports-create.md'
+    - 'Big Query Exports Delete': 'folders_big-query-exports-delete.md'
+    - 'Big Query Exports Get': 'folders_big-query-exports-get.md'
+    - 'Big Query Exports List': 'folders_big-query-exports-list.md'
+    - 'Big Query Exports Patch': 'folders_big-query-exports-patch.md'
+    - 'Findings Bulk Mute': 'folders_findings-bulk-mute.md'
+    - 'Mute Configs Create': 'folders_mute-configs-create.md'
+    - 'Mute Configs Delete': 'folders_mute-configs-delete.md'
+    - 'Mute Configs Get': 'folders_mute-configs-get.md'
+    - 'Mute Configs List': 'folders_mute-configs-list.md'
+    - 'Mute Configs Patch': 'folders_mute-configs-patch.md'
+    - 'Notification Configs Create': 'folders_notification-configs-create.md'
+    - 'Notification Configs Delete': 'folders_notification-configs-delete.md'
+    - 'Notification Configs Get': 'folders_notification-configs-get.md'
+    - 'Notification Configs List': 'folders_notification-configs-list.md'
+    - 'Notification Configs Patch': 'folders_notification-configs-patch.md'
+    - 'Sources Findings External Systems Patch': 'folders_sources-findings-external-systems-patch.md'
+    - 'Sources Findings Group': 'folders_sources-findings-group.md'
+    - 'Sources Findings List': 'folders_sources-findings-list.md'
+    - 'Sources Findings Patch': 'folders_sources-findings-patch.md'
+    - 'Sources Findings Set Mute': 'folders_sources-findings-set-mute.md'
+    - 'Sources Findings Set State': 'folders_sources-findings-set-state.md'
+    - 'Sources Findings Update Security Marks': 'folders_sources-findings-update-security-marks.md'
+    - 'Sources List': 'folders_sources-list.md'
+- 'Organizations':
+    - 'Assets Group': 'organizations_assets-group.md'
+    - 'Assets List': 'organizations_assets-list.md'
+    - 'Assets Run Discovery': 'organizations_assets-run-discovery.md'
+    - 'Assets Update Security Marks': 'organizations_assets-update-security-marks.md'
+    - 'Big Query Exports Create': 'organizations_big-query-exports-create.md'
+    - 'Big Query Exports Delete': 'organizations_big-query-exports-delete.md'
+    - 'Big Query Exports Get': 'organizations_big-query-exports-get.md'
+    - 'Big Query Exports List': 'organizations_big-query-exports-list.md'
+    - 'Big Query Exports Patch': 'organizations_big-query-exports-patch.md'
+    - 'Findings Bulk Mute': 'organizations_findings-bulk-mute.md'
+    - 'Get Organization Settings': 'organizations_get-organization-settings.md'
+    - 'Mute Configs Create': 'organizations_mute-configs-create.md'
+    - 'Mute Configs Delete': 'organizations_mute-configs-delete.md'
+    - 'Mute Configs Get': 'organizations_mute-configs-get.md'
+    - 'Mute Configs List': 'organizations_mute-configs-list.md'
+    - 'Mute Configs Patch': 'organizations_mute-configs-patch.md'
+    - 'Notification Configs Create': 'organizations_notification-configs-create.md'
+    - 'Notification Configs Delete': 'organizations_notification-configs-delete.md'
+    - 'Notification Configs Get': 'organizations_notification-configs-get.md'
+    - 'Notification Configs List': 'organizations_notification-configs-list.md'
+    - 'Notification Configs Patch': 'organizations_notification-configs-patch.md'
+    - 'Operations Cancel': 'organizations_operations-cancel.md'
+    - 'Operations Delete': 'organizations_operations-delete.md'
+    - 'Operations Get': 'organizations_operations-get.md'
+    - 'Operations List': 'organizations_operations-list.md'
+    - 'Sources Create': 'organizations_sources-create.md'
+    - 'Sources Findings Create': 'organizations_sources-findings-create.md'
+    - 'Sources Findings External Systems Patch': 'organizations_sources-findings-external-systems-patch.md'
+    - 'Sources Findings Group': 'organizations_sources-findings-group.md'
+    - 'Sources Findings List': 'organizations_sources-findings-list.md'
+    - 'Sources Findings Patch': 'organizations_sources-findings-patch.md'
+    - 'Sources Findings Set Mute': 'organizations_sources-findings-set-mute.md'
+    - 'Sources Findings Set State': 'organizations_sources-findings-set-state.md'
+    - 'Sources Findings Update Security Marks': 'organizations_sources-findings-update-security-marks.md'
+    - 'Sources Get': 'organizations_sources-get.md'
+    - 'Sources Get Iam Policy': 'organizations_sources-get-iam-policy.md'
+    - 'Sources List': 'organizations_sources-list.md'
+    - 'Sources Patch': 'organizations_sources-patch.md'
+    - 'Sources Set Iam Policy': 'organizations_sources-set-iam-policy.md'
+    - 'Sources Test Iam Permissions': 'organizations_sources-test-iam-permissions.md'
+    - 'Update Organization Settings': 'organizations_update-organization-settings.md'
+- 'Projects':
+    - 'Assets Group': 'projects_assets-group.md'
+    - 'Assets List': 'projects_assets-list.md'
+    - 'Assets Update Security Marks': 'projects_assets-update-security-marks.md'
+    - 'Big Query Exports Create': 'projects_big-query-exports-create.md'
+    - 'Big Query Exports Delete': 'projects_big-query-exports-delete.md'
+    - 'Big Query Exports Get': 'projects_big-query-exports-get.md'
+    - 'Big Query Exports List': 'projects_big-query-exports-list.md'
+    - 'Big Query Exports Patch': 'projects_big-query-exports-patch.md'
+    - 'Findings Bulk Mute': 'projects_findings-bulk-mute.md'
+    - 'Mute Configs Create': 'projects_mute-configs-create.md'
+    - 'Mute Configs Delete': 'projects_mute-configs-delete.md'
+    - 'Mute Configs Get': 'projects_mute-configs-get.md'
+    - 'Mute Configs List': 'projects_mute-configs-list.md'
+    - 'Mute Configs Patch': 'projects_mute-configs-patch.md'
+    - 'Notification Configs Create': 'projects_notification-configs-create.md'
+    - 'Notification Configs Delete': 'projects_notification-configs-delete.md'
+    - 'Notification Configs Get': 'projects_notification-configs-get.md'
+    - 'Notification Configs List': 'projects_notification-configs-list.md'
+    - 'Notification Configs Patch': 'projects_notification-configs-patch.md'
+    - 'Sources Findings External Systems Patch': 'projects_sources-findings-external-systems-patch.md'
+    - 'Sources Findings Group': 'projects_sources-findings-group.md'
+    - 'Sources Findings List': 'projects_sources-findings-list.md'
+    - 'Sources Findings Patch': 'projects_sources-findings-patch.md'
+    - 'Sources Findings Set Mute': 'projects_sources-findings-set-mute.md'
+    - 'Sources Findings Set State': 'projects_sources-findings-set-state.md'
+    - 'Sources Findings Update Security Marks': 'projects_sources-findings-update-security-marks.md'
+    - 'Sources List': 'projects_sources-list.md'
 
 theme: readthedocs
 

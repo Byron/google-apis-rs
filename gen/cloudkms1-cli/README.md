@@ -25,11 +25,14 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Cloud KMS* API at revision *20220225*. The CLI is at version *4.0.1*.
+This documentation was generated from the *Cloud KMS* API at revision *20230106*. The CLI is at version *5.0.2*.
 
 ```bash
 cloudkms1 [options]
         projects
+                locations-ekm-config-get-iam-policy <resource> [-p <v>]... [-o <out>]
+                locations-ekm-config-set-iam-policy <resource> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-ekm-config-test-iam-permissions <resource> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-ekm-connections-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-ekm-connections-get <name> [-p <v>]... [-o <out>]
                 locations-ekm-connections-get-iam-policy <resource> [-p <v>]... [-o <out>]

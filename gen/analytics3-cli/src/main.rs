@@ -3,8 +3,6 @@
 // DO NOT EDIT !
 #![allow(unused_variables, unused_imports, dead_code, unused_mut)]
 
-extern crate tokio;
-
 #[macro_use]
 extern crate clap;
 
@@ -12,9 +10,10 @@ use std::env;
 use std::io::{self, Write};
 use clap::{App, SubCommand, Arg};
 
-use google_analytics3::{api, Error, oauth2};
+use google_analytics3::{api, Error, oauth2, client::chrono, FieldMask};
 
-mod client;
+
+use google_clis_common as client;
 
 use client::{InvalidOptionsError, CLIError, arg_from_str, writer_from_opts, parse_kv_arg,
           input_file_from_opts, input_mime_from_opts, FieldCursor, FieldError, CallType, UploadProtocol,
@@ -58,7 +57,7 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "start-index" => {
-                    call = call.start_index(arg_from_str(value.unwrap_or("-0"), err, "start-index", "integer"));
+                    call = call.start_index(        value.map(|v| arg_from_str(v, err, "start-index", "int32")).unwrap_or(-0));
                 },
                 "sort" => {
                     call = call.sort(value.unwrap_or(""));
@@ -73,10 +72,10 @@ where
                     call = call.output(value.unwrap_or(""));
                 },
                 "max-results" => {
-                    call = call.max_results(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
+                    call = call.max_results(        value.map(|v| arg_from_str(v, err, "max-results", "int32")).unwrap_or(-0));
                 },
                 "include-empty-rows" => {
-                    call = call.include_empty_rows(arg_from_str(value.unwrap_or("false"), err, "include-empty-rows", "boolean"));
+                    call = call.include_empty_rows(        value.map(|v| arg_from_str(v, err, "include-empty-rows", "boolean")).unwrap_or(false));
                 },
                 "filters" => {
                     call = call.filters(value.unwrap_or(""));
@@ -138,7 +137,7 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "start-index" => {
-                    call = call.start_index(arg_from_str(value.unwrap_or("-0"), err, "start-index", "integer"));
+                    call = call.start_index(        value.map(|v| arg_from_str(v, err, "start-index", "int32")).unwrap_or(-0));
                 },
                 "sort" => {
                     call = call.sort(value.unwrap_or(""));
@@ -147,7 +146,7 @@ where
                     call = call.sampling_level(value.unwrap_or(""));
                 },
                 "max-results" => {
-                    call = call.max_results(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
+                    call = call.max_results(        value.map(|v| arg_from_str(v, err, "max-results", "int32")).unwrap_or(-0));
                 },
                 "filters" => {
                     call = call.filters(value.unwrap_or(""));
@@ -212,7 +211,7 @@ where
                     call = call.sort(value.unwrap_or(""));
                 },
                 "max-results" => {
-                    call = call.max_results(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
+                    call = call.max_results(        value.map(|v| arg_from_str(v, err, "max-results", "int32")).unwrap_or(-0));
                 },
                 "filters" => {
                     call = call.filters(value.unwrap_or(""));
@@ -274,10 +273,10 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "start-index" => {
-                    call = call.start_index(arg_from_str(value.unwrap_or("-0"), err, "start-index", "integer"));
+                    call = call.start_index(        value.map(|v| arg_from_str(v, err, "start-index", "int32")).unwrap_or(-0));
                 },
                 "max-results" => {
-                    call = call.max_results(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
+                    call = call.max_results(        value.map(|v| arg_from_str(v, err, "max-results", "int32")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -486,10 +485,10 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "start-index" => {
-                    call = call.start_index(arg_from_str(value.unwrap_or("-0"), err, "start-index", "integer"));
+                    call = call.start_index(        value.map(|v| arg_from_str(v, err, "start-index", "int32")).unwrap_or(-0));
                 },
                 "max-results" => {
-                    call = call.max_results(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
+                    call = call.max_results(        value.map(|v| arg_from_str(v, err, "max-results", "int32")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -654,10 +653,10 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "start-index" => {
-                    call = call.start_index(arg_from_str(value.unwrap_or("-0"), err, "start-index", "integer"));
+                    call = call.start_index(        value.map(|v| arg_from_str(v, err, "start-index", "int32")).unwrap_or(-0));
                 },
                 "max-results" => {
-                    call = call.max_results(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
+                    call = call.max_results(        value.map(|v| arg_from_str(v, err, "max-results", "int32")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -800,10 +799,10 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "start-index" => {
-                    call = call.start_index(arg_from_str(value.unwrap_or("-0"), err, "start-index", "integer"));
+                    call = call.start_index(        value.map(|v| arg_from_str(v, err, "start-index", "int32")).unwrap_or(-0));
                 },
                 "max-results" => {
-                    call = call.max_results(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
+                    call = call.max_results(        value.map(|v| arg_from_str(v, err, "max-results", "int32")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -1008,10 +1007,10 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "start-index" => {
-                    call = call.start_index(arg_from_str(value.unwrap_or("-0"), err, "start-index", "integer"));
+                    call = call.start_index(        value.map(|v| arg_from_str(v, err, "start-index", "int32")).unwrap_or(-0));
                 },
                 "max-results" => {
-                    call = call.max_results(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
+                    call = call.max_results(        value.map(|v| arg_from_str(v, err, "max-results", "int32")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -1112,7 +1111,7 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "ignore-custom-data-source-links" => {
-                    call = call.ignore_custom_data_source_links(arg_from_str(value.unwrap_or("false"), err, "ignore-custom-data-source-links", "boolean"));
+                    call = call.ignore_custom_data_source_links(        value.map(|v| arg_from_str(v, err, "ignore-custom-data-source-links", "boolean")).unwrap_or(false));
                 },
                 _ => {
                     let mut found = false;
@@ -1213,7 +1212,7 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "ignore-custom-data-source-links" => {
-                    call = call.ignore_custom_data_source_links(arg_from_str(value.unwrap_or("false"), err, "ignore-custom-data-source-links", "boolean"));
+                    call = call.ignore_custom_data_source_links(        value.map(|v| arg_from_str(v, err, "ignore-custom-data-source-links", "boolean")).unwrap_or(false));
                 },
                 _ => {
                     let mut found = false;
@@ -1421,10 +1420,10 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "start-index" => {
-                    call = call.start_index(arg_from_str(value.unwrap_or("-0"), err, "start-index", "integer"));
+                    call = call.start_index(        value.map(|v| arg_from_str(v, err, "start-index", "int32")).unwrap_or(-0));
                 },
                 "max-results" => {
-                    call = call.max_results(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
+                    call = call.max_results(        value.map(|v| arg_from_str(v, err, "max-results", "int32")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -1528,7 +1527,7 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "ignore-custom-data-source-links" => {
-                    call = call.ignore_custom_data_source_links(arg_from_str(value.unwrap_or("false"), err, "ignore-custom-data-source-links", "boolean"));
+                    call = call.ignore_custom_data_source_links(        value.map(|v| arg_from_str(v, err, "ignore-custom-data-source-links", "boolean")).unwrap_or(false));
                 },
                 _ => {
                     let mut found = false;
@@ -1632,7 +1631,7 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "ignore-custom-data-source-links" => {
-                    call = call.ignore_custom_data_source_links(arg_from_str(value.unwrap_or("false"), err, "ignore-custom-data-source-links", "boolean"));
+                    call = call.ignore_custom_data_source_links(        value.map(|v| arg_from_str(v, err, "ignore-custom-data-source-links", "boolean")).unwrap_or(false));
                 },
                 _ => {
                     let mut found = false;
@@ -1896,10 +1895,10 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "start-index" => {
-                    call = call.start_index(arg_from_str(value.unwrap_or("-0"), err, "start-index", "integer"));
+                    call = call.start_index(        value.map(|v| arg_from_str(v, err, "start-index", "int32")).unwrap_or(-0));
                 },
                 "max-results" => {
-                    call = call.max_results(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
+                    call = call.max_results(        value.map(|v| arg_from_str(v, err, "max-results", "int32")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -2411,10 +2410,10 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "start-index" => {
-                    call = call.start_index(arg_from_str(value.unwrap_or("-0"), err, "start-index", "integer"));
+                    call = call.start_index(        value.map(|v| arg_from_str(v, err, "start-index", "int32")).unwrap_or(-0));
                 },
                 "max-results" => {
-                    call = call.max_results(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
+                    call = call.max_results(        value.map(|v| arg_from_str(v, err, "max-results", "int32")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -2886,10 +2885,10 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "start-index" => {
-                    call = call.start_index(arg_from_str(value.unwrap_or("-0"), err, "start-index", "integer"));
+                    call = call.start_index(        value.map(|v| arg_from_str(v, err, "start-index", "int32")).unwrap_or(-0));
                 },
                 "max-results" => {
-                    call = call.max_results(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
+                    call = call.max_results(        value.map(|v| arg_from_str(v, err, "max-results", "int32")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -3357,10 +3356,10 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "start-index" => {
-                    call = call.start_index(arg_from_str(value.unwrap_or("-0"), err, "start-index", "integer"));
+                    call = call.start_index(        value.map(|v| arg_from_str(v, err, "start-index", "int32")).unwrap_or(-0));
                 },
                 "max-results" => {
-                    call = call.max_results(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
+                    call = call.max_results(        value.map(|v| arg_from_str(v, err, "max-results", "int32")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -3769,10 +3768,10 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "start-index" => {
-                    call = call.start_index(arg_from_str(value.unwrap_or("-0"), err, "start-index", "integer"));
+                    call = call.start_index(        value.map(|v| arg_from_str(v, err, "start-index", "int32")).unwrap_or(-0));
                 },
                 "max-results" => {
-                    call = call.max_results(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
+                    call = call.max_results(        value.map(|v| arg_from_str(v, err, "max-results", "int32")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -4145,10 +4144,10 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "start-index" => {
-                    call = call.start_index(arg_from_str(value.unwrap_or("-0"), err, "start-index", "integer"));
+                    call = call.start_index(        value.map(|v| arg_from_str(v, err, "start-index", "int32")).unwrap_or(-0));
                 },
                 "max-results" => {
-                    call = call.max_results(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
+                    call = call.max_results(        value.map(|v| arg_from_str(v, err, "max-results", "int32")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -4634,10 +4633,10 @@ where
                     call = call.type_(value.unwrap_or(""));
                 },
                 "start-index" => {
-                    call = call.start_index(arg_from_str(value.unwrap_or("-0"), err, "start-index", "integer"));
+                    call = call.start_index(        value.map(|v| arg_from_str(v, err, "start-index", "int32")).unwrap_or(-0));
                 },
                 "max-results" => {
-                    call = call.max_results(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
+                    call = call.max_results(        value.map(|v| arg_from_str(v, err, "max-results", "int32")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -4907,10 +4906,10 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "start-index" => {
-                    call = call.start_index(arg_from_str(value.unwrap_or("-0"), err, "start-index", "integer"));
+                    call = call.start_index(        value.map(|v| arg_from_str(v, err, "start-index", "int32")).unwrap_or(-0));
                 },
                 "max-results" => {
-                    call = call.max_results(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
+                    call = call.max_results(        value.map(|v| arg_from_str(v, err, "max-results", "int32")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -5166,10 +5165,10 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "start-index" => {
-                    call = call.start_index(arg_from_str(value.unwrap_or("-0"), err, "start-index", "integer"));
+                    call = call.start_index(        value.map(|v| arg_from_str(v, err, "start-index", "int32")).unwrap_or(-0));
                 },
                 "max-results" => {
-                    call = call.max_results(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
+                    call = call.max_results(        value.map(|v| arg_from_str(v, err, "max-results", "int32")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -5354,10 +5353,10 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "start-index" => {
-                    call = call.start_index(arg_from_str(value.unwrap_or("-0"), err, "start-index", "integer"));
+                    call = call.start_index(        value.map(|v| arg_from_str(v, err, "start-index", "int32")).unwrap_or(-0));
                 },
                 "max-results" => {
-                    call = call.max_results(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
+                    call = call.max_results(        value.map(|v| arg_from_str(v, err, "max-results", "int32")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -5659,10 +5658,10 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "start-index" => {
-                    call = call.start_index(arg_from_str(value.unwrap_or("-0"), err, "start-index", "integer"));
+                    call = call.start_index(        value.map(|v| arg_from_str(v, err, "start-index", "int32")).unwrap_or(-0));
                 },
                 "max-results" => {
-                    call = call.max_results(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
+                    call = call.max_results(        value.map(|v| arg_from_str(v, err, "max-results", "int32")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -6065,10 +6064,10 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "start-index" => {
-                    call = call.start_index(arg_from_str(value.unwrap_or("-0"), err, "start-index", "integer"));
+                    call = call.start_index(        value.map(|v| arg_from_str(v, err, "start-index", "int32")).unwrap_or(-0));
                 },
                 "max-results" => {
-                    call = call.max_results(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
+                    call = call.max_results(        value.map(|v| arg_from_str(v, err, "max-results", "int32")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -6487,10 +6486,10 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "start-index" => {
-                    call = call.start_index(arg_from_str(value.unwrap_or("-0"), err, "start-index", "integer"));
+                    call = call.start_index(        value.map(|v| arg_from_str(v, err, "start-index", "int32")).unwrap_or(-0));
                 },
                 "max-results" => {
-                    call = call.max_results(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
+                    call = call.max_results(        value.map(|v| arg_from_str(v, err, "max-results", "int32")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -10376,7 +10375,7 @@ async fn main() {
     
     let mut app = App::new("analytics3")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("4.0.1+20190807")
+           .version("5.0.2+20190807")
            .about("Views and manages your Google Analytics data.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_analytics3_cli")
            .arg(Arg::with_name("url")

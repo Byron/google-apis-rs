@@ -4,12 +4,12 @@
 [package]
 
 name = "google-managedidentities1"
-version = "5.0.2-beta-1+20221227"
+version = "5.0.2+20221227"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Managed Service for Microsoft Active Directory Consumer API (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/managedidentities1"
 homepage = "https://cloud.google.com/managed-microsoft-ad/"
-documentation = "https://docs.rs/google-managedidentities1/5.0.2-beta-1+20221227"
+documentation = "https://docs.rs/google-managedidentities1/5.0.2+20221227"
 license = "MIT"
 keywords = ["managedidentities", "google", "protocol", "web", "api"]
 autobins = false

@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Monitoring* API at revision *20220218*. The CLI is at version *4.0.1*.
+This documentation was generated from the *Monitoring* API at revision *20230115*. The CLI is at version *5.0.2*.
 
 ```bash
 monitoring3 [options]
@@ -62,6 +62,10 @@ monitoring3 [options]
                 notification-channels-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 notification-channels-send-verification-code <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 notification-channels-verify <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                snoozes-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                snoozes-get <name> [-p <v>]... [-o <out>]
+                snoozes-list <parent> [-p <v>]... [-o <out>]
+                snoozes-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 time-series-create <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 time-series-create-service <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 time-series-list <name> [-p <v>]... [-o <out>]

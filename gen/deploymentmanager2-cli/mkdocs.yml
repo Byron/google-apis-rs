@@ -1,4 +1,4 @@
-site_name: Deployment Manager v4.0.1+20220225
+site_name: Deployment Manager v5.0.2+20221208
 site_url: http://byron.github.io/google-apis-rs/google-deploymentmanager2-cli
 site_description: A complete library to interact with Deployment Manager (protocol v2)
 
@@ -7,26 +7,31 @@ repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/deploymentmanage
 docs_dir: docs
 site_dir: build_html
 
-pages:
-- ['index.md', 'Home']
-- ['deployments_cancel-preview.md', 'Deployments', 'Cancel Preview']
-- ['deployments_delete.md', 'Deployments', 'Delete']
-- ['deployments_get.md', 'Deployments', 'Get']
-- ['deployments_get-iam-policy.md', 'Deployments', 'Get Iam Policy']
-- ['deployments_insert.md', 'Deployments', 'Insert']
-- ['deployments_list.md', 'Deployments', 'List']
-- ['deployments_patch.md', 'Deployments', 'Patch']
-- ['deployments_set-iam-policy.md', 'Deployments', 'Set Iam Policy']
-- ['deployments_stop.md', 'Deployments', 'Stop']
-- ['deployments_test-iam-permissions.md', 'Deployments', 'Test Iam Permissions']
-- ['deployments_update.md', 'Deployments', 'Update']
-- ['manifests_get.md', 'Manifests', 'Get']
-- ['manifests_list.md', 'Manifests', 'List']
-- ['operations_get.md', 'Operations', 'Get']
-- ['operations_list.md', 'Operations', 'List']
-- ['resources_get.md', 'Resources', 'Get']
-- ['resources_list.md', 'Resources', 'List']
-- ['types_list.md', 'Types', 'List']
+nav:
+- Home: 'index.md'
+- 'Deployments':
+    - 'Cancel Preview': 'deployments_cancel-preview.md'
+    - 'Delete': 'deployments_delete.md'
+    - 'Get': 'deployments_get.md'
+    - 'Get Iam Policy': 'deployments_get-iam-policy.md'
+    - 'Insert': 'deployments_insert.md'
+    - 'List': 'deployments_list.md'
+    - 'Patch': 'deployments_patch.md'
+    - 'Set Iam Policy': 'deployments_set-iam-policy.md'
+    - 'Stop': 'deployments_stop.md'
+    - 'Test Iam Permissions': 'deployments_test-iam-permissions.md'
+    - 'Update': 'deployments_update.md'
+- 'Manifests':
+    - 'Get': 'manifests_get.md'
+    - 'List': 'manifests_list.md'
+- 'Operations':
+    - 'Get': 'operations_get.md'
+    - 'List': 'operations_list.md'
+- 'Resources':
+    - 'Get': 'resources_get.md'
+    - 'List': 'resources_list.md'
+- 'Types':
+    - 'List': 'types_list.md'
 
 theme: readthedocs
 

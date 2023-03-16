@@ -1,4 +1,4 @@
-site_name: Recaptcha Enterprise v4.0.1+20220226
+site_name: Recaptcha Enterprise v5.0.2+20230115
 site_url: http://byron.github.io/google-apis-rs/google-recaptchaenterprise1-cli
 site_description: A complete library to interact with Recaptcha Enterprise (protocol v1)
 
@@ -7,20 +7,22 @@ repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/recaptchaenterpr
 docs_dir: docs
 site_dir: build_html
 
-pages:
-- ['index.md', 'Home']
-- ['projects_assessments-annotate.md', 'Projects', 'Assessments Annotate']
-- ['projects_assessments-create.md', 'Projects', 'Assessments Create']
-- ['projects_keys-create.md', 'Projects', 'Keys Create']
-- ['projects_keys-delete.md', 'Projects', 'Keys Delete']
-- ['projects_keys-get.md', 'Projects', 'Keys Get']
-- ['projects_keys-get-metrics.md', 'Projects', 'Keys Get Metrics']
-- ['projects_keys-list.md', 'Projects', 'Keys List']
-- ['projects_keys-migrate.md', 'Projects', 'Keys Migrate']
-- ['projects_keys-patch.md', 'Projects', 'Keys Patch']
-- ['projects_relatedaccountgroupmemberships-search.md', 'Projects', 'Relatedaccountgroupmemberships Search']
-- ['projects_relatedaccountgroups-list.md', 'Projects', 'Relatedaccountgroups List']
-- ['projects_relatedaccountgroups-memberships-list.md', 'Projects', 'Relatedaccountgroups Memberships List']
+nav:
+- Home: 'index.md'
+- 'Projects':
+    - 'Assessments Annotate': 'projects_assessments-annotate.md'
+    - 'Assessments Create': 'projects_assessments-create.md'
+    - 'Keys Create': 'projects_keys-create.md'
+    - 'Keys Delete': 'projects_keys-delete.md'
+    - 'Keys Get': 'projects_keys-get.md'
+    - 'Keys Get Metrics': 'projects_keys-get-metrics.md'
+    - 'Keys List': 'projects_keys-list.md'
+    - 'Keys Migrate': 'projects_keys-migrate.md'
+    - 'Keys Patch': 'projects_keys-patch.md'
+    - 'Keys Retrieve Legacy Secret Key': 'projects_keys-retrieve-legacy-secret-key.md'
+    - 'Relatedaccountgroupmemberships Search': 'projects_relatedaccountgroupmemberships-search.md'
+    - 'Relatedaccountgroups List': 'projects_relatedaccountgroups-list.md'
+    - 'Relatedaccountgroups Memberships List': 'projects_relatedaccountgroups-memberships-list.md'
 
 theme: readthedocs
 

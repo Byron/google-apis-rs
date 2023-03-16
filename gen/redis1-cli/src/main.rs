@@ -3,8 +3,6 @@
 // DO NOT EDIT !
 #![allow(unused_variables, unused_imports, dead_code, unused_mut)]
 
-extern crate tokio;
-
 #[macro_use]
 extern crate clap;
 
@@ -12,9 +10,10 @@ use std::env;
 use std::io::{self, Write};
 use clap::{App, SubCommand, Arg};
 
-use google_redis1::{api, Error, oauth2};
+use google_redis1::{api, Error, oauth2, client::chrono, FieldMask};
 
-mod client;
+
+use google_clis_common as client;
 
 use client::{InvalidOptionsError, CLIError, arg_from_str, writer_from_opts, parse_kv_arg,
           input_file_from_opts, input_mime_from_opts, FieldCursor, FieldError, CallType, UploadProtocol,
@@ -132,6 +131,7 @@ where
                     "connect-mode" => Some(("connectMode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "current-location-id" => Some(("currentLocationId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "customer-managed-key" => Some(("customerManagedKey", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "display-name" => Some(("displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "host" => Some(("host", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
@@ -161,10 +161,11 @@ where
                     "secondary-ip-range" => Some(("secondaryIpRange", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "state" => Some(("state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "status-message" => Some(("statusMessage", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "suspension-reasons" => Some(("suspensionReasons", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "tier" => Some(("tier", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "transit-encryption-mode" => Some(("transitEncryptionMode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["alternative-location-id", "auth-enabled", "authorized-network", "can-reschedule", "connect-mode", "create-time", "current-location-id", "description", "display-name", "end-time", "host", "labels", "location-id", "maintenance-policy", "maintenance-schedule", "memory-size-gb", "name", "persistence-config", "persistence-iam-identity", "persistence-mode", "port", "rdb-next-snapshot-time", "rdb-snapshot-period", "rdb-snapshot-start-time", "read-endpoint", "read-endpoint-port", "read-replicas-mode", "redis-configs", "redis-version", "replica-count", "reserved-ip-range", "schedule-deadline-time", "secondary-ip-range", "start-time", "state", "status-message", "tier", "transit-encryption-mode", "update-time"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["alternative-location-id", "auth-enabled", "authorized-network", "can-reschedule", "connect-mode", "create-time", "current-location-id", "customer-managed-key", "description", "display-name", "end-time", "host", "labels", "location-id", "maintenance-policy", "maintenance-schedule", "memory-size-gb", "name", "persistence-config", "persistence-iam-identity", "persistence-mode", "port", "rdb-next-snapshot-time", "rdb-snapshot-period", "rdb-snapshot-start-time", "read-endpoint", "read-endpoint-port", "read-replicas-mode", "redis-configs", "redis-version", "replica-count", "reserved-ip-range", "schedule-deadline-time", "secondary-ip-range", "start-time", "state", "status-message", "suspension-reasons", "tier", "transit-encryption-mode", "update-time"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -649,7 +650,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -727,6 +728,7 @@ where
                     "connect-mode" => Some(("connectMode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "current-location-id" => Some(("currentLocationId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "customer-managed-key" => Some(("customerManagedKey", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "display-name" => Some(("displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "host" => Some(("host", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
@@ -756,10 +758,11 @@ where
                     "secondary-ip-range" => Some(("secondaryIpRange", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "state" => Some(("state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "status-message" => Some(("statusMessage", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "suspension-reasons" => Some(("suspensionReasons", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "tier" => Some(("tier", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "transit-encryption-mode" => Some(("transitEncryptionMode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["alternative-location-id", "auth-enabled", "authorized-network", "can-reschedule", "connect-mode", "create-time", "current-location-id", "description", "display-name", "end-time", "host", "labels", "location-id", "maintenance-policy", "maintenance-schedule", "memory-size-gb", "name", "persistence-config", "persistence-iam-identity", "persistence-mode", "port", "rdb-next-snapshot-time", "rdb-snapshot-period", "rdb-snapshot-start-time", "read-endpoint", "read-endpoint-port", "read-replicas-mode", "redis-configs", "redis-version", "replica-count", "reserved-ip-range", "schedule-deadline-time", "secondary-ip-range", "start-time", "state", "status-message", "tier", "transit-encryption-mode", "update-time"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["alternative-location-id", "auth-enabled", "authorized-network", "can-reschedule", "connect-mode", "create-time", "current-location-id", "customer-managed-key", "description", "display-name", "end-time", "host", "labels", "location-id", "maintenance-policy", "maintenance-schedule", "memory-size-gb", "name", "persistence-config", "persistence-iam-identity", "persistence-mode", "port", "rdb-next-snapshot-time", "rdb-snapshot-period", "rdb-snapshot-start-time", "read-endpoint", "read-endpoint-port", "read-replicas-mode", "redis-configs", "redis-version", "replica-count", "reserved-ip-range", "schedule-deadline-time", "secondary-ip-range", "start-time", "state", "status-message", "suspension-reasons", "tier", "transit-encryption-mode", "update-time"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -774,7 +777,7 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "update-mask" => {
-                    call = call.update_mask(value.unwrap_or(""));
+                    call = call.update_mask(        value.map(|v| arg_from_str(v, err, "update-mask", "google-fieldmask")).unwrap_or(FieldMask::default()));
                 },
                 _ => {
                     let mut found = false;
@@ -1004,7 +1007,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 "filter" => {
                     call = call.filter(value.unwrap_or(""));
@@ -1222,7 +1225,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 "filter" => {
                     call = call.filter(value.unwrap_or(""));
@@ -1834,7 +1837,7 @@ async fn main() {
     
     let mut app = App::new("redis1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("4.0.1+20220301")
+           .version("5.0.2+20230111")
            .about("Creates and manages Redis instances on the Google Cloud Platform.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_redis1_cli")
            .arg(Arg::with_name("url")

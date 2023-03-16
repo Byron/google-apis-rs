@@ -1,4 +1,4 @@
-site_name: SQL Admin v4.0.1+20220226
+site_name: SQL Admin v5.0.2+20221209
 site_url: http://byron.github.io/google-apis-rs/google-sqladmin1_beta4-cli
 site_description: A complete library to interact with SQL Admin (protocol v1beta4)
 
@@ -7,57 +7,68 @@ repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/sqladmin1_beta4-
 docs_dir: docs
 site_dir: build_html
 
-pages:
-- ['index.md', 'Home']
-- ['backup-runs_delete.md', 'Backup Runs', 'Delete']
-- ['backup-runs_get.md', 'Backup Runs', 'Get']
-- ['backup-runs_insert.md', 'Backup Runs', 'Insert']
-- ['backup-runs_list.md', 'Backup Runs', 'List']
-- ['connect_generate-ephemeral.md', 'Connect', 'Generate Ephemeral']
-- ['connect_get.md', 'Connect', 'Get']
-- ['databases_delete.md', 'Databases', 'Delete']
-- ['databases_get.md', 'Databases', 'Get']
-- ['databases_insert.md', 'Databases', 'Insert']
-- ['databases_list.md', 'Databases', 'List']
-- ['databases_patch.md', 'Databases', 'Patch']
-- ['databases_update.md', 'Databases', 'Update']
-- ['flags_list.md', 'Flags', 'List']
-- ['instances_add-server-ca.md', 'Instances', 'Add Server Ca']
-- ['instances_clone.md', 'Instances', 'Clone']
-- ['instances_delete.md', 'Instances', 'Delete']
-- ['instances_demote-master.md', 'Instances', 'Demote Master']
-- ['instances_export.md', 'Instances', 'Export']
-- ['instances_failover.md', 'Instances', 'Failover']
-- ['instances_get.md', 'Instances', 'Get']
-- ['instances_import.md', 'Instances', 'Import']
-- ['instances_insert.md', 'Instances', 'Insert']
-- ['instances_list.md', 'Instances', 'List']
-- ['instances_list-server-cas.md', 'Instances', 'List Server Cas']
-- ['instances_patch.md', 'Instances', 'Patch']
-- ['instances_promote-replica.md', 'Instances', 'Promote Replica']
-- ['instances_reset-ssl-config.md', 'Instances', 'Reset Ssl Config']
-- ['instances_restart.md', 'Instances', 'Restart']
-- ['instances_restore-backup.md', 'Instances', 'Restore Backup']
-- ['instances_rotate-server-ca.md', 'Instances', 'Rotate Server Ca']
-- ['instances_start-replica.md', 'Instances', 'Start Replica']
-- ['instances_stop-replica.md', 'Instances', 'Stop Replica']
-- ['instances_truncate-log.md', 'Instances', 'Truncate Log']
-- ['instances_update.md', 'Instances', 'Update']
-- ['operations_get.md', 'Operations', 'Get']
-- ['operations_list.md', 'Operations', 'List']
-- ['projects_instances-reschedule-maintenance.md', 'Projects', 'Instances Reschedule Maintenance']
-- ['projects_instances-start-external-sync.md', 'Projects', 'Instances Start External Sync']
-- ['projects_instances-verify-external-sync-settings.md', 'Projects', 'Instances Verify External Sync Settings']
-- ['ssl-certs_create-ephemeral.md', 'Ssl Certs', 'Create Ephemeral']
-- ['ssl-certs_delete.md', 'Ssl Certs', 'Delete']
-- ['ssl-certs_get.md', 'Ssl Certs', 'Get']
-- ['ssl-certs_insert.md', 'Ssl Certs', 'Insert']
-- ['ssl-certs_list.md', 'Ssl Certs', 'List']
-- ['tiers_list.md', 'Tiers', 'List']
-- ['users_delete.md', 'Users', 'Delete']
-- ['users_insert.md', 'Users', 'Insert']
-- ['users_list.md', 'Users', 'List']
-- ['users_update.md', 'Users', 'Update']
+nav:
+- Home: 'index.md'
+- 'Backup Runs':
+    - 'Delete': 'backup-runs_delete.md'
+    - 'Get': 'backup-runs_get.md'
+    - 'Insert': 'backup-runs_insert.md'
+    - 'List': 'backup-runs_list.md'
+- 'Connect':
+    - 'Generate Ephemeral': 'connect_generate-ephemeral.md'
+    - 'Get': 'connect_get.md'
+- 'Databases':
+    - 'Delete': 'databases_delete.md'
+    - 'Get': 'databases_get.md'
+    - 'Insert': 'databases_insert.md'
+    - 'List': 'databases_list.md'
+    - 'Patch': 'databases_patch.md'
+    - 'Update': 'databases_update.md'
+- 'Flags':
+    - 'List': 'flags_list.md'
+- 'Instances':
+    - 'Add Server Ca': 'instances_add-server-ca.md'
+    - 'Clone': 'instances_clone.md'
+    - 'Delete': 'instances_delete.md'
+    - 'Demote Master': 'instances_demote-master.md'
+    - 'Export': 'instances_export.md'
+    - 'Failover': 'instances_failover.md'
+    - 'Get': 'instances_get.md'
+    - 'Import': 'instances_import.md'
+    - 'Insert': 'instances_insert.md'
+    - 'List': 'instances_list.md'
+    - 'List Server Cas': 'instances_list-server-cas.md'
+    - 'Patch': 'instances_patch.md'
+    - 'Promote Replica': 'instances_promote-replica.md'
+    - 'Reset Ssl Config': 'instances_reset-ssl-config.md'
+    - 'Restart': 'instances_restart.md'
+    - 'Restore Backup': 'instances_restore-backup.md'
+    - 'Rotate Server Ca': 'instances_rotate-server-ca.md'
+    - 'Start Replica': 'instances_start-replica.md'
+    - 'Stop Replica': 'instances_stop-replica.md'
+    - 'Truncate Log': 'instances_truncate-log.md'
+    - 'Update': 'instances_update.md'
+- 'Operations':
+    - 'Get': 'operations_get.md'
+    - 'List': 'operations_list.md'
+- 'Projects':
+    - 'Instances Reschedule Maintenance': 'projects_instances-reschedule-maintenance.md'
+    - 'Instances Start External Sync': 'projects_instances-start-external-sync.md'
+    - 'Instances Verify External Sync Settings': 'projects_instances-verify-external-sync-settings.md'
+- 'Ssl Certs':
+    - 'Create Ephemeral': 'ssl-certs_create-ephemeral.md'
+    - 'Delete': 'ssl-certs_delete.md'
+    - 'Get': 'ssl-certs_get.md'
+    - 'Insert': 'ssl-certs_insert.md'
+    - 'List': 'ssl-certs_list.md'
+- 'Tiers':
+    - 'List': 'tiers_list.md'
+- 'Users':
+    - 'Delete': 'users_delete.md'
+    - 'Get': 'users_get.md'
+    - 'Insert': 'users_insert.md'
+    - 'List': 'users_list.md'
+    - 'Update': 'users_update.md'
 
 theme: readthedocs
 

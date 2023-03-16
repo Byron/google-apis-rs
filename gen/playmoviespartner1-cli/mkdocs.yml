@@ -1,4 +1,4 @@
-site_name: Play Movies v4.0.1+20170919
+site_name: Play Movies v5.0.2+20170919
 site_url: http://byron.github.io/google-apis-rs/google-playmoviespartner1-cli
 site_description: A complete library to interact with Play Movies (protocol v1)
 
@@ -7,14 +7,15 @@ repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/playmoviespartne
 docs_dir: docs
 site_dir: build_html
 
-pages:
-- ['index.md', 'Home']
-- ['accounts_avails-get.md', 'Accounts', 'Avails Get']
-- ['accounts_avails-list.md', 'Accounts', 'Avails List']
-- ['accounts_orders-get.md', 'Accounts', 'Orders Get']
-- ['accounts_orders-list.md', 'Accounts', 'Orders List']
-- ['accounts_store-infos-country-get.md', 'Accounts', 'Store Infos Country Get']
-- ['accounts_store-infos-list.md', 'Accounts', 'Store Infos List']
+nav:
+- Home: 'index.md'
+- 'Accounts':
+    - 'Avails Get': 'accounts_avails-get.md'
+    - 'Avails List': 'accounts_avails-list.md'
+    - 'Orders Get': 'accounts_orders-get.md'
+    - 'Orders List': 'accounts_orders-list.md'
+    - 'Store Infos Country Get': 'accounts_store-infos-country-get.md'
+    - 'Store Infos List': 'accounts_store-infos-list.md'
 
 theme: readthedocs
 

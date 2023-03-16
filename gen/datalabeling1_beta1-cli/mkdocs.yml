@@ -1,4 +1,4 @@
-site_name: Data Labeling v4.0.1+20220301
+site_name: Data Labeling v5.0.2+20221205
 site_url: http://byron.github.io/google-apis-rs/google-datalabeling1_beta1-cli
 site_description: A complete library to interact with Data Labeling (protocol v1beta1)
 
@@ -7,55 +7,56 @@ repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/datalabeling1_be
 docs_dir: docs
 site_dir: build_html
 
-pages:
-- ['index.md', 'Home']
-- ['projects_annotation-spec-sets-create.md', 'Projects', 'Annotation Spec Sets Create']
-- ['projects_annotation-spec-sets-delete.md', 'Projects', 'Annotation Spec Sets Delete']
-- ['projects_annotation-spec-sets-get.md', 'Projects', 'Annotation Spec Sets Get']
-- ['projects_annotation-spec-sets-list.md', 'Projects', 'Annotation Spec Sets List']
-- ['projects_datasets-annotated-datasets-data-items-get.md', 'Projects', 'Datasets Annotated Datasets Data Items Get']
-- ['projects_datasets-annotated-datasets-data-items-list.md', 'Projects', 'Datasets Annotated Datasets Data Items List']
-- ['projects_datasets-annotated-datasets-delete.md', 'Projects', 'Datasets Annotated Datasets Delete']
-- ['projects_datasets-annotated-datasets-examples-get.md', 'Projects', 'Datasets Annotated Datasets Examples Get']
-- ['projects_datasets-annotated-datasets-examples-list.md', 'Projects', 'Datasets Annotated Datasets Examples List']
-- ['projects_datasets-annotated-datasets-feedback-threads-delete.md', 'Projects', 'Datasets Annotated Datasets Feedback Threads Delete']
-- ['projects_datasets-annotated-datasets-feedback-threads-feedback-messages-create.md', 'Projects', 'Datasets Annotated Datasets Feedback Threads Feedback Messages Create']
-- ['projects_datasets-annotated-datasets-feedback-threads-feedback-messages-delete.md', 'Projects', 'Datasets Annotated Datasets Feedback Threads Feedback Messages Delete']
-- ['projects_datasets-annotated-datasets-feedback-threads-feedback-messages-get.md', 'Projects', 'Datasets Annotated Datasets Feedback Threads Feedback Messages Get']
-- ['projects_datasets-annotated-datasets-feedback-threads-feedback-messages-list.md', 'Projects', 'Datasets Annotated Datasets Feedback Threads Feedback Messages List']
-- ['projects_datasets-annotated-datasets-feedback-threads-get.md', 'Projects', 'Datasets Annotated Datasets Feedback Threads Get']
-- ['projects_datasets-annotated-datasets-feedback-threads-list.md', 'Projects', 'Datasets Annotated Datasets Feedback Threads List']
-- ['projects_datasets-annotated-datasets-get.md', 'Projects', 'Datasets Annotated Datasets Get']
-- ['projects_datasets-annotated-datasets-list.md', 'Projects', 'Datasets Annotated Datasets List']
-- ['projects_datasets-create.md', 'Projects', 'Datasets Create']
-- ['projects_datasets-data-items-get.md', 'Projects', 'Datasets Data Items Get']
-- ['projects_datasets-data-items-list.md', 'Projects', 'Datasets Data Items List']
-- ['projects_datasets-delete.md', 'Projects', 'Datasets Delete']
-- ['projects_datasets-evaluations-example-comparisons-search.md', 'Projects', 'Datasets Evaluations Example Comparisons Search']
-- ['projects_datasets-evaluations-get.md', 'Projects', 'Datasets Evaluations Get']
-- ['projects_datasets-export-data.md', 'Projects', 'Datasets Export Data']
-- ['projects_datasets-get.md', 'Projects', 'Datasets Get']
-- ['projects_datasets-image-label.md', 'Projects', 'Datasets Image Label']
-- ['projects_datasets-import-data.md', 'Projects', 'Datasets Import Data']
-- ['projects_datasets-list.md', 'Projects', 'Datasets List']
-- ['projects_datasets-text-label.md', 'Projects', 'Datasets Text Label']
-- ['projects_datasets-video-label.md', 'Projects', 'Datasets Video Label']
-- ['projects_evaluation-jobs-create.md', 'Projects', 'Evaluation Jobs Create']
-- ['projects_evaluation-jobs-delete.md', 'Projects', 'Evaluation Jobs Delete']
-- ['projects_evaluation-jobs-get.md', 'Projects', 'Evaluation Jobs Get']
-- ['projects_evaluation-jobs-list.md', 'Projects', 'Evaluation Jobs List']
-- ['projects_evaluation-jobs-patch.md', 'Projects', 'Evaluation Jobs Patch']
-- ['projects_evaluation-jobs-pause.md', 'Projects', 'Evaluation Jobs Pause']
-- ['projects_evaluation-jobs-resume.md', 'Projects', 'Evaluation Jobs Resume']
-- ['projects_evaluations-search.md', 'Projects', 'Evaluations Search']
-- ['projects_instructions-create.md', 'Projects', 'Instructions Create']
-- ['projects_instructions-delete.md', 'Projects', 'Instructions Delete']
-- ['projects_instructions-get.md', 'Projects', 'Instructions Get']
-- ['projects_instructions-list.md', 'Projects', 'Instructions List']
-- ['projects_operations-cancel.md', 'Projects', 'Operations Cancel']
-- ['projects_operations-delete.md', 'Projects', 'Operations Delete']
-- ['projects_operations-get.md', 'Projects', 'Operations Get']
-- ['projects_operations-list.md', 'Projects', 'Operations List']
+nav:
+- Home: 'index.md'
+- 'Projects':
+    - 'Annotation Spec Sets Create': 'projects_annotation-spec-sets-create.md'
+    - 'Annotation Spec Sets Delete': 'projects_annotation-spec-sets-delete.md'
+    - 'Annotation Spec Sets Get': 'projects_annotation-spec-sets-get.md'
+    - 'Annotation Spec Sets List': 'projects_annotation-spec-sets-list.md'
+    - 'Datasets Annotated Datasets Data Items Get': 'projects_datasets-annotated-datasets-data-items-get.md'
+    - 'Datasets Annotated Datasets Data Items List': 'projects_datasets-annotated-datasets-data-items-list.md'
+    - 'Datasets Annotated Datasets Delete': 'projects_datasets-annotated-datasets-delete.md'
+    - 'Datasets Annotated Datasets Examples Get': 'projects_datasets-annotated-datasets-examples-get.md'
+    - 'Datasets Annotated Datasets Examples List': 'projects_datasets-annotated-datasets-examples-list.md'
+    - 'Datasets Annotated Datasets Feedback Threads Delete': 'projects_datasets-annotated-datasets-feedback-threads-delete.md'
+    - 'Datasets Annotated Datasets Feedback Threads Feedback Messages Create': 'projects_datasets-annotated-datasets-feedback-threads-feedback-messages-create.md'
+    - 'Datasets Annotated Datasets Feedback Threads Feedback Messages Delete': 'projects_datasets-annotated-datasets-feedback-threads-feedback-messages-delete.md'
+    - 'Datasets Annotated Datasets Feedback Threads Feedback Messages Get': 'projects_datasets-annotated-datasets-feedback-threads-feedback-messages-get.md'
+    - 'Datasets Annotated Datasets Feedback Threads Feedback Messages List': 'projects_datasets-annotated-datasets-feedback-threads-feedback-messages-list.md'
+    - 'Datasets Annotated Datasets Feedback Threads Get': 'projects_datasets-annotated-datasets-feedback-threads-get.md'
+    - 'Datasets Annotated Datasets Feedback Threads List': 'projects_datasets-annotated-datasets-feedback-threads-list.md'
+    - 'Datasets Annotated Datasets Get': 'projects_datasets-annotated-datasets-get.md'
+    - 'Datasets Annotated Datasets List': 'projects_datasets-annotated-datasets-list.md'
+    - 'Datasets Create': 'projects_datasets-create.md'
+    - 'Datasets Data Items Get': 'projects_datasets-data-items-get.md'
+    - 'Datasets Data Items List': 'projects_datasets-data-items-list.md'
+    - 'Datasets Delete': 'projects_datasets-delete.md'
+    - 'Datasets Evaluations Example Comparisons Search': 'projects_datasets-evaluations-example-comparisons-search.md'
+    - 'Datasets Evaluations Get': 'projects_datasets-evaluations-get.md'
+    - 'Datasets Export Data': 'projects_datasets-export-data.md'
+    - 'Datasets Get': 'projects_datasets-get.md'
+    - 'Datasets Image Label': 'projects_datasets-image-label.md'
+    - 'Datasets Import Data': 'projects_datasets-import-data.md'
+    - 'Datasets List': 'projects_datasets-list.md'
+    - 'Datasets Text Label': 'projects_datasets-text-label.md'
+    - 'Datasets Video Label': 'projects_datasets-video-label.md'
+    - 'Evaluation Jobs Create': 'projects_evaluation-jobs-create.md'
+    - 'Evaluation Jobs Delete': 'projects_evaluation-jobs-delete.md'
+    - 'Evaluation Jobs Get': 'projects_evaluation-jobs-get.md'
+    - 'Evaluation Jobs List': 'projects_evaluation-jobs-list.md'
+    - 'Evaluation Jobs Patch': 'projects_evaluation-jobs-patch.md'
+    - 'Evaluation Jobs Pause': 'projects_evaluation-jobs-pause.md'
+    - 'Evaluation Jobs Resume': 'projects_evaluation-jobs-resume.md'
+    - 'Evaluations Search': 'projects_evaluations-search.md'
+    - 'Instructions Create': 'projects_instructions-create.md'
+    - 'Instructions Delete': 'projects_instructions-delete.md'
+    - 'Instructions Get': 'projects_instructions-get.md'
+    - 'Instructions List': 'projects_instructions-list.md'
+    - 'Operations Cancel': 'projects_operations-cancel.md'
+    - 'Operations Delete': 'projects_operations-delete.md'
+    - 'Operations Get': 'projects_operations-get.md'
+    - 'Operations List': 'projects_operations-list.md'
 
 theme: readthedocs
 

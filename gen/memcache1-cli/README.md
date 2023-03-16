@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Cloud Memorystore for Memcached* API at revision *20220224*. The CLI is at version *4.0.1*.
+This documentation was generated from the *Cloud Memorystore for Memcached* API at revision *20230103*. The CLI is at version *5.0.2*.
 
 ```bash
 memcache1 [options]
@@ -37,6 +37,7 @@ memcache1 [options]
                 locations-instances-get <name> [-p <v>]... [-o <out>]
                 locations-instances-list <parent> [-p <v>]... [-o <out>]
                 locations-instances-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-instances-reschedule-maintenance <instance> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-instances-update-parameters <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-list <name> [-p <v>]... [-o <out>]
                 locations-operations-cancel <name> (-r <kv>)... [-p <v>]... [-o <out>]

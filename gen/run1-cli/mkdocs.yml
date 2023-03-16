@@ -1,4 +1,4 @@
-site_name: Cloud Run v4.0.1+20220225
+site_name: Cloud Run v5.0.2+20230113
 site_url: http://byron.github.io/google-apis-rs/google-run1-cli
 site_description: A complete library to interact with Cloud Run (protocol v1)
 
@@ -7,61 +7,64 @@ repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/run1-cli
 docs_dir: docs
 site_dir: build_html
 
-pages:
-- ['index.md', 'Home']
-- ['namespaces_authorizeddomains-list.md', 'Namespaces', 'Authorizeddomains List']
-- ['namespaces_configurations-get.md', 'Namespaces', 'Configurations Get']
-- ['namespaces_configurations-list.md', 'Namespaces', 'Configurations List']
-- ['namespaces_domainmappings-create.md', 'Namespaces', 'Domainmappings Create']
-- ['namespaces_domainmappings-delete.md', 'Namespaces', 'Domainmappings Delete']
-- ['namespaces_domainmappings-get.md', 'Namespaces', 'Domainmappings Get']
-- ['namespaces_domainmappings-list.md', 'Namespaces', 'Domainmappings List']
-- ['namespaces_executions-delete.md', 'Namespaces', 'Executions Delete']
-- ['namespaces_executions-get.md', 'Namespaces', 'Executions Get']
-- ['namespaces_executions-list.md', 'Namespaces', 'Executions List']
-- ['namespaces_jobs-create.md', 'Namespaces', 'Jobs Create']
-- ['namespaces_jobs-delete.md', 'Namespaces', 'Jobs Delete']
-- ['namespaces_jobs-get.md', 'Namespaces', 'Jobs Get']
-- ['namespaces_jobs-list.md', 'Namespaces', 'Jobs List']
-- ['namespaces_jobs-replace-job.md', 'Namespaces', 'Jobs Replace Job']
-- ['namespaces_jobs-run.md', 'Namespaces', 'Jobs Run']
-- ['namespaces_revisions-delete.md', 'Namespaces', 'Revisions Delete']
-- ['namespaces_revisions-get.md', 'Namespaces', 'Revisions Get']
-- ['namespaces_revisions-list.md', 'Namespaces', 'Revisions List']
-- ['namespaces_routes-get.md', 'Namespaces', 'Routes Get']
-- ['namespaces_routes-list.md', 'Namespaces', 'Routes List']
-- ['namespaces_services-create.md', 'Namespaces', 'Services Create']
-- ['namespaces_services-delete.md', 'Namespaces', 'Services Delete']
-- ['namespaces_services-get.md', 'Namespaces', 'Services Get']
-- ['namespaces_services-list.md', 'Namespaces', 'Services List']
-- ['namespaces_services-replace-service.md', 'Namespaces', 'Services Replace Service']
-- ['namespaces_tasks-get.md', 'Namespaces', 'Tasks Get']
-- ['namespaces_tasks-list.md', 'Namespaces', 'Tasks List']
-- ['projects_authorizeddomains-list.md', 'Projects', 'Authorizeddomains List']
-- ['projects_locations-authorizeddomains-list.md', 'Projects', 'Locations Authorizeddomains List']
-- ['projects_locations-configurations-get.md', 'Projects', 'Locations Configurations Get']
-- ['projects_locations-configurations-list.md', 'Projects', 'Locations Configurations List']
-- ['projects_locations-domainmappings-create.md', 'Projects', 'Locations Domainmappings Create']
-- ['projects_locations-domainmappings-delete.md', 'Projects', 'Locations Domainmappings Delete']
-- ['projects_locations-domainmappings-get.md', 'Projects', 'Locations Domainmappings Get']
-- ['projects_locations-domainmappings-list.md', 'Projects', 'Locations Domainmappings List']
-- ['projects_locations-jobs-get-iam-policy.md', 'Projects', 'Locations Jobs Get Iam Policy']
-- ['projects_locations-jobs-set-iam-policy.md', 'Projects', 'Locations Jobs Set Iam Policy']
-- ['projects_locations-jobs-test-iam-permissions.md', 'Projects', 'Locations Jobs Test Iam Permissions']
-- ['projects_locations-list.md', 'Projects', 'Locations List']
-- ['projects_locations-revisions-delete.md', 'Projects', 'Locations Revisions Delete']
-- ['projects_locations-revisions-get.md', 'Projects', 'Locations Revisions Get']
-- ['projects_locations-revisions-list.md', 'Projects', 'Locations Revisions List']
-- ['projects_locations-routes-get.md', 'Projects', 'Locations Routes Get']
-- ['projects_locations-routes-list.md', 'Projects', 'Locations Routes List']
-- ['projects_locations-services-create.md', 'Projects', 'Locations Services Create']
-- ['projects_locations-services-delete.md', 'Projects', 'Locations Services Delete']
-- ['projects_locations-services-get.md', 'Projects', 'Locations Services Get']
-- ['projects_locations-services-get-iam-policy.md', 'Projects', 'Locations Services Get Iam Policy']
-- ['projects_locations-services-list.md', 'Projects', 'Locations Services List']
-- ['projects_locations-services-replace-service.md', 'Projects', 'Locations Services Replace Service']
-- ['projects_locations-services-set-iam-policy.md', 'Projects', 'Locations Services Set Iam Policy']
-- ['projects_locations-services-test-iam-permissions.md', 'Projects', 'Locations Services Test Iam Permissions']
+nav:
+- Home: 'index.md'
+- 'Namespaces':
+    - 'Authorizeddomains List': 'namespaces_authorizeddomains-list.md'
+    - 'Configurations Get': 'namespaces_configurations-get.md'
+    - 'Configurations List': 'namespaces_configurations-list.md'
+    - 'Domainmappings Create': 'namespaces_domainmappings-create.md'
+    - 'Domainmappings Delete': 'namespaces_domainmappings-delete.md'
+    - 'Domainmappings Get': 'namespaces_domainmappings-get.md'
+    - 'Domainmappings List': 'namespaces_domainmappings-list.md'
+    - 'Executions Cancel': 'namespaces_executions-cancel.md'
+    - 'Executions Delete': 'namespaces_executions-delete.md'
+    - 'Executions Get': 'namespaces_executions-get.md'
+    - 'Executions List': 'namespaces_executions-list.md'
+    - 'Jobs Create': 'namespaces_jobs-create.md'
+    - 'Jobs Delete': 'namespaces_jobs-delete.md'
+    - 'Jobs Get': 'namespaces_jobs-get.md'
+    - 'Jobs List': 'namespaces_jobs-list.md'
+    - 'Jobs Replace Job': 'namespaces_jobs-replace-job.md'
+    - 'Jobs Run': 'namespaces_jobs-run.md'
+    - 'Revisions Delete': 'namespaces_revisions-delete.md'
+    - 'Revisions Get': 'namespaces_revisions-get.md'
+    - 'Revisions List': 'namespaces_revisions-list.md'
+    - 'Routes Get': 'namespaces_routes-get.md'
+    - 'Routes List': 'namespaces_routes-list.md'
+    - 'Services Create': 'namespaces_services-create.md'
+    - 'Services Delete': 'namespaces_services-delete.md'
+    - 'Services Get': 'namespaces_services-get.md'
+    - 'Services List': 'namespaces_services-list.md'
+    - 'Services Replace Service': 'namespaces_services-replace-service.md'
+    - 'Tasks Get': 'namespaces_tasks-get.md'
+    - 'Tasks List': 'namespaces_tasks-list.md'
+- 'Projects':
+    - 'Authorizeddomains List': 'projects_authorizeddomains-list.md'
+    - 'Locations Authorizeddomains List': 'projects_locations-authorizeddomains-list.md'
+    - 'Locations Configurations Get': 'projects_locations-configurations-get.md'
+    - 'Locations Configurations List': 'projects_locations-configurations-list.md'
+    - 'Locations Domainmappings Create': 'projects_locations-domainmappings-create.md'
+    - 'Locations Domainmappings Delete': 'projects_locations-domainmappings-delete.md'
+    - 'Locations Domainmappings Get': 'projects_locations-domainmappings-get.md'
+    - 'Locations Domainmappings List': 'projects_locations-domainmappings-list.md'
+    - 'Locations Jobs Get Iam Policy': 'projects_locations-jobs-get-iam-policy.md'
+    - 'Locations Jobs Set Iam Policy': 'projects_locations-jobs-set-iam-policy.md'
+    - 'Locations Jobs Test Iam Permissions': 'projects_locations-jobs-test-iam-permissions.md'
+    - 'Locations List': 'projects_locations-list.md'
+    - 'Locations Revisions Delete': 'projects_locations-revisions-delete.md'
+    - 'Locations Revisions Get': 'projects_locations-revisions-get.md'
+    - 'Locations Revisions List': 'projects_locations-revisions-list.md'
+    - 'Locations Routes Get': 'projects_locations-routes-get.md'
+    - 'Locations Routes List': 'projects_locations-routes-list.md'
+    - 'Locations Services Create': 'projects_locations-services-create.md'
+    - 'Locations Services Delete': 'projects_locations-services-delete.md'
+    - 'Locations Services Get': 'projects_locations-services-get.md'
+    - 'Locations Services Get Iam Policy': 'projects_locations-services-get-iam-policy.md'
+    - 'Locations Services List': 'projects_locations-services-list.md'
+    - 'Locations Services Replace Service': 'projects_locations-services-replace-service.md'
+    - 'Locations Services Set Iam Policy': 'projects_locations-services-set-iam-policy.md'
+    - 'Locations Services Test Iam Permissions': 'projects_locations-services-test-iam-permissions.md'
 
 theme: readthedocs
 

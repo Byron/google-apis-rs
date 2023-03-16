@@ -25,10 +25,12 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Cloud Resource Manager* API at revision *20220306*. The CLI is at version *4.0.1*.
+This documentation was generated from the *Cloud Resource Manager* API at revision *20230115*. The CLI is at version *5.0.2*.
 
 ```bash
 cloudresourcemanager3 [options]
+        effective-tags
+                list [-p <v>]... [-o <out>]
         folders
                 create (-r <kv>)... [-p <v>]... [-o <out>]
                 delete <name> [-p <v>]... [-o <out>]
@@ -87,6 +89,9 @@ cloudresourcemanager3 [options]
                 list [-p <v>]... [-o <out>]
                 patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 set-iam-policy <resource> (-r <kv>)... [-p <v>]... [-o <out>]
+                tag-holds-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                tag-holds-delete <name> [-p <v>]... [-o <out>]
+                tag-holds-list <parent> [-p <v>]... [-o <out>]
                 test-iam-permissions <resource> (-r <kv>)... [-p <v>]... [-o <out>]
   cloudresourcemanager3 --help
 

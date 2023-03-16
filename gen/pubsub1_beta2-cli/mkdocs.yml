@@ -1,4 +1,4 @@
-site_name: Pubsub v4.0.1+20220221
+site_name: Pubsub v5.0.2+20230119
 site_url: http://byron.github.io/google-apis-rs/google-pubsub1_beta2-cli
 site_description: A complete library to interact with Pubsub (protocol v1beta2)
 
@@ -7,28 +7,29 @@ repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/pubsub1_beta2-cl
 docs_dir: docs
 site_dir: build_html
 
-pages:
-- ['index.md', 'Home']
-- ['projects_subscriptions-acknowledge.md', 'Projects', 'Subscriptions Acknowledge']
-- ['projects_subscriptions-create.md', 'Projects', 'Subscriptions Create']
-- ['projects_subscriptions-delete.md', 'Projects', 'Subscriptions Delete']
-- ['projects_subscriptions-get.md', 'Projects', 'Subscriptions Get']
-- ['projects_subscriptions-get-iam-policy.md', 'Projects', 'Subscriptions Get Iam Policy']
-- ['projects_subscriptions-list.md', 'Projects', 'Subscriptions List']
-- ['projects_subscriptions-modify-ack-deadline.md', 'Projects', 'Subscriptions Modify Ack Deadline']
-- ['projects_subscriptions-modify-push-config.md', 'Projects', 'Subscriptions Modify Push Config']
-- ['projects_subscriptions-pull.md', 'Projects', 'Subscriptions Pull']
-- ['projects_subscriptions-set-iam-policy.md', 'Projects', 'Subscriptions Set Iam Policy']
-- ['projects_subscriptions-test-iam-permissions.md', 'Projects', 'Subscriptions Test Iam Permissions']
-- ['projects_topics-create.md', 'Projects', 'Topics Create']
-- ['projects_topics-delete.md', 'Projects', 'Topics Delete']
-- ['projects_topics-get.md', 'Projects', 'Topics Get']
-- ['projects_topics-get-iam-policy.md', 'Projects', 'Topics Get Iam Policy']
-- ['projects_topics-list.md', 'Projects', 'Topics List']
-- ['projects_topics-publish.md', 'Projects', 'Topics Publish']
-- ['projects_topics-set-iam-policy.md', 'Projects', 'Topics Set Iam Policy']
-- ['projects_topics-subscriptions-list.md', 'Projects', 'Topics Subscriptions List']
-- ['projects_topics-test-iam-permissions.md', 'Projects', 'Topics Test Iam Permissions']
+nav:
+- Home: 'index.md'
+- 'Projects':
+    - 'Subscriptions Acknowledge': 'projects_subscriptions-acknowledge.md'
+    - 'Subscriptions Create': 'projects_subscriptions-create.md'
+    - 'Subscriptions Delete': 'projects_subscriptions-delete.md'
+    - 'Subscriptions Get': 'projects_subscriptions-get.md'
+    - 'Subscriptions Get Iam Policy': 'projects_subscriptions-get-iam-policy.md'
+    - 'Subscriptions List': 'projects_subscriptions-list.md'
+    - 'Subscriptions Modify Ack Deadline': 'projects_subscriptions-modify-ack-deadline.md'
+    - 'Subscriptions Modify Push Config': 'projects_subscriptions-modify-push-config.md'
+    - 'Subscriptions Pull': 'projects_subscriptions-pull.md'
+    - 'Subscriptions Set Iam Policy': 'projects_subscriptions-set-iam-policy.md'
+    - 'Subscriptions Test Iam Permissions': 'projects_subscriptions-test-iam-permissions.md'
+    - 'Topics Create': 'projects_topics-create.md'
+    - 'Topics Delete': 'projects_topics-delete.md'
+    - 'Topics Get': 'projects_topics-get.md'
+    - 'Topics Get Iam Policy': 'projects_topics-get-iam-policy.md'
+    - 'Topics List': 'projects_topics-list.md'
+    - 'Topics Publish': 'projects_topics-publish.md'
+    - 'Topics Set Iam Policy': 'projects_topics-set-iam-policy.md'
+    - 'Topics Subscriptions List': 'projects_topics-subscriptions-list.md'
+    - 'Topics Test Iam Permissions': 'projects_topics-test-iam-permissions.md'
 
 theme: readthedocs
 

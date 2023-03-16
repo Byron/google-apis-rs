@@ -1,4 +1,4 @@
-site_name: cloudlatencytest v4.0.1+20160309
+site_name: cloudlatencytest v5.0.2+20160309
 site_url: http://byron.github.io/google-apis-rs/google-cloudlatencytest2-cli
 site_description: A complete library to interact with cloudlatencytest (protocol v2)
 
@@ -7,10 +7,11 @@ repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/cloudlatencytest
 docs_dir: docs
 site_dir: build_html
 
-pages:
-- ['index.md', 'Home']
-- ['statscollection_updateaggregatedstats.md', 'Statscollection', 'Updateaggregatedstats']
-- ['statscollection_updatestats.md', 'Statscollection', 'Updatestats']
+nav:
+- Home: 'index.md'
+- 'Statscollection':
+    - 'Updateaggregatedstats': 'statscollection_updateaggregatedstats.md'
+    - 'Updatestats': 'statscollection_updatestats.md'
 
 theme: readthedocs
 

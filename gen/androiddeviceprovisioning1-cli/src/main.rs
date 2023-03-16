@@ -3,8 +3,6 @@
 // DO NOT EDIT !
 #![allow(unused_variables, unused_imports, dead_code, unused_mut)]
 
-extern crate tokio;
-
 #[macro_use]
 extern crate clap;
 
@@ -12,9 +10,10 @@ use std::env;
 use std::io::{self, Write};
 use clap::{App, SubCommand, Arg};
 
-use google_androiddeviceprovisioning1::{api, Error, oauth2};
+use google_androiddeviceprovisioning1::{api, Error, oauth2, client::chrono, FieldMask};
 
-mod client;
+
+use google_clis_common as client;
 
 use client::{InvalidOptionsError, CLIError, arg_from_str, writer_from_opts, parse_kv_arg,
           input_file_from_opts, input_mime_from_opts, FieldCursor, FieldError, CallType, UploadProtocol,
@@ -338,7 +337,7 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "update-mask" => {
-                    call = call.update_mask(value.unwrap_or(""));
+                    call = call.update_mask(        value.map(|v| arg_from_str(v, err, "update-mask", "google-fieldmask")).unwrap_or(FieldMask::default()));
                 },
                 _ => {
                     let mut found = false;
@@ -409,13 +408,15 @@ where
                 match &temp_cursor.to_string()[..] {
                     "configuration" => Some(("configuration", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "device.device-id" => Some(("device.deviceId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "device.device-identifier.chrome-os-attested-device-id" => Some(("device.deviceIdentifier.chromeOsAttestedDeviceId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "device.device-identifier.device-type" => Some(("device.deviceIdentifier.deviceType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "device.device-identifier.imei" => Some(("device.deviceIdentifier.imei", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "device.device-identifier.manufacturer" => Some(("device.deviceIdentifier.manufacturer", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "device.device-identifier.meid" => Some(("device.deviceIdentifier.meid", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "device.device-identifier.model" => Some(("device.deviceIdentifier.model", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "device.device-identifier.serial-number" => Some(("device.deviceIdentifier.serialNumber", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["configuration", "device", "device-id", "device-identifier", "imei", "manufacturer", "meid", "model", "serial-number"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["chrome-os-attested-device-id", "configuration", "device", "device-id", "device-identifier", "device-type", "imei", "manufacturer", "meid", "model", "serial-number"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -531,7 +532,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(value.unwrap_or(""));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int64")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -601,13 +602,15 @@ where
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
                     "device.device-id" => Some(("device.deviceId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "device.device-identifier.chrome-os-attested-device-id" => Some(("device.deviceIdentifier.chromeOsAttestedDeviceId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "device.device-identifier.device-type" => Some(("device.deviceIdentifier.deviceType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "device.device-identifier.imei" => Some(("device.deviceIdentifier.imei", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "device.device-identifier.manufacturer" => Some(("device.deviceIdentifier.manufacturer", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "device.device-identifier.meid" => Some(("device.deviceIdentifier.meid", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "device.device-identifier.model" => Some(("device.deviceIdentifier.model", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "device.device-identifier.serial-number" => Some(("device.deviceIdentifier.serialNumber", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["device", "device-id", "device-identifier", "imei", "manufacturer", "meid", "model", "serial-number"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["chrome-os-attested-device-id", "device", "device-id", "device-identifier", "device-type", "imei", "manufacturer", "meid", "model", "serial-number"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -688,13 +691,15 @@ where
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
                     "device.device-id" => Some(("device.deviceId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "device.device-identifier.chrome-os-attested-device-id" => Some(("device.deviceIdentifier.chromeOsAttestedDeviceId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "device.device-identifier.device-type" => Some(("device.deviceIdentifier.deviceType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "device.device-identifier.imei" => Some(("device.deviceIdentifier.imei", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "device.device-identifier.manufacturer" => Some(("device.deviceIdentifier.manufacturer", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "device.device-identifier.meid" => Some(("device.deviceIdentifier.meid", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "device.device-identifier.model" => Some(("device.deviceIdentifier.model", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "device.device-identifier.serial-number" => Some(("device.deviceIdentifier.serialNumber", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["device", "device-id", "device-identifier", "imei", "manufacturer", "meid", "model", "serial-number"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["chrome-os-attested-device-id", "device", "device-id", "device-identifier", "device-type", "imei", "manufacturer", "meid", "model", "serial-number"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -810,7 +815,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -931,13 +936,15 @@ where
                     "customer.admin-emails" => Some(("customer.adminEmails", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "customer.company-id" => Some(("customer.companyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "customer.company-name" => Some(("customer.companyName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "customer.google-workspace-account.customer-id" => Some(("customer.googleWorkspaceAccount.customerId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "customer.google-workspace-account.pre-provisioning-tokens" => Some(("customer.googleWorkspaceAccount.preProvisioningTokens", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "customer.language-code" => Some(("customer.languageCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "customer.name" => Some(("customer.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "customer.owner-emails" => Some(("customer.ownerEmails", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "customer.skip-welcome-email" => Some(("customer.skipWelcomeEmail", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "customer.terms-status" => Some(("customer.termsStatus", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["admin-emails", "company-id", "company-name", "customer", "language-code", "name", "owner-emails", "skip-welcome-email", "terms-status"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["admin-emails", "company-id", "company-name", "customer", "customer-id", "google-workspace-account", "language-code", "name", "owner-emails", "pre-provisioning-tokens", "skip-welcome-email", "terms-status"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1004,7 +1011,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -1074,15 +1081,20 @@ where
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
                     "customer-id" => Some(("customerId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "device-identifier.chrome-os-attested-device-id" => Some(("deviceIdentifier.chromeOsAttestedDeviceId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "device-identifier.device-type" => Some(("deviceIdentifier.deviceType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "device-identifier.imei" => Some(("deviceIdentifier.imei", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "device-identifier.manufacturer" => Some(("deviceIdentifier.manufacturer", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "device-identifier.meid" => Some(("deviceIdentifier.meid", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "device-identifier.model" => Some(("deviceIdentifier.model", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "device-identifier.serial-number" => Some(("deviceIdentifier.serialNumber", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "device-metadata.entries" => Some(("deviceMetadata.entries", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "google-workspace-customer-id" => Some(("googleWorkspaceCustomerId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "pre-provisioning-token" => Some(("preProvisioningToken", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "section-type" => Some(("sectionType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "simlock-profile-id" => Some(("simlockProfileId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["customer-id", "device-identifier", "device-metadata", "entries", "imei", "manufacturer", "meid", "model", "section-type", "serial-number"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["chrome-os-attested-device-id", "customer-id", "device-identifier", "device-metadata", "device-type", "entries", "google-workspace-customer-id", "imei", "manufacturer", "meid", "model", "pre-provisioning-token", "section-type", "serial-number", "simlock-profile-id"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1243,6 +1255,8 @@ where
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
+                    "device-identifier.chrome-os-attested-device-id" => Some(("deviceIdentifier.chromeOsAttestedDeviceId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "device-identifier.device-type" => Some(("deviceIdentifier.deviceType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "device-identifier.imei" => Some(("deviceIdentifier.imei", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "device-identifier.manufacturer" => Some(("deviceIdentifier.manufacturer", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "device-identifier.meid" => Some(("deviceIdentifier.meid", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -1251,7 +1265,7 @@ where
                     "limit" => Some(("limit", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "page-token" => Some(("pageToken", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["device-identifier", "imei", "limit", "manufacturer", "meid", "model", "page-token", "serial-number"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["chrome-os-attested-device-id", "device-identifier", "device-type", "imei", "limit", "manufacturer", "meid", "model", "page-token", "serial-number"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1332,11 +1346,12 @@ where
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
                     "customer-id" => Some(("customerId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "google-workspace-customer-id" => Some(("googleWorkspaceCustomerId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "limit" => Some(("limit", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "page-token" => Some(("pageToken", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "section-type" => Some(("sectionType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["customer-id", "limit", "page-token", "section-type"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["customer-id", "google-workspace-customer-id", "limit", "page-token", "section-type"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1548,6 +1563,8 @@ where
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
                     "device-id" => Some(("deviceId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "device-identifier.chrome-os-attested-device-id" => Some(("deviceIdentifier.chromeOsAttestedDeviceId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "device-identifier.device-type" => Some(("deviceIdentifier.deviceType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "device-identifier.imei" => Some(("deviceIdentifier.imei", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "device-identifier.manufacturer" => Some(("deviceIdentifier.manufacturer", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "device-identifier.meid" => Some(("deviceIdentifier.meid", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -1557,7 +1574,7 @@ where
                     "vacation-mode-days" => Some(("vacationModeDays", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "vacation-mode-expire-time" => Some(("vacationModeExpireTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["device-id", "device-identifier", "imei", "manufacturer", "meid", "model", "section-type", "serial-number", "vacation-mode-days", "vacation-mode-expire-time"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["chrome-os-attested-device-id", "device-id", "device-identifier", "device-type", "imei", "manufacturer", "meid", "model", "section-type", "serial-number", "vacation-mode-days", "vacation-mode-expire-time"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1786,7 +1803,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -1842,7 +1859,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -2570,7 +2587,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("devices-metadata",
-                    Some(r##"Updates reseller metadata associated with the device."##),
+                    Some(r##"Updates reseller metadata associated with the device. Android devices only."##),
                     "Details at http://byron.github.io/google-apis-rs/google_androiddeviceprovisioning1_cli/partners_devices-metadata",
                   vec![
                     (Some(r##"metadata-owner-id"##),
@@ -2660,7 +2677,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("devices-update-metadata-async",
-                    Some(r##"Updates the reseller metadata attached to a batch of devices. This method updates devices asynchronously and returns an `Operation` that can be used to track progress. Read [Long‑running batch operations](/zero-touch/guides/how-it-works#operations)."##),
+                    Some(r##"Updates the reseller metadata attached to a batch of devices. This method updates devices asynchronously and returns an `Operation` that can be used to track progress. Read [Long‑running batch operations](/zero-touch/guides/how-it-works#operations). Android Devices only."##),
                     "Details at http://byron.github.io/google-apis-rs/google_androiddeviceprovisioning1_cli/partners_devices-update-metadata-async",
                   vec![
                     (Some(r##"partner-id"##),
@@ -2737,7 +2754,7 @@ async fn main() {
     
     let mut app = App::new("androiddeviceprovisioning1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("4.0.1+20220305")
+           .version("5.0.2+20230115")
            .about("Automates Android zero-touch enrollment for device resellers, customers, and EMMs.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_androiddeviceprovisioning1_cli")
            .arg(Arg::with_name("folder")

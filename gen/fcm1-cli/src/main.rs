@@ -3,8 +3,6 @@
 // DO NOT EDIT !
 #![allow(unused_variables, unused_imports, dead_code, unused_mut)]
 
-extern crate tokio;
-
 #[macro_use]
 extern crate clap;
 
@@ -12,9 +10,10 @@ use std::env;
 use std::io::{self, Write};
 use clap::{App, SubCommand, Arg};
 
-use google_fcm1::{api, Error, oauth2};
+use google_fcm1::{api, Error, oauth2, client::chrono, FieldMask};
 
-mod client;
+
+use google_clis_common as client;
 
 use client::{InvalidOptionsError, CLIError, arg_from_str, writer_from_opts, parse_kv_arg,
           input_file_from_opts, input_mime_from_opts, FieldCursor, FieldError, CallType, UploadProtocol,
@@ -81,6 +80,7 @@ where
                     "message.android.notification.body" => Some(("message.android.notification.body", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "message.android.notification.body-loc-args" => Some(("message.android.notification.bodyLocArgs", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "message.android.notification.body-loc-key" => Some(("message.android.notification.bodyLocKey", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "message.android.notification.bypass-proxy-notification" => Some(("message.android.notification.bypassProxyNotification", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "message.android.notification.channel-id" => Some(("message.android.notification.channelId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "message.android.notification.click-action" => Some(("message.android.notification.clickAction", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "message.android.notification.color" => Some(("message.android.notification.color", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -129,7 +129,7 @@ where
                     "message.webpush.headers" => Some(("message.webpush.headers", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "validate-only" => Some(("validateOnly", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["alpha", "analytics-label", "android", "apns", "blue", "body", "body-loc-args", "body-loc-key", "channel-id", "click-action", "collapse-key", "color", "condition", "data", "default-light-settings", "default-sound", "default-vibrate-timings", "direct-boot-ok", "event-time", "fcm-options", "green", "headers", "icon", "image", "light-off-duration", "light-on-duration", "light-settings", "link", "local-only", "message", "name", "notification", "notification-count", "notification-priority", "priority", "red", "restricted-package-name", "sound", "sticky", "tag", "ticker", "title", "title-loc-args", "title-loc-key", "token", "topic", "ttl", "validate-only", "vibrate-timings", "visibility", "webpush"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["alpha", "analytics-label", "android", "apns", "blue", "body", "body-loc-args", "body-loc-key", "bypass-proxy-notification", "channel-id", "click-action", "collapse-key", "color", "condition", "data", "default-light-settings", "default-sound", "default-vibrate-timings", "direct-boot-ok", "event-time", "fcm-options", "green", "headers", "icon", "image", "light-off-duration", "light-on-duration", "light-settings", "link", "local-only", "message", "name", "notification", "notification-count", "notification-priority", "priority", "red", "restricted-package-name", "sound", "sticky", "tag", "ticker", "title", "title-loc-args", "title-loc-key", "token", "topic", "ttl", "validate-only", "vibrate-timings", "visibility", "webpush"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -313,7 +313,7 @@ async fn main() {
     
     let mut app = App::new("fcm1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("4.0.1+20220228")
+           .version("5.0.2+20230106")
            .about("FCM send API that provides a cross-platform messaging solution to reliably deliver messages at no cost.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_fcm1_cli")
            .arg(Arg::with_name("url")

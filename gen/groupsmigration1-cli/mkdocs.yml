@@ -1,4 +1,4 @@
-site_name: Groups Migration v4.0.1+20220226
+site_name: Groups Migration v5.0.2+20230117
 site_url: http://byron.github.io/google-apis-rs/google-groupsmigration1-cli
 site_description: A complete library to interact with Groups Migration (protocol v1)
 
@@ -7,9 +7,10 @@ repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/groupsmigration1
 docs_dir: docs
 site_dir: build_html
 
-pages:
-- ['index.md', 'Home']
-- ['archive_insert.md', 'Archive', 'Insert']
+nav:
+- Home: 'index.md'
+- 'Archive':
+    - 'Insert': 'archive_insert.md'
 
 theme: readthedocs
 

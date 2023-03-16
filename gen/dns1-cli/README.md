@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Dns* API at revision *20220217*. The CLI is at version *4.0.1*.
+This documentation was generated from the *Dns* API at revision *20230119*. The CLI is at version *5.0.2*.
 
 ```bash
 dns1 [options]
@@ -43,8 +43,11 @@ dns1 [options]
                 create <project> (-r <kv>)... [-p <v>]... [-o <out>]
                 delete <project> <managed-zone> [-p <v>]...
                 get <project> <managed-zone> [-p <v>]... [-o <out>]
+                get-iam-policy <resource> (-r <kv>)... [-p <v>]... [-o <out>]
                 list <project> [-p <v>]... [-o <out>]
                 patch <project> <managed-zone> (-r <kv>)... [-p <v>]... [-o <out>]
+                set-iam-policy <resource> (-r <kv>)... [-p <v>]... [-o <out>]
+                test-iam-permissions <resource> (-r <kv>)... [-p <v>]... [-o <out>]
                 update <project> <managed-zone> (-r <kv>)... [-p <v>]... [-o <out>]
         policies
                 create <project> (-r <kv>)... [-p <v>]... [-o <out>]

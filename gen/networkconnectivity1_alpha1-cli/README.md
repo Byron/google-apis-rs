@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *networkconnectivity* API at revision *20220210*. The CLI is at version *4.0.1*.
+This documentation was generated from the *networkconnectivity* API at revision *20230105*. The CLI is at version *5.0.2*.
 
 ```bash
 networkconnectivity1-alpha1 [options]
@@ -39,7 +39,12 @@ networkconnectivity1-alpha1 [options]
                 locations-global-hubs-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-global-hubs-set-iam-policy <resource> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-global-hubs-test-iam-permissions <resource> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-internal-ranges-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-internal-ranges-delete <name> [-p <v>]... [-o <out>]
+                locations-internal-ranges-get <name> [-p <v>]... [-o <out>]
                 locations-internal-ranges-get-iam-policy <resource> [-p <v>]... [-o <out>]
+                locations-internal-ranges-list <parent> [-p <v>]... [-o <out>]
+                locations-internal-ranges-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-internal-ranges-set-iam-policy <resource> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-internal-ranges-test-iam-permissions <resource> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-list <name> [-p <v>]... [-o <out>]

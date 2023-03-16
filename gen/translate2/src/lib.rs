@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/generator/templates/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Translate* crate version *5.0.2-beta-1+20170525*, where *20170525* is the exact revision of the *translate:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.2-beta-1*.
+//! This documentation was generated from *Translate* crate version *5.0.2+20170525*, where *20170525* is the exact revision of the *translate:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.2*.
 //! 
 //! Everything else about the *Translate* *v2* API can be found at the
 //! [official documentation site](https://code.google.com/apis/language/translate/v2/getting_started.html).

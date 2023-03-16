@@ -3,8 +3,6 @@
 // DO NOT EDIT !
 #![allow(unused_variables, unused_imports, dead_code, unused_mut)]
 
-extern crate tokio;
-
 #[macro_use]
 extern crate clap;
 
@@ -12,9 +10,10 @@ use std::env;
 use std::io::{self, Write};
 use clap::{App, SubCommand, Arg};
 
-use google_remotebuildexecution2::{api, Error, oauth2};
+use google_remotebuildexecution2::{api, Error, oauth2, client::chrono, FieldMask};
 
-mod client;
+
+use google_clis_common as client;
 
 use client::{InvalidOptionsError, CLIError, arg_from_str, writer_from_opts, parse_kv_arg,
           input_file_from_opts, input_mime_from_opts, FieldCursor, FieldError, CallType, UploadProtocol,
@@ -58,10 +57,10 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "inline-stdout" => {
-                    call = call.inline_stdout(arg_from_str(value.unwrap_or("false"), err, "inline-stdout", "boolean"));
+                    call = call.inline_stdout(        value.map(|v| arg_from_str(v, err, "inline-stdout", "boolean")).unwrap_or(false));
                 },
                 "inline-stderr" => {
-                    call = call.inline_stderr(arg_from_str(value.unwrap_or("false"), err, "inline-stderr", "boolean"));
+                    call = call.inline_stderr(        value.map(|v| arg_from_str(v, err, "inline-stderr", "boolean")).unwrap_or(false));
                 },
                 "inline-output-files" => {
                     call = call.add_inline_output_files(value.unwrap_or(""));
@@ -169,7 +168,7 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "results-cache-policy-priority" => {
-                    call = call.results_cache_policy_priority(arg_from_str(value.unwrap_or("-0"), err, "results-cache-policy-priority", "integer"));
+                    call = call.results_cache_policy_priority(        value.map(|v| arg_from_str(v, err, "results-cache-policy-priority", "int32")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -569,7 +568,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -1188,7 +1187,7 @@ async fn main() {
     
     let mut app = App::new("remotebuildexecution2")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("4.0.1+20210329")
+           .version("5.0.2+20210329")
            .about("Supplies a Remote Execution API service for tools such as bazel.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_remotebuildexecution2_cli")
            .arg(Arg::with_name("url")

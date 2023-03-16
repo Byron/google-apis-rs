@@ -25,19 +25,24 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Recommender* API at revision *20220228*. The CLI is at version *4.0.1*.
+This documentation was generated from the *Recommender* API at revision *20230108*. The CLI is at version *5.0.2*.
 
 ```bash
 recommender1 [options]
         billing-accounts
+                locations-insight-types-get-config <name> [-p <v>]... [-o <out>]
                 locations-insight-types-insights-get <name> [-p <v>]... [-o <out>]
                 locations-insight-types-insights-list <parent> [-p <v>]... [-o <out>]
                 locations-insight-types-insights-mark-accepted <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-insight-types-update-config <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-recommenders-get-config <name> [-p <v>]... [-o <out>]
                 locations-recommenders-recommendations-get <name> [-p <v>]... [-o <out>]
                 locations-recommenders-recommendations-list <parent> [-p <v>]... [-o <out>]
                 locations-recommenders-recommendations-mark-claimed <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-recommenders-recommendations-mark-dismissed <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-recommenders-recommendations-mark-failed <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-recommenders-recommendations-mark-succeeded <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-recommenders-update-config <name> (-r <kv>)... [-p <v>]... [-o <out>]
         folders
                 locations-insight-types-insights-get <name> [-p <v>]... [-o <out>]
                 locations-insight-types-insights-list <parent> [-p <v>]... [-o <out>]
@@ -45,26 +50,37 @@ recommender1 [options]
                 locations-recommenders-recommendations-get <name> [-p <v>]... [-o <out>]
                 locations-recommenders-recommendations-list <parent> [-p <v>]... [-o <out>]
                 locations-recommenders-recommendations-mark-claimed <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-recommenders-recommendations-mark-dismissed <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-recommenders-recommendations-mark-failed <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-recommenders-recommendations-mark-succeeded <name> (-r <kv>)... [-p <v>]... [-o <out>]
         organizations
+                locations-insight-types-get-config <name> [-p <v>]... [-o <out>]
                 locations-insight-types-insights-get <name> [-p <v>]... [-o <out>]
                 locations-insight-types-insights-list <parent> [-p <v>]... [-o <out>]
                 locations-insight-types-insights-mark-accepted <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-insight-types-update-config <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-recommenders-get-config <name> [-p <v>]... [-o <out>]
                 locations-recommenders-recommendations-get <name> [-p <v>]... [-o <out>]
                 locations-recommenders-recommendations-list <parent> [-p <v>]... [-o <out>]
                 locations-recommenders-recommendations-mark-claimed <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-recommenders-recommendations-mark-dismissed <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-recommenders-recommendations-mark-failed <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-recommenders-recommendations-mark-succeeded <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-recommenders-update-config <name> (-r <kv>)... [-p <v>]... [-o <out>]
         projects
+                locations-insight-types-get-config <name> [-p <v>]... [-o <out>]
                 locations-insight-types-insights-get <name> [-p <v>]... [-o <out>]
                 locations-insight-types-insights-list <parent> [-p <v>]... [-o <out>]
                 locations-insight-types-insights-mark-accepted <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-insight-types-update-config <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-recommenders-get-config <name> [-p <v>]... [-o <out>]
                 locations-recommenders-recommendations-get <name> [-p <v>]... [-o <out>]
                 locations-recommenders-recommendations-list <parent> [-p <v>]... [-o <out>]
                 locations-recommenders-recommendations-mark-claimed <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-recommenders-recommendations-mark-dismissed <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-recommenders-recommendations-mark-failed <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-recommenders-recommendations-mark-succeeded <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-recommenders-update-config <name> (-r <kv>)... [-p <v>]... [-o <out>]
   recommender1 --help
 
 Configuration:

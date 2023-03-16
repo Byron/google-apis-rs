@@ -1,4 +1,4 @@
-site_name: Cloud Video Intelligence v4.0.1+20220225
+site_name: Cloud Video Intelligence v5.0.2+20230119
 site_url: http://byron.github.io/google-apis-rs/google-videointelligence1-cli
 site_description: A complete library to interact with Cloud Video Intelligence (protocol v1)
 
@@ -7,16 +7,19 @@ repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/videointelligenc
 docs_dir: docs
 site_dir: build_html
 
-pages:
-- ['index.md', 'Home']
-- ['operations_projects-locations-operations-cancel.md', 'Operations', 'Projects Locations Operations Cancel']
-- ['operations_projects-locations-operations-delete.md', 'Operations', 'Projects Locations Operations Delete']
-- ['operations_projects-locations-operations-get.md', 'Operations', 'Projects Locations Operations Get']
-- ['projects_locations-operations-cancel.md', 'Projects', 'Locations Operations Cancel']
-- ['projects_locations-operations-delete.md', 'Projects', 'Locations Operations Delete']
-- ['projects_locations-operations-get.md', 'Projects', 'Locations Operations Get']
-- ['projects_locations-operations-list.md', 'Projects', 'Locations Operations List']
-- ['videos_annotate.md', 'Videos', 'Annotate']
+nav:
+- Home: 'index.md'
+- 'Operations':
+    - 'Projects Locations Operations Cancel': 'operations_projects-locations-operations-cancel.md'
+    - 'Projects Locations Operations Delete': 'operations_projects-locations-operations-delete.md'
+    - 'Projects Locations Operations Get': 'operations_projects-locations-operations-get.md'
+- 'Projects':
+    - 'Locations Operations Cancel': 'projects_locations-operations-cancel.md'
+    - 'Locations Operations Delete': 'projects_locations-operations-delete.md'
+    - 'Locations Operations Get': 'projects_locations-operations-get.md'
+    - 'Locations Operations List': 'projects_locations-operations-list.md'
+- 'Videos':
+    - 'Annotate': 'videos_annotate.md'
 
 theme: readthedocs
 

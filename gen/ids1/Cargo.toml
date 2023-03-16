@@ -4,12 +4,12 @@
 [package]
 
 name = "google-ids1"
-version = "5.0.2-beta-1+20221113"
+version = "5.0.2+20221113"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with IDS (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/ids1"
 homepage = "https://cloud.google.com/"
-documentation = "https://docs.rs/google-ids1/5.0.2-beta-1+20221113"
+documentation = "https://docs.rs/google-ids1/5.0.2+20221113"
 license = "MIT"
 keywords = ["ids", "google", "protocol", "web", "api"]
 autobins = false

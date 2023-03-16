@@ -1,4 +1,4 @@
-site_name: AnalyticsReporting v4.0.1+20220215
+site_name: AnalyticsReporting v5.0.2+20221104
 site_url: http://byron.github.io/google-apis-rs/google-analyticsreporting4-cli
 site_description: A complete library to interact with AnalyticsReporting (protocol v4)
 
@@ -7,10 +7,12 @@ repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/analyticsreporti
 docs_dir: docs
 site_dir: build_html
 
-pages:
-- ['index.md', 'Home']
-- ['reports_batch-get.md', 'Reports', 'Batch Get']
-- ['user-activity_search.md', 'User Activity', 'Search']
+nav:
+- Home: 'index.md'
+- 'Reports':
+    - 'Batch Get': 'reports_batch-get.md'
+- 'User Activity':
+    - 'Search': 'user-activity_search.md'
 
 theme: readthedocs
 

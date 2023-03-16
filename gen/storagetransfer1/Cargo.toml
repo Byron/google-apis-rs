@@ -4,12 +4,12 @@
 [package]
 
 name = "google-storagetransfer1"
-version = "5.0.2-beta-1+20230111"
+version = "5.0.2+20230111"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with storagetransfer (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/storagetransfer1"
 homepage = "https://cloud.google.com/storage-transfer/docs"
-documentation = "https://docs.rs/google-storagetransfer1/5.0.2-beta-1+20230111"
+documentation = "https://docs.rs/google-storagetransfer1/5.0.2+20230111"
 license = "MIT"
 keywords = ["storagetransfer", "google", "protocol", "web", "api"]
 autobins = false

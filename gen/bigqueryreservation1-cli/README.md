@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *BigQuery Reservation* API at revision *20220226*. The CLI is at version *4.0.1*.
+This documentation was generated from the *BigQuery Reservation* API at revision *20230117*. The CLI is at version *5.0.2*.
 
 ```bash
 bigqueryreservation1 [options]
@@ -42,6 +42,7 @@ bigqueryreservation1 [options]
                 locations-reservations-assignments-delete <name> [-p <v>]... [-o <out>]
                 locations-reservations-assignments-list <parent> [-p <v>]... [-o <out>]
                 locations-reservations-assignments-move <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-reservations-assignments-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-reservations-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-reservations-delete <name> [-p <v>]... [-o <out>]
                 locations-reservations-get <name> [-p <v>]... [-o <out>]

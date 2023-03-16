@@ -1,4 +1,4 @@
-site_name: Tasks v4.0.1+20220305
+site_name: Tasks v5.0.2+20230122
 site_url: http://byron.github.io/google-apis-rs/google-tasks1-cli
 site_description: A complete library to interact with Tasks (protocol v1)
 
@@ -7,22 +7,24 @@ repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/tasks1-cli
 docs_dir: docs
 site_dir: build_html
 
-pages:
-- ['index.md', 'Home']
-- ['tasklists_delete.md', 'Tasklists', 'Delete']
-- ['tasklists_get.md', 'Tasklists', 'Get']
-- ['tasklists_insert.md', 'Tasklists', 'Insert']
-- ['tasklists_list.md', 'Tasklists', 'List']
-- ['tasklists_patch.md', 'Tasklists', 'Patch']
-- ['tasklists_update.md', 'Tasklists', 'Update']
-- ['tasks_clear.md', 'Tasks', 'Clear']
-- ['tasks_delete.md', 'Tasks', 'Delete']
-- ['tasks_get.md', 'Tasks', 'Get']
-- ['tasks_insert.md', 'Tasks', 'Insert']
-- ['tasks_list.md', 'Tasks', 'List']
-- ['tasks_move.md', 'Tasks', 'Move']
-- ['tasks_patch.md', 'Tasks', 'Patch']
-- ['tasks_update.md', 'Tasks', 'Update']
+nav:
+- Home: 'index.md'
+- 'Tasklists':
+    - 'Delete': 'tasklists_delete.md'
+    - 'Get': 'tasklists_get.md'
+    - 'Insert': 'tasklists_insert.md'
+    - 'List': 'tasklists_list.md'
+    - 'Patch': 'tasklists_patch.md'
+    - 'Update': 'tasklists_update.md'
+- 'Tasks':
+    - 'Clear': 'tasks_clear.md'
+    - 'Delete': 'tasks_delete.md'
+    - 'Get': 'tasks_get.md'
+    - 'Insert': 'tasks_insert.md'
+    - 'List': 'tasks_list.md'
+    - 'Move': 'tasks_move.md'
+    - 'Patch': 'tasks_patch.md'
+    - 'Update': 'tasks_update.md'
 
 theme: readthedocs
 

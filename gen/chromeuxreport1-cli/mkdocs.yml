@@ -1,4 +1,4 @@
-site_name: Chrome UX Report v4.0.1+20220302
+site_name: Chrome UX Report v5.0.2+20230117
 site_url: http://byron.github.io/google-apis-rs/google-chromeuxreport1-cli
 site_description: A complete library to interact with Chrome UX Report (protocol v1)
 
@@ -7,9 +7,10 @@ repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/chromeuxreport1-
 docs_dir: docs
 site_dir: build_html
 
-pages:
-- ['index.md', 'Home']
-- ['records_query-record.md', 'Records', 'Query Record']
+nav:
+- Home: 'index.md'
+- 'Records':
+    - 'Query Record': 'records_query-record.md'
 
 theme: readthedocs
 

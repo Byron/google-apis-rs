@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Gmail* API at revision *20220228*. The CLI is at version *4.0.1*.
+This documentation was generated from the *Gmail* API at revision *20230116*. The CLI is at version *5.0.2*.
 
 ```bash
 gmail1 [options]
@@ -56,6 +56,17 @@ gmail1 [options]
                 messages-send <user-id> (-r <kv>)... (-u simple -f <file> [-m <mime>]) [-p <v>]... [-o <out>]
                 messages-trash <user-id> <id> [-p <v>]... [-o <out>]
                 messages-untrash <user-id> <id> [-p <v>]... [-o <out>]
+                settings-cse-identities-create <user-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                settings-cse-identities-delete <user-id> <cse-email-address> [-p <v>]...
+                settings-cse-identities-get <user-id> <cse-email-address> [-p <v>]... [-o <out>]
+                settings-cse-identities-list <user-id> [-p <v>]... [-o <out>]
+                settings-cse-identities-patch <user-id> <email-address> (-r <kv>)... [-p <v>]... [-o <out>]
+                settings-cse-keypairs-create <user-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                settings-cse-keypairs-disable <user-id> <key-pair-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                settings-cse-keypairs-enable <user-id> <key-pair-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                settings-cse-keypairs-get <user-id> <key-pair-id> [-p <v>]... [-o <out>]
+                settings-cse-keypairs-list <user-id> [-p <v>]... [-o <out>]
+                settings-cse-keypairs-obliterate <user-id> <key-pair-id> (-r <kv>)... [-p <v>]...
                 settings-delegates-create <user-id> (-r <kv>)... [-p <v>]... [-o <out>]
                 settings-delegates-delete <user-id> <delegate-email> [-p <v>]...
                 settings-delegates-get <user-id> <delegate-email> [-p <v>]... [-o <out>]

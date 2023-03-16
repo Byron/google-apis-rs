@@ -3,8 +3,6 @@
 // DO NOT EDIT !
 #![allow(unused_variables, unused_imports, dead_code, unused_mut)]
 
-extern crate tokio;
-
 #[macro_use]
 extern crate clap;
 
@@ -12,9 +10,10 @@ use std::env;
 use std::io::{self, Write};
 use clap::{App, SubCommand, Arg};
 
-use google_calendar3::{api, Error, oauth2};
+use google_calendar3::{api, Error, oauth2, client::chrono, FieldMask};
 
-mod client;
+
+use google_clis_common as client;
 
 use client::{InvalidOptionsError, CLIError, arg_from_str, writer_from_opts, parse_kv_arg,
           input_file_from_opts, input_mime_from_opts, FieldCursor, FieldError, CallType, UploadProtocol,
@@ -192,7 +191,7 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "send-notifications" => {
-                    call = call.send_notifications(arg_from_str(value.unwrap_or("false"), err, "send-notifications", "boolean"));
+                    call = call.send_notifications(        value.map(|v| arg_from_str(v, err, "send-notifications", "boolean")).unwrap_or(false));
                 },
                 _ => {
                     let mut found = false;
@@ -251,13 +250,13 @@ where
                     call = call.sync_token(value.unwrap_or(""));
                 },
                 "show-deleted" => {
-                    call = call.show_deleted(arg_from_str(value.unwrap_or("false"), err, "show-deleted", "boolean"));
+                    call = call.show_deleted(        value.map(|v| arg_from_str(v, err, "show-deleted", "boolean")).unwrap_or(false));
                 },
                 "page-token" => {
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "max-results" => {
-                    call = call.max_results(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
+                    call = call.max_results(        value.map(|v| arg_from_str(v, err, "max-results", "int32")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -351,7 +350,7 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "send-notifications" => {
-                    call = call.send_notifications(arg_from_str(value.unwrap_or("false"), err, "send-notifications", "boolean"));
+                    call = call.send_notifications(        value.map(|v| arg_from_str(v, err, "send-notifications", "boolean")).unwrap_or(false));
                 },
                 _ => {
                     let mut found = false;
@@ -445,7 +444,7 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "send-notifications" => {
-                    call = call.send_notifications(arg_from_str(value.unwrap_or("false"), err, "send-notifications", "boolean"));
+                    call = call.send_notifications(        value.map(|v| arg_from_str(v, err, "send-notifications", "boolean")).unwrap_or(false));
                 },
                 _ => {
                     let mut found = false;
@@ -546,13 +545,13 @@ where
                     call = call.sync_token(value.unwrap_or(""));
                 },
                 "show-deleted" => {
-                    call = call.show_deleted(arg_from_str(value.unwrap_or("false"), err, "show-deleted", "boolean"));
+                    call = call.show_deleted(        value.map(|v| arg_from_str(v, err, "show-deleted", "boolean")).unwrap_or(false));
                 },
                 "page-token" => {
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "max-results" => {
-                    call = call.max_results(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
+                    call = call.max_results(        value.map(|v| arg_from_str(v, err, "max-results", "int32")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -753,7 +752,7 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "color-rgb-format" => {
-                    call = call.color_rgb_format(arg_from_str(value.unwrap_or("false"), err, "color-rgb-format", "boolean"));
+                    call = call.color_rgb_format(        value.map(|v| arg_from_str(v, err, "color-rgb-format", "boolean")).unwrap_or(false));
                 },
                 _ => {
                     let mut found = false;
@@ -812,10 +811,10 @@ where
                     call = call.sync_token(value.unwrap_or(""));
                 },
                 "show-hidden" => {
-                    call = call.show_hidden(arg_from_str(value.unwrap_or("false"), err, "show-hidden", "boolean"));
+                    call = call.show_hidden(        value.map(|v| arg_from_str(v, err, "show-hidden", "boolean")).unwrap_or(false));
                 },
                 "show-deleted" => {
-                    call = call.show_deleted(arg_from_str(value.unwrap_or("false"), err, "show-deleted", "boolean"));
+                    call = call.show_deleted(        value.map(|v| arg_from_str(v, err, "show-deleted", "boolean")).unwrap_or(false));
                 },
                 "page-token" => {
                     call = call.page_token(value.unwrap_or(""));
@@ -824,7 +823,7 @@ where
                     call = call.min_access_role(value.unwrap_or(""));
                 },
                 "max-results" => {
-                    call = call.max_results(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
+                    call = call.max_results(        value.map(|v| arg_from_str(v, err, "max-results", "int32")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -929,7 +928,7 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "color-rgb-format" => {
-                    call = call.color_rgb_format(arg_from_str(value.unwrap_or("false"), err, "color-rgb-format", "boolean"));
+                    call = call.color_rgb_format(        value.map(|v| arg_from_str(v, err, "color-rgb-format", "boolean")).unwrap_or(false));
                 },
                 _ => {
                     let mut found = false;
@@ -1034,7 +1033,7 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "color-rgb-format" => {
-                    call = call.color_rgb_format(arg_from_str(value.unwrap_or("false"), err, "color-rgb-format", "boolean"));
+                    call = call.color_rgb_format(        value.map(|v| arg_from_str(v, err, "color-rgb-format", "boolean")).unwrap_or(false));
                 },
                 _ => {
                     let mut found = false;
@@ -1135,10 +1134,10 @@ where
                     call = call.sync_token(value.unwrap_or(""));
                 },
                 "show-hidden" => {
-                    call = call.show_hidden(arg_from_str(value.unwrap_or("false"), err, "show-hidden", "boolean"));
+                    call = call.show_hidden(        value.map(|v| arg_from_str(v, err, "show-hidden", "boolean")).unwrap_or(false));
                 },
                 "show-deleted" => {
-                    call = call.show_deleted(arg_from_str(value.unwrap_or("false"), err, "show-deleted", "boolean"));
+                    call = call.show_deleted(        value.map(|v| arg_from_str(v, err, "show-deleted", "boolean")).unwrap_or(false));
                 },
                 "page-token" => {
                     call = call.page_token(value.unwrap_or(""));
@@ -1147,7 +1146,7 @@ where
                     call = call.min_access_role(value.unwrap_or(""));
                 },
                 "max-results" => {
-                    call = call.max_results(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
+                    call = call.max_results(        value.map(|v| arg_from_str(v, err, "max-results", "int32")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -1760,7 +1759,7 @@ where
                     call = call.send_updates(value.unwrap_or(""));
                 },
                 "send-notifications" => {
-                    call = call.send_notifications(arg_from_str(value.unwrap_or("false"), err, "send-notifications", "boolean"));
+                    call = call.send_notifications(        value.map(|v| arg_from_str(v, err, "send-notifications", "boolean")).unwrap_or(false));
                 },
                 _ => {
                     let mut found = false;
@@ -1811,10 +1810,10 @@ where
                     call = call.time_zone(value.unwrap_or(""));
                 },
                 "max-attendees" => {
-                    call = call.max_attendees(arg_from_str(value.unwrap_or("-0"), err, "max-attendees", "integer"));
+                    call = call.max_attendees(        value.map(|v| arg_from_str(v, err, "max-attendees", "int32")).unwrap_or(-0));
                 },
                 "always-include-email" => {
-                    call = call.always_include_email(arg_from_str(value.unwrap_or("false"), err, "always-include-email", "boolean"));
+                    call = call.always_include_email(        value.map(|v| arg_from_str(v, err, "always-include-email", "boolean")).unwrap_or(false));
                 },
                 _ => {
                     let mut found = false;
@@ -1969,10 +1968,10 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "supports-attachments" => {
-                    call = call.supports_attachments(arg_from_str(value.unwrap_or("false"), err, "supports-attachments", "boolean"));
+                    call = call.supports_attachments(        value.map(|v| arg_from_str(v, err, "supports-attachments", "boolean")).unwrap_or(false));
                 },
                 "conference-data-version" => {
-                    call = call.conference_data_version(arg_from_str(value.unwrap_or("-0"), err, "conference-data-version", "integer"));
+                    call = call.conference_data_version(        value.map(|v| arg_from_str(v, err, "conference-data-version", "int32")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -2127,19 +2126,19 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "supports-attachments" => {
-                    call = call.supports_attachments(arg_from_str(value.unwrap_or("false"), err, "supports-attachments", "boolean"));
+                    call = call.supports_attachments(        value.map(|v| arg_from_str(v, err, "supports-attachments", "boolean")).unwrap_or(false));
                 },
                 "send-updates" => {
                     call = call.send_updates(value.unwrap_or(""));
                 },
                 "send-notifications" => {
-                    call = call.send_notifications(arg_from_str(value.unwrap_or("false"), err, "send-notifications", "boolean"));
+                    call = call.send_notifications(        value.map(|v| arg_from_str(v, err, "send-notifications", "boolean")).unwrap_or(false));
                 },
                 "max-attendees" => {
-                    call = call.max_attendees(arg_from_str(value.unwrap_or("-0"), err, "max-attendees", "integer"));
+                    call = call.max_attendees(        value.map(|v| arg_from_str(v, err, "max-attendees", "int32")).unwrap_or(-0));
                 },
                 "conference-data-version" => {
-                    call = call.conference_data_version(arg_from_str(value.unwrap_or("-0"), err, "conference-data-version", "integer"));
+                    call = call.conference_data_version(        value.map(|v| arg_from_str(v, err, "conference-data-version", "int32")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -2198,13 +2197,13 @@ where
                     call = call.time_zone(value.unwrap_or(""));
                 },
                 "time-min" => {
-                    call = call.time_min(value.unwrap_or(""));
+                    call = call.time_min(        value.map(|v| arg_from_str(v, err, "time-min", "date-time")).unwrap_or(chrono::Utc::now()));
                 },
                 "time-max" => {
-                    call = call.time_max(value.unwrap_or(""));
+                    call = call.time_max(        value.map(|v| arg_from_str(v, err, "time-max", "date-time")).unwrap_or(chrono::Utc::now()));
                 },
                 "show-deleted" => {
-                    call = call.show_deleted(arg_from_str(value.unwrap_or("false"), err, "show-deleted", "boolean"));
+                    call = call.show_deleted(        value.map(|v| arg_from_str(v, err, "show-deleted", "boolean")).unwrap_or(false));
                 },
                 "page-token" => {
                     call = call.page_token(value.unwrap_or(""));
@@ -2213,13 +2212,13 @@ where
                     call = call.original_start(value.unwrap_or(""));
                 },
                 "max-results" => {
-                    call = call.max_results(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
+                    call = call.max_results(        value.map(|v| arg_from_str(v, err, "max-results", "int32")).unwrap_or(-0));
                 },
                 "max-attendees" => {
-                    call = call.max_attendees(arg_from_str(value.unwrap_or("-0"), err, "max-attendees", "integer"));
+                    call = call.max_attendees(        value.map(|v| arg_from_str(v, err, "max-attendees", "int32")).unwrap_or(-0));
                 },
                 "always-include-email" => {
-                    call = call.always_include_email(arg_from_str(value.unwrap_or("false"), err, "always-include-email", "boolean"));
+                    call = call.always_include_email(        value.map(|v| arg_from_str(v, err, "always-include-email", "boolean")).unwrap_or(false));
                 },
                 _ => {
                     let mut found = false;
@@ -2275,28 +2274,28 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "updated-min" => {
-                    call = call.updated_min(value.unwrap_or(""));
+                    call = call.updated_min(        value.map(|v| arg_from_str(v, err, "updated-min", "date-time")).unwrap_or(chrono::Utc::now()));
                 },
                 "time-zone" => {
                     call = call.time_zone(value.unwrap_or(""));
                 },
                 "time-min" => {
-                    call = call.time_min(value.unwrap_or(""));
+                    call = call.time_min(        value.map(|v| arg_from_str(v, err, "time-min", "date-time")).unwrap_or(chrono::Utc::now()));
                 },
                 "time-max" => {
-                    call = call.time_max(value.unwrap_or(""));
+                    call = call.time_max(        value.map(|v| arg_from_str(v, err, "time-max", "date-time")).unwrap_or(chrono::Utc::now()));
                 },
                 "sync-token" => {
                     call = call.sync_token(value.unwrap_or(""));
                 },
                 "single-events" => {
-                    call = call.single_events(arg_from_str(value.unwrap_or("false"), err, "single-events", "boolean"));
+                    call = call.single_events(        value.map(|v| arg_from_str(v, err, "single-events", "boolean")).unwrap_or(false));
                 },
                 "show-hidden-invitations" => {
-                    call = call.show_hidden_invitations(arg_from_str(value.unwrap_or("false"), err, "show-hidden-invitations", "boolean"));
+                    call = call.show_hidden_invitations(        value.map(|v| arg_from_str(v, err, "show-hidden-invitations", "boolean")).unwrap_or(false));
                 },
                 "show-deleted" => {
-                    call = call.show_deleted(arg_from_str(value.unwrap_or("false"), err, "show-deleted", "boolean"));
+                    call = call.show_deleted(        value.map(|v| arg_from_str(v, err, "show-deleted", "boolean")).unwrap_or(false));
                 },
                 "shared-extended-property" => {
                     call = call.add_shared_extended_property(value.unwrap_or(""));
@@ -2314,16 +2313,16 @@ where
                     call = call.order_by(value.unwrap_or(""));
                 },
                 "max-results" => {
-                    call = call.max_results(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
+                    call = call.max_results(        value.map(|v| arg_from_str(v, err, "max-results", "int32")).unwrap_or(-0));
                 },
                 "max-attendees" => {
-                    call = call.max_attendees(arg_from_str(value.unwrap_or("-0"), err, "max-attendees", "integer"));
+                    call = call.max_attendees(        value.map(|v| arg_from_str(v, err, "max-attendees", "int32")).unwrap_or(-0));
                 },
                 "i-cal-uid" => {
                     call = call.i_cal_uid(value.unwrap_or(""));
                 },
                 "always-include-email" => {
-                    call = call.always_include_email(arg_from_str(value.unwrap_or("false"), err, "always-include-email", "boolean"));
+                    call = call.always_include_email(        value.map(|v| arg_from_str(v, err, "always-include-email", "boolean")).unwrap_or(false));
                 },
                 _ => {
                     let mut found = false;
@@ -2382,7 +2381,7 @@ where
                     call = call.send_updates(value.unwrap_or(""));
                 },
                 "send-notifications" => {
-                    call = call.send_notifications(arg_from_str(value.unwrap_or("false"), err, "send-notifications", "boolean"));
+                    call = call.send_notifications(        value.map(|v| arg_from_str(v, err, "send-notifications", "boolean")).unwrap_or(false));
                 },
                 _ => {
                     let mut found = false;
@@ -2537,22 +2536,22 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "supports-attachments" => {
-                    call = call.supports_attachments(arg_from_str(value.unwrap_or("false"), err, "supports-attachments", "boolean"));
+                    call = call.supports_attachments(        value.map(|v| arg_from_str(v, err, "supports-attachments", "boolean")).unwrap_or(false));
                 },
                 "send-updates" => {
                     call = call.send_updates(value.unwrap_or(""));
                 },
                 "send-notifications" => {
-                    call = call.send_notifications(arg_from_str(value.unwrap_or("false"), err, "send-notifications", "boolean"));
+                    call = call.send_notifications(        value.map(|v| arg_from_str(v, err, "send-notifications", "boolean")).unwrap_or(false));
                 },
                 "max-attendees" => {
-                    call = call.max_attendees(arg_from_str(value.unwrap_or("-0"), err, "max-attendees", "integer"));
+                    call = call.max_attendees(        value.map(|v| arg_from_str(v, err, "max-attendees", "int32")).unwrap_or(-0));
                 },
                 "conference-data-version" => {
-                    call = call.conference_data_version(arg_from_str(value.unwrap_or("-0"), err, "conference-data-version", "integer"));
+                    call = call.conference_data_version(        value.map(|v| arg_from_str(v, err, "conference-data-version", "int32")).unwrap_or(-0));
                 },
                 "always-include-email" => {
-                    call = call.always_include_email(arg_from_str(value.unwrap_or("false"), err, "always-include-email", "boolean"));
+                    call = call.always_include_email(        value.map(|v| arg_from_str(v, err, "always-include-email", "boolean")).unwrap_or(false));
                 },
                 _ => {
                     let mut found = false;
@@ -2611,7 +2610,7 @@ where
                     call = call.send_updates(value.unwrap_or(""));
                 },
                 "send-notifications" => {
-                    call = call.send_notifications(arg_from_str(value.unwrap_or("false"), err, "send-notifications", "boolean"));
+                    call = call.send_notifications(        value.map(|v| arg_from_str(v, err, "send-notifications", "boolean")).unwrap_or(false));
                 },
                 _ => {
                     let mut found = false;
@@ -2766,22 +2765,22 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "supports-attachments" => {
-                    call = call.supports_attachments(arg_from_str(value.unwrap_or("false"), err, "supports-attachments", "boolean"));
+                    call = call.supports_attachments(        value.map(|v| arg_from_str(v, err, "supports-attachments", "boolean")).unwrap_or(false));
                 },
                 "send-updates" => {
                     call = call.send_updates(value.unwrap_or(""));
                 },
                 "send-notifications" => {
-                    call = call.send_notifications(arg_from_str(value.unwrap_or("false"), err, "send-notifications", "boolean"));
+                    call = call.send_notifications(        value.map(|v| arg_from_str(v, err, "send-notifications", "boolean")).unwrap_or(false));
                 },
                 "max-attendees" => {
-                    call = call.max_attendees(arg_from_str(value.unwrap_or("-0"), err, "max-attendees", "integer"));
+                    call = call.max_attendees(        value.map(|v| arg_from_str(v, err, "max-attendees", "int32")).unwrap_or(-0));
                 },
                 "conference-data-version" => {
-                    call = call.conference_data_version(arg_from_str(value.unwrap_or("-0"), err, "conference-data-version", "integer"));
+                    call = call.conference_data_version(        value.map(|v| arg_from_str(v, err, "conference-data-version", "int32")).unwrap_or(-0));
                 },
                 "always-include-email" => {
-                    call = call.always_include_email(arg_from_str(value.unwrap_or("false"), err, "always-include-email", "boolean"));
+                    call = call.always_include_email(        value.map(|v| arg_from_str(v, err, "always-include-email", "boolean")).unwrap_or(false));
                 },
                 _ => {
                     let mut found = false;
@@ -2879,28 +2878,28 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "updated-min" => {
-                    call = call.updated_min(value.unwrap_or(""));
+                    call = call.updated_min(        value.map(|v| arg_from_str(v, err, "updated-min", "date-time")).unwrap_or(chrono::Utc::now()));
                 },
                 "time-zone" => {
                     call = call.time_zone(value.unwrap_or(""));
                 },
                 "time-min" => {
-                    call = call.time_min(value.unwrap_or(""));
+                    call = call.time_min(        value.map(|v| arg_from_str(v, err, "time-min", "date-time")).unwrap_or(chrono::Utc::now()));
                 },
                 "time-max" => {
-                    call = call.time_max(value.unwrap_or(""));
+                    call = call.time_max(        value.map(|v| arg_from_str(v, err, "time-max", "date-time")).unwrap_or(chrono::Utc::now()));
                 },
                 "sync-token" => {
                     call = call.sync_token(value.unwrap_or(""));
                 },
                 "single-events" => {
-                    call = call.single_events(arg_from_str(value.unwrap_or("false"), err, "single-events", "boolean"));
+                    call = call.single_events(        value.map(|v| arg_from_str(v, err, "single-events", "boolean")).unwrap_or(false));
                 },
                 "show-hidden-invitations" => {
-                    call = call.show_hidden_invitations(arg_from_str(value.unwrap_or("false"), err, "show-hidden-invitations", "boolean"));
+                    call = call.show_hidden_invitations(        value.map(|v| arg_from_str(v, err, "show-hidden-invitations", "boolean")).unwrap_or(false));
                 },
                 "show-deleted" => {
-                    call = call.show_deleted(arg_from_str(value.unwrap_or("false"), err, "show-deleted", "boolean"));
+                    call = call.show_deleted(        value.map(|v| arg_from_str(v, err, "show-deleted", "boolean")).unwrap_or(false));
                 },
                 "shared-extended-property" => {
                     call = call.add_shared_extended_property(value.unwrap_or(""));
@@ -2918,16 +2917,16 @@ where
                     call = call.order_by(value.unwrap_or(""));
                 },
                 "max-results" => {
-                    call = call.max_results(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
+                    call = call.max_results(        value.map(|v| arg_from_str(v, err, "max-results", "int32")).unwrap_or(-0));
                 },
                 "max-attendees" => {
-                    call = call.max_attendees(arg_from_str(value.unwrap_or("-0"), err, "max-attendees", "integer"));
+                    call = call.max_attendees(        value.map(|v| arg_from_str(v, err, "max-attendees", "int32")).unwrap_or(-0));
                 },
                 "i-cal-uid" => {
                     call = call.i_cal_uid(value.unwrap_or(""));
                 },
                 "always-include-email" => {
-                    call = call.always_include_email(arg_from_str(value.unwrap_or("false"), err, "always-include-email", "boolean"));
+                    call = call.always_include_email(        value.map(|v| arg_from_str(v, err, "always-include-email", "boolean")).unwrap_or(false));
                 },
                 _ => {
                     let mut found = false;
@@ -3130,7 +3129,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "max-results" => {
-                    call = call.max_results(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
+                    call = call.max_results(        value.map(|v| arg_from_str(v, err, "max-results", "int32")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -3234,7 +3233,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "max-results" => {
-                    call = call.max_results(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
+                    call = call.max_results(        value.map(|v| arg_from_str(v, err, "max-results", "int32")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -4086,7 +4085,7 @@ async fn main() {
                      Some(true)),
                   ]),
             ("get",
-                    Some(r##"Returns an event."##),
+                    Some(r##"Returns an event based on its Google Calendar ID. To retrieve an event using its iCalendar ID, call the events.list method using the iCalUID parameter."##),
                     "Details at http://byron.github.io/google-apis-rs/google_calendar3_cli/events_get",
                   vec![
                     (Some(r##"calendar-id"##),
@@ -4471,7 +4470,7 @@ async fn main() {
     
     let mut app = App::new("calendar3")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("4.0.1+20220217")
+           .version("5.0.2+20221229")
            .about("Manipulates events and other calendar data.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_calendar3_cli")
            .arg(Arg::with_name("url")

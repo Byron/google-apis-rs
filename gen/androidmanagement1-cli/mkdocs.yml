@@ -1,4 +1,4 @@
-site_name: Android Management v4.0.1+20220302
+site_name: Android Management v5.0.2+20230119
 site_url: http://byron.github.io/google-apis-rs/google-androidmanagement1-cli
 site_description: A complete library to interact with Android Management (protocol v1)
 
@@ -7,36 +7,40 @@ repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/androidmanagemen
 docs_dir: docs
 site_dir: build_html
 
-pages:
-- ['index.md', 'Home']
-- ['enterprises_applications-get.md', 'Enterprises', 'Applications Get']
-- ['enterprises_create.md', 'Enterprises', 'Create']
-- ['enterprises_delete.md', 'Enterprises', 'Delete']
-- ['enterprises_devices-delete.md', 'Enterprises', 'Devices Delete']
-- ['enterprises_devices-get.md', 'Enterprises', 'Devices Get']
-- ['enterprises_devices-issue-command.md', 'Enterprises', 'Devices Issue Command']
-- ['enterprises_devices-list.md', 'Enterprises', 'Devices List']
-- ['enterprises_devices-operations-cancel.md', 'Enterprises', 'Devices Operations Cancel']
-- ['enterprises_devices-operations-delete.md', 'Enterprises', 'Devices Operations Delete']
-- ['enterprises_devices-operations-get.md', 'Enterprises', 'Devices Operations Get']
-- ['enterprises_devices-operations-list.md', 'Enterprises', 'Devices Operations List']
-- ['enterprises_devices-patch.md', 'Enterprises', 'Devices Patch']
-- ['enterprises_enrollment-tokens-create.md', 'Enterprises', 'Enrollment Tokens Create']
-- ['enterprises_enrollment-tokens-delete.md', 'Enterprises', 'Enrollment Tokens Delete']
-- ['enterprises_get.md', 'Enterprises', 'Get']
-- ['enterprises_list.md', 'Enterprises', 'List']
-- ['enterprises_patch.md', 'Enterprises', 'Patch']
-- ['enterprises_policies-delete.md', 'Enterprises', 'Policies Delete']
-- ['enterprises_policies-get.md', 'Enterprises', 'Policies Get']
-- ['enterprises_policies-list.md', 'Enterprises', 'Policies List']
-- ['enterprises_policies-patch.md', 'Enterprises', 'Policies Patch']
-- ['enterprises_web-apps-create.md', 'Enterprises', 'Web Apps Create']
-- ['enterprises_web-apps-delete.md', 'Enterprises', 'Web Apps Delete']
-- ['enterprises_web-apps-get.md', 'Enterprises', 'Web Apps Get']
-- ['enterprises_web-apps-list.md', 'Enterprises', 'Web Apps List']
-- ['enterprises_web-apps-patch.md', 'Enterprises', 'Web Apps Patch']
-- ['enterprises_web-tokens-create.md', 'Enterprises', 'Web Tokens Create']
-- ['signup-urls_create.md', 'Signup Urls', 'Create']
+nav:
+- Home: 'index.md'
+- 'Enterprises':
+    - 'Applications Get': 'enterprises_applications-get.md'
+    - 'Create': 'enterprises_create.md'
+    - 'Delete': 'enterprises_delete.md'
+    - 'Devices Delete': 'enterprises_devices-delete.md'
+    - 'Devices Get': 'enterprises_devices-get.md'
+    - 'Devices Issue Command': 'enterprises_devices-issue-command.md'
+    - 'Devices List': 'enterprises_devices-list.md'
+    - 'Devices Operations Cancel': 'enterprises_devices-operations-cancel.md'
+    - 'Devices Operations Delete': 'enterprises_devices-operations-delete.md'
+    - 'Devices Operations Get': 'enterprises_devices-operations-get.md'
+    - 'Devices Operations List': 'enterprises_devices-operations-list.md'
+    - 'Devices Patch': 'enterprises_devices-patch.md'
+    - 'Enrollment Tokens Create': 'enterprises_enrollment-tokens-create.md'
+    - 'Enrollment Tokens Delete': 'enterprises_enrollment-tokens-delete.md'
+    - 'Enrollment Tokens Get': 'enterprises_enrollment-tokens-get.md'
+    - 'Enrollment Tokens List': 'enterprises_enrollment-tokens-list.md'
+    - 'Get': 'enterprises_get.md'
+    - 'List': 'enterprises_list.md'
+    - 'Patch': 'enterprises_patch.md'
+    - 'Policies Delete': 'enterprises_policies-delete.md'
+    - 'Policies Get': 'enterprises_policies-get.md'
+    - 'Policies List': 'enterprises_policies-list.md'
+    - 'Policies Patch': 'enterprises_policies-patch.md'
+    - 'Web Apps Create': 'enterprises_web-apps-create.md'
+    - 'Web Apps Delete': 'enterprises_web-apps-delete.md'
+    - 'Web Apps Get': 'enterprises_web-apps-get.md'
+    - 'Web Apps List': 'enterprises_web-apps-list.md'
+    - 'Web Apps Patch': 'enterprises_web-apps-patch.md'
+    - 'Web Tokens Create': 'enterprises_web-tokens-create.md'
+- 'Signup Urls':
+    - 'Create': 'signup-urls_create.md'
 
 theme: readthedocs
 

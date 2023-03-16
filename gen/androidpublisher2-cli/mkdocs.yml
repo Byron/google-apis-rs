@@ -1,4 +1,4 @@
-site_name: Android Publisher v4.0.1+20200331
+site_name: Android Publisher v5.0.2+20200331
 site_url: http://byron.github.io/google-apis-rs/google-androidpublisher2-cli
 site_description: A complete library to interact with Android Publisher (protocol v2)
 
@@ -7,66 +7,71 @@ repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/androidpublisher
 docs_dir: docs
 site_dir: build_html
 
-pages:
-- ['index.md', 'Home']
-- ['edits_apklistings-delete.md', 'Edits', 'Apklistings Delete']
-- ['edits_apklistings-deleteall.md', 'Edits', 'Apklistings Deleteall']
-- ['edits_apklistings-get.md', 'Edits', 'Apklistings Get']
-- ['edits_apklistings-list.md', 'Edits', 'Apklistings List']
-- ['edits_apklistings-patch.md', 'Edits', 'Apklistings Patch']
-- ['edits_apklistings-update.md', 'Edits', 'Apklistings Update']
-- ['edits_apks-addexternallyhosted.md', 'Edits', 'Apks Addexternallyhosted']
-- ['edits_apks-list.md', 'Edits', 'Apks List']
-- ['edits_apks-upload.md', 'Edits', 'Apks Upload']
-- ['edits_bundles-list.md', 'Edits', 'Bundles List']
-- ['edits_bundles-upload.md', 'Edits', 'Bundles Upload']
-- ['edits_commit.md', 'Edits', 'Commit']
-- ['edits_delete.md', 'Edits', 'Delete']
-- ['edits_deobfuscationfiles-upload.md', 'Edits', 'Deobfuscationfiles Upload']
-- ['edits_details-get.md', 'Edits', 'Details Get']
-- ['edits_details-patch.md', 'Edits', 'Details Patch']
-- ['edits_details-update.md', 'Edits', 'Details Update']
-- ['edits_expansionfiles-get.md', 'Edits', 'Expansionfiles Get']
-- ['edits_expansionfiles-patch.md', 'Edits', 'Expansionfiles Patch']
-- ['edits_expansionfiles-update.md', 'Edits', 'Expansionfiles Update']
-- ['edits_expansionfiles-upload.md', 'Edits', 'Expansionfiles Upload']
-- ['edits_get.md', 'Edits', 'Get']
-- ['edits_images-delete.md', 'Edits', 'Images Delete']
-- ['edits_images-deleteall.md', 'Edits', 'Images Deleteall']
-- ['edits_images-list.md', 'Edits', 'Images List']
-- ['edits_images-upload.md', 'Edits', 'Images Upload']
-- ['edits_insert.md', 'Edits', 'Insert']
-- ['edits_listings-delete.md', 'Edits', 'Listings Delete']
-- ['edits_listings-deleteall.md', 'Edits', 'Listings Deleteall']
-- ['edits_listings-get.md', 'Edits', 'Listings Get']
-- ['edits_listings-list.md', 'Edits', 'Listings List']
-- ['edits_listings-patch.md', 'Edits', 'Listings Patch']
-- ['edits_listings-update.md', 'Edits', 'Listings Update']
-- ['edits_testers-get.md', 'Edits', 'Testers Get']
-- ['edits_testers-patch.md', 'Edits', 'Testers Patch']
-- ['edits_testers-update.md', 'Edits', 'Testers Update']
-- ['edits_tracks-get.md', 'Edits', 'Tracks Get']
-- ['edits_tracks-list.md', 'Edits', 'Tracks List']
-- ['edits_tracks-patch.md', 'Edits', 'Tracks Patch']
-- ['edits_tracks-update.md', 'Edits', 'Tracks Update']
-- ['edits_validate.md', 'Edits', 'Validate']
-- ['inappproducts_delete.md', 'Inappproducts', 'Delete']
-- ['inappproducts_get.md', 'Inappproducts', 'Get']
-- ['inappproducts_insert.md', 'Inappproducts', 'Insert']
-- ['inappproducts_list.md', 'Inappproducts', 'List']
-- ['inappproducts_patch.md', 'Inappproducts', 'Patch']
-- ['inappproducts_update.md', 'Inappproducts', 'Update']
-- ['orders_refund.md', 'Orders', 'Refund']
-- ['purchases_products-get.md', 'Purchases', 'Products Get']
-- ['purchases_subscriptions-cancel.md', 'Purchases', 'Subscriptions Cancel']
-- ['purchases_subscriptions-defer.md', 'Purchases', 'Subscriptions Defer']
-- ['purchases_subscriptions-get.md', 'Purchases', 'Subscriptions Get']
-- ['purchases_subscriptions-refund.md', 'Purchases', 'Subscriptions Refund']
-- ['purchases_subscriptions-revoke.md', 'Purchases', 'Subscriptions Revoke']
-- ['purchases_voidedpurchases-list.md', 'Purchases', 'Voidedpurchases List']
-- ['reviews_get.md', 'Reviews', 'Get']
-- ['reviews_list.md', 'Reviews', 'List']
-- ['reviews_reply.md', 'Reviews', 'Reply']
+nav:
+- Home: 'index.md'
+- 'Edits':
+    - 'Apklistings Delete': 'edits_apklistings-delete.md'
+    - 'Apklistings Deleteall': 'edits_apklistings-deleteall.md'
+    - 'Apklistings Get': 'edits_apklistings-get.md'
+    - 'Apklistings List': 'edits_apklistings-list.md'
+    - 'Apklistings Patch': 'edits_apklistings-patch.md'
+    - 'Apklistings Update': 'edits_apklistings-update.md'
+    - 'Apks Addexternallyhosted': 'edits_apks-addexternallyhosted.md'
+    - 'Apks List': 'edits_apks-list.md'
+    - 'Apks Upload': 'edits_apks-upload.md'
+    - 'Bundles List': 'edits_bundles-list.md'
+    - 'Bundles Upload': 'edits_bundles-upload.md'
+    - 'Commit': 'edits_commit.md'
+    - 'Delete': 'edits_delete.md'
+    - 'Deobfuscationfiles Upload': 'edits_deobfuscationfiles-upload.md'
+    - 'Details Get': 'edits_details-get.md'
+    - 'Details Patch': 'edits_details-patch.md'
+    - 'Details Update': 'edits_details-update.md'
+    - 'Expansionfiles Get': 'edits_expansionfiles-get.md'
+    - 'Expansionfiles Patch': 'edits_expansionfiles-patch.md'
+    - 'Expansionfiles Update': 'edits_expansionfiles-update.md'
+    - 'Expansionfiles Upload': 'edits_expansionfiles-upload.md'
+    - 'Get': 'edits_get.md'
+    - 'Images Delete': 'edits_images-delete.md'
+    - 'Images Deleteall': 'edits_images-deleteall.md'
+    - 'Images List': 'edits_images-list.md'
+    - 'Images Upload': 'edits_images-upload.md'
+    - 'Insert': 'edits_insert.md'
+    - 'Listings Delete': 'edits_listings-delete.md'
+    - 'Listings Deleteall': 'edits_listings-deleteall.md'
+    - 'Listings Get': 'edits_listings-get.md'
+    - 'Listings List': 'edits_listings-list.md'
+    - 'Listings Patch': 'edits_listings-patch.md'
+    - 'Listings Update': 'edits_listings-update.md'
+    - 'Testers Get': 'edits_testers-get.md'
+    - 'Testers Patch': 'edits_testers-patch.md'
+    - 'Testers Update': 'edits_testers-update.md'
+    - 'Tracks Get': 'edits_tracks-get.md'
+    - 'Tracks List': 'edits_tracks-list.md'
+    - 'Tracks Patch': 'edits_tracks-patch.md'
+    - 'Tracks Update': 'edits_tracks-update.md'
+    - 'Validate': 'edits_validate.md'
+- 'Inappproducts':
+    - 'Delete': 'inappproducts_delete.md'
+    - 'Get': 'inappproducts_get.md'
+    - 'Insert': 'inappproducts_insert.md'
+    - 'List': 'inappproducts_list.md'
+    - 'Patch': 'inappproducts_patch.md'
+    - 'Update': 'inappproducts_update.md'
+- 'Orders':
+    - 'Refund': 'orders_refund.md'
+- 'Purchases':
+    - 'Products Get': 'purchases_products-get.md'
+    - 'Subscriptions Cancel': 'purchases_subscriptions-cancel.md'
+    - 'Subscriptions Defer': 'purchases_subscriptions-defer.md'
+    - 'Subscriptions Get': 'purchases_subscriptions-get.md'
+    - 'Subscriptions Refund': 'purchases_subscriptions-refund.md'
+    - 'Subscriptions Revoke': 'purchases_subscriptions-revoke.md'
+    - 'Voidedpurchases List': 'purchases_voidedpurchases-list.md'
+- 'Reviews':
+    - 'Get': 'reviews_get.md'
+    - 'List': 'reviews_list.md'
+    - 'Reply': 'reviews_reply.md'
 
 theme: readthedocs
 

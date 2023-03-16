@@ -4,12 +4,12 @@
 [package]
 
 name = "google-bigtableadmin2"
-version = "5.0.2-beta-1+20230110"
+version = "5.0.2+20230110"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Bigtable Admin (protocol v2)"
 repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/bigtableadmin2"
 homepage = "https://cloud.google.com/bigtable/"
-documentation = "https://docs.rs/google-bigtableadmin2/5.0.2-beta-1+20230110"
+documentation = "https://docs.rs/google-bigtableadmin2/5.0.2+20230110"
 license = "MIT"
 keywords = ["bigtableadmin", "google", "protocol", "web", "api"]
 autobins = false

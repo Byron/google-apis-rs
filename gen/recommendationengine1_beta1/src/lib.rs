@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/generator/templates/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Recommendations AI* crate version *5.0.2-beta-1+20230105*, where *20230105* is the exact revision of the *recommendationengine:v1beta1* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.2-beta-1*.
+//! This documentation was generated from *Recommendations AI* crate version *5.0.2+20230105*, where *20230105* is the exact revision of the *recommendationengine:v1beta1* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.2*.
 //! 
 //! Everything else about the *Recommendations AI* *v1_beta1* API can be found at the
 //! [official documentation site](https://cloud.google.com/recommendations-ai/docs).

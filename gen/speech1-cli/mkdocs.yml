@@ -1,4 +1,4 @@
-site_name: Speech v4.0.1+20220221
+site_name: Speech v5.0.2+20230119
 site_url: http://byron.github.io/google-apis-rs/google-speech1-cli
 site_description: A complete library to interact with Speech (protocol v1)
 
@@ -7,22 +7,25 @@ repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/speech1-cli
 docs_dir: docs
 site_dir: build_html
 
-pages:
-- ['index.md', 'Home']
-- ['operations_get.md', 'Operations', 'Get']
-- ['operations_list.md', 'Operations', 'List']
-- ['projects_locations-custom-classes-create.md', 'Projects', 'Locations Custom Classes Create']
-- ['projects_locations-custom-classes-delete.md', 'Projects', 'Locations Custom Classes Delete']
-- ['projects_locations-custom-classes-get.md', 'Projects', 'Locations Custom Classes Get']
-- ['projects_locations-custom-classes-list.md', 'Projects', 'Locations Custom Classes List']
-- ['projects_locations-custom-classes-patch.md', 'Projects', 'Locations Custom Classes Patch']
-- ['projects_locations-phrase-sets-create.md', 'Projects', 'Locations Phrase Sets Create']
-- ['projects_locations-phrase-sets-delete.md', 'Projects', 'Locations Phrase Sets Delete']
-- ['projects_locations-phrase-sets-get.md', 'Projects', 'Locations Phrase Sets Get']
-- ['projects_locations-phrase-sets-list.md', 'Projects', 'Locations Phrase Sets List']
-- ['projects_locations-phrase-sets-patch.md', 'Projects', 'Locations Phrase Sets Patch']
-- ['speech_longrunningrecognize.md', 'Speech', 'Longrunningrecognize']
-- ['speech_recognize.md', 'Speech', 'Recognize']
+nav:
+- Home: 'index.md'
+- 'Operations':
+    - 'Get': 'operations_get.md'
+    - 'List': 'operations_list.md'
+- 'Projects':
+    - 'Locations Custom Classes Create': 'projects_locations-custom-classes-create.md'
+    - 'Locations Custom Classes Delete': 'projects_locations-custom-classes-delete.md'
+    - 'Locations Custom Classes Get': 'projects_locations-custom-classes-get.md'
+    - 'Locations Custom Classes List': 'projects_locations-custom-classes-list.md'
+    - 'Locations Custom Classes Patch': 'projects_locations-custom-classes-patch.md'
+    - 'Locations Phrase Sets Create': 'projects_locations-phrase-sets-create.md'
+    - 'Locations Phrase Sets Delete': 'projects_locations-phrase-sets-delete.md'
+    - 'Locations Phrase Sets Get': 'projects_locations-phrase-sets-get.md'
+    - 'Locations Phrase Sets List': 'projects_locations-phrase-sets-list.md'
+    - 'Locations Phrase Sets Patch': 'projects_locations-phrase-sets-patch.md'
+- 'Speech':
+    - 'Longrunningrecognize': 'speech_longrunningrecognize.md'
+    - 'Recognize': 'speech_recognize.md'
 
 theme: readthedocs
 

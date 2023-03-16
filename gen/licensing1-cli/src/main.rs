@@ -3,8 +3,6 @@
 // DO NOT EDIT !
 #![allow(unused_variables, unused_imports, dead_code, unused_mut)]
 
-extern crate tokio;
-
 #[macro_use]
 extern crate clap;
 
@@ -12,9 +10,10 @@ use std::env;
 use std::io::{self, Write};
 use clap::{App, SubCommand, Arg};
 
-use google_licensing1::{api, Error, oauth2};
+use google_licensing1::{api, Error, oauth2, client::chrono, FieldMask};
 
-mod client;
+
+use google_clis_common as client;
 
 use client::{InvalidOptionsError, CLIError, arg_from_str, writer_from_opts, parse_kv_arg,
           input_file_from_opts, input_mime_from_opts, FieldCursor, FieldError, CallType, UploadProtocol,
@@ -250,7 +249,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "max-results" => {
-                    call = call.max_results(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
+                    call = call.max_results(        value.map(|v| arg_from_str(v, err, "max-results", "uint32")).unwrap_or(0));
                 },
                 _ => {
                     let mut found = false;
@@ -309,7 +308,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "max-results" => {
-                    call = call.max_results(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
+                    call = call.max_results(        value.map(|v| arg_from_str(v, err, "max-results", "uint32")).unwrap_or(0));
                 },
                 _ => {
                     let mut found = false;
@@ -764,7 +763,7 @@ async fn main() {
         
                     (Some(r##"customer-id"##),
                      None,
-                     Some(r##"Customer's `customerId`. A previous version of this API accepted the primary domain name as a value for this field. If the customer is suspended, the server returns an error."##),
+                     Some(r##"The customer's unique ID as defined in the Admin console, such as `C00000000`. If the customer is suspended, the server returns an error."##),
                      Some(true),
                      Some(false)),
         
@@ -798,7 +797,7 @@ async fn main() {
         
                     (Some(r##"customer-id"##),
                      None,
-                     Some(r##"Customer's `customerId`. A previous version of this API accepted the primary domain name as a value for this field. If the customer is suspended, the server returns an error."##),
+                     Some(r##"The customer's unique ID as defined in the Admin console, such as `C00000000`. If the customer is suspended, the server returns an error."##),
                      Some(true),
                      Some(false)),
         
@@ -900,8 +899,8 @@ async fn main() {
     
     let mut app = App::new("licensing1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("4.0.1+20220305")
-           .about("The Google Enterprise License Manager API's allows you to license apps for all the users of a domain managed by you.")
+           .version("5.0.2+20230121")
+           .about("The Google Enterprise License Manager API lets you manage Google Workspace and related licenses for all users of a customer that you manage.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_licensing1_cli")
            .arg(Arg::with_name("url")
                    .long("scope")

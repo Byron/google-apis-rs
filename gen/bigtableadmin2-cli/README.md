@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Bigtable Admin* API at revision *20220222*. The CLI is at version *4.0.1*.
+This documentation was generated from the *Bigtable Admin* API at revision *20230110*. The CLI is at version *5.0.2*.
 
 ```bash
 bigtableadmin2 [options]
@@ -40,6 +40,7 @@ bigtableadmin2 [options]
                 instances-app-profiles-get <name> [-p <v>]... [-o <out>]
                 instances-app-profiles-list <parent> [-p <v>]... [-o <out>]
                 instances-app-profiles-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                instances-clusters-backups-copy <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 instances-clusters-backups-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 instances-clusters-backups-delete <name> [-p <v>]... [-o <out>]
                 instances-clusters-backups-get <name> [-p <v>]... [-o <out>]
@@ -51,6 +52,7 @@ bigtableadmin2 [options]
                 instances-clusters-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 instances-clusters-delete <name> [-p <v>]... [-o <out>]
                 instances-clusters-get <name> [-p <v>]... [-o <out>]
+                instances-clusters-hot-tablets-list <parent> [-p <v>]... [-o <out>]
                 instances-clusters-list <parent> [-p <v>]... [-o <out>]
                 instances-clusters-partial-update-cluster <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 instances-clusters-update <name> (-r <kv>)... [-p <v>]... [-o <out>]
@@ -70,9 +72,11 @@ bigtableadmin2 [options]
                 instances-tables-get-iam-policy <resource> (-r <kv>)... [-p <v>]... [-o <out>]
                 instances-tables-list <parent> [-p <v>]... [-o <out>]
                 instances-tables-modify-column-families <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                instances-tables-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 instances-tables-restore <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 instances-tables-set-iam-policy <resource> (-r <kv>)... [-p <v>]... [-o <out>]
                 instances-tables-test-iam-permissions <resource> (-r <kv>)... [-p <v>]... [-o <out>]
+                instances-tables-undelete <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 instances-test-iam-permissions <resource> (-r <kv>)... [-p <v>]... [-o <out>]
                 instances-update <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-get <name> [-p <v>]... [-o <out>]

@@ -3,8 +3,6 @@
 // DO NOT EDIT !
 #![allow(unused_variables, unused_imports, dead_code, unused_mut)]
 
-extern crate tokio;
-
 #[macro_use]
 extern crate clap;
 
@@ -12,9 +10,10 @@ use std::env;
 use std::io::{self, Write};
 use clap::{App, SubCommand, Arg};
 
-use google_fitness1::{api, Error, oauth2};
+use google_fitness1::{api, Error, oauth2, client::chrono, FieldMask};
 
-mod client;
+
+use google_clis_common as client;
 
 use client::{InvalidOptionsError, CLIError, arg_from_str, writer_from_opts, parse_kv_arg,
           input_file_from_opts, input_mime_from_opts, FieldCursor, FieldError, CallType, UploadProtocol,
@@ -160,7 +159,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "limit" => {
-                    call = call.limit(arg_from_str(value.unwrap_or("-0"), err, "limit", "integer"));
+                    call = call.limit(        value.map(|v| arg_from_str(v, err, "limit", "int32")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -263,7 +262,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "limit" => {
-                    call = call.limit(arg_from_str(value.unwrap_or("-0"), err, "limit", "integer"));
+                    call = call.limit(        value.map(|v| arg_from_str(v, err, "limit", "int32")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -812,13 +811,13 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "include-deleted" => {
-                    call = call.include_deleted(arg_from_str(value.unwrap_or("false"), err, "include-deleted", "boolean"));
+                    call = call.include_deleted(        value.map(|v| arg_from_str(v, err, "include-deleted", "boolean")).unwrap_or(false));
                 },
                 "end-time" => {
                     call = call.end_time(value.unwrap_or(""));
                 },
                 "activity-type" => {
-                    call = call.add_activity_type(arg_from_str(value.unwrap_or("-0"), err, "activity-type", "integer"));
+                    call = call.add_activity_type(        value.map(|v| arg_from_str(v, err, "activity-type", "int32")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -1471,7 +1470,7 @@ async fn main() {
     
     let mut app = App::new("fitness1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("4.0.1+20220302")
+           .version("5.0.2+20230120")
            .about("The Fitness API for managing users' fitness tracking data.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_fitness1_cli")
            .arg(Arg::with_name("url")

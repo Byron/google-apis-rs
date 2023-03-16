@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Cloud Domains* API at revision *20220128*. The CLI is at version *4.0.1*.
+This documentation was generated from the *Cloud Domains* API at revision *20230105*. The CLI is at version *5.0.2*.
 
 ```bash
 domains1-beta1 [options]
@@ -41,11 +41,13 @@ domains1-beta1 [options]
                 locations-registrations-export <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-registrations-get <name> [-p <v>]... [-o <out>]
                 locations-registrations-get-iam-policy <resource> [-p <v>]... [-o <out>]
+                locations-registrations-import <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-registrations-list <parent> [-p <v>]... [-o <out>]
                 locations-registrations-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-registrations-register <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-registrations-reset-authorization-code <registration> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-registrations-retrieve-authorization-code <registration> [-p <v>]... [-o <out>]
+                locations-registrations-retrieve-importable-domains <location> [-p <v>]... [-o <out>]
                 locations-registrations-retrieve-register-parameters <location> [-p <v>]... [-o <out>]
                 locations-registrations-retrieve-transfer-parameters <location> [-p <v>]... [-o <out>]
                 locations-registrations-search-domains <location> [-p <v>]... [-o <out>]

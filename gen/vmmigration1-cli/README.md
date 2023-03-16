@@ -11,7 +11,7 @@ capabilities. Errors will be printed to standard error, and cause the program's 
 If data-structures are requested, these will be returned as pretty-printed JSON, to be useful as input to other tools.
 
 Everything else about the *VM Migration Service* API can be found at the
-[official documentation site](https://cloud.google.com/migrate/compute-engine).
+[official documentation site](https://cloud.google.com/migrate/virtual-machines).
 
 # Installation and Source Code
 
@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *VM Migration Service* API at revision *20220225*. The CLI is at version *4.0.1*.
+This documentation was generated from the *VM Migration Service* API at revision *20230119*. The CLI is at version *5.0.2*.
 
 ```bash
 vmmigration1 [options]
@@ -68,6 +68,8 @@ vmmigration1 [options]
                 locations-sources-migrating-vms-list <parent> [-p <v>]... [-o <out>]
                 locations-sources-migrating-vms-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-sources-migrating-vms-pause-migration <migrating-vm> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-sources-migrating-vms-replication-cycles-get <name> [-p <v>]... [-o <out>]
+                locations-sources-migrating-vms-replication-cycles-list <parent> [-p <v>]... [-o <out>]
                 locations-sources-migrating-vms-resume-migration <migrating-vm> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-sources-migrating-vms-start-migration <migrating-vm> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-sources-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]

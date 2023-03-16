@@ -25,14 +25,29 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Cloud Run* API at revision *20220225*. The CLI is at version *4.0.1*.
+This documentation was generated from the *Cloud Run* API at revision *20230113*. The CLI is at version *5.0.2*.
 
 ```bash
 run2 [options]
         projects
+                locations-jobs-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-jobs-delete <name> [-p <v>]... [-o <out>]
+                locations-jobs-executions-delete <name> [-p <v>]... [-o <out>]
+                locations-jobs-executions-get <name> [-p <v>]... [-o <out>]
+                locations-jobs-executions-list <parent> [-p <v>]... [-o <out>]
+                locations-jobs-executions-tasks-get <name> [-p <v>]... [-o <out>]
+                locations-jobs-executions-tasks-list <parent> [-p <v>]... [-o <out>]
+                locations-jobs-get <name> [-p <v>]... [-o <out>]
+                locations-jobs-get-iam-policy <resource> [-p <v>]... [-o <out>]
+                locations-jobs-list <parent> [-p <v>]... [-o <out>]
+                locations-jobs-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-jobs-run <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-jobs-set-iam-policy <resource> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-jobs-test-iam-permissions <resource> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-operations-delete <name> [-p <v>]... [-o <out>]
                 locations-operations-get <name> [-p <v>]... [-o <out>]
                 locations-operations-list <name> [-p <v>]... [-o <out>]
+                locations-operations-wait <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-services-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-services-delete <name> [-p <v>]... [-o <out>]
                 locations-services-get <name> [-p <v>]... [-o <out>]

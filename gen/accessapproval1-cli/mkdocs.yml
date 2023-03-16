@@ -1,4 +1,4 @@
-site_name: Access Approval v4.0.1+20220225
+site_name: Access Approval v5.0.2+20230120
 site_url: http://byron.github.io/google-apis-rs/google-accessapproval1-cli
 site_description: A complete library to interact with Access Approval (protocol v1)
 
@@ -7,29 +7,38 @@ repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/accessapproval1-
 docs_dir: docs
 site_dir: build_html
 
-pages:
-- ['index.md', 'Home']
-- ['folders_approval-requests-approve.md', 'Folders', 'Approval Requests Approve']
-- ['folders_approval-requests-dismiss.md', 'Folders', 'Approval Requests Dismiss']
-- ['folders_approval-requests-get.md', 'Folders', 'Approval Requests Get']
-- ['folders_approval-requests-list.md', 'Folders', 'Approval Requests List']
-- ['folders_delete-access-approval-settings.md', 'Folders', 'Delete Access Approval Settings']
-- ['folders_get-access-approval-settings.md', 'Folders', 'Get Access Approval Settings']
-- ['folders_update-access-approval-settings.md', 'Folders', 'Update Access Approval Settings']
-- ['organizations_approval-requests-approve.md', 'Organizations', 'Approval Requests Approve']
-- ['organizations_approval-requests-dismiss.md', 'Organizations', 'Approval Requests Dismiss']
-- ['organizations_approval-requests-get.md', 'Organizations', 'Approval Requests Get']
-- ['organizations_approval-requests-list.md', 'Organizations', 'Approval Requests List']
-- ['organizations_delete-access-approval-settings.md', 'Organizations', 'Delete Access Approval Settings']
-- ['organizations_get-access-approval-settings.md', 'Organizations', 'Get Access Approval Settings']
-- ['organizations_update-access-approval-settings.md', 'Organizations', 'Update Access Approval Settings']
-- ['projects_approval-requests-approve.md', 'Projects', 'Approval Requests Approve']
-- ['projects_approval-requests-dismiss.md', 'Projects', 'Approval Requests Dismiss']
-- ['projects_approval-requests-get.md', 'Projects', 'Approval Requests Get']
-- ['projects_approval-requests-list.md', 'Projects', 'Approval Requests List']
-- ['projects_delete-access-approval-settings.md', 'Projects', 'Delete Access Approval Settings']
-- ['projects_get-access-approval-settings.md', 'Projects', 'Get Access Approval Settings']
-- ['projects_update-access-approval-settings.md', 'Projects', 'Update Access Approval Settings']
+nav:
+- Home: 'index.md'
+- 'Folders':
+    - 'Approval Requests Approve': 'folders_approval-requests-approve.md'
+    - 'Approval Requests Dismiss': 'folders_approval-requests-dismiss.md'
+    - 'Approval Requests Get': 'folders_approval-requests-get.md'
+    - 'Approval Requests Invalidate': 'folders_approval-requests-invalidate.md'
+    - 'Approval Requests List': 'folders_approval-requests-list.md'
+    - 'Delete Access Approval Settings': 'folders_delete-access-approval-settings.md'
+    - 'Get Access Approval Settings': 'folders_get-access-approval-settings.md'
+    - 'Get Service Account': 'folders_get-service-account.md'
+    - 'Update Access Approval Settings': 'folders_update-access-approval-settings.md'
+- 'Organizations':
+    - 'Approval Requests Approve': 'organizations_approval-requests-approve.md'
+    - 'Approval Requests Dismiss': 'organizations_approval-requests-dismiss.md'
+    - 'Approval Requests Get': 'organizations_approval-requests-get.md'
+    - 'Approval Requests Invalidate': 'organizations_approval-requests-invalidate.md'
+    - 'Approval Requests List': 'organizations_approval-requests-list.md'
+    - 'Delete Access Approval Settings': 'organizations_delete-access-approval-settings.md'
+    - 'Get Access Approval Settings': 'organizations_get-access-approval-settings.md'
+    - 'Get Service Account': 'organizations_get-service-account.md'
+    - 'Update Access Approval Settings': 'organizations_update-access-approval-settings.md'
+- 'Projects':
+    - 'Approval Requests Approve': 'projects_approval-requests-approve.md'
+    - 'Approval Requests Dismiss': 'projects_approval-requests-dismiss.md'
+    - 'Approval Requests Get': 'projects_approval-requests-get.md'
+    - 'Approval Requests Invalidate': 'projects_approval-requests-invalidate.md'
+    - 'Approval Requests List': 'projects_approval-requests-list.md'
+    - 'Delete Access Approval Settings': 'projects_delete-access-approval-settings.md'
+    - 'Get Access Approval Settings': 'projects_get-access-approval-settings.md'
+    - 'Get Service Account': 'projects_get-service-account.md'
+    - 'Update Access Approval Settings': 'projects_update-access-approval-settings.md'
 
 theme: readthedocs
 

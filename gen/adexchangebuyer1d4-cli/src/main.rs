@@ -3,8 +3,6 @@
 // DO NOT EDIT !
 #![allow(unused_variables, unused_imports, dead_code, unused_mut)]
 
-extern crate tokio;
-
 #[macro_use]
 extern crate clap;
 
@@ -12,9 +10,10 @@ use std::env;
 use std::io::{self, Write};
 use clap::{App, SubCommand, Arg};
 
-use google_adexchangebuyer1d4::{api, Error, oauth2};
+use google_adexchangebuyer1d4::{api, Error, oauth2, client::chrono, FieldMask};
 
-mod client;
+
+use google_clis_common as client;
 
 use client::{InvalidOptionsError, CLIError, arg_from_str, writer_from_opts, parse_kv_arg,
           input_file_from_opts, input_mime_from_opts, FieldCursor, FieldError, CallType, UploadProtocol,
@@ -204,7 +203,7 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "confirm-unsafe-account-change" => {
-                    call = call.confirm_unsafe_account_change(arg_from_str(value.unwrap_or("false"), err, "confirm-unsafe-account-change", "boolean"));
+                    call = call.confirm_unsafe_account_change(        value.map(|v| arg_from_str(v, err, "confirm-unsafe-account-change", "boolean")).unwrap_or(false));
                 },
                 _ => {
                     let mut found = false;
@@ -301,7 +300,7 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "confirm-unsafe-account-change" => {
-                    call = call.confirm_unsafe_account_change(arg_from_str(value.unwrap_or("false"), err, "confirm-unsafe-account-change", "boolean"));
+                    call = call.confirm_unsafe_account_change(        value.map(|v| arg_from_str(v, err, "confirm-unsafe-account-change", "boolean")).unwrap_or(false));
                 },
                 _ => {
                     let mut found = false;
@@ -930,7 +929,7 @@ where
                     call = call.open_auction_status_filter(value.unwrap_or(""));
                 },
                 "max-results" => {
-                    call = call.max_results(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
+                    call = call.max_results(        value.map(|v| arg_from_str(v, err, "max-results", "uint32")).unwrap_or(0));
                 },
                 "deals-status-filter" => {
                     call = call.deals_status_filter(value.unwrap_or(""));
@@ -939,7 +938,7 @@ where
                     call = call.add_buyer_creative_id(value.unwrap_or(""));
                 },
                 "account-id" => {
-                    call = call.add_account_id(arg_from_str(value.unwrap_or("-0"), err, "account-id", "integer"));
+                    call = call.add_account_id(        value.map(|v| arg_from_str(v, err, "account-id", "int32")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -1660,7 +1659,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "max-results" => {
-                    call = call.max_results(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
+                    call = call.max_results(        value.map(|v| arg_from_str(v, err, "max-results", "uint32")).unwrap_or(0));
                 },
                 _ => {
                     let mut found = false;
@@ -4087,7 +4086,7 @@ async fn main() {
     
     let mut app = App::new("adexchangebuyer1d4")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("4.0.1+20210330")
+           .version("5.0.2+20210330")
            .about("Accesses your bidding-account information, submits creatives for validation, finds available direct deals, and retrieves performance reports.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_adexchangebuyer1d4_cli")
            .arg(Arg::with_name("url")

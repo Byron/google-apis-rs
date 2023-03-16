@@ -3,8 +3,6 @@
 // DO NOT EDIT !
 #![allow(unused_variables, unused_imports, dead_code, unused_mut)]
 
-extern crate tokio;
-
 #[macro_use]
 extern crate clap;
 
@@ -12,9 +10,10 @@ use std::env;
 use std::io::{self, Write};
 use clap::{App, SubCommand, Arg};
 
-use google_serviceregistryalpha::{api, Error, oauth2};
+use google_serviceregistryalpha::{api, Error, oauth2, client::chrono, FieldMask};
 
-mod client;
+
+use google_clis_common as client;
 
 use client::{InvalidOptionsError, CLIError, arg_from_str, writer_from_opts, parse_kv_arg,
           input_file_from_opts, input_mime_from_opts, FieldCursor, FieldError, CallType, UploadProtocol,
@@ -262,7 +261,7 @@ where
                     call = call.order_by(value.unwrap_or(""));
                 },
                 "max-results" => {
-                    call = call.max_results(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
+                    call = call.max_results(        value.map(|v| arg_from_str(v, err, "max-results", "uint32")).unwrap_or(0));
                 },
                 "filter" => {
                     call = call.filter(value.unwrap_or(""));
@@ -567,7 +566,7 @@ where
                     call = call.order_by(value.unwrap_or(""));
                 },
                 "max-results" => {
-                    call = call.max_results(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
+                    call = call.max_results(        value.map(|v| arg_from_str(v, err, "max-results", "uint32")).unwrap_or(0));
                 },
                 "filter" => {
                     call = call.filter(value.unwrap_or(""));
@@ -968,7 +967,7 @@ async fn main() {
     
     let mut app = App::new("serviceregistryalpha")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("4.0.1+20160401")
+           .version("5.0.2+20160401")
            .about("Manages service endpoints in Service Registry and provides integration with DNS for service discovery and name resolution.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_serviceregistryalpha_cli")
            .arg(Arg::with_name("url")

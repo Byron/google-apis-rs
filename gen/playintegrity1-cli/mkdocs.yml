@@ -1,4 +1,4 @@
-site_name: Play Integrity v4.0.1+20220305
+site_name: Play Integrity v5.0.2+20230123
 site_url: http://byron.github.io/google-apis-rs/google-playintegrity1-cli
 site_description: A complete library to interact with Play Integrity (protocol v1)
 
@@ -7,9 +7,10 @@ repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/playintegrity1-c
 docs_dir: docs
 site_dir: build_html
 
-pages:
-- ['index.md', 'Home']
-- ['methods_decode-integrity-token.md', 'Methods', 'Decode Integrity Token']
+nav:
+- Home: 'index.md'
+- 'Methods':
+    - 'Decode Integrity Token': 'methods_decode-integrity-token.md'
 
 theme: readthedocs
 

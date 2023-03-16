@@ -1,4 +1,4 @@
-site_name: Firebasestorage v4.0.1+20220218
+site_name: Firebasestorage v5.0.2+20230106
 site_url: http://byron.github.io/google-apis-rs/google-firebasestorage1_beta-cli
 site_description: A complete library to interact with Firebasestorage (protocol v1beta)
 
@@ -7,12 +7,13 @@ repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/firebasestorage1
 docs_dir: docs
 site_dir: build_html
 
-pages:
-- ['index.md', 'Home']
-- ['projects_buckets-add-firebase.md', 'Projects', 'Buckets Add Firebase']
-- ['projects_buckets-get.md', 'Projects', 'Buckets Get']
-- ['projects_buckets-list.md', 'Projects', 'Buckets List']
-- ['projects_buckets-remove-firebase.md', 'Projects', 'Buckets Remove Firebase']
+nav:
+- Home: 'index.md'
+- 'Projects':
+    - 'Buckets Add Firebase': 'projects_buckets-add-firebase.md'
+    - 'Buckets Get': 'projects_buckets-get.md'
+    - 'Buckets List': 'projects_buckets-list.md'
+    - 'Buckets Remove Firebase': 'projects_buckets-remove-firebase.md'
 
 theme: readthedocs
 

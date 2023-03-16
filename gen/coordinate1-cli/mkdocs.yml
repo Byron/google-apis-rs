@@ -1,4 +1,4 @@
-site_name: coordinate v4.0.1+20150811
+site_name: coordinate v5.0.2+20150811
 site_url: http://byron.github.io/google-apis-rs/google-coordinate1-cli
 site_description: A complete library to interact with coordinate (protocol v1)
 
@@ -7,20 +7,26 @@ repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/coordinate1-cli
 docs_dir: docs
 site_dir: build_html
 
-pages:
-- ['index.md', 'Home']
-- ['custom-field-def_list.md', 'Custom Field Def', 'List']
-- ['jobs_get.md', 'Jobs', 'Get']
-- ['jobs_insert.md', 'Jobs', 'Insert']
-- ['jobs_list.md', 'Jobs', 'List']
-- ['jobs_patch.md', 'Jobs', 'Patch']
-- ['jobs_update.md', 'Jobs', 'Update']
-- ['location_list.md', 'Location', 'List']
-- ['schedule_get.md', 'Schedule', 'Get']
-- ['schedule_patch.md', 'Schedule', 'Patch']
-- ['schedule_update.md', 'Schedule', 'Update']
-- ['team_list.md', 'Team', 'List']
-- ['worker_list.md', 'Worker', 'List']
+nav:
+- Home: 'index.md'
+- 'Custom Field Def':
+    - 'List': 'custom-field-def_list.md'
+- 'Jobs':
+    - 'Get': 'jobs_get.md'
+    - 'Insert': 'jobs_insert.md'
+    - 'List': 'jobs_list.md'
+    - 'Patch': 'jobs_patch.md'
+    - 'Update': 'jobs_update.md'
+- 'Location':
+    - 'List': 'location_list.md'
+- 'Schedule':
+    - 'Get': 'schedule_get.md'
+    - 'Patch': 'schedule_patch.md'
+    - 'Update': 'schedule_update.md'
+- 'Team':
+    - 'List': 'team_list.md'
+- 'Worker':
+    - 'List': 'worker_list.md'
 
 theme: readthedocs
 

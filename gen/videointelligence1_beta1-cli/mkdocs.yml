@@ -1,4 +1,4 @@
-site_name: Cloud Video Intelligence v4.0.1+20171122
+site_name: Cloud Video Intelligence v5.0.2+20171122
 site_url: http://byron.github.io/google-apis-rs/google-videointelligence1_beta1-cli
 site_description: A complete library to interact with Cloud Video Intelligence (protocol v1beta1)
 
@@ -7,9 +7,10 @@ repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/videointelligenc
 docs_dir: docs
 site_dir: build_html
 
-pages:
-- ['index.md', 'Home']
-- ['videos_annotate.md', 'Videos', 'Annotate']
+nav:
+- Home: 'index.md'
+- 'Videos':
+    - 'Annotate': 'videos_annotate.md'
 
 theme: readthedocs
 

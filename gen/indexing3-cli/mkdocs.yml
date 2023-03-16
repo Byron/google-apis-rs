@@ -1,4 +1,4 @@
-site_name: Indexing v4.0.1+20220126
+site_name: Indexing v5.0.2+20230117
 site_url: http://byron.github.io/google-apis-rs/google-indexing3-cli
 site_description: A complete library to interact with Indexing (protocol v3)
 
@@ -7,10 +7,11 @@ repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/indexing3-cli
 docs_dir: docs
 site_dir: build_html
 
-pages:
-- ['index.md', 'Home']
-- ['url-notifications_get-metadata.md', 'Url Notifications', 'Get Metadata']
-- ['url-notifications_publish.md', 'Url Notifications', 'Publish']
+nav:
+- Home: 'index.md'
+- 'Url Notifications':
+    - 'Get Metadata': 'url-notifications_get-metadata.md'
+    - 'Publish': 'url-notifications_publish.md'
 
 theme: readthedocs
 

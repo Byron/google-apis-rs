@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Firebase Realtime Database* API at revision *20220304*. The CLI is at version *4.0.1*.
+This documentation was generated from the *Firebase Realtime Database* API at revision *20230123*. The CLI is at version *5.0.2*.
 
 ```bash
 firebasedatabase1-beta [options]
@@ -36,6 +36,7 @@ firebasedatabase1-beta [options]
                 locations-instances-get <name> [-p <v>]... [-o <out>]
                 locations-instances-list <parent> [-p <v>]... [-o <out>]
                 locations-instances-reenable <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-instances-undelete <name> (-r <kv>)... [-p <v>]... [-o <out>]
   firebasedatabase1-beta --help
 
 Configuration:

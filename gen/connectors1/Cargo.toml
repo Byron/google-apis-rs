@@ -4,12 +4,12 @@
 [package]
 
 name = "google-connectors1"
-version = "5.0.2-beta-1+20230103"
+version = "5.0.2+20230103"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Connectors (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/connectors1"
 homepage = "https://cloud.google.com/apigee/docs/api-platform/connectors/about-connectors"
-documentation = "https://docs.rs/google-connectors1/5.0.2-beta-1+20230103"
+documentation = "https://docs.rs/google-connectors1/5.0.2+20230103"
 license = "MIT"
 keywords = ["connectors", "google", "protocol", "web", "api"]
 autobins = false

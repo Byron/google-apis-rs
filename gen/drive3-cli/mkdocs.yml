@@ -1,4 +1,4 @@
-site_name: drive v5.0.2-beta-1+20220225
+site_name: drive v5.0.2+20230115
 site_url: http://byron.github.io/google-apis-rs/google-drive3-cli
 site_description: A complete library to interact with drive (protocol v3)
 
@@ -40,6 +40,8 @@ nav:
     - 'Generate Ids': 'files_generate-ids.md'
     - 'Get': 'files_get.md'
     - 'List': 'files_list.md'
+    - 'List Labels': 'files_list-labels.md'
+    - 'Modify Labels': 'files_modify-labels.md'
     - 'Update': 'files_update.md'
     - 'Watch': 'files_watch.md'
 - 'Permissions':

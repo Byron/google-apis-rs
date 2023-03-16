@@ -25,11 +25,19 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Chrome Policy* API at revision *20220305*. The CLI is at version *4.0.1*.
+This documentation was generated from the *Chrome Policy* API at revision *20230123*. The CLI is at version *5.0.2*.
 
 ```bash
 chromepolicy1 [options]
         customers
+                policies-groups-batch-delete <customer> (-r <kv>)... [-p <v>]... [-o <out>]
+                policies-groups-batch-modify <customer> (-r <kv>)... [-p <v>]... [-o <out>]
+                policies-groups-list-group-priority-ordering <customer> (-r <kv>)... [-p <v>]... [-o <out>]
+                policies-groups-update-group-priority-ordering <customer> (-r <kv>)... [-p <v>]... [-o <out>]
+                policies-networks-define-certificate <customer> (-r <kv>)... [-p <v>]... [-o <out>]
+                policies-networks-define-network <customer> (-r <kv>)... [-p <v>]... [-o <out>]
+                policies-networks-remove-certificate <customer> (-r <kv>)... [-p <v>]... [-o <out>]
+                policies-networks-remove-network <customer> (-r <kv>)... [-p <v>]... [-o <out>]
                 policies-orgunits-batch-inherit <customer> (-r <kv>)... [-p <v>]... [-o <out>]
                 policies-orgunits-batch-modify <customer> (-r <kv>)... [-p <v>]... [-o <out>]
                 policies-resolve <customer> (-r <kv>)... [-p <v>]... [-o <out>]

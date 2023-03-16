@@ -1,4 +1,4 @@
-site_name: My Business Notification Settings v4.0.1+20220305
+site_name: My Business Notification Settings v5.0.2+20230124
 site_url: http://byron.github.io/google-apis-rs/google-mybusinessnotifications1-cli
 site_description: A complete library to interact with My Business Notification Settings (protocol v1)
 
@@ -7,10 +7,11 @@ repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/mybusinessnotifi
 docs_dir: docs
 site_dir: build_html
 
-pages:
-- ['index.md', 'Home']
-- ['accounts_get-notification-setting.md', 'Accounts', 'Get Notification Setting']
-- ['accounts_update-notification-setting.md', 'Accounts', 'Update Notification Setting']
+nav:
+- Home: 'index.md'
+- 'Accounts':
+    - 'Get Notification Setting': 'accounts_get-notification-setting.md'
+    - 'Update Notification Setting': 'accounts_update-notification-setting.md'
 
 theme: readthedocs
 

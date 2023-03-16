@@ -25,10 +25,17 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Texttospeech* API at revision *20220228*. The CLI is at version *4.0.1*.
+This documentation was generated from the *Texttospeech* API at revision *20230118*. The CLI is at version *5.0.2*.
 
 ```bash
 texttospeech1 [options]
+        operations
+                cancel <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                delete <name> [-p <v>]... [-o <out>]
+        projects
+                locations-operations-get <name> [-p <v>]... [-o <out>]
+                locations-operations-list <name> [-p <v>]... [-o <out>]
+                locations-synthesize-long-audio <parent> (-r <kv>)... [-p <v>]... [-o <out>]
         text
                 synthesize (-r <kv>)... [-p <v>]... [-o <out>]
         voices

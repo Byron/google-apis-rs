@@ -1,4 +1,4 @@
-site_name: QPX Express v4.0.1+20160708
+site_name: QPX Express v5.0.2+20160708
 site_url: http://byron.github.io/google-apis-rs/google-qpxexpress1-cli
 site_description: A complete library to interact with QPX Express (protocol v1)
 
@@ -7,9 +7,10 @@ repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/qpxexpress1-cli
 docs_dir: docs
 site_dir: build_html
 
-pages:
-- ['index.md', 'Home']
-- ['trips_search.md', 'Trips', 'Search']
+nav:
+- Home: 'index.md'
+- 'Trips':
+    - 'Search': 'trips_search.md'
 
 theme: readthedocs
 

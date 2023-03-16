@@ -3,8 +3,6 @@
 // DO NOT EDIT !
 #![allow(unused_variables, unused_imports, dead_code, unused_mut)]
 
-extern crate tokio;
-
 #[macro_use]
 extern crate clap;
 
@@ -12,9 +10,10 @@ use std::env;
 use std::io::{self, Write};
 use clap::{App, SubCommand, Arg};
 
-use google_cloudbuild1::{api, Error, oauth2};
+use google_cloudbuild1::{api, Error, oauth2, client::chrono, FieldMask};
 
-mod client;
+
+use google_clis_common as client;
 
 use client::{InvalidOptionsError, CLIError, arg_from_str, writer_from_opts, parse_kv_arg,
           input_file_from_opts, input_mime_from_opts, FieldCursor, FieldError, CallType, UploadProtocol,
@@ -51,6 +50,93 @@ where
     S::Future: Send + Unpin + 'static,
     S::Error: Into<Box<dyn StdError + Send + Sync>>,
 {
+    async fn _github_dot_com_webhook_receive(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "content-type" => Some(("contentType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "data" => Some(("data", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["content-type", "data"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::HttpBody = json::value::from_value(object).unwrap();
+        let mut call = self.hub.github_dot_com_webhook().receive(request);
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "webhook-key" => {
+                    call = call.webhook_key(value.unwrap_or(""));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["webhook-key"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
     async fn _locations_regional_webhook(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
@@ -771,7 +857,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 "filter" => {
                     call = call.filter(value.unwrap_or(""));
@@ -1246,7 +1332,7 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "update-mask" => {
-                    call = call.update_mask(value.unwrap_or(""));
+                    call = call.update_mask(        value.map(|v| arg_from_str(v, err, "update-mask", "google-fieldmask")).unwrap_or(FieldMask::default()));
                 },
                 _ => {
                     let mut found = false;
@@ -1262,93 +1348,6 @@ where
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
                                                                            v.extend(["update-mask"].iter().map(|v|*v));
-                                                                           v } ));
-                    }
-                }
-            }
-        }
-        let protocol = CallType::Standard;
-        if dry_run {
-            Ok(())
-        } else {
-            assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-                call = call.add_scope(scope);
-            }
-            let mut ostream = match writer_from_opts(opt.value_of("out")) {
-                Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
-            };
-            match match protocol {
-                CallType::Standard => call.doit().await,
-                _ => unreachable!()
-            } {
-                Err(api_err) => Err(DoitError::ApiError(api_err)),
-                Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
-                    remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
-                    ostream.flush().unwrap();
-                    Ok(())
-                }
-            }
-        }
-    }
-
-    async fn _projects_locations_bitbucket_server_configs_add_bitbucket_server_connected_repository(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        
-        let mut field_cursor = FieldCursor::default();
-        let mut object = json::value::Value::Object(Default::default());
-        
-        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-            let last_errc = err.issues.len();
-            let (key, value) = parse_kv_arg(&*kvarg, err, false);
-            let mut temp_cursor = field_cursor.clone();
-            if let Err(field_err) = temp_cursor.set(&*key) {
-                err.issues.push(field_err);
-            }
-            if value.is_none() {
-                field_cursor = temp_cursor.clone();
-                if err.issues.len() > last_errc {
-                    err.issues.remove(last_errc);
-                }
-                continue;
-            }
-        
-            let type_info: Option<(&'static str, JsonTypeInfo)> =
-                match &temp_cursor.to_string()[..] {
-                    "connected-repository.project-key" => Some(("connectedRepository.projectKey", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "connected-repository.repo-slug" => Some(("connectedRepository.repoSlug", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "connected-repository.webhook-id" => Some(("connectedRepository.webhookId", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["connected-repository", "project-key", "repo-slug", "webhook-id"]);
-                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                        None
-                    }
-                };
-            if let Some((field_cursor_str, type_info)) = type_info {
-                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
-            }
-        }
-        let mut request: api::AddBitbucketServerConnectedRepositoryRequest = json::value::from_value(object).unwrap();
-        let mut call = self.hub.projects().locations_bitbucket_server_configs_add_bitbucket_server_connected_repository(request, opt.value_of("config").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-            let (key, value) = parse_kv_arg(&*parg, err, false);
-            match key {
-                _ => {
-                    let mut found = false;
-                    for param in &self.gp {
-                        if key == *param {
-                            found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
-                            break;
-                        }
-                    }
-                    if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -1679,7 +1678,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -1778,7 +1777,7 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "update-mask" => {
-                    call = call.update_mask(value.unwrap_or(""));
+                    call = call.update_mask(        value.map(|v| arg_from_str(v, err, "update-mask", "google-fieldmask")).unwrap_or(FieldMask::default()));
                 },
                 _ => {
                     let mut found = false;
@@ -1924,7 +1923,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -2386,7 +2385,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 "filter" => {
                     call = call.filter(value.unwrap_or(""));
@@ -2492,6 +2491,596 @@ where
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_locations_git_lab_configs_connected_repositories_batch_create(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec![]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::BatchCreateGitLabConnectedRepositoriesRequest = json::value::from_value(object).unwrap();
+        let mut call = self.hub.projects().locations_git_lab_configs_connected_repositories_batch_create(request, opt.value_of("parent").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_locations_git_lab_configs_create(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "enterprise-config.host-uri" => Some(("enterpriseConfig.hostUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "enterprise-config.service-directory-config.service" => Some(("enterpriseConfig.serviceDirectoryConfig.service", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "enterprise-config.ssl-ca" => Some(("enterpriseConfig.sslCa", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "secrets.api-access-token-version" => Some(("secrets.apiAccessTokenVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "secrets.api-key-version" => Some(("secrets.apiKeyVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "secrets.read-access-token-version" => Some(("secrets.readAccessTokenVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "secrets.webhook-secret-version" => Some(("secrets.webhookSecretVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "username" => Some(("username", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "webhook-key" => Some(("webhookKey", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["api-access-token-version", "api-key-version", "create-time", "enterprise-config", "host-uri", "name", "read-access-token-version", "secrets", "service", "service-directory-config", "ssl-ca", "username", "webhook-key", "webhook-secret-version"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::GitLabConfig = json::value::from_value(object).unwrap();
+        let mut call = self.hub.projects().locations_git_lab_configs_create(request, opt.value_of("parent").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "gitlab-config-id" => {
+                    call = call.gitlab_config_id(value.unwrap_or(""));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["gitlab-config-id"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_locations_git_lab_configs_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.projects().locations_git_lab_configs_delete(opt.value_of("name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_locations_git_lab_configs_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.projects().locations_git_lab_configs_get(opt.value_of("name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_locations_git_lab_configs_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.projects().locations_git_lab_configs_list(opt.value_of("parent").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "page-token" => {
+                    call = call.page_token(value.unwrap_or(""));
+                },
+                "page-size" => {
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["page-size", "page-token"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_locations_git_lab_configs_patch(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "enterprise-config.host-uri" => Some(("enterpriseConfig.hostUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "enterprise-config.service-directory-config.service" => Some(("enterpriseConfig.serviceDirectoryConfig.service", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "enterprise-config.ssl-ca" => Some(("enterpriseConfig.sslCa", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "secrets.api-access-token-version" => Some(("secrets.apiAccessTokenVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "secrets.api-key-version" => Some(("secrets.apiKeyVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "secrets.read-access-token-version" => Some(("secrets.readAccessTokenVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "secrets.webhook-secret-version" => Some(("secrets.webhookSecretVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "username" => Some(("username", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "webhook-key" => Some(("webhookKey", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["api-access-token-version", "api-key-version", "create-time", "enterprise-config", "host-uri", "name", "read-access-token-version", "secrets", "service", "service-directory-config", "ssl-ca", "username", "webhook-key", "webhook-secret-version"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::GitLabConfig = json::value::from_value(object).unwrap();
+        let mut call = self.hub.projects().locations_git_lab_configs_patch(request, opt.value_of("name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "update-mask" => {
+                    call = call.update_mask(        value.map(|v| arg_from_str(v, err, "update-mask", "google-fieldmask")).unwrap_or(FieldMask::default()));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["update-mask"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_locations_git_lab_configs_remove_git_lab_connected_repository(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "connected-repository.id" => Some(("connectedRepository.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "connected-repository.webhook-id" => Some(("connectedRepository.webhookId", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["connected-repository", "id", "webhook-id"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::RemoveGitLabConnectedRepositoryRequest = json::value::from_value(object).unwrap();
+        let mut call = self.hub.projects().locations_git_lab_configs_remove_git_lab_connected_repository(request, opt.value_of("config").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_locations_git_lab_configs_repos_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.projects().locations_git_lab_configs_repos_list(opt.value_of("parent").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "page-token" => {
+                    call = call.page_token(value.unwrap_or(""));
+                },
+                "page-size" => {
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["page-size", "page-token"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -2861,7 +3450,7 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "update-mask" => {
-                    call = call.update_mask(value.unwrap_or(""));
+                    call = call.update_mask(        value.map(|v| arg_from_str(v, err, "update-mask", "google-fieldmask")).unwrap_or(FieldMask::default()));
                 },
                 _ => {
                     let mut found = false;
@@ -3190,14 +3779,42 @@ where
                     "github.push.branch" => Some(("github.push.branch", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "github.push.invert-regex" => Some(("github.push.invertRegex", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "github.push.tag" => Some(("github.push.tag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "gitlab-enterprise-events-config.gitlab-config.create-time" => Some(("gitlabEnterpriseEventsConfig.gitlabConfig.createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "gitlab-enterprise-events-config.gitlab-config.enterprise-config.host-uri" => Some(("gitlabEnterpriseEventsConfig.gitlabConfig.enterpriseConfig.hostUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "gitlab-enterprise-events-config.gitlab-config.enterprise-config.service-directory-config.service" => Some(("gitlabEnterpriseEventsConfig.gitlabConfig.enterpriseConfig.serviceDirectoryConfig.service", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "gitlab-enterprise-events-config.gitlab-config.enterprise-config.ssl-ca" => Some(("gitlabEnterpriseEventsConfig.gitlabConfig.enterpriseConfig.sslCa", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "gitlab-enterprise-events-config.gitlab-config.name" => Some(("gitlabEnterpriseEventsConfig.gitlabConfig.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "gitlab-enterprise-events-config.gitlab-config.secrets.api-access-token-version" => Some(("gitlabEnterpriseEventsConfig.gitlabConfig.secrets.apiAccessTokenVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "gitlab-enterprise-events-config.gitlab-config.secrets.api-key-version" => Some(("gitlabEnterpriseEventsConfig.gitlabConfig.secrets.apiKeyVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "gitlab-enterprise-events-config.gitlab-config.secrets.read-access-token-version" => Some(("gitlabEnterpriseEventsConfig.gitlabConfig.secrets.readAccessTokenVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "gitlab-enterprise-events-config.gitlab-config.secrets.webhook-secret-version" => Some(("gitlabEnterpriseEventsConfig.gitlabConfig.secrets.webhookSecretVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "gitlab-enterprise-events-config.gitlab-config.username" => Some(("gitlabEnterpriseEventsConfig.gitlabConfig.username", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "gitlab-enterprise-events-config.gitlab-config.webhook-key" => Some(("gitlabEnterpriseEventsConfig.gitlabConfig.webhookKey", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "gitlab-enterprise-events-config.gitlab-config-resource" => Some(("gitlabEnterpriseEventsConfig.gitlabConfigResource", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "gitlab-enterprise-events-config.project-namespace" => Some(("gitlabEnterpriseEventsConfig.projectNamespace", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "gitlab-enterprise-events-config.pull-request.branch" => Some(("gitlabEnterpriseEventsConfig.pullRequest.branch", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "gitlab-enterprise-events-config.pull-request.comment-control" => Some(("gitlabEnterpriseEventsConfig.pullRequest.commentControl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "gitlab-enterprise-events-config.pull-request.invert-regex" => Some(("gitlabEnterpriseEventsConfig.pullRequest.invertRegex", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "gitlab-enterprise-events-config.push.branch" => Some(("gitlabEnterpriseEventsConfig.push.branch", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "gitlab-enterprise-events-config.push.invert-regex" => Some(("gitlabEnterpriseEventsConfig.push.invertRegex", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "gitlab-enterprise-events-config.push.tag" => Some(("gitlabEnterpriseEventsConfig.push.tag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "ignored-files" => Some(("ignoredFiles", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "include-build-logs" => Some(("includeBuildLogs", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "included-files" => Some(("includedFiles", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "pubsub-config.service-account-email" => Some(("pubsubConfig.serviceAccountEmail", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "pubsub-config.state" => Some(("pubsubConfig.state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "pubsub-config.subscription" => Some(("pubsubConfig.subscription", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "pubsub-config.topic" => Some(("pubsubConfig.topic", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "repository-event-config.pull-request.branch" => Some(("repositoryEventConfig.pullRequest.branch", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "repository-event-config.pull-request.comment-control" => Some(("repositoryEventConfig.pullRequest.commentControl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "repository-event-config.pull-request.invert-regex" => Some(("repositoryEventConfig.pullRequest.invertRegex", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "repository-event-config.push.branch" => Some(("repositoryEventConfig.push.branch", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "repository-event-config.push.invert-regex" => Some(("repositoryEventConfig.push.invertRegex", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "repository-event-config.push.tag" => Some(("repositoryEventConfig.push.tag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "repository-event-config.repository" => Some(("repositoryEventConfig.repository", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "repository-event-config.repository-type" => Some(("repositoryEventConfig.repositoryType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "resource-name" => Some(("resourceName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "service-account" => Some(("serviceAccount", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "source-to-build.bitbucket-server-config" => Some(("sourceToBuild.bitbucketServerConfig", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -3218,7 +3835,7 @@ where
                     "webhook-config.secret" => Some(("webhookConfig.secret", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "webhook-config.state" => Some(("webhookConfig.state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["admin-access-token-version-name", "api-key", "approval", "approval-config", "approval-required", "approval-time", "approver-account", "artifact-manifest", "artifact-timing", "artifacts", "autodetect", "bitbucket-server-config", "bitbucket-server-config-resource", "bitbucket-server-trigger-config", "branch", "branch-name", "bucket", "build", "build-step-images", "build-step-outputs", "build-trigger-id", "comment", "comment-control", "commit-sha", "config", "create-time", "decision", "description", "detail", "dir", "disabled", "disk-size-gb", "dynamic-substitutions", "end-time", "enterprise-config-resource-name", "env", "event-type", "failure-info", "filename", "filter", "finish-time", "generation", "git-file-source", "github", "github-enterprise-config", "host-uri", "id", "ignored-files", "images", "included-files", "installation-id", "invert-regex", "location", "log-streaming-option", "log-url", "logging", "logs-bucket", "machine-type", "name", "num-artifacts", "object", "objects", "options", "owner", "path", "paths", "peered-network", "pool", "project-id", "project-key", "pubsub-config", "pull-request", "push", "queue-ttl", "read-access-token-version-name", "ref", "repo-name", "repo-slug", "repo-source", "repo-type", "requested-verify-option", "resolved-repo-source", "resolved-storage-source", "resolved-storage-source-manifest", "resource-name", "result", "results", "revision", "secret", "secret-env", "secrets", "service-account", "service-account-email", "source", "source-provenance", "source-provenance-hash", "source-to-build", "ssl-ca", "start-time", "state", "status", "status-detail", "storage-source", "storage-source-manifest", "subscription", "substitution-option", "substitutions", "tag", "tag-name", "tags", "timeout", "timing", "topic", "trigger-template", "type", "uri", "url", "username", "webhook-config", "webhook-key", "webhook-secret-version-name", "worker-pool"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["admin-access-token-version-name", "api-access-token-version", "api-key", "api-key-version", "approval", "approval-config", "approval-required", "approval-time", "approver-account", "artifact-manifest", "artifact-timing", "artifacts", "autodetect", "bitbucket-server-config", "bitbucket-server-config-resource", "bitbucket-server-trigger-config", "branch", "branch-name", "bucket", "build", "build-step-images", "build-step-outputs", "build-trigger-id", "comment", "comment-control", "commit-sha", "config", "create-time", "decision", "description", "detail", "dir", "disabled", "disk-size-gb", "dynamic-substitutions", "end-time", "enterprise-config", "enterprise-config-resource-name", "env", "event-type", "failure-info", "filename", "filter", "finish-time", "generation", "git-file-source", "github", "github-enterprise-config", "gitlab-config", "gitlab-config-resource", "gitlab-enterprise-events-config", "host-uri", "id", "ignored-files", "images", "include-build-logs", "included-files", "installation-id", "invert-regex", "location", "log-streaming-option", "log-url", "logging", "logs-bucket", "machine-type", "name", "num-artifacts", "object", "objects", "options", "owner", "path", "paths", "peered-network", "pool", "project-id", "project-key", "project-namespace", "pubsub-config", "pull-request", "push", "queue-ttl", "read-access-token-version", "read-access-token-version-name", "ref", "repo-name", "repo-slug", "repo-source", "repo-type", "repository", "repository-event-config", "repository-type", "requested-verify-option", "resolved-repo-source", "resolved-storage-source", "resolved-storage-source-manifest", "resource-name", "result", "results", "revision", "secret", "secret-env", "secrets", "service", "service-account", "service-account-email", "service-directory-config", "source", "source-provenance", "source-provenance-hash", "source-to-build", "ssl-ca", "start-time", "state", "status", "status-detail", "storage-source", "storage-source-manifest", "subscription", "substitution-option", "substitutions", "tag", "tag-name", "tags", "timeout", "timing", "topic", "trigger-template", "type", "uri", "url", "username", "webhook-config", "webhook-key", "webhook-secret-version", "webhook-secret-version-name", "worker-pool"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -3413,7 +4030,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -3606,14 +4223,42 @@ where
                     "github.push.branch" => Some(("github.push.branch", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "github.push.invert-regex" => Some(("github.push.invertRegex", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "github.push.tag" => Some(("github.push.tag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "gitlab-enterprise-events-config.gitlab-config.create-time" => Some(("gitlabEnterpriseEventsConfig.gitlabConfig.createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "gitlab-enterprise-events-config.gitlab-config.enterprise-config.host-uri" => Some(("gitlabEnterpriseEventsConfig.gitlabConfig.enterpriseConfig.hostUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "gitlab-enterprise-events-config.gitlab-config.enterprise-config.service-directory-config.service" => Some(("gitlabEnterpriseEventsConfig.gitlabConfig.enterpriseConfig.serviceDirectoryConfig.service", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "gitlab-enterprise-events-config.gitlab-config.enterprise-config.ssl-ca" => Some(("gitlabEnterpriseEventsConfig.gitlabConfig.enterpriseConfig.sslCa", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "gitlab-enterprise-events-config.gitlab-config.name" => Some(("gitlabEnterpriseEventsConfig.gitlabConfig.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "gitlab-enterprise-events-config.gitlab-config.secrets.api-access-token-version" => Some(("gitlabEnterpriseEventsConfig.gitlabConfig.secrets.apiAccessTokenVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "gitlab-enterprise-events-config.gitlab-config.secrets.api-key-version" => Some(("gitlabEnterpriseEventsConfig.gitlabConfig.secrets.apiKeyVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "gitlab-enterprise-events-config.gitlab-config.secrets.read-access-token-version" => Some(("gitlabEnterpriseEventsConfig.gitlabConfig.secrets.readAccessTokenVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "gitlab-enterprise-events-config.gitlab-config.secrets.webhook-secret-version" => Some(("gitlabEnterpriseEventsConfig.gitlabConfig.secrets.webhookSecretVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "gitlab-enterprise-events-config.gitlab-config.username" => Some(("gitlabEnterpriseEventsConfig.gitlabConfig.username", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "gitlab-enterprise-events-config.gitlab-config.webhook-key" => Some(("gitlabEnterpriseEventsConfig.gitlabConfig.webhookKey", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "gitlab-enterprise-events-config.gitlab-config-resource" => Some(("gitlabEnterpriseEventsConfig.gitlabConfigResource", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "gitlab-enterprise-events-config.project-namespace" => Some(("gitlabEnterpriseEventsConfig.projectNamespace", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "gitlab-enterprise-events-config.pull-request.branch" => Some(("gitlabEnterpriseEventsConfig.pullRequest.branch", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "gitlab-enterprise-events-config.pull-request.comment-control" => Some(("gitlabEnterpriseEventsConfig.pullRequest.commentControl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "gitlab-enterprise-events-config.pull-request.invert-regex" => Some(("gitlabEnterpriseEventsConfig.pullRequest.invertRegex", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "gitlab-enterprise-events-config.push.branch" => Some(("gitlabEnterpriseEventsConfig.push.branch", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "gitlab-enterprise-events-config.push.invert-regex" => Some(("gitlabEnterpriseEventsConfig.push.invertRegex", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "gitlab-enterprise-events-config.push.tag" => Some(("gitlabEnterpriseEventsConfig.push.tag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "ignored-files" => Some(("ignoredFiles", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "include-build-logs" => Some(("includeBuildLogs", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "included-files" => Some(("includedFiles", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "pubsub-config.service-account-email" => Some(("pubsubConfig.serviceAccountEmail", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "pubsub-config.state" => Some(("pubsubConfig.state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "pubsub-config.subscription" => Some(("pubsubConfig.subscription", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "pubsub-config.topic" => Some(("pubsubConfig.topic", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "repository-event-config.pull-request.branch" => Some(("repositoryEventConfig.pullRequest.branch", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "repository-event-config.pull-request.comment-control" => Some(("repositoryEventConfig.pullRequest.commentControl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "repository-event-config.pull-request.invert-regex" => Some(("repositoryEventConfig.pullRequest.invertRegex", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "repository-event-config.push.branch" => Some(("repositoryEventConfig.push.branch", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "repository-event-config.push.invert-regex" => Some(("repositoryEventConfig.push.invertRegex", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "repository-event-config.push.tag" => Some(("repositoryEventConfig.push.tag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "repository-event-config.repository" => Some(("repositoryEventConfig.repository", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "repository-event-config.repository-type" => Some(("repositoryEventConfig.repositoryType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "resource-name" => Some(("resourceName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "service-account" => Some(("serviceAccount", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "source-to-build.bitbucket-server-config" => Some(("sourceToBuild.bitbucketServerConfig", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -3634,7 +4279,7 @@ where
                     "webhook-config.secret" => Some(("webhookConfig.secret", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "webhook-config.state" => Some(("webhookConfig.state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["admin-access-token-version-name", "api-key", "approval", "approval-config", "approval-required", "approval-time", "approver-account", "artifact-manifest", "artifact-timing", "artifacts", "autodetect", "bitbucket-server-config", "bitbucket-server-config-resource", "bitbucket-server-trigger-config", "branch", "branch-name", "bucket", "build", "build-step-images", "build-step-outputs", "build-trigger-id", "comment", "comment-control", "commit-sha", "config", "create-time", "decision", "description", "detail", "dir", "disabled", "disk-size-gb", "dynamic-substitutions", "end-time", "enterprise-config-resource-name", "env", "event-type", "failure-info", "filename", "filter", "finish-time", "generation", "git-file-source", "github", "github-enterprise-config", "host-uri", "id", "ignored-files", "images", "included-files", "installation-id", "invert-regex", "location", "log-streaming-option", "log-url", "logging", "logs-bucket", "machine-type", "name", "num-artifacts", "object", "objects", "options", "owner", "path", "paths", "peered-network", "pool", "project-id", "project-key", "pubsub-config", "pull-request", "push", "queue-ttl", "read-access-token-version-name", "ref", "repo-name", "repo-slug", "repo-source", "repo-type", "requested-verify-option", "resolved-repo-source", "resolved-storage-source", "resolved-storage-source-manifest", "resource-name", "result", "results", "revision", "secret", "secret-env", "secrets", "service-account", "service-account-email", "source", "source-provenance", "source-provenance-hash", "source-to-build", "ssl-ca", "start-time", "state", "status", "status-detail", "storage-source", "storage-source-manifest", "subscription", "substitution-option", "substitutions", "tag", "tag-name", "tags", "timeout", "timing", "topic", "trigger-template", "type", "uri", "url", "username", "webhook-config", "webhook-key", "webhook-secret-version-name", "worker-pool"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["admin-access-token-version-name", "api-access-token-version", "api-key", "api-key-version", "approval", "approval-config", "approval-required", "approval-time", "approver-account", "artifact-manifest", "artifact-timing", "artifacts", "autodetect", "bitbucket-server-config", "bitbucket-server-config-resource", "bitbucket-server-trigger-config", "branch", "branch-name", "bucket", "build", "build-step-images", "build-step-outputs", "build-trigger-id", "comment", "comment-control", "commit-sha", "config", "create-time", "decision", "description", "detail", "dir", "disabled", "disk-size-gb", "dynamic-substitutions", "end-time", "enterprise-config", "enterprise-config-resource-name", "env", "event-type", "failure-info", "filename", "filter", "finish-time", "generation", "git-file-source", "github", "github-enterprise-config", "gitlab-config", "gitlab-config-resource", "gitlab-enterprise-events-config", "host-uri", "id", "ignored-files", "images", "include-build-logs", "included-files", "installation-id", "invert-regex", "location", "log-streaming-option", "log-url", "logging", "logs-bucket", "machine-type", "name", "num-artifacts", "object", "objects", "options", "owner", "path", "paths", "peered-network", "pool", "project-id", "project-key", "project-namespace", "pubsub-config", "pull-request", "push", "queue-ttl", "read-access-token-version", "read-access-token-version-name", "ref", "repo-name", "repo-slug", "repo-source", "repo-type", "repository", "repository-event-config", "repository-type", "requested-verify-option", "resolved-repo-source", "resolved-storage-source", "resolved-storage-source-manifest", "resource-name", "result", "results", "revision", "secret", "secret-env", "secrets", "service", "service-account", "service-account-email", "service-directory-config", "source", "source-provenance", "source-provenance-hash", "source-to-build", "ssl-ca", "start-time", "state", "status", "status-detail", "storage-source", "storage-source-manifest", "subscription", "substitution-option", "substitutions", "tag", "tag-name", "tags", "timeout", "timing", "topic", "trigger-template", "type", "uri", "url", "username", "webhook-config", "webhook-key", "webhook-secret-version", "webhook-secret-version-name", "worker-pool"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -3919,13 +4564,14 @@ where
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "private-pool-v1-config.network-config.egress-option" => Some(("privatePoolV1Config.networkConfig.egressOption", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "private-pool-v1-config.network-config.peered-network" => Some(("privatePoolV1Config.networkConfig.peeredNetwork", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "private-pool-v1-config.network-config.peered-network-ip-range" => Some(("privatePoolV1Config.networkConfig.peeredNetworkIpRange", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "private-pool-v1-config.worker-config.disk-size-gb" => Some(("privatePoolV1Config.workerConfig.diskSizeGb", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "private-pool-v1-config.worker-config.machine-type" => Some(("privatePoolV1Config.workerConfig.machineType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "state" => Some(("state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "uid" => Some(("uid", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["annotations", "create-time", "delete-time", "disk-size-gb", "display-name", "egress-option", "etag", "machine-type", "name", "network-config", "peered-network", "private-pool-v1-config", "state", "uid", "update-time", "worker-config"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["annotations", "create-time", "delete-time", "disk-size-gb", "display-name", "egress-option", "etag", "machine-type", "name", "network-config", "peered-network", "peered-network-ip-range", "private-pool-v1-config", "state", "uid", "update-time", "worker-config"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -3943,7 +4589,7 @@ where
                     call = call.worker_pool_id(value.unwrap_or(""));
                 },
                 "validate-only" => {
-                    call = call.validate_only(arg_from_str(value.unwrap_or("false"), err, "validate-only", "boolean"));
+                    call = call.validate_only(        value.map(|v| arg_from_str(v, err, "validate-only", "boolean")).unwrap_or(false));
                 },
                 _ => {
                     let mut found = false;
@@ -3999,13 +4645,13 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "validate-only" => {
-                    call = call.validate_only(arg_from_str(value.unwrap_or("false"), err, "validate-only", "boolean"));
+                    call = call.validate_only(        value.map(|v| arg_from_str(v, err, "validate-only", "boolean")).unwrap_or(false));
                 },
                 "etag" => {
                     call = call.etag(value.unwrap_or(""));
                 },
                 "allow-missing" => {
-                    call = call.allow_missing(arg_from_str(value.unwrap_or("false"), err, "allow-missing", "boolean"));
+                    call = call.allow_missing(        value.map(|v| arg_from_str(v, err, "allow-missing", "boolean")).unwrap_or(false));
                 },
                 _ => {
                     let mut found = false;
@@ -4116,7 +4762,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -4196,13 +4842,14 @@ where
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "private-pool-v1-config.network-config.egress-option" => Some(("privatePoolV1Config.networkConfig.egressOption", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "private-pool-v1-config.network-config.peered-network" => Some(("privatePoolV1Config.networkConfig.peeredNetwork", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "private-pool-v1-config.network-config.peered-network-ip-range" => Some(("privatePoolV1Config.networkConfig.peeredNetworkIpRange", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "private-pool-v1-config.worker-config.disk-size-gb" => Some(("privatePoolV1Config.workerConfig.diskSizeGb", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "private-pool-v1-config.worker-config.machine-type" => Some(("privatePoolV1Config.workerConfig.machineType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "state" => Some(("state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "uid" => Some(("uid", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["annotations", "create-time", "delete-time", "disk-size-gb", "display-name", "egress-option", "etag", "machine-type", "name", "network-config", "peered-network", "private-pool-v1-config", "state", "uid", "update-time", "worker-config"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["annotations", "create-time", "delete-time", "disk-size-gb", "display-name", "egress-option", "etag", "machine-type", "name", "network-config", "peered-network", "peered-network-ip-range", "private-pool-v1-config", "state", "uid", "update-time", "worker-config"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -4217,10 +4864,10 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "validate-only" => {
-                    call = call.validate_only(arg_from_str(value.unwrap_or("false"), err, "validate-only", "boolean"));
+                    call = call.validate_only(        value.map(|v| arg_from_str(v, err, "validate-only", "boolean")).unwrap_or(false));
                 },
                 "update-mask" => {
-                    call = call.update_mask(value.unwrap_or(""));
+                    call = call.update_mask(        value.map(|v| arg_from_str(v, err, "update-mask", "google-fieldmask")).unwrap_or(FieldMask::default()));
                 },
                 _ => {
                     let mut found = false;
@@ -4413,14 +5060,42 @@ where
                     "github.push.branch" => Some(("github.push.branch", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "github.push.invert-regex" => Some(("github.push.invertRegex", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "github.push.tag" => Some(("github.push.tag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "gitlab-enterprise-events-config.gitlab-config.create-time" => Some(("gitlabEnterpriseEventsConfig.gitlabConfig.createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "gitlab-enterprise-events-config.gitlab-config.enterprise-config.host-uri" => Some(("gitlabEnterpriseEventsConfig.gitlabConfig.enterpriseConfig.hostUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "gitlab-enterprise-events-config.gitlab-config.enterprise-config.service-directory-config.service" => Some(("gitlabEnterpriseEventsConfig.gitlabConfig.enterpriseConfig.serviceDirectoryConfig.service", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "gitlab-enterprise-events-config.gitlab-config.enterprise-config.ssl-ca" => Some(("gitlabEnterpriseEventsConfig.gitlabConfig.enterpriseConfig.sslCa", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "gitlab-enterprise-events-config.gitlab-config.name" => Some(("gitlabEnterpriseEventsConfig.gitlabConfig.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "gitlab-enterprise-events-config.gitlab-config.secrets.api-access-token-version" => Some(("gitlabEnterpriseEventsConfig.gitlabConfig.secrets.apiAccessTokenVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "gitlab-enterprise-events-config.gitlab-config.secrets.api-key-version" => Some(("gitlabEnterpriseEventsConfig.gitlabConfig.secrets.apiKeyVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "gitlab-enterprise-events-config.gitlab-config.secrets.read-access-token-version" => Some(("gitlabEnterpriseEventsConfig.gitlabConfig.secrets.readAccessTokenVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "gitlab-enterprise-events-config.gitlab-config.secrets.webhook-secret-version" => Some(("gitlabEnterpriseEventsConfig.gitlabConfig.secrets.webhookSecretVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "gitlab-enterprise-events-config.gitlab-config.username" => Some(("gitlabEnterpriseEventsConfig.gitlabConfig.username", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "gitlab-enterprise-events-config.gitlab-config.webhook-key" => Some(("gitlabEnterpriseEventsConfig.gitlabConfig.webhookKey", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "gitlab-enterprise-events-config.gitlab-config-resource" => Some(("gitlabEnterpriseEventsConfig.gitlabConfigResource", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "gitlab-enterprise-events-config.project-namespace" => Some(("gitlabEnterpriseEventsConfig.projectNamespace", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "gitlab-enterprise-events-config.pull-request.branch" => Some(("gitlabEnterpriseEventsConfig.pullRequest.branch", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "gitlab-enterprise-events-config.pull-request.comment-control" => Some(("gitlabEnterpriseEventsConfig.pullRequest.commentControl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "gitlab-enterprise-events-config.pull-request.invert-regex" => Some(("gitlabEnterpriseEventsConfig.pullRequest.invertRegex", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "gitlab-enterprise-events-config.push.branch" => Some(("gitlabEnterpriseEventsConfig.push.branch", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "gitlab-enterprise-events-config.push.invert-regex" => Some(("gitlabEnterpriseEventsConfig.push.invertRegex", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "gitlab-enterprise-events-config.push.tag" => Some(("gitlabEnterpriseEventsConfig.push.tag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "ignored-files" => Some(("ignoredFiles", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "include-build-logs" => Some(("includeBuildLogs", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "included-files" => Some(("includedFiles", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "pubsub-config.service-account-email" => Some(("pubsubConfig.serviceAccountEmail", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "pubsub-config.state" => Some(("pubsubConfig.state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "pubsub-config.subscription" => Some(("pubsubConfig.subscription", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "pubsub-config.topic" => Some(("pubsubConfig.topic", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "repository-event-config.pull-request.branch" => Some(("repositoryEventConfig.pullRequest.branch", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "repository-event-config.pull-request.comment-control" => Some(("repositoryEventConfig.pullRequest.commentControl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "repository-event-config.pull-request.invert-regex" => Some(("repositoryEventConfig.pullRequest.invertRegex", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "repository-event-config.push.branch" => Some(("repositoryEventConfig.push.branch", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "repository-event-config.push.invert-regex" => Some(("repositoryEventConfig.push.invertRegex", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "repository-event-config.push.tag" => Some(("repositoryEventConfig.push.tag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "repository-event-config.repository" => Some(("repositoryEventConfig.repository", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "repository-event-config.repository-type" => Some(("repositoryEventConfig.repositoryType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "resource-name" => Some(("resourceName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "service-account" => Some(("serviceAccount", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "source-to-build.bitbucket-server-config" => Some(("sourceToBuild.bitbucketServerConfig", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -4441,7 +5116,7 @@ where
                     "webhook-config.secret" => Some(("webhookConfig.secret", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "webhook-config.state" => Some(("webhookConfig.state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["admin-access-token-version-name", "api-key", "approval", "approval-config", "approval-required", "approval-time", "approver-account", "artifact-manifest", "artifact-timing", "artifacts", "autodetect", "bitbucket-server-config", "bitbucket-server-config-resource", "bitbucket-server-trigger-config", "branch", "branch-name", "bucket", "build", "build-step-images", "build-step-outputs", "build-trigger-id", "comment", "comment-control", "commit-sha", "config", "create-time", "decision", "description", "detail", "dir", "disabled", "disk-size-gb", "dynamic-substitutions", "end-time", "enterprise-config-resource-name", "env", "event-type", "failure-info", "filename", "filter", "finish-time", "generation", "git-file-source", "github", "github-enterprise-config", "host-uri", "id", "ignored-files", "images", "included-files", "installation-id", "invert-regex", "location", "log-streaming-option", "log-url", "logging", "logs-bucket", "machine-type", "name", "num-artifacts", "object", "objects", "options", "owner", "path", "paths", "peered-network", "pool", "project-id", "project-key", "pubsub-config", "pull-request", "push", "queue-ttl", "read-access-token-version-name", "ref", "repo-name", "repo-slug", "repo-source", "repo-type", "requested-verify-option", "resolved-repo-source", "resolved-storage-source", "resolved-storage-source-manifest", "resource-name", "result", "results", "revision", "secret", "secret-env", "secrets", "service-account", "service-account-email", "source", "source-provenance", "source-provenance-hash", "source-to-build", "ssl-ca", "start-time", "state", "status", "status-detail", "storage-source", "storage-source-manifest", "subscription", "substitution-option", "substitutions", "tag", "tag-name", "tags", "timeout", "timing", "topic", "trigger-template", "type", "uri", "url", "username", "webhook-config", "webhook-key", "webhook-secret-version-name", "worker-pool"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["admin-access-token-version-name", "api-access-token-version", "api-key", "api-key-version", "approval", "approval-config", "approval-required", "approval-time", "approver-account", "artifact-manifest", "artifact-timing", "artifacts", "autodetect", "bitbucket-server-config", "bitbucket-server-config-resource", "bitbucket-server-trigger-config", "branch", "branch-name", "bucket", "build", "build-step-images", "build-step-outputs", "build-trigger-id", "comment", "comment-control", "commit-sha", "config", "create-time", "decision", "description", "detail", "dir", "disabled", "disk-size-gb", "dynamic-substitutions", "end-time", "enterprise-config", "enterprise-config-resource-name", "env", "event-type", "failure-info", "filename", "filter", "finish-time", "generation", "git-file-source", "github", "github-enterprise-config", "gitlab-config", "gitlab-config-resource", "gitlab-enterprise-events-config", "host-uri", "id", "ignored-files", "images", "include-build-logs", "included-files", "installation-id", "invert-regex", "location", "log-streaming-option", "log-url", "logging", "logs-bucket", "machine-type", "name", "num-artifacts", "object", "objects", "options", "owner", "path", "paths", "peered-network", "pool", "project-id", "project-key", "project-namespace", "pubsub-config", "pull-request", "push", "queue-ttl", "read-access-token-version", "read-access-token-version-name", "ref", "repo-name", "repo-slug", "repo-source", "repo-type", "repository", "repository-event-config", "repository-type", "requested-verify-option", "resolved-repo-source", "resolved-storage-source", "resolved-storage-source-manifest", "resource-name", "result", "results", "revision", "secret", "secret-env", "secrets", "service", "service-account", "service-account-email", "service-directory-config", "source", "source-provenance", "source-provenance-hash", "source-to-build", "ssl-ca", "start-time", "state", "status", "status-detail", "storage-source", "storage-source-manifest", "subscription", "substitution-option", "substitutions", "tag", "tag-name", "tags", "timeout", "timing", "topic", "trigger-template", "type", "uri", "url", "username", "webhook-config", "webhook-key", "webhook-secret-version", "webhook-secret-version-name", "worker-pool"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -4630,7 +5305,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -4823,14 +5498,42 @@ where
                     "github.push.branch" => Some(("github.push.branch", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "github.push.invert-regex" => Some(("github.push.invertRegex", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "github.push.tag" => Some(("github.push.tag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "gitlab-enterprise-events-config.gitlab-config.create-time" => Some(("gitlabEnterpriseEventsConfig.gitlabConfig.createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "gitlab-enterprise-events-config.gitlab-config.enterprise-config.host-uri" => Some(("gitlabEnterpriseEventsConfig.gitlabConfig.enterpriseConfig.hostUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "gitlab-enterprise-events-config.gitlab-config.enterprise-config.service-directory-config.service" => Some(("gitlabEnterpriseEventsConfig.gitlabConfig.enterpriseConfig.serviceDirectoryConfig.service", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "gitlab-enterprise-events-config.gitlab-config.enterprise-config.ssl-ca" => Some(("gitlabEnterpriseEventsConfig.gitlabConfig.enterpriseConfig.sslCa", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "gitlab-enterprise-events-config.gitlab-config.name" => Some(("gitlabEnterpriseEventsConfig.gitlabConfig.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "gitlab-enterprise-events-config.gitlab-config.secrets.api-access-token-version" => Some(("gitlabEnterpriseEventsConfig.gitlabConfig.secrets.apiAccessTokenVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "gitlab-enterprise-events-config.gitlab-config.secrets.api-key-version" => Some(("gitlabEnterpriseEventsConfig.gitlabConfig.secrets.apiKeyVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "gitlab-enterprise-events-config.gitlab-config.secrets.read-access-token-version" => Some(("gitlabEnterpriseEventsConfig.gitlabConfig.secrets.readAccessTokenVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "gitlab-enterprise-events-config.gitlab-config.secrets.webhook-secret-version" => Some(("gitlabEnterpriseEventsConfig.gitlabConfig.secrets.webhookSecretVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "gitlab-enterprise-events-config.gitlab-config.username" => Some(("gitlabEnterpriseEventsConfig.gitlabConfig.username", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "gitlab-enterprise-events-config.gitlab-config.webhook-key" => Some(("gitlabEnterpriseEventsConfig.gitlabConfig.webhookKey", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "gitlab-enterprise-events-config.gitlab-config-resource" => Some(("gitlabEnterpriseEventsConfig.gitlabConfigResource", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "gitlab-enterprise-events-config.project-namespace" => Some(("gitlabEnterpriseEventsConfig.projectNamespace", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "gitlab-enterprise-events-config.pull-request.branch" => Some(("gitlabEnterpriseEventsConfig.pullRequest.branch", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "gitlab-enterprise-events-config.pull-request.comment-control" => Some(("gitlabEnterpriseEventsConfig.pullRequest.commentControl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "gitlab-enterprise-events-config.pull-request.invert-regex" => Some(("gitlabEnterpriseEventsConfig.pullRequest.invertRegex", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "gitlab-enterprise-events-config.push.branch" => Some(("gitlabEnterpriseEventsConfig.push.branch", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "gitlab-enterprise-events-config.push.invert-regex" => Some(("gitlabEnterpriseEventsConfig.push.invertRegex", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "gitlab-enterprise-events-config.push.tag" => Some(("gitlabEnterpriseEventsConfig.push.tag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "ignored-files" => Some(("ignoredFiles", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "include-build-logs" => Some(("includeBuildLogs", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "included-files" => Some(("includedFiles", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "pubsub-config.service-account-email" => Some(("pubsubConfig.serviceAccountEmail", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "pubsub-config.state" => Some(("pubsubConfig.state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "pubsub-config.subscription" => Some(("pubsubConfig.subscription", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "pubsub-config.topic" => Some(("pubsubConfig.topic", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "repository-event-config.pull-request.branch" => Some(("repositoryEventConfig.pullRequest.branch", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "repository-event-config.pull-request.comment-control" => Some(("repositoryEventConfig.pullRequest.commentControl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "repository-event-config.pull-request.invert-regex" => Some(("repositoryEventConfig.pullRequest.invertRegex", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "repository-event-config.push.branch" => Some(("repositoryEventConfig.push.branch", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "repository-event-config.push.invert-regex" => Some(("repositoryEventConfig.push.invertRegex", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "repository-event-config.push.tag" => Some(("repositoryEventConfig.push.tag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "repository-event-config.repository" => Some(("repositoryEventConfig.repository", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "repository-event-config.repository-type" => Some(("repositoryEventConfig.repositoryType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "resource-name" => Some(("resourceName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "service-account" => Some(("serviceAccount", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "source-to-build.bitbucket-server-config" => Some(("sourceToBuild.bitbucketServerConfig", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -4851,7 +5554,7 @@ where
                     "webhook-config.secret" => Some(("webhookConfig.secret", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "webhook-config.state" => Some(("webhookConfig.state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["admin-access-token-version-name", "api-key", "approval", "approval-config", "approval-required", "approval-time", "approver-account", "artifact-manifest", "artifact-timing", "artifacts", "autodetect", "bitbucket-server-config", "bitbucket-server-config-resource", "bitbucket-server-trigger-config", "branch", "branch-name", "bucket", "build", "build-step-images", "build-step-outputs", "build-trigger-id", "comment", "comment-control", "commit-sha", "config", "create-time", "decision", "description", "detail", "dir", "disabled", "disk-size-gb", "dynamic-substitutions", "end-time", "enterprise-config-resource-name", "env", "event-type", "failure-info", "filename", "filter", "finish-time", "generation", "git-file-source", "github", "github-enterprise-config", "host-uri", "id", "ignored-files", "images", "included-files", "installation-id", "invert-regex", "location", "log-streaming-option", "log-url", "logging", "logs-bucket", "machine-type", "name", "num-artifacts", "object", "objects", "options", "owner", "path", "paths", "peered-network", "pool", "project-id", "project-key", "pubsub-config", "pull-request", "push", "queue-ttl", "read-access-token-version-name", "ref", "repo-name", "repo-slug", "repo-source", "repo-type", "requested-verify-option", "resolved-repo-source", "resolved-storage-source", "resolved-storage-source-manifest", "resource-name", "result", "results", "revision", "secret", "secret-env", "secrets", "service-account", "service-account-email", "source", "source-provenance", "source-provenance-hash", "source-to-build", "ssl-ca", "start-time", "state", "status", "status-detail", "storage-source", "storage-source-manifest", "subscription", "substitution-option", "substitutions", "tag", "tag-name", "tags", "timeout", "timing", "topic", "trigger-template", "type", "uri", "url", "username", "webhook-config", "webhook-key", "webhook-secret-version-name", "worker-pool"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["admin-access-token-version-name", "api-access-token-version", "api-key", "api-key-version", "approval", "approval-config", "approval-required", "approval-time", "approver-account", "artifact-manifest", "artifact-timing", "artifacts", "autodetect", "bitbucket-server-config", "bitbucket-server-config-resource", "bitbucket-server-trigger-config", "branch", "branch-name", "bucket", "build", "build-step-images", "build-step-outputs", "build-trigger-id", "comment", "comment-control", "commit-sha", "config", "create-time", "decision", "description", "detail", "dir", "disabled", "disk-size-gb", "dynamic-substitutions", "end-time", "enterprise-config", "enterprise-config-resource-name", "env", "event-type", "failure-info", "filename", "filter", "finish-time", "generation", "git-file-source", "github", "github-enterprise-config", "gitlab-config", "gitlab-config-resource", "gitlab-enterprise-events-config", "host-uri", "id", "ignored-files", "images", "include-build-logs", "included-files", "installation-id", "invert-regex", "location", "log-streaming-option", "log-url", "logging", "logs-bucket", "machine-type", "name", "num-artifacts", "object", "objects", "options", "owner", "path", "paths", "peered-network", "pool", "project-id", "project-key", "project-namespace", "pubsub-config", "pull-request", "push", "queue-ttl", "read-access-token-version", "read-access-token-version-name", "ref", "repo-name", "repo-slug", "repo-source", "repo-type", "repository", "repository-event-config", "repository-type", "requested-verify-option", "resolved-repo-source", "resolved-storage-source", "resolved-storage-source-manifest", "resource-name", "result", "results", "revision", "secret", "secret-env", "secrets", "service", "service-account", "service-account-email", "service-directory-config", "source", "source-provenance", "source-provenance-hash", "source-to-build", "ssl-ca", "start-time", "state", "status", "status-detail", "storage-source", "storage-source-manifest", "subscription", "substitution-option", "substitutions", "tag", "tag-name", "tags", "timeout", "timing", "topic", "trigger-template", "type", "uri", "url", "username", "webhook-config", "webhook-key", "webhook-secret-version", "webhook-secret-version-name", "worker-pool"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -5102,6 +5805,17 @@ where
         let mut call_result: Result<(), DoitError> = Ok(());
         let mut err_opt: Option<InvalidOptionsError> = None;
         match self.opt.subcommand() {
+            ("github-dot-com-webhook", Some(opt)) => {
+                match opt.subcommand() {
+                    ("receive", Some(opt)) => {
+                        call_result = self._github_dot_com_webhook_receive(opt, dry_run, &mut err).await;
+                    },
+                    _ => {
+                        err.issues.push(CLIError::MissingMethodError("github-dot-com-webhook".to_string()));
+                        writeln!(io::stderr(), "{}\n", opt.usage()).ok();
+                    }
+                }
+            },
             ("locations", Some(opt)) => {
                 match opt.subcommand() {
                     ("regional-webhook", Some(opt)) => {
@@ -5173,9 +5887,6 @@ where
                     ("github-enterprise-configs-patch", Some(opt)) => {
                         call_result = self._projects_github_enterprise_configs_patch(opt, dry_run, &mut err).await;
                     },
-                    ("locations-bitbucket-server-configs-add-bitbucket-server-connected-repository", Some(opt)) => {
-                        call_result = self._projects_locations_bitbucket_server_configs_add_bitbucket_server_connected_repository(opt, dry_run, &mut err).await;
-                    },
                     ("locations-bitbucket-server-configs-connected-repositories-batch-create", Some(opt)) => {
                         call_result = self._projects_locations_bitbucket_server_configs_connected_repositories_batch_create(opt, dry_run, &mut err).await;
                     },
@@ -5217,6 +5928,30 @@ where
                     },
                     ("locations-builds-retry", Some(opt)) => {
                         call_result = self._projects_locations_builds_retry(opt, dry_run, &mut err).await;
+                    },
+                    ("locations-git-lab-configs-connected-repositories-batch-create", Some(opt)) => {
+                        call_result = self._projects_locations_git_lab_configs_connected_repositories_batch_create(opt, dry_run, &mut err).await;
+                    },
+                    ("locations-git-lab-configs-create", Some(opt)) => {
+                        call_result = self._projects_locations_git_lab_configs_create(opt, dry_run, &mut err).await;
+                    },
+                    ("locations-git-lab-configs-delete", Some(opt)) => {
+                        call_result = self._projects_locations_git_lab_configs_delete(opt, dry_run, &mut err).await;
+                    },
+                    ("locations-git-lab-configs-get", Some(opt)) => {
+                        call_result = self._projects_locations_git_lab_configs_get(opt, dry_run, &mut err).await;
+                    },
+                    ("locations-git-lab-configs-list", Some(opt)) => {
+                        call_result = self._projects_locations_git_lab_configs_list(opt, dry_run, &mut err).await;
+                    },
+                    ("locations-git-lab-configs-patch", Some(opt)) => {
+                        call_result = self._projects_locations_git_lab_configs_patch(opt, dry_run, &mut err).await;
+                    },
+                    ("locations-git-lab-configs-remove-git-lab-connected-repository", Some(opt)) => {
+                        call_result = self._projects_locations_git_lab_configs_remove_git_lab_connected_repository(opt, dry_run, &mut err).await;
+                    },
+                    ("locations-git-lab-configs-repos-list", Some(opt)) => {
+                        call_result = self._projects_locations_git_lab_configs_repos_list(opt, dry_run, &mut err).await;
                     },
                     ("locations-github-enterprise-configs-create", Some(opt)) => {
                         call_result = self._projects_locations_github_enterprise_configs_create(opt, dry_run, &mut err).await;
@@ -5375,6 +6110,31 @@ where
 async fn main() {
     let mut exit_status = 0i32;
     let arg_data = [
+        ("github-dot-com-webhook", "methods: 'receive'", vec![
+            ("receive",
+                    Some(r##"ReceiveGitHubDotComWebhook is called when the API receives a github.com webhook."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_cloudbuild1_cli/github-dot-com-webhook_receive",
+                  vec![
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ]),
+        
         ("locations", "methods: 'regional-webhook'", vec![
             ("regional-webhook",
                     Some(r##"ReceiveRegionalWebhook is called when the API receives a regional GitHub webhook."##),
@@ -5484,7 +6244,7 @@ async fn main() {
                   ]),
             ]),
         
-        ("projects", "methods: 'builds-approve', 'builds-cancel', 'builds-create', 'builds-get', 'builds-list', 'builds-retry', 'github-enterprise-configs-create', 'github-enterprise-configs-delete', 'github-enterprise-configs-get', 'github-enterprise-configs-list', 'github-enterprise-configs-patch', 'locations-bitbucket-server-configs-add-bitbucket-server-connected-repository', 'locations-bitbucket-server-configs-connected-repositories-batch-create', 'locations-bitbucket-server-configs-create', 'locations-bitbucket-server-configs-delete', 'locations-bitbucket-server-configs-get', 'locations-bitbucket-server-configs-list', 'locations-bitbucket-server-configs-patch', 'locations-bitbucket-server-configs-remove-bitbucket-server-connected-repository', 'locations-bitbucket-server-configs-repos-list', 'locations-builds-approve', 'locations-builds-cancel', 'locations-builds-create', 'locations-builds-get', 'locations-builds-list', 'locations-builds-retry', 'locations-github-enterprise-configs-create', 'locations-github-enterprise-configs-delete', 'locations-github-enterprise-configs-get', 'locations-github-enterprise-configs-list', 'locations-github-enterprise-configs-patch', 'locations-operations-cancel', 'locations-operations-get', 'locations-triggers-create', 'locations-triggers-delete', 'locations-triggers-get', 'locations-triggers-list', 'locations-triggers-patch', 'locations-triggers-run', 'locations-triggers-webhook', 'locations-worker-pools-create', 'locations-worker-pools-delete', 'locations-worker-pools-get', 'locations-worker-pools-list', 'locations-worker-pools-patch', 'triggers-create', 'triggers-delete', 'triggers-get', 'triggers-list', 'triggers-patch', 'triggers-run' and 'triggers-webhook'", vec![
+        ("projects", "methods: 'builds-approve', 'builds-cancel', 'builds-create', 'builds-get', 'builds-list', 'builds-retry', 'github-enterprise-configs-create', 'github-enterprise-configs-delete', 'github-enterprise-configs-get', 'github-enterprise-configs-list', 'github-enterprise-configs-patch', 'locations-bitbucket-server-configs-connected-repositories-batch-create', 'locations-bitbucket-server-configs-create', 'locations-bitbucket-server-configs-delete', 'locations-bitbucket-server-configs-get', 'locations-bitbucket-server-configs-list', 'locations-bitbucket-server-configs-patch', 'locations-bitbucket-server-configs-remove-bitbucket-server-connected-repository', 'locations-bitbucket-server-configs-repos-list', 'locations-builds-approve', 'locations-builds-cancel', 'locations-builds-create', 'locations-builds-get', 'locations-builds-list', 'locations-builds-retry', 'locations-git-lab-configs-connected-repositories-batch-create', 'locations-git-lab-configs-create', 'locations-git-lab-configs-delete', 'locations-git-lab-configs-get', 'locations-git-lab-configs-list', 'locations-git-lab-configs-patch', 'locations-git-lab-configs-remove-git-lab-connected-repository', 'locations-git-lab-configs-repos-list', 'locations-github-enterprise-configs-create', 'locations-github-enterprise-configs-delete', 'locations-github-enterprise-configs-get', 'locations-github-enterprise-configs-list', 'locations-github-enterprise-configs-patch', 'locations-operations-cancel', 'locations-operations-get', 'locations-triggers-create', 'locations-triggers-delete', 'locations-triggers-get', 'locations-triggers-list', 'locations-triggers-patch', 'locations-triggers-run', 'locations-triggers-webhook', 'locations-worker-pools-create', 'locations-worker-pools-delete', 'locations-worker-pools-get', 'locations-worker-pools-list', 'locations-worker-pools-patch', 'triggers-create', 'triggers-delete', 'triggers-get', 'triggers-list', 'triggers-patch', 'triggers-run' and 'triggers-webhook'", vec![
             ("builds-approve",
                     Some(r##"Approves or rejects a pending build. If approved, the returned LRO will be analogous to the LRO returned from a CreateBuild call. If rejected, the returned LRO will be immediately done."##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudbuild1_cli/projects_builds-approve",
@@ -5693,7 +6453,7 @@ async fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"This field should contain the name of the enterprise config resource. For example: "projects/{$project_id}/githubEnterpriseConfigs/{$config_id}""##),
+                     Some(r##"This field should contain the name of the enterprise config resource. For example: "projects/{$project_id}/locations/{$location_id}/githubEnterpriseConfigs/{$config_id}""##),
                      Some(true),
                      Some(false)),
         
@@ -5715,7 +6475,7 @@ async fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"This field should contain the name of the enterprise config resource. For example: "projects/{$project_id}/githubEnterpriseConfigs/{$config_id}""##),
+                     Some(r##"This field should contain the name of the enterprise config resource. For example: "projects/{$project_id}/locations/{$location_id}/githubEnterpriseConfigs/{$config_id}""##),
                      Some(true),
                      Some(false)),
         
@@ -5759,35 +6519,7 @@ async fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Optional. The full resource name for the GitHubEnterpriseConfig For example: "projects/{$project_id}/githubEnterpriseConfigs/{$config_id}""##),
-                     Some(true),
-                     Some(false)),
-        
-                    (Some(r##"kv"##),
-                     Some(r##"r"##),
-                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
-                     Some(true),
-                     Some(true)),
-        
-                    (Some(r##"v"##),
-                     Some(r##"p"##),
-                     Some(r##"Set various optional parameters, matching the key=value form"##),
-                     Some(false),
-                     Some(true)),
-        
-                    (Some(r##"out"##),
-                     Some(r##"o"##),
-                     Some(r##"Specify the file into which to write the program's output"##),
-                     Some(false),
-                     Some(false)),
-                  ]),
-            ("locations-bitbucket-server-configs-add-bitbucket-server-connected-repository",
-                    Some(r##"Add a Bitbucket Server repository to a given BitbucketServerConfig's connected repositories. This API is experimental."##),
-                    "Details at http://byron.github.io/google-apis-rs/google_cloudbuild1_cli/projects_locations-bitbucket-server-configs-add-bitbucket-server-connected-repository",
-                  vec![
-                    (Some(r##"config"##),
-                     None,
-                     Some(r##"Required. The name of the `BitbucketServerConfig` to add a connected repository. Format: `projects/{project}/locations/{location}/bitbucketServerConfigs/{config}`"##),
+                     Some(r##"Optional. The full resource name for the GitHubEnterpriseConfig For example: "projects/{$project_id}/locations/{$location_id}/githubEnterpriseConfigs/{$config_id}""##),
                      Some(true),
                      Some(false)),
         
@@ -5960,7 +6692,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("locations-bitbucket-server-configs-remove-bitbucket-server-connected-repository",
-                    Some(r##"Remove a Bitbucket Server repository from an given BitbucketServerConfig’s connected repositories. This API is experimental."##),
+                    Some(r##"Remove a Bitbucket Server repository from a given BitbucketServerConfig's connected repositories. This API is experimental."##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudbuild1_cli/projects_locations-bitbucket-server-configs-remove-bitbucket-server-connected-repository",
                   vec![
                     (Some(r##"config"##),
@@ -6121,7 +6853,7 @@ async fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"The parent of the collection of `Builds`. Format: `projects/{project}/locations/location`"##),
+                     Some(r##"The parent of the collection of `Builds`. Format: `projects/{project}/locations/{location}`"##),
                      Some(true),
                      Some(false)),
         
@@ -6152,6 +6884,206 @@ async fn main() {
                      Some(r##"Set various fields of the request structure, matching the key=value form"##),
                      Some(true),
                      Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-git-lab-configs-connected-repositories-batch-create",
+                    Some(r##"Batch connecting GitLab repositories to Cloud Build. This API is experimental."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_cloudbuild1_cli/projects_locations-git-lab-configs-connected-repositories-batch-create",
+                  vec![
+                    (Some(r##"parent"##),
+                     None,
+                     Some(r##"The name of the `GitLabConfig` that adds connected repositories. Format: `projects/{project}/locations/{location}/gitLabConfigs/{config}`"##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-git-lab-configs-create",
+                    Some(r##"Creates a new `GitLabConfig`. This API is experimental"##),
+                    "Details at http://byron.github.io/google-apis-rs/google_cloudbuild1_cli/projects_locations-git-lab-configs-create",
+                  vec![
+                    (Some(r##"parent"##),
+                     None,
+                     Some(r##"Required. Name of the parent resource."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-git-lab-configs-delete",
+                    Some(r##"Delete a `GitLabConfig`. This API is experimental"##),
+                    "Details at http://byron.github.io/google-apis-rs/google_cloudbuild1_cli/projects_locations-git-lab-configs-delete",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. The config resource name."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-git-lab-configs-get",
+                    Some(r##"Retrieves a `GitLabConfig`. This API is experimental"##),
+                    "Details at http://byron.github.io/google-apis-rs/google_cloudbuild1_cli/projects_locations-git-lab-configs-get",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. The config resource name."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-git-lab-configs-list",
+                    Some(r##"List all `GitLabConfigs` for a given project. This API is experimental"##),
+                    "Details at http://byron.github.io/google-apis-rs/google_cloudbuild1_cli/projects_locations-git-lab-configs-list",
+                  vec![
+                    (Some(r##"parent"##),
+                     None,
+                     Some(r##"Required. Name of the parent resource"##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-git-lab-configs-patch",
+                    Some(r##"Updates an existing `GitLabConfig`. This API is experimental"##),
+                    "Details at http://byron.github.io/google-apis-rs/google_cloudbuild1_cli/projects_locations-git-lab-configs-patch",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"The resource name for the config."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-git-lab-configs-remove-git-lab-connected-repository",
+                    Some(r##"Remove a GitLab repository from a given GitLabConfig's connected repositories. This API is experimental."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_cloudbuild1_cli/projects_locations-git-lab-configs-remove-git-lab-connected-repository",
+                  vec![
+                    (Some(r##"config"##),
+                     None,
+                     Some(r##"Required. The name of the `GitLabConfig` to remove a connected repository. Format: `projects/{project}/locations/{location}/gitLabConfigs/{config}`"##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-git-lab-configs-repos-list",
+                    Some(r##"List all repositories for a given `GitLabConfig`. This API is experimental"##),
+                    "Details at http://byron.github.io/google-apis-rs/google_cloudbuild1_cli/projects_locations-git-lab-configs-repos-list",
+                  vec![
+                    (Some(r##"parent"##),
+                     None,
+                     Some(r##"Required. Name of the parent resource."##),
+                     Some(true),
+                     Some(false)),
         
                     (Some(r##"v"##),
                      Some(r##"p"##),
@@ -6199,7 +7131,7 @@ async fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"This field should contain the name of the enterprise config resource. For example: "projects/{$project_id}/githubEnterpriseConfigs/{$config_id}""##),
+                     Some(r##"This field should contain the name of the enterprise config resource. For example: "projects/{$project_id}/locations/{$location_id}/githubEnterpriseConfigs/{$config_id}""##),
                      Some(true),
                      Some(false)),
         
@@ -6221,7 +7153,7 @@ async fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"This field should contain the name of the enterprise config resource. For example: "projects/{$project_id}/githubEnterpriseConfigs/{$config_id}""##),
+                     Some(r##"This field should contain the name of the enterprise config resource. For example: "projects/{$project_id}/locations/{$location_id}/githubEnterpriseConfigs/{$config_id}""##),
                      Some(true),
                      Some(false)),
         
@@ -6265,7 +7197,7 @@ async fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Optional. The full resource name for the GitHubEnterpriseConfig For example: "projects/{$project_id}/githubEnterpriseConfigs/{$config_id}""##),
+                     Some(r##"Optional. The full resource name for the GitHubEnterpriseConfig For example: "projects/{$project_id}/locations/{$location_id}/githubEnterpriseConfigs/{$config_id}""##),
                      Some(true),
                      Some(false)),
         
@@ -6460,7 +7392,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("locations-triggers-run",
-                    Some(r##"Runs a `BuildTrigger` at a particular source revision."##),
+                    Some(r##"Runs a `BuildTrigger` at a particular source revision. To run a regional or global trigger, use the POST request that includes the location endpoint in the path (ex. v1/projects/{projectId}/locations/{region}/triggers/{triggerId}:run). The POST request that does not include the location endpoint in the path can only be used when running global triggers."##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudbuild1_cli/projects_locations-triggers-run",
                   vec![
                     (Some(r##"name"##),
@@ -6549,7 +7481,7 @@ async fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. The name of the `WorkerPool` to delete. Format: `projects/{project}/locations/{workerPool}/workerPools/{workerPool}`."##),
+                     Some(r##"Required. The name of the `WorkerPool` to delete. Format: `projects/{project}/locations/{location}/workerPools/{workerPool}`."##),
                      Some(true),
                      Some(false)),
         
@@ -6778,7 +7710,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("triggers-run",
-                    Some(r##"Runs a `BuildTrigger` at a particular source revision."##),
+                    Some(r##"Runs a `BuildTrigger` at a particular source revision. To run a regional or global trigger, use the POST request that includes the location endpoint in the path (ex. v1/projects/{projectId}/locations/{region}/triggers/{triggerId}:run). The POST request that does not include the location endpoint in the path can only be used when running global triggers."##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudbuild1_cli/projects_triggers-run",
                   vec![
                     (Some(r##"project-id"##),
@@ -6851,7 +7783,7 @@ async fn main() {
     
     let mut app = App::new("cloudbuild1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("4.0.1+20220218")
+           .version("5.0.2+20230120")
            .about("Creates and manages builds on Google Cloud Platform.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_cloudbuild1_cli")
            .arg(Arg::with_name("url")

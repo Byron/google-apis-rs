@@ -1,4 +1,4 @@
-site_name: On-Demand Scanning v4.0.1+20220228
+site_name: On-Demand Scanning v5.0.2+20230109
 site_url: http://byron.github.io/google-apis-rs/google-ondemandscanning1-cli
 site_description: A complete library to interact with On-Demand Scanning (protocol v1)
 
@@ -7,15 +7,16 @@ repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/ondemandscanning
 docs_dir: docs
 site_dir: build_html
 
-pages:
-- ['index.md', 'Home']
-- ['projects_locations-operations-cancel.md', 'Projects', 'Locations Operations Cancel']
-- ['projects_locations-operations-delete.md', 'Projects', 'Locations Operations Delete']
-- ['projects_locations-operations-get.md', 'Projects', 'Locations Operations Get']
-- ['projects_locations-operations-list.md', 'Projects', 'Locations Operations List']
-- ['projects_locations-operations-wait.md', 'Projects', 'Locations Operations Wait']
-- ['projects_locations-scans-analyze-packages.md', 'Projects', 'Locations Scans Analyze Packages']
-- ['projects_locations-scans-vulnerabilities-list.md', 'Projects', 'Locations Scans Vulnerabilities List']
+nav:
+- Home: 'index.md'
+- 'Projects':
+    - 'Locations Operations Cancel': 'projects_locations-operations-cancel.md'
+    - 'Locations Operations Delete': 'projects_locations-operations-delete.md'
+    - 'Locations Operations Get': 'projects_locations-operations-get.md'
+    - 'Locations Operations List': 'projects_locations-operations-list.md'
+    - 'Locations Operations Wait': 'projects_locations-operations-wait.md'
+    - 'Locations Scans Analyze Packages': 'projects_locations-scans-analyze-packages.md'
+    - 'Locations Scans Vulnerabilities List': 'projects_locations-scans-vulnerabilities-list.md'
 
 theme: readthedocs
 

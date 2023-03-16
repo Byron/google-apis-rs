@@ -1,4 +1,4 @@
-site_name: Cloud Asset v4.0.1+20220225
+site_name: Cloud Asset v5.0.2+20230121
 site_url: http://byron.github.io/google-apis-rs/google-cloudasset1-cli
 site_description: A complete library to interact with Cloud Asset (protocol v1)
 
@@ -7,28 +7,38 @@ repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/cloudasset1-cli
 docs_dir: docs
 site_dir: build_html
 
-pages:
-- ['index.md', 'Home']
-- ['assets_list.md', 'Assets', 'List']
-- ['effective-iam-policies_batch-get.md', 'Effective Iam Policies', 'Batch Get']
-- ['feeds_create.md', 'Feeds', 'Create']
-- ['feeds_delete.md', 'Feeds', 'Delete']
-- ['feeds_get.md', 'Feeds', 'Get']
-- ['feeds_list.md', 'Feeds', 'List']
-- ['feeds_patch.md', 'Feeds', 'Patch']
-- ['methods_analyze-iam-policy.md', 'Methods', 'Analyze Iam Policy']
-- ['methods_analyze-iam-policy-longrunning.md', 'Methods', 'Analyze Iam Policy Longrunning']
-- ['methods_analyze-move.md', 'Methods', 'Analyze Move']
-- ['methods_batch-get-assets-history.md', 'Methods', 'Batch Get Assets History']
-- ['methods_export-assets.md', 'Methods', 'Export Assets']
-- ['methods_search-all-iam-policies.md', 'Methods', 'Search All Iam Policies']
-- ['methods_search-all-resources.md', 'Methods', 'Search All Resources']
-- ['operations_get.md', 'Operations', 'Get']
-- ['saved-queries_create.md', 'Saved Queries', 'Create']
-- ['saved-queries_delete.md', 'Saved Queries', 'Delete']
-- ['saved-queries_get.md', 'Saved Queries', 'Get']
-- ['saved-queries_list.md', 'Saved Queries', 'List']
-- ['saved-queries_patch.md', 'Saved Queries', 'Patch']
+nav:
+- Home: 'index.md'
+- 'Assets':
+    - 'List': 'assets_list.md'
+- 'Effective Iam Policies':
+    - 'Batch Get': 'effective-iam-policies_batch-get.md'
+- 'Feeds':
+    - 'Create': 'feeds_create.md'
+    - 'Delete': 'feeds_delete.md'
+    - 'Get': 'feeds_get.md'
+    - 'List': 'feeds_list.md'
+    - 'Patch': 'feeds_patch.md'
+- 'Methods':
+    - 'Analyze Iam Policy': 'methods_analyze-iam-policy.md'
+    - 'Analyze Iam Policy Longrunning': 'methods_analyze-iam-policy-longrunning.md'
+    - 'Analyze Move': 'methods_analyze-move.md'
+    - 'Analyze Org Policies': 'methods_analyze-org-policies.md'
+    - 'Analyze Org Policy Governed Assets': 'methods_analyze-org-policy-governed-assets.md'
+    - 'Analyze Org Policy Governed Containers': 'methods_analyze-org-policy-governed-containers.md'
+    - 'Batch Get Assets History': 'methods_batch-get-assets-history.md'
+    - 'Export Assets': 'methods_export-assets.md'
+    - 'Query Assets': 'methods_query-assets.md'
+    - 'Search All Iam Policies': 'methods_search-all-iam-policies.md'
+    - 'Search All Resources': 'methods_search-all-resources.md'
+- 'Operations':
+    - 'Get': 'operations_get.md'
+- 'Saved Queries':
+    - 'Create': 'saved-queries_create.md'
+    - 'Delete': 'saved-queries_delete.md'
+    - 'Get': 'saved-queries_get.md'
+    - 'List': 'saved-queries_list.md'
+    - 'Patch': 'saved-queries_patch.md'
 
 theme: readthedocs
 

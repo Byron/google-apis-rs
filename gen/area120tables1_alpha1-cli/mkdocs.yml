@@ -1,4 +1,4 @@
-site_name: Area120 Tables v4.0.1+20220301
+site_name: Area120 Tables v5.0.2+20230123
 site_url: http://byron.github.io/google-apis-rs/google-area120tables1_alpha1-cli
 site_description: A complete library to interact with Area120 Tables (protocol v1alpha1)
 
@@ -7,20 +7,22 @@ repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/area120tables1_a
 docs_dir: docs
 site_dir: build_html
 
-pages:
-- ['index.md', 'Home']
-- ['tables_get.md', 'Tables', 'Get']
-- ['tables_list.md', 'Tables', 'List']
-- ['tables_rows-batch-create.md', 'Tables', 'Rows Batch Create']
-- ['tables_rows-batch-delete.md', 'Tables', 'Rows Batch Delete']
-- ['tables_rows-batch-update.md', 'Tables', 'Rows Batch Update']
-- ['tables_rows-create.md', 'Tables', 'Rows Create']
-- ['tables_rows-delete.md', 'Tables', 'Rows Delete']
-- ['tables_rows-get.md', 'Tables', 'Rows Get']
-- ['tables_rows-list.md', 'Tables', 'Rows List']
-- ['tables_rows-patch.md', 'Tables', 'Rows Patch']
-- ['workspaces_get.md', 'Workspaces', 'Get']
-- ['workspaces_list.md', 'Workspaces', 'List']
+nav:
+- Home: 'index.md'
+- 'Tables':
+    - 'Get': 'tables_get.md'
+    - 'List': 'tables_list.md'
+    - 'Rows Batch Create': 'tables_rows-batch-create.md'
+    - 'Rows Batch Delete': 'tables_rows-batch-delete.md'
+    - 'Rows Batch Update': 'tables_rows-batch-update.md'
+    - 'Rows Create': 'tables_rows-create.md'
+    - 'Rows Delete': 'tables_rows-delete.md'
+    - 'Rows Get': 'tables_rows-get.md'
+    - 'Rows List': 'tables_rows-list.md'
+    - 'Rows Patch': 'tables_rows-patch.md'
+- 'Workspaces':
+    - 'Get': 'workspaces_get.md'
+    - 'List': 'workspaces_list.md'
 
 theme: readthedocs
 

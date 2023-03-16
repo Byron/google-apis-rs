@@ -25,47 +25,20 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Game Services* API at revision *20220223*. The CLI is at version *4.0.1*.
+This documentation was generated from the *Game Services* API at revision *20230105*. The CLI is at version *5.0.2*.
 
 ```bash
 gameservices1 [options]
         projects
-                locations-game-server-deployments-configs-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
-                locations-game-server-deployments-configs-delete <name> [-p <v>]... [-o <out>]
-                locations-game-server-deployments-configs-get <name> [-p <v>]... [-o <out>]
-                locations-game-server-deployments-configs-list <parent> [-p <v>]... [-o <out>]
-                locations-game-server-deployments-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
-                locations-game-server-deployments-delete <name> [-p <v>]... [-o <out>]
-                locations-game-server-deployments-fetch-deployment-state <name> (-r <kv>)... [-p <v>]... [-o <out>]
-                locations-game-server-deployments-get <name> [-p <v>]... [-o <out>]
                 locations-game-server-deployments-get-iam-policy <resource> [-p <v>]... [-o <out>]
-                locations-game-server-deployments-get-rollout <name> [-p <v>]... [-o <out>]
-                locations-game-server-deployments-list <parent> [-p <v>]... [-o <out>]
-                locations-game-server-deployments-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
-                locations-game-server-deployments-preview-rollout <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-game-server-deployments-set-iam-policy <resource> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-game-server-deployments-test-iam-permissions <resource> (-r <kv>)... [-p <v>]... [-o <out>]
-                locations-game-server-deployments-update-rollout <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-get <name> [-p <v>]... [-o <out>]
                 locations-list <name> [-p <v>]... [-o <out>]
                 locations-operations-cancel <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-operations-delete <name> [-p <v>]... [-o <out>]
                 locations-operations-get <name> [-p <v>]... [-o <out>]
                 locations-operations-list <name> [-p <v>]... [-o <out>]
-                locations-realms-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
-                locations-realms-delete <name> [-p <v>]... [-o <out>]
-                locations-realms-game-server-clusters-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
-                locations-realms-game-server-clusters-delete <name> [-p <v>]... [-o <out>]
-                locations-realms-game-server-clusters-get <name> [-p <v>]... [-o <out>]
-                locations-realms-game-server-clusters-list <parent> [-p <v>]... [-o <out>]
-                locations-realms-game-server-clusters-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
-                locations-realms-game-server-clusters-preview-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
-                locations-realms-game-server-clusters-preview-delete <name> [-p <v>]... [-o <out>]
-                locations-realms-game-server-clusters-preview-update <name> (-r <kv>)... [-p <v>]... [-o <out>]
-                locations-realms-get <name> [-p <v>]... [-o <out>]
-                locations-realms-list <parent> [-p <v>]... [-o <out>]
-                locations-realms-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
-                locations-realms-preview-update <name> (-r <kv>)... [-p <v>]... [-o <out>]
   gameservices1 --help
 
 Configuration:

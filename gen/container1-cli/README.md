@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Container* API at revision *20220215*. The CLI is at version *4.0.1*.
+This documentation was generated from the *Container* API at revision *20230104*. The CLI is at version *5.0.2*.
 
 ```bash
 container1 [options]
@@ -37,6 +37,7 @@ container1 [options]
                 locations-clusters-get <name> [-p <v>]... [-o <out>]
                 locations-clusters-get-jwks <parent> [-p <v>]... [-o <out>]
                 locations-clusters-list <parent> [-p <v>]... [-o <out>]
+                locations-clusters-node-pools-complete-upgrade <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-clusters-node-pools-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-clusters-node-pools-delete <name> [-p <v>]... [-o <out>]
                 locations-clusters-node-pools-get <name> [-p <v>]... [-o <out>]

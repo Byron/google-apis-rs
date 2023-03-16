@@ -3,8 +3,6 @@
 // DO NOT EDIT !
 #![allow(unused_variables, unused_imports, dead_code, unused_mut)]
 
-extern crate tokio;
-
 #[macro_use]
 extern crate clap;
 
@@ -12,9 +10,10 @@ use std::env;
 use std::io::{self, Write};
 use clap::{App, SubCommand, Arg};
 
-use google_cloudasset1_beta1::{api, Error, oauth2};
+use google_cloudasset1_beta1::{api, Error, oauth2, client::chrono, FieldMask};
 
-mod client;
+
+use google_clis_common as client;
 
 use client::{InvalidOptionsError, CLIError, arg_from_str, writer_from_opts, parse_kv_arg,
           input_file_from_opts, input_mime_from_opts, FieldCursor, FieldError, CallType, UploadProtocol,
@@ -199,10 +198,10 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "read-time-window-start-time" => {
-                    call = call.read_time_window_start_time(value.unwrap_or(""));
+                    call = call.read_time_window_start_time(        value.map(|v| arg_from_str(v, err, "read-time-window-start-time", "google-datetime")).unwrap_or(chrono::Utc::now()));
                 },
                 "read-time-window-end-time" => {
-                    call = call.read_time_window_end_time(value.unwrap_or(""));
+                    call = call.read_time_window_end_time(        value.map(|v| arg_from_str(v, err, "read-time-window-end-time", "google-datetime")).unwrap_or(chrono::Utc::now()));
                 },
                 "content-type" => {
                     call = call.content_type(value.unwrap_or(""));
@@ -405,10 +404,10 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "read-time-window-start-time" => {
-                    call = call.read_time_window_start_time(value.unwrap_or(""));
+                    call = call.read_time_window_start_time(        value.map(|v| arg_from_str(v, err, "read-time-window-start-time", "google-datetime")).unwrap_or(chrono::Utc::now()));
                 },
                 "read-time-window-end-time" => {
-                    call = call.read_time_window_end_time(value.unwrap_or(""));
+                    call = call.read_time_window_end_time(        value.map(|v| arg_from_str(v, err, "read-time-window-end-time", "google-datetime")).unwrap_or(chrono::Utc::now()));
                 },
                 "content-type" => {
                     call = call.content_type(value.unwrap_or(""));
@@ -937,8 +936,8 @@ async fn main() {
     
     let mut app = App::new("cloudasset1-beta1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("4.0.1+20220225")
-           .about("The cloud asset API manages the history and inventory of cloud resources.")
+           .version("5.0.2+20230121")
+           .about("The Cloud Asset API manages the history and inventory of Google Cloud resources.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_cloudasset1_beta1_cli")
            .arg(Arg::with_name("url")
                    .long("scope")

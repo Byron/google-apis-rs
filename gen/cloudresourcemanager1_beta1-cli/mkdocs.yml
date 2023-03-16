@@ -1,4 +1,4 @@
-site_name: Cloud Resource Manager v4.0.1+20220306
+site_name: Cloud Resource Manager v5.0.2+20230115
 site_url: http://byron.github.io/google-apis-rs/google-cloudresourcemanager1_beta1-cli
 site_description: A complete library to interact with Cloud Resource Manager (protocol v1beta1)
 
@@ -7,24 +7,26 @@ repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/cloudresourceman
 docs_dir: docs
 site_dir: build_html
 
-pages:
-- ['index.md', 'Home']
-- ['organizations_get.md', 'Organizations', 'Get']
-- ['organizations_get-iam-policy.md', 'Organizations', 'Get Iam Policy']
-- ['organizations_list.md', 'Organizations', 'List']
-- ['organizations_set-iam-policy.md', 'Organizations', 'Set Iam Policy']
-- ['organizations_test-iam-permissions.md', 'Organizations', 'Test Iam Permissions']
-- ['organizations_update.md', 'Organizations', 'Update']
-- ['projects_create.md', 'Projects', 'Create']
-- ['projects_delete.md', 'Projects', 'Delete']
-- ['projects_get.md', 'Projects', 'Get']
-- ['projects_get-ancestry.md', 'Projects', 'Get Ancestry']
-- ['projects_get-iam-policy.md', 'Projects', 'Get Iam Policy']
-- ['projects_list.md', 'Projects', 'List']
-- ['projects_set-iam-policy.md', 'Projects', 'Set Iam Policy']
-- ['projects_test-iam-permissions.md', 'Projects', 'Test Iam Permissions']
-- ['projects_undelete.md', 'Projects', 'Undelete']
-- ['projects_update.md', 'Projects', 'Update']
+nav:
+- Home: 'index.md'
+- 'Organizations':
+    - 'Get': 'organizations_get.md'
+    - 'Get Iam Policy': 'organizations_get-iam-policy.md'
+    - 'List': 'organizations_list.md'
+    - 'Set Iam Policy': 'organizations_set-iam-policy.md'
+    - 'Test Iam Permissions': 'organizations_test-iam-permissions.md'
+    - 'Update': 'organizations_update.md'
+- 'Projects':
+    - 'Create': 'projects_create.md'
+    - 'Delete': 'projects_delete.md'
+    - 'Get': 'projects_get.md'
+    - 'Get Ancestry': 'projects_get-ancestry.md'
+    - 'Get Iam Policy': 'projects_get-iam-policy.md'
+    - 'List': 'projects_list.md'
+    - 'Set Iam Policy': 'projects_set-iam-policy.md'
+    - 'Test Iam Permissions': 'projects_test-iam-permissions.md'
+    - 'Undelete': 'projects_undelete.md'
+    - 'Update': 'projects_update.md'
 
 theme: readthedocs
 

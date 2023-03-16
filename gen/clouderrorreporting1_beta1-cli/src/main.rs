@@ -3,8 +3,6 @@
 // DO NOT EDIT !
 #![allow(unused_variables, unused_imports, dead_code, unused_mut)]
 
-extern crate tokio;
-
 #[macro_use]
 extern crate clap;
 
@@ -12,9 +10,10 @@ use std::env;
 use std::io::{self, Write};
 use clap::{App, SubCommand, Arg};
 
-use google_clouderrorreporting1_beta1::{api, Error, oauth2};
+use google_clouderrorreporting1_beta1::{api, Error, oauth2, client::chrono, FieldMask};
 
-mod client;
+
+use google_clis_common as client;
 
 use client::{InvalidOptionsError, CLIError, arg_from_str, writer_from_opts, parse_kv_arg,
           input_file_from_opts, input_mime_from_opts, FieldCursor, FieldError, CallType, UploadProtocol,
@@ -125,7 +124,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 "group-id" => {
                     call = call.group_id(value.unwrap_or(""));
@@ -283,7 +282,7 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "timed-count-duration" => {
-                    call = call.timed_count_duration(value.unwrap_or(""));
+                    call = call.timed_count_duration(        value.map(|v| arg_from_str(v, err, "timed-count-duration", "google-duration")).unwrap_or(chrono::Duration::seconds(0)));
                 },
                 "time-range-period" => {
                     call = call.time_range_period(value.unwrap_or(""));
@@ -301,7 +300,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 "order" => {
                     call = call.order(value.unwrap_or(""));
@@ -310,7 +309,7 @@ where
                     call = call.add_group_id(value.unwrap_or(""));
                 },
                 "alignment-time" => {
-                    call = call.alignment_time(value.unwrap_or(""));
+                    call = call.alignment_time(        value.map(|v| arg_from_str(v, err, "alignment-time", "google-datetime")).unwrap_or(chrono::Utc::now()));
                 },
                 "alignment" => {
                     call = call.alignment(value.unwrap_or(""));
@@ -684,7 +683,7 @@ async fn main() {
                   vec![
                     (Some(r##"project-name"##),
                      None,
-                     Some(r##"Required. The resource name of the Google Cloud Platform project. Written as `projects/{projectID}` or `projects/{projectNumber}`, where `{projectID}` and `{projectNumber}` can be found in the [Google Cloud Console](https://support.google.com/cloud/answer/6158840). Examples: `projects/my-project-123`, `projects/5551234`."##),
+                     Some(r##"Required. The resource name of the Google Cloud Platform project. Written as `projects/{projectID}` or `projects/{projectNumber}`, where `{projectID}` and `{projectNumber}` can be found in the [Google Cloud console](https://support.google.com/cloud/answer/6158840). Examples: `projects/my-project-123`, `projects/5551234`."##),
                      Some(true),
                      Some(false)),
         
@@ -706,7 +705,7 @@ async fn main() {
                   vec![
                     (Some(r##"group-name"##),
                      None,
-                     Some(r##"Required. The group resource name. Written as `projects/{projectID}/groups/{group_name}`. Call [`groupStats.list`](https://cloud.google.com/error-reporting/reference/rest/v1beta1/projects.groupStats/list) to return a list of groups belonging to this project. Example: `projects/my-project-123/groups/my-group`"##),
+                     Some(r##"Required. The group resource name. Written as `projects/{projectID}/groups/{group_name}`. Call groupStats.list to return a list of groups belonging to this project. Example: `projects/my-project-123/groups/my-group`"##),
                      Some(true),
                      Some(false)),
         
@@ -756,7 +755,7 @@ async fn main() {
     
     let mut app = App::new("clouderrorreporting1-beta1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("4.0.1+20220302")
+           .version("5.0.2+20230112")
            .about("Groups and counts similar errors from cloud services and applications, reports new errors, and provides access to error groups and their associated errors. ")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_clouderrorreporting1_beta1_cli")
            .arg(Arg::with_name("url")

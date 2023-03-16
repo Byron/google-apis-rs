@@ -3,8 +3,6 @@
 // DO NOT EDIT !
 #![allow(unused_variables, unused_imports, dead_code, unused_mut)]
 
-extern crate tokio;
-
 #[macro_use]
 extern crate clap;
 
@@ -12,9 +10,10 @@ use std::env;
 use std::io::{self, Write};
 use clap::{App, SubCommand, Arg};
 
-use google_workflowexecutions1::{api, Error, oauth2};
+use google_workflowexecutions1::{api, Error, oauth2, client::chrono, FieldMask};
 
-mod client;
+
+use google_clis_common as client;
 
 use client::{InvalidOptionsError, CLIError, arg_from_str, writer_from_opts, parse_kv_arg,
           input_file_from_opts, input_mime_from_opts, FieldCursor, FieldError, CallType, UploadProtocol,
@@ -160,6 +159,7 @@ where
                 match &temp_cursor.to_string()[..] {
                     "argument" => Some(("argument", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "call-log-level" => Some(("callLogLevel", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "duration" => Some(("duration", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "end-time" => Some(("endTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "error.context" => Some(("error.context", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "error.payload" => Some(("error.payload", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -169,7 +169,7 @@ where
                     "state" => Some(("state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "workflow-revision-id" => Some(("workflowRevisionId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["argument", "call-log-level", "context", "end-time", "error", "name", "payload", "result", "start-time", "state", "workflow-revision-id"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["argument", "call-log-level", "context", "duration", "end-time", "error", "name", "payload", "result", "start-time", "state", "workflow-revision-id"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -298,7 +298,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -314,6 +314,97 @@ where
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
                                                                            v.extend(["page-size", "page-token", "view"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_locations_workflows_trigger_pubsub_execution(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "gcp-cloud-events-mode" => Some(("GCPCloudEventsMode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "message.attributes" => Some(("message.attributes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "message.data" => Some(("message.data", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "message.message-id" => Some(("message.messageId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "message.ordering-key" => Some(("message.orderingKey", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "message.publish-time" => Some(("message.publishTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "subscription" => Some(("subscription", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["gcp-cloud-events-mode", "attributes", "data", "message", "message-id", "ordering-key", "publish-time", "subscription"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::TriggerPubsubExecutionRequest = json::value::from_value(object).unwrap();
+        let mut call = self.hub.projects().locations_workflows_trigger_pubsub_execution(request, opt.value_of("workflow").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -365,6 +456,9 @@ where
                     },
                     ("locations-workflows-executions-list", Some(opt)) => {
                         call_result = self._projects_locations_workflows_executions_list(opt, dry_run, &mut err).await;
+                    },
+                    ("locations-workflows-trigger-pubsub-execution", Some(opt)) => {
+                        call_result = self._projects_locations_workflows_trigger_pubsub_execution(opt, dry_run, &mut err).await;
                     },
                     _ => {
                         err.issues.push(CLIError::MissingMethodError("projects".to_string()));
@@ -445,7 +539,7 @@ where
 async fn main() {
     let mut exit_status = 0i32;
     let arg_data = [
-        ("projects", "methods: 'locations-workflows-executions-cancel', 'locations-workflows-executions-create', 'locations-workflows-executions-get' and 'locations-workflows-executions-list'", vec![
+        ("projects", "methods: 'locations-workflows-executions-cancel', 'locations-workflows-executions-create', 'locations-workflows-executions-get', 'locations-workflows-executions-list' and 'locations-workflows-trigger-pubsub-execution'", vec![
             ("locations-workflows-executions-cancel",
                     Some(r##"Cancels an execution of the given name."##),
                     "Details at http://byron.github.io/google-apis-rs/google_workflowexecutions1_cli/projects_locations-workflows-executions-cancel",
@@ -546,13 +640,41 @@ async fn main() {
                      Some(false),
                      Some(false)),
                   ]),
+            ("locations-workflows-trigger-pubsub-execution",
+                    Some(r##"Triggers a new execution using the latest revision of the given workflow by a Pub/Sub push notification."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_workflowexecutions1_cli/projects_locations-workflows-trigger-pubsub-execution",
+                  vec![
+                    (Some(r##"workflow"##),
+                     None,
+                     Some(r##"Required. Name of the workflow for which an execution should be created. Format: projects/{project}/locations/{location}/workflows/{workflow}"##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
             ]),
         
     ];
     
     let mut app = App::new("workflowexecutions1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("4.0.1+20220222")
+           .version("5.0.2+20230110")
            .about("Execute workflows created with Workflows API.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_workflowexecutions1_cli")
            .arg(Arg::with_name("url")

@@ -1,4 +1,4 @@
-site_name: Cloud Monitoring v4.0.1+20170501
+site_name: Cloud Monitoring v5.0.2+20170501
 site_url: http://byron.github.io/google-apis-rs/google-cloudmonitoring2_beta2-cli
 site_description: A complete library to interact with Cloud Monitoring (protocol v2beta2)
 
@@ -7,14 +7,17 @@ repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/cloudmonitoring2
 docs_dir: docs
 site_dir: build_html
 
-pages:
-- ['index.md', 'Home']
-- ['metric-descriptors_create.md', 'Metric Descriptors', 'Create']
-- ['metric-descriptors_delete.md', 'Metric Descriptors', 'Delete']
-- ['metric-descriptors_list.md', 'Metric Descriptors', 'List']
-- ['timeseries_list.md', 'Timeseries', 'List']
-- ['timeseries_write.md', 'Timeseries', 'Write']
-- ['timeseries-descriptors_list.md', 'Timeseries Descriptors', 'List']
+nav:
+- Home: 'index.md'
+- 'Metric Descriptors':
+    - 'Create': 'metric-descriptors_create.md'
+    - 'Delete': 'metric-descriptors_delete.md'
+    - 'List': 'metric-descriptors_list.md'
+- 'Timeseries':
+    - 'List': 'timeseries_list.md'
+    - 'Write': 'timeseries_write.md'
+- 'Timeseries Descriptors':
+    - 'List': 'timeseries-descriptors_list.md'
 
 theme: readthedocs
 

@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *AI Platform Notebooks* API at revision *20220224*. The CLI is at version *4.0.1*.
+This documentation was generated from the *AI Platform Notebooks* API at revision *20221213*. The CLI is at version *5.0.2*.
 
 ```bash
 notebooks1 [options]
@@ -41,6 +41,7 @@ notebooks1 [options]
                 locations-get <name> [-p <v>]... [-o <out>]
                 locations-instances-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-instances-delete <name> [-p <v>]... [-o <out>]
+                locations-instances-diagnose <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-instances-get <name> [-p <v>]... [-o <out>]
                 locations-instances-get-iam-policy <resource> [-p <v>]... [-o <out>]
                 locations-instances-get-instance-health <name> [-p <v>]... [-o <out>]
@@ -69,9 +70,12 @@ notebooks1 [options]
                 locations-operations-list <name> [-p <v>]... [-o <out>]
                 locations-runtimes-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-runtimes-delete <name> [-p <v>]... [-o <out>]
+                locations-runtimes-diagnose <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-runtimes-get <name> [-p <v>]... [-o <out>]
                 locations-runtimes-get-iam-policy <resource> [-p <v>]... [-o <out>]
                 locations-runtimes-list <parent> [-p <v>]... [-o <out>]
+                locations-runtimes-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-runtimes-refresh-runtime-token-internal <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-runtimes-report-event <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-runtimes-reset <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-runtimes-set-iam-policy <resource> (-r <kv>)... [-p <v>]... [-o <out>]
@@ -79,6 +83,7 @@ notebooks1 [options]
                 locations-runtimes-stop <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-runtimes-switch <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-runtimes-test-iam-permissions <resource> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-runtimes-upgrade <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-schedules-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-schedules-delete <name> [-p <v>]... [-o <out>]
                 locations-schedules-get <name> [-p <v>]... [-o <out>]

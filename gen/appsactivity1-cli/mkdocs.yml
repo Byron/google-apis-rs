@@ -1,4 +1,4 @@
-site_name: appsactivity v4.0.1+20200628
+site_name: appsactivity v5.0.2+20200628
 site_url: http://byron.github.io/google-apis-rs/google-appsactivity1-cli
 site_description: A complete library to interact with appsactivity (protocol v1)
 
@@ -7,9 +7,10 @@ repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/appsactivity1-cl
 docs_dir: docs
 site_dir: build_html
 
-pages:
-- ['index.md', 'Home']
-- ['activities_list.md', 'Activities', 'List']
+nav:
+- Home: 'index.md'
+- 'Activities':
+    - 'List': 'activities_list.md'
 
 theme: readthedocs
 

@@ -4,12 +4,12 @@
 [package]
 
 name = "google-mybusinessbusinesscalls1"
-version = "5.0.2-beta-1+20230124"
+version = "5.0.2+20230124"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with My Business Business Calls (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/mybusinessbusinesscalls1"
 homepage = "https://developers.google.com/my-business/"
-documentation = "https://docs.rs/google-mybusinessbusinesscalls1/5.0.2-beta-1+20230124"
+documentation = "https://docs.rs/google-mybusinessbusinesscalls1/5.0.2+20230124"
 license = "MIT"
 keywords = ["mybusinessbusinessca", "google", "protocol", "web", "api"]
 autobins = false

@@ -3,8 +3,6 @@
 // DO NOT EDIT !
 #![allow(unused_variables, unused_imports, dead_code, unused_mut)]
 
-extern crate tokio;
-
 #[macro_use]
 extern crate clap;
 
@@ -12,9 +10,10 @@ use std::env;
 use std::io::{self, Write};
 use clap::{App, SubCommand, Arg};
 
-use google_bigqueryreservation1::{api, Error, oauth2};
+use google_bigqueryreservation1::{api, Error, oauth2, client::chrono, FieldMask};
 
-mod client;
+
+use google_clis_common as client;
 
 use client::{InvalidOptionsError, CLIError, arg_from_str, writer_from_opts, parse_kv_arg,
           input_file_from_opts, input_mime_from_opts, FieldCursor, FieldError, CallType, UploadProtocol,
@@ -100,7 +99,7 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "enforce-single-admin-project-per-org" => {
-                    call = call.enforce_single_admin_project_per_org(arg_from_str(value.unwrap_or("false"), err, "enforce-single-admin-project-per-org", "boolean"));
+                    call = call.enforce_single_admin_project_per_org(        value.map(|v| arg_from_str(v, err, "enforce-single-admin-project-per-org", "boolean")).unwrap_or(false));
                 },
                 "capacity-commitment-id" => {
                     call = call.capacity_commitment_id(value.unwrap_or(""));
@@ -159,7 +158,7 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "force" => {
-                    call = call.force(arg_from_str(value.unwrap_or("false"), err, "force", "boolean"));
+                    call = call.force(        value.map(|v| arg_from_str(v, err, "force", "boolean")).unwrap_or(false));
                 },
                 _ => {
                     let mut found = false;
@@ -270,7 +269,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -453,7 +452,7 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "update-mask" => {
-                    call = call.update_mask(value.unwrap_or(""));
+                    call = call.update_mask(        value.map(|v| arg_from_str(v, err, "update-mask", "google-fieldmask")).unwrap_or(FieldMask::default()));
                 },
                 _ => {
                     let mut found = false;
@@ -793,7 +792,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -894,6 +893,98 @@ where
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_locations_reservations_assignments_patch(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "assignee" => Some(("assignee", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "job-type" => Some(("jobType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "state" => Some(("state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["assignee", "job-type", "name", "state"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::Assignment = json::value::from_value(object).unwrap();
+        let mut call = self.hub.projects().locations_reservations_assignments_patch(request, opt.value_of("name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "update-mask" => {
+                    call = call.update_mask(        value.map(|v| arg_from_str(v, err, "update-mask", "google-fieldmask")).unwrap_or(FieldMask::default()));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["update-mask"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -1136,7 +1227,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -1231,7 +1322,7 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "update-mask" => {
-                    call = call.update_mask(value.unwrap_or(""));
+                    call = call.update_mask(        value.map(|v| arg_from_str(v, err, "update-mask", "google-fieldmask")).unwrap_or(FieldMask::default()));
                 },
                 _ => {
                     let mut found = false;
@@ -1293,7 +1384,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -1355,7 +1446,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -1446,7 +1537,7 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "update-mask" => {
-                    call = call.update_mask(value.unwrap_or(""));
+                    call = call.update_mask(        value.map(|v| arg_from_str(v, err, "update-mask", "google-fieldmask")).unwrap_or(FieldMask::default()));
                 },
                 _ => {
                     let mut found = false;
@@ -1537,6 +1628,9 @@ where
                     },
                     ("locations-reservations-assignments-move", Some(opt)) => {
                         call_result = self._projects_locations_reservations_assignments_move(opt, dry_run, &mut err).await;
+                    },
+                    ("locations-reservations-assignments-patch", Some(opt)) => {
+                        call_result = self._projects_locations_reservations_assignments_patch(opt, dry_run, &mut err).await;
                     },
                     ("locations-reservations-create", Some(opt)) => {
                         call_result = self._projects_locations_reservations_create(opt, dry_run, &mut err).await;
@@ -1641,7 +1735,7 @@ where
 async fn main() {
     let mut exit_status = 0i32;
     let arg_data = [
-        ("projects", "methods: 'locations-capacity-commitments-create', 'locations-capacity-commitments-delete', 'locations-capacity-commitments-get', 'locations-capacity-commitments-list', 'locations-capacity-commitments-merge', 'locations-capacity-commitments-patch', 'locations-capacity-commitments-split', 'locations-get-bi-reservation', 'locations-reservations-assignments-create', 'locations-reservations-assignments-delete', 'locations-reservations-assignments-list', 'locations-reservations-assignments-move', 'locations-reservations-create', 'locations-reservations-delete', 'locations-reservations-get', 'locations-reservations-list', 'locations-reservations-patch', 'locations-search-all-assignments', 'locations-search-assignments' and 'locations-update-bi-reservation'", vec![
+        ("projects", "methods: 'locations-capacity-commitments-create', 'locations-capacity-commitments-delete', 'locations-capacity-commitments-get', 'locations-capacity-commitments-list', 'locations-capacity-commitments-merge', 'locations-capacity-commitments-patch', 'locations-capacity-commitments-split', 'locations-get-bi-reservation', 'locations-reservations-assignments-create', 'locations-reservations-assignments-delete', 'locations-reservations-assignments-list', 'locations-reservations-assignments-move', 'locations-reservations-assignments-patch', 'locations-reservations-create', 'locations-reservations-delete', 'locations-reservations-get', 'locations-reservations-list', 'locations-reservations-patch', 'locations-search-all-assignments', 'locations-search-assignments' and 'locations-update-bi-reservation'", vec![
             ("locations-capacity-commitments-create",
                     Some(r##"Creates a new capacity commitment resource."##),
                     "Details at http://byron.github.io/google-apis-rs/google_bigqueryreservation1_cli/projects_locations-capacity-commitments-create",
@@ -1770,7 +1864,7 @@ async fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Output only. The resource name of the capacity commitment, e.g., `projects/myproject/locations/US/capacityCommitments/123` For the commitment id, it must only contain lower case alphanumeric characters or dashes.It must start with a letter and must not end with a dash. Its maximum length is 64 characters."##),
+                     Some(r##"Output only. The resource name of the capacity commitment, e.g., `projects/myproject/locations/US/capacityCommitments/123` The commitment_id must only contain lower case alphanumeric characters or dashes. It must start with a letter and must not end with a dash. Its maximum length is 64 characters."##),
                      Some(true),
                      Some(false)),
         
@@ -1793,7 +1887,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("locations-capacity-commitments-split",
-                    Some(r##"Splits capacity commitment to two commitments of the same plan and `commitment_end_time`. A common use case is to enable downgrading commitments. For example, in order to downgrade from 10000 slots to 8000, you might split a 10000 capacity commitment into commitments of 2000 and 8000. Then, you would change the plan of the first one to `FLEX` and then delete it."##),
+                    Some(r##"Splits capacity commitment to two commitments of the same plan and `commitment_end_time`. A common use case is to enable downgrading commitments. For example, in order to downgrade from 10000 slots to 8000, you might split a 10000 capacity commitment into commitments of 2000 and 8000. Then, you delete the first one after the commitment end time passes."##),
                     "Details at http://byron.github.io/google-apis-rs/google_bigqueryreservation1_cli/projects_locations-capacity-commitments-split",
                   vec![
                     (Some(r##"name"##),
@@ -1942,6 +2036,34 @@ async fn main() {
                      Some(false),
                      Some(false)),
                   ]),
+            ("locations-reservations-assignments-patch",
+                    Some(r##"Updates an existing assignment. Only the `priority` field can be updated."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_bigqueryreservation1_cli/projects_locations-reservations-assignments-patch",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Output only. Name of the resource. E.g.: `projects/myproject/locations/US/reservations/team1-prod/assignments/123`. The assignment_id must only contain lower case alphanumeric characters or dashes and the max length is 64 characters."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
             ("locations-reservations-create",
                     Some(r##"Creates a new reservation resource."##),
                     "Details at http://byron.github.io/google-apis-rs/google_bigqueryreservation1_cli/projects_locations-reservations-create",
@@ -2042,7 +2164,7 @@ async fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The resource name of the reservation, e.g., `projects/*/locations/*/reservations/team1-prod`. For the reservation id, it must only contain lower case alphanumeric characters or dashes.It must start with a letter and must not end with a dash. Its maximum length is 64 characters."##),
+                     Some(r##"The resource name of the reservation, e.g., `projects/*/locations/*/reservations/team1-prod`. The reservation_id must only contain lower case alphanumeric characters or dashes. It must start with a letter and must not end with a dash. Its maximum length is 64 characters."##),
                      Some(true),
                      Some(false)),
         
@@ -2142,7 +2264,7 @@ async fn main() {
     
     let mut app = App::new("bigqueryreservation1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("4.0.1+20220226")
+           .version("5.0.2+20230117")
            .about("A service to modify your BigQuery flat-rate reservations.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_bigqueryreservation1_cli")
            .arg(Arg::with_name("url")

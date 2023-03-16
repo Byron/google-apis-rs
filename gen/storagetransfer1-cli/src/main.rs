@@ -3,8 +3,6 @@
 // DO NOT EDIT !
 #![allow(unused_variables, unused_imports, dead_code, unused_mut)]
 
-extern crate tokio;
-
 #[macro_use]
 extern crate clap;
 
@@ -12,9 +10,10 @@ use std::env;
 use std::io::{self, Write};
 use clap::{App, SubCommand, Arg};
 
-use google_storagetransfer1::{api, Error, oauth2};
+use google_storagetransfer1::{api, Error, oauth2, client::chrono, FieldMask};
 
-mod client;
+
+use google_clis_common as client;
 
 use client::{InvalidOptionsError, CLIError, arg_from_str, writer_from_opts, parse_kv_arg,
           input_file_from_opts, input_mime_from_opts, FieldCursor, FieldError, CallType, UploadProtocol,
@@ -309,7 +308,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 "filter" => {
                     call = call.filter(value.unwrap_or(""));
@@ -404,7 +403,7 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "update-mask" => {
-                    call = call.update_mask(value.unwrap_or(""));
+                    call = call.update_mask(        value.map(|v| arg_from_str(v, err, "update-mask", "google-fieldmask")).unwrap_or(FieldMask::default()));
                 },
                 _ => {
                     let mut found = false;
@@ -479,6 +478,9 @@ where
                     "creation-time" => Some(("creationTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "deletion-time" => Some(("deletionTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "event-stream.event-stream-expiration-time" => Some(("eventStream.eventStreamExpirationTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "event-stream.event-stream-start-time" => Some(("eventStream.eventStreamStartTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "event-stream.name" => Some(("eventStream.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "last-modification-time" => Some(("lastModificationTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "latest-operation-name" => Some(("latestOperationName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "logging-config.enable-onprem-gcs-transfer-logs" => Some(("loggingConfig.enableOnpremGcsTransferLogs", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
@@ -505,6 +507,14 @@ where
                     "schedule.start-time-of-day.nanos" => Some(("schedule.startTimeOfDay.nanos", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "schedule.start-time-of-day.seconds" => Some(("schedule.startTimeOfDay.seconds", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "status" => Some(("status", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "transfer-spec.aws-s3-compatible-data-source.bucket-name" => Some(("transferSpec.awsS3CompatibleDataSource.bucketName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "transfer-spec.aws-s3-compatible-data-source.endpoint" => Some(("transferSpec.awsS3CompatibleDataSource.endpoint", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "transfer-spec.aws-s3-compatible-data-source.path" => Some(("transferSpec.awsS3CompatibleDataSource.path", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "transfer-spec.aws-s3-compatible-data-source.region" => Some(("transferSpec.awsS3CompatibleDataSource.region", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "transfer-spec.aws-s3-compatible-data-source.s3-metadata.auth-method" => Some(("transferSpec.awsS3CompatibleDataSource.s3Metadata.authMethod", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "transfer-spec.aws-s3-compatible-data-source.s3-metadata.list-api" => Some(("transferSpec.awsS3CompatibleDataSource.s3Metadata.listApi", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "transfer-spec.aws-s3-compatible-data-source.s3-metadata.protocol" => Some(("transferSpec.awsS3CompatibleDataSource.s3Metadata.protocol", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "transfer-spec.aws-s3-compatible-data-source.s3-metadata.request-model" => Some(("transferSpec.awsS3CompatibleDataSource.s3Metadata.requestModel", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "transfer-spec.aws-s3-data-source.aws-access-key.access-key-id" => Some(("transferSpec.awsS3DataSource.awsAccessKey.accessKeyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "transfer-spec.aws-s3-data-source.aws-access-key.secret-access-key" => Some(("transferSpec.awsS3DataSource.awsAccessKey.secretAccessKey", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "transfer-spec.aws-s3-data-source.bucket-name" => Some(("transferSpec.awsS3DataSource.bucketName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -544,8 +554,9 @@ where
                     "transfer-spec.transfer-options.metadata-options.time-created" => Some(("transferSpec.transferOptions.metadataOptions.timeCreated", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "transfer-spec.transfer-options.metadata-options.uid" => Some(("transferSpec.transferOptions.metadataOptions.uid", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "transfer-spec.transfer-options.overwrite-objects-already-existing-in-sink" => Some(("transferSpec.transferOptions.overwriteObjectsAlreadyExistingInSink", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "transfer-spec.transfer-options.overwrite-when" => Some(("transferSpec.transferOptions.overwriteWhen", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["access-key-id", "acl", "aws-access-key", "aws-s3-data-source", "azure-blob-storage-data-source", "azure-credentials", "bucket-name", "container", "creation-time", "day", "delete-objects-from-source-after-transfer", "delete-objects-unique-in-sink", "deletion-time", "description", "enable-onprem-gcs-transfer-logs", "end-time-of-day", "event-types", "exclude-prefixes", "gcs-data-sink", "gcs-data-source", "gcs-intermediate-data-location", "gid", "hours", "http-data-source", "include-prefixes", "kms-key", "last-modification-time", "last-modified-before", "last-modified-since", "latest-operation-name", "list-url", "location", "log-action-states", "log-actions", "logging-config", "max-time-elapsed-since-last-modification", "metadata-options", "min-time-elapsed-since-last-modification", "minutes", "mode", "month", "name", "nanos", "notification-config", "object-conditions", "overwrite-objects-already-existing-in-sink", "path", "payload-format", "posix-data-sink", "posix-data-source", "project-id", "pubsub-topic", "repeat-interval", "role-arn", "root-directory", "sas-token", "schedule", "schedule-end-date", "schedule-start-date", "seconds", "secret-access-key", "sink-agent-pool-name", "source-agent-pool-name", "start-time-of-day", "status", "storage-account", "storage-class", "symlink", "temporary-hold", "time-created", "transfer-manifest", "transfer-options", "transfer-spec", "uid", "year"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["access-key-id", "acl", "auth-method", "aws-access-key", "aws-s3-compatible-data-source", "aws-s3-data-source", "azure-blob-storage-data-source", "azure-credentials", "bucket-name", "container", "creation-time", "day", "delete-objects-from-source-after-transfer", "delete-objects-unique-in-sink", "deletion-time", "description", "enable-onprem-gcs-transfer-logs", "end-time-of-day", "endpoint", "event-stream", "event-stream-expiration-time", "event-stream-start-time", "event-types", "exclude-prefixes", "gcs-data-sink", "gcs-data-source", "gcs-intermediate-data-location", "gid", "hours", "http-data-source", "include-prefixes", "kms-key", "last-modification-time", "last-modified-before", "last-modified-since", "latest-operation-name", "list-api", "list-url", "location", "log-action-states", "log-actions", "logging-config", "max-time-elapsed-since-last-modification", "metadata-options", "min-time-elapsed-since-last-modification", "minutes", "mode", "month", "name", "nanos", "notification-config", "object-conditions", "overwrite-objects-already-existing-in-sink", "overwrite-when", "path", "payload-format", "posix-data-sink", "posix-data-source", "project-id", "protocol", "pubsub-topic", "region", "repeat-interval", "request-model", "role-arn", "root-directory", "s3-metadata", "sas-token", "schedule", "schedule-end-date", "schedule-start-date", "seconds", "secret-access-key", "sink-agent-pool-name", "source-agent-pool-name", "start-time-of-day", "status", "storage-account", "storage-class", "symlink", "temporary-hold", "time-created", "transfer-manifest", "transfer-options", "transfer-spec", "uid", "year"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -556,6 +567,58 @@ where
         }
         let mut request: api::TransferJob = json::value::from_value(object).unwrap();
         let mut call = self.hub.transfer_jobs().create(request);
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _transfer_jobs_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.transfer_jobs().delete(opt.value_of("job-name").unwrap_or(""), opt.value_of("project-id").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
@@ -667,7 +730,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -743,6 +806,9 @@ where
                     "transfer-job.creation-time" => Some(("transferJob.creationTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "transfer-job.deletion-time" => Some(("transferJob.deletionTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "transfer-job.description" => Some(("transferJob.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "transfer-job.event-stream.event-stream-expiration-time" => Some(("transferJob.eventStream.eventStreamExpirationTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "transfer-job.event-stream.event-stream-start-time" => Some(("transferJob.eventStream.eventStreamStartTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "transfer-job.event-stream.name" => Some(("transferJob.eventStream.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "transfer-job.last-modification-time" => Some(("transferJob.lastModificationTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "transfer-job.latest-operation-name" => Some(("transferJob.latestOperationName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "transfer-job.logging-config.enable-onprem-gcs-transfer-logs" => Some(("transferJob.loggingConfig.enableOnpremGcsTransferLogs", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
@@ -769,6 +835,14 @@ where
                     "transfer-job.schedule.start-time-of-day.nanos" => Some(("transferJob.schedule.startTimeOfDay.nanos", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "transfer-job.schedule.start-time-of-day.seconds" => Some(("transferJob.schedule.startTimeOfDay.seconds", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "transfer-job.status" => Some(("transferJob.status", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "transfer-job.transfer-spec.aws-s3-compatible-data-source.bucket-name" => Some(("transferJob.transferSpec.awsS3CompatibleDataSource.bucketName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "transfer-job.transfer-spec.aws-s3-compatible-data-source.endpoint" => Some(("transferJob.transferSpec.awsS3CompatibleDataSource.endpoint", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "transfer-job.transfer-spec.aws-s3-compatible-data-source.path" => Some(("transferJob.transferSpec.awsS3CompatibleDataSource.path", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "transfer-job.transfer-spec.aws-s3-compatible-data-source.region" => Some(("transferJob.transferSpec.awsS3CompatibleDataSource.region", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "transfer-job.transfer-spec.aws-s3-compatible-data-source.s3-metadata.auth-method" => Some(("transferJob.transferSpec.awsS3CompatibleDataSource.s3Metadata.authMethod", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "transfer-job.transfer-spec.aws-s3-compatible-data-source.s3-metadata.list-api" => Some(("transferJob.transferSpec.awsS3CompatibleDataSource.s3Metadata.listApi", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "transfer-job.transfer-spec.aws-s3-compatible-data-source.s3-metadata.protocol" => Some(("transferJob.transferSpec.awsS3CompatibleDataSource.s3Metadata.protocol", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "transfer-job.transfer-spec.aws-s3-compatible-data-source.s3-metadata.request-model" => Some(("transferJob.transferSpec.awsS3CompatibleDataSource.s3Metadata.requestModel", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "transfer-job.transfer-spec.aws-s3-data-source.aws-access-key.access-key-id" => Some(("transferJob.transferSpec.awsS3DataSource.awsAccessKey.accessKeyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "transfer-job.transfer-spec.aws-s3-data-source.aws-access-key.secret-access-key" => Some(("transferJob.transferSpec.awsS3DataSource.awsAccessKey.secretAccessKey", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "transfer-job.transfer-spec.aws-s3-data-source.bucket-name" => Some(("transferJob.transferSpec.awsS3DataSource.bucketName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -808,9 +882,10 @@ where
                     "transfer-job.transfer-spec.transfer-options.metadata-options.time-created" => Some(("transferJob.transferSpec.transferOptions.metadataOptions.timeCreated", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "transfer-job.transfer-spec.transfer-options.metadata-options.uid" => Some(("transferJob.transferSpec.transferOptions.metadataOptions.uid", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "transfer-job.transfer-spec.transfer-options.overwrite-objects-already-existing-in-sink" => Some(("transferJob.transferSpec.transferOptions.overwriteObjectsAlreadyExistingInSink", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "transfer-job.transfer-spec.transfer-options.overwrite-when" => Some(("transferJob.transferSpec.transferOptions.overwriteWhen", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "update-transfer-job-field-mask" => Some(("updateTransferJobFieldMask", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["access-key-id", "acl", "aws-access-key", "aws-s3-data-source", "azure-blob-storage-data-source", "azure-credentials", "bucket-name", "container", "creation-time", "day", "delete-objects-from-source-after-transfer", "delete-objects-unique-in-sink", "deletion-time", "description", "enable-onprem-gcs-transfer-logs", "end-time-of-day", "event-types", "exclude-prefixes", "gcs-data-sink", "gcs-data-source", "gcs-intermediate-data-location", "gid", "hours", "http-data-source", "include-prefixes", "kms-key", "last-modification-time", "last-modified-before", "last-modified-since", "latest-operation-name", "list-url", "location", "log-action-states", "log-actions", "logging-config", "max-time-elapsed-since-last-modification", "metadata-options", "min-time-elapsed-since-last-modification", "minutes", "mode", "month", "name", "nanos", "notification-config", "object-conditions", "overwrite-objects-already-existing-in-sink", "path", "payload-format", "posix-data-sink", "posix-data-source", "project-id", "pubsub-topic", "repeat-interval", "role-arn", "root-directory", "sas-token", "schedule", "schedule-end-date", "schedule-start-date", "seconds", "secret-access-key", "sink-agent-pool-name", "source-agent-pool-name", "start-time-of-day", "status", "storage-account", "storage-class", "symlink", "temporary-hold", "time-created", "transfer-job", "transfer-manifest", "transfer-options", "transfer-spec", "uid", "update-transfer-job-field-mask", "year"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["access-key-id", "acl", "auth-method", "aws-access-key", "aws-s3-compatible-data-source", "aws-s3-data-source", "azure-blob-storage-data-source", "azure-credentials", "bucket-name", "container", "creation-time", "day", "delete-objects-from-source-after-transfer", "delete-objects-unique-in-sink", "deletion-time", "description", "enable-onprem-gcs-transfer-logs", "end-time-of-day", "endpoint", "event-stream", "event-stream-expiration-time", "event-stream-start-time", "event-types", "exclude-prefixes", "gcs-data-sink", "gcs-data-source", "gcs-intermediate-data-location", "gid", "hours", "http-data-source", "include-prefixes", "kms-key", "last-modification-time", "last-modified-before", "last-modified-since", "latest-operation-name", "list-api", "list-url", "location", "log-action-states", "log-actions", "logging-config", "max-time-elapsed-since-last-modification", "metadata-options", "min-time-elapsed-since-last-modification", "minutes", "mode", "month", "name", "nanos", "notification-config", "object-conditions", "overwrite-objects-already-existing-in-sink", "overwrite-when", "path", "payload-format", "posix-data-sink", "posix-data-source", "project-id", "protocol", "pubsub-topic", "region", "repeat-interval", "request-model", "role-arn", "root-directory", "s3-metadata", "sas-token", "schedule", "schedule-end-date", "schedule-start-date", "seconds", "secret-access-key", "sink-agent-pool-name", "source-agent-pool-name", "start-time-of-day", "status", "storage-account", "storage-class", "symlink", "temporary-hold", "time-created", "transfer-job", "transfer-manifest", "transfer-options", "transfer-spec", "uid", "update-transfer-job-field-mask", "year"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1101,7 +1176,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -1361,6 +1436,9 @@ where
                 match opt.subcommand() {
                     ("create", Some(opt)) => {
                         call_result = self._transfer_jobs_create(opt, dry_run, &mut err).await;
+                    },
+                    ("delete", Some(opt)) => {
+                        call_result = self._transfer_jobs_delete(opt, dry_run, &mut err).await;
                     },
                     ("get", Some(opt)) => {
                         call_result = self._transfer_jobs_get(opt, dry_run, &mut err).await;
@@ -1626,7 +1704,7 @@ async fn main() {
                   ]),
             ]),
         
-        ("transfer-jobs", "methods: 'create', 'get', 'list', 'patch' and 'run'", vec![
+        ("transfer-jobs", "methods: 'create', 'delete', 'get', 'list', 'patch' and 'run'", vec![
             ("create",
                     Some(r##"Creates a transfer job that runs periodically."##),
                     "Details at http://byron.github.io/google-apis-rs/google_storagetransfer1_cli/transfer-jobs_create",
@@ -1636,6 +1714,34 @@ async fn main() {
                      Some(r##"Set various fields of the request structure, matching the key=value form"##),
                      Some(true),
                      Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("delete",
+                    Some(r##"Deletes a transfer job. Deleting a transfer job sets its status to DELETED."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_storagetransfer1_cli/transfer-jobs_delete",
+                  vec![
+                    (Some(r##"job-name"##),
+                     None,
+                     Some(r##"Required. The job to delete."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"project-id"##),
+                     None,
+                     Some(r##"Required. The ID of the Google Cloud project that owns the job."##),
+                     Some(true),
+                     Some(false)),
         
                     (Some(r##"v"##),
                      Some(r##"p"##),
@@ -1728,7 +1834,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("run",
-                    Some(r##"Attempts to start a new TransferOperation for the current TransferJob. A TransferJob has a maximum of one active TransferOperation. If this method is called while a TransferOperation is active, an error will be returned."##),
+                    Some(r##"Starts a new operation for the specified transfer job. A `TransferJob` has a maximum of one active `TransferOperation`. If this method is called while a `TransferOperation` is active, an error is returned."##),
                     "Details at http://byron.github.io/google-apis-rs/google_storagetransfer1_cli/transfer-jobs_run",
                   vec![
                     (Some(r##"job-name"##),
@@ -1898,8 +2004,8 @@ async fn main() {
     
     let mut app = App::new("storagetransfer1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("4.0.1+20220223")
-           .about("Transfers data from external data sources to a Google Cloud Storage bucket or between Google Cloud Storage buckets.")
+           .version("5.0.2+20230111")
+           .about("Transfers data from external data sources to a Google Cloud Storage bucket or between Google Cloud Storage buckets. ")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_storagetransfer1_cli")
            .arg(Arg::with_name("url")
                    .long("scope")

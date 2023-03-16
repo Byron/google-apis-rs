@@ -1,4 +1,4 @@
-site_name: BigQuery Reservation v4.0.1+20220226
+site_name: BigQuery Reservation v5.0.2+20230117
 site_url: http://byron.github.io/google-apis-rs/google-bigqueryreservation1-cli
 site_description: A complete library to interact with BigQuery Reservation (protocol v1)
 
@@ -7,28 +7,30 @@ repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/bigqueryreservat
 docs_dir: docs
 site_dir: build_html
 
-pages:
-- ['index.md', 'Home']
-- ['projects_locations-capacity-commitments-create.md', 'Projects', 'Locations Capacity Commitments Create']
-- ['projects_locations-capacity-commitments-delete.md', 'Projects', 'Locations Capacity Commitments Delete']
-- ['projects_locations-capacity-commitments-get.md', 'Projects', 'Locations Capacity Commitments Get']
-- ['projects_locations-capacity-commitments-list.md', 'Projects', 'Locations Capacity Commitments List']
-- ['projects_locations-capacity-commitments-merge.md', 'Projects', 'Locations Capacity Commitments Merge']
-- ['projects_locations-capacity-commitments-patch.md', 'Projects', 'Locations Capacity Commitments Patch']
-- ['projects_locations-capacity-commitments-split.md', 'Projects', 'Locations Capacity Commitments Split']
-- ['projects_locations-get-bi-reservation.md', 'Projects', 'Locations Get Bi Reservation']
-- ['projects_locations-reservations-assignments-create.md', 'Projects', 'Locations Reservations Assignments Create']
-- ['projects_locations-reservations-assignments-delete.md', 'Projects', 'Locations Reservations Assignments Delete']
-- ['projects_locations-reservations-assignments-list.md', 'Projects', 'Locations Reservations Assignments List']
-- ['projects_locations-reservations-assignments-move.md', 'Projects', 'Locations Reservations Assignments Move']
-- ['projects_locations-reservations-create.md', 'Projects', 'Locations Reservations Create']
-- ['projects_locations-reservations-delete.md', 'Projects', 'Locations Reservations Delete']
-- ['projects_locations-reservations-get.md', 'Projects', 'Locations Reservations Get']
-- ['projects_locations-reservations-list.md', 'Projects', 'Locations Reservations List']
-- ['projects_locations-reservations-patch.md', 'Projects', 'Locations Reservations Patch']
-- ['projects_locations-search-all-assignments.md', 'Projects', 'Locations Search All Assignments']
-- ['projects_locations-search-assignments.md', 'Projects', 'Locations Search Assignments']
-- ['projects_locations-update-bi-reservation.md', 'Projects', 'Locations Update Bi Reservation']
+nav:
+- Home: 'index.md'
+- 'Projects':
+    - 'Locations Capacity Commitments Create': 'projects_locations-capacity-commitments-create.md'
+    - 'Locations Capacity Commitments Delete': 'projects_locations-capacity-commitments-delete.md'
+    - 'Locations Capacity Commitments Get': 'projects_locations-capacity-commitments-get.md'
+    - 'Locations Capacity Commitments List': 'projects_locations-capacity-commitments-list.md'
+    - 'Locations Capacity Commitments Merge': 'projects_locations-capacity-commitments-merge.md'
+    - 'Locations Capacity Commitments Patch': 'projects_locations-capacity-commitments-patch.md'
+    - 'Locations Capacity Commitments Split': 'projects_locations-capacity-commitments-split.md'
+    - 'Locations Get Bi Reservation': 'projects_locations-get-bi-reservation.md'
+    - 'Locations Reservations Assignments Create': 'projects_locations-reservations-assignments-create.md'
+    - 'Locations Reservations Assignments Delete': 'projects_locations-reservations-assignments-delete.md'
+    - 'Locations Reservations Assignments List': 'projects_locations-reservations-assignments-list.md'
+    - 'Locations Reservations Assignments Move': 'projects_locations-reservations-assignments-move.md'
+    - 'Locations Reservations Assignments Patch': 'projects_locations-reservations-assignments-patch.md'
+    - 'Locations Reservations Create': 'projects_locations-reservations-create.md'
+    - 'Locations Reservations Delete': 'projects_locations-reservations-delete.md'
+    - 'Locations Reservations Get': 'projects_locations-reservations-get.md'
+    - 'Locations Reservations List': 'projects_locations-reservations-list.md'
+    - 'Locations Reservations Patch': 'projects_locations-reservations-patch.md'
+    - 'Locations Search All Assignments': 'projects_locations-search-all-assignments.md'
+    - 'Locations Search Assignments': 'projects_locations-search-assignments.md'
+    - 'Locations Update Bi Reservation': 'projects_locations-update-bi-reservation.md'
 
 theme: readthedocs
 

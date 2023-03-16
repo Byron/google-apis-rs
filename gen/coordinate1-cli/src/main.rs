@@ -3,8 +3,6 @@
 // DO NOT EDIT !
 #![allow(unused_variables, unused_imports, dead_code, unused_mut)]
 
-extern crate tokio;
-
 #[macro_use]
 extern crate clap;
 
@@ -12,9 +10,10 @@ use std::env;
 use std::io::{self, Write};
 use clap::{App, SubCommand, Arg};
 
-use google_coordinate1::{api, Error, oauth2};
+use google_coordinate1::{api, Error, oauth2, client::chrono, FieldMask};
 
-mod client;
+
+use google_clis_common as client;
 
 use client::{InvalidOptionsError, CLIError, arg_from_str, writer_from_opts, parse_kv_arg,
           input_file_from_opts, input_mime_from_opts, FieldCursor, FieldError, CallType, UploadProtocol,
@@ -281,13 +280,13 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "omit-job-changes" => {
-                    call = call.omit_job_changes(arg_from_str(value.unwrap_or("false"), err, "omit-job-changes", "boolean"));
+                    call = call.omit_job_changes(        value.map(|v| arg_from_str(v, err, "omit-job-changes", "boolean")).unwrap_or(false));
                 },
                 "min-modified-timestamp-ms" => {
-                    call = call.min_modified_timestamp_ms(value.unwrap_or(""));
+                    call = call.min_modified_timestamp_ms(        value.map(|v| arg_from_str(v, err, "min-modified-timestamp-ms", "uint64")).unwrap_or(0));
                 },
                 "max-results" => {
-                    call = call.max_results(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
+                    call = call.max_results(        value.map(|v| arg_from_str(v, err, "max-results", "uint32")).unwrap_or(0));
                 },
                 _ => {
                     let mut found = false;
@@ -398,10 +397,10 @@ where
                     call = call.note(value.unwrap_or(""));
                 },
                 "lng" => {
-                    call = call.lng(arg_from_str(value.unwrap_or("0.0"), err, "lng", "number"));
+                    call = call.lng(        value.map(|v| arg_from_str(v, err, "lng", "double")).unwrap_or(0.0));
                 },
                 "lat" => {
-                    call = call.lat(arg_from_str(value.unwrap_or("0.0"), err, "lat", "number"));
+                    call = call.lat(        value.map(|v| arg_from_str(v, err, "lat", "double")).unwrap_or(0.0));
                 },
                 "customer-phone-number" => {
                     call = call.customer_phone_number(value.unwrap_or(""));
@@ -527,10 +526,10 @@ where
                     call = call.note(value.unwrap_or(""));
                 },
                 "lng" => {
-                    call = call.lng(arg_from_str(value.unwrap_or("0.0"), err, "lng", "number"));
+                    call = call.lng(        value.map(|v| arg_from_str(v, err, "lng", "double")).unwrap_or(0.0));
                 },
                 "lat" => {
-                    call = call.lat(arg_from_str(value.unwrap_or("0.0"), err, "lat", "number"));
+                    call = call.lat(        value.map(|v| arg_from_str(v, err, "lat", "double")).unwrap_or(0.0));
                 },
                 "customer-phone-number" => {
                     call = call.customer_phone_number(value.unwrap_or(""));
@@ -604,7 +603,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "max-results" => {
-                    call = call.max_results(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
+                    call = call.max_results(        value.map(|v| arg_from_str(v, err, "max-results", "uint32")).unwrap_or(0));
                 },
                 _ => {
                     let mut found = false;
@@ -749,16 +748,16 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "start-time" => {
-                    call = call.start_time(value.unwrap_or(""));
+                    call = call.start_time(        value.map(|v| arg_from_str(v, err, "start-time", "uint64")).unwrap_or(0));
                 },
                 "end-time" => {
-                    call = call.end_time(value.unwrap_or(""));
+                    call = call.end_time(        value.map(|v| arg_from_str(v, err, "end-time", "uint64")).unwrap_or(0));
                 },
                 "duration" => {
-                    call = call.duration(value.unwrap_or(""));
+                    call = call.duration(        value.map(|v| arg_from_str(v, err, "duration", "uint64")).unwrap_or(0));
                 },
                 "all-day" => {
-                    call = call.all_day(arg_from_str(value.unwrap_or("false"), err, "all-day", "boolean"));
+                    call = call.all_day(        value.map(|v| arg_from_str(v, err, "all-day", "boolean")).unwrap_or(false));
                 },
                 _ => {
                     let mut found = false;
@@ -851,16 +850,16 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "start-time" => {
-                    call = call.start_time(value.unwrap_or(""));
+                    call = call.start_time(        value.map(|v| arg_from_str(v, err, "start-time", "uint64")).unwrap_or(0));
                 },
                 "end-time" => {
-                    call = call.end_time(value.unwrap_or(""));
+                    call = call.end_time(        value.map(|v| arg_from_str(v, err, "end-time", "uint64")).unwrap_or(0));
                 },
                 "duration" => {
-                    call = call.duration(value.unwrap_or(""));
+                    call = call.duration(        value.map(|v| arg_from_str(v, err, "duration", "uint64")).unwrap_or(0));
                 },
                 "all-day" => {
-                    call = call.all_day(arg_from_str(value.unwrap_or("false"), err, "all-day", "boolean"));
+                    call = call.all_day(        value.map(|v| arg_from_str(v, err, "all-day", "boolean")).unwrap_or(false));
                 },
                 _ => {
                     let mut found = false;
@@ -916,13 +915,13 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "worker" => {
-                    call = call.worker(arg_from_str(value.unwrap_or("false"), err, "worker", "boolean"));
+                    call = call.worker(        value.map(|v| arg_from_str(v, err, "worker", "boolean")).unwrap_or(false));
                 },
                 "dispatcher" => {
-                    call = call.dispatcher(arg_from_str(value.unwrap_or("false"), err, "dispatcher", "boolean"));
+                    call = call.dispatcher(        value.map(|v| arg_from_str(v, err, "dispatcher", "boolean")).unwrap_or(false));
                 },
                 "admin" => {
-                    call = call.admin(arg_from_str(value.unwrap_or("false"), err, "admin", "boolean"));
+                    call = call.admin(        value.map(|v| arg_from_str(v, err, "admin", "boolean")).unwrap_or(false));
                 },
                 _ => {
                     let mut found = false;
@@ -1564,7 +1563,7 @@ async fn main() {
     
     let mut app = App::new("coordinate1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("4.0.1+20150811")
+           .version("5.0.2+20150811")
            .about("Lets you view and manage jobs in a Coordinate team.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_coordinate1_cli")
            .arg(Arg::with_name("url")

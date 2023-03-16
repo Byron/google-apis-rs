@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/generator/templates/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *DoubleClick Bid Manager* crate version *5.0.2-beta-1+20230117*, where *20230117* is the exact revision of the *doubleclickbidmanager:v1.1* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.2-beta-1*.
+//! This documentation was generated from *DoubleClick Bid Manager* crate version *5.0.2+20230117*, where *20230117* is the exact revision of the *doubleclickbidmanager:v1.1* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.2*.
 //! 
 //! Everything else about the *DoubleClick Bid Manager* *v1d1* API can be found at the
 //! [official documentation site](https://developers.google.com/bid-manager/).

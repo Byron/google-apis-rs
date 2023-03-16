@@ -3,8 +3,6 @@
 // DO NOT EDIT !
 #![allow(unused_variables, unused_imports, dead_code, unused_mut)]
 
-extern crate tokio;
-
 #[macro_use]
 extern crate clap;
 
@@ -12,9 +10,10 @@ use std::env;
 use std::io::{self, Write};
 use clap::{App, SubCommand, Arg};
 
-use google_cloudasset1::{api, Error, oauth2};
+use google_cloudasset1::{api, Error, oauth2, client::chrono, FieldMask};
 
-mod client;
+
+use google_clis_common as client;
 
 use client::{InvalidOptionsError, CLIError, arg_from_str, writer_from_opts, parse_kv_arg,
           input_file_from_opts, input_mime_from_opts, FieldCursor, FieldError, CallType, UploadProtocol,
@@ -61,13 +60,13 @@ where
                     call = call.add_relationship_types(value.unwrap_or(""));
                 },
                 "read-time" => {
-                    call = call.read_time(value.unwrap_or(""));
+                    call = call.read_time(        value.map(|v| arg_from_str(v, err, "read-time", "google-datetime")).unwrap_or(chrono::Utc::now()));
                 },
                 "page-token" => {
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 "content-type" => {
                     call = call.content_type(value.unwrap_or(""));
@@ -534,34 +533,34 @@ where
                     call = call.saved_analysis_query(value.unwrap_or(""));
                 },
                 "execution-timeout" => {
-                    call = call.execution_timeout(value.unwrap_or(""));
+                    call = call.execution_timeout(        value.map(|v| arg_from_str(v, err, "execution-timeout", "google-duration")).unwrap_or(chrono::Duration::seconds(0)));
                 },
                 "analysis-query-resource-selector-full-resource-name" => {
                     call = call.analysis_query_resource_selector_full_resource_name(value.unwrap_or(""));
                 },
                 "analysis-query-options-output-resource-edges" => {
-                    call = call.analysis_query_options_output_resource_edges(arg_from_str(value.unwrap_or("false"), err, "analysis-query-options-output-resource-edges", "boolean"));
+                    call = call.analysis_query_options_output_resource_edges(        value.map(|v| arg_from_str(v, err, "analysis-query-options-output-resource-edges", "boolean")).unwrap_or(false));
                 },
                 "analysis-query-options-output-group-edges" => {
-                    call = call.analysis_query_options_output_group_edges(arg_from_str(value.unwrap_or("false"), err, "analysis-query-options-output-group-edges", "boolean"));
+                    call = call.analysis_query_options_output_group_edges(        value.map(|v| arg_from_str(v, err, "analysis-query-options-output-group-edges", "boolean")).unwrap_or(false));
                 },
                 "analysis-query-options-expand-roles" => {
-                    call = call.analysis_query_options_expand_roles(arg_from_str(value.unwrap_or("false"), err, "analysis-query-options-expand-roles", "boolean"));
+                    call = call.analysis_query_options_expand_roles(        value.map(|v| arg_from_str(v, err, "analysis-query-options-expand-roles", "boolean")).unwrap_or(false));
                 },
                 "analysis-query-options-expand-resources" => {
-                    call = call.analysis_query_options_expand_resources(arg_from_str(value.unwrap_or("false"), err, "analysis-query-options-expand-resources", "boolean"));
+                    call = call.analysis_query_options_expand_resources(        value.map(|v| arg_from_str(v, err, "analysis-query-options-expand-resources", "boolean")).unwrap_or(false));
                 },
                 "analysis-query-options-expand-groups" => {
-                    call = call.analysis_query_options_expand_groups(arg_from_str(value.unwrap_or("false"), err, "analysis-query-options-expand-groups", "boolean"));
+                    call = call.analysis_query_options_expand_groups(        value.map(|v| arg_from_str(v, err, "analysis-query-options-expand-groups", "boolean")).unwrap_or(false));
                 },
                 "analysis-query-options-analyze-service-account-impersonation" => {
-                    call = call.analysis_query_options_analyze_service_account_impersonation(arg_from_str(value.unwrap_or("false"), err, "analysis-query-options-analyze-service-account-impersonation", "boolean"));
+                    call = call.analysis_query_options_analyze_service_account_impersonation(        value.map(|v| arg_from_str(v, err, "analysis-query-options-analyze-service-account-impersonation", "boolean")).unwrap_or(false));
                 },
                 "analysis-query-identity-selector-identity" => {
                     call = call.analysis_query_identity_selector_identity(value.unwrap_or(""));
                 },
                 "analysis-query-condition-context-access-time" => {
-                    call = call.analysis_query_condition_context_access_time(value.unwrap_or(""));
+                    call = call.analysis_query_condition_context_access_time(        value.map(|v| arg_from_str(v, err, "analysis-query-condition-context-access-time", "google-datetime")).unwrap_or(chrono::Utc::now()));
                 },
                 "analysis-query-access-selector-roles" => {
                     call = call.add_analysis_query_access_selector_roles(value.unwrap_or(""));
@@ -777,6 +776,201 @@ where
         }
     }
 
+    async fn _methods_analyze_org_policies(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.methods().analyze_org_policies(opt.value_of("scope").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "page-token" => {
+                    call = call.page_token(value.unwrap_or(""));
+                },
+                "page-size" => {
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
+                },
+                "filter" => {
+                    call = call.filter(value.unwrap_or(""));
+                },
+                "constraint" => {
+                    call = call.constraint(value.unwrap_or(""));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["constraint", "filter", "page-size", "page-token"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _methods_analyze_org_policy_governed_assets(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.methods().analyze_org_policy_governed_assets(opt.value_of("scope").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "page-token" => {
+                    call = call.page_token(value.unwrap_or(""));
+                },
+                "page-size" => {
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
+                },
+                "filter" => {
+                    call = call.filter(value.unwrap_or(""));
+                },
+                "constraint" => {
+                    call = call.constraint(value.unwrap_or(""));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["constraint", "filter", "page-size", "page-token"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _methods_analyze_org_policy_governed_containers(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.methods().analyze_org_policy_governed_containers(opt.value_of("scope").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "page-token" => {
+                    call = call.page_token(value.unwrap_or(""));
+                },
+                "page-size" => {
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
+                },
+                "filter" => {
+                    call = call.filter(value.unwrap_or(""));
+                },
+                "constraint" => {
+                    call = call.constraint(value.unwrap_or(""));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["constraint", "filter", "page-size", "page-token"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
     async fn _methods_batch_get_assets_history(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.methods().batch_get_assets_history(opt.value_of("parent").unwrap_or(""));
@@ -787,10 +981,10 @@ where
                     call = call.add_relationship_types(value.unwrap_or(""));
                 },
                 "read-time-window-start-time" => {
-                    call = call.read_time_window_start_time(value.unwrap_or(""));
+                    call = call.read_time_window_start_time(        value.map(|v| arg_from_str(v, err, "read-time-window-start-time", "google-datetime")).unwrap_or(chrono::Utc::now()));
                 },
                 "read-time-window-end-time" => {
-                    call = call.read_time_window_end_time(value.unwrap_or(""));
+                    call = call.read_time_window_end_time(        value.map(|v| arg_from_str(v, err, "read-time-window-end-time", "google-datetime")).unwrap_or(chrono::Utc::now()));
                 },
                 "content-type" => {
                     call = call.content_type(value.unwrap_or(""));
@@ -940,6 +1134,101 @@ where
         }
     }
 
+    async fn _methods_query_assets(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "job-reference" => Some(("jobReference", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "output-config.bigquery-destination.dataset" => Some(("outputConfig.bigqueryDestination.dataset", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "output-config.bigquery-destination.table" => Some(("outputConfig.bigqueryDestination.table", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "output-config.bigquery-destination.write-disposition" => Some(("outputConfig.bigqueryDestination.writeDisposition", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "page-size" => Some(("pageSize", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "page-token" => Some(("pageToken", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "read-time" => Some(("readTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "read-time-window.end-time" => Some(("readTimeWindow.endTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "read-time-window.start-time" => Some(("readTimeWindow.startTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "statement" => Some(("statement", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "timeout" => Some(("timeout", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["bigquery-destination", "dataset", "end-time", "job-reference", "output-config", "page-size", "page-token", "read-time", "read-time-window", "start-time", "statement", "table", "timeout", "write-disposition"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::QueryAssetsRequest = json::value::from_value(object).unwrap();
+        let mut call = self.hub.methods().query_assets(request, opt.value_of("parent").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
     async fn _methods_search_all_iam_policies(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.methods().search_all_iam_policies(opt.value_of("scope").unwrap_or(""));
@@ -953,7 +1242,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 "order-by" => {
                     call = call.order_by(value.unwrap_or(""));
@@ -1015,7 +1304,7 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "read-mask" => {
-                    call = call.read_mask(value.unwrap_or(""));
+                    call = call.read_mask(        value.map(|v| arg_from_str(v, err, "read-mask", "google-fieldmask")).unwrap_or(FieldMask::default()));
                 },
                 "query" => {
                     call = call.query(value.unwrap_or(""));
@@ -1024,7 +1313,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 "order-by" => {
                     call = call.order_by(value.unwrap_or(""));
@@ -1352,7 +1641,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 "filter" => {
                     call = call.filter(value.unwrap_or(""));
@@ -1462,7 +1751,7 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "update-mask" => {
-                    call = call.update_mask(value.unwrap_or(""));
+                    call = call.update_mask(        value.map(|v| arg_from_str(v, err, "update-mask", "google-fieldmask")).unwrap_or(FieldMask::default()));
                 },
                 _ => {
                     let mut found = false;
@@ -1572,11 +1861,23 @@ where
                     ("analyze-move", Some(opt)) => {
                         call_result = self._methods_analyze_move(opt, dry_run, &mut err).await;
                     },
+                    ("analyze-org-policies", Some(opt)) => {
+                        call_result = self._methods_analyze_org_policies(opt, dry_run, &mut err).await;
+                    },
+                    ("analyze-org-policy-governed-assets", Some(opt)) => {
+                        call_result = self._methods_analyze_org_policy_governed_assets(opt, dry_run, &mut err).await;
+                    },
+                    ("analyze-org-policy-governed-containers", Some(opt)) => {
+                        call_result = self._methods_analyze_org_policy_governed_containers(opt, dry_run, &mut err).await;
+                    },
                     ("batch-get-assets-history", Some(opt)) => {
                         call_result = self._methods_batch_get_assets_history(opt, dry_run, &mut err).await;
                     },
                     ("export-assets", Some(opt)) => {
                         call_result = self._methods_export_assets(opt, dry_run, &mut err).await;
+                    },
+                    ("query-assets", Some(opt)) => {
+                        call_result = self._methods_query_assets(opt, dry_run, &mut err).await;
                     },
                     ("search-all-iam-policies", Some(opt)) => {
                         call_result = self._methods_search_all_iam_policies(opt, dry_run, &mut err).await;
@@ -1872,7 +2173,7 @@ async fn main() {
                   ]),
             ]),
         
-        ("methods", "methods: 'analyze-iam-policy', 'analyze-iam-policy-longrunning', 'analyze-move', 'batch-get-assets-history', 'export-assets', 'search-all-iam-policies' and 'search-all-resources'", vec![
+        ("methods", "methods: 'analyze-iam-policy', 'analyze-iam-policy-longrunning', 'analyze-move', 'analyze-org-policies', 'analyze-org-policy-governed-assets', 'analyze-org-policy-governed-containers', 'batch-get-assets-history', 'export-assets', 'query-assets', 'search-all-iam-policies' and 'search-all-resources'", vec![
             ("analyze-iam-policy",
                     Some(r##"Analyzes IAM policies to answer which identities have what accesses on which resources."##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudasset1_cli/methods_analyze-iam-policy",
@@ -1929,7 +2230,73 @@ async fn main() {
                   vec![
                     (Some(r##"resource"##),
                      None,
-                     Some(r##"Required. Name of the resource to perform the analysis against. Only GCP Project are supported as of today. Hence, this can only be Project ID (such as "projects/my-project-id") or a Project Number (such as "projects/12345")."##),
+                     Some(r##"Required. Name of the resource to perform the analysis against. Only Google Cloud projects are supported as of today. Hence, this can only be a project ID (such as "projects/my-project-id") or a project number (such as "projects/12345")."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("analyze-org-policies",
+                    Some(r##"Analyzes organization policies under a scope."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_cloudasset1_cli/methods_analyze-org-policies",
+                  vec![
+                    (Some(r##"scope"##),
+                     None,
+                     Some(r##"Required. The organization to scope the request. Only organization policies within the scope will be analyzed. * organizations/{ORGANIZATION_NUMBER} (e.g., "organizations/123456")"##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("analyze-org-policy-governed-assets",
+                    Some(r##"Analyzes organization policies governed assets (Google Cloud resources or policies) under a scope. This RPC supports custom constraints and the following 10 canned constraints: * storage.uniformBucketLevelAccess * iam.disableServiceAccountKeyCreation * iam.allowedPolicyMemberDomains * compute.vmExternalIpAccess * appengine.enforceServiceAccountActAsCheck * gcp.resourceLocations * compute.trustedImageProjects * compute.skipDefaultNetworkCreation * compute.requireOsLogin * compute.disableNestedVirtualization This RPC only returns either resources of types supported by [searchable asset types](https://cloud.google.com/asset-inventory/docs/supported-asset-types#searchable_asset_types), or IAM policies."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_cloudasset1_cli/methods_analyze-org-policy-governed-assets",
+                  vec![
+                    (Some(r##"scope"##),
+                     None,
+                     Some(r##"Required. The organization to scope the request. Only organization policies within the scope will be analyzed. The output assets will also be limited to the ones governed by those in-scope organization policies. * organizations/{ORGANIZATION_NUMBER} (e.g., "organizations/123456")"##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("analyze-org-policy-governed-containers",
+                    Some(r##"Analyzes organization policies governed containers (projects, folders or organization) under a scope."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_cloudasset1_cli/methods_analyze-org-policy-governed-containers",
+                  vec![
+                    (Some(r##"scope"##),
+                     None,
+                     Some(r##"Required. The organization to scope the request. Only organization policies within the scope will be analyzed. The output containers will also be limited to the ones governed by those in-scope organization policies. * organizations/{ORGANIZATION_NUMBER} (e.g., "organizations/123456")"##),
                      Some(true),
                      Some(false)),
         
@@ -1995,6 +2362,34 @@ async fn main() {
                      Some(false),
                      Some(false)),
                   ]),
+            ("query-assets",
+                    Some(r##"Issue a job that queries assets using a SQL statement compatible with [BigQuery Standard SQL](http://cloud/bigquery/docs/reference/standard-sql/enabling-standard-sql). If the query execution finishes within timeout and there's no pagination, the full query results will be returned in the `QueryAssetsResponse`. Otherwise, full query results can be obtained by issuing extra requests with the `job_reference` from the a previous `QueryAssets` call. Note, the query result has approximately 10 GB limitation enforced by BigQuery https://cloud.google.com/bigquery/docs/best-practices-performance-output, queries return larger results will result in errors."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_cloudasset1_cli/methods_query-assets",
+                  vec![
+                    (Some(r##"parent"##),
+                     None,
+                     Some(r##"Required. The relative name of the root asset. This can only be an organization number (such as "organizations/123"), a project ID (such as "projects/my-project-id"), or a project number (such as "projects/12345"), or a folder number (such as "folders/123"). Only assets belonging to the `parent` will be returned."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
             ("search-all-iam-policies",
                     Some(r##"Searches all IAM policies within the specified scope, such as a project, folder, or organization. The caller must be granted the `cloudasset.assets.searchAllIamPolicies` permission on the desired scope, otherwise the request will be rejected."##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudasset1_cli/methods_search-all-iam-policies",
@@ -2018,7 +2413,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("search-all-resources",
-                    Some(r##"Searches all Cloud resources within the specified scope, such as a project, folder, or organization. The caller must be granted the `cloudasset.assets.searchAllResources` permission on the desired scope, otherwise the request will be rejected."##),
+                    Some(r##"Searches all Google Cloud resources within the specified scope, such as a project, folder, or organization. The caller must be granted the `cloudasset.assets.searchAllResources` permission on the desired scope, otherwise the request will be rejected."##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudasset1_cli/methods_search-all-resources",
                   vec![
                     (Some(r##"scope"##),
@@ -2195,8 +2590,8 @@ async fn main() {
     
     let mut app = App::new("cloudasset1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("4.0.1+20220225")
-           .about("The cloud asset API manages the history and inventory of cloud resources.")
+           .version("5.0.2+20230121")
+           .about("The Cloud Asset API manages the history and inventory of Google Cloud resources.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_cloudasset1_cli")
            .arg(Arg::with_name("url")
                    .long("scope")

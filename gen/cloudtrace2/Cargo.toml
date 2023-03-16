@@ -4,12 +4,12 @@
 [package]
 
 name = "google-cloudtrace2"
-version = "5.0.2-beta-1+20230112"
+version = "5.0.2+20230112"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Cloud Trace (protocol v2)"
 repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/cloudtrace2"
 homepage = "https://cloud.google.com/trace"
-documentation = "https://docs.rs/google-cloudtrace2/5.0.2-beta-1+20230112"
+documentation = "https://docs.rs/google-cloudtrace2/5.0.2+20230112"
 license = "MIT"
 keywords = ["cloudtrace", "google", "protocol", "web", "api"]
 autobins = false

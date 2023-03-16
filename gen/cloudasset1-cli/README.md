@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Cloud Asset* API at revision *20220225*. The CLI is at version *4.0.1*.
+This documentation was generated from the *Cloud Asset* API at revision *20230121*. The CLI is at version *5.0.2*.
 
 ```bash
 cloudasset1 [options]
@@ -43,8 +43,12 @@ cloudasset1 [options]
                 analyze-iam-policy <scope> [-p <v>]... [-o <out>]
                 analyze-iam-policy-longrunning <scope> (-r <kv>)... [-p <v>]... [-o <out>]
                 analyze-move <resource> [-p <v>]... [-o <out>]
+                analyze-org-policies <scope> [-p <v>]... [-o <out>]
+                analyze-org-policy-governed-assets <scope> [-p <v>]... [-o <out>]
+                analyze-org-policy-governed-containers <scope> [-p <v>]... [-o <out>]
                 batch-get-assets-history <parent> [-p <v>]... [-o <out>]
                 export-assets <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                query-assets <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 search-all-iam-policies <scope> [-p <v>]... [-o <out>]
                 search-all-resources <scope> [-p <v>]... [-o <out>]
         operations

@@ -4,12 +4,12 @@
 [package]
 
 name = "google-policyanalyzer1"
-version = "5.0.2-beta-1+20230122"
+version = "5.0.2+20230122"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Policy Analyzer (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/policyanalyzer1"
 homepage = "https://www.google.com"
-documentation = "https://docs.rs/google-policyanalyzer1/5.0.2-beta-1+20230122"
+documentation = "https://docs.rs/google-policyanalyzer1/5.0.2+20230122"
 license = "MIT"
 keywords = ["policyanalyzer", "google", "protocol", "web", "api"]
 autobins = false

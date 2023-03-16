@@ -1,4 +1,4 @@
-site_name: My Business Business Calls v4.0.1+20220305
+site_name: My Business Business Calls v5.0.2+20230124
 site_url: http://byron.github.io/google-apis-rs/google-mybusinessbusinesscalls1-cli
 site_description: A complete library to interact with My Business Business Calls (protocol v1)
 
@@ -7,11 +7,12 @@ repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/mybusinessbusine
 docs_dir: docs
 site_dir: build_html
 
-pages:
-- ['index.md', 'Home']
-- ['locations_businesscallsinsights-list.md', 'Locations', 'Businesscallsinsights List']
-- ['locations_get-businesscallssettings.md', 'Locations', 'Get Businesscallssettings']
-- ['locations_update-businesscallssettings.md', 'Locations', 'Update Businesscallssettings']
+nav:
+- Home: 'index.md'
+- 'Locations':
+    - 'Businesscallsinsights List': 'locations_businesscallsinsights-list.md'
+    - 'Get Businesscallssettings': 'locations_get-businesscallssettings.md'
+    - 'Update Businesscallssettings': 'locations_update-businesscallssettings.md'
 
 theme: readthedocs
 

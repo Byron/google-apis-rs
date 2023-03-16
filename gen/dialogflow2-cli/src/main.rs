@@ -3,8 +3,6 @@
 // DO NOT EDIT !
 #![allow(unused_variables, unused_imports, dead_code, unused_mut)]
 
-extern crate tokio;
-
 #[macro_use]
 extern crate clap;
 
@@ -12,9 +10,10 @@ use std::env;
 use std::io::{self, Write};
 use clap::{App, SubCommand, Arg};
 
-use google_dialogflow2::{api, Error, oauth2};
+use google_dialogflow2::{api, Error, oauth2, client::chrono, FieldMask};
 
-mod client;
+
+use google_clis_common as client;
 
 use client::{InvalidOptionsError, CLIError, arg_from_str, writer_from_opts, parse_kv_arg,
           input_file_from_opts, input_mime_from_opts, FieldCursor, FieldError, CallType, UploadProtocol,
@@ -691,7 +690,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 "language-code" => {
                     call = call.language_code(value.unwrap_or(""));
@@ -787,7 +786,7 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "update-mask" => {
-                    call = call.update_mask(value.unwrap_or(""));
+                    call = call.update_mask(        value.map(|v| arg_from_str(v, err, "update-mask", "google-fieldmask")).unwrap_or(FieldMask::default()));
                 },
                 "language-code" => {
                     call = call.language_code(value.unwrap_or(""));
@@ -1057,7 +1056,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -1116,7 +1115,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 "language-code" => {
                     call = call.language_code(value.unwrap_or(""));
@@ -1181,7 +1180,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -1285,10 +1284,10 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "update-mask" => {
-                    call = call.update_mask(value.unwrap_or(""));
+                    call = call.update_mask(        value.map(|v| arg_from_str(v, err, "update-mask", "google-fieldmask")).unwrap_or(FieldMask::default()));
                 },
                 "allow-load-to-draft-and-discard-changes" => {
-                    call = call.allow_load_to_draft_and_discard_changes(arg_from_str(value.unwrap_or("false"), err, "allow-load-to-draft-and-discard-changes", "boolean"));
+                    call = call.allow_load_to_draft_and_discard_changes(        value.map(|v| arg_from_str(v, err, "allow-load-to-draft-and-discard-changes", "boolean")).unwrap_or(false));
                 },
                 _ => {
                     let mut found = false;
@@ -1537,7 +1536,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -1627,7 +1626,7 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "update-mask" => {
-                    call = call.update_mask(value.unwrap_or(""));
+                    call = call.update_mask(        value.map(|v| arg_from_str(v, err, "update-mask", "google-fieldmask")).unwrap_or(FieldMask::default()));
                 },
                 _ => {
                     let mut found = false;
@@ -2041,7 +2040,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -2131,7 +2130,7 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "update-mask" => {
-                    call = call.update_mask(value.unwrap_or(""));
+                    call = call.update_mask(        value.map(|v| arg_from_str(v, err, "update-mask", "google-fieldmask")).unwrap_or(FieldMask::default()));
                 },
                 _ => {
                     let mut found = false;
@@ -2858,7 +2857,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 "language-code" => {
                     call = call.language_code(value.unwrap_or(""));
@@ -2967,7 +2966,7 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "update-mask" => {
-                    call = call.update_mask(value.unwrap_or(""));
+                    call = call.update_mask(        value.map(|v| arg_from_str(v, err, "update-mask", "google-fieldmask")).unwrap_or(FieldMask::default()));
                 },
                 "language-code" => {
                     call = call.language_code(value.unwrap_or(""));
@@ -3116,7 +3115,7 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "force" => {
-                    call = call.force(arg_from_str(value.unwrap_or("false"), err, "force", "boolean"));
+                    call = call.force(        value.map(|v| arg_from_str(v, err, "force", "boolean")).unwrap_or(false));
                 },
                 _ => {
                     let mut found = false;
@@ -3375,7 +3374,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 "filter" => {
                     call = call.filter(value.unwrap_or(""));
@@ -3478,7 +3477,7 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "update-mask" => {
-                    call = call.update_mask(value.unwrap_or(""));
+                    call = call.update_mask(        value.map(|v| arg_from_str(v, err, "update-mask", "google-fieldmask")).unwrap_or(FieldMask::default()));
                 },
                 _ => {
                     let mut found = false;
@@ -3676,7 +3675,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 "filter" => {
                     call = call.filter(value.unwrap_or(""));
@@ -3770,7 +3769,7 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "update-mask" => {
-                    call = call.update_mask(value.unwrap_or(""));
+                    call = call.update_mask(        value.map(|v| arg_from_str(v, err, "update-mask", "google-fieldmask")).unwrap_or(FieldMask::default()));
                 },
                 _ => {
                     let mut found = false;
@@ -3915,7 +3914,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -4164,7 +4163,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -4254,7 +4253,7 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "update-mask" => {
-                    call = call.update_mask(value.unwrap_or(""));
+                    call = call.update_mask(        value.map(|v| arg_from_str(v, err, "update-mask", "google-fieldmask")).unwrap_or(FieldMask::default()));
                 },
                 _ => {
                     let mut found = false;
@@ -4668,7 +4667,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -4758,7 +4757,7 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "update-mask" => {
-                    call = call.update_mask(value.unwrap_or(""));
+                    call = call.update_mask(        value.map(|v| arg_from_str(v, err, "update-mask", "google-fieldmask")).unwrap_or(FieldMask::default()));
                 },
                 _ => {
                     let mut found = false;
@@ -4938,7 +4937,7 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "update-mask" => {
-                    call = call.update_mask(value.unwrap_or(""));
+                    call = call.update_mask(        value.map(|v| arg_from_str(v, err, "update-mask", "google-fieldmask")).unwrap_or(FieldMask::default()));
                 },
                 _ => {
                     let mut found = false;
@@ -5190,7 +5189,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -5283,7 +5282,7 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "update-mask" => {
-                    call = call.update_mask(value.unwrap_or(""));
+                    call = call.update_mask(        value.map(|v| arg_from_str(v, err, "update-mask", "google-fieldmask")).unwrap_or(FieldMask::default()));
                 },
                 _ => {
                     let mut found = false;
@@ -5342,7 +5341,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 "filter" => {
                     call = call.filter(value.unwrap_or(""));
@@ -5432,6 +5431,9 @@ where
                     "answer-feedback.agent-assistant-detail-feedback.answer-relevance" => Some(("answerFeedback.agentAssistantDetailFeedback.answerRelevance", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "answer-feedback.agent-assistant-detail-feedback.document-correctness" => Some(("answerFeedback.agentAssistantDetailFeedback.documentCorrectness", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "answer-feedback.agent-assistant-detail-feedback.document-efficiency" => Some(("answerFeedback.agentAssistantDetailFeedback.documentEfficiency", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "answer-feedback.agent-assistant-detail-feedback.summarization-feedback.start-time" => Some(("answerFeedback.agentAssistantDetailFeedback.summarizationFeedback.startTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "answer-feedback.agent-assistant-detail-feedback.summarization-feedback.submit-time" => Some(("answerFeedback.agentAssistantDetailFeedback.summarizationFeedback.submitTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "answer-feedback.agent-assistant-detail-feedback.summarization-feedback.summary-text" => Some(("answerFeedback.agentAssistantDetailFeedback.summarizationFeedback.summaryText", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "answer-feedback.click-time" => Some(("answerFeedback.clickTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "answer-feedback.clicked" => Some(("answerFeedback.clicked", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "answer-feedback.correctness-level" => Some(("answerFeedback.correctnessLevel", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -5439,7 +5441,7 @@ where
                     "answer-feedback.displayed" => Some(("answerFeedback.displayed", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["agent-assistant-detail-feedback", "agent-assistant-record", "answer", "answer-feedback", "answer-record", "answer-relevance", "article-suggestion-answer", "click-time", "clicked", "confidence", "correctness-level", "display-time", "displayed", "document-correctness", "document-efficiency", "faq-answer", "metadata", "name", "question", "snippets", "source", "title", "uri"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["agent-assistant-detail-feedback", "agent-assistant-record", "answer", "answer-feedback", "answer-record", "answer-relevance", "article-suggestion-answer", "click-time", "clicked", "confidence", "correctness-level", "display-time", "displayed", "document-correctness", "document-efficiency", "faq-answer", "metadata", "name", "question", "snippets", "source", "start-time", "submit-time", "summarization-feedback", "summary-text", "title", "uri"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -5454,7 +5456,7 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "update-mask" => {
-                    call = call.update_mask(value.unwrap_or(""));
+                    call = call.update_mask(        value.map(|v| arg_from_str(v, err, "update-mask", "google-fieldmask")).unwrap_or(FieldMask::default()));
                 },
                 _ => {
                     let mut found = false;
@@ -5650,7 +5652,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -5988,7 +5990,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -6099,7 +6101,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -6363,11 +6365,12 @@ where
                     "notification-config.message-format" => Some(("notificationConfig.messageFormat", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "notification-config.topic" => Some(("notificationConfig.topic", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "security-settings" => Some(("securitySettings", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "stt-config.model" => Some(("sttConfig.model", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "stt-config.speech-model-variant" => Some(("sttConfig.speechModelVariant", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "time-zone" => Some(("timeZone", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account-number", "agent", "automated-agent-config", "button-id", "create-time", "deployment-id", "display-name", "enable-entity-extraction", "enable-sentiment-analysis", "enable-stackdriver-logging", "end-user-suggestion-config", "endpoint-domain", "group-suggestion-responses", "human-agent-assistant-config", "human-agent-handoff-config", "human-agent-suggestion-config", "language-code", "live-person-config", "logging-config", "message-analysis-config", "message-format", "name", "new-message-event-notification-config", "notification-config", "organization-id", "salesforce-live-agent-config", "security-settings", "speech-model-variant", "stt-config", "time-zone", "topic", "update-time"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account-number", "agent", "automated-agent-config", "button-id", "create-time", "deployment-id", "display-name", "enable-entity-extraction", "enable-sentiment-analysis", "enable-stackdriver-logging", "end-user-suggestion-config", "endpoint-domain", "group-suggestion-responses", "human-agent-assistant-config", "human-agent-handoff-config", "human-agent-suggestion-config", "language-code", "live-person-config", "logging-config", "message-analysis-config", "message-format", "model", "name", "new-message-event-notification-config", "notification-config", "organization-id", "salesforce-live-agent-config", "security-settings", "speech-model-variant", "stt-config", "time-zone", "topic", "update-time"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -6541,7 +6544,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -6635,11 +6638,12 @@ where
                     "notification-config.message-format" => Some(("notificationConfig.messageFormat", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "notification-config.topic" => Some(("notificationConfig.topic", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "security-settings" => Some(("securitySettings", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "stt-config.model" => Some(("sttConfig.model", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "stt-config.speech-model-variant" => Some(("sttConfig.speechModelVariant", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "time-zone" => Some(("timeZone", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account-number", "agent", "automated-agent-config", "button-id", "create-time", "deployment-id", "display-name", "enable-entity-extraction", "enable-sentiment-analysis", "enable-stackdriver-logging", "end-user-suggestion-config", "endpoint-domain", "group-suggestion-responses", "human-agent-assistant-config", "human-agent-handoff-config", "human-agent-suggestion-config", "language-code", "live-person-config", "logging-config", "message-analysis-config", "message-format", "name", "new-message-event-notification-config", "notification-config", "organization-id", "salesforce-live-agent-config", "security-settings", "speech-model-variant", "stt-config", "time-zone", "topic", "update-time"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account-number", "agent", "automated-agent-config", "button-id", "create-time", "deployment-id", "display-name", "enable-entity-extraction", "enable-sentiment-analysis", "enable-stackdriver-logging", "end-user-suggestion-config", "endpoint-domain", "group-suggestion-responses", "human-agent-assistant-config", "human-agent-handoff-config", "human-agent-suggestion-config", "language-code", "live-person-config", "logging-config", "message-analysis-config", "message-format", "model", "name", "new-message-event-notification-config", "notification-config", "organization-id", "salesforce-live-agent-config", "security-settings", "speech-model-variant", "stt-config", "time-zone", "topic", "update-time"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -6654,7 +6658,7 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "update-mask" => {
-                    call = call.update_mask(value.unwrap_or(""));
+                    call = call.update_mask(        value.map(|v| arg_from_str(v, err, "update-mask", "google-fieldmask")).unwrap_or(FieldMask::default()));
                 },
                 _ => {
                     let mut found = false;
@@ -7043,7 +7047,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 "filter" => {
                     call = call.filter(value.unwrap_or(""));
@@ -7105,7 +7109,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 "filter" => {
                     call = call.filter(value.unwrap_or(""));
@@ -7286,10 +7290,11 @@ where
                 match &temp_cursor.to_string()[..] {
                     "documents-metadata-filters" => Some(("documentsMetadataFilters", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "obfuscated-external-user-id" => Some(("obfuscatedExternalUserId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "role" => Some(("role", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "sip-recording-media-label" => Some(("sipRecordingMediaLabel", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["documents-metadata-filters", "name", "role", "sip-recording-media-label"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["documents-metadata-filters", "name", "obfuscated-external-user-id", "role", "sip-recording-media-label"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -7411,7 +7416,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -7485,10 +7490,11 @@ where
                 match &temp_cursor.to_string()[..] {
                     "documents-metadata-filters" => Some(("documentsMetadataFilters", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "obfuscated-external-user-id" => Some(("obfuscatedExternalUserId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "role" => Some(("role", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "sip-recording-media-label" => Some(("sipRecordingMediaLabel", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["documents-metadata-filters", "name", "role", "sip-recording-media-label"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["documents-metadata-filters", "name", "obfuscated-external-user-id", "role", "sip-recording-media-label"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -7503,7 +7509,7 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "update-mask" => {
-                    call = call.update_mask(value.unwrap_or(""));
+                    call = call.update_mask(        value.map(|v| arg_from_str(v, err, "update-mask", "google-fieldmask")).unwrap_or(FieldMask::default()));
                 },
                 _ => {
                     let mut found = false;
@@ -7814,6 +7820,92 @@ where
         }
     }
 
+    async fn _projects_conversations_suggestions_suggest_conversation_summary(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "context-size" => Some(("contextSize", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "latest-message" => Some(("latestMessage", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["context-size", "latest-message"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::GoogleCloudDialogflowV2SuggestConversationSummaryRequest = json::value::from_value(object).unwrap();
+        let mut call = self.hub.projects().conversations_suggestions_suggest_conversation_summary(request, opt.value_of("conversation").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
     async fn _projects_delete_agent(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.projects().delete_agent(opt.value_of("parent").unwrap_or(""));
@@ -8012,7 +8104,7 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "force" => {
-                    call = call.force(arg_from_str(value.unwrap_or("false"), err, "force", "boolean"));
+                    call = call.force(        value.map(|v| arg_from_str(v, err, "force", "boolean")).unwrap_or(false));
                 },
                 _ => {
                     let mut found = false;
@@ -8447,7 +8539,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 "filter" => {
                     call = call.filter(value.unwrap_or(""));
@@ -8550,7 +8642,7 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "update-mask" => {
-                    call = call.update_mask(value.unwrap_or(""));
+                    call = call.update_mask(        value.map(|v| arg_from_str(v, err, "update-mask", "google-fieldmask")).unwrap_or(FieldMask::default()));
                 },
                 _ => {
                     let mut found = false;
@@ -8748,7 +8840,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 "filter" => {
                     call = call.filter(value.unwrap_or(""));
@@ -8842,7 +8934,7 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "update-mask" => {
-                    call = call.update_mask(value.unwrap_or(""));
+                    call = call.update_mask(        value.map(|v| arg_from_str(v, err, "update-mask", "google-fieldmask")).unwrap_or(FieldMask::default()));
                 },
                 _ => {
                     let mut found = false;
@@ -9531,7 +9623,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 "language-code" => {
                     call = call.language_code(value.unwrap_or(""));
@@ -9627,7 +9719,7 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "update-mask" => {
-                    call = call.update_mask(value.unwrap_or(""));
+                    call = call.update_mask(        value.map(|v| arg_from_str(v, err, "update-mask", "google-fieldmask")).unwrap_or(FieldMask::default()));
                 },
                 "language-code" => {
                     call = call.language_code(value.unwrap_or(""));
@@ -9897,7 +9989,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -9956,7 +10048,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 "language-code" => {
                     call = call.language_code(value.unwrap_or(""));
@@ -10021,7 +10113,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -10125,10 +10217,10 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "update-mask" => {
-                    call = call.update_mask(value.unwrap_or(""));
+                    call = call.update_mask(        value.map(|v| arg_from_str(v, err, "update-mask", "google-fieldmask")).unwrap_or(FieldMask::default()));
                 },
                 "allow-load-to-draft-and-discard-changes" => {
-                    call = call.allow_load_to_draft_and_discard_changes(arg_from_str(value.unwrap_or("false"), err, "allow-load-to-draft-and-discard-changes", "boolean"));
+                    call = call.allow_load_to_draft_and_discard_changes(        value.map(|v| arg_from_str(v, err, "allow-load-to-draft-and-discard-changes", "boolean")).unwrap_or(false));
                 },
                 _ => {
                     let mut found = false;
@@ -10377,7 +10469,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -10467,7 +10559,7 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "update-mask" => {
-                    call = call.update_mask(value.unwrap_or(""));
+                    call = call.update_mask(        value.map(|v| arg_from_str(v, err, "update-mask", "google-fieldmask")).unwrap_or(FieldMask::default()));
                 },
                 _ => {
                     let mut found = false;
@@ -10881,7 +10973,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -10971,7 +11063,7 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "update-mask" => {
-                    call = call.update_mask(value.unwrap_or(""));
+                    call = call.update_mask(        value.map(|v| arg_from_str(v, err, "update-mask", "google-fieldmask")).unwrap_or(FieldMask::default()));
                 },
                 _ => {
                     let mut found = false;
@@ -11698,7 +11790,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 "language-code" => {
                     call = call.language_code(value.unwrap_or(""));
@@ -11807,7 +11899,7 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "update-mask" => {
-                    call = call.update_mask(value.unwrap_or(""));
+                    call = call.update_mask(        value.map(|v| arg_from_str(v, err, "update-mask", "google-fieldmask")).unwrap_or(FieldMask::default()));
                 },
                 "language-code" => {
                     call = call.language_code(value.unwrap_or(""));
@@ -11958,7 +12050,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -12207,7 +12299,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -12297,7 +12389,7 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "update-mask" => {
-                    call = call.update_mask(value.unwrap_or(""));
+                    call = call.update_mask(        value.map(|v| arg_from_str(v, err, "update-mask", "google-fieldmask")).unwrap_or(FieldMask::default()));
                 },
                 _ => {
                     let mut found = false;
@@ -12711,7 +12803,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -12801,7 +12893,7 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "update-mask" => {
-                    call = call.update_mask(value.unwrap_or(""));
+                    call = call.update_mask(        value.map(|v| arg_from_str(v, err, "update-mask", "google-fieldmask")).unwrap_or(FieldMask::default()));
                 },
                 _ => {
                     let mut found = false;
@@ -12981,7 +13073,7 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "update-mask" => {
-                    call = call.update_mask(value.unwrap_or(""));
+                    call = call.update_mask(        value.map(|v| arg_from_str(v, err, "update-mask", "google-fieldmask")).unwrap_or(FieldMask::default()));
                 },
                 _ => {
                     let mut found = false;
@@ -13233,7 +13325,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -13326,7 +13418,7 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "update-mask" => {
-                    call = call.update_mask(value.unwrap_or(""));
+                    call = call.update_mask(        value.map(|v| arg_from_str(v, err, "update-mask", "google-fieldmask")).unwrap_or(FieldMask::default()));
                 },
                 _ => {
                     let mut found = false;
@@ -13385,7 +13477,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 "filter" => {
                     call = call.filter(value.unwrap_or(""));
@@ -13475,6 +13567,9 @@ where
                     "answer-feedback.agent-assistant-detail-feedback.answer-relevance" => Some(("answerFeedback.agentAssistantDetailFeedback.answerRelevance", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "answer-feedback.agent-assistant-detail-feedback.document-correctness" => Some(("answerFeedback.agentAssistantDetailFeedback.documentCorrectness", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "answer-feedback.agent-assistant-detail-feedback.document-efficiency" => Some(("answerFeedback.agentAssistantDetailFeedback.documentEfficiency", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "answer-feedback.agent-assistant-detail-feedback.summarization-feedback.start-time" => Some(("answerFeedback.agentAssistantDetailFeedback.summarizationFeedback.startTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "answer-feedback.agent-assistant-detail-feedback.summarization-feedback.submit-time" => Some(("answerFeedback.agentAssistantDetailFeedback.summarizationFeedback.submitTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "answer-feedback.agent-assistant-detail-feedback.summarization-feedback.summary-text" => Some(("answerFeedback.agentAssistantDetailFeedback.summarizationFeedback.summaryText", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "answer-feedback.click-time" => Some(("answerFeedback.clickTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "answer-feedback.clicked" => Some(("answerFeedback.clicked", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "answer-feedback.correctness-level" => Some(("answerFeedback.correctnessLevel", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -13482,7 +13577,7 @@ where
                     "answer-feedback.displayed" => Some(("answerFeedback.displayed", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["agent-assistant-detail-feedback", "agent-assistant-record", "answer", "answer-feedback", "answer-record", "answer-relevance", "article-suggestion-answer", "click-time", "clicked", "confidence", "correctness-level", "display-time", "displayed", "document-correctness", "document-efficiency", "faq-answer", "metadata", "name", "question", "snippets", "source", "title", "uri"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["agent-assistant-detail-feedback", "agent-assistant-record", "answer", "answer-feedback", "answer-record", "answer-relevance", "article-suggestion-answer", "click-time", "clicked", "confidence", "correctness-level", "display-time", "displayed", "document-correctness", "document-efficiency", "faq-answer", "metadata", "name", "question", "snippets", "source", "start-time", "submit-time", "summarization-feedback", "summary-text", "title", "uri"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -13497,7 +13592,7 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "update-mask" => {
-                    call = call.update_mask(value.unwrap_or(""));
+                    call = call.update_mask(        value.map(|v| arg_from_str(v, err, "update-mask", "google-fieldmask")).unwrap_or(FieldMask::default()));
                 },
                 _ => {
                     let mut found = false;
@@ -13836,7 +13931,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -14142,10 +14237,11 @@ where
                     "conversation-model-evaluation.evaluation-config.smart-reply-config.allowlist-document" => Some(("conversationModelEvaluation.evaluationConfig.smartReplyConfig.allowlistDocument", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "conversation-model-evaluation.evaluation-config.smart-reply-config.max-result-count" => Some(("conversationModelEvaluation.evaluationConfig.smartReplyConfig.maxResultCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "conversation-model-evaluation.name" => Some(("conversationModelEvaluation.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "conversation-model-evaluation.raw-human-eval-template-csv" => Some(("conversationModelEvaluation.rawHumanEvalTemplateCsv", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "conversation-model-evaluation.smart-reply-metrics.allowlist-coverage" => Some(("conversationModelEvaluation.smartReplyMetrics.allowlistCoverage", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "conversation-model-evaluation.smart-reply-metrics.conversation-count" => Some(("conversationModelEvaluation.smartReplyMetrics.conversationCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["allowlist-coverage", "allowlist-document", "conversation-count", "conversation-model-evaluation", "create-time", "display-name", "evaluation-config", "max-result-count", "name", "smart-compose-config", "smart-reply-config", "smart-reply-metrics"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["allowlist-coverage", "allowlist-document", "conversation-count", "conversation-model-evaluation", "create-time", "display-name", "evaluation-config", "max-result-count", "name", "raw-human-eval-template-csv", "smart-compose-config", "smart-reply-config", "smart-reply-metrics"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -14267,7 +14363,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -14378,7 +14474,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -14642,11 +14738,12 @@ where
                     "notification-config.message-format" => Some(("notificationConfig.messageFormat", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "notification-config.topic" => Some(("notificationConfig.topic", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "security-settings" => Some(("securitySettings", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "stt-config.model" => Some(("sttConfig.model", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "stt-config.speech-model-variant" => Some(("sttConfig.speechModelVariant", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "time-zone" => Some(("timeZone", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account-number", "agent", "automated-agent-config", "button-id", "create-time", "deployment-id", "display-name", "enable-entity-extraction", "enable-sentiment-analysis", "enable-stackdriver-logging", "end-user-suggestion-config", "endpoint-domain", "group-suggestion-responses", "human-agent-assistant-config", "human-agent-handoff-config", "human-agent-suggestion-config", "language-code", "live-person-config", "logging-config", "message-analysis-config", "message-format", "name", "new-message-event-notification-config", "notification-config", "organization-id", "salesforce-live-agent-config", "security-settings", "speech-model-variant", "stt-config", "time-zone", "topic", "update-time"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account-number", "agent", "automated-agent-config", "button-id", "create-time", "deployment-id", "display-name", "enable-entity-extraction", "enable-sentiment-analysis", "enable-stackdriver-logging", "end-user-suggestion-config", "endpoint-domain", "group-suggestion-responses", "human-agent-assistant-config", "human-agent-handoff-config", "human-agent-suggestion-config", "language-code", "live-person-config", "logging-config", "message-analysis-config", "message-format", "model", "name", "new-message-event-notification-config", "notification-config", "organization-id", "salesforce-live-agent-config", "security-settings", "speech-model-variant", "stt-config", "time-zone", "topic", "update-time"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -14820,7 +14917,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -14914,11 +15011,12 @@ where
                     "notification-config.message-format" => Some(("notificationConfig.messageFormat", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "notification-config.topic" => Some(("notificationConfig.topic", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "security-settings" => Some(("securitySettings", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "stt-config.model" => Some(("sttConfig.model", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "stt-config.speech-model-variant" => Some(("sttConfig.speechModelVariant", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "time-zone" => Some(("timeZone", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account-number", "agent", "automated-agent-config", "button-id", "create-time", "deployment-id", "display-name", "enable-entity-extraction", "enable-sentiment-analysis", "enable-stackdriver-logging", "end-user-suggestion-config", "endpoint-domain", "group-suggestion-responses", "human-agent-assistant-config", "human-agent-handoff-config", "human-agent-suggestion-config", "language-code", "live-person-config", "logging-config", "message-analysis-config", "message-format", "name", "new-message-event-notification-config", "notification-config", "organization-id", "salesforce-live-agent-config", "security-settings", "speech-model-variant", "stt-config", "time-zone", "topic", "update-time"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account-number", "agent", "automated-agent-config", "button-id", "create-time", "deployment-id", "display-name", "enable-entity-extraction", "enable-sentiment-analysis", "enable-stackdriver-logging", "end-user-suggestion-config", "endpoint-domain", "group-suggestion-responses", "human-agent-assistant-config", "human-agent-handoff-config", "human-agent-suggestion-config", "language-code", "live-person-config", "logging-config", "message-analysis-config", "message-format", "model", "name", "new-message-event-notification-config", "notification-config", "organization-id", "salesforce-live-agent-config", "security-settings", "speech-model-variant", "stt-config", "time-zone", "topic", "update-time"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -14933,7 +15031,7 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "update-mask" => {
-                    call = call.update_mask(value.unwrap_or(""));
+                    call = call.update_mask(        value.map(|v| arg_from_str(v, err, "update-mask", "google-fieldmask")).unwrap_or(FieldMask::default()));
                 },
                 _ => {
                     let mut found = false;
@@ -15322,7 +15420,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 "filter" => {
                     call = call.filter(value.unwrap_or(""));
@@ -15384,7 +15482,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 "filter" => {
                     call = call.filter(value.unwrap_or(""));
@@ -15565,10 +15663,11 @@ where
                 match &temp_cursor.to_string()[..] {
                     "documents-metadata-filters" => Some(("documentsMetadataFilters", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "obfuscated-external-user-id" => Some(("obfuscatedExternalUserId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "role" => Some(("role", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "sip-recording-media-label" => Some(("sipRecordingMediaLabel", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["documents-metadata-filters", "name", "role", "sip-recording-media-label"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["documents-metadata-filters", "name", "obfuscated-external-user-id", "role", "sip-recording-media-label"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -15690,7 +15789,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -15764,10 +15863,11 @@ where
                 match &temp_cursor.to_string()[..] {
                     "documents-metadata-filters" => Some(("documentsMetadataFilters", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "obfuscated-external-user-id" => Some(("obfuscatedExternalUserId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "role" => Some(("role", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "sip-recording-media-label" => Some(("sipRecordingMediaLabel", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["documents-metadata-filters", "name", "role", "sip-recording-media-label"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["documents-metadata-filters", "name", "obfuscated-external-user-id", "role", "sip-recording-media-label"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -15782,7 +15882,7 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "update-mask" => {
-                    call = call.update_mask(value.unwrap_or(""));
+                    call = call.update_mask(        value.map(|v| arg_from_str(v, err, "update-mask", "google-fieldmask")).unwrap_or(FieldMask::default()));
                 },
                 _ => {
                     let mut found = false;
@@ -16093,6 +16193,92 @@ where
         }
     }
 
+    async fn _projects_locations_conversations_suggestions_suggest_conversation_summary(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "context-size" => Some(("contextSize", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "latest-message" => Some(("latestMessage", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["context-size", "latest-message"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::GoogleCloudDialogflowV2SuggestConversationSummaryRequest = json::value::from_value(object).unwrap();
+        let mut call = self.hub.projects().locations_conversations_suggestions_suggest_conversation_summary(request, opt.value_of("conversation").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
     async fn _projects_locations_delete_agent(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.projects().locations_delete_agent(opt.value_of("parent").unwrap_or(""));
@@ -16343,7 +16529,7 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "force" => {
-                    call = call.force(arg_from_str(value.unwrap_or("false"), err, "force", "boolean"));
+                    call = call.force(        value.map(|v| arg_from_str(v, err, "force", "boolean")).unwrap_or(false));
                 },
                 _ => {
                     let mut found = false;
@@ -16778,7 +16964,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 "filter" => {
                     call = call.filter(value.unwrap_or(""));
@@ -16881,7 +17067,7 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "update-mask" => {
-                    call = call.update_mask(value.unwrap_or(""));
+                    call = call.update_mask(        value.map(|v| arg_from_str(v, err, "update-mask", "google-fieldmask")).unwrap_or(FieldMask::default()));
                 },
                 _ => {
                     let mut found = false;
@@ -17079,7 +17265,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 "filter" => {
                     call = call.filter(value.unwrap_or(""));
@@ -17173,7 +17359,7 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "update-mask" => {
-                    call = call.update_mask(value.unwrap_or(""));
+                    call = call.update_mask(        value.map(|v| arg_from_str(v, err, "update-mask", "google-fieldmask")).unwrap_or(FieldMask::default()));
                 },
                 _ => {
                     let mut found = false;
@@ -17232,7 +17418,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 "filter" => {
                     call = call.filter(value.unwrap_or(""));
@@ -17398,7 +17584,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 "filter" => {
                     call = call.filter(value.unwrap_or(""));
@@ -17501,7 +17687,7 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "update-mask" => {
-                    call = call.update_mask(value.unwrap_or(""));
+                    call = call.update_mask(        value.map(|v| arg_from_str(v, err, "update-mask", "google-fieldmask")).unwrap_or(FieldMask::default()));
                 },
                 _ => {
                     let mut found = false;
@@ -17664,7 +17850,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 "filter" => {
                     call = call.filter(value.unwrap_or(""));
@@ -17767,7 +17953,7 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "update-mask" => {
-                    call = call.update_mask(value.unwrap_or(""));
+                    call = call.update_mask(        value.map(|v| arg_from_str(v, err, "update-mask", "google-fieldmask")).unwrap_or(FieldMask::default()));
                 },
                 _ => {
                     let mut found = false;
@@ -18138,6 +18324,9 @@ where
                     ("conversations-participants-suggestions-suggest-smart-replies", Some(opt)) => {
                         call_result = self._projects_conversations_participants_suggestions_suggest_smart_replies(opt, dry_run, &mut err).await;
                     },
+                    ("conversations-suggestions-suggest-conversation-summary", Some(opt)) => {
+                        call_result = self._projects_conversations_suggestions_suggest_conversation_summary(opt, dry_run, &mut err).await;
+                    },
                     ("delete-agent", Some(opt)) => {
                         call_result = self._projects_delete_agent(opt, dry_run, &mut err).await;
                     },
@@ -18474,6 +18663,9 @@ where
                     ("locations-conversations-participants-suggestions-suggest-smart-replies", Some(opt)) => {
                         call_result = self._projects_locations_conversations_participants_suggestions_suggest_smart_replies(opt, dry_run, &mut err).await;
                     },
+                    ("locations-conversations-suggestions-suggest-conversation-summary", Some(opt)) => {
+                        call_result = self._projects_locations_conversations_suggestions_suggest_conversation_summary(opt, dry_run, &mut err).await;
+                    },
                     ("locations-delete-agent", Some(opt)) => {
                         call_result = self._projects_locations_delete_agent(opt, dry_run, &mut err).await;
                     },
@@ -18628,7 +18820,7 @@ where
 async fn main() {
     let mut exit_status = 0i32;
     let arg_data = [
-        ("projects", "methods: 'agent-entity-types-batch-delete', 'agent-entity-types-batch-update', 'agent-entity-types-create', 'agent-entity-types-delete', 'agent-entity-types-entities-batch-create', 'agent-entity-types-entities-batch-delete', 'agent-entity-types-entities-batch-update', 'agent-entity-types-get', 'agent-entity-types-list', 'agent-entity-types-patch', 'agent-environments-create', 'agent-environments-delete', 'agent-environments-get', 'agent-environments-get-history', 'agent-environments-intents-list', 'agent-environments-list', 'agent-environments-patch', 'agent-environments-users-sessions-contexts-create', 'agent-environments-users-sessions-contexts-delete', 'agent-environments-users-sessions-contexts-get', 'agent-environments-users-sessions-contexts-list', 'agent-environments-users-sessions-contexts-patch', 'agent-environments-users-sessions-delete-contexts', 'agent-environments-users-sessions-detect-intent', 'agent-environments-users-sessions-entity-types-create', 'agent-environments-users-sessions-entity-types-delete', 'agent-environments-users-sessions-entity-types-get', 'agent-environments-users-sessions-entity-types-list', 'agent-environments-users-sessions-entity-types-patch', 'agent-export', 'agent-get-fulfillment', 'agent-get-validation-result', 'agent-import', 'agent-intents-batch-delete', 'agent-intents-batch-update', 'agent-intents-create', 'agent-intents-delete', 'agent-intents-get', 'agent-intents-list', 'agent-intents-patch', 'agent-knowledge-bases-create', 'agent-knowledge-bases-delete', 'agent-knowledge-bases-documents-create', 'agent-knowledge-bases-documents-delete', 'agent-knowledge-bases-documents-get', 'agent-knowledge-bases-documents-list', 'agent-knowledge-bases-documents-patch', 'agent-knowledge-bases-documents-reload', 'agent-knowledge-bases-get', 'agent-knowledge-bases-list', 'agent-knowledge-bases-patch', 'agent-restore', 'agent-search', 'agent-sessions-contexts-create', 'agent-sessions-contexts-delete', 'agent-sessions-contexts-get', 'agent-sessions-contexts-list', 'agent-sessions-contexts-patch', 'agent-sessions-delete-contexts', 'agent-sessions-detect-intent', 'agent-sessions-entity-types-create', 'agent-sessions-entity-types-delete', 'agent-sessions-entity-types-get', 'agent-sessions-entity-types-list', 'agent-sessions-entity-types-patch', 'agent-train', 'agent-update-fulfillment', 'agent-versions-create', 'agent-versions-delete', 'agent-versions-get', 'agent-versions-list', 'agent-versions-patch', 'answer-records-list', 'answer-records-patch', 'conversation-datasets-get', 'conversation-datasets-import-conversation-data', 'conversation-datasets-list', 'conversation-models-create', 'conversation-models-delete', 'conversation-models-deploy', 'conversation-models-evaluations-get', 'conversation-models-evaluations-list', 'conversation-models-get', 'conversation-models-list', 'conversation-models-undeploy', 'conversation-profiles-clear-suggestion-feature-config', 'conversation-profiles-create', 'conversation-profiles-delete', 'conversation-profiles-get', 'conversation-profiles-list', 'conversation-profiles-patch', 'conversation-profiles-set-suggestion-feature-config', 'conversations-complete', 'conversations-create', 'conversations-get', 'conversations-list', 'conversations-messages-list', 'conversations-participants-analyze-content', 'conversations-participants-create', 'conversations-participants-get', 'conversations-participants-list', 'conversations-participants-patch', 'conversations-participants-suggestions-suggest-articles', 'conversations-participants-suggestions-suggest-faq-answers', 'conversations-participants-suggestions-suggest-smart-replies', 'delete-agent', 'get-agent', 'knowledge-bases-create', 'knowledge-bases-delete', 'knowledge-bases-documents-create', 'knowledge-bases-documents-delete', 'knowledge-bases-documents-export', 'knowledge-bases-documents-get', 'knowledge-bases-documents-import', 'knowledge-bases-documents-list', 'knowledge-bases-documents-patch', 'knowledge-bases-documents-reload', 'knowledge-bases-get', 'knowledge-bases-list', 'knowledge-bases-patch', 'locations-agent-entity-types-batch-delete', 'locations-agent-entity-types-batch-update', 'locations-agent-entity-types-create', 'locations-agent-entity-types-delete', 'locations-agent-entity-types-entities-batch-create', 'locations-agent-entity-types-entities-batch-delete', 'locations-agent-entity-types-entities-batch-update', 'locations-agent-entity-types-get', 'locations-agent-entity-types-list', 'locations-agent-entity-types-patch', 'locations-agent-environments-create', 'locations-agent-environments-delete', 'locations-agent-environments-get', 'locations-agent-environments-get-history', 'locations-agent-environments-intents-list', 'locations-agent-environments-list', 'locations-agent-environments-patch', 'locations-agent-environments-users-sessions-contexts-create', 'locations-agent-environments-users-sessions-contexts-delete', 'locations-agent-environments-users-sessions-contexts-get', 'locations-agent-environments-users-sessions-contexts-list', 'locations-agent-environments-users-sessions-contexts-patch', 'locations-agent-environments-users-sessions-delete-contexts', 'locations-agent-environments-users-sessions-detect-intent', 'locations-agent-environments-users-sessions-entity-types-create', 'locations-agent-environments-users-sessions-entity-types-delete', 'locations-agent-environments-users-sessions-entity-types-get', 'locations-agent-environments-users-sessions-entity-types-list', 'locations-agent-environments-users-sessions-entity-types-patch', 'locations-agent-export', 'locations-agent-get-fulfillment', 'locations-agent-get-validation-result', 'locations-agent-import', 'locations-agent-intents-batch-delete', 'locations-agent-intents-batch-update', 'locations-agent-intents-create', 'locations-agent-intents-delete', 'locations-agent-intents-get', 'locations-agent-intents-list', 'locations-agent-intents-patch', 'locations-agent-restore', 'locations-agent-search', 'locations-agent-sessions-contexts-create', 'locations-agent-sessions-contexts-delete', 'locations-agent-sessions-contexts-get', 'locations-agent-sessions-contexts-list', 'locations-agent-sessions-contexts-patch', 'locations-agent-sessions-delete-contexts', 'locations-agent-sessions-detect-intent', 'locations-agent-sessions-entity-types-create', 'locations-agent-sessions-entity-types-delete', 'locations-agent-sessions-entity-types-get', 'locations-agent-sessions-entity-types-list', 'locations-agent-sessions-entity-types-patch', 'locations-agent-train', 'locations-agent-update-fulfillment', 'locations-agent-versions-create', 'locations-agent-versions-delete', 'locations-agent-versions-get', 'locations-agent-versions-list', 'locations-agent-versions-patch', 'locations-answer-records-list', 'locations-answer-records-patch', 'locations-conversation-datasets-create', 'locations-conversation-datasets-delete', 'locations-conversation-datasets-get', 'locations-conversation-datasets-import-conversation-data', 'locations-conversation-datasets-list', 'locations-conversation-models-create', 'locations-conversation-models-delete', 'locations-conversation-models-deploy', 'locations-conversation-models-evaluations-create', 'locations-conversation-models-evaluations-get', 'locations-conversation-models-evaluations-list', 'locations-conversation-models-get', 'locations-conversation-models-list', 'locations-conversation-models-undeploy', 'locations-conversation-profiles-clear-suggestion-feature-config', 'locations-conversation-profiles-create', 'locations-conversation-profiles-delete', 'locations-conversation-profiles-get', 'locations-conversation-profiles-list', 'locations-conversation-profiles-patch', 'locations-conversation-profiles-set-suggestion-feature-config', 'locations-conversations-complete', 'locations-conversations-create', 'locations-conversations-get', 'locations-conversations-list', 'locations-conversations-messages-list', 'locations-conversations-participants-analyze-content', 'locations-conversations-participants-create', 'locations-conversations-participants-get', 'locations-conversations-participants-list', 'locations-conversations-participants-patch', 'locations-conversations-participants-suggestions-suggest-articles', 'locations-conversations-participants-suggestions-suggest-faq-answers', 'locations-conversations-participants-suggestions-suggest-smart-replies', 'locations-delete-agent', 'locations-get', 'locations-get-agent', 'locations-knowledge-bases-create', 'locations-knowledge-bases-delete', 'locations-knowledge-bases-documents-create', 'locations-knowledge-bases-documents-delete', 'locations-knowledge-bases-documents-export', 'locations-knowledge-bases-documents-get', 'locations-knowledge-bases-documents-import', 'locations-knowledge-bases-documents-list', 'locations-knowledge-bases-documents-patch', 'locations-knowledge-bases-documents-reload', 'locations-knowledge-bases-get', 'locations-knowledge-bases-list', 'locations-knowledge-bases-patch', 'locations-list', 'locations-operations-cancel', 'locations-operations-get', 'locations-operations-list', 'locations-set-agent', 'operations-cancel', 'operations-get', 'operations-list' and 'set-agent'", vec![
+        ("projects", "methods: 'agent-entity-types-batch-delete', 'agent-entity-types-batch-update', 'agent-entity-types-create', 'agent-entity-types-delete', 'agent-entity-types-entities-batch-create', 'agent-entity-types-entities-batch-delete', 'agent-entity-types-entities-batch-update', 'agent-entity-types-get', 'agent-entity-types-list', 'agent-entity-types-patch', 'agent-environments-create', 'agent-environments-delete', 'agent-environments-get', 'agent-environments-get-history', 'agent-environments-intents-list', 'agent-environments-list', 'agent-environments-patch', 'agent-environments-users-sessions-contexts-create', 'agent-environments-users-sessions-contexts-delete', 'agent-environments-users-sessions-contexts-get', 'agent-environments-users-sessions-contexts-list', 'agent-environments-users-sessions-contexts-patch', 'agent-environments-users-sessions-delete-contexts', 'agent-environments-users-sessions-detect-intent', 'agent-environments-users-sessions-entity-types-create', 'agent-environments-users-sessions-entity-types-delete', 'agent-environments-users-sessions-entity-types-get', 'agent-environments-users-sessions-entity-types-list', 'agent-environments-users-sessions-entity-types-patch', 'agent-export', 'agent-get-fulfillment', 'agent-get-validation-result', 'agent-import', 'agent-intents-batch-delete', 'agent-intents-batch-update', 'agent-intents-create', 'agent-intents-delete', 'agent-intents-get', 'agent-intents-list', 'agent-intents-patch', 'agent-knowledge-bases-create', 'agent-knowledge-bases-delete', 'agent-knowledge-bases-documents-create', 'agent-knowledge-bases-documents-delete', 'agent-knowledge-bases-documents-get', 'agent-knowledge-bases-documents-list', 'agent-knowledge-bases-documents-patch', 'agent-knowledge-bases-documents-reload', 'agent-knowledge-bases-get', 'agent-knowledge-bases-list', 'agent-knowledge-bases-patch', 'agent-restore', 'agent-search', 'agent-sessions-contexts-create', 'agent-sessions-contexts-delete', 'agent-sessions-contexts-get', 'agent-sessions-contexts-list', 'agent-sessions-contexts-patch', 'agent-sessions-delete-contexts', 'agent-sessions-detect-intent', 'agent-sessions-entity-types-create', 'agent-sessions-entity-types-delete', 'agent-sessions-entity-types-get', 'agent-sessions-entity-types-list', 'agent-sessions-entity-types-patch', 'agent-train', 'agent-update-fulfillment', 'agent-versions-create', 'agent-versions-delete', 'agent-versions-get', 'agent-versions-list', 'agent-versions-patch', 'answer-records-list', 'answer-records-patch', 'conversation-datasets-get', 'conversation-datasets-import-conversation-data', 'conversation-datasets-list', 'conversation-models-create', 'conversation-models-delete', 'conversation-models-deploy', 'conversation-models-evaluations-get', 'conversation-models-evaluations-list', 'conversation-models-get', 'conversation-models-list', 'conversation-models-undeploy', 'conversation-profiles-clear-suggestion-feature-config', 'conversation-profiles-create', 'conversation-profiles-delete', 'conversation-profiles-get', 'conversation-profiles-list', 'conversation-profiles-patch', 'conversation-profiles-set-suggestion-feature-config', 'conversations-complete', 'conversations-create', 'conversations-get', 'conversations-list', 'conversations-messages-list', 'conversations-participants-analyze-content', 'conversations-participants-create', 'conversations-participants-get', 'conversations-participants-list', 'conversations-participants-patch', 'conversations-participants-suggestions-suggest-articles', 'conversations-participants-suggestions-suggest-faq-answers', 'conversations-participants-suggestions-suggest-smart-replies', 'conversations-suggestions-suggest-conversation-summary', 'delete-agent', 'get-agent', 'knowledge-bases-create', 'knowledge-bases-delete', 'knowledge-bases-documents-create', 'knowledge-bases-documents-delete', 'knowledge-bases-documents-export', 'knowledge-bases-documents-get', 'knowledge-bases-documents-import', 'knowledge-bases-documents-list', 'knowledge-bases-documents-patch', 'knowledge-bases-documents-reload', 'knowledge-bases-get', 'knowledge-bases-list', 'knowledge-bases-patch', 'locations-agent-entity-types-batch-delete', 'locations-agent-entity-types-batch-update', 'locations-agent-entity-types-create', 'locations-agent-entity-types-delete', 'locations-agent-entity-types-entities-batch-create', 'locations-agent-entity-types-entities-batch-delete', 'locations-agent-entity-types-entities-batch-update', 'locations-agent-entity-types-get', 'locations-agent-entity-types-list', 'locations-agent-entity-types-patch', 'locations-agent-environments-create', 'locations-agent-environments-delete', 'locations-agent-environments-get', 'locations-agent-environments-get-history', 'locations-agent-environments-intents-list', 'locations-agent-environments-list', 'locations-agent-environments-patch', 'locations-agent-environments-users-sessions-contexts-create', 'locations-agent-environments-users-sessions-contexts-delete', 'locations-agent-environments-users-sessions-contexts-get', 'locations-agent-environments-users-sessions-contexts-list', 'locations-agent-environments-users-sessions-contexts-patch', 'locations-agent-environments-users-sessions-delete-contexts', 'locations-agent-environments-users-sessions-detect-intent', 'locations-agent-environments-users-sessions-entity-types-create', 'locations-agent-environments-users-sessions-entity-types-delete', 'locations-agent-environments-users-sessions-entity-types-get', 'locations-agent-environments-users-sessions-entity-types-list', 'locations-agent-environments-users-sessions-entity-types-patch', 'locations-agent-export', 'locations-agent-get-fulfillment', 'locations-agent-get-validation-result', 'locations-agent-import', 'locations-agent-intents-batch-delete', 'locations-agent-intents-batch-update', 'locations-agent-intents-create', 'locations-agent-intents-delete', 'locations-agent-intents-get', 'locations-agent-intents-list', 'locations-agent-intents-patch', 'locations-agent-restore', 'locations-agent-search', 'locations-agent-sessions-contexts-create', 'locations-agent-sessions-contexts-delete', 'locations-agent-sessions-contexts-get', 'locations-agent-sessions-contexts-list', 'locations-agent-sessions-contexts-patch', 'locations-agent-sessions-delete-contexts', 'locations-agent-sessions-detect-intent', 'locations-agent-sessions-entity-types-create', 'locations-agent-sessions-entity-types-delete', 'locations-agent-sessions-entity-types-get', 'locations-agent-sessions-entity-types-list', 'locations-agent-sessions-entity-types-patch', 'locations-agent-train', 'locations-agent-update-fulfillment', 'locations-agent-versions-create', 'locations-agent-versions-delete', 'locations-agent-versions-get', 'locations-agent-versions-list', 'locations-agent-versions-patch', 'locations-answer-records-list', 'locations-answer-records-patch', 'locations-conversation-datasets-create', 'locations-conversation-datasets-delete', 'locations-conversation-datasets-get', 'locations-conversation-datasets-import-conversation-data', 'locations-conversation-datasets-list', 'locations-conversation-models-create', 'locations-conversation-models-delete', 'locations-conversation-models-deploy', 'locations-conversation-models-evaluations-create', 'locations-conversation-models-evaluations-get', 'locations-conversation-models-evaluations-list', 'locations-conversation-models-get', 'locations-conversation-models-list', 'locations-conversation-models-undeploy', 'locations-conversation-profiles-clear-suggestion-feature-config', 'locations-conversation-profiles-create', 'locations-conversation-profiles-delete', 'locations-conversation-profiles-get', 'locations-conversation-profiles-list', 'locations-conversation-profiles-patch', 'locations-conversation-profiles-set-suggestion-feature-config', 'locations-conversations-complete', 'locations-conversations-create', 'locations-conversations-get', 'locations-conversations-list', 'locations-conversations-messages-list', 'locations-conversations-participants-analyze-content', 'locations-conversations-participants-create', 'locations-conversations-participants-get', 'locations-conversations-participants-list', 'locations-conversations-participants-patch', 'locations-conversations-participants-suggestions-suggest-articles', 'locations-conversations-participants-suggestions-suggest-faq-answers', 'locations-conversations-participants-suggestions-suggest-smart-replies', 'locations-conversations-suggestions-suggest-conversation-summary', 'locations-delete-agent', 'locations-get', 'locations-get-agent', 'locations-knowledge-bases-create', 'locations-knowledge-bases-delete', 'locations-knowledge-bases-documents-create', 'locations-knowledge-bases-documents-delete', 'locations-knowledge-bases-documents-export', 'locations-knowledge-bases-documents-get', 'locations-knowledge-bases-documents-import', 'locations-knowledge-bases-documents-list', 'locations-knowledge-bases-documents-patch', 'locations-knowledge-bases-documents-reload', 'locations-knowledge-bases-get', 'locations-knowledge-bases-list', 'locations-knowledge-bases-patch', 'locations-list', 'locations-operations-cancel', 'locations-operations-get', 'locations-operations-list', 'locations-set-agent', 'operations-cancel', 'operations-get', 'operations-list' and 'set-agent'", vec![
             ("agent-entity-types-batch-delete",
                     Some(r##"Deletes entity types in the specified agent. This method is a [long-running operation](https://cloud.google.com/dialogflow/es/docs/how/long-running-operations). The returned `Operation` type has the following method-specific fields: - `metadata`: An empty [Struct message](https://developers.google.com/protocol-buffers/docs/reference/google.protobuf#struct) - `response`: An [Empty message](https://developers.google.com/protocol-buffers/docs/reference/google.protobuf#empty) Note: You should always train an agent prior to sending it queries. See the [training documentation](https://cloud.google.com/dialogflow/es/docs/training)."##),
                     "Details at http://byron.github.io/google-apis-rs/google_dialogflow2_cli/projects_agent-entity-types-batch-delete",
@@ -21230,6 +21422,34 @@ async fn main() {
                     (Some(r##"parent"##),
                      None,
                      Some(r##"Required. The name of the participant to fetch suggestion for. Format: `projects//locations//conversations//participants/`."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("conversations-suggestions-suggest-conversation-summary",
+                    Some(r##"Suggests summary for a conversation based on specific historical messages. The range of the messages to be used for summary can be specified in the request."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_dialogflow2_cli/projects_conversations-suggestions-suggest-conversation-summary",
+                  vec![
+                    (Some(r##"conversation"##),
+                     None,
+                     Some(r##"Required. The conversation to fetch suggestion for. Format: `projects//locations//conversations/`."##),
                      Some(true),
                      Some(false)),
         
@@ -24051,6 +24271,34 @@ async fn main() {
                      Some(false),
                      Some(false)),
                   ]),
+            ("locations-conversations-suggestions-suggest-conversation-summary",
+                    Some(r##"Suggests summary for a conversation based on specific historical messages. The range of the messages to be used for summary can be specified in the request."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_dialogflow2_cli/projects_locations-conversations-suggestions-suggest-conversation-summary",
+                  vec![
+                    (Some(r##"conversation"##),
+                     None,
+                     Some(r##"Required. The conversation to fetch suggestion for. Format: `projects//locations//conversations/`."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
             ("locations-delete-agent",
                     Some(r##"Deletes the specified agent."##),
                     "Details at http://byron.github.io/google-apis-rs/google_dialogflow2_cli/projects_locations-delete-agent",
@@ -24661,7 +24909,7 @@ async fn main() {
     
     let mut app = App::new("dialogflow2")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("4.0.1+20220228")
+           .version("5.0.2+20230110")
            .about("Builds conversational interfaces (for example, chatbots, and voice-powered apps and devices).")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_dialogflow2_cli")
            .arg(Arg::with_name("url")

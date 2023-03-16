@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Dataproc* API at revision *20220224*. The CLI is at version *4.0.1*.
+This documentation was generated from the *Dataproc* API at revision *20230103*. The CLI is at version *5.0.2*.
 
 ```bash
 dataproc1 [options]
@@ -42,6 +42,10 @@ dataproc1 [options]
                 locations-batches-delete <name> [-p <v>]... [-o <out>]
                 locations-batches-get <name> [-p <v>]... [-o <out>]
                 locations-batches-list <parent> [-p <v>]... [-o <out>]
+                locations-operations-cancel <name> [-p <v>]... [-o <out>]
+                locations-operations-delete <name> [-p <v>]... [-o <out>]
+                locations-operations-get <name> [-p <v>]... [-o <out>]
+                locations-operations-list <name> [-p <v>]... [-o <out>]
                 locations-workflow-templates-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-workflow-templates-delete <name> [-p <v>]... [-o <out>]
                 locations-workflow-templates-get <name> [-p <v>]... [-o <out>]
@@ -67,6 +71,9 @@ dataproc1 [options]
                 regions-clusters-get-iam-policy <resource> (-r <kv>)... [-p <v>]... [-o <out>]
                 regions-clusters-inject-credentials <project> <region> <cluster> (-r <kv>)... [-p <v>]... [-o <out>]
                 regions-clusters-list <project-id> <region> [-p <v>]... [-o <out>]
+                regions-clusters-node-groups-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                regions-clusters-node-groups-get <name> [-p <v>]... [-o <out>]
+                regions-clusters-node-groups-resize <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 regions-clusters-patch <project-id> <region> <cluster-name> (-r <kv>)... [-p <v>]... [-o <out>]
                 regions-clusters-repair <project-id> <region> <cluster-name> (-r <kv>)... [-p <v>]... [-o <out>]
                 regions-clusters-set-iam-policy <resource> (-r <kv>)... [-p <v>]... [-o <out>]

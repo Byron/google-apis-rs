@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/generator/templates/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Google Analytics Admin* crate version *5.0.2-beta-1+20220307*, where *20220307* is the exact revision of the *analyticsadmin:v1alpha* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.2-beta-1*.
+//! This documentation was generated from *Google Analytics Admin* crate version *5.0.2+20220307*, where *20220307* is the exact revision of the *analyticsadmin:v1alpha* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.2*.
 //! 
 //! Everything else about the *Google Analytics Admin* *v1_alpha* API can be found at the
 //! [official documentation site](http://code.google.com/apis/analytics/docs/mgmt/home.html).

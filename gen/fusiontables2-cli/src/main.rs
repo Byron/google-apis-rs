@@ -3,8 +3,6 @@
 // DO NOT EDIT !
 #![allow(unused_variables, unused_imports, dead_code, unused_mut)]
 
-extern crate tokio;
-
 #[macro_use]
 extern crate clap;
 
@@ -12,9 +10,10 @@ use std::env;
 use std::io::{self, Write};
 use clap::{App, SubCommand, Arg};
 
-use google_fusiontables2::{api, Error, oauth2};
+use google_fusiontables2::{api, Error, oauth2, client::chrono, FieldMask};
 
-mod client;
+
+use google_clis_common as client;
 
 use client::{InvalidOptionsError, CLIError, arg_from_str, writer_from_opts, parse_kv_arg,
           input_file_from_opts, input_mime_from_opts, FieldCursor, FieldError, CallType, UploadProtocol,
@@ -254,7 +253,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "max-results" => {
-                    call = call.max_results(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
+                    call = call.max_results(        value.map(|v| arg_from_str(v, err, "max-results", "uint32")).unwrap_or(0));
                 },
                 _ => {
                     let mut found = false;
@@ -505,10 +504,10 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "typed" => {
-                    call = call.typed(arg_from_str(value.unwrap_or("false"), err, "typed", "boolean"));
+                    call = call.typed(        value.map(|v| arg_from_str(v, err, "typed", "boolean")).unwrap_or(false));
                 },
                 "hdrs" => {
-                    call = call.hdrs(arg_from_str(value.unwrap_or("false"), err, "hdrs", "boolean"));
+                    call = call.hdrs(        value.map(|v| arg_from_str(v, err, "hdrs", "boolean")).unwrap_or(false));
                 },
                 _ => {
                     let mut found = false;
@@ -574,10 +573,10 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "typed" => {
-                    call = call.typed(arg_from_str(value.unwrap_or("false"), err, "typed", "boolean"));
+                    call = call.typed(        value.map(|v| arg_from_str(v, err, "typed", "boolean")).unwrap_or(false));
                 },
                 "hdrs" => {
-                    call = call.hdrs(arg_from_str(value.unwrap_or("false"), err, "hdrs", "boolean"));
+                    call = call.hdrs(        value.map(|v| arg_from_str(v, err, "hdrs", "boolean")).unwrap_or(false));
                 },
                 _ => {
                     let mut found = false;
@@ -864,7 +863,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "max-results" => {
-                    call = call.max_results(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
+                    call = call.max_results(        value.map(|v| arg_from_str(v, err, "max-results", "uint32")).unwrap_or(0));
                 },
                 _ => {
                     let mut found = false;
@@ -1164,7 +1163,7 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "copy-presentation" => {
-                    call = call.copy_presentation(arg_from_str(value.unwrap_or("false"), err, "copy-presentation", "boolean"));
+                    call = call.copy_presentation(        value.map(|v| arg_from_str(v, err, "copy-presentation", "boolean")).unwrap_or(false));
                 },
                 _ => {
                     let mut found = false;
@@ -1316,13 +1315,13 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "start-line" => {
-                    call = call.start_line(arg_from_str(value.unwrap_or("-0"), err, "start-line", "integer"));
+                    call = call.start_line(        value.map(|v| arg_from_str(v, err, "start-line", "int32")).unwrap_or(-0));
                 },
                 "is-strict" => {
-                    call = call.is_strict(arg_from_str(value.unwrap_or("false"), err, "is-strict", "boolean"));
+                    call = call.is_strict(        value.map(|v| arg_from_str(v, err, "is-strict", "boolean")).unwrap_or(false));
                 },
                 "end-line" => {
-                    call = call.end_line(arg_from_str(value.unwrap_or("-0"), err, "end-line", "integer"));
+                    call = call.end_line(        value.map(|v| arg_from_str(v, err, "end-line", "int32")).unwrap_or(-0));
                 },
                 "encoding" => {
                     call = call.encoding(value.unwrap_or(""));
@@ -1548,7 +1547,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "max-results" => {
-                    call = call.max_results(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
+                    call = call.max_results(        value.map(|v| arg_from_str(v, err, "max-results", "uint32")).unwrap_or(0));
                 },
                 _ => {
                     let mut found = false;
@@ -1648,7 +1647,7 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "replace-view-definition" => {
-                    call = call.replace_view_definition(arg_from_str(value.unwrap_or("false"), err, "replace-view-definition", "boolean"));
+                    call = call.replace_view_definition(        value.map(|v| arg_from_str(v, err, "replace-view-definition", "boolean")).unwrap_or(false));
                 },
                 _ => {
                     let mut found = false;
@@ -1756,13 +1755,13 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "start-line" => {
-                    call = call.start_line(arg_from_str(value.unwrap_or("-0"), err, "start-line", "integer"));
+                    call = call.start_line(        value.map(|v| arg_from_str(v, err, "start-line", "int32")).unwrap_or(-0));
                 },
                 "is-strict" => {
-                    call = call.is_strict(arg_from_str(value.unwrap_or("false"), err, "is-strict", "boolean"));
+                    call = call.is_strict(        value.map(|v| arg_from_str(v, err, "is-strict", "boolean")).unwrap_or(false));
                 },
                 "end-line" => {
-                    call = call.end_line(arg_from_str(value.unwrap_or("-0"), err, "end-line", "integer"));
+                    call = call.end_line(        value.map(|v| arg_from_str(v, err, "end-line", "int32")).unwrap_or(-0));
                 },
                 "encoding" => {
                     call = call.encoding(value.unwrap_or(""));
@@ -1871,7 +1870,7 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "replace-view-definition" => {
-                    call = call.replace_view_definition(arg_from_str(value.unwrap_or("false"), err, "replace-view-definition", "boolean"));
+                    call = call.replace_view_definition(        value.map(|v| arg_from_str(v, err, "replace-view-definition", "boolean")).unwrap_or(false));
                 },
                 _ => {
                     let mut found = false;
@@ -2023,13 +2022,13 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "start-index" => {
-                    call = call.start_index(arg_from_str(value.unwrap_or("-0"), err, "start-index", "integer"));
+                    call = call.start_index(        value.map(|v| arg_from_str(v, err, "start-index", "uint32")).unwrap_or(0));
                 },
                 "page-token" => {
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "max-results" => {
-                    call = call.max_results(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
+                    call = call.max_results(        value.map(|v| arg_from_str(v, err, "max-results", "uint32")).unwrap_or(0));
                 },
                 _ => {
                     let mut found = false;
@@ -2276,7 +2275,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "max-results" => {
-                    call = call.max_results(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
+                    call = call.max_results(        value.map(|v| arg_from_str(v, err, "max-results", "uint32")).unwrap_or(0));
                 },
                 _ => {
                     let mut found = false;
@@ -3655,7 +3654,7 @@ async fn main() {
     
     let mut app = App::new("fusiontables2")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("4.0.1+20171117")
+           .version("5.0.2+20171117")
            .about("API for working with Fusion Tables data.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_fusiontables2_cli")
            .arg(Arg::with_name("url")

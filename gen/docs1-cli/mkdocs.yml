@@ -1,4 +1,4 @@
-site_name: Docs v3.1.0+20220301
+site_name: Docs v5.0.2+20230119
 site_url: http://byron.github.io/google-apis-rs/google-docs1-cli
 site_description: A complete library to interact with Docs (protocol v1)
 
@@ -7,11 +7,12 @@ repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/docs1-cli
 docs_dir: docs
 site_dir: build_html
 
-pages:
-- ['index.md', 'Home']
-- ['documents_batch-update.md', 'Documents', 'Batch Update']
-- ['documents_create.md', 'Documents', 'Create']
-- ['documents_get.md', 'Documents', 'Get']
+nav:
+- Home: 'index.md'
+- 'Documents':
+    - 'Batch Update': 'documents_batch-update.md'
+    - 'Create': 'documents_create.md'
+    - 'Get': 'documents_get.md'
 
 theme: readthedocs
 

@@ -1,4 +1,4 @@
-site_name: Cloud Asset v4.0.1+20220225
+site_name: Cloud Asset v5.0.2+20230121
 site_url: http://byron.github.io/google-apis-rs/google-cloudasset1_beta1-cli
 site_description: A complete library to interact with Cloud Asset (protocol v1beta1)
 
@@ -7,16 +7,19 @@ repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/cloudasset1_beta
 docs_dir: docs
 site_dir: build_html
 
-pages:
-- ['index.md', 'Home']
-- ['folders_export-assets.md', 'Folders', 'Export Assets']
-- ['folders_operations-get.md', 'Folders', 'Operations Get']
-- ['organizations_batch-get-assets-history.md', 'Organizations', 'Batch Get Assets History']
-- ['organizations_export-assets.md', 'Organizations', 'Export Assets']
-- ['organizations_operations-get.md', 'Organizations', 'Operations Get']
-- ['projects_batch-get-assets-history.md', 'Projects', 'Batch Get Assets History']
-- ['projects_export-assets.md', 'Projects', 'Export Assets']
-- ['projects_operations-get.md', 'Projects', 'Operations Get']
+nav:
+- Home: 'index.md'
+- 'Folders':
+    - 'Export Assets': 'folders_export-assets.md'
+    - 'Operations Get': 'folders_operations-get.md'
+- 'Organizations':
+    - 'Batch Get Assets History': 'organizations_batch-get-assets-history.md'
+    - 'Export Assets': 'organizations_export-assets.md'
+    - 'Operations Get': 'organizations_operations-get.md'
+- 'Projects':
+    - 'Batch Get Assets History': 'projects_batch-get-assets-history.md'
+    - 'Export Assets': 'projects_export-assets.md'
+    - 'Operations Get': 'projects_operations-get.md'
 
 theme: readthedocs
 

@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Database Migration Service* API at revision *20220216*. The CLI is at version *4.0.1*.
+This documentation was generated from the *Database Migration Service* API at revision *20230105*. The CLI is at version *5.0.2*.
 
 ```bash
 datamigration1 [options]
@@ -38,6 +38,20 @@ datamigration1 [options]
                 locations-connection-profiles-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-connection-profiles-set-iam-policy <resource> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-connection-profiles-test-iam-permissions <resource> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-conversion-workspaces-apply <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-conversion-workspaces-commit <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-conversion-workspaces-convert <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-conversion-workspaces-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-conversion-workspaces-delete <name> [-p <v>]... [-o <out>]
+                locations-conversion-workspaces-describe-conversion-workspace-revisions <conversion-workspace> [-p <v>]... [-o <out>]
+                locations-conversion-workspaces-describe-database-entities <conversion-workspace> [-p <v>]... [-o <out>]
+                locations-conversion-workspaces-get <name> [-p <v>]... [-o <out>]
+                locations-conversion-workspaces-list <parent> [-p <v>]... [-o <out>]
+                locations-conversion-workspaces-mapping-rules-import <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-conversion-workspaces-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-conversion-workspaces-rollback <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-conversion-workspaces-search-background-jobs <conversion-workspace> [-p <v>]... [-o <out>]
+                locations-conversion-workspaces-seed <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-get <name> [-p <v>]... [-o <out>]
                 locations-list <name> [-p <v>]... [-o <out>]
                 locations-migration-jobs-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
@@ -59,6 +73,10 @@ datamigration1 [options]
                 locations-operations-delete <name> [-p <v>]... [-o <out>]
                 locations-operations-get <name> [-p <v>]... [-o <out>]
                 locations-operations-list <name> [-p <v>]... [-o <out>]
+                locations-private-connections-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-private-connections-delete <name> [-p <v>]... [-o <out>]
+                locations-private-connections-get <name> [-p <v>]... [-o <out>]
+                locations-private-connections-list <parent> [-p <v>]... [-o <out>]
   datamigration1 --help
 
 Configuration:

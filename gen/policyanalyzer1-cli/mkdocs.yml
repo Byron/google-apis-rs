@@ -1,4 +1,4 @@
-site_name: Policy Analyzer v4.0.1+20220227
+site_name: Policy Analyzer v5.0.2+20230122
 site_url: http://byron.github.io/google-apis-rs/google-policyanalyzer1-cli
 site_description: A complete library to interact with Policy Analyzer (protocol v1)
 
@@ -7,9 +7,10 @@ repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/policyanalyzer1-
 docs_dir: docs
 site_dir: build_html
 
-pages:
-- ['index.md', 'Home']
-- ['projects_locations-activity-types-activities-query.md', 'Projects', 'Locations Activity Types Activities Query']
+nav:
+- Home: 'index.md'
+- 'Projects':
+    - 'Locations Activity Types Activities Query': 'projects_locations-activity-types-activities-query.md'
 
 theme: readthedocs
 

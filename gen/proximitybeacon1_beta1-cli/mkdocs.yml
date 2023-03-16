@@ -1,4 +1,4 @@
-site_name: proximitybeacon v4.0.1+20200127
+site_name: proximitybeacon v5.0.2+20200127
 site_url: http://byron.github.io/google-apis-rs/google-proximitybeacon1_beta1-cli
 site_description: A complete library to interact with proximitybeacon (protocol v1beta1)
 
@@ -7,25 +7,29 @@ repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/proximitybeacon1
 docs_dir: docs
 site_dir: build_html
 
-pages:
-- ['index.md', 'Home']
-- ['beaconinfo_getforobserved.md', 'Beaconinfo', 'Getforobserved']
-- ['beacons_activate.md', 'Beacons', 'Activate']
-- ['beacons_attachments-batch-delete.md', 'Beacons', 'Attachments Batch Delete']
-- ['beacons_attachments-create.md', 'Beacons', 'Attachments Create']
-- ['beacons_attachments-delete.md', 'Beacons', 'Attachments Delete']
-- ['beacons_attachments-list.md', 'Beacons', 'Attachments List']
-- ['beacons_deactivate.md', 'Beacons', 'Deactivate']
-- ['beacons_decommission.md', 'Beacons', 'Decommission']
-- ['beacons_delete.md', 'Beacons', 'Delete']
-- ['beacons_diagnostics-list.md', 'Beacons', 'Diagnostics List']
-- ['beacons_get.md', 'Beacons', 'Get']
-- ['beacons_list.md', 'Beacons', 'List']
-- ['beacons_register.md', 'Beacons', 'Register']
-- ['beacons_update.md', 'Beacons', 'Update']
-- ['methods_get-eidparams.md', 'Methods', 'Get Eidparams']
-- ['namespaces_list.md', 'Namespaces', 'List']
-- ['namespaces_update.md', 'Namespaces', 'Update']
+nav:
+- Home: 'index.md'
+- 'Beaconinfo':
+    - 'Getforobserved': 'beaconinfo_getforobserved.md'
+- 'Beacons':
+    - 'Activate': 'beacons_activate.md'
+    - 'Attachments Batch Delete': 'beacons_attachments-batch-delete.md'
+    - 'Attachments Create': 'beacons_attachments-create.md'
+    - 'Attachments Delete': 'beacons_attachments-delete.md'
+    - 'Attachments List': 'beacons_attachments-list.md'
+    - 'Deactivate': 'beacons_deactivate.md'
+    - 'Decommission': 'beacons_decommission.md'
+    - 'Delete': 'beacons_delete.md'
+    - 'Diagnostics List': 'beacons_diagnostics-list.md'
+    - 'Get': 'beacons_get.md'
+    - 'List': 'beacons_list.md'
+    - 'Register': 'beacons_register.md'
+    - 'Update': 'beacons_update.md'
+- 'Methods':
+    - 'Get Eidparams': 'methods_get-eidparams.md'
+- 'Namespaces':
+    - 'List': 'namespaces_list.md'
+    - 'Update': 'namespaces_update.md'
 
 theme: readthedocs
 

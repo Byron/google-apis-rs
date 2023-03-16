@@ -1,4 +1,4 @@
-site_name: Cloud Identity v4.0.1+20220301
+site_name: Cloud Identity v5.0.2+20230117
 site_url: http://byron.github.io/google-apis-rs/google-cloudidentity1-cli
 site_description: A complete library to interact with Cloud Identity (protocol v1)
 
@@ -7,44 +7,68 @@ repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/cloudidentity1-c
 docs_dir: docs
 site_dir: build_html
 
-pages:
-- ['index.md', 'Home']
-- ['devices_cancel-wipe.md', 'Devices', 'Cancel Wipe']
-- ['devices_create.md', 'Devices', 'Create']
-- ['devices_delete.md', 'Devices', 'Delete']
-- ['devices_device-users-approve.md', 'Devices', 'Device Users Approve']
-- ['devices_device-users-block.md', 'Devices', 'Device Users Block']
-- ['devices_device-users-cancel-wipe.md', 'Devices', 'Device Users Cancel Wipe']
-- ['devices_device-users-client-states-get.md', 'Devices', 'Device Users Client States Get']
-- ['devices_device-users-client-states-list.md', 'Devices', 'Device Users Client States List']
-- ['devices_device-users-client-states-patch.md', 'Devices', 'Device Users Client States Patch']
-- ['devices_device-users-delete.md', 'Devices', 'Device Users Delete']
-- ['devices_device-users-get.md', 'Devices', 'Device Users Get']
-- ['devices_device-users-list.md', 'Devices', 'Device Users List']
-- ['devices_device-users-lookup.md', 'Devices', 'Device Users Lookup']
-- ['devices_device-users-wipe.md', 'Devices', 'Device Users Wipe']
-- ['devices_get.md', 'Devices', 'Get']
-- ['devices_list.md', 'Devices', 'List']
-- ['devices_wipe.md', 'Devices', 'Wipe']
-- ['groups_create.md', 'Groups', 'Create']
-- ['groups_delete.md', 'Groups', 'Delete']
-- ['groups_get.md', 'Groups', 'Get']
-- ['groups_get-security-settings.md', 'Groups', 'Get Security Settings']
-- ['groups_list.md', 'Groups', 'List']
-- ['groups_lookup.md', 'Groups', 'Lookup']
-- ['groups_memberships-check-transitive-membership.md', 'Groups', 'Memberships Check Transitive Membership']
-- ['groups_memberships-create.md', 'Groups', 'Memberships Create']
-- ['groups_memberships-delete.md', 'Groups', 'Memberships Delete']
-- ['groups_memberships-get.md', 'Groups', 'Memberships Get']
-- ['groups_memberships-get-membership-graph.md', 'Groups', 'Memberships Get Membership Graph']
-- ['groups_memberships-list.md', 'Groups', 'Memberships List']
-- ['groups_memberships-lookup.md', 'Groups', 'Memberships Lookup']
-- ['groups_memberships-modify-membership-roles.md', 'Groups', 'Memberships Modify Membership Roles']
-- ['groups_memberships-search-transitive-groups.md', 'Groups', 'Memberships Search Transitive Groups']
-- ['groups_memberships-search-transitive-memberships.md', 'Groups', 'Memberships Search Transitive Memberships']
-- ['groups_patch.md', 'Groups', 'Patch']
-- ['groups_search.md', 'Groups', 'Search']
-- ['groups_update-security-settings.md', 'Groups', 'Update Security Settings']
+nav:
+- Home: 'index.md'
+- 'Customers':
+    - 'Userinvitations Cancel': 'customers_userinvitations-cancel.md'
+    - 'Userinvitations Get': 'customers_userinvitations-get.md'
+    - 'Userinvitations Is Invitable User': 'customers_userinvitations-is-invitable-user.md'
+    - 'Userinvitations List': 'customers_userinvitations-list.md'
+    - 'Userinvitations Send': 'customers_userinvitations-send.md'
+- 'Devices':
+    - 'Cancel Wipe': 'devices_cancel-wipe.md'
+    - 'Create': 'devices_create.md'
+    - 'Delete': 'devices_delete.md'
+    - 'Device Users Approve': 'devices_device-users-approve.md'
+    - 'Device Users Block': 'devices_device-users-block.md'
+    - 'Device Users Cancel Wipe': 'devices_device-users-cancel-wipe.md'
+    - 'Device Users Client States Get': 'devices_device-users-client-states-get.md'
+    - 'Device Users Client States List': 'devices_device-users-client-states-list.md'
+    - 'Device Users Client States Patch': 'devices_device-users-client-states-patch.md'
+    - 'Device Users Delete': 'devices_device-users-delete.md'
+    - 'Device Users Get': 'devices_device-users-get.md'
+    - 'Device Users List': 'devices_device-users-list.md'
+    - 'Device Users Lookup': 'devices_device-users-lookup.md'
+    - 'Device Users Wipe': 'devices_device-users-wipe.md'
+    - 'Get': 'devices_get.md'
+    - 'List': 'devices_list.md'
+    - 'Wipe': 'devices_wipe.md'
+- 'Groups':
+    - 'Create': 'groups_create.md'
+    - 'Delete': 'groups_delete.md'
+    - 'Get': 'groups_get.md'
+    - 'Get Security Settings': 'groups_get-security-settings.md'
+    - 'List': 'groups_list.md'
+    - 'Lookup': 'groups_lookup.md'
+    - 'Memberships Check Transitive Membership': 'groups_memberships-check-transitive-membership.md'
+    - 'Memberships Create': 'groups_memberships-create.md'
+    - 'Memberships Delete': 'groups_memberships-delete.md'
+    - 'Memberships Get': 'groups_memberships-get.md'
+    - 'Memberships Get Membership Graph': 'groups_memberships-get-membership-graph.md'
+    - 'Memberships List': 'groups_memberships-list.md'
+    - 'Memberships Lookup': 'groups_memberships-lookup.md'
+    - 'Memberships Modify Membership Roles': 'groups_memberships-modify-membership-roles.md'
+    - 'Memberships Search Transitive Groups': 'groups_memberships-search-transitive-groups.md'
+    - 'Memberships Search Transitive Memberships': 'groups_memberships-search-transitive-memberships.md'
+    - 'Patch': 'groups_patch.md'
+    - 'Search': 'groups_search.md'
+    - 'Update Security Settings': 'groups_update-security-settings.md'
+- 'Inbound Saml Sso Profiles':
+    - 'Create': 'inbound-saml-sso-profiles_create.md'
+    - 'Delete': 'inbound-saml-sso-profiles_delete.md'
+    - 'Get': 'inbound-saml-sso-profiles_get.md'
+    - 'Idp Credentials Add': 'inbound-saml-sso-profiles_idp-credentials-add.md'
+    - 'Idp Credentials Delete': 'inbound-saml-sso-profiles_idp-credentials-delete.md'
+    - 'Idp Credentials Get': 'inbound-saml-sso-profiles_idp-credentials-get.md'
+    - 'Idp Credentials List': 'inbound-saml-sso-profiles_idp-credentials-list.md'
+    - 'List': 'inbound-saml-sso-profiles_list.md'
+    - 'Patch': 'inbound-saml-sso-profiles_patch.md'
+- 'Inbound Sso Assignments':
+    - 'Create': 'inbound-sso-assignments_create.md'
+    - 'Delete': 'inbound-sso-assignments_delete.md'
+    - 'Get': 'inbound-sso-assignments_get.md'
+    - 'List': 'inbound-sso-assignments_list.md'
+    - 'Patch': 'inbound-sso-assignments_patch.md'
 
 theme: readthedocs
 

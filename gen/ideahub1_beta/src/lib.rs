@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/generator/templates/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Ideahub* crate version *5.0.2-beta-1+20220305*, where *20220305* is the exact revision of the *ideahub:v1beta* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.2-beta-1*.
+//! This documentation was generated from *Ideahub* crate version *5.0.2+20220305*, where *20220305* is the exact revision of the *ideahub:v1beta* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.2*.
 //! 
 //! Everything else about the *Ideahub* *v1_beta* API can be found at the
 //! [official documentation site](https://console.cloud.google.com/apis/library/ideahub.googleapis.com).

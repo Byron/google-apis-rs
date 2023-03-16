@@ -25,18 +25,28 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Eventarc* API at revision *20220301*. The CLI is at version *4.0.1*.
+This documentation was generated from the *Eventarc* API at revision *20230113*. The CLI is at version *5.0.2*.
 
 ```bash
 eventarc1 [options]
         projects
+                locations-channel-connections-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-channel-connections-delete <name> [-p <v>]... [-o <out>]
+                locations-channel-connections-get <name> [-p <v>]... [-o <out>]
                 locations-channel-connections-get-iam-policy <resource> [-p <v>]... [-o <out>]
+                locations-channel-connections-list <parent> [-p <v>]... [-o <out>]
                 locations-channel-connections-set-iam-policy <resource> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-channel-connections-test-iam-permissions <resource> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-channels-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-channels-delete <name> [-p <v>]... [-o <out>]
+                locations-channels-get <name> [-p <v>]... [-o <out>]
                 locations-channels-get-iam-policy <resource> [-p <v>]... [-o <out>]
+                locations-channels-list <parent> [-p <v>]... [-o <out>]
+                locations-channels-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-channels-set-iam-policy <resource> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-channels-test-iam-permissions <resource> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-get <name> [-p <v>]... [-o <out>]
+                locations-get-google-channel-config <name> [-p <v>]... [-o <out>]
                 locations-list <name> [-p <v>]... [-o <out>]
                 locations-operations-cancel <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-operations-delete <name> [-p <v>]... [-o <out>]
@@ -52,6 +62,7 @@ eventarc1 [options]
                 locations-triggers-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-triggers-set-iam-policy <resource> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-triggers-test-iam-permissions <resource> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-update-google-channel-config <name> (-r <kv>)... [-p <v>]... [-o <out>]
   eventarc1 --help
 
 Configuration:

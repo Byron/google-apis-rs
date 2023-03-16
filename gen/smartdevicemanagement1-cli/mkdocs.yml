@@ -1,4 +1,4 @@
-site_name: Smart Device Management v4.0.1+20220302
+site_name: Smart Device Management v5.0.2+20230112
 site_url: http://byron.github.io/google-apis-rs/google-smartdevicemanagement1-cli
 site_description: A complete library to interact with Smart Device Management (protocol v1)
 
@@ -7,15 +7,16 @@ repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/smartdevicemanag
 docs_dir: docs
 site_dir: build_html
 
-pages:
-- ['index.md', 'Home']
-- ['enterprises_devices-execute-command.md', 'Enterprises', 'Devices Execute Command']
-- ['enterprises_devices-get.md', 'Enterprises', 'Devices Get']
-- ['enterprises_devices-list.md', 'Enterprises', 'Devices List']
-- ['enterprises_structures-get.md', 'Enterprises', 'Structures Get']
-- ['enterprises_structures-list.md', 'Enterprises', 'Structures List']
-- ['enterprises_structures-rooms-get.md', 'Enterprises', 'Structures Rooms Get']
-- ['enterprises_structures-rooms-list.md', 'Enterprises', 'Structures Rooms List']
+nav:
+- Home: 'index.md'
+- 'Enterprises':
+    - 'Devices Execute Command': 'enterprises_devices-execute-command.md'
+    - 'Devices Get': 'enterprises_devices-get.md'
+    - 'Devices List': 'enterprises_devices-list.md'
+    - 'Structures Get': 'enterprises_structures-get.md'
+    - 'Structures List': 'enterprises_structures-list.md'
+    - 'Structures Rooms Get': 'enterprises_structures-rooms-get.md'
+    - 'Structures Rooms List': 'enterprises_structures-rooms-list.md'
 
 theme: readthedocs
 

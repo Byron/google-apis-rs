@@ -4,12 +4,12 @@
 [package]
 
 name = "google-sql1_beta4"
-version = "5.0.2-beta-1+20200331"
+version = "5.0.2+20200331"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with SQL Admin (protocol v1beta4)"
 repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/sql1_beta4"
 homepage = "https://developers.google.com/cloud-sql/"
-documentation = "https://docs.rs/google-sql1_beta4/5.0.2-beta-1+20200331"
+documentation = "https://docs.rs/google-sql1_beta4/5.0.2+20200331"
 license = "MIT"
 keywords = ["sql", "google", "protocol", "web", "api"]
 autobins = false

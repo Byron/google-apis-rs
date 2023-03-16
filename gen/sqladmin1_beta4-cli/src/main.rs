@@ -3,8 +3,6 @@
 // DO NOT EDIT !
 #![allow(unused_variables, unused_imports, dead_code, unused_mut)]
 
-extern crate tokio;
-
 #[macro_use]
 extern crate clap;
 
@@ -12,9 +10,10 @@ use std::env;
 use std::io::{self, Write};
 use clap::{App, SubCommand, Arg};
 
-use google_sqladmin1_beta4::{api, Error, oauth2};
+use google_sqladmin1_beta4::{api, Error, oauth2, client::chrono, FieldMask};
 
-mod client;
+
+use google_clis_common as client;
 
 use client::{InvalidOptionsError, CLIError, arg_from_str, writer_from_opts, parse_kv_arg,
           input_file_from_opts, input_mime_from_opts, FieldCursor, FieldError, CallType, UploadProtocol,
@@ -196,10 +195,11 @@ where
                     "self-link" => Some(("selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "start-time" => Some(("startTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "status" => Some(("status", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "time-zone" => Some(("timeZone", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "type" => Some(("type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "window-start-time" => Some(("windowStartTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["backup-kind", "code", "description", "disk-encryption-configuration", "disk-encryption-status", "end-time", "enqueued-time", "error", "id", "instance", "kind", "kms-key-name", "kms-key-version-name", "location", "message", "self-link", "start-time", "status", "type", "window-start-time"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["backup-kind", "code", "description", "disk-encryption-configuration", "disk-encryption-status", "end-time", "enqueued-time", "error", "id", "instance", "kind", "kms-key-name", "kms-key-version-name", "location", "message", "self-link", "start-time", "status", "time-zone", "type", "window-start-time"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -269,7 +269,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "max-results" => {
-                    call = call.max_results(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
+                    call = call.max_results(        value.map(|v| arg_from_str(v, err, "max-results", "int32")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -413,7 +413,7 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "read-time" => {
-                    call = call.read_time(value.unwrap_or(""));
+                    call = call.read_time(        value.map(|v| arg_from_str(v, err, "read-time", "google-datetime")).unwrap_or(chrono::Utc::now()));
                 },
                 _ => {
                     let mut found = false;
@@ -1035,12 +1035,13 @@ where
                     "clone-context.bin-log-coordinates.bin-log-file-name" => Some(("cloneContext.binLogCoordinates.binLogFileName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "clone-context.bin-log-coordinates.bin-log-position" => Some(("cloneContext.binLogCoordinates.binLogPosition", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "clone-context.bin-log-coordinates.kind" => Some(("cloneContext.binLogCoordinates.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "clone-context.database-names" => Some(("cloneContext.databaseNames", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "clone-context.destination-instance-name" => Some(("cloneContext.destinationInstanceName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "clone-context.kind" => Some(("cloneContext.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "clone-context.pitr-timestamp-ms" => Some(("cloneContext.pitrTimestampMs", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "clone-context.point-in-time" => Some(("cloneContext.pointInTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["allocated-ip-range", "bin-log-coordinates", "bin-log-file-name", "bin-log-position", "clone-context", "destination-instance-name", "kind", "pitr-timestamp-ms", "point-in-time"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["allocated-ip-range", "bin-log-coordinates", "bin-log-file-name", "bin-log-position", "clone-context", "database-names", "destination-instance-name", "kind", "pitr-timestamp-ms", "point-in-time"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1270,6 +1271,8 @@ where
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
+                    "export-context.bak-export-options.stripe-count" => Some(("exportContext.bakExportOptions.stripeCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "export-context.bak-export-options.striped" => Some(("exportContext.bakExportOptions.striped", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "export-context.csv-export-options.escape-character" => Some(("exportContext.csvExportOptions.escapeCharacter", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "export-context.csv-export-options.fields-terminated-by" => Some(("exportContext.csvExportOptions.fieldsTerminatedBy", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "export-context.csv-export-options.lines-terminated-by" => Some(("exportContext.csvExportOptions.linesTerminatedBy", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -1284,7 +1287,7 @@ where
                     "export-context.sql-export-options.tables" => Some(("exportContext.sqlExportOptions.tables", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "export-context.uri" => Some(("exportContext.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["csv-export-options", "databases", "escape-character", "export-context", "fields-terminated-by", "file-type", "kind", "lines-terminated-by", "master-data", "mysql-export-options", "offload", "quote-character", "schema-only", "select-query", "sql-export-options", "tables", "uri"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["bak-export-options", "csv-export-options", "databases", "escape-character", "export-context", "fields-terminated-by", "file-type", "kind", "lines-terminated-by", "master-data", "mysql-export-options", "offload", "quote-character", "schema-only", "select-query", "sql-export-options", "stripe-count", "striped", "tables", "uri"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1508,6 +1511,7 @@ where
                     "import-context.bak-import-options.encryption-options.cert-path" => Some(("importContext.bakImportOptions.encryptionOptions.certPath", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "import-context.bak-import-options.encryption-options.pvk-password" => Some(("importContext.bakImportOptions.encryptionOptions.pvkPassword", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "import-context.bak-import-options.encryption-options.pvk-path" => Some(("importContext.bakImportOptions.encryptionOptions.pvkPath", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "import-context.bak-import-options.striped" => Some(("importContext.bakImportOptions.striped", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "import-context.csv-import-options.columns" => Some(("importContext.csvImportOptions.columns", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "import-context.csv-import-options.escape-character" => Some(("importContext.csvImportOptions.escapeCharacter", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "import-context.csv-import-options.fields-terminated-by" => Some(("importContext.csvImportOptions.fieldsTerminatedBy", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -1520,7 +1524,7 @@ where
                     "import-context.kind" => Some(("importContext.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "import-context.uri" => Some(("importContext.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["bak-import-options", "cert-path", "columns", "csv-import-options", "database", "encryption-options", "escape-character", "fields-terminated-by", "file-type", "import-context", "import-user", "kind", "lines-terminated-by", "pvk-password", "pvk-path", "quote-character", "table", "uri"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["bak-import-options", "cert-path", "columns", "csv-import-options", "database", "encryption-options", "escape-character", "fields-terminated-by", "file-type", "import-context", "import-user", "kind", "lines-terminated-by", "pvk-password", "pvk-path", "quote-character", "striped", "table", "uri"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1688,16 +1692,19 @@ where
                     "settings.backup-configuration.start-time" => Some(("settings.backupConfiguration.startTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "settings.backup-configuration.transaction-log-retention-days" => Some(("settings.backupConfiguration.transactionLogRetentionDays", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "settings.collation" => Some(("settings.collation", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "settings.connector-enforcement" => Some(("settings.connectorEnforcement", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "settings.crash-safe-replication-enabled" => Some(("settings.crashSafeReplicationEnabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "settings.data-disk-size-gb" => Some(("settings.dataDiskSizeGb", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "settings.data-disk-type" => Some(("settings.dataDiskType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "settings.database-replication-enabled" => Some(("settings.databaseReplicationEnabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "settings.deletion-protection-enabled" => Some(("settings.deletionProtectionEnabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "settings.insights-config.query-insights-enabled" => Some(("settings.insightsConfig.queryInsightsEnabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "settings.insights-config.query-plans-per-minute" => Some(("settings.insightsConfig.queryPlansPerMinute", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "settings.insights-config.query-string-length" => Some(("settings.insightsConfig.queryStringLength", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "settings.insights-config.record-application-tags" => Some(("settings.insightsConfig.recordApplicationTags", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "settings.insights-config.record-client-address" => Some(("settings.insightsConfig.recordClientAddress", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "settings.ip-configuration.allocated-ip-range" => Some(("settings.ipConfiguration.allocatedIpRange", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "settings.ip-configuration.enable-private-path-for-google-cloud-services" => Some(("settings.ipConfiguration.enablePrivatePathForGoogleCloudServices", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "settings.ip-configuration.ipv4-enabled" => Some(("settings.ipConfiguration.ipv4Enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "settings.ip-configuration.private-network" => Some(("settings.ipConfiguration.privateNetwork", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "settings.ip-configuration.require-ssl" => Some(("settings.ipConfiguration.requireSsl", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
@@ -1712,6 +1719,7 @@ where
                     "settings.maintenance-window.update-track" => Some(("settings.maintenanceWindow.updateTrack", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "settings.password-validation-policy.complexity" => Some(("settings.passwordValidationPolicy.complexity", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "settings.password-validation-policy.disallow-username-substring" => Some(("settings.passwordValidationPolicy.disallowUsernameSubstring", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "settings.password-validation-policy.enable-password-policy" => Some(("settings.passwordValidationPolicy.enablePasswordPolicy", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "settings.password-validation-policy.min-length" => Some(("settings.passwordValidationPolicy.minLength", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "settings.password-validation-policy.password-change-interval" => Some(("settings.passwordValidationPolicy.passwordChangeInterval", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "settings.password-validation-policy.reuse-interval" => Some(("settings.passwordValidationPolicy.reuseInterval", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
@@ -1720,14 +1728,17 @@ where
                     "settings.settings-version" => Some(("settings.settingsVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "settings.sql-server-audit-config.bucket" => Some(("settings.sqlServerAuditConfig.bucket", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "settings.sql-server-audit-config.kind" => Some(("settings.sqlServerAuditConfig.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "settings.sql-server-audit-config.retention-interval" => Some(("settings.sqlServerAuditConfig.retentionInterval", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "settings.sql-server-audit-config.upload-interval" => Some(("settings.sqlServerAuditConfig.uploadInterval", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "settings.storage-auto-resize" => Some(("settings.storageAutoResize", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "settings.storage-auto-resize-limit" => Some(("settings.storageAutoResizeLimit", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "settings.tier" => Some(("settings.tier", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "settings.time-zone" => Some(("settings.timeZone", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "settings.user-labels" => Some(("settings.userLabels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "state" => Some(("state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "suspension-reason" => Some(("suspensionReason", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["activation-policy", "active-directory-config", "allocated-ip-range", "authorized-gae-applications", "availability-type", "available", "available-maintenance-versions", "backend-type", "backup-configuration", "backup-retention-settings", "binary-log-enabled", "bucket", "ca-certificate", "can-defer", "can-reschedule", "cert", "cert-serial-number", "client-certificate", "client-key", "collation", "common-name", "complexity", "connect-retry-interval", "connection-name", "crash-safe-replication-enabled", "create-time", "current-disk-size", "data-disk-size-gb", "data-disk-type", "database-installed-version", "database-replication-enabled", "database-version", "day", "disallow-username-substring", "disk-encryption-configuration", "disk-encryption-status", "domain", "dump-file-path", "enabled", "etag", "expiration-time", "failover-replica", "failover-target", "follow-gae-application", "gce-zone", "host-port", "hour", "insights-config", "instance", "instance-type", "ip-configuration", "ipv4-enabled", "ipv6-address", "kind", "kms-key-name", "kms-key-version-name", "location", "location-preference", "maintenance-version", "maintenance-window", "master-heartbeat-period", "master-instance-name", "max-disk-size", "min-length", "mysql-replica-configuration", "name", "on-premises-configuration", "out-of-disk-report", "password", "password-change-interval", "password-validation-policy", "point-in-time-recovery-enabled", "pricing-plan", "private-network", "project", "query-insights-enabled", "query-plans-per-minute", "query-string-length", "record-application-tags", "record-client-address", "region", "replica-configuration", "replica-names", "replication-log-archiving-enabled", "replication-type", "require-ssl", "retained-backups", "retention-unit", "reuse-interval", "root-password", "satisfies-pzs", "schedule-deadline-time", "scheduled-maintenance", "secondary-gce-zone", "secondary-zone", "self-link", "server-ca-cert", "service-account-email-address", "settings", "settings-version", "sha1-fingerprint", "source-instance", "sql-min-recommended-increase-size-gb", "sql-out-of-disk-state", "sql-server-audit-config", "ssl-cipher", "start-time", "state", "storage-auto-resize", "storage-auto-resize-limit", "suspension-reason", "tier", "transaction-log-retention-days", "update-track", "user-labels", "username", "verify-server-certificate", "zone"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["activation-policy", "active-directory-config", "allocated-ip-range", "authorized-gae-applications", "availability-type", "available", "available-maintenance-versions", "backend-type", "backup-configuration", "backup-retention-settings", "binary-log-enabled", "bucket", "ca-certificate", "can-defer", "can-reschedule", "cert", "cert-serial-number", "client-certificate", "client-key", "collation", "common-name", "complexity", "connect-retry-interval", "connection-name", "connector-enforcement", "crash-safe-replication-enabled", "create-time", "current-disk-size", "data-disk-size-gb", "data-disk-type", "database-installed-version", "database-replication-enabled", "database-version", "day", "deletion-protection-enabled", "disallow-username-substring", "disk-encryption-configuration", "disk-encryption-status", "domain", "dump-file-path", "enable-password-policy", "enable-private-path-for-google-cloud-services", "enabled", "etag", "expiration-time", "failover-replica", "failover-target", "follow-gae-application", "gce-zone", "host-port", "hour", "insights-config", "instance", "instance-type", "ip-configuration", "ipv4-enabled", "ipv6-address", "kind", "kms-key-name", "kms-key-version-name", "location", "location-preference", "maintenance-version", "maintenance-window", "master-heartbeat-period", "master-instance-name", "max-disk-size", "min-length", "mysql-replica-configuration", "name", "on-premises-configuration", "out-of-disk-report", "password", "password-change-interval", "password-validation-policy", "point-in-time-recovery-enabled", "pricing-plan", "private-network", "project", "query-insights-enabled", "query-plans-per-minute", "query-string-length", "record-application-tags", "record-client-address", "region", "replica-configuration", "replica-names", "replication-log-archiving-enabled", "replication-type", "require-ssl", "retained-backups", "retention-interval", "retention-unit", "reuse-interval", "root-password", "satisfies-pzs", "schedule-deadline-time", "scheduled-maintenance", "secondary-gce-zone", "secondary-zone", "self-link", "server-ca-cert", "service-account-email-address", "settings", "settings-version", "sha1-fingerprint", "source-instance", "sql-min-recommended-increase-size-gb", "sql-out-of-disk-state", "sql-server-audit-config", "ssl-cipher", "start-time", "state", "storage-auto-resize", "storage-auto-resize-limit", "suspension-reason", "tier", "time-zone", "transaction-log-retention-days", "update-track", "upload-interval", "user-labels", "username", "verify-server-certificate", "zone"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1797,7 +1808,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "max-results" => {
-                    call = call.max_results(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
+                    call = call.max_results(        value.map(|v| arg_from_str(v, err, "max-results", "uint32")).unwrap_or(0));
                 },
                 "filter" => {
                     call = call.filter(value.unwrap_or(""));
@@ -2009,16 +2020,19 @@ where
                     "settings.backup-configuration.start-time" => Some(("settings.backupConfiguration.startTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "settings.backup-configuration.transaction-log-retention-days" => Some(("settings.backupConfiguration.transactionLogRetentionDays", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "settings.collation" => Some(("settings.collation", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "settings.connector-enforcement" => Some(("settings.connectorEnforcement", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "settings.crash-safe-replication-enabled" => Some(("settings.crashSafeReplicationEnabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "settings.data-disk-size-gb" => Some(("settings.dataDiskSizeGb", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "settings.data-disk-type" => Some(("settings.dataDiskType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "settings.database-replication-enabled" => Some(("settings.databaseReplicationEnabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "settings.deletion-protection-enabled" => Some(("settings.deletionProtectionEnabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "settings.insights-config.query-insights-enabled" => Some(("settings.insightsConfig.queryInsightsEnabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "settings.insights-config.query-plans-per-minute" => Some(("settings.insightsConfig.queryPlansPerMinute", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "settings.insights-config.query-string-length" => Some(("settings.insightsConfig.queryStringLength", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "settings.insights-config.record-application-tags" => Some(("settings.insightsConfig.recordApplicationTags", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "settings.insights-config.record-client-address" => Some(("settings.insightsConfig.recordClientAddress", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "settings.ip-configuration.allocated-ip-range" => Some(("settings.ipConfiguration.allocatedIpRange", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "settings.ip-configuration.enable-private-path-for-google-cloud-services" => Some(("settings.ipConfiguration.enablePrivatePathForGoogleCloudServices", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "settings.ip-configuration.ipv4-enabled" => Some(("settings.ipConfiguration.ipv4Enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "settings.ip-configuration.private-network" => Some(("settings.ipConfiguration.privateNetwork", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "settings.ip-configuration.require-ssl" => Some(("settings.ipConfiguration.requireSsl", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
@@ -2033,6 +2047,7 @@ where
                     "settings.maintenance-window.update-track" => Some(("settings.maintenanceWindow.updateTrack", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "settings.password-validation-policy.complexity" => Some(("settings.passwordValidationPolicy.complexity", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "settings.password-validation-policy.disallow-username-substring" => Some(("settings.passwordValidationPolicy.disallowUsernameSubstring", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "settings.password-validation-policy.enable-password-policy" => Some(("settings.passwordValidationPolicy.enablePasswordPolicy", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "settings.password-validation-policy.min-length" => Some(("settings.passwordValidationPolicy.minLength", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "settings.password-validation-policy.password-change-interval" => Some(("settings.passwordValidationPolicy.passwordChangeInterval", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "settings.password-validation-policy.reuse-interval" => Some(("settings.passwordValidationPolicy.reuseInterval", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
@@ -2041,14 +2056,17 @@ where
                     "settings.settings-version" => Some(("settings.settingsVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "settings.sql-server-audit-config.bucket" => Some(("settings.sqlServerAuditConfig.bucket", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "settings.sql-server-audit-config.kind" => Some(("settings.sqlServerAuditConfig.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "settings.sql-server-audit-config.retention-interval" => Some(("settings.sqlServerAuditConfig.retentionInterval", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "settings.sql-server-audit-config.upload-interval" => Some(("settings.sqlServerAuditConfig.uploadInterval", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "settings.storage-auto-resize" => Some(("settings.storageAutoResize", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "settings.storage-auto-resize-limit" => Some(("settings.storageAutoResizeLimit", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "settings.tier" => Some(("settings.tier", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "settings.time-zone" => Some(("settings.timeZone", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "settings.user-labels" => Some(("settings.userLabels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "state" => Some(("state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "suspension-reason" => Some(("suspensionReason", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["activation-policy", "active-directory-config", "allocated-ip-range", "authorized-gae-applications", "availability-type", "available", "available-maintenance-versions", "backend-type", "backup-configuration", "backup-retention-settings", "binary-log-enabled", "bucket", "ca-certificate", "can-defer", "can-reschedule", "cert", "cert-serial-number", "client-certificate", "client-key", "collation", "common-name", "complexity", "connect-retry-interval", "connection-name", "crash-safe-replication-enabled", "create-time", "current-disk-size", "data-disk-size-gb", "data-disk-type", "database-installed-version", "database-replication-enabled", "database-version", "day", "disallow-username-substring", "disk-encryption-configuration", "disk-encryption-status", "domain", "dump-file-path", "enabled", "etag", "expiration-time", "failover-replica", "failover-target", "follow-gae-application", "gce-zone", "host-port", "hour", "insights-config", "instance", "instance-type", "ip-configuration", "ipv4-enabled", "ipv6-address", "kind", "kms-key-name", "kms-key-version-name", "location", "location-preference", "maintenance-version", "maintenance-window", "master-heartbeat-period", "master-instance-name", "max-disk-size", "min-length", "mysql-replica-configuration", "name", "on-premises-configuration", "out-of-disk-report", "password", "password-change-interval", "password-validation-policy", "point-in-time-recovery-enabled", "pricing-plan", "private-network", "project", "query-insights-enabled", "query-plans-per-minute", "query-string-length", "record-application-tags", "record-client-address", "region", "replica-configuration", "replica-names", "replication-log-archiving-enabled", "replication-type", "require-ssl", "retained-backups", "retention-unit", "reuse-interval", "root-password", "satisfies-pzs", "schedule-deadline-time", "scheduled-maintenance", "secondary-gce-zone", "secondary-zone", "self-link", "server-ca-cert", "service-account-email-address", "settings", "settings-version", "sha1-fingerprint", "source-instance", "sql-min-recommended-increase-size-gb", "sql-out-of-disk-state", "sql-server-audit-config", "ssl-cipher", "start-time", "state", "storage-auto-resize", "storage-auto-resize-limit", "suspension-reason", "tier", "transaction-log-retention-days", "update-track", "user-labels", "username", "verify-server-certificate", "zone"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["activation-policy", "active-directory-config", "allocated-ip-range", "authorized-gae-applications", "availability-type", "available", "available-maintenance-versions", "backend-type", "backup-configuration", "backup-retention-settings", "binary-log-enabled", "bucket", "ca-certificate", "can-defer", "can-reschedule", "cert", "cert-serial-number", "client-certificate", "client-key", "collation", "common-name", "complexity", "connect-retry-interval", "connection-name", "connector-enforcement", "crash-safe-replication-enabled", "create-time", "current-disk-size", "data-disk-size-gb", "data-disk-type", "database-installed-version", "database-replication-enabled", "database-version", "day", "deletion-protection-enabled", "disallow-username-substring", "disk-encryption-configuration", "disk-encryption-status", "domain", "dump-file-path", "enable-password-policy", "enable-private-path-for-google-cloud-services", "enabled", "etag", "expiration-time", "failover-replica", "failover-target", "follow-gae-application", "gce-zone", "host-port", "hour", "insights-config", "instance", "instance-type", "ip-configuration", "ipv4-enabled", "ipv6-address", "kind", "kms-key-name", "kms-key-version-name", "location", "location-preference", "maintenance-version", "maintenance-window", "master-heartbeat-period", "master-instance-name", "max-disk-size", "min-length", "mysql-replica-configuration", "name", "on-premises-configuration", "out-of-disk-report", "password", "password-change-interval", "password-validation-policy", "point-in-time-recovery-enabled", "pricing-plan", "private-network", "project", "query-insights-enabled", "query-plans-per-minute", "query-string-length", "record-application-tags", "record-client-address", "region", "replica-configuration", "replica-names", "replication-log-archiving-enabled", "replication-type", "require-ssl", "retained-backups", "retention-interval", "retention-unit", "reuse-interval", "root-password", "satisfies-pzs", "schedule-deadline-time", "scheduled-maintenance", "secondary-gce-zone", "secondary-zone", "self-link", "server-ca-cert", "service-account-email-address", "settings", "settings-version", "sha1-fingerprint", "source-instance", "sql-min-recommended-increase-size-gb", "sql-out-of-disk-state", "sql-server-audit-config", "ssl-cipher", "start-time", "state", "storage-auto-resize", "storage-auto-resize-limit", "suspension-reason", "tier", "time-zone", "transaction-log-retention-days", "update-track", "upload-interval", "user-labels", "username", "verify-server-certificate", "zone"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -2736,16 +2754,19 @@ where
                     "settings.backup-configuration.start-time" => Some(("settings.backupConfiguration.startTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "settings.backup-configuration.transaction-log-retention-days" => Some(("settings.backupConfiguration.transactionLogRetentionDays", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "settings.collation" => Some(("settings.collation", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "settings.connector-enforcement" => Some(("settings.connectorEnforcement", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "settings.crash-safe-replication-enabled" => Some(("settings.crashSafeReplicationEnabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "settings.data-disk-size-gb" => Some(("settings.dataDiskSizeGb", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "settings.data-disk-type" => Some(("settings.dataDiskType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "settings.database-replication-enabled" => Some(("settings.databaseReplicationEnabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "settings.deletion-protection-enabled" => Some(("settings.deletionProtectionEnabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "settings.insights-config.query-insights-enabled" => Some(("settings.insightsConfig.queryInsightsEnabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "settings.insights-config.query-plans-per-minute" => Some(("settings.insightsConfig.queryPlansPerMinute", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "settings.insights-config.query-string-length" => Some(("settings.insightsConfig.queryStringLength", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "settings.insights-config.record-application-tags" => Some(("settings.insightsConfig.recordApplicationTags", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "settings.insights-config.record-client-address" => Some(("settings.insightsConfig.recordClientAddress", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "settings.ip-configuration.allocated-ip-range" => Some(("settings.ipConfiguration.allocatedIpRange", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "settings.ip-configuration.enable-private-path-for-google-cloud-services" => Some(("settings.ipConfiguration.enablePrivatePathForGoogleCloudServices", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "settings.ip-configuration.ipv4-enabled" => Some(("settings.ipConfiguration.ipv4Enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "settings.ip-configuration.private-network" => Some(("settings.ipConfiguration.privateNetwork", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "settings.ip-configuration.require-ssl" => Some(("settings.ipConfiguration.requireSsl", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
@@ -2760,6 +2781,7 @@ where
                     "settings.maintenance-window.update-track" => Some(("settings.maintenanceWindow.updateTrack", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "settings.password-validation-policy.complexity" => Some(("settings.passwordValidationPolicy.complexity", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "settings.password-validation-policy.disallow-username-substring" => Some(("settings.passwordValidationPolicy.disallowUsernameSubstring", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "settings.password-validation-policy.enable-password-policy" => Some(("settings.passwordValidationPolicy.enablePasswordPolicy", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "settings.password-validation-policy.min-length" => Some(("settings.passwordValidationPolicy.minLength", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "settings.password-validation-policy.password-change-interval" => Some(("settings.passwordValidationPolicy.passwordChangeInterval", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "settings.password-validation-policy.reuse-interval" => Some(("settings.passwordValidationPolicy.reuseInterval", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
@@ -2768,14 +2790,17 @@ where
                     "settings.settings-version" => Some(("settings.settingsVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "settings.sql-server-audit-config.bucket" => Some(("settings.sqlServerAuditConfig.bucket", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "settings.sql-server-audit-config.kind" => Some(("settings.sqlServerAuditConfig.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "settings.sql-server-audit-config.retention-interval" => Some(("settings.sqlServerAuditConfig.retentionInterval", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "settings.sql-server-audit-config.upload-interval" => Some(("settings.sqlServerAuditConfig.uploadInterval", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "settings.storage-auto-resize" => Some(("settings.storageAutoResize", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "settings.storage-auto-resize-limit" => Some(("settings.storageAutoResizeLimit", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "settings.tier" => Some(("settings.tier", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "settings.time-zone" => Some(("settings.timeZone", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "settings.user-labels" => Some(("settings.userLabels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "state" => Some(("state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "suspension-reason" => Some(("suspensionReason", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["activation-policy", "active-directory-config", "allocated-ip-range", "authorized-gae-applications", "availability-type", "available", "available-maintenance-versions", "backend-type", "backup-configuration", "backup-retention-settings", "binary-log-enabled", "bucket", "ca-certificate", "can-defer", "can-reschedule", "cert", "cert-serial-number", "client-certificate", "client-key", "collation", "common-name", "complexity", "connect-retry-interval", "connection-name", "crash-safe-replication-enabled", "create-time", "current-disk-size", "data-disk-size-gb", "data-disk-type", "database-installed-version", "database-replication-enabled", "database-version", "day", "disallow-username-substring", "disk-encryption-configuration", "disk-encryption-status", "domain", "dump-file-path", "enabled", "etag", "expiration-time", "failover-replica", "failover-target", "follow-gae-application", "gce-zone", "host-port", "hour", "insights-config", "instance", "instance-type", "ip-configuration", "ipv4-enabled", "ipv6-address", "kind", "kms-key-name", "kms-key-version-name", "location", "location-preference", "maintenance-version", "maintenance-window", "master-heartbeat-period", "master-instance-name", "max-disk-size", "min-length", "mysql-replica-configuration", "name", "on-premises-configuration", "out-of-disk-report", "password", "password-change-interval", "password-validation-policy", "point-in-time-recovery-enabled", "pricing-plan", "private-network", "project", "query-insights-enabled", "query-plans-per-minute", "query-string-length", "record-application-tags", "record-client-address", "region", "replica-configuration", "replica-names", "replication-log-archiving-enabled", "replication-type", "require-ssl", "retained-backups", "retention-unit", "reuse-interval", "root-password", "satisfies-pzs", "schedule-deadline-time", "scheduled-maintenance", "secondary-gce-zone", "secondary-zone", "self-link", "server-ca-cert", "service-account-email-address", "settings", "settings-version", "sha1-fingerprint", "source-instance", "sql-min-recommended-increase-size-gb", "sql-out-of-disk-state", "sql-server-audit-config", "ssl-cipher", "start-time", "state", "storage-auto-resize", "storage-auto-resize-limit", "suspension-reason", "tier", "transaction-log-retention-days", "update-track", "user-labels", "username", "verify-server-certificate", "zone"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["activation-policy", "active-directory-config", "allocated-ip-range", "authorized-gae-applications", "availability-type", "available", "available-maintenance-versions", "backend-type", "backup-configuration", "backup-retention-settings", "binary-log-enabled", "bucket", "ca-certificate", "can-defer", "can-reschedule", "cert", "cert-serial-number", "client-certificate", "client-key", "collation", "common-name", "complexity", "connect-retry-interval", "connection-name", "connector-enforcement", "crash-safe-replication-enabled", "create-time", "current-disk-size", "data-disk-size-gb", "data-disk-type", "database-installed-version", "database-replication-enabled", "database-version", "day", "deletion-protection-enabled", "disallow-username-substring", "disk-encryption-configuration", "disk-encryption-status", "domain", "dump-file-path", "enable-password-policy", "enable-private-path-for-google-cloud-services", "enabled", "etag", "expiration-time", "failover-replica", "failover-target", "follow-gae-application", "gce-zone", "host-port", "hour", "insights-config", "instance", "instance-type", "ip-configuration", "ipv4-enabled", "ipv6-address", "kind", "kms-key-name", "kms-key-version-name", "location", "location-preference", "maintenance-version", "maintenance-window", "master-heartbeat-period", "master-instance-name", "max-disk-size", "min-length", "mysql-replica-configuration", "name", "on-premises-configuration", "out-of-disk-report", "password", "password-change-interval", "password-validation-policy", "point-in-time-recovery-enabled", "pricing-plan", "private-network", "project", "query-insights-enabled", "query-plans-per-minute", "query-string-length", "record-application-tags", "record-client-address", "region", "replica-configuration", "replica-names", "replication-log-archiving-enabled", "replication-type", "require-ssl", "retained-backups", "retention-interval", "retention-unit", "reuse-interval", "root-password", "satisfies-pzs", "schedule-deadline-time", "scheduled-maintenance", "secondary-gce-zone", "secondary-zone", "self-link", "server-ca-cert", "service-account-email-address", "settings", "settings-version", "sha1-fingerprint", "source-instance", "sql-min-recommended-increase-size-gb", "sql-out-of-disk-state", "sql-server-audit-config", "ssl-cipher", "start-time", "state", "storage-auto-resize", "storage-auto-resize-limit", "suspension-reason", "tier", "time-zone", "transaction-log-retention-days", "update-track", "upload-interval", "user-labels", "username", "verify-server-certificate", "zone"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -2897,7 +2922,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "max-results" => {
-                    call = call.max_results(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
+                    call = call.max_results(        value.map(|v| arg_from_str(v, err, "max-results", "uint32")).unwrap_or(0));
                 },
                 "instance" => {
                     call = call.instance(value.unwrap_or(""));
@@ -3646,6 +3671,62 @@ where
         }
     }
 
+    async fn _users_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.users().get(opt.value_of("project").unwrap_or(""), opt.value_of("instance").unwrap_or(""), opt.value_of("name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "host" => {
+                    call = call.host(value.unwrap_or(""));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["host"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
     async fn _users_insert(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
@@ -3669,6 +3750,7 @@ where
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
+                    "dual-password-type" => Some(("dualPasswordType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "etag" => Some(("etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "host" => Some(("host", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "instance" => Some(("instance", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -3677,6 +3759,7 @@ where
                     "password" => Some(("password", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "password-policy.allowed-failed-attempts" => Some(("passwordPolicy.allowedFailedAttempts", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "password-policy.enable-failed-attempts-check" => Some(("passwordPolicy.enableFailedAttemptsCheck", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "password-policy.enable-password-verification" => Some(("passwordPolicy.enablePasswordVerification", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "password-policy.password-expiration-duration" => Some(("passwordPolicy.passwordExpirationDuration", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "password-policy.status.locked" => Some(("passwordPolicy.status.locked", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "password-policy.status.password-expiration-time" => Some(("passwordPolicy.status.passwordExpirationTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -3685,7 +3768,7 @@ where
                     "sqlserver-user-details.server-roles" => Some(("sqlserverUserDetails.serverRoles", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "type" => Some(("type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["allowed-failed-attempts", "disabled", "enable-failed-attempts-check", "etag", "host", "instance", "kind", "locked", "name", "password", "password-expiration-duration", "password-expiration-time", "password-policy", "project", "server-roles", "sqlserver-user-details", "status", "type"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["allowed-failed-attempts", "disabled", "dual-password-type", "enable-failed-attempts-check", "enable-password-verification", "etag", "host", "instance", "kind", "locked", "name", "password", "password-expiration-duration", "password-expiration-time", "password-policy", "project", "server-roles", "sqlserver-user-details", "status", "type"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -3820,6 +3903,7 @@ where
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
+                    "dual-password-type" => Some(("dualPasswordType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "etag" => Some(("etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "host" => Some(("host", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "instance" => Some(("instance", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -3828,6 +3912,7 @@ where
                     "password" => Some(("password", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "password-policy.allowed-failed-attempts" => Some(("passwordPolicy.allowedFailedAttempts", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "password-policy.enable-failed-attempts-check" => Some(("passwordPolicy.enableFailedAttemptsCheck", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "password-policy.enable-password-verification" => Some(("passwordPolicy.enablePasswordVerification", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "password-policy.password-expiration-duration" => Some(("passwordPolicy.passwordExpirationDuration", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "password-policy.status.locked" => Some(("passwordPolicy.status.locked", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "password-policy.status.password-expiration-time" => Some(("passwordPolicy.status.passwordExpirationTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -3836,7 +3921,7 @@ where
                     "sqlserver-user-details.server-roles" => Some(("sqlserverUserDetails.serverRoles", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "type" => Some(("type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["allowed-failed-attempts", "disabled", "enable-failed-attempts-check", "etag", "host", "instance", "kind", "locked", "name", "password", "password-expiration-duration", "password-expiration-time", "password-policy", "project", "server-roles", "sqlserver-user-details", "status", "type"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["allowed-failed-attempts", "disabled", "dual-password-type", "enable-failed-attempts-check", "enable-password-verification", "etag", "host", "instance", "kind", "locked", "name", "password", "password-expiration-duration", "password-expiration-time", "password-policy", "project", "server-roles", "sqlserver-user-details", "status", "type"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -4119,6 +4204,9 @@ where
                 match opt.subcommand() {
                     ("delete", Some(opt)) => {
                         call_result = self._users_delete(opt, dry_run, &mut err).await;
+                    },
+                    ("get", Some(opt)) => {
+                        call_result = self._users_get(opt, dry_run, &mut err).await;
                     },
                     ("insert", Some(opt)) => {
                         call_result = self._users_insert(opt, dry_run, &mut err).await;
@@ -4972,7 +5060,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("patch",
-                    Some(r##"Updates settings of a Cloud SQL instance. This method supports patch semantics."##),
+                    Some(r##"Partially updates settings of a Cloud SQL instance by merging the request with the current configuration. This method supports patch semantics."##),
                     "Details at http://byron.github.io/google-apis-rs/google_sqladmin1_beta4_cli/instances_patch",
                   vec![
                     (Some(r##"project"##),
@@ -5633,7 +5721,7 @@ async fn main() {
                   ]),
             ]),
         
-        ("users", "methods: 'delete', 'insert', 'list' and 'update'", vec![
+        ("users", "methods: 'delete', 'get', 'insert', 'list' and 'update'", vec![
             ("delete",
                     Some(r##"Deletes a user from a Cloud SQL instance."##),
                     "Details at http://byron.github.io/google-apis-rs/google_sqladmin1_beta4_cli/users_delete",
@@ -5647,6 +5735,40 @@ async fn main() {
                     (Some(r##"instance"##),
                      None,
                      Some(r##"Database instance ID. This does not include the project ID."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("get",
+                    Some(r##"Retrieves a resource containing information about a user."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_sqladmin1_beta4_cli/users_get",
+                  vec![
+                    (Some(r##"project"##),
+                     None,
+                     Some(r##"Project ID of the project that contains the instance."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"instance"##),
+                     None,
+                     Some(r##"Database instance ID. This does not include the project ID."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"User of the instance."##),
                      Some(true),
                      Some(false)),
         
@@ -5764,7 +5886,7 @@ async fn main() {
     
     let mut app = App::new("sqladmin1-beta4")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("4.0.1+20220226")
+           .version("5.0.2+20221209")
            .about("API for Cloud SQL database instance management")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_sqladmin1_beta4_cli")
            .arg(Arg::with_name("url")

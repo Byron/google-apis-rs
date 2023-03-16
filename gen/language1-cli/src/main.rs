@@ -3,8 +3,6 @@
 // DO NOT EDIT !
 #![allow(unused_variables, unused_imports, dead_code, unused_mut)]
 
-extern crate tokio;
-
 #[macro_use]
 extern crate clap;
 
@@ -12,9 +10,10 @@ use std::env;
 use std::io::{self, Write};
 use clap::{App, SubCommand, Arg};
 
-use google_language1::{api, Error, oauth2};
+use google_language1::{api, Error, oauth2, client::chrono, FieldMask};
 
-mod client;
+
+use google_clis_common as client;
 
 use client::{InvalidOptionsError, CLIError, arg_from_str, writer_from_opts, parse_kv_arg,
           input_file_from_opts, input_mime_from_opts, FieldCursor, FieldError, CallType, UploadProtocol,
@@ -435,13 +434,14 @@ where
                     "document.language" => Some(("document.language", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "document.type" => Some(("document.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "encoding-type" => Some(("encodingType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "features.classification-model-options.v2-model.content-categories-version" => Some(("features.classificationModelOptions.v2Model.contentCategoriesVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "features.classify-text" => Some(("features.classifyText", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "features.extract-document-sentiment" => Some(("features.extractDocumentSentiment", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "features.extract-entities" => Some(("features.extractEntities", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "features.extract-entity-sentiment" => Some(("features.extractEntitySentiment", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "features.extract-syntax" => Some(("features.extractSyntax", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["classify-text", "content", "document", "encoding-type", "extract-document-sentiment", "extract-entities", "extract-entity-sentiment", "extract-syntax", "features", "gcs-content-uri", "language", "type"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["classification-model-options", "classify-text", "content", "content-categories-version", "document", "encoding-type", "extract-document-sentiment", "extract-entities", "extract-entity-sentiment", "extract-syntax", "features", "gcs-content-uri", "language", "type", "v2-model"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -524,12 +524,13 @@ where
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
+                    "classification-model-options.v2-model.content-categories-version" => Some(("classificationModelOptions.v2Model.contentCategoriesVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "document.content" => Some(("document.content", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "document.gcs-content-uri" => Some(("document.gcsContentUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "document.language" => Some(("document.language", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "document.type" => Some(("document.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["content", "document", "gcs-content-uri", "language", "type"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["classification-model-options", "content", "content-categories-version", "document", "gcs-content-uri", "language", "type", "v2-model"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -832,7 +833,7 @@ async fn main() {
     
     let mut app = App::new("language1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("4.0.1+20220218")
+           .version("5.0.2+20230121")
            .about("Provides natural language understanding technologies, such as sentiment analysis, entity recognition, entity sentiment analysis, and other text annotations, to developers.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_language1_cli")
            .arg(Arg::with_name("url")

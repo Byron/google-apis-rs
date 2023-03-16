@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/generator/templates/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *DLP* crate version *5.0.2-beta-1+20230121*, where *20230121* is the exact revision of the *dlp:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.2-beta-1*.
+//! This documentation was generated from *DLP* crate version *5.0.2+20230121*, where *20230121* is the exact revision of the *dlp:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.2*.
 //! 
 //! Everything else about the *DLP* *v2* API can be found at the
 //! [official documentation site](https://cloud.google.com/dlp/docs/).

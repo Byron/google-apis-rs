@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Cloud IAP* API at revision *20220225*. The CLI is at version *4.0.1*.
+This documentation was generated from the *Cloud IAP* API at revision *20230118*. The CLI is at version *5.0.2*.
 
 ```bash
 iap1 [options]
@@ -44,6 +44,11 @@ iap1 [options]
                 brands-identity-aware-proxy-clients-list <parent> [-p <v>]... [-o <out>]
                 brands-identity-aware-proxy-clients-reset-secret <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 brands-list <parent> [-p <v>]... [-o <out>]
+                iap-tunnel-locations-dest-groups-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                iap-tunnel-locations-dest-groups-delete <name> [-p <v>]... [-o <out>]
+                iap-tunnel-locations-dest-groups-get <name> [-p <v>]... [-o <out>]
+                iap-tunnel-locations-dest-groups-list <parent> [-p <v>]... [-o <out>]
+                iap-tunnel-locations-dest-groups-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
   iap1 --help
 
 Configuration:

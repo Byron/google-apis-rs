@@ -1,4 +1,4 @@
-site_name: Cloud OS Login v4.0.1+20220228
+site_name: Cloud OS Login v5.0.2+20230115
 site_url: http://byron.github.io/google-apis-rs/google-oslogin1_beta-cli
 site_description: A complete library to interact with Cloud OS Login (protocol v1beta)
 
@@ -7,15 +7,16 @@ repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/oslogin1_beta-cl
 docs_dir: docs
 site_dir: build_html
 
-pages:
-- ['index.md', 'Home']
-- ['users_get-login-profile.md', 'Users', 'Get Login Profile']
-- ['users_import-ssh-public-key.md', 'Users', 'Import Ssh Public Key']
-- ['users_projects-delete.md', 'Users', 'Projects Delete']
-- ['users_ssh-public-keys-create.md', 'Users', 'Ssh Public Keys Create']
-- ['users_ssh-public-keys-delete.md', 'Users', 'Ssh Public Keys Delete']
-- ['users_ssh-public-keys-get.md', 'Users', 'Ssh Public Keys Get']
-- ['users_ssh-public-keys-patch.md', 'Users', 'Ssh Public Keys Patch']
+nav:
+- Home: 'index.md'
+- 'Users':
+    - 'Get Login Profile': 'users_get-login-profile.md'
+    - 'Import Ssh Public Key': 'users_import-ssh-public-key.md'
+    - 'Projects Delete': 'users_projects-delete.md'
+    - 'Ssh Public Keys Create': 'users_ssh-public-keys-create.md'
+    - 'Ssh Public Keys Delete': 'users_ssh-public-keys-delete.md'
+    - 'Ssh Public Keys Get': 'users_ssh-public-keys-get.md'
+    - 'Ssh Public Keys Patch': 'users_ssh-public-keys-patch.md'
 
 theme: readthedocs
 

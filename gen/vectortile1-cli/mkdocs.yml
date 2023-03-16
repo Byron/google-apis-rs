@@ -1,4 +1,4 @@
-site_name: Semantic Tile v4.0.1+20210331
+site_name: Semantic Tile v5.0.2+20210331
 site_url: http://byron.github.io/google-apis-rs/google-vectortile1-cli
 site_description: A complete library to interact with Semantic Tile (protocol v1)
 
@@ -7,10 +7,12 @@ repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/vectortile1-cli
 docs_dir: docs
 site_dir: build_html
 
-pages:
-- ['index.md', 'Home']
-- ['featuretiles_get.md', 'Featuretiles', 'Get']
-- ['terraintiles_get.md', 'Terraintiles', 'Get']
+nav:
+- Home: 'index.md'
+- 'Featuretiles':
+    - 'Get': 'featuretiles_get.md'
+- 'Terraintiles':
+    - 'Get': 'terraintiles_get.md'
 
 theme: readthedocs
 

@@ -1,4 +1,4 @@
-site_name: siteVerification v4.0.1+20191119
+site_name: siteVerification v5.0.2+20191119
 site_url: http://byron.github.io/google-apis-rs/google-siteverification1-cli
 site_description: A complete library to interact with siteVerification (protocol v1)
 
@@ -7,15 +7,16 @@ repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/siteverification
 docs_dir: docs
 site_dir: build_html
 
-pages:
-- ['index.md', 'Home']
-- ['web-resource_delete.md', 'Web Resource', 'Delete']
-- ['web-resource_get.md', 'Web Resource', 'Get']
-- ['web-resource_get-token.md', 'Web Resource', 'Get Token']
-- ['web-resource_insert.md', 'Web Resource', 'Insert']
-- ['web-resource_list.md', 'Web Resource', 'List']
-- ['web-resource_patch.md', 'Web Resource', 'Patch']
-- ['web-resource_update.md', 'Web Resource', 'Update']
+nav:
+- Home: 'index.md'
+- 'Web Resource':
+    - 'Delete': 'web-resource_delete.md'
+    - 'Get': 'web-resource_get.md'
+    - 'Get Token': 'web-resource_get-token.md'
+    - 'Insert': 'web-resource_insert.md'
+    - 'List': 'web-resource_list.md'
+    - 'Patch': 'web-resource_patch.md'
+    - 'Update': 'web-resource_update.md'
 
 theme: readthedocs
 

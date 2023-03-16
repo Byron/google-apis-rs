@@ -1,4 +1,4 @@
-site_name: Clouderrorreporting v4.0.1+20220302
+site_name: Clouderrorreporting v5.0.2+20230112
 site_url: http://byron.github.io/google-apis-rs/google-clouderrorreporting1_beta1-cli
 site_description: A complete library to interact with Clouderrorreporting (protocol v1beta1)
 
@@ -7,14 +7,15 @@ repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/clouderrorreport
 docs_dir: docs
 site_dir: build_html
 
-pages:
-- ['index.md', 'Home']
-- ['projects_delete-events.md', 'Projects', 'Delete Events']
-- ['projects_events-list.md', 'Projects', 'Events List']
-- ['projects_events-report.md', 'Projects', 'Events Report']
-- ['projects_group-stats-list.md', 'Projects', 'Group Stats List']
-- ['projects_groups-get.md', 'Projects', 'Groups Get']
-- ['projects_groups-update.md', 'Projects', 'Groups Update']
+nav:
+- Home: 'index.md'
+- 'Projects':
+    - 'Delete Events': 'projects_delete-events.md'
+    - 'Events List': 'projects_events-list.md'
+    - 'Events Report': 'projects_events-report.md'
+    - 'Group Stats List': 'projects_group-stats-list.md'
+    - 'Groups Get': 'projects_groups-get.md'
+    - 'Groups Update': 'projects_groups-update.md'
 
 theme: readthedocs
 

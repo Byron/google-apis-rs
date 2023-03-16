@@ -3,8 +3,6 @@
 // DO NOT EDIT !
 #![allow(unused_variables, unused_imports, dead_code, unused_mut)]
 
-extern crate tokio;
-
 #[macro_use]
 extern crate clap;
 
@@ -12,9 +10,10 @@ use std::env;
 use std::io::{self, Write};
 use clap::{App, SubCommand, Arg};
 
-use google_datastore1_beta3::{api, Error, oauth2};
+use google_datastore1_beta3::{api, Error, oauth2, client::chrono, FieldMask};
 
-mod client;
+
+use google_clis_common as client;
 
 use client::{InvalidOptionsError, CLIError, arg_from_str, writer_from_opts, parse_kv_arg,
           input_file_from_opts, input_mime_from_opts, FieldCursor, FieldError, CallType, UploadProtocol,
@@ -158,9 +157,10 @@ where
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
+                    "transaction-options.read-only.read-time" => Some(("transactionOptions.readOnly.readTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "transaction-options.read-write.previous-transaction" => Some(("transactionOptions.readWrite.previousTransaction", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["previous-transaction", "read-write", "transaction-options"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["previous-transaction", "read-only", "read-time", "read-write", "transaction-options"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -330,9 +330,10 @@ where
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
                     "read-options.read-consistency" => Some(("readOptions.readConsistency", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "read-options.read-time" => Some(("readOptions.readTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "read-options.transaction" => Some(("readOptions.transaction", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["read-consistency", "read-options", "transaction"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["read-consistency", "read-options", "read-time", "transaction"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -562,6 +563,119 @@ where
         }
     }
 
+    async fn _projects_run_aggregation_query(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "aggregation-query.nested-query.end-cursor" => Some(("aggregationQuery.nestedQuery.endCursor", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "aggregation-query.nested-query.filter.composite-filter.op" => Some(("aggregationQuery.nestedQuery.filter.compositeFilter.op", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "aggregation-query.nested-query.filter.property-filter.op" => Some(("aggregationQuery.nestedQuery.filter.propertyFilter.op", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "aggregation-query.nested-query.filter.property-filter.property.name" => Some(("aggregationQuery.nestedQuery.filter.propertyFilter.property.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "aggregation-query.nested-query.filter.property-filter.value.blob-value" => Some(("aggregationQuery.nestedQuery.filter.propertyFilter.value.blobValue", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "aggregation-query.nested-query.filter.property-filter.value.boolean-value" => Some(("aggregationQuery.nestedQuery.filter.propertyFilter.value.booleanValue", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "aggregation-query.nested-query.filter.property-filter.value.double-value" => Some(("aggregationQuery.nestedQuery.filter.propertyFilter.value.doubleValue", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "aggregation-query.nested-query.filter.property-filter.value.entity-value.key.partition-id.namespace-id" => Some(("aggregationQuery.nestedQuery.filter.propertyFilter.value.entityValue.key.partitionId.namespaceId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "aggregation-query.nested-query.filter.property-filter.value.entity-value.key.partition-id.project-id" => Some(("aggregationQuery.nestedQuery.filter.propertyFilter.value.entityValue.key.partitionId.projectId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "aggregation-query.nested-query.filter.property-filter.value.exclude-from-indexes" => Some(("aggregationQuery.nestedQuery.filter.propertyFilter.value.excludeFromIndexes", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "aggregation-query.nested-query.filter.property-filter.value.geo-point-value.latitude" => Some(("aggregationQuery.nestedQuery.filter.propertyFilter.value.geoPointValue.latitude", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "aggregation-query.nested-query.filter.property-filter.value.geo-point-value.longitude" => Some(("aggregationQuery.nestedQuery.filter.propertyFilter.value.geoPointValue.longitude", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "aggregation-query.nested-query.filter.property-filter.value.integer-value" => Some(("aggregationQuery.nestedQuery.filter.propertyFilter.value.integerValue", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "aggregation-query.nested-query.filter.property-filter.value.key-value.partition-id.namespace-id" => Some(("aggregationQuery.nestedQuery.filter.propertyFilter.value.keyValue.partitionId.namespaceId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "aggregation-query.nested-query.filter.property-filter.value.key-value.partition-id.project-id" => Some(("aggregationQuery.nestedQuery.filter.propertyFilter.value.keyValue.partitionId.projectId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "aggregation-query.nested-query.filter.property-filter.value.meaning" => Some(("aggregationQuery.nestedQuery.filter.propertyFilter.value.meaning", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "aggregation-query.nested-query.filter.property-filter.value.null-value" => Some(("aggregationQuery.nestedQuery.filter.propertyFilter.value.nullValue", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "aggregation-query.nested-query.filter.property-filter.value.string-value" => Some(("aggregationQuery.nestedQuery.filter.propertyFilter.value.stringValue", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "aggregation-query.nested-query.filter.property-filter.value.timestamp-value" => Some(("aggregationQuery.nestedQuery.filter.propertyFilter.value.timestampValue", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "aggregation-query.nested-query.limit" => Some(("aggregationQuery.nestedQuery.limit", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "aggregation-query.nested-query.offset" => Some(("aggregationQuery.nestedQuery.offset", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "aggregation-query.nested-query.start-cursor" => Some(("aggregationQuery.nestedQuery.startCursor", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "gql-query.allow-literals" => Some(("gqlQuery.allowLiterals", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "gql-query.query-string" => Some(("gqlQuery.queryString", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "partition-id.namespace-id" => Some(("partitionId.namespaceId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "partition-id.project-id" => Some(("partitionId.projectId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "read-options.read-consistency" => Some(("readOptions.readConsistency", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "read-options.read-time" => Some(("readOptions.readTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "read-options.transaction" => Some(("readOptions.transaction", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["aggregation-query", "allow-literals", "blob-value", "boolean-value", "composite-filter", "double-value", "end-cursor", "entity-value", "exclude-from-indexes", "filter", "geo-point-value", "gql-query", "integer-value", "key", "key-value", "latitude", "limit", "longitude", "meaning", "name", "namespace-id", "nested-query", "null-value", "offset", "op", "partition-id", "project-id", "property", "property-filter", "query-string", "read-consistency", "read-options", "read-time", "start-cursor", "string-value", "timestamp-value", "transaction", "value"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::RunAggregationQueryRequest = json::value::from_value(object).unwrap();
+        let mut call = self.hub.projects().run_aggregation_query(request, opt.value_of("project-id").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
     async fn _projects_run_query(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
@@ -612,9 +726,10 @@ where
                     "query.offset" => Some(("query.offset", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "query.start-cursor" => Some(("query.startCursor", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "read-options.read-consistency" => Some(("readOptions.readConsistency", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "read-options.read-time" => Some(("readOptions.readTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "read-options.transaction" => Some(("readOptions.transaction", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["allow-literals", "blob-value", "boolean-value", "composite-filter", "double-value", "end-cursor", "entity-value", "exclude-from-indexes", "filter", "geo-point-value", "gql-query", "integer-value", "key", "key-value", "latitude", "limit", "longitude", "meaning", "name", "namespace-id", "null-value", "offset", "op", "partition-id", "project-id", "property", "property-filter", "query", "query-string", "read-consistency", "read-options", "start-cursor", "string-value", "timestamp-value", "transaction", "value"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["allow-literals", "blob-value", "boolean-value", "composite-filter", "double-value", "end-cursor", "entity-value", "exclude-from-indexes", "filter", "geo-point-value", "gql-query", "integer-value", "key", "key-value", "latitude", "limit", "longitude", "meaning", "name", "namespace-id", "null-value", "offset", "op", "partition-id", "project-id", "property", "property-filter", "query", "query-string", "read-consistency", "read-options", "read-time", "start-cursor", "string-value", "timestamp-value", "transaction", "value"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -699,6 +814,9 @@ where
                     ("rollback", Some(opt)) => {
                         call_result = self._projects_rollback(opt, dry_run, &mut err).await;
                     },
+                    ("run-aggregation-query", Some(opt)) => {
+                        call_result = self._projects_run_aggregation_query(opt, dry_run, &mut err).await;
+                    },
                     ("run-query", Some(opt)) => {
                         call_result = self._projects_run_query(opt, dry_run, &mut err).await;
                     },
@@ -781,7 +899,7 @@ where
 async fn main() {
     let mut exit_status = 0i32;
     let arg_data = [
-        ("projects", "methods: 'allocate-ids', 'begin-transaction', 'commit', 'lookup', 'reserve-ids', 'rollback' and 'run-query'", vec![
+        ("projects", "methods: 'allocate-ids', 'begin-transaction', 'commit', 'lookup', 'reserve-ids', 'rollback', 'run-aggregation-query' and 'run-query'", vec![
             ("allocate-ids",
                     Some(r##"Allocates IDs for the given keys, which is useful for referencing an entity before it is inserted."##),
                     "Details at http://byron.github.io/google-apis-rs/google_datastore1_beta3_cli/projects_allocate-ids",
@@ -950,6 +1068,34 @@ async fn main() {
                      Some(false),
                      Some(false)),
                   ]),
+            ("run-aggregation-query",
+                    Some(r##"Runs an aggregation query."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_datastore1_beta3_cli/projects_run-aggregation-query",
+                  vec![
+                    (Some(r##"project-id"##),
+                     None,
+                     Some(r##"Required. The ID of the project against which to make the request."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
             ("run-query",
                     Some(r##"Queries for entities."##),
                     "Details at http://byron.github.io/google-apis-rs/google_datastore1_beta3_cli/projects_run-query",
@@ -984,7 +1130,7 @@ async fn main() {
     
     let mut app = App::new("datastore1-beta3")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("4.0.1+20220221")
+           .version("5.0.2+20230118")
            .about("Accesses the schemaless NoSQL database to provide fully managed, robust, scalable storage for your application. ")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_datastore1_beta3_cli")
            .arg(Arg::with_name("url")

@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/generator/templates/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Connectors* crate version *5.0.2-beta-1+20230103*, where *20230103* is the exact revision of the *connectors:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.2-beta-1*.
+//! This documentation was generated from *Connectors* crate version *5.0.2+20230103*, where *20230103* is the exact revision of the *connectors:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.2*.
 //! 
 //! Everything else about the *Connectors* *v1* API can be found at the
 //! [official documentation site](https://cloud.google.com/apigee/docs/api-platform/connectors/about-connectors).

@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Iam* API at revision *20220224*. The CLI is at version *4.0.1*.
+This documentation was generated from the *Iam* API at revision *20230112*. The CLI is at version *5.0.2*.
 
 ```bash
 iam1 [options]
@@ -34,6 +34,7 @@ iam1 [options]
                 query-auditable-services (-r <kv>)... [-p <v>]... [-o <out>]
         locations
                 workforce-pools-operations-get <name> [-p <v>]... [-o <out>]
+                workforce-pools-providers-keys-operations-get <name> [-p <v>]... [-o <out>]
                 workforce-pools-providers-operations-get <name> [-p <v>]... [-o <out>]
                 workforce-pools-subjects-operations-get <name> [-p <v>]... [-o <out>]
         organizations

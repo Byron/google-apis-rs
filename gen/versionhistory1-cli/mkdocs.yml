@@ -1,4 +1,4 @@
-site_name: Version History v4.0.1+20220307
+site_name: Version History v5.0.2+20230123
 site_url: http://byron.github.io/google-apis-rs/google-versionhistory1-cli
 site_description: A complete library to interact with Version History (protocol v1)
 
@@ -7,12 +7,13 @@ repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/versionhistory1-
 docs_dir: docs
 site_dir: build_html
 
-pages:
-- ['index.md', 'Home']
-- ['platforms_channels-list.md', 'Platforms', 'Channels List']
-- ['platforms_channels-versions-list.md', 'Platforms', 'Channels Versions List']
-- ['platforms_channels-versions-releases-list.md', 'Platforms', 'Channels Versions Releases List']
-- ['platforms_list.md', 'Platforms', 'List']
+nav:
+- Home: 'index.md'
+- 'Platforms':
+    - 'Channels List': 'platforms_channels-list.md'
+    - 'Channels Versions List': 'platforms_channels-versions-list.md'
+    - 'Channels Versions Releases List': 'platforms_channels-versions-releases-list.md'
+    - 'List': 'platforms_list.md'
 
 theme: readthedocs
 

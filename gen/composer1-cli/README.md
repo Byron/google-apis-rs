@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Cloud Composer* API at revision *20220224*. The CLI is at version *4.0.1*.
+This documentation was generated from the *Cloud Composer* API at revision *20230107*. The CLI is at version *5.0.2*.
 
 ```bash
 composer1 [options]
@@ -34,7 +34,9 @@ composer1 [options]
                 locations-environments-delete <name> [-p <v>]... [-o <out>]
                 locations-environments-get <name> [-p <v>]... [-o <out>]
                 locations-environments-list <parent> [-p <v>]... [-o <out>]
+                locations-environments-load-snapshot <environment> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-environments-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-environments-save-snapshot <environment> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-image-versions-list <parent> [-p <v>]... [-o <out>]
                 locations-operations-delete <name> [-p <v>]... [-o <out>]
                 locations-operations-get <name> [-p <v>]... [-o <out>]

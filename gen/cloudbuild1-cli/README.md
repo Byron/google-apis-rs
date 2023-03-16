@@ -25,10 +25,12 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Cloud Build* API at revision *20220218*. The CLI is at version *4.0.1*.
+This documentation was generated from the *Cloud Build* API at revision *20230120*. The CLI is at version *5.0.2*.
 
 ```bash
 cloudbuild1 [options]
+        github-dot-com-webhook
+                receive (-r <kv>)... [-p <v>]... [-o <out>]
         locations
                 regional-webhook <location> (-r <kv>)... [-p <v>]... [-o <out>]
         methods
@@ -48,7 +50,6 @@ cloudbuild1 [options]
                 github-enterprise-configs-get <name> [-p <v>]... [-o <out>]
                 github-enterprise-configs-list <parent> [-p <v>]... [-o <out>]
                 github-enterprise-configs-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
-                locations-bitbucket-server-configs-add-bitbucket-server-connected-repository <config> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-bitbucket-server-configs-connected-repositories-batch-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-bitbucket-server-configs-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-bitbucket-server-configs-delete <name> [-p <v>]... [-o <out>]
@@ -63,6 +64,14 @@ cloudbuild1 [options]
                 locations-builds-get <name> [-p <v>]... [-o <out>]
                 locations-builds-list <parent> [-p <v>]... [-o <out>]
                 locations-builds-retry <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-git-lab-configs-connected-repositories-batch-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-git-lab-configs-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-git-lab-configs-delete <name> [-p <v>]... [-o <out>]
+                locations-git-lab-configs-get <name> [-p <v>]... [-o <out>]
+                locations-git-lab-configs-list <parent> [-p <v>]... [-o <out>]
+                locations-git-lab-configs-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-git-lab-configs-remove-git-lab-connected-repository <config> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-git-lab-configs-repos-list <parent> [-p <v>]... [-o <out>]
                 locations-github-enterprise-configs-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-github-enterprise-configs-delete <name> [-p <v>]... [-o <out>]
                 locations-github-enterprise-configs-get <name> [-p <v>]... [-o <out>]

@@ -1,4 +1,4 @@
-site_name: Fact Check Tools v4.0.1+20220305
+site_name: Fact Check Tools v5.0.2+20230121
 site_url: http://byron.github.io/google-apis-rs/google-factchecktools1_alpha1-cli
 site_description: A complete library to interact with Fact Check Tools (protocol v1alpha1)
 
@@ -7,14 +7,16 @@ repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/factchecktools1_
 docs_dir: docs
 site_dir: build_html
 
-pages:
-- ['index.md', 'Home']
-- ['claims_search.md', 'Claims', 'Search']
-- ['pages_create.md', 'Pages', 'Create']
-- ['pages_delete.md', 'Pages', 'Delete']
-- ['pages_get.md', 'Pages', 'Get']
-- ['pages_list.md', 'Pages', 'List']
-- ['pages_update.md', 'Pages', 'Update']
+nav:
+- Home: 'index.md'
+- 'Claims':
+    - 'Search': 'claims_search.md'
+- 'Pages':
+    - 'Create': 'pages_create.md'
+    - 'Delete': 'pages_delete.md'
+    - 'Get': 'pages_get.md'
+    - 'List': 'pages_list.md'
+    - 'Update': 'pages_update.md'
 
 theme: readthedocs
 

@@ -25,16 +25,25 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Dataproc Metastore* API at revision *20220222*. The CLI is at version *4.0.1*.
+This documentation was generated from the *Dataproc Metastore* API at revision *20230111*. The CLI is at version *5.0.2*.
 
 ```bash
 metastore1-beta [options]
         projects
+                locations-federations-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-federations-delete <name> [-p <v>]... [-o <out>]
+                locations-federations-get <name> [-p <v>]... [-o <out>]
+                locations-federations-get-iam-policy <resource> [-p <v>]... [-o <out>]
+                locations-federations-list <parent> [-p <v>]... [-o <out>]
+                locations-federations-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-federations-set-iam-policy <resource> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-federations-test-iam-permissions <resource> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-get <name> [-p <v>]... [-o <out>]
                 locations-list <name> [-p <v>]... [-o <out>]
                 locations-operations-delete <name> [-p <v>]... [-o <out>]
                 locations-operations-get <name> [-p <v>]... [-o <out>]
                 locations-operations-list <name> [-p <v>]... [-o <out>]
+                locations-services-alter-location <service> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-services-backups-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-services-backups-delete <name> [-p <v>]... [-o <out>]
                 locations-services-backups-get <name> [-p <v>]... [-o <out>]
@@ -58,7 +67,9 @@ metastore1-beta [options]
                 locations-services-metadata-imports-get <name> [-p <v>]... [-o <out>]
                 locations-services-metadata-imports-list <parent> [-p <v>]... [-o <out>]
                 locations-services-metadata-imports-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-services-move-table-to-database <service> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-services-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-services-query-metadata <service> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-services-remove-iam-policy <resource> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-services-restore <service> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-services-set-iam-policy <resource> (-r <kv>)... [-p <v>]... [-o <out>]

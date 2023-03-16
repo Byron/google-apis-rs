@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Chrome Management* API at revision *20220305*. The CLI is at version *4.0.1*.
+This documentation was generated from the *Chrome Management* API at revision *20230123*. The CLI is at version *5.0.2*.
 
 ```bash
 chromemanagement1 [options]
@@ -34,10 +34,15 @@ chromemanagement1 [options]
                 apps-chrome-get <name> [-p <v>]... [-o <out>]
                 apps-count-chrome-app-requests <customer> [-p <v>]... [-o <out>]
                 apps-web-get <name> [-p <v>]... [-o <out>]
+                reports-count-chrome-devices-reaching-auto-expiration-date <customer> [-p <v>]... [-o <out>]
+                reports-count-chrome-devices-that-need-attention <customer> [-p <v>]... [-o <out>]
+                reports-count-chrome-hardware-fleet-devices <customer> [-p <v>]... [-o <out>]
                 reports-count-chrome-versions <customer> [-p <v>]... [-o <out>]
                 reports-count-installed-apps <customer> [-p <v>]... [-o <out>]
                 reports-find-installed-app-devices <customer> [-p <v>]... [-o <out>]
+                telemetry-devices-get <name> [-p <v>]... [-o <out>]
                 telemetry-devices-list <parent> [-p <v>]... [-o <out>]
+                telemetry-events-list <parent> [-p <v>]... [-o <out>]
   chromemanagement1 --help
 
 Configuration:

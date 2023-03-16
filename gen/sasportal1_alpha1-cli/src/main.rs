@@ -3,8 +3,6 @@
 // DO NOT EDIT !
 #![allow(unused_variables, unused_imports, dead_code, unused_mut)]
 
-extern crate tokio;
-
 #[macro_use]
 extern crate clap;
 
@@ -12,9 +10,10 @@ use std::env;
 use std::io::{self, Write};
 use clap::{App, SubCommand, Arg};
 
-use google_sasportal1_alpha1::{api, Error, oauth2};
+use google_sasportal1_alpha1::{api, Error, oauth2, client::chrono, FieldMask};
 
-mod client;
+
+use google_clis_common as client;
 
 use client::{InvalidOptionsError, CLIError, arg_from_str, writer_from_opts, parse_kv_arg,
           input_file_from_opts, input_mime_from_opts, FieldCursor, FieldError, CallType, UploadProtocol,
@@ -222,9 +221,11 @@ where
                     "active-config.installation-params.antenna-beamwidth" => Some(("activeConfig.installationParams.antennaBeamwidth", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "active-config.installation-params.antenna-downtilt" => Some(("activeConfig.installationParams.antennaDowntilt", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "active-config.installation-params.antenna-gain" => Some(("activeConfig.installationParams.antennaGain", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "active-config.installation-params.antenna-gain-new-field" => Some(("activeConfig.installationParams.antennaGainNewField", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "active-config.installation-params.antenna-model" => Some(("activeConfig.installationParams.antennaModel", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "active-config.installation-params.cpe-cbsd-indication" => Some(("activeConfig.installationParams.cpeCbsdIndication", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "active-config.installation-params.eirp-capability" => Some(("activeConfig.installationParams.eirpCapability", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "active-config.installation-params.eirp-capability-new-field" => Some(("activeConfig.installationParams.eirpCapabilityNewField", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "active-config.installation-params.height" => Some(("activeConfig.installationParams.height", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "active-config.installation-params.height-type" => Some(("activeConfig.installationParams.heightType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "active-config.installation-params.horizontal-accuracy" => Some(("activeConfig.installationParams.horizontalAccuracy", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
@@ -250,6 +251,7 @@ where
                     "device-metadata.nrqz-validation.cpi-id" => Some(("deviceMetadata.nrqzValidation.cpiId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "device-metadata.nrqz-validation.latitude" => Some(("deviceMetadata.nrqzValidation.latitude", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "device-metadata.nrqz-validation.longitude" => Some(("deviceMetadata.nrqzValidation.longitude", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "device-metadata.nrqz-validation.state" => Some(("deviceMetadata.nrqzValidation.state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "display-name" => Some(("displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "fcc-id" => Some(("fccId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -261,9 +263,11 @@ where
                     "preloaded-config.installation-params.antenna-beamwidth" => Some(("preloadedConfig.installationParams.antennaBeamwidth", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "preloaded-config.installation-params.antenna-downtilt" => Some(("preloadedConfig.installationParams.antennaDowntilt", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "preloaded-config.installation-params.antenna-gain" => Some(("preloadedConfig.installationParams.antennaGain", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "preloaded-config.installation-params.antenna-gain-new-field" => Some(("preloadedConfig.installationParams.antennaGainNewField", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "preloaded-config.installation-params.antenna-model" => Some(("preloadedConfig.installationParams.antennaModel", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "preloaded-config.installation-params.cpe-cbsd-indication" => Some(("preloadedConfig.installationParams.cpeCbsdIndication", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "preloaded-config.installation-params.eirp-capability" => Some(("preloadedConfig.installationParams.eirpCapability", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "preloaded-config.installation-params.eirp-capability-new-field" => Some(("preloadedConfig.installationParams.eirpCapabilityNewField", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "preloaded-config.installation-params.height" => Some(("preloadedConfig.installationParams.height", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "preloaded-config.installation-params.height-type" => Some(("preloadedConfig.installationParams.heightType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "preloaded-config.installation-params.horizontal-accuracy" => Some(("preloadedConfig.installationParams.horizontalAccuracy", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
@@ -284,7 +288,7 @@ where
                     "serial-number" => Some(("serialNumber", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "state" => Some(("state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["active-config", "air-interface", "antenna-azimuth", "antenna-beamwidth", "antenna-downtilt", "antenna-gain", "antenna-model", "call-sign", "case-id", "category", "common-channel-group", "cpe-cbsd-indication", "cpi-id", "device-metadata", "display-name", "eirp-capability", "fcc-id", "firmware-version", "hardware-version", "height", "height-type", "horizontal-accuracy", "indoor-deployment", "installation-params", "interference-coordination-group", "is-signed", "latitude", "longitude", "measurement-capabilities", "model", "name", "nrqz-validated", "nrqz-validation", "preloaded-config", "radio-technology", "serial-number", "software-version", "state", "supported-spec", "update-time", "user-id", "vendor", "vertical-accuracy"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["active-config", "air-interface", "antenna-azimuth", "antenna-beamwidth", "antenna-downtilt", "antenna-gain", "antenna-gain-new-field", "antenna-model", "call-sign", "case-id", "category", "common-channel-group", "cpe-cbsd-indication", "cpi-id", "device-metadata", "display-name", "eirp-capability", "eirp-capability-new-field", "fcc-id", "firmware-version", "hardware-version", "height", "height-type", "horizontal-accuracy", "indoor-deployment", "installation-params", "interference-coordination-group", "is-signed", "latitude", "longitude", "measurement-capabilities", "model", "name", "nrqz-validated", "nrqz-validation", "preloaded-config", "radio-technology", "serial-number", "software-version", "state", "supported-spec", "update-time", "user-id", "vendor", "vertical-accuracy"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -440,7 +444,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 "filter" => {
                     call = call.filter(value.unwrap_or(""));
@@ -554,7 +558,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 "filter" => {
                     call = call.filter(value.unwrap_or(""));
@@ -734,7 +738,7 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "update-mask" => {
-                    call = call.update_mask(value.unwrap_or(""));
+                    call = call.update_mask(        value.map(|v| arg_from_str(v, err, "update-mask", "google-fieldmask")).unwrap_or(FieldMask::default()));
                 },
                 _ => {
                     let mut found = false;
@@ -814,9 +818,11 @@ where
                     "active-config.installation-params.antenna-beamwidth" => Some(("activeConfig.installationParams.antennaBeamwidth", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "active-config.installation-params.antenna-downtilt" => Some(("activeConfig.installationParams.antennaDowntilt", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "active-config.installation-params.antenna-gain" => Some(("activeConfig.installationParams.antennaGain", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "active-config.installation-params.antenna-gain-new-field" => Some(("activeConfig.installationParams.antennaGainNewField", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "active-config.installation-params.antenna-model" => Some(("activeConfig.installationParams.antennaModel", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "active-config.installation-params.cpe-cbsd-indication" => Some(("activeConfig.installationParams.cpeCbsdIndication", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "active-config.installation-params.eirp-capability" => Some(("activeConfig.installationParams.eirpCapability", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "active-config.installation-params.eirp-capability-new-field" => Some(("activeConfig.installationParams.eirpCapabilityNewField", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "active-config.installation-params.height" => Some(("activeConfig.installationParams.height", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "active-config.installation-params.height-type" => Some(("activeConfig.installationParams.heightType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "active-config.installation-params.horizontal-accuracy" => Some(("activeConfig.installationParams.horizontalAccuracy", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
@@ -842,6 +848,7 @@ where
                     "device-metadata.nrqz-validation.cpi-id" => Some(("deviceMetadata.nrqzValidation.cpiId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "device-metadata.nrqz-validation.latitude" => Some(("deviceMetadata.nrqzValidation.latitude", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "device-metadata.nrqz-validation.longitude" => Some(("deviceMetadata.nrqzValidation.longitude", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "device-metadata.nrqz-validation.state" => Some(("deviceMetadata.nrqzValidation.state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "display-name" => Some(("displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "fcc-id" => Some(("fccId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -853,9 +860,11 @@ where
                     "preloaded-config.installation-params.antenna-beamwidth" => Some(("preloadedConfig.installationParams.antennaBeamwidth", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "preloaded-config.installation-params.antenna-downtilt" => Some(("preloadedConfig.installationParams.antennaDowntilt", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "preloaded-config.installation-params.antenna-gain" => Some(("preloadedConfig.installationParams.antennaGain", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "preloaded-config.installation-params.antenna-gain-new-field" => Some(("preloadedConfig.installationParams.antennaGainNewField", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "preloaded-config.installation-params.antenna-model" => Some(("preloadedConfig.installationParams.antennaModel", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "preloaded-config.installation-params.cpe-cbsd-indication" => Some(("preloadedConfig.installationParams.cpeCbsdIndication", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "preloaded-config.installation-params.eirp-capability" => Some(("preloadedConfig.installationParams.eirpCapability", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "preloaded-config.installation-params.eirp-capability-new-field" => Some(("preloadedConfig.installationParams.eirpCapabilityNewField", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "preloaded-config.installation-params.height" => Some(("preloadedConfig.installationParams.height", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "preloaded-config.installation-params.height-type" => Some(("preloadedConfig.installationParams.heightType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "preloaded-config.installation-params.horizontal-accuracy" => Some(("preloadedConfig.installationParams.horizontalAccuracy", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
@@ -876,7 +885,7 @@ where
                     "serial-number" => Some(("serialNumber", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "state" => Some(("state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["active-config", "air-interface", "antenna-azimuth", "antenna-beamwidth", "antenna-downtilt", "antenna-gain", "antenna-model", "call-sign", "case-id", "category", "common-channel-group", "cpe-cbsd-indication", "cpi-id", "device-metadata", "display-name", "eirp-capability", "fcc-id", "firmware-version", "hardware-version", "height", "height-type", "horizontal-accuracy", "indoor-deployment", "installation-params", "interference-coordination-group", "is-signed", "latitude", "longitude", "measurement-capabilities", "model", "name", "nrqz-validated", "nrqz-validation", "preloaded-config", "radio-technology", "serial-number", "software-version", "state", "supported-spec", "update-time", "user-id", "vendor", "vertical-accuracy"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["active-config", "air-interface", "antenna-azimuth", "antenna-beamwidth", "antenna-downtilt", "antenna-gain", "antenna-gain-new-field", "antenna-model", "call-sign", "case-id", "category", "common-channel-group", "cpe-cbsd-indication", "cpi-id", "device-metadata", "display-name", "eirp-capability", "eirp-capability-new-field", "fcc-id", "firmware-version", "hardware-version", "height", "height-type", "horizontal-accuracy", "indoor-deployment", "installation-params", "interference-coordination-group", "is-signed", "latitude", "longitude", "measurement-capabilities", "model", "name", "nrqz-validated", "nrqz-validation", "preloaded-config", "radio-technology", "serial-number", "software-version", "state", "supported-spec", "update-time", "user-id", "vendor", "vertical-accuracy"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1136,7 +1145,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 "filter" => {
                     call = call.filter(value.unwrap_or(""));
@@ -1304,9 +1313,11 @@ where
                     "active-config.installation-params.antenna-beamwidth" => Some(("activeConfig.installationParams.antennaBeamwidth", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "active-config.installation-params.antenna-downtilt" => Some(("activeConfig.installationParams.antennaDowntilt", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "active-config.installation-params.antenna-gain" => Some(("activeConfig.installationParams.antennaGain", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "active-config.installation-params.antenna-gain-new-field" => Some(("activeConfig.installationParams.antennaGainNewField", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "active-config.installation-params.antenna-model" => Some(("activeConfig.installationParams.antennaModel", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "active-config.installation-params.cpe-cbsd-indication" => Some(("activeConfig.installationParams.cpeCbsdIndication", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "active-config.installation-params.eirp-capability" => Some(("activeConfig.installationParams.eirpCapability", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "active-config.installation-params.eirp-capability-new-field" => Some(("activeConfig.installationParams.eirpCapabilityNewField", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "active-config.installation-params.height" => Some(("activeConfig.installationParams.height", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "active-config.installation-params.height-type" => Some(("activeConfig.installationParams.heightType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "active-config.installation-params.horizontal-accuracy" => Some(("activeConfig.installationParams.horizontalAccuracy", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
@@ -1332,6 +1343,7 @@ where
                     "device-metadata.nrqz-validation.cpi-id" => Some(("deviceMetadata.nrqzValidation.cpiId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "device-metadata.nrqz-validation.latitude" => Some(("deviceMetadata.nrqzValidation.latitude", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "device-metadata.nrqz-validation.longitude" => Some(("deviceMetadata.nrqzValidation.longitude", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "device-metadata.nrqz-validation.state" => Some(("deviceMetadata.nrqzValidation.state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "display-name" => Some(("displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "fcc-id" => Some(("fccId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -1343,9 +1355,11 @@ where
                     "preloaded-config.installation-params.antenna-beamwidth" => Some(("preloadedConfig.installationParams.antennaBeamwidth", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "preloaded-config.installation-params.antenna-downtilt" => Some(("preloadedConfig.installationParams.antennaDowntilt", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "preloaded-config.installation-params.antenna-gain" => Some(("preloadedConfig.installationParams.antennaGain", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "preloaded-config.installation-params.antenna-gain-new-field" => Some(("preloadedConfig.installationParams.antennaGainNewField", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "preloaded-config.installation-params.antenna-model" => Some(("preloadedConfig.installationParams.antennaModel", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "preloaded-config.installation-params.cpe-cbsd-indication" => Some(("preloadedConfig.installationParams.cpeCbsdIndication", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "preloaded-config.installation-params.eirp-capability" => Some(("preloadedConfig.installationParams.eirpCapability", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "preloaded-config.installation-params.eirp-capability-new-field" => Some(("preloadedConfig.installationParams.eirpCapabilityNewField", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "preloaded-config.installation-params.height" => Some(("preloadedConfig.installationParams.height", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "preloaded-config.installation-params.height-type" => Some(("preloadedConfig.installationParams.heightType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "preloaded-config.installation-params.horizontal-accuracy" => Some(("preloadedConfig.installationParams.horizontalAccuracy", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
@@ -1366,7 +1380,7 @@ where
                     "serial-number" => Some(("serialNumber", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "state" => Some(("state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["active-config", "air-interface", "antenna-azimuth", "antenna-beamwidth", "antenna-downtilt", "antenna-gain", "antenna-model", "call-sign", "case-id", "category", "common-channel-group", "cpe-cbsd-indication", "cpi-id", "device-metadata", "display-name", "eirp-capability", "fcc-id", "firmware-version", "hardware-version", "height", "height-type", "horizontal-accuracy", "indoor-deployment", "installation-params", "interference-coordination-group", "is-signed", "latitude", "longitude", "measurement-capabilities", "model", "name", "nrqz-validated", "nrqz-validation", "preloaded-config", "radio-technology", "serial-number", "software-version", "state", "supported-spec", "update-time", "user-id", "vendor", "vertical-accuracy"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["active-config", "air-interface", "antenna-azimuth", "antenna-beamwidth", "antenna-downtilt", "antenna-gain", "antenna-gain-new-field", "antenna-model", "call-sign", "case-id", "category", "common-channel-group", "cpe-cbsd-indication", "cpi-id", "device-metadata", "display-name", "eirp-capability", "eirp-capability-new-field", "fcc-id", "firmware-version", "hardware-version", "height", "height-type", "horizontal-accuracy", "indoor-deployment", "installation-params", "interference-coordination-group", "is-signed", "latitude", "longitude", "measurement-capabilities", "model", "name", "nrqz-validated", "nrqz-validation", "preloaded-config", "radio-technology", "serial-number", "software-version", "state", "supported-spec", "update-time", "user-id", "vendor", "vertical-accuracy"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1381,7 +1395,7 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "update-mask" => {
-                    call = call.update_mask(value.unwrap_or(""));
+                    call = call.update_mask(        value.map(|v| arg_from_str(v, err, "update-mask", "google-fieldmask")).unwrap_or(FieldMask::default()));
                 },
                 _ => {
                     let mut found = false;
@@ -1461,9 +1475,11 @@ where
                     "device.active-config.installation-params.antenna-beamwidth" => Some(("device.activeConfig.installationParams.antennaBeamwidth", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "device.active-config.installation-params.antenna-downtilt" => Some(("device.activeConfig.installationParams.antennaDowntilt", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "device.active-config.installation-params.antenna-gain" => Some(("device.activeConfig.installationParams.antennaGain", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "device.active-config.installation-params.antenna-gain-new-field" => Some(("device.activeConfig.installationParams.antennaGainNewField", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "device.active-config.installation-params.antenna-model" => Some(("device.activeConfig.installationParams.antennaModel", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "device.active-config.installation-params.cpe-cbsd-indication" => Some(("device.activeConfig.installationParams.cpeCbsdIndication", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "device.active-config.installation-params.eirp-capability" => Some(("device.activeConfig.installationParams.eirpCapability", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "device.active-config.installation-params.eirp-capability-new-field" => Some(("device.activeConfig.installationParams.eirpCapabilityNewField", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "device.active-config.installation-params.height" => Some(("device.activeConfig.installationParams.height", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "device.active-config.installation-params.height-type" => Some(("device.activeConfig.installationParams.heightType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "device.active-config.installation-params.horizontal-accuracy" => Some(("device.activeConfig.installationParams.horizontalAccuracy", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
@@ -1489,6 +1505,7 @@ where
                     "device.device-metadata.nrqz-validation.cpi-id" => Some(("device.deviceMetadata.nrqzValidation.cpiId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "device.device-metadata.nrqz-validation.latitude" => Some(("device.deviceMetadata.nrqzValidation.latitude", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "device.device-metadata.nrqz-validation.longitude" => Some(("device.deviceMetadata.nrqzValidation.longitude", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "device.device-metadata.nrqz-validation.state" => Some(("device.deviceMetadata.nrqzValidation.state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "device.display-name" => Some(("device.displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "device.fcc-id" => Some(("device.fccId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "device.name" => Some(("device.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -1500,9 +1517,11 @@ where
                     "device.preloaded-config.installation-params.antenna-beamwidth" => Some(("device.preloadedConfig.installationParams.antennaBeamwidth", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "device.preloaded-config.installation-params.antenna-downtilt" => Some(("device.preloadedConfig.installationParams.antennaDowntilt", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "device.preloaded-config.installation-params.antenna-gain" => Some(("device.preloadedConfig.installationParams.antennaGain", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "device.preloaded-config.installation-params.antenna-gain-new-field" => Some(("device.preloadedConfig.installationParams.antennaGainNewField", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "device.preloaded-config.installation-params.antenna-model" => Some(("device.preloadedConfig.installationParams.antennaModel", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "device.preloaded-config.installation-params.cpe-cbsd-indication" => Some(("device.preloadedConfig.installationParams.cpeCbsdIndication", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "device.preloaded-config.installation-params.eirp-capability" => Some(("device.preloadedConfig.installationParams.eirpCapability", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "device.preloaded-config.installation-params.eirp-capability-new-field" => Some(("device.preloadedConfig.installationParams.eirpCapabilityNewField", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "device.preloaded-config.installation-params.height" => Some(("device.preloadedConfig.installationParams.height", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "device.preloaded-config.installation-params.height-type" => Some(("device.preloadedConfig.installationParams.heightType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "device.preloaded-config.installation-params.horizontal-accuracy" => Some(("device.preloadedConfig.installationParams.horizontalAccuracy", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
@@ -1523,7 +1542,7 @@ where
                     "device.serial-number" => Some(("device.serialNumber", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "device.state" => Some(("device.state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["active-config", "air-interface", "antenna-azimuth", "antenna-beamwidth", "antenna-downtilt", "antenna-gain", "antenna-model", "call-sign", "case-id", "category", "common-channel-group", "cpe-cbsd-indication", "cpi-id", "device", "device-metadata", "display-name", "eirp-capability", "fcc-id", "firmware-version", "hardware-version", "height", "height-type", "horizontal-accuracy", "indoor-deployment", "installation-params", "interference-coordination-group", "is-signed", "latitude", "longitude", "measurement-capabilities", "model", "name", "nrqz-validated", "nrqz-validation", "preloaded-config", "radio-technology", "serial-number", "software-version", "state", "supported-spec", "update-time", "user-id", "vendor", "vertical-accuracy"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["active-config", "air-interface", "antenna-azimuth", "antenna-beamwidth", "antenna-downtilt", "antenna-gain", "antenna-gain-new-field", "antenna-model", "call-sign", "case-id", "category", "common-channel-group", "cpe-cbsd-indication", "cpi-id", "device", "device-metadata", "display-name", "eirp-capability", "eirp-capability-new-field", "fcc-id", "firmware-version", "hardware-version", "height", "height-type", "horizontal-accuracy", "indoor-deployment", "installation-params", "interference-coordination-group", "is-signed", "latitude", "longitude", "measurement-capabilities", "model", "name", "nrqz-validated", "nrqz-validation", "preloaded-config", "radio-technology", "serial-number", "software-version", "state", "supported-spec", "update-time", "user-id", "vendor", "vertical-accuracy"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1731,7 +1750,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -2017,7 +2036,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 "filter" => {
                     call = call.filter(value.unwrap_or(""));
@@ -2100,9 +2119,11 @@ where
                     "active-config.installation-params.antenna-beamwidth" => Some(("activeConfig.installationParams.antennaBeamwidth", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "active-config.installation-params.antenna-downtilt" => Some(("activeConfig.installationParams.antennaDowntilt", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "active-config.installation-params.antenna-gain" => Some(("activeConfig.installationParams.antennaGain", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "active-config.installation-params.antenna-gain-new-field" => Some(("activeConfig.installationParams.antennaGainNewField", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "active-config.installation-params.antenna-model" => Some(("activeConfig.installationParams.antennaModel", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "active-config.installation-params.cpe-cbsd-indication" => Some(("activeConfig.installationParams.cpeCbsdIndication", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "active-config.installation-params.eirp-capability" => Some(("activeConfig.installationParams.eirpCapability", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "active-config.installation-params.eirp-capability-new-field" => Some(("activeConfig.installationParams.eirpCapabilityNewField", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "active-config.installation-params.height" => Some(("activeConfig.installationParams.height", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "active-config.installation-params.height-type" => Some(("activeConfig.installationParams.heightType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "active-config.installation-params.horizontal-accuracy" => Some(("activeConfig.installationParams.horizontalAccuracy", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
@@ -2128,6 +2149,7 @@ where
                     "device-metadata.nrqz-validation.cpi-id" => Some(("deviceMetadata.nrqzValidation.cpiId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "device-metadata.nrqz-validation.latitude" => Some(("deviceMetadata.nrqzValidation.latitude", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "device-metadata.nrqz-validation.longitude" => Some(("deviceMetadata.nrqzValidation.longitude", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "device-metadata.nrqz-validation.state" => Some(("deviceMetadata.nrqzValidation.state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "display-name" => Some(("displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "fcc-id" => Some(("fccId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -2139,9 +2161,11 @@ where
                     "preloaded-config.installation-params.antenna-beamwidth" => Some(("preloadedConfig.installationParams.antennaBeamwidth", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "preloaded-config.installation-params.antenna-downtilt" => Some(("preloadedConfig.installationParams.antennaDowntilt", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "preloaded-config.installation-params.antenna-gain" => Some(("preloadedConfig.installationParams.antennaGain", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "preloaded-config.installation-params.antenna-gain-new-field" => Some(("preloadedConfig.installationParams.antennaGainNewField", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "preloaded-config.installation-params.antenna-model" => Some(("preloadedConfig.installationParams.antennaModel", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "preloaded-config.installation-params.cpe-cbsd-indication" => Some(("preloadedConfig.installationParams.cpeCbsdIndication", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "preloaded-config.installation-params.eirp-capability" => Some(("preloadedConfig.installationParams.eirpCapability", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "preloaded-config.installation-params.eirp-capability-new-field" => Some(("preloadedConfig.installationParams.eirpCapabilityNewField", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "preloaded-config.installation-params.height" => Some(("preloadedConfig.installationParams.height", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "preloaded-config.installation-params.height-type" => Some(("preloadedConfig.installationParams.heightType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "preloaded-config.installation-params.horizontal-accuracy" => Some(("preloadedConfig.installationParams.horizontalAccuracy", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
@@ -2162,7 +2186,7 @@ where
                     "serial-number" => Some(("serialNumber", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "state" => Some(("state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["active-config", "air-interface", "antenna-azimuth", "antenna-beamwidth", "antenna-downtilt", "antenna-gain", "antenna-model", "call-sign", "case-id", "category", "common-channel-group", "cpe-cbsd-indication", "cpi-id", "device-metadata", "display-name", "eirp-capability", "fcc-id", "firmware-version", "hardware-version", "height", "height-type", "horizontal-accuracy", "indoor-deployment", "installation-params", "interference-coordination-group", "is-signed", "latitude", "longitude", "measurement-capabilities", "model", "name", "nrqz-validated", "nrqz-validation", "preloaded-config", "radio-technology", "serial-number", "software-version", "state", "supported-spec", "update-time", "user-id", "vendor", "vertical-accuracy"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["active-config", "air-interface", "antenna-azimuth", "antenna-beamwidth", "antenna-downtilt", "antenna-gain", "antenna-gain-new-field", "antenna-model", "call-sign", "case-id", "category", "common-channel-group", "cpe-cbsd-indication", "cpi-id", "device-metadata", "display-name", "eirp-capability", "eirp-capability-new-field", "fcc-id", "firmware-version", "hardware-version", "height", "height-type", "horizontal-accuracy", "indoor-deployment", "installation-params", "interference-coordination-group", "is-signed", "latitude", "longitude", "measurement-capabilities", "model", "name", "nrqz-validated", "nrqz-validation", "preloaded-config", "radio-technology", "serial-number", "software-version", "state", "supported-spec", "update-time", "user-id", "vendor", "vertical-accuracy"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -2318,7 +2342,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 "filter" => {
                     call = call.filter(value.unwrap_or(""));
@@ -2432,7 +2456,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 "filter" => {
                     call = call.filter(value.unwrap_or(""));
@@ -2666,7 +2690,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 "filter" => {
                     call = call.filter(value.unwrap_or(""));
@@ -2760,7 +2784,7 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "update-mask" => {
-                    call = call.update_mask(value.unwrap_or(""));
+                    call = call.update_mask(        value.map(|v| arg_from_str(v, err, "update-mask", "google-fieldmask")).unwrap_or(FieldMask::default()));
                 },
                 _ => {
                     let mut found = false;
@@ -2851,7 +2875,7 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "update-mask" => {
-                    call = call.update_mask(value.unwrap_or(""));
+                    call = call.update_mask(        value.map(|v| arg_from_str(v, err, "update-mask", "google-fieldmask")).unwrap_or(FieldMask::default()));
                 },
                 _ => {
                     let mut found = false;
@@ -3120,9 +3144,11 @@ where
                     "active-config.installation-params.antenna-beamwidth" => Some(("activeConfig.installationParams.antennaBeamwidth", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "active-config.installation-params.antenna-downtilt" => Some(("activeConfig.installationParams.antennaDowntilt", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "active-config.installation-params.antenna-gain" => Some(("activeConfig.installationParams.antennaGain", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "active-config.installation-params.antenna-gain-new-field" => Some(("activeConfig.installationParams.antennaGainNewField", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "active-config.installation-params.antenna-model" => Some(("activeConfig.installationParams.antennaModel", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "active-config.installation-params.cpe-cbsd-indication" => Some(("activeConfig.installationParams.cpeCbsdIndication", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "active-config.installation-params.eirp-capability" => Some(("activeConfig.installationParams.eirpCapability", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "active-config.installation-params.eirp-capability-new-field" => Some(("activeConfig.installationParams.eirpCapabilityNewField", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "active-config.installation-params.height" => Some(("activeConfig.installationParams.height", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "active-config.installation-params.height-type" => Some(("activeConfig.installationParams.heightType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "active-config.installation-params.horizontal-accuracy" => Some(("activeConfig.installationParams.horizontalAccuracy", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
@@ -3148,6 +3174,7 @@ where
                     "device-metadata.nrqz-validation.cpi-id" => Some(("deviceMetadata.nrqzValidation.cpiId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "device-metadata.nrqz-validation.latitude" => Some(("deviceMetadata.nrqzValidation.latitude", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "device-metadata.nrqz-validation.longitude" => Some(("deviceMetadata.nrqzValidation.longitude", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "device-metadata.nrqz-validation.state" => Some(("deviceMetadata.nrqzValidation.state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "display-name" => Some(("displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "fcc-id" => Some(("fccId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -3159,9 +3186,11 @@ where
                     "preloaded-config.installation-params.antenna-beamwidth" => Some(("preloadedConfig.installationParams.antennaBeamwidth", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "preloaded-config.installation-params.antenna-downtilt" => Some(("preloadedConfig.installationParams.antennaDowntilt", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "preloaded-config.installation-params.antenna-gain" => Some(("preloadedConfig.installationParams.antennaGain", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "preloaded-config.installation-params.antenna-gain-new-field" => Some(("preloadedConfig.installationParams.antennaGainNewField", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "preloaded-config.installation-params.antenna-model" => Some(("preloadedConfig.installationParams.antennaModel", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "preloaded-config.installation-params.cpe-cbsd-indication" => Some(("preloadedConfig.installationParams.cpeCbsdIndication", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "preloaded-config.installation-params.eirp-capability" => Some(("preloadedConfig.installationParams.eirpCapability", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "preloaded-config.installation-params.eirp-capability-new-field" => Some(("preloadedConfig.installationParams.eirpCapabilityNewField", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "preloaded-config.installation-params.height" => Some(("preloadedConfig.installationParams.height", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "preloaded-config.installation-params.height-type" => Some(("preloadedConfig.installationParams.heightType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "preloaded-config.installation-params.horizontal-accuracy" => Some(("preloadedConfig.installationParams.horizontalAccuracy", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
@@ -3182,7 +3211,7 @@ where
                     "serial-number" => Some(("serialNumber", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "state" => Some(("state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["active-config", "air-interface", "antenna-azimuth", "antenna-beamwidth", "antenna-downtilt", "antenna-gain", "antenna-model", "call-sign", "case-id", "category", "common-channel-group", "cpe-cbsd-indication", "cpi-id", "device-metadata", "display-name", "eirp-capability", "fcc-id", "firmware-version", "hardware-version", "height", "height-type", "horizontal-accuracy", "indoor-deployment", "installation-params", "interference-coordination-group", "is-signed", "latitude", "longitude", "measurement-capabilities", "model", "name", "nrqz-validated", "nrqz-validation", "preloaded-config", "radio-technology", "serial-number", "software-version", "state", "supported-spec", "update-time", "user-id", "vendor", "vertical-accuracy"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["active-config", "air-interface", "antenna-azimuth", "antenna-beamwidth", "antenna-downtilt", "antenna-gain", "antenna-gain-new-field", "antenna-model", "call-sign", "case-id", "category", "common-channel-group", "cpe-cbsd-indication", "cpi-id", "device-metadata", "display-name", "eirp-capability", "eirp-capability-new-field", "fcc-id", "firmware-version", "hardware-version", "height", "height-type", "horizontal-accuracy", "indoor-deployment", "installation-params", "interference-coordination-group", "is-signed", "latitude", "longitude", "measurement-capabilities", "model", "name", "nrqz-validated", "nrqz-validation", "preloaded-config", "radio-technology", "serial-number", "software-version", "state", "supported-spec", "update-time", "user-id", "vendor", "vertical-accuracy"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -3197,7 +3226,7 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "update-mask" => {
-                    call = call.update_mask(value.unwrap_or(""));
+                    call = call.update_mask(        value.map(|v| arg_from_str(v, err, "update-mask", "google-fieldmask")).unwrap_or(FieldMask::default()));
                 },
                 _ => {
                     let mut found = false;
@@ -3277,9 +3306,11 @@ where
                     "device.active-config.installation-params.antenna-beamwidth" => Some(("device.activeConfig.installationParams.antennaBeamwidth", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "device.active-config.installation-params.antenna-downtilt" => Some(("device.activeConfig.installationParams.antennaDowntilt", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "device.active-config.installation-params.antenna-gain" => Some(("device.activeConfig.installationParams.antennaGain", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "device.active-config.installation-params.antenna-gain-new-field" => Some(("device.activeConfig.installationParams.antennaGainNewField", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "device.active-config.installation-params.antenna-model" => Some(("device.activeConfig.installationParams.antennaModel", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "device.active-config.installation-params.cpe-cbsd-indication" => Some(("device.activeConfig.installationParams.cpeCbsdIndication", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "device.active-config.installation-params.eirp-capability" => Some(("device.activeConfig.installationParams.eirpCapability", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "device.active-config.installation-params.eirp-capability-new-field" => Some(("device.activeConfig.installationParams.eirpCapabilityNewField", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "device.active-config.installation-params.height" => Some(("device.activeConfig.installationParams.height", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "device.active-config.installation-params.height-type" => Some(("device.activeConfig.installationParams.heightType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "device.active-config.installation-params.horizontal-accuracy" => Some(("device.activeConfig.installationParams.horizontalAccuracy", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
@@ -3305,6 +3336,7 @@ where
                     "device.device-metadata.nrqz-validation.cpi-id" => Some(("device.deviceMetadata.nrqzValidation.cpiId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "device.device-metadata.nrqz-validation.latitude" => Some(("device.deviceMetadata.nrqzValidation.latitude", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "device.device-metadata.nrqz-validation.longitude" => Some(("device.deviceMetadata.nrqzValidation.longitude", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "device.device-metadata.nrqz-validation.state" => Some(("device.deviceMetadata.nrqzValidation.state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "device.display-name" => Some(("device.displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "device.fcc-id" => Some(("device.fccId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "device.name" => Some(("device.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -3316,9 +3348,11 @@ where
                     "device.preloaded-config.installation-params.antenna-beamwidth" => Some(("device.preloadedConfig.installationParams.antennaBeamwidth", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "device.preloaded-config.installation-params.antenna-downtilt" => Some(("device.preloadedConfig.installationParams.antennaDowntilt", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "device.preloaded-config.installation-params.antenna-gain" => Some(("device.preloadedConfig.installationParams.antennaGain", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "device.preloaded-config.installation-params.antenna-gain-new-field" => Some(("device.preloadedConfig.installationParams.antennaGainNewField", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "device.preloaded-config.installation-params.antenna-model" => Some(("device.preloadedConfig.installationParams.antennaModel", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "device.preloaded-config.installation-params.cpe-cbsd-indication" => Some(("device.preloadedConfig.installationParams.cpeCbsdIndication", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "device.preloaded-config.installation-params.eirp-capability" => Some(("device.preloadedConfig.installationParams.eirpCapability", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "device.preloaded-config.installation-params.eirp-capability-new-field" => Some(("device.preloadedConfig.installationParams.eirpCapabilityNewField", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "device.preloaded-config.installation-params.height" => Some(("device.preloadedConfig.installationParams.height", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "device.preloaded-config.installation-params.height-type" => Some(("device.preloadedConfig.installationParams.heightType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "device.preloaded-config.installation-params.horizontal-accuracy" => Some(("device.preloadedConfig.installationParams.horizontalAccuracy", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
@@ -3339,7 +3373,7 @@ where
                     "device.serial-number" => Some(("device.serialNumber", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "device.state" => Some(("device.state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["active-config", "air-interface", "antenna-azimuth", "antenna-beamwidth", "antenna-downtilt", "antenna-gain", "antenna-model", "call-sign", "case-id", "category", "common-channel-group", "cpe-cbsd-indication", "cpi-id", "device", "device-metadata", "display-name", "eirp-capability", "fcc-id", "firmware-version", "hardware-version", "height", "height-type", "horizontal-accuracy", "indoor-deployment", "installation-params", "interference-coordination-group", "is-signed", "latitude", "longitude", "measurement-capabilities", "model", "name", "nrqz-validated", "nrqz-validation", "preloaded-config", "radio-technology", "serial-number", "software-version", "state", "supported-spec", "update-time", "user-id", "vendor", "vertical-accuracy"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["active-config", "air-interface", "antenna-azimuth", "antenna-beamwidth", "antenna-downtilt", "antenna-gain", "antenna-gain-new-field", "antenna-model", "call-sign", "case-id", "category", "common-channel-group", "cpe-cbsd-indication", "cpi-id", "device", "device-metadata", "display-name", "eirp-capability", "eirp-capability-new-field", "fcc-id", "firmware-version", "hardware-version", "height", "height-type", "horizontal-accuracy", "indoor-deployment", "installation-params", "interference-coordination-group", "is-signed", "latitude", "longitude", "measurement-capabilities", "model", "name", "nrqz-validated", "nrqz-validation", "preloaded-config", "radio-technology", "serial-number", "software-version", "state", "supported-spec", "update-time", "user-id", "vendor", "vertical-accuracy"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -3791,9 +3825,11 @@ where
                     "active-config.installation-params.antenna-beamwidth" => Some(("activeConfig.installationParams.antennaBeamwidth", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "active-config.installation-params.antenna-downtilt" => Some(("activeConfig.installationParams.antennaDowntilt", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "active-config.installation-params.antenna-gain" => Some(("activeConfig.installationParams.antennaGain", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "active-config.installation-params.antenna-gain-new-field" => Some(("activeConfig.installationParams.antennaGainNewField", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "active-config.installation-params.antenna-model" => Some(("activeConfig.installationParams.antennaModel", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "active-config.installation-params.cpe-cbsd-indication" => Some(("activeConfig.installationParams.cpeCbsdIndication", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "active-config.installation-params.eirp-capability" => Some(("activeConfig.installationParams.eirpCapability", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "active-config.installation-params.eirp-capability-new-field" => Some(("activeConfig.installationParams.eirpCapabilityNewField", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "active-config.installation-params.height" => Some(("activeConfig.installationParams.height", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "active-config.installation-params.height-type" => Some(("activeConfig.installationParams.heightType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "active-config.installation-params.horizontal-accuracy" => Some(("activeConfig.installationParams.horizontalAccuracy", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
@@ -3819,6 +3855,7 @@ where
                     "device-metadata.nrqz-validation.cpi-id" => Some(("deviceMetadata.nrqzValidation.cpiId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "device-metadata.nrqz-validation.latitude" => Some(("deviceMetadata.nrqzValidation.latitude", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "device-metadata.nrqz-validation.longitude" => Some(("deviceMetadata.nrqzValidation.longitude", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "device-metadata.nrqz-validation.state" => Some(("deviceMetadata.nrqzValidation.state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "display-name" => Some(("displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "fcc-id" => Some(("fccId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -3830,9 +3867,11 @@ where
                     "preloaded-config.installation-params.antenna-beamwidth" => Some(("preloadedConfig.installationParams.antennaBeamwidth", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "preloaded-config.installation-params.antenna-downtilt" => Some(("preloadedConfig.installationParams.antennaDowntilt", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "preloaded-config.installation-params.antenna-gain" => Some(("preloadedConfig.installationParams.antennaGain", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "preloaded-config.installation-params.antenna-gain-new-field" => Some(("preloadedConfig.installationParams.antennaGainNewField", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "preloaded-config.installation-params.antenna-model" => Some(("preloadedConfig.installationParams.antennaModel", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "preloaded-config.installation-params.cpe-cbsd-indication" => Some(("preloadedConfig.installationParams.cpeCbsdIndication", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "preloaded-config.installation-params.eirp-capability" => Some(("preloadedConfig.installationParams.eirpCapability", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "preloaded-config.installation-params.eirp-capability-new-field" => Some(("preloadedConfig.installationParams.eirpCapabilityNewField", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "preloaded-config.installation-params.height" => Some(("preloadedConfig.installationParams.height", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "preloaded-config.installation-params.height-type" => Some(("preloadedConfig.installationParams.heightType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "preloaded-config.installation-params.horizontal-accuracy" => Some(("preloadedConfig.installationParams.horizontalAccuracy", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
@@ -3853,7 +3892,7 @@ where
                     "serial-number" => Some(("serialNumber", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "state" => Some(("state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["active-config", "air-interface", "antenna-azimuth", "antenna-beamwidth", "antenna-downtilt", "antenna-gain", "antenna-model", "call-sign", "case-id", "category", "common-channel-group", "cpe-cbsd-indication", "cpi-id", "device-metadata", "display-name", "eirp-capability", "fcc-id", "firmware-version", "hardware-version", "height", "height-type", "horizontal-accuracy", "indoor-deployment", "installation-params", "interference-coordination-group", "is-signed", "latitude", "longitude", "measurement-capabilities", "model", "name", "nrqz-validated", "nrqz-validation", "preloaded-config", "radio-technology", "serial-number", "software-version", "state", "supported-spec", "update-time", "user-id", "vendor", "vertical-accuracy"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["active-config", "air-interface", "antenna-azimuth", "antenna-beamwidth", "antenna-downtilt", "antenna-gain", "antenna-gain-new-field", "antenna-model", "call-sign", "case-id", "category", "common-channel-group", "cpe-cbsd-indication", "cpi-id", "device-metadata", "display-name", "eirp-capability", "eirp-capability-new-field", "fcc-id", "firmware-version", "hardware-version", "height", "height-type", "horizontal-accuracy", "indoor-deployment", "installation-params", "interference-coordination-group", "is-signed", "latitude", "longitude", "measurement-capabilities", "model", "name", "nrqz-validated", "nrqz-validation", "preloaded-config", "radio-technology", "serial-number", "software-version", "state", "supported-spec", "update-time", "user-id", "vendor", "vertical-accuracy"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -4009,7 +4048,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 "filter" => {
                     call = call.filter(value.unwrap_or(""));
@@ -4123,7 +4162,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 "filter" => {
                     call = call.filter(value.unwrap_or(""));
@@ -4303,7 +4342,7 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "update-mask" => {
-                    call = call.update_mask(value.unwrap_or(""));
+                    call = call.update_mask(        value.map(|v| arg_from_str(v, err, "update-mask", "google-fieldmask")).unwrap_or(FieldMask::default()));
                 },
                 _ => {
                     let mut found = false;
@@ -4383,9 +4422,11 @@ where
                     "active-config.installation-params.antenna-beamwidth" => Some(("activeConfig.installationParams.antennaBeamwidth", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "active-config.installation-params.antenna-downtilt" => Some(("activeConfig.installationParams.antennaDowntilt", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "active-config.installation-params.antenna-gain" => Some(("activeConfig.installationParams.antennaGain", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "active-config.installation-params.antenna-gain-new-field" => Some(("activeConfig.installationParams.antennaGainNewField", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "active-config.installation-params.antenna-model" => Some(("activeConfig.installationParams.antennaModel", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "active-config.installation-params.cpe-cbsd-indication" => Some(("activeConfig.installationParams.cpeCbsdIndication", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "active-config.installation-params.eirp-capability" => Some(("activeConfig.installationParams.eirpCapability", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "active-config.installation-params.eirp-capability-new-field" => Some(("activeConfig.installationParams.eirpCapabilityNewField", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "active-config.installation-params.height" => Some(("activeConfig.installationParams.height", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "active-config.installation-params.height-type" => Some(("activeConfig.installationParams.heightType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "active-config.installation-params.horizontal-accuracy" => Some(("activeConfig.installationParams.horizontalAccuracy", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
@@ -4411,6 +4452,7 @@ where
                     "device-metadata.nrqz-validation.cpi-id" => Some(("deviceMetadata.nrqzValidation.cpiId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "device-metadata.nrqz-validation.latitude" => Some(("deviceMetadata.nrqzValidation.latitude", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "device-metadata.nrqz-validation.longitude" => Some(("deviceMetadata.nrqzValidation.longitude", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "device-metadata.nrqz-validation.state" => Some(("deviceMetadata.nrqzValidation.state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "display-name" => Some(("displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "fcc-id" => Some(("fccId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -4422,9 +4464,11 @@ where
                     "preloaded-config.installation-params.antenna-beamwidth" => Some(("preloadedConfig.installationParams.antennaBeamwidth", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "preloaded-config.installation-params.antenna-downtilt" => Some(("preloadedConfig.installationParams.antennaDowntilt", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "preloaded-config.installation-params.antenna-gain" => Some(("preloadedConfig.installationParams.antennaGain", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "preloaded-config.installation-params.antenna-gain-new-field" => Some(("preloadedConfig.installationParams.antennaGainNewField", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "preloaded-config.installation-params.antenna-model" => Some(("preloadedConfig.installationParams.antennaModel", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "preloaded-config.installation-params.cpe-cbsd-indication" => Some(("preloadedConfig.installationParams.cpeCbsdIndication", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "preloaded-config.installation-params.eirp-capability" => Some(("preloadedConfig.installationParams.eirpCapability", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "preloaded-config.installation-params.eirp-capability-new-field" => Some(("preloadedConfig.installationParams.eirpCapabilityNewField", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "preloaded-config.installation-params.height" => Some(("preloadedConfig.installationParams.height", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "preloaded-config.installation-params.height-type" => Some(("preloadedConfig.installationParams.heightType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "preloaded-config.installation-params.horizontal-accuracy" => Some(("preloadedConfig.installationParams.horizontalAccuracy", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
@@ -4445,7 +4489,7 @@ where
                     "serial-number" => Some(("serialNumber", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "state" => Some(("state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["active-config", "air-interface", "antenna-azimuth", "antenna-beamwidth", "antenna-downtilt", "antenna-gain", "antenna-model", "call-sign", "case-id", "category", "common-channel-group", "cpe-cbsd-indication", "cpi-id", "device-metadata", "display-name", "eirp-capability", "fcc-id", "firmware-version", "hardware-version", "height", "height-type", "horizontal-accuracy", "indoor-deployment", "installation-params", "interference-coordination-group", "is-signed", "latitude", "longitude", "measurement-capabilities", "model", "name", "nrqz-validated", "nrqz-validation", "preloaded-config", "radio-technology", "serial-number", "software-version", "state", "supported-spec", "update-time", "user-id", "vendor", "vertical-accuracy"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["active-config", "air-interface", "antenna-azimuth", "antenna-beamwidth", "antenna-downtilt", "antenna-gain", "antenna-gain-new-field", "antenna-model", "call-sign", "case-id", "category", "common-channel-group", "cpe-cbsd-indication", "cpi-id", "device-metadata", "display-name", "eirp-capability", "eirp-capability-new-field", "fcc-id", "firmware-version", "hardware-version", "height", "height-type", "horizontal-accuracy", "indoor-deployment", "installation-params", "interference-coordination-group", "is-signed", "latitude", "longitude", "measurement-capabilities", "model", "name", "nrqz-validated", "nrqz-validation", "preloaded-config", "radio-technology", "serial-number", "software-version", "state", "supported-spec", "update-time", "user-id", "vendor", "vertical-accuracy"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -4705,7 +4749,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 "filter" => {
                     call = call.filter(value.unwrap_or(""));
@@ -4873,9 +4917,11 @@ where
                     "active-config.installation-params.antenna-beamwidth" => Some(("activeConfig.installationParams.antennaBeamwidth", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "active-config.installation-params.antenna-downtilt" => Some(("activeConfig.installationParams.antennaDowntilt", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "active-config.installation-params.antenna-gain" => Some(("activeConfig.installationParams.antennaGain", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "active-config.installation-params.antenna-gain-new-field" => Some(("activeConfig.installationParams.antennaGainNewField", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "active-config.installation-params.antenna-model" => Some(("activeConfig.installationParams.antennaModel", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "active-config.installation-params.cpe-cbsd-indication" => Some(("activeConfig.installationParams.cpeCbsdIndication", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "active-config.installation-params.eirp-capability" => Some(("activeConfig.installationParams.eirpCapability", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "active-config.installation-params.eirp-capability-new-field" => Some(("activeConfig.installationParams.eirpCapabilityNewField", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "active-config.installation-params.height" => Some(("activeConfig.installationParams.height", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "active-config.installation-params.height-type" => Some(("activeConfig.installationParams.heightType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "active-config.installation-params.horizontal-accuracy" => Some(("activeConfig.installationParams.horizontalAccuracy", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
@@ -4901,6 +4947,7 @@ where
                     "device-metadata.nrqz-validation.cpi-id" => Some(("deviceMetadata.nrqzValidation.cpiId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "device-metadata.nrqz-validation.latitude" => Some(("deviceMetadata.nrqzValidation.latitude", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "device-metadata.nrqz-validation.longitude" => Some(("deviceMetadata.nrqzValidation.longitude", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "device-metadata.nrqz-validation.state" => Some(("deviceMetadata.nrqzValidation.state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "display-name" => Some(("displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "fcc-id" => Some(("fccId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -4912,9 +4959,11 @@ where
                     "preloaded-config.installation-params.antenna-beamwidth" => Some(("preloadedConfig.installationParams.antennaBeamwidth", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "preloaded-config.installation-params.antenna-downtilt" => Some(("preloadedConfig.installationParams.antennaDowntilt", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "preloaded-config.installation-params.antenna-gain" => Some(("preloadedConfig.installationParams.antennaGain", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "preloaded-config.installation-params.antenna-gain-new-field" => Some(("preloadedConfig.installationParams.antennaGainNewField", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "preloaded-config.installation-params.antenna-model" => Some(("preloadedConfig.installationParams.antennaModel", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "preloaded-config.installation-params.cpe-cbsd-indication" => Some(("preloadedConfig.installationParams.cpeCbsdIndication", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "preloaded-config.installation-params.eirp-capability" => Some(("preloadedConfig.installationParams.eirpCapability", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "preloaded-config.installation-params.eirp-capability-new-field" => Some(("preloadedConfig.installationParams.eirpCapabilityNewField", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "preloaded-config.installation-params.height" => Some(("preloadedConfig.installationParams.height", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "preloaded-config.installation-params.height-type" => Some(("preloadedConfig.installationParams.heightType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "preloaded-config.installation-params.horizontal-accuracy" => Some(("preloadedConfig.installationParams.horizontalAccuracy", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
@@ -4935,7 +4984,7 @@ where
                     "serial-number" => Some(("serialNumber", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "state" => Some(("state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["active-config", "air-interface", "antenna-azimuth", "antenna-beamwidth", "antenna-downtilt", "antenna-gain", "antenna-model", "call-sign", "case-id", "category", "common-channel-group", "cpe-cbsd-indication", "cpi-id", "device-metadata", "display-name", "eirp-capability", "fcc-id", "firmware-version", "hardware-version", "height", "height-type", "horizontal-accuracy", "indoor-deployment", "installation-params", "interference-coordination-group", "is-signed", "latitude", "longitude", "measurement-capabilities", "model", "name", "nrqz-validated", "nrqz-validation", "preloaded-config", "radio-technology", "serial-number", "software-version", "state", "supported-spec", "update-time", "user-id", "vendor", "vertical-accuracy"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["active-config", "air-interface", "antenna-azimuth", "antenna-beamwidth", "antenna-downtilt", "antenna-gain", "antenna-gain-new-field", "antenna-model", "call-sign", "case-id", "category", "common-channel-group", "cpe-cbsd-indication", "cpi-id", "device-metadata", "display-name", "eirp-capability", "eirp-capability-new-field", "fcc-id", "firmware-version", "hardware-version", "height", "height-type", "horizontal-accuracy", "indoor-deployment", "installation-params", "interference-coordination-group", "is-signed", "latitude", "longitude", "measurement-capabilities", "model", "name", "nrqz-validated", "nrqz-validation", "preloaded-config", "radio-technology", "serial-number", "software-version", "state", "supported-spec", "update-time", "user-id", "vendor", "vertical-accuracy"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -4950,7 +4999,7 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "update-mask" => {
-                    call = call.update_mask(value.unwrap_or(""));
+                    call = call.update_mask(        value.map(|v| arg_from_str(v, err, "update-mask", "google-fieldmask")).unwrap_or(FieldMask::default()));
                 },
                 _ => {
                     let mut found = false;
@@ -5030,9 +5079,11 @@ where
                     "device.active-config.installation-params.antenna-beamwidth" => Some(("device.activeConfig.installationParams.antennaBeamwidth", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "device.active-config.installation-params.antenna-downtilt" => Some(("device.activeConfig.installationParams.antennaDowntilt", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "device.active-config.installation-params.antenna-gain" => Some(("device.activeConfig.installationParams.antennaGain", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "device.active-config.installation-params.antenna-gain-new-field" => Some(("device.activeConfig.installationParams.antennaGainNewField", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "device.active-config.installation-params.antenna-model" => Some(("device.activeConfig.installationParams.antennaModel", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "device.active-config.installation-params.cpe-cbsd-indication" => Some(("device.activeConfig.installationParams.cpeCbsdIndication", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "device.active-config.installation-params.eirp-capability" => Some(("device.activeConfig.installationParams.eirpCapability", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "device.active-config.installation-params.eirp-capability-new-field" => Some(("device.activeConfig.installationParams.eirpCapabilityNewField", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "device.active-config.installation-params.height" => Some(("device.activeConfig.installationParams.height", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "device.active-config.installation-params.height-type" => Some(("device.activeConfig.installationParams.heightType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "device.active-config.installation-params.horizontal-accuracy" => Some(("device.activeConfig.installationParams.horizontalAccuracy", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
@@ -5058,6 +5109,7 @@ where
                     "device.device-metadata.nrqz-validation.cpi-id" => Some(("device.deviceMetadata.nrqzValidation.cpiId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "device.device-metadata.nrqz-validation.latitude" => Some(("device.deviceMetadata.nrqzValidation.latitude", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "device.device-metadata.nrqz-validation.longitude" => Some(("device.deviceMetadata.nrqzValidation.longitude", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "device.device-metadata.nrqz-validation.state" => Some(("device.deviceMetadata.nrqzValidation.state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "device.display-name" => Some(("device.displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "device.fcc-id" => Some(("device.fccId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "device.name" => Some(("device.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -5069,9 +5121,11 @@ where
                     "device.preloaded-config.installation-params.antenna-beamwidth" => Some(("device.preloadedConfig.installationParams.antennaBeamwidth", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "device.preloaded-config.installation-params.antenna-downtilt" => Some(("device.preloadedConfig.installationParams.antennaDowntilt", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "device.preloaded-config.installation-params.antenna-gain" => Some(("device.preloadedConfig.installationParams.antennaGain", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "device.preloaded-config.installation-params.antenna-gain-new-field" => Some(("device.preloadedConfig.installationParams.antennaGainNewField", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "device.preloaded-config.installation-params.antenna-model" => Some(("device.preloadedConfig.installationParams.antennaModel", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "device.preloaded-config.installation-params.cpe-cbsd-indication" => Some(("device.preloadedConfig.installationParams.cpeCbsdIndication", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "device.preloaded-config.installation-params.eirp-capability" => Some(("device.preloadedConfig.installationParams.eirpCapability", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "device.preloaded-config.installation-params.eirp-capability-new-field" => Some(("device.preloadedConfig.installationParams.eirpCapabilityNewField", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "device.preloaded-config.installation-params.height" => Some(("device.preloadedConfig.installationParams.height", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "device.preloaded-config.installation-params.height-type" => Some(("device.preloadedConfig.installationParams.heightType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "device.preloaded-config.installation-params.horizontal-accuracy" => Some(("device.preloadedConfig.installationParams.horizontalAccuracy", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
@@ -5092,7 +5146,7 @@ where
                     "device.serial-number" => Some(("device.serialNumber", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "device.state" => Some(("device.state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["active-config", "air-interface", "antenna-azimuth", "antenna-beamwidth", "antenna-downtilt", "antenna-gain", "antenna-model", "call-sign", "case-id", "category", "common-channel-group", "cpe-cbsd-indication", "cpi-id", "device", "device-metadata", "display-name", "eirp-capability", "fcc-id", "firmware-version", "hardware-version", "height", "height-type", "horizontal-accuracy", "indoor-deployment", "installation-params", "interference-coordination-group", "is-signed", "latitude", "longitude", "measurement-capabilities", "model", "name", "nrqz-validated", "nrqz-validation", "preloaded-config", "radio-technology", "serial-number", "software-version", "state", "supported-spec", "update-time", "user-id", "vendor", "vertical-accuracy"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["active-config", "air-interface", "antenna-azimuth", "antenna-beamwidth", "antenna-downtilt", "antenna-gain", "antenna-gain-new-field", "antenna-model", "call-sign", "case-id", "category", "common-channel-group", "cpe-cbsd-indication", "cpi-id", "device", "device-metadata", "display-name", "eirp-capability", "eirp-capability-new-field", "fcc-id", "firmware-version", "hardware-version", "height", "height-type", "horizontal-accuracy", "indoor-deployment", "installation-params", "interference-coordination-group", "is-signed", "latitude", "longitude", "measurement-capabilities", "model", "name", "nrqz-validated", "nrqz-validation", "preloaded-config", "radio-technology", "serial-number", "software-version", "state", "supported-spec", "update-time", "user-id", "vendor", "vertical-accuracy"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -5527,7 +5581,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 "filter" => {
                     call = call.filter(value.unwrap_or(""));
@@ -5610,9 +5664,11 @@ where
                     "active-config.installation-params.antenna-beamwidth" => Some(("activeConfig.installationParams.antennaBeamwidth", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "active-config.installation-params.antenna-downtilt" => Some(("activeConfig.installationParams.antennaDowntilt", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "active-config.installation-params.antenna-gain" => Some(("activeConfig.installationParams.antennaGain", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "active-config.installation-params.antenna-gain-new-field" => Some(("activeConfig.installationParams.antennaGainNewField", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "active-config.installation-params.antenna-model" => Some(("activeConfig.installationParams.antennaModel", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "active-config.installation-params.cpe-cbsd-indication" => Some(("activeConfig.installationParams.cpeCbsdIndication", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "active-config.installation-params.eirp-capability" => Some(("activeConfig.installationParams.eirpCapability", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "active-config.installation-params.eirp-capability-new-field" => Some(("activeConfig.installationParams.eirpCapabilityNewField", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "active-config.installation-params.height" => Some(("activeConfig.installationParams.height", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "active-config.installation-params.height-type" => Some(("activeConfig.installationParams.heightType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "active-config.installation-params.horizontal-accuracy" => Some(("activeConfig.installationParams.horizontalAccuracy", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
@@ -5638,6 +5694,7 @@ where
                     "device-metadata.nrqz-validation.cpi-id" => Some(("deviceMetadata.nrqzValidation.cpiId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "device-metadata.nrqz-validation.latitude" => Some(("deviceMetadata.nrqzValidation.latitude", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "device-metadata.nrqz-validation.longitude" => Some(("deviceMetadata.nrqzValidation.longitude", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "device-metadata.nrqz-validation.state" => Some(("deviceMetadata.nrqzValidation.state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "display-name" => Some(("displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "fcc-id" => Some(("fccId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -5649,9 +5706,11 @@ where
                     "preloaded-config.installation-params.antenna-beamwidth" => Some(("preloadedConfig.installationParams.antennaBeamwidth", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "preloaded-config.installation-params.antenna-downtilt" => Some(("preloadedConfig.installationParams.antennaDowntilt", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "preloaded-config.installation-params.antenna-gain" => Some(("preloadedConfig.installationParams.antennaGain", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "preloaded-config.installation-params.antenna-gain-new-field" => Some(("preloadedConfig.installationParams.antennaGainNewField", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "preloaded-config.installation-params.antenna-model" => Some(("preloadedConfig.installationParams.antennaModel", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "preloaded-config.installation-params.cpe-cbsd-indication" => Some(("preloadedConfig.installationParams.cpeCbsdIndication", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "preloaded-config.installation-params.eirp-capability" => Some(("preloadedConfig.installationParams.eirpCapability", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "preloaded-config.installation-params.eirp-capability-new-field" => Some(("preloadedConfig.installationParams.eirpCapabilityNewField", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "preloaded-config.installation-params.height" => Some(("preloadedConfig.installationParams.height", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "preloaded-config.installation-params.height-type" => Some(("preloadedConfig.installationParams.heightType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "preloaded-config.installation-params.horizontal-accuracy" => Some(("preloadedConfig.installationParams.horizontalAccuracy", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
@@ -5672,7 +5731,7 @@ where
                     "serial-number" => Some(("serialNumber", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "state" => Some(("state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["active-config", "air-interface", "antenna-azimuth", "antenna-beamwidth", "antenna-downtilt", "antenna-gain", "antenna-model", "call-sign", "case-id", "category", "common-channel-group", "cpe-cbsd-indication", "cpi-id", "device-metadata", "display-name", "eirp-capability", "fcc-id", "firmware-version", "hardware-version", "height", "height-type", "horizontal-accuracy", "indoor-deployment", "installation-params", "interference-coordination-group", "is-signed", "latitude", "longitude", "measurement-capabilities", "model", "name", "nrqz-validated", "nrqz-validation", "preloaded-config", "radio-technology", "serial-number", "software-version", "state", "supported-spec", "update-time", "user-id", "vendor", "vertical-accuracy"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["active-config", "air-interface", "antenna-azimuth", "antenna-beamwidth", "antenna-downtilt", "antenna-gain", "antenna-gain-new-field", "antenna-model", "call-sign", "case-id", "category", "common-channel-group", "cpe-cbsd-indication", "cpi-id", "device-metadata", "display-name", "eirp-capability", "eirp-capability-new-field", "fcc-id", "firmware-version", "hardware-version", "height", "height-type", "horizontal-accuracy", "indoor-deployment", "installation-params", "interference-coordination-group", "is-signed", "latitude", "longitude", "measurement-capabilities", "model", "name", "nrqz-validated", "nrqz-validation", "preloaded-config", "radio-technology", "serial-number", "software-version", "state", "supported-spec", "update-time", "user-id", "vendor", "vertical-accuracy"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -5828,7 +5887,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 "filter" => {
                     call = call.filter(value.unwrap_or(""));
@@ -5942,7 +6001,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 "filter" => {
                     call = call.filter(value.unwrap_or(""));
@@ -6176,7 +6235,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 "filter" => {
                     call = call.filter(value.unwrap_or(""));
@@ -6270,7 +6329,7 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "update-mask" => {
-                    call = call.update_mask(value.unwrap_or(""));
+                    call = call.update_mask(        value.map(|v| arg_from_str(v, err, "update-mask", "google-fieldmask")).unwrap_or(FieldMask::default()));
                 },
                 _ => {
                     let mut found = false;
@@ -8873,7 +8932,7 @@ async fn main() {
     
     let mut app = App::new("sasportal1-alpha1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("4.0.1+20220301")
+           .version("5.0.2+20230121")
            .about("")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_sasportal1_alpha1_cli")
            .arg(Arg::with_name("url")

@@ -25,16 +25,16 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Datapipelines* API at revision *20220218*. The CLI is at version *4.0.1*.
+This documentation was generated from the *Datapipelines* API at revision *20230115*. The CLI is at version *5.0.2*.
 
 ```bash
 datapipelines1 [options]
         projects
-                locations-list-pipelines <parent> [-p <v>]... [-o <out>]
                 locations-pipelines-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-pipelines-delete <name> [-p <v>]... [-o <out>]
                 locations-pipelines-get <name> [-p <v>]... [-o <out>]
                 locations-pipelines-jobs-list <parent> [-p <v>]... [-o <out>]
+                locations-pipelines-list <parent> [-p <v>]... [-o <out>]
                 locations-pipelines-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-pipelines-run <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-pipelines-stop <name> (-r <kv>)... [-p <v>]... [-o <out>]

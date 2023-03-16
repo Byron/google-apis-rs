@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *storagetransfer* API at revision *20220223*. The CLI is at version *4.0.1*.
+This documentation was generated from the *storagetransfer* API at revision *20230111*. The CLI is at version *5.0.2*.
 
 ```bash
 storagetransfer1 [options]
@@ -39,6 +39,7 @@ storagetransfer1 [options]
                 agent-pools-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
         transfer-jobs
                 create (-r <kv>)... [-p <v>]... [-o <out>]
+                delete <job-name> <project-id> [-p <v>]... [-o <out>]
                 get <job-name> <project-id> [-p <v>]... [-o <out>]
                 list <filter> [-p <v>]... [-o <out>]
                 patch <job-name> (-r <kv>)... [-p <v>]... [-o <out>]

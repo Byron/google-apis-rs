@@ -1,4 +1,4 @@
-site_name: Games v4.0.1+20220217
+site_name: Games v5.0.2+20230112
 site_url: http://byron.github.io/google-apis-rs/google-games1-cli
 site_description: A complete library to interact with Games (protocol v1)
 
@@ -7,37 +7,49 @@ repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/games1-cli
 docs_dir: docs
 site_dir: build_html
 
-pages:
-- ['index.md', 'Home']
-- ['achievement-definitions_list.md', 'Achievement Definitions', 'List']
-- ['achievements_increment.md', 'Achievements', 'Increment']
-- ['achievements_list.md', 'Achievements', 'List']
-- ['achievements_reveal.md', 'Achievements', 'Reveal']
-- ['achievements_set-steps-at-least.md', 'Achievements', 'Set Steps At Least']
-- ['achievements_unlock.md', 'Achievements', 'Unlock']
-- ['achievements_update-multiple.md', 'Achievements', 'Update Multiple']
-- ['applications_get.md', 'Applications', 'Get']
-- ['applications_get-end-point.md', 'Applications', 'Get End Point']
-- ['applications_played.md', 'Applications', 'Played']
-- ['applications_verify.md', 'Applications', 'Verify']
-- ['events_list-by-player.md', 'Events', 'List By Player']
-- ['events_list-definitions.md', 'Events', 'List Definitions']
-- ['events_record.md', 'Events', 'Record']
-- ['leaderboards_get.md', 'Leaderboards', 'Get']
-- ['leaderboards_list.md', 'Leaderboards', 'List']
-- ['metagame_get-metagame-config.md', 'Metagame', 'Get Metagame Config']
-- ['metagame_list-categories-by-player.md', 'Metagame', 'List Categories By Player']
-- ['players_get.md', 'Players', 'Get']
-- ['players_list.md', 'Players', 'List']
-- ['revisions_check.md', 'Revisions', 'Check']
-- ['scores_get.md', 'Scores', 'Get']
-- ['scores_list.md', 'Scores', 'List']
-- ['scores_list-window.md', 'Scores', 'List Window']
-- ['scores_submit.md', 'Scores', 'Submit']
-- ['scores_submit-multiple.md', 'Scores', 'Submit Multiple']
-- ['snapshots_get.md', 'Snapshots', 'Get']
-- ['snapshots_list.md', 'Snapshots', 'List']
-- ['stats_get.md', 'Stats', 'Get']
+nav:
+- Home: 'index.md'
+- 'Achievement Definitions':
+    - 'List': 'achievement-definitions_list.md'
+- 'Achievements':
+    - 'Increment': 'achievements_increment.md'
+    - 'List': 'achievements_list.md'
+    - 'Reveal': 'achievements_reveal.md'
+    - 'Set Steps At Least': 'achievements_set-steps-at-least.md'
+    - 'Unlock': 'achievements_unlock.md'
+    - 'Update Multiple': 'achievements_update-multiple.md'
+- 'Applications':
+    - 'Get': 'applications_get.md'
+    - 'Get End Point': 'applications_get-end-point.md'
+    - 'Played': 'applications_played.md'
+    - 'Verify': 'applications_verify.md'
+- 'Events':
+    - 'List By Player': 'events_list-by-player.md'
+    - 'List Definitions': 'events_list-definitions.md'
+    - 'Record': 'events_record.md'
+- 'Leaderboards':
+    - 'Get': 'leaderboards_get.md'
+    - 'List': 'leaderboards_list.md'
+- 'Metagame':
+    - 'Get Metagame Config': 'metagame_get-metagame-config.md'
+    - 'List Categories By Player': 'metagame_list-categories-by-player.md'
+- 'Players':
+    - 'Get': 'players_get.md'
+    - 'Get Scoped Player Ids': 'players_get-scoped-player-ids.md'
+    - 'List': 'players_list.md'
+- 'Revisions':
+    - 'Check': 'revisions_check.md'
+- 'Scores':
+    - 'Get': 'scores_get.md'
+    - 'List': 'scores_list.md'
+    - 'List Window': 'scores_list-window.md'
+    - 'Submit': 'scores_submit.md'
+    - 'Submit Multiple': 'scores_submit-multiple.md'
+- 'Snapshots':
+    - 'Get': 'snapshots_get.md'
+    - 'List': 'snapshots_list.md'
+- 'Stats':
+    - 'Get': 'stats_get.md'
 
 theme: readthedocs
 

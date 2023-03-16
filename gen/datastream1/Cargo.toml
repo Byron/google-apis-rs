@@ -4,12 +4,12 @@
 [package]
 
 name = "google-datastream1"
-version = "5.0.2-beta-1+20230111"
+version = "5.0.2+20230111"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Datastream (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/datastream1"
 homepage = "https://cloud.google.com/datastream/"
-documentation = "https://docs.rs/google-datastream1/5.0.2-beta-1+20230111"
+documentation = "https://docs.rs/google-datastream1/5.0.2+20230111"
 license = "MIT"
 keywords = ["datastream", "google", "protocol", "web", "api"]
 autobins = false

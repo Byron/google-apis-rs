@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/generator/templates/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *My Business Verifications* crate version *5.0.2-beta-1+20230124*, where *20230124* is the exact revision of the *mybusinessverifications:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.2-beta-1*.
+//! This documentation was generated from *My Business Verifications* crate version *5.0.2+20230124*, where *20230124* is the exact revision of the *mybusinessverifications:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.2*.
 //! 
 //! Everything else about the *My Business Verifications* *v1* API can be found at the
 //! [official documentation site](https://developers.google.com/my-business/).

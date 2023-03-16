@@ -4,12 +4,12 @@
 [package]
 
 name = "google-firebaseappcheck1_beta"
-version = "5.0.2-beta-1+20230116"
+version = "5.0.2+20230116"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Firebaseappcheck (protocol v1beta)"
 repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/firebaseappcheck1_beta"
 homepage = "https://firebase.google.com/docs/app-check"
-documentation = "https://docs.rs/google-firebaseappcheck1_beta/5.0.2-beta-1+20230116"
+documentation = "https://docs.rs/google-firebaseappcheck1_beta/5.0.2+20230116"
 license = "MIT"
 keywords = ["firebaseappcheck", "google", "protocol", "web", "api"]
 autobins = false

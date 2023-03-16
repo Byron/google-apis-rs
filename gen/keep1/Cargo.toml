@@ -4,12 +4,12 @@
 [package]
 
 name = "google-keep1"
-version = "5.0.2-beta-1+20230117"
+version = "5.0.2+20230117"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Keep (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/keep1"
 homepage = "https://developers.google.com/keep/api"
-documentation = "https://docs.rs/google-keep1/5.0.2-beta-1+20230117"
+documentation = "https://docs.rs/google-keep1/5.0.2+20230117"
 license = "MIT"
 keywords = ["keep", "google", "protocol", "web", "api"]
 autobins = false

@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Security Command Center* API at revision *20220224*. The CLI is at version *4.0.1*.
+This documentation was generated from the *Security Command Center* API at revision *20230123*. The CLI is at version *5.0.2*.
 
 ```bash
 securitycenter1 [options]
@@ -44,6 +44,11 @@ securitycenter1 [options]
                 mute-configs-get <name> [-p <v>]... [-o <out>]
                 mute-configs-list <parent> [-p <v>]... [-o <out>]
                 mute-configs-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                notification-configs-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                notification-configs-delete <name> [-p <v>]... [-o <out>]
+                notification-configs-get <name> [-p <v>]... [-o <out>]
+                notification-configs-list <parent> [-p <v>]... [-o <out>]
+                notification-configs-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 sources-findings-external-systems-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 sources-findings-group <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 sources-findings-list <parent> [-p <v>]... [-o <out>]
@@ -109,6 +114,11 @@ securitycenter1 [options]
                 mute-configs-get <name> [-p <v>]... [-o <out>]
                 mute-configs-list <parent> [-p <v>]... [-o <out>]
                 mute-configs-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                notification-configs-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                notification-configs-delete <name> [-p <v>]... [-o <out>]
+                notification-configs-get <name> [-p <v>]... [-o <out>]
+                notification-configs-list <parent> [-p <v>]... [-o <out>]
+                notification-configs-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 sources-findings-external-systems-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 sources-findings-group <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 sources-findings-list <parent> [-p <v>]... [-o <out>]

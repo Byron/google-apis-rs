@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/generator/templates/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Surveys* crate version *5.0.2-beta-1+20180508*, where *20180508* is the exact revision of the *surveys:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.2-beta-1*.
+//! This documentation was generated from *Surveys* crate version *5.0.2+20180508*, where *20180508* is the exact revision of the *surveys:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.2*.
 //! The original source code is [on github](https://github.com/Byron/google-apis-rs/tree/main/gen/surveys2).
 //! # Features
 //! 

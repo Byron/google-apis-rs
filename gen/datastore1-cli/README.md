@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *datastore* API at revision *20220221*. The CLI is at version *4.0.1*.
+This documentation was generated from the *datastore* API at revision *20230118*. The CLI is at version *5.0.2*.
 
 ```bash
 datastore1 [options]
@@ -46,6 +46,7 @@ datastore1 [options]
                 operations-list <name> [-p <v>]... [-o <out>]
                 reserve-ids <project-id> (-r <kv>)... [-p <v>]... [-o <out>]
                 rollback <project-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                run-aggregation-query <project-id> (-r <kv>)... [-p <v>]... [-o <out>]
                 run-query <project-id> (-r <kv>)... [-p <v>]... [-o <out>]
   datastore1 --help
 

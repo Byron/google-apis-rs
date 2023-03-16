@@ -1,4 +1,4 @@
-site_name: Data Fusion v4.0.1+20211028
+site_name: Data Fusion v5.0.2+20221213
 site_url: http://byron.github.io/google-apis-rs/google-datafusion1_beta1-cli
 site_description: A complete library to interact with Data Fusion (protocol v1beta1)
 
@@ -7,33 +7,34 @@ repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/datafusion1_beta
 docs_dir: docs
 site_dir: build_html
 
-pages:
-- ['index.md', 'Home']
-- ['projects_locations-get.md', 'Projects', 'Locations Get']
-- ['projects_locations-instances-create.md', 'Projects', 'Locations Instances Create']
-- ['projects_locations-instances-delete.md', 'Projects', 'Locations Instances Delete']
-- ['projects_locations-instances-dns-peerings-add.md', 'Projects', 'Locations Instances Dns Peerings Add']
-- ['projects_locations-instances-dns-peerings-list.md', 'Projects', 'Locations Instances Dns Peerings List']
-- ['projects_locations-instances-dns-peerings-remove.md', 'Projects', 'Locations Instances Dns Peerings Remove']
-- ['projects_locations-instances-get.md', 'Projects', 'Locations Instances Get']
-- ['projects_locations-instances-get-iam-policy.md', 'Projects', 'Locations Instances Get Iam Policy']
-- ['projects_locations-instances-list.md', 'Projects', 'Locations Instances List']
-- ['projects_locations-instances-namespaces-get-iam-policy.md', 'Projects', 'Locations Instances Namespaces Get Iam Policy']
-- ['projects_locations-instances-namespaces-list.md', 'Projects', 'Locations Instances Namespaces List']
-- ['projects_locations-instances-namespaces-set-iam-policy.md', 'Projects', 'Locations Instances Namespaces Set Iam Policy']
-- ['projects_locations-instances-namespaces-test-iam-permissions.md', 'Projects', 'Locations Instances Namespaces Test Iam Permissions']
-- ['projects_locations-instances-patch.md', 'Projects', 'Locations Instances Patch']
-- ['projects_locations-instances-restart.md', 'Projects', 'Locations Instances Restart']
-- ['projects_locations-instances-set-iam-policy.md', 'Projects', 'Locations Instances Set Iam Policy']
-- ['projects_locations-instances-test-iam-permissions.md', 'Projects', 'Locations Instances Test Iam Permissions']
-- ['projects_locations-instances-upgrade.md', 'Projects', 'Locations Instances Upgrade']
-- ['projects_locations-list.md', 'Projects', 'Locations List']
-- ['projects_locations-operations-cancel.md', 'Projects', 'Locations Operations Cancel']
-- ['projects_locations-operations-delete.md', 'Projects', 'Locations Operations Delete']
-- ['projects_locations-operations-get.md', 'Projects', 'Locations Operations Get']
-- ['projects_locations-operations-list.md', 'Projects', 'Locations Operations List']
-- ['projects_locations-remove-iam-policy.md', 'Projects', 'Locations Remove Iam Policy']
-- ['projects_locations-versions-list.md', 'Projects', 'Locations Versions List']
+nav:
+- Home: 'index.md'
+- 'Projects':
+    - 'Locations Get': 'projects_locations-get.md'
+    - 'Locations Instances Create': 'projects_locations-instances-create.md'
+    - 'Locations Instances Delete': 'projects_locations-instances-delete.md'
+    - 'Locations Instances Dns Peerings Create': 'projects_locations-instances-dns-peerings-create.md'
+    - 'Locations Instances Dns Peerings Delete': 'projects_locations-instances-dns-peerings-delete.md'
+    - 'Locations Instances Dns Peerings List': 'projects_locations-instances-dns-peerings-list.md'
+    - 'Locations Instances Get': 'projects_locations-instances-get.md'
+    - 'Locations Instances Get Iam Policy': 'projects_locations-instances-get-iam-policy.md'
+    - 'Locations Instances List': 'projects_locations-instances-list.md'
+    - 'Locations Instances Namespaces Get Iam Policy': 'projects_locations-instances-namespaces-get-iam-policy.md'
+    - 'Locations Instances Namespaces List': 'projects_locations-instances-namespaces-list.md'
+    - 'Locations Instances Namespaces Set Iam Policy': 'projects_locations-instances-namespaces-set-iam-policy.md'
+    - 'Locations Instances Namespaces Test Iam Permissions': 'projects_locations-instances-namespaces-test-iam-permissions.md'
+    - 'Locations Instances Patch': 'projects_locations-instances-patch.md'
+    - 'Locations Instances Restart': 'projects_locations-instances-restart.md'
+    - 'Locations Instances Set Iam Policy': 'projects_locations-instances-set-iam-policy.md'
+    - 'Locations Instances Test Iam Permissions': 'projects_locations-instances-test-iam-permissions.md'
+    - 'Locations Instances Upgrade': 'projects_locations-instances-upgrade.md'
+    - 'Locations List': 'projects_locations-list.md'
+    - 'Locations Operations Cancel': 'projects_locations-operations-cancel.md'
+    - 'Locations Operations Delete': 'projects_locations-operations-delete.md'
+    - 'Locations Operations Get': 'projects_locations-operations-get.md'
+    - 'Locations Operations List': 'projects_locations-operations-list.md'
+    - 'Locations Remove Iam Policy': 'projects_locations-remove-iam-policy.md'
+    - 'Locations Versions List': 'projects_locations-versions-list.md'
 
 theme: readthedocs
 

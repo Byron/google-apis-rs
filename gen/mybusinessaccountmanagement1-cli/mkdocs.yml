@@ -1,4 +1,4 @@
-site_name: My Business Account Management v4.0.1+20220305
+site_name: My Business Account Management v5.0.2+20230124
 site_url: http://byron.github.io/google-apis-rs/google-mybusinessaccountmanagement1-cli
 site_description: A complete library to interact with My Business Account Management (protocol v1)
 
@@ -7,24 +7,26 @@ repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/mybusinessaccoun
 docs_dir: docs
 site_dir: build_html
 
-pages:
-- ['index.md', 'Home']
-- ['accounts_admins-create.md', 'Accounts', 'Admins Create']
-- ['accounts_admins-delete.md', 'Accounts', 'Admins Delete']
-- ['accounts_admins-list.md', 'Accounts', 'Admins List']
-- ['accounts_admins-patch.md', 'Accounts', 'Admins Patch']
-- ['accounts_create.md', 'Accounts', 'Create']
-- ['accounts_get.md', 'Accounts', 'Get']
-- ['accounts_invitations-accept.md', 'Accounts', 'Invitations Accept']
-- ['accounts_invitations-decline.md', 'Accounts', 'Invitations Decline']
-- ['accounts_invitations-list.md', 'Accounts', 'Invitations List']
-- ['accounts_list.md', 'Accounts', 'List']
-- ['accounts_patch.md', 'Accounts', 'Patch']
-- ['locations_admins-create.md', 'Locations', 'Admins Create']
-- ['locations_admins-delete.md', 'Locations', 'Admins Delete']
-- ['locations_admins-list.md', 'Locations', 'Admins List']
-- ['locations_admins-patch.md', 'Locations', 'Admins Patch']
-- ['locations_transfer.md', 'Locations', 'Transfer']
+nav:
+- Home: 'index.md'
+- 'Accounts':
+    - 'Admins Create': 'accounts_admins-create.md'
+    - 'Admins Delete': 'accounts_admins-delete.md'
+    - 'Admins List': 'accounts_admins-list.md'
+    - 'Admins Patch': 'accounts_admins-patch.md'
+    - 'Create': 'accounts_create.md'
+    - 'Get': 'accounts_get.md'
+    - 'Invitations Accept': 'accounts_invitations-accept.md'
+    - 'Invitations Decline': 'accounts_invitations-decline.md'
+    - 'Invitations List': 'accounts_invitations-list.md'
+    - 'List': 'accounts_list.md'
+    - 'Patch': 'accounts_patch.md'
+- 'Locations':
+    - 'Admins Create': 'locations_admins-create.md'
+    - 'Admins Delete': 'locations_admins-delete.md'
+    - 'Admins List': 'locations_admins-list.md'
+    - 'Admins Patch': 'locations_admins-patch.md'
+    - 'Transfer': 'locations_transfer.md'
 
 theme: readthedocs
 

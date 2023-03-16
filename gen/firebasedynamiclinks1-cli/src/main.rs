@@ -3,8 +3,6 @@
 // DO NOT EDIT !
 #![allow(unused_variables, unused_imports, dead_code, unused_mut)]
 
-extern crate tokio;
-
 #[macro_use]
 extern crate clap;
 
@@ -12,9 +10,10 @@ use std::env;
 use std::io::{self, Write};
 use clap::{App, SubCommand, Arg};
 
-use google_firebasedynamiclinks1::{api, Error, oauth2};
+use google_firebasedynamiclinks1::{api, Error, oauth2, client::chrono, FieldMask};
 
-mod client;
+
+use google_clis_common as client;
 
 use client::{InvalidOptionsError, CLIError, arg_from_str, writer_from_opts, parse_kv_arg,
           input_file_from_opts, input_mime_from_opts, FieldCursor, FieldError, CallType, UploadProtocol,
@@ -179,7 +178,7 @@ where
                     call = call.sdk_version(value.unwrap_or(""));
                 },
                 "duration-days" => {
-                    call = call.duration_days(value.unwrap_or(""));
+                    call = call.duration_days(        value.map(|v| arg_from_str(v, err, "duration-days", "int64")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -770,7 +769,7 @@ async fn main() {
     
     let mut app = App::new("firebasedynamiclinks1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("4.0.1+20220228")
+           .version("5.0.2+20230123")
            .about("Programmatically creates and manages Firebase Dynamic Links.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_firebasedynamiclinks1_cli")
            .arg(Arg::with_name("url")

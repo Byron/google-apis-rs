@@ -11,7 +11,7 @@ capabilities. Errors will be printed to standard error, and cause the program's 
 If data-structures are requested, these will be returned as pretty-printed JSON, to be useful as input to other tools.
 
 Everything else about the *Assuredworkloads* API can be found at the
-[official documentation site](https://cloud.google.com).
+[official documentation site](https://cloud.google.com/learnmoreurl).
 
 # Installation and Source Code
 
@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Assuredworkloads* API at revision *20220224*. The CLI is at version *4.0.1*.
+This documentation was generated from the *Assuredworkloads* API at revision *20230116*. The CLI is at version *5.0.2*.
 
 ```bash
 assuredworkloads1 [options]
@@ -36,7 +36,12 @@ assuredworkloads1 [options]
                 locations-workloads-delete <name> [-p <v>]... [-o <out>]
                 locations-workloads-get <name> [-p <v>]... [-o <out>]
                 locations-workloads-list <parent> [-p <v>]... [-o <out>]
+                locations-workloads-mutate-partner-permissions <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-workloads-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-workloads-restrict-allowed-resources <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-workloads-violations-acknowledge <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-workloads-violations-get <name> [-p <v>]... [-o <out>]
+                locations-workloads-violations-list <parent> [-p <v>]... [-o <out>]
   assuredworkloads1 --help
 
 Configuration:

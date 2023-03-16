@@ -3,8 +3,6 @@
 // DO NOT EDIT !
 #![allow(unused_variables, unused_imports, dead_code, unused_mut)]
 
-extern crate tokio;
-
 #[macro_use]
 extern crate clap;
 
@@ -12,9 +10,10 @@ use std::env;
 use std::io::{self, Write};
 use clap::{App, SubCommand, Arg};
 
-use google_factchecktools1_alpha1::{api, Error, oauth2};
+use google_factchecktools1_alpha1::{api, Error, oauth2, client::chrono, FieldMask};
 
-mod client;
+
+use google_clis_common as client;
 
 use client::{InvalidOptionsError, CLIError, arg_from_str, writer_from_opts, parse_kv_arg,
           input_file_from_opts, input_mime_from_opts, FieldCursor, FieldError, CallType, UploadProtocol,
@@ -67,13 +66,13 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 "offset" => {
-                    call = call.offset(arg_from_str(value.unwrap_or("-0"), err, "offset", "integer"));
+                    call = call.offset(        value.map(|v| arg_from_str(v, err, "offset", "int32")).unwrap_or(-0));
                 },
                 "max-age-days" => {
-                    call = call.max_age_days(arg_from_str(value.unwrap_or("-0"), err, "max-age-days", "integer"));
+                    call = call.max_age_days(        value.map(|v| arg_from_str(v, err, "max-age-days", "int32")).unwrap_or(-0));
                 },
                 "language-code" => {
                     call = call.language_code(value.unwrap_or(""));
@@ -329,13 +328,13 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 "organization" => {
                     call = call.organization(value.unwrap_or(""));
                 },
                 "offset" => {
-                    call = call.offset(arg_from_str(value.unwrap_or("-0"), err, "offset", "integer"));
+                    call = call.offset(        value.map(|v| arg_from_str(v, err, "offset", "int32")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -722,7 +721,7 @@ async fn main() {
     
     let mut app = App::new("factchecktools1-alpha1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("4.0.1+20220305")
+           .version("5.0.2+20230121")
            .about("")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_factchecktools1_alpha1_cli")
            .arg(Arg::with_name("url")

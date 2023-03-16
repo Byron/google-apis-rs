@@ -1,4 +1,4 @@
-site_name: appengine v4.0.1+20181005
+site_name: appengine v5.0.2+20181005
 site_url: http://byron.github.io/google-apis-rs/google-appengine1_beta4-cli
 site_description: A complete library to interact with appengine (protocol v1beta4)
 
@@ -7,28 +7,29 @@ repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/appengine1_beta4
 docs_dir: docs
 site_dir: build_html
 
-pages:
-- ['index.md', 'Home']
-- ['apps_create.md', 'Apps', 'Create']
-- ['apps_get.md', 'Apps', 'Get']
-- ['apps_locations-get.md', 'Apps', 'Locations Get']
-- ['apps_locations-list.md', 'Apps', 'Locations List']
-- ['apps_modules-delete.md', 'Apps', 'Modules Delete']
-- ['apps_modules-get.md', 'Apps', 'Modules Get']
-- ['apps_modules-list.md', 'Apps', 'Modules List']
-- ['apps_modules-patch.md', 'Apps', 'Modules Patch']
-- ['apps_modules-versions-create.md', 'Apps', 'Modules Versions Create']
-- ['apps_modules-versions-delete.md', 'Apps', 'Modules Versions Delete']
-- ['apps_modules-versions-get.md', 'Apps', 'Modules Versions Get']
-- ['apps_modules-versions-instances-debug.md', 'Apps', 'Modules Versions Instances Debug']
-- ['apps_modules-versions-instances-delete.md', 'Apps', 'Modules Versions Instances Delete']
-- ['apps_modules-versions-instances-get.md', 'Apps', 'Modules Versions Instances Get']
-- ['apps_modules-versions-instances-list.md', 'Apps', 'Modules Versions Instances List']
-- ['apps_modules-versions-list.md', 'Apps', 'Modules Versions List']
-- ['apps_modules-versions-patch.md', 'Apps', 'Modules Versions Patch']
-- ['apps_operations-get.md', 'Apps', 'Operations Get']
-- ['apps_operations-list.md', 'Apps', 'Operations List']
-- ['apps_patch.md', 'Apps', 'Patch']
+nav:
+- Home: 'index.md'
+- 'Apps':
+    - 'Create': 'apps_create.md'
+    - 'Get': 'apps_get.md'
+    - 'Locations Get': 'apps_locations-get.md'
+    - 'Locations List': 'apps_locations-list.md'
+    - 'Modules Delete': 'apps_modules-delete.md'
+    - 'Modules Get': 'apps_modules-get.md'
+    - 'Modules List': 'apps_modules-list.md'
+    - 'Modules Patch': 'apps_modules-patch.md'
+    - 'Modules Versions Create': 'apps_modules-versions-create.md'
+    - 'Modules Versions Delete': 'apps_modules-versions-delete.md'
+    - 'Modules Versions Get': 'apps_modules-versions-get.md'
+    - 'Modules Versions Instances Debug': 'apps_modules-versions-instances-debug.md'
+    - 'Modules Versions Instances Delete': 'apps_modules-versions-instances-delete.md'
+    - 'Modules Versions Instances Get': 'apps_modules-versions-instances-get.md'
+    - 'Modules Versions Instances List': 'apps_modules-versions-instances-list.md'
+    - 'Modules Versions List': 'apps_modules-versions-list.md'
+    - 'Modules Versions Patch': 'apps_modules-versions-patch.md'
+    - 'Operations Get': 'apps_operations-get.md'
+    - 'Operations List': 'apps_operations-list.md'
+    - 'Patch': 'apps_patch.md'
 
 theme: readthedocs
 

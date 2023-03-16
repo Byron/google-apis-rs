@@ -3,8 +3,6 @@
 // DO NOT EDIT !
 #![allow(unused_variables, unused_imports, dead_code, unused_mut)]
 
-extern crate tokio;
-
 #[macro_use]
 extern crate clap;
 
@@ -12,9 +10,10 @@ use std::env;
 use std::io::{self, Write};
 use clap::{App, SubCommand, Arg};
 
-use google_datastream1::{api, Error, oauth2};
+use google_datastream1::{api, Error, oauth2, client::chrono, FieldMask};
 
-mod client;
+
+use google_clis_common as client;
 
 use client::{InvalidOptionsError, CLIError, arg_from_str, writer_from_opts, parse_kv_arg,
           input_file_from_opts, input_mime_from_opts, FieldCursor, FieldError, CallType, UploadProtocol,
@@ -101,10 +100,15 @@ where
                     "oracle-profile.password" => Some(("oracleProfile.password", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "oracle-profile.port" => Some(("oracleProfile.port", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "oracle-profile.username" => Some(("oracleProfile.username", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "postgresql-profile.database" => Some(("postgresqlProfile.database", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "postgresql-profile.hostname" => Some(("postgresqlProfile.hostname", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "postgresql-profile.password" => Some(("postgresqlProfile.password", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "postgresql-profile.port" => Some(("postgresqlProfile.port", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "postgresql-profile.username" => Some(("postgresqlProfile.username", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "private-connectivity.private-connection" => Some(("privateConnectivity.privateConnection", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["bucket", "ca-certificate", "ca-certificate-set", "client-certificate", "client-certificate-set", "client-key", "client-key-set", "connection-attributes", "create-time", "database-service", "display-name", "forward-ssh-connectivity", "gcs-profile", "hostname", "labels", "mysql-profile", "name", "oracle-profile", "password", "port", "private-connection", "private-connectivity", "private-key", "root-path", "ssl-config", "update-time", "username"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["bucket", "ca-certificate", "ca-certificate-set", "client-certificate", "client-certificate-set", "client-key", "client-key-set", "connection-attributes", "create-time", "database", "database-service", "display-name", "forward-ssh-connectivity", "gcs-profile", "hostname", "labels", "mysql-profile", "name", "oracle-profile", "password", "port", "postgresql-profile", "private-connection", "private-connectivity", "private-key", "root-path", "ssl-config", "update-time", "username"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -119,13 +123,13 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "validate-only" => {
-                    call = call.validate_only(arg_from_str(value.unwrap_or("false"), err, "validate-only", "boolean"));
+                    call = call.validate_only(        value.map(|v| arg_from_str(v, err, "validate-only", "boolean")).unwrap_or(false));
                 },
                 "request-id" => {
                     call = call.request_id(value.unwrap_or(""));
                 },
                 "force" => {
-                    call = call.force(arg_from_str(value.unwrap_or("false"), err, "force", "boolean"));
+                    call = call.force(        value.map(|v| arg_from_str(v, err, "force", "boolean")).unwrap_or(false));
                 },
                 "connection-profile-id" => {
                     call = call.connection_profile_id(value.unwrap_or(""));
@@ -283,13 +287,18 @@ where
                     "connection-profile.oracle-profile.password" => Some(("connectionProfile.oracleProfile.password", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "connection-profile.oracle-profile.port" => Some(("connectionProfile.oracleProfile.port", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "connection-profile.oracle-profile.username" => Some(("connectionProfile.oracleProfile.username", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "connection-profile.postgresql-profile.database" => Some(("connectionProfile.postgresqlProfile.database", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "connection-profile.postgresql-profile.hostname" => Some(("connectionProfile.postgresqlProfile.hostname", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "connection-profile.postgresql-profile.password" => Some(("connectionProfile.postgresqlProfile.password", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "connection-profile.postgresql-profile.port" => Some(("connectionProfile.postgresqlProfile.port", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "connection-profile.postgresql-profile.username" => Some(("connectionProfile.postgresqlProfile.username", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "connection-profile.private-connectivity.private-connection" => Some(("connectionProfile.privateConnectivity.privateConnection", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "connection-profile.update-time" => Some(("connectionProfile.updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "connection-profile-name" => Some(("connectionProfileName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "full-hierarchy" => Some(("fullHierarchy", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "hierarchy-depth" => Some(("hierarchyDepth", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["bucket", "ca-certificate", "ca-certificate-set", "client-certificate", "client-certificate-set", "client-key", "client-key-set", "connection-attributes", "connection-profile", "connection-profile-name", "create-time", "database-service", "display-name", "forward-ssh-connectivity", "full-hierarchy", "gcs-profile", "hierarchy-depth", "hostname", "labels", "mysql-profile", "name", "oracle-profile", "password", "port", "private-connection", "private-connectivity", "private-key", "root-path", "ssl-config", "update-time", "username"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["bucket", "ca-certificate", "ca-certificate-set", "client-certificate", "client-certificate-set", "client-key", "client-key-set", "connection-attributes", "connection-profile", "connection-profile-name", "create-time", "database", "database-service", "display-name", "forward-ssh-connectivity", "full-hierarchy", "gcs-profile", "hierarchy-depth", "hostname", "labels", "mysql-profile", "name", "oracle-profile", "password", "port", "postgresql-profile", "private-connection", "private-connectivity", "private-key", "root-path", "ssl-config", "update-time", "username"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -411,7 +420,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 "order-by" => {
                     call = call.order_by(value.unwrap_or(""));
@@ -516,10 +525,15 @@ where
                     "oracle-profile.password" => Some(("oracleProfile.password", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "oracle-profile.port" => Some(("oracleProfile.port", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "oracle-profile.username" => Some(("oracleProfile.username", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "postgresql-profile.database" => Some(("postgresqlProfile.database", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "postgresql-profile.hostname" => Some(("postgresqlProfile.hostname", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "postgresql-profile.password" => Some(("postgresqlProfile.password", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "postgresql-profile.port" => Some(("postgresqlProfile.port", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "postgresql-profile.username" => Some(("postgresqlProfile.username", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "private-connectivity.private-connection" => Some(("privateConnectivity.privateConnection", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["bucket", "ca-certificate", "ca-certificate-set", "client-certificate", "client-certificate-set", "client-key", "client-key-set", "connection-attributes", "create-time", "database-service", "display-name", "forward-ssh-connectivity", "gcs-profile", "hostname", "labels", "mysql-profile", "name", "oracle-profile", "password", "port", "private-connection", "private-connectivity", "private-key", "root-path", "ssl-config", "update-time", "username"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["bucket", "ca-certificate", "ca-certificate-set", "client-certificate", "client-certificate-set", "client-key", "client-key-set", "connection-attributes", "create-time", "database", "database-service", "display-name", "forward-ssh-connectivity", "gcs-profile", "hostname", "labels", "mysql-profile", "name", "oracle-profile", "password", "port", "postgresql-profile", "private-connection", "private-connectivity", "private-key", "root-path", "ssl-config", "update-time", "username"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -534,16 +548,16 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "validate-only" => {
-                    call = call.validate_only(arg_from_str(value.unwrap_or("false"), err, "validate-only", "boolean"));
+                    call = call.validate_only(        value.map(|v| arg_from_str(v, err, "validate-only", "boolean")).unwrap_or(false));
                 },
                 "update-mask" => {
-                    call = call.update_mask(value.unwrap_or(""));
+                    call = call.update_mask(        value.map(|v| arg_from_str(v, err, "update-mask", "google-fieldmask")).unwrap_or(FieldMask::default()));
                 },
                 "request-id" => {
                     call = call.request_id(value.unwrap_or(""));
                 },
                 "force" => {
-                    call = call.force(arg_from_str(value.unwrap_or("false"), err, "force", "boolean"));
+                    call = call.force(        value.map(|v| arg_from_str(v, err, "force", "boolean")).unwrap_or(false));
                 },
                 _ => {
                     let mut found = false;
@@ -602,7 +616,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -713,7 +727,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 "filter" => {
                     call = call.filter(value.unwrap_or(""));
@@ -963,7 +977,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 "filter" => {
                     call = call.filter(value.unwrap_or(""));
@@ -1072,6 +1086,9 @@ where
                 "private-connection-id" => {
                     call = call.private_connection_id(value.unwrap_or(""));
                 },
+                "force" => {
+                    call = call.force(        value.map(|v| arg_from_str(v, err, "force", "boolean")).unwrap_or(false));
+                },
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -1085,7 +1102,7 @@ where
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["private-connection-id", "request-id"].iter().map(|v|*v));
+                                                                           v.extend(["force", "private-connection-id", "request-id"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -1129,7 +1146,7 @@ where
                     call = call.request_id(value.unwrap_or(""));
                 },
                 "force" => {
-                    call = call.force(arg_from_str(value.unwrap_or("false"), err, "force", "boolean"));
+                    call = call.force(        value.map(|v| arg_from_str(v, err, "force", "boolean")).unwrap_or(false));
                 },
                 _ => {
                     let mut found = false;
@@ -1240,7 +1257,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 "order-by" => {
                     call = call.order_by(value.unwrap_or(""));
@@ -1511,7 +1528,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 "order-by" => {
                     call = call.order_by(value.unwrap_or(""));
@@ -1591,6 +1608,11 @@ where
                 match &temp_cursor.to_string()[..] {
                     "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "customer-managed-encryption-key" => Some(("customerManagedEncryptionKey", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "destination-config.bigquery-destination-config.data-freshness" => Some(("destinationConfig.bigqueryDestinationConfig.dataFreshness", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "destination-config.bigquery-destination-config.single-target-dataset.dataset-id" => Some(("destinationConfig.bigqueryDestinationConfig.singleTargetDataset.datasetId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "destination-config.bigquery-destination-config.source-hierarchy-datasets.dataset-template.dataset-id-prefix" => Some(("destinationConfig.bigqueryDestinationConfig.sourceHierarchyDatasets.datasetTemplate.datasetIdPrefix", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "destination-config.bigquery-destination-config.source-hierarchy-datasets.dataset-template.kms-key-name" => Some(("destinationConfig.bigqueryDestinationConfig.sourceHierarchyDatasets.datasetTemplate.kmsKeyName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "destination-config.bigquery-destination-config.source-hierarchy-datasets.dataset-template.location" => Some(("destinationConfig.bigqueryDestinationConfig.sourceHierarchyDatasets.datasetTemplate.location", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "destination-config.destination-connection-profile" => Some(("destinationConfig.destinationConnectionProfile", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "destination-config.gcs-destination-config.file-rotation-interval" => Some(("destinationConfig.gcsDestinationConfig.fileRotationInterval", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "destination-config.gcs-destination-config.file-rotation-mb" => Some(("destinationConfig.gcsDestinationConfig.fileRotationMb", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
@@ -1600,11 +1622,15 @@ where
                     "display-name" => Some(("displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "source-config.mysql-source-config.max-concurrent-cdc-tasks" => Some(("sourceConfig.mysqlSourceConfig.maxConcurrentCdcTasks", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "source-config.oracle-source-config.max-concurrent-cdc-tasks" => Some(("sourceConfig.oracleSourceConfig.maxConcurrentCdcTasks", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "source-config.postgresql-source-config.publication" => Some(("sourceConfig.postgresqlSourceConfig.publication", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "source-config.postgresql-source-config.replication-slot" => Some(("sourceConfig.postgresqlSourceConfig.replicationSlot", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "source-config.source-connection-profile" => Some(("sourceConfig.sourceConnectionProfile", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "state" => Some(("state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["compression", "create-time", "customer-managed-encryption-key", "destination-config", "destination-connection-profile", "display-name", "file-rotation-interval", "file-rotation-mb", "gcs-destination-config", "json-file-format", "labels", "name", "path", "schema-file-format", "source-config", "source-connection-profile", "state", "update-time"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["bigquery-destination-config", "compression", "create-time", "customer-managed-encryption-key", "data-freshness", "dataset-id", "dataset-id-prefix", "dataset-template", "destination-config", "destination-connection-profile", "display-name", "file-rotation-interval", "file-rotation-mb", "gcs-destination-config", "json-file-format", "kms-key-name", "labels", "location", "max-concurrent-cdc-tasks", "mysql-source-config", "name", "oracle-source-config", "path", "postgresql-source-config", "publication", "replication-slot", "schema-file-format", "single-target-dataset", "source-config", "source-connection-profile", "source-hierarchy-datasets", "state", "update-time"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1619,7 +1645,7 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "validate-only" => {
-                    call = call.validate_only(arg_from_str(value.unwrap_or("false"), err, "validate-only", "boolean"));
+                    call = call.validate_only(        value.map(|v| arg_from_str(v, err, "validate-only", "boolean")).unwrap_or(false));
                 },
                 "stream-id" => {
                     call = call.stream_id(value.unwrap_or(""));
@@ -1628,7 +1654,7 @@ where
                     call = call.request_id(value.unwrap_or(""));
                 },
                 "force" => {
-                    call = call.force(arg_from_str(value.unwrap_or("false"), err, "force", "boolean"));
+                    call = call.force(        value.map(|v| arg_from_str(v, err, "force", "boolean")).unwrap_or(false));
                 },
                 _ => {
                     let mut found = false;
@@ -1795,7 +1821,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 "order-by" => {
                     call = call.order_by(value.unwrap_or(""));
@@ -1912,7 +1938,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -1988,8 +2014,10 @@ where
                     "source-object-identifier.mysql-identifier.table" => Some(("sourceObjectIdentifier.mysqlIdentifier.table", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "source-object-identifier.oracle-identifier.schema" => Some(("sourceObjectIdentifier.oracleIdentifier.schema", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "source-object-identifier.oracle-identifier.table" => Some(("sourceObjectIdentifier.oracleIdentifier.table", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "source-object-identifier.postgresql-identifier.schema" => Some(("sourceObjectIdentifier.postgresqlIdentifier.schema", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "source-object-identifier.postgresql-identifier.table" => Some(("sourceObjectIdentifier.postgresqlIdentifier.table", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["database", "mysql-identifier", "oracle-identifier", "schema", "source-object-identifier", "table"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["database", "mysql-identifier", "oracle-identifier", "postgresql-identifier", "schema", "source-object-identifier", "table"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -2242,6 +2270,11 @@ where
                 match &temp_cursor.to_string()[..] {
                     "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "customer-managed-encryption-key" => Some(("customerManagedEncryptionKey", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "destination-config.bigquery-destination-config.data-freshness" => Some(("destinationConfig.bigqueryDestinationConfig.dataFreshness", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "destination-config.bigquery-destination-config.single-target-dataset.dataset-id" => Some(("destinationConfig.bigqueryDestinationConfig.singleTargetDataset.datasetId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "destination-config.bigquery-destination-config.source-hierarchy-datasets.dataset-template.dataset-id-prefix" => Some(("destinationConfig.bigqueryDestinationConfig.sourceHierarchyDatasets.datasetTemplate.datasetIdPrefix", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "destination-config.bigquery-destination-config.source-hierarchy-datasets.dataset-template.kms-key-name" => Some(("destinationConfig.bigqueryDestinationConfig.sourceHierarchyDatasets.datasetTemplate.kmsKeyName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "destination-config.bigquery-destination-config.source-hierarchy-datasets.dataset-template.location" => Some(("destinationConfig.bigqueryDestinationConfig.sourceHierarchyDatasets.datasetTemplate.location", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "destination-config.destination-connection-profile" => Some(("destinationConfig.destinationConnectionProfile", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "destination-config.gcs-destination-config.file-rotation-interval" => Some(("destinationConfig.gcsDestinationConfig.fileRotationInterval", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "destination-config.gcs-destination-config.file-rotation-mb" => Some(("destinationConfig.gcsDestinationConfig.fileRotationMb", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
@@ -2251,11 +2284,15 @@ where
                     "display-name" => Some(("displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "source-config.mysql-source-config.max-concurrent-cdc-tasks" => Some(("sourceConfig.mysqlSourceConfig.maxConcurrentCdcTasks", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "source-config.oracle-source-config.max-concurrent-cdc-tasks" => Some(("sourceConfig.oracleSourceConfig.maxConcurrentCdcTasks", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "source-config.postgresql-source-config.publication" => Some(("sourceConfig.postgresqlSourceConfig.publication", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "source-config.postgresql-source-config.replication-slot" => Some(("sourceConfig.postgresqlSourceConfig.replicationSlot", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "source-config.source-connection-profile" => Some(("sourceConfig.sourceConnectionProfile", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "state" => Some(("state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["compression", "create-time", "customer-managed-encryption-key", "destination-config", "destination-connection-profile", "display-name", "file-rotation-interval", "file-rotation-mb", "gcs-destination-config", "json-file-format", "labels", "name", "path", "schema-file-format", "source-config", "source-connection-profile", "state", "update-time"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["bigquery-destination-config", "compression", "create-time", "customer-managed-encryption-key", "data-freshness", "dataset-id", "dataset-id-prefix", "dataset-template", "destination-config", "destination-connection-profile", "display-name", "file-rotation-interval", "file-rotation-mb", "gcs-destination-config", "json-file-format", "kms-key-name", "labels", "location", "max-concurrent-cdc-tasks", "mysql-source-config", "name", "oracle-source-config", "path", "postgresql-source-config", "publication", "replication-slot", "schema-file-format", "single-target-dataset", "source-config", "source-connection-profile", "source-hierarchy-datasets", "state", "update-time"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -2270,16 +2307,16 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "validate-only" => {
-                    call = call.validate_only(arg_from_str(value.unwrap_or("false"), err, "validate-only", "boolean"));
+                    call = call.validate_only(        value.map(|v| arg_from_str(v, err, "validate-only", "boolean")).unwrap_or(false));
                 },
                 "update-mask" => {
-                    call = call.update_mask(value.unwrap_or(""));
+                    call = call.update_mask(        value.map(|v| arg_from_str(v, err, "update-mask", "google-fieldmask")).unwrap_or(FieldMask::default()));
                 },
                 "request-id" => {
                     call = call.request_id(value.unwrap_or(""));
                 },
                 "force" => {
-                    call = call.force(arg_from_str(value.unwrap_or("false"), err, "force", "boolean"));
+                    call = call.force(        value.map(|v| arg_from_str(v, err, "force", "boolean")).unwrap_or(false));
                 },
                 _ => {
                     let mut found = false;
@@ -3262,7 +3299,7 @@ async fn main() {
     
     let mut app = App::new("datastream1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("4.0.1+20220207")
+           .version("5.0.2+20230111")
            .about("")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_datastream1_cli")
            .arg(Arg::with_name("url")

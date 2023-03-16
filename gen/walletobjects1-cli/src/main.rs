@@ -10,7 +10,8 @@ use std::env;
 use std::io::{self, Write};
 use clap::{App, SubCommand, Arg};
 
-use google_walletobjects1::{api, Error, oauth2};
+use google_walletobjects1::{api, Error, oauth2, client::chrono, FieldMask};
+
 
 use google_clis_common as client;
 
@@ -410,10 +411,10 @@ where
                     call = call.token(value.unwrap_or(""));
                 },
                 "max-results" => {
-                    call = call.max_results(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
+                    call = call.max_results(        value.map(|v| arg_from_str(v, err, "max-results", "int32")).unwrap_or(-0));
                 },
                 "issuer-id" => {
-                    call = call.issuer_id(value.unwrap_or(""));
+                    call = call.issuer_id(        value.map(|v| arg_from_str(v, err, "issuer-id", "int64")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -1377,7 +1378,7 @@ where
                     call = call.token(value.unwrap_or(""));
                 },
                 "max-results" => {
-                    call = call.max_results(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
+                    call = call.max_results(        value.map(|v| arg_from_str(v, err, "max-results", "int32")).unwrap_or(-0));
                 },
                 "class-id" => {
                     call = call.class_id(value.unwrap_or(""));
@@ -2612,10 +2613,10 @@ where
                     call = call.token(value.unwrap_or(""));
                 },
                 "max-results" => {
-                    call = call.max_results(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
+                    call = call.max_results(        value.map(|v| arg_from_str(v, err, "max-results", "int32")).unwrap_or(-0));
                 },
                 "issuer-id" => {
-                    call = call.issuer_id(value.unwrap_or(""));
+                    call = call.issuer_id(        value.map(|v| arg_from_str(v, err, "issuer-id", "int64")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -3671,7 +3672,7 @@ where
                     call = call.token(value.unwrap_or(""));
                 },
                 "max-results" => {
-                    call = call.max_results(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
+                    call = call.max_results(        value.map(|v| arg_from_str(v, err, "max-results", "int32")).unwrap_or(-0));
                 },
                 "class-id" => {
                     call = call.class_id(value.unwrap_or(""));
@@ -4668,10 +4669,10 @@ where
                     call = call.token(value.unwrap_or(""));
                 },
                 "max-results" => {
-                    call = call.max_results(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
+                    call = call.max_results(        value.map(|v| arg_from_str(v, err, "max-results", "int32")).unwrap_or(-0));
                 },
                 "issuer-id" => {
-                    call = call.issuer_id(value.unwrap_or(""));
+                    call = call.issuer_id(        value.map(|v| arg_from_str(v, err, "issuer-id", "int64")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -5200,7 +5201,7 @@ where
                     call = call.token(value.unwrap_or(""));
                 },
                 "max-results" => {
-                    call = call.max_results(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
+                    call = call.max_results(        value.map(|v| arg_from_str(v, err, "max-results", "int32")).unwrap_or(-0));
                 },
                 "class-id" => {
                     call = call.class_id(value.unwrap_or(""));
@@ -6046,10 +6047,10 @@ where
                     call = call.token(value.unwrap_or(""));
                 },
                 "max-results" => {
-                    call = call.max_results(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
+                    call = call.max_results(        value.map(|v| arg_from_str(v, err, "max-results", "int32")).unwrap_or(-0));
                 },
                 "issuer-id" => {
-                    call = call.issuer_id(value.unwrap_or(""));
+                    call = call.issuer_id(        value.map(|v| arg_from_str(v, err, "issuer-id", "int64")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -6897,7 +6898,7 @@ where
                     call = call.token(value.unwrap_or(""));
                 },
                 "max-results" => {
-                    call = call.max_results(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
+                    call = call.max_results(        value.map(|v| arg_from_str(v, err, "max-results", "int32")).unwrap_or(-0));
                 },
                 "class-id" => {
                     call = call.class_id(value.unwrap_or(""));
@@ -8378,10 +8379,10 @@ where
                     call = call.token(value.unwrap_or(""));
                 },
                 "max-results" => {
-                    call = call.max_results(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
+                    call = call.max_results(        value.map(|v| arg_from_str(v, err, "max-results", "int32")).unwrap_or(-0));
                 },
                 "issuer-id" => {
-                    call = call.issuer_id(value.unwrap_or(""));
+                    call = call.issuer_id(        value.map(|v| arg_from_str(v, err, "issuer-id", "int64")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -9343,7 +9344,7 @@ where
                     call = call.token(value.unwrap_or(""));
                 },
                 "max-results" => {
-                    call = call.max_results(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
+                    call = call.max_results(        value.map(|v| arg_from_str(v, err, "max-results", "int32")).unwrap_or(-0));
                 },
                 "class-id" => {
                     call = call.class_id(value.unwrap_or(""));
@@ -10183,6 +10184,245 @@ where
         }
     }
 
+    async fn _media_upload(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "blob.algorithm" => Some(("blob.algorithm", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "blob.bigstore-object-ref" => Some(("blob.bigstoreObjectRef", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "blob.blob-ref" => Some(("blob.blobRef", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "blob.blobstore2-info.blob-generation" => Some(("blob.blobstore2Info.blobGeneration", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "blob.blobstore2-info.blob-id" => Some(("blob.blobstore2Info.blobId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "blob.blobstore2-info.download-read-handle" => Some(("blob.blobstore2Info.downloadReadHandle", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "blob.blobstore2-info.read-token" => Some(("blob.blobstore2Info.readToken", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "blob.blobstore2-info.upload-metadata-container" => Some(("blob.blobstore2Info.uploadMetadataContainer", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "blob.content-type" => Some(("blob.contentType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "blob.content-type-info.best-guess" => Some(("blob.contentTypeInfo.bestGuess", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "blob.content-type-info.from-bytes" => Some(("blob.contentTypeInfo.fromBytes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "blob.content-type-info.from-file-name" => Some(("blob.contentTypeInfo.fromFileName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "blob.content-type-info.from-header" => Some(("blob.contentTypeInfo.fromHeader", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "blob.content-type-info.from-url-path" => Some(("blob.contentTypeInfo.fromUrlPath", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "blob.cosmo-binary-reference" => Some(("blob.cosmoBinaryReference", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "blob.crc32c-hash" => Some(("blob.crc32cHash", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "blob.diff-checksums-response.checksums-location.blob-ref" => Some(("blob.diffChecksumsResponse.checksumsLocation.blobRef", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "blob.diff-checksums-response.checksums-location.blobstore2-info.blob-generation" => Some(("blob.diffChecksumsResponse.checksumsLocation.blobstore2Info.blobGeneration", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "blob.diff-checksums-response.checksums-location.blobstore2-info.blob-id" => Some(("blob.diffChecksumsResponse.checksumsLocation.blobstore2Info.blobId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "blob.diff-checksums-response.checksums-location.blobstore2-info.download-read-handle" => Some(("blob.diffChecksumsResponse.checksumsLocation.blobstore2Info.downloadReadHandle", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "blob.diff-checksums-response.checksums-location.blobstore2-info.read-token" => Some(("blob.diffChecksumsResponse.checksumsLocation.blobstore2Info.readToken", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "blob.diff-checksums-response.checksums-location.blobstore2-info.upload-metadata-container" => Some(("blob.diffChecksumsResponse.checksumsLocation.blobstore2Info.uploadMetadataContainer", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "blob.diff-checksums-response.checksums-location.cosmo-binary-reference" => Some(("blob.diffChecksumsResponse.checksumsLocation.cosmoBinaryReference", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "blob.diff-checksums-response.checksums-location.crc32c-hash" => Some(("blob.diffChecksumsResponse.checksumsLocation.crc32cHash", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "blob.diff-checksums-response.checksums-location.inline" => Some(("blob.diffChecksumsResponse.checksumsLocation.inline", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "blob.diff-checksums-response.checksums-location.length" => Some(("blob.diffChecksumsResponse.checksumsLocation.length", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "blob.diff-checksums-response.checksums-location.md5-hash" => Some(("blob.diffChecksumsResponse.checksumsLocation.md5Hash", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "blob.diff-checksums-response.checksums-location.object-id.bucket-name" => Some(("blob.diffChecksumsResponse.checksumsLocation.objectId.bucketName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "blob.diff-checksums-response.checksums-location.object-id.generation" => Some(("blob.diffChecksumsResponse.checksumsLocation.objectId.generation", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "blob.diff-checksums-response.checksums-location.object-id.object-name" => Some(("blob.diffChecksumsResponse.checksumsLocation.objectId.objectName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "blob.diff-checksums-response.checksums-location.path" => Some(("blob.diffChecksumsResponse.checksumsLocation.path", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "blob.diff-checksums-response.checksums-location.reference-type" => Some(("blob.diffChecksumsResponse.checksumsLocation.referenceType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "blob.diff-checksums-response.checksums-location.sha1-hash" => Some(("blob.diffChecksumsResponse.checksumsLocation.sha1Hash", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "blob.diff-checksums-response.chunk-size-bytes" => Some(("blob.diffChecksumsResponse.chunkSizeBytes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "blob.diff-checksums-response.object-location.blob-ref" => Some(("blob.diffChecksumsResponse.objectLocation.blobRef", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "blob.diff-checksums-response.object-location.blobstore2-info.blob-generation" => Some(("blob.diffChecksumsResponse.objectLocation.blobstore2Info.blobGeneration", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "blob.diff-checksums-response.object-location.blobstore2-info.blob-id" => Some(("blob.diffChecksumsResponse.objectLocation.blobstore2Info.blobId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "blob.diff-checksums-response.object-location.blobstore2-info.download-read-handle" => Some(("blob.diffChecksumsResponse.objectLocation.blobstore2Info.downloadReadHandle", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "blob.diff-checksums-response.object-location.blobstore2-info.read-token" => Some(("blob.diffChecksumsResponse.objectLocation.blobstore2Info.readToken", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "blob.diff-checksums-response.object-location.blobstore2-info.upload-metadata-container" => Some(("blob.diffChecksumsResponse.objectLocation.blobstore2Info.uploadMetadataContainer", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "blob.diff-checksums-response.object-location.cosmo-binary-reference" => Some(("blob.diffChecksumsResponse.objectLocation.cosmoBinaryReference", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "blob.diff-checksums-response.object-location.crc32c-hash" => Some(("blob.diffChecksumsResponse.objectLocation.crc32cHash", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "blob.diff-checksums-response.object-location.inline" => Some(("blob.diffChecksumsResponse.objectLocation.inline", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "blob.diff-checksums-response.object-location.length" => Some(("blob.diffChecksumsResponse.objectLocation.length", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "blob.diff-checksums-response.object-location.md5-hash" => Some(("blob.diffChecksumsResponse.objectLocation.md5Hash", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "blob.diff-checksums-response.object-location.object-id.bucket-name" => Some(("blob.diffChecksumsResponse.objectLocation.objectId.bucketName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "blob.diff-checksums-response.object-location.object-id.generation" => Some(("blob.diffChecksumsResponse.objectLocation.objectId.generation", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "blob.diff-checksums-response.object-location.object-id.object-name" => Some(("blob.diffChecksumsResponse.objectLocation.objectId.objectName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "blob.diff-checksums-response.object-location.path" => Some(("blob.diffChecksumsResponse.objectLocation.path", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "blob.diff-checksums-response.object-location.reference-type" => Some(("blob.diffChecksumsResponse.objectLocation.referenceType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "blob.diff-checksums-response.object-location.sha1-hash" => Some(("blob.diffChecksumsResponse.objectLocation.sha1Hash", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "blob.diff-checksums-response.object-size-bytes" => Some(("blob.diffChecksumsResponse.objectSizeBytes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "blob.diff-checksums-response.object-version" => Some(("blob.diffChecksumsResponse.objectVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "blob.diff-download-response.object-location.blob-ref" => Some(("blob.diffDownloadResponse.objectLocation.blobRef", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "blob.diff-download-response.object-location.blobstore2-info.blob-generation" => Some(("blob.diffDownloadResponse.objectLocation.blobstore2Info.blobGeneration", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "blob.diff-download-response.object-location.blobstore2-info.blob-id" => Some(("blob.diffDownloadResponse.objectLocation.blobstore2Info.blobId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "blob.diff-download-response.object-location.blobstore2-info.download-read-handle" => Some(("blob.diffDownloadResponse.objectLocation.blobstore2Info.downloadReadHandle", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "blob.diff-download-response.object-location.blobstore2-info.read-token" => Some(("blob.diffDownloadResponse.objectLocation.blobstore2Info.readToken", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "blob.diff-download-response.object-location.blobstore2-info.upload-metadata-container" => Some(("blob.diffDownloadResponse.objectLocation.blobstore2Info.uploadMetadataContainer", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "blob.diff-download-response.object-location.cosmo-binary-reference" => Some(("blob.diffDownloadResponse.objectLocation.cosmoBinaryReference", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "blob.diff-download-response.object-location.crc32c-hash" => Some(("blob.diffDownloadResponse.objectLocation.crc32cHash", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "blob.diff-download-response.object-location.inline" => Some(("blob.diffDownloadResponse.objectLocation.inline", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "blob.diff-download-response.object-location.length" => Some(("blob.diffDownloadResponse.objectLocation.length", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "blob.diff-download-response.object-location.md5-hash" => Some(("blob.diffDownloadResponse.objectLocation.md5Hash", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "blob.diff-download-response.object-location.object-id.bucket-name" => Some(("blob.diffDownloadResponse.objectLocation.objectId.bucketName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "blob.diff-download-response.object-location.object-id.generation" => Some(("blob.diffDownloadResponse.objectLocation.objectId.generation", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "blob.diff-download-response.object-location.object-id.object-name" => Some(("blob.diffDownloadResponse.objectLocation.objectId.objectName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "blob.diff-download-response.object-location.path" => Some(("blob.diffDownloadResponse.objectLocation.path", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "blob.diff-download-response.object-location.reference-type" => Some(("blob.diffDownloadResponse.objectLocation.referenceType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "blob.diff-download-response.object-location.sha1-hash" => Some(("blob.diffDownloadResponse.objectLocation.sha1Hash", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "blob.diff-upload-request.checksums-info.blob-ref" => Some(("blob.diffUploadRequest.checksumsInfo.blobRef", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "blob.diff-upload-request.checksums-info.blobstore2-info.blob-generation" => Some(("blob.diffUploadRequest.checksumsInfo.blobstore2Info.blobGeneration", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "blob.diff-upload-request.checksums-info.blobstore2-info.blob-id" => Some(("blob.diffUploadRequest.checksumsInfo.blobstore2Info.blobId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "blob.diff-upload-request.checksums-info.blobstore2-info.download-read-handle" => Some(("blob.diffUploadRequest.checksumsInfo.blobstore2Info.downloadReadHandle", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "blob.diff-upload-request.checksums-info.blobstore2-info.read-token" => Some(("blob.diffUploadRequest.checksumsInfo.blobstore2Info.readToken", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "blob.diff-upload-request.checksums-info.blobstore2-info.upload-metadata-container" => Some(("blob.diffUploadRequest.checksumsInfo.blobstore2Info.uploadMetadataContainer", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "blob.diff-upload-request.checksums-info.cosmo-binary-reference" => Some(("blob.diffUploadRequest.checksumsInfo.cosmoBinaryReference", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "blob.diff-upload-request.checksums-info.crc32c-hash" => Some(("blob.diffUploadRequest.checksumsInfo.crc32cHash", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "blob.diff-upload-request.checksums-info.inline" => Some(("blob.diffUploadRequest.checksumsInfo.inline", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "blob.diff-upload-request.checksums-info.length" => Some(("blob.diffUploadRequest.checksumsInfo.length", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "blob.diff-upload-request.checksums-info.md5-hash" => Some(("blob.diffUploadRequest.checksumsInfo.md5Hash", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "blob.diff-upload-request.checksums-info.object-id.bucket-name" => Some(("blob.diffUploadRequest.checksumsInfo.objectId.bucketName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "blob.diff-upload-request.checksums-info.object-id.generation" => Some(("blob.diffUploadRequest.checksumsInfo.objectId.generation", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "blob.diff-upload-request.checksums-info.object-id.object-name" => Some(("blob.diffUploadRequest.checksumsInfo.objectId.objectName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "blob.diff-upload-request.checksums-info.path" => Some(("blob.diffUploadRequest.checksumsInfo.path", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "blob.diff-upload-request.checksums-info.reference-type" => Some(("blob.diffUploadRequest.checksumsInfo.referenceType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "blob.diff-upload-request.checksums-info.sha1-hash" => Some(("blob.diffUploadRequest.checksumsInfo.sha1Hash", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "blob.diff-upload-request.object-info.blob-ref" => Some(("blob.diffUploadRequest.objectInfo.blobRef", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "blob.diff-upload-request.object-info.blobstore2-info.blob-generation" => Some(("blob.diffUploadRequest.objectInfo.blobstore2Info.blobGeneration", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "blob.diff-upload-request.object-info.blobstore2-info.blob-id" => Some(("blob.diffUploadRequest.objectInfo.blobstore2Info.blobId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "blob.diff-upload-request.object-info.blobstore2-info.download-read-handle" => Some(("blob.diffUploadRequest.objectInfo.blobstore2Info.downloadReadHandle", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "blob.diff-upload-request.object-info.blobstore2-info.read-token" => Some(("blob.diffUploadRequest.objectInfo.blobstore2Info.readToken", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "blob.diff-upload-request.object-info.blobstore2-info.upload-metadata-container" => Some(("blob.diffUploadRequest.objectInfo.blobstore2Info.uploadMetadataContainer", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "blob.diff-upload-request.object-info.cosmo-binary-reference" => Some(("blob.diffUploadRequest.objectInfo.cosmoBinaryReference", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "blob.diff-upload-request.object-info.crc32c-hash" => Some(("blob.diffUploadRequest.objectInfo.crc32cHash", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "blob.diff-upload-request.object-info.inline" => Some(("blob.diffUploadRequest.objectInfo.inline", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "blob.diff-upload-request.object-info.length" => Some(("blob.diffUploadRequest.objectInfo.length", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "blob.diff-upload-request.object-info.md5-hash" => Some(("blob.diffUploadRequest.objectInfo.md5Hash", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "blob.diff-upload-request.object-info.object-id.bucket-name" => Some(("blob.diffUploadRequest.objectInfo.objectId.bucketName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "blob.diff-upload-request.object-info.object-id.generation" => Some(("blob.diffUploadRequest.objectInfo.objectId.generation", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "blob.diff-upload-request.object-info.object-id.object-name" => Some(("blob.diffUploadRequest.objectInfo.objectId.objectName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "blob.diff-upload-request.object-info.path" => Some(("blob.diffUploadRequest.objectInfo.path", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "blob.diff-upload-request.object-info.reference-type" => Some(("blob.diffUploadRequest.objectInfo.referenceType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "blob.diff-upload-request.object-info.sha1-hash" => Some(("blob.diffUploadRequest.objectInfo.sha1Hash", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "blob.diff-upload-request.object-version" => Some(("blob.diffUploadRequest.objectVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "blob.diff-upload-response.object-version" => Some(("blob.diffUploadResponse.objectVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "blob.diff-upload-response.original-object.blob-ref" => Some(("blob.diffUploadResponse.originalObject.blobRef", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "blob.diff-upload-response.original-object.blobstore2-info.blob-generation" => Some(("blob.diffUploadResponse.originalObject.blobstore2Info.blobGeneration", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "blob.diff-upload-response.original-object.blobstore2-info.blob-id" => Some(("blob.diffUploadResponse.originalObject.blobstore2Info.blobId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "blob.diff-upload-response.original-object.blobstore2-info.download-read-handle" => Some(("blob.diffUploadResponse.originalObject.blobstore2Info.downloadReadHandle", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "blob.diff-upload-response.original-object.blobstore2-info.read-token" => Some(("blob.diffUploadResponse.originalObject.blobstore2Info.readToken", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "blob.diff-upload-response.original-object.blobstore2-info.upload-metadata-container" => Some(("blob.diffUploadResponse.originalObject.blobstore2Info.uploadMetadataContainer", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "blob.diff-upload-response.original-object.cosmo-binary-reference" => Some(("blob.diffUploadResponse.originalObject.cosmoBinaryReference", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "blob.diff-upload-response.original-object.crc32c-hash" => Some(("blob.diffUploadResponse.originalObject.crc32cHash", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "blob.diff-upload-response.original-object.inline" => Some(("blob.diffUploadResponse.originalObject.inline", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "blob.diff-upload-response.original-object.length" => Some(("blob.diffUploadResponse.originalObject.length", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "blob.diff-upload-response.original-object.md5-hash" => Some(("blob.diffUploadResponse.originalObject.md5Hash", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "blob.diff-upload-response.original-object.object-id.bucket-name" => Some(("blob.diffUploadResponse.originalObject.objectId.bucketName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "blob.diff-upload-response.original-object.object-id.generation" => Some(("blob.diffUploadResponse.originalObject.objectId.generation", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "blob.diff-upload-response.original-object.object-id.object-name" => Some(("blob.diffUploadResponse.originalObject.objectId.objectName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "blob.diff-upload-response.original-object.path" => Some(("blob.diffUploadResponse.originalObject.path", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "blob.diff-upload-response.original-object.reference-type" => Some(("blob.diffUploadResponse.originalObject.referenceType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "blob.diff-upload-response.original-object.sha1-hash" => Some(("blob.diffUploadResponse.originalObject.sha1Hash", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "blob.diff-version-response.object-size-bytes" => Some(("blob.diffVersionResponse.objectSizeBytes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "blob.diff-version-response.object-version" => Some(("blob.diffVersionResponse.objectVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "blob.download-parameters.allow-gzip-compression" => Some(("blob.downloadParameters.allowGzipCompression", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "blob.download-parameters.ignore-range" => Some(("blob.downloadParameters.ignoreRange", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "blob.filename" => Some(("blob.filename", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "blob.hash" => Some(("blob.hash", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "blob.hash-verified" => Some(("blob.hashVerified", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "blob.inline" => Some(("blob.inline", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "blob.is-potential-retry" => Some(("blob.isPotentialRetry", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "blob.length" => Some(("blob.length", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "blob.md5-hash" => Some(("blob.md5Hash", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "blob.media-id" => Some(("blob.mediaId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "blob.object-id.bucket-name" => Some(("blob.objectId.bucketName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "blob.object-id.generation" => Some(("blob.objectId.generation", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "blob.object-id.object-name" => Some(("blob.objectId.objectName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "blob.path" => Some(("blob.path", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "blob.reference-type" => Some(("blob.referenceType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "blob.sha1-hash" => Some(("blob.sha1Hash", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "blob.sha256-hash" => Some(("blob.sha256Hash", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "blob.timestamp" => Some(("blob.timestamp", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "blob.token" => Some(("blob.token", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "media-request-info.current-bytes" => Some(("mediaRequestInfo.currentBytes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "media-request-info.custom-data" => Some(("mediaRequestInfo.customData", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "media-request-info.diff-object-version" => Some(("mediaRequestInfo.diffObjectVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "media-request-info.final-status" => Some(("mediaRequestInfo.finalStatus", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "media-request-info.notification-type" => Some(("mediaRequestInfo.notificationType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "media-request-info.request-id" => Some(("mediaRequestInfo.requestId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "media-request-info.total-bytes" => Some(("mediaRequestInfo.totalBytes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "media-request-info.total-bytes-is-estimated" => Some(("mediaRequestInfo.totalBytesIsEstimated", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["algorithm", "allow-gzip-compression", "best-guess", "bigstore-object-ref", "blob", "blob-generation", "blob-id", "blob-ref", "blobstore2-info", "bucket-name", "checksums-info", "checksums-location", "chunk-size-bytes", "content-type", "content-type-info", "cosmo-binary-reference", "crc32c-hash", "current-bytes", "custom-data", "diff-checksums-response", "diff-download-response", "diff-object-version", "diff-upload-request", "diff-upload-response", "diff-version-response", "download-parameters", "download-read-handle", "filename", "final-status", "from-bytes", "from-file-name", "from-header", "from-url-path", "generation", "hash", "hash-verified", "ignore-range", "inline", "is-potential-retry", "length", "md5-hash", "media-id", "media-request-info", "notification-type", "object-id", "object-info", "object-location", "object-name", "object-size-bytes", "object-version", "original-object", "path", "read-token", "reference-type", "request-id", "sha1-hash", "sha256-hash", "timestamp", "token", "total-bytes", "total-bytes-is-estimated", "upload-metadata-container"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::UploadPrivateImageRequest = json::value::from_value(object).unwrap();
+        let mut call = self.hub.media().upload(request, opt.value_of("issuer-id").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let vals = opt.values_of("mode").unwrap().collect::<Vec<&str>>();
+        let protocol = calltype_from_str(vals[0], ["simple"].iter().map(|&v| v.to_string()).collect(), err);
+        let mut input_file = input_file_from_opts(vals[1], err);
+        let mime_type = input_mime_from_opts(opt.value_of("mime").unwrap_or("application/octet-stream"), err);
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Upload(UploadProtocol::Simple) => call.upload(input_file.unwrap(), mime_type.unwrap()).await,
+                CallType::Standard => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
     async fn _offerclass_addmessage(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
@@ -10526,10 +10766,10 @@ where
                     call = call.token(value.unwrap_or(""));
                 },
                 "max-results" => {
-                    call = call.max_results(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
+                    call = call.max_results(        value.map(|v| arg_from_str(v, err, "max-results", "int32")).unwrap_or(-0));
                 },
                 "issuer-id" => {
-                    call = call.issuer_id(value.unwrap_or(""));
+                    call = call.issuer_id(        value.map(|v| arg_from_str(v, err, "issuer-id", "int64")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -11409,7 +11649,7 @@ where
                     call = call.token(value.unwrap_or(""));
                 },
                 "max-results" => {
-                    call = call.max_results(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
+                    call = call.max_results(        value.map(|v| arg_from_str(v, err, "max-results", "int32")).unwrap_or(-0));
                 },
                 "class-id" => {
                     call = call.class_id(value.unwrap_or(""));
@@ -12474,6 +12714,8 @@ where
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
+                    "activation-options.activation-url" => Some(("activationOptions.activationUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "activation-options.allow-reactivation" => Some(("activationOptions.allowReactivation", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "allow-multiple-users-per-object" => Some(("allowMultipleUsersPerObject", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "callback-options.update-request-url" => Some(("callbackOptions.updateRequestUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "callback-options.url" => Some(("callbackOptions.url", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -12631,7 +12873,7 @@ where
                     "word-mark.source-uri.localized-description.kind" => Some(("wordMark.sourceUri.localizedDescription.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "word-mark.source-uri.uri" => Some(("wordMark.sourceUri.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["allow-multiple-users-per-object", "animation-type", "callback-options", "class-template-info", "comments", "content-description", "country-code", "custom-carriage-label", "custom-coach-label", "custom-concession-category-label", "custom-confirmation-code-label", "custom-discount-message-label", "custom-fare-class-label", "custom-fare-name-label", "custom-other-restrictions-label", "custom-platform-label", "custom-purchase-face-value-label", "custom-purchase-price-label", "custom-purchase-receipt-number-label", "custom-route-restrictions-details-label", "custom-route-restrictions-label", "custom-seat-label", "custom-ticket-number-label", "custom-time-restrictions-label", "custom-transit-terminus-name-label", "custom-zone-label", "default-value", "description", "enable-single-leg-itinerary", "enable-smart-tap", "first-row-option", "hero-image", "hex-background-color", "homepage-uri", "id", "info-module-data", "issuer-name", "kind", "language", "language-override", "list-template-override", "localized-description", "localized-issuer-name", "logo", "multiple-devices-and-holders-allowed-status", "redemption-issuers", "review", "review-status", "security-animation", "show-last-update-time", "source-uri", "transit-operator-name", "transit-option", "transit-type", "update-request-url", "uri", "url", "value", "version", "view-unlock-requirement", "watermark", "word-mark"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["activation-options", "activation-url", "allow-multiple-users-per-object", "allow-reactivation", "animation-type", "callback-options", "class-template-info", "comments", "content-description", "country-code", "custom-carriage-label", "custom-coach-label", "custom-concession-category-label", "custom-confirmation-code-label", "custom-discount-message-label", "custom-fare-class-label", "custom-fare-name-label", "custom-other-restrictions-label", "custom-platform-label", "custom-purchase-face-value-label", "custom-purchase-price-label", "custom-purchase-receipt-number-label", "custom-route-restrictions-details-label", "custom-route-restrictions-label", "custom-seat-label", "custom-ticket-number-label", "custom-time-restrictions-label", "custom-transit-terminus-name-label", "custom-zone-label", "default-value", "description", "enable-single-leg-itinerary", "enable-smart-tap", "first-row-option", "hero-image", "hex-background-color", "homepage-uri", "id", "info-module-data", "issuer-name", "kind", "language", "language-override", "list-template-override", "localized-description", "localized-issuer-name", "logo", "multiple-devices-and-holders-allowed-status", "redemption-issuers", "review", "review-status", "security-animation", "show-last-update-time", "source-uri", "transit-operator-name", "transit-option", "transit-type", "update-request-url", "uri", "url", "value", "version", "view-unlock-requirement", "watermark", "word-mark"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -12701,10 +12943,10 @@ where
                     call = call.token(value.unwrap_or(""));
                 },
                 "max-results" => {
-                    call = call.max_results(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
+                    call = call.max_results(        value.map(|v| arg_from_str(v, err, "max-results", "int32")).unwrap_or(-0));
                 },
                 "issuer-id" => {
-                    call = call.issuer_id(value.unwrap_or(""));
+                    call = call.issuer_id(        value.map(|v| arg_from_str(v, err, "issuer-id", "int64")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -12776,6 +13018,8 @@ where
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
+                    "activation-options.activation-url" => Some(("activationOptions.activationUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "activation-options.allow-reactivation" => Some(("activationOptions.allowReactivation", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "allow-multiple-users-per-object" => Some(("allowMultipleUsersPerObject", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "callback-options.update-request-url" => Some(("callbackOptions.updateRequestUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "callback-options.url" => Some(("callbackOptions.url", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -12933,7 +13177,7 @@ where
                     "word-mark.source-uri.localized-description.kind" => Some(("wordMark.sourceUri.localizedDescription.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "word-mark.source-uri.uri" => Some(("wordMark.sourceUri.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["allow-multiple-users-per-object", "animation-type", "callback-options", "class-template-info", "comments", "content-description", "country-code", "custom-carriage-label", "custom-coach-label", "custom-concession-category-label", "custom-confirmation-code-label", "custom-discount-message-label", "custom-fare-class-label", "custom-fare-name-label", "custom-other-restrictions-label", "custom-platform-label", "custom-purchase-face-value-label", "custom-purchase-price-label", "custom-purchase-receipt-number-label", "custom-route-restrictions-details-label", "custom-route-restrictions-label", "custom-seat-label", "custom-ticket-number-label", "custom-time-restrictions-label", "custom-transit-terminus-name-label", "custom-zone-label", "default-value", "description", "enable-single-leg-itinerary", "enable-smart-tap", "first-row-option", "hero-image", "hex-background-color", "homepage-uri", "id", "info-module-data", "issuer-name", "kind", "language", "language-override", "list-template-override", "localized-description", "localized-issuer-name", "logo", "multiple-devices-and-holders-allowed-status", "redemption-issuers", "review", "review-status", "security-animation", "show-last-update-time", "source-uri", "transit-operator-name", "transit-option", "transit-type", "update-request-url", "uri", "url", "value", "version", "view-unlock-requirement", "watermark", "word-mark"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["activation-options", "activation-url", "allow-multiple-users-per-object", "allow-reactivation", "animation-type", "callback-options", "class-template-info", "comments", "content-description", "country-code", "custom-carriage-label", "custom-coach-label", "custom-concession-category-label", "custom-confirmation-code-label", "custom-discount-message-label", "custom-fare-class-label", "custom-fare-name-label", "custom-other-restrictions-label", "custom-platform-label", "custom-purchase-face-value-label", "custom-purchase-price-label", "custom-purchase-receipt-number-label", "custom-route-restrictions-details-label", "custom-route-restrictions-label", "custom-seat-label", "custom-ticket-number-label", "custom-time-restrictions-label", "custom-transit-terminus-name-label", "custom-zone-label", "default-value", "description", "enable-single-leg-itinerary", "enable-smart-tap", "first-row-option", "hero-image", "hex-background-color", "homepage-uri", "id", "info-module-data", "issuer-name", "kind", "language", "language-override", "list-template-override", "localized-description", "localized-issuer-name", "logo", "multiple-devices-and-holders-allowed-status", "redemption-issuers", "review", "review-status", "security-animation", "show-last-update-time", "source-uri", "transit-operator-name", "transit-option", "transit-type", "update-request-url", "uri", "url", "value", "version", "view-unlock-requirement", "watermark", "word-mark"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -13016,6 +13260,8 @@ where
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
+                    "activation-options.activation-url" => Some(("activationOptions.activationUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "activation-options.allow-reactivation" => Some(("activationOptions.allowReactivation", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "allow-multiple-users-per-object" => Some(("allowMultipleUsersPerObject", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "callback-options.update-request-url" => Some(("callbackOptions.updateRequestUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "callback-options.url" => Some(("callbackOptions.url", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -13173,7 +13419,7 @@ where
                     "word-mark.source-uri.localized-description.kind" => Some(("wordMark.sourceUri.localizedDescription.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "word-mark.source-uri.uri" => Some(("wordMark.sourceUri.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["allow-multiple-users-per-object", "animation-type", "callback-options", "class-template-info", "comments", "content-description", "country-code", "custom-carriage-label", "custom-coach-label", "custom-concession-category-label", "custom-confirmation-code-label", "custom-discount-message-label", "custom-fare-class-label", "custom-fare-name-label", "custom-other-restrictions-label", "custom-platform-label", "custom-purchase-face-value-label", "custom-purchase-price-label", "custom-purchase-receipt-number-label", "custom-route-restrictions-details-label", "custom-route-restrictions-label", "custom-seat-label", "custom-ticket-number-label", "custom-time-restrictions-label", "custom-transit-terminus-name-label", "custom-zone-label", "default-value", "description", "enable-single-leg-itinerary", "enable-smart-tap", "first-row-option", "hero-image", "hex-background-color", "homepage-uri", "id", "info-module-data", "issuer-name", "kind", "language", "language-override", "list-template-override", "localized-description", "localized-issuer-name", "logo", "multiple-devices-and-holders-allowed-status", "redemption-issuers", "review", "review-status", "security-animation", "show-last-update-time", "source-uri", "transit-operator-name", "transit-option", "transit-type", "update-request-url", "uri", "url", "value", "version", "view-unlock-requirement", "watermark", "word-mark"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["activation-options", "activation-url", "allow-multiple-users-per-object", "allow-reactivation", "animation-type", "callback-options", "class-template-info", "comments", "content-description", "country-code", "custom-carriage-label", "custom-coach-label", "custom-concession-category-label", "custom-confirmation-code-label", "custom-discount-message-label", "custom-fare-class-label", "custom-fare-name-label", "custom-other-restrictions-label", "custom-platform-label", "custom-purchase-face-value-label", "custom-purchase-price-label", "custom-purchase-receipt-number-label", "custom-route-restrictions-details-label", "custom-route-restrictions-label", "custom-seat-label", "custom-ticket-number-label", "custom-time-restrictions-label", "custom-transit-terminus-name-label", "custom-zone-label", "default-value", "description", "enable-single-leg-itinerary", "enable-smart-tap", "first-row-option", "hero-image", "hex-background-color", "homepage-uri", "id", "info-module-data", "issuer-name", "kind", "language", "language-override", "list-template-override", "localized-description", "localized-issuer-name", "logo", "multiple-devices-and-holders-allowed-status", "redemption-issuers", "review", "review-status", "security-animation", "show-last-update-time", "source-uri", "transit-operator-name", "transit-option", "transit-type", "update-request-url", "uri", "url", "value", "version", "view-unlock-requirement", "watermark", "word-mark"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -13408,6 +13654,7 @@ where
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
+                    "activation-status.state" => Some(("activationStatus.state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.android-app-link-info.app-logo-image.content-description.default-value.kind" => Some(("appLinkData.androidAppLinkInfo.appLogoImage.contentDescription.defaultValue.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.android-app-link-info.app-logo-image.content-description.default-value.language" => Some(("appLinkData.androidAppLinkInfo.appLogoImage.contentDescription.defaultValue.language", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.android-app-link-info.app-logo-image.content-description.default-value.value" => Some(("appLinkData.androidAppLinkInfo.appLogoImage.contentDescription.defaultValue.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -13499,6 +13746,8 @@ where
                     "barcode.type" => Some(("barcode.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "barcode.value" => Some(("barcode.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "class-id" => Some(("classId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "class-reference.activation-options.activation-url" => Some(("classReference.activationOptions.activationUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "class-reference.activation-options.allow-reactivation" => Some(("classReference.activationOptions.allowReactivation", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "class-reference.allow-multiple-users-per-object" => Some(("classReference.allowMultipleUsersPerObject", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "class-reference.callback-options.update-request-url" => Some(("classReference.callbackOptions.updateRequestUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "class-reference.callback-options.url" => Some(("classReference.callbackOptions.url", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -13664,6 +13913,7 @@ where
                     "custom-ticket-status.default-value.language" => Some(("customTicketStatus.defaultValue.language", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "custom-ticket-status.default-value.value" => Some(("customTicketStatus.defaultValue.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "custom-ticket-status.kind" => Some(("customTicketStatus.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "device-context.device-token" => Some(("deviceContext.deviceToken", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "disable-expiration-notification" => Some(("disableExpirationNotification", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "grouping-info.grouping-id" => Some(("groupingInfo.groupingId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "grouping-info.sort-index" => Some(("groupingInfo.sortIndex", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
@@ -13774,7 +14024,7 @@ where
                     "valid-time-interval.start.date" => Some(("validTimeInterval.start.date", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "version" => Some(("version", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id", "algorithm", "allow-multiple-users-per-object", "alternate-text", "android-app-link-info", "animation-type", "app-link-data", "app-logo-image", "app-target", "arrival-date-time", "barcode", "callback-options", "carriage", "class-id", "class-reference", "class-template-info", "coach", "comments", "concession-category", "confirmation-code", "content-description", "country-code", "currency-code", "custom-carriage-label", "custom-coach-label", "custom-concession-category", "custom-concession-category-label", "custom-confirmation-code-label", "custom-discount-message-label", "custom-fare-class", "custom-fare-class-label", "custom-fare-name-label", "custom-other-restrictions-label", "custom-platform-label", "custom-purchase-face-value-label", "custom-purchase-price-label", "custom-purchase-receipt-number-label", "custom-route-restrictions-details-label", "custom-route-restrictions-label", "custom-seat-label", "custom-ticket-number-label", "custom-ticket-status", "custom-time-restrictions-label", "custom-transit-terminus-name-label", "custom-zone-label", "date", "default-value", "departure-date-time", "description", "destination-name", "destination-station-code", "disable-expiration-notification", "discount-message", "enable-single-leg-itinerary", "enable-smart-tap", "end", "face-value", "fare-class", "fare-name", "first-row-option", "grouping-id", "grouping-info", "has-linked-device", "has-users", "hero-image", "hex-background-color", "homepage-uri", "id", "info-module-data", "ios-app-link-info", "issuer-name", "kind", "language", "language-override", "list-template-override", "localized-description", "localized-issuer-name", "logo", "micros", "multiple-devices-and-holders-allowed-status", "origin-name", "origin-station-code", "other-restrictions", "passenger-names", "passenger-type", "period-millis", "platform", "purchase-date-time", "purchase-details", "purchase-price", "purchase-receipt-number", "redemption-issuers", "render-encoding", "review", "review-status", "rotating-barcode", "route-restrictions", "route-restrictions-details", "seat", "seat-assignment", "security-animation", "show-code-text", "show-last-update-time", "smart-tap-redemption-value", "sort-index", "source-uri", "start", "state", "target-uri", "ticket-cost", "ticket-leg", "ticket-number", "ticket-restrictions", "ticket-seat", "ticket-status", "time-restrictions", "title", "totp-details", "transit-operator-name", "transit-option", "transit-terminus-name", "transit-type", "trip-id", "trip-type", "type", "update-request-url", "uri", "url", "valid-time-interval", "value", "value-pattern", "version", "view-unlock-requirement", "watermark", "web-app-link-info", "word-mark", "zone"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id", "activation-options", "activation-status", "activation-url", "algorithm", "allow-multiple-users-per-object", "allow-reactivation", "alternate-text", "android-app-link-info", "animation-type", "app-link-data", "app-logo-image", "app-target", "arrival-date-time", "barcode", "callback-options", "carriage", "class-id", "class-reference", "class-template-info", "coach", "comments", "concession-category", "confirmation-code", "content-description", "country-code", "currency-code", "custom-carriage-label", "custom-coach-label", "custom-concession-category", "custom-concession-category-label", "custom-confirmation-code-label", "custom-discount-message-label", "custom-fare-class", "custom-fare-class-label", "custom-fare-name-label", "custom-other-restrictions-label", "custom-platform-label", "custom-purchase-face-value-label", "custom-purchase-price-label", "custom-purchase-receipt-number-label", "custom-route-restrictions-details-label", "custom-route-restrictions-label", "custom-seat-label", "custom-ticket-number-label", "custom-ticket-status", "custom-time-restrictions-label", "custom-transit-terminus-name-label", "custom-zone-label", "date", "default-value", "departure-date-time", "description", "destination-name", "destination-station-code", "device-context", "device-token", "disable-expiration-notification", "discount-message", "enable-single-leg-itinerary", "enable-smart-tap", "end", "face-value", "fare-class", "fare-name", "first-row-option", "grouping-id", "grouping-info", "has-linked-device", "has-users", "hero-image", "hex-background-color", "homepage-uri", "id", "info-module-data", "ios-app-link-info", "issuer-name", "kind", "language", "language-override", "list-template-override", "localized-description", "localized-issuer-name", "logo", "micros", "multiple-devices-and-holders-allowed-status", "origin-name", "origin-station-code", "other-restrictions", "passenger-names", "passenger-type", "period-millis", "platform", "purchase-date-time", "purchase-details", "purchase-price", "purchase-receipt-number", "redemption-issuers", "render-encoding", "review", "review-status", "rotating-barcode", "route-restrictions", "route-restrictions-details", "seat", "seat-assignment", "security-animation", "show-code-text", "show-last-update-time", "smart-tap-redemption-value", "sort-index", "source-uri", "start", "state", "target-uri", "ticket-cost", "ticket-leg", "ticket-number", "ticket-restrictions", "ticket-seat", "ticket-status", "time-restrictions", "title", "totp-details", "transit-operator-name", "transit-option", "transit-terminus-name", "transit-type", "trip-id", "trip-type", "type", "update-request-url", "uri", "url", "valid-time-interval", "value", "value-pattern", "version", "view-unlock-requirement", "watermark", "web-app-link-info", "word-mark", "zone"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -13844,7 +14094,7 @@ where
                     call = call.token(value.unwrap_or(""));
                 },
                 "max-results" => {
-                    call = call.max_results(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
+                    call = call.max_results(        value.map(|v| arg_from_str(v, err, "max-results", "int32")).unwrap_or(-0));
                 },
                 "class-id" => {
                     call = call.class_id(value.unwrap_or(""));
@@ -13919,6 +14169,7 @@ where
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
+                    "activation-status.state" => Some(("activationStatus.state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.android-app-link-info.app-logo-image.content-description.default-value.kind" => Some(("appLinkData.androidAppLinkInfo.appLogoImage.contentDescription.defaultValue.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.android-app-link-info.app-logo-image.content-description.default-value.language" => Some(("appLinkData.androidAppLinkInfo.appLogoImage.contentDescription.defaultValue.language", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.android-app-link-info.app-logo-image.content-description.default-value.value" => Some(("appLinkData.androidAppLinkInfo.appLogoImage.contentDescription.defaultValue.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -14010,6 +14261,8 @@ where
                     "barcode.type" => Some(("barcode.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "barcode.value" => Some(("barcode.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "class-id" => Some(("classId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "class-reference.activation-options.activation-url" => Some(("classReference.activationOptions.activationUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "class-reference.activation-options.allow-reactivation" => Some(("classReference.activationOptions.allowReactivation", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "class-reference.allow-multiple-users-per-object" => Some(("classReference.allowMultipleUsersPerObject", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "class-reference.callback-options.update-request-url" => Some(("classReference.callbackOptions.updateRequestUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "class-reference.callback-options.url" => Some(("classReference.callbackOptions.url", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -14175,6 +14428,7 @@ where
                     "custom-ticket-status.default-value.language" => Some(("customTicketStatus.defaultValue.language", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "custom-ticket-status.default-value.value" => Some(("customTicketStatus.defaultValue.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "custom-ticket-status.kind" => Some(("customTicketStatus.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "device-context.device-token" => Some(("deviceContext.deviceToken", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "disable-expiration-notification" => Some(("disableExpirationNotification", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "grouping-info.grouping-id" => Some(("groupingInfo.groupingId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "grouping-info.sort-index" => Some(("groupingInfo.sortIndex", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
@@ -14285,7 +14539,7 @@ where
                     "valid-time-interval.start.date" => Some(("validTimeInterval.start.date", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "version" => Some(("version", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id", "algorithm", "allow-multiple-users-per-object", "alternate-text", "android-app-link-info", "animation-type", "app-link-data", "app-logo-image", "app-target", "arrival-date-time", "barcode", "callback-options", "carriage", "class-id", "class-reference", "class-template-info", "coach", "comments", "concession-category", "confirmation-code", "content-description", "country-code", "currency-code", "custom-carriage-label", "custom-coach-label", "custom-concession-category", "custom-concession-category-label", "custom-confirmation-code-label", "custom-discount-message-label", "custom-fare-class", "custom-fare-class-label", "custom-fare-name-label", "custom-other-restrictions-label", "custom-platform-label", "custom-purchase-face-value-label", "custom-purchase-price-label", "custom-purchase-receipt-number-label", "custom-route-restrictions-details-label", "custom-route-restrictions-label", "custom-seat-label", "custom-ticket-number-label", "custom-ticket-status", "custom-time-restrictions-label", "custom-transit-terminus-name-label", "custom-zone-label", "date", "default-value", "departure-date-time", "description", "destination-name", "destination-station-code", "disable-expiration-notification", "discount-message", "enable-single-leg-itinerary", "enable-smart-tap", "end", "face-value", "fare-class", "fare-name", "first-row-option", "grouping-id", "grouping-info", "has-linked-device", "has-users", "hero-image", "hex-background-color", "homepage-uri", "id", "info-module-data", "ios-app-link-info", "issuer-name", "kind", "language", "language-override", "list-template-override", "localized-description", "localized-issuer-name", "logo", "micros", "multiple-devices-and-holders-allowed-status", "origin-name", "origin-station-code", "other-restrictions", "passenger-names", "passenger-type", "period-millis", "platform", "purchase-date-time", "purchase-details", "purchase-price", "purchase-receipt-number", "redemption-issuers", "render-encoding", "review", "review-status", "rotating-barcode", "route-restrictions", "route-restrictions-details", "seat", "seat-assignment", "security-animation", "show-code-text", "show-last-update-time", "smart-tap-redemption-value", "sort-index", "source-uri", "start", "state", "target-uri", "ticket-cost", "ticket-leg", "ticket-number", "ticket-restrictions", "ticket-seat", "ticket-status", "time-restrictions", "title", "totp-details", "transit-operator-name", "transit-option", "transit-terminus-name", "transit-type", "trip-id", "trip-type", "type", "update-request-url", "uri", "url", "valid-time-interval", "value", "value-pattern", "version", "view-unlock-requirement", "watermark", "web-app-link-info", "word-mark", "zone"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id", "activation-options", "activation-status", "activation-url", "algorithm", "allow-multiple-users-per-object", "allow-reactivation", "alternate-text", "android-app-link-info", "animation-type", "app-link-data", "app-logo-image", "app-target", "arrival-date-time", "barcode", "callback-options", "carriage", "class-id", "class-reference", "class-template-info", "coach", "comments", "concession-category", "confirmation-code", "content-description", "country-code", "currency-code", "custom-carriage-label", "custom-coach-label", "custom-concession-category", "custom-concession-category-label", "custom-confirmation-code-label", "custom-discount-message-label", "custom-fare-class", "custom-fare-class-label", "custom-fare-name-label", "custom-other-restrictions-label", "custom-platform-label", "custom-purchase-face-value-label", "custom-purchase-price-label", "custom-purchase-receipt-number-label", "custom-route-restrictions-details-label", "custom-route-restrictions-label", "custom-seat-label", "custom-ticket-number-label", "custom-ticket-status", "custom-time-restrictions-label", "custom-transit-terminus-name-label", "custom-zone-label", "date", "default-value", "departure-date-time", "description", "destination-name", "destination-station-code", "device-context", "device-token", "disable-expiration-notification", "discount-message", "enable-single-leg-itinerary", "enable-smart-tap", "end", "face-value", "fare-class", "fare-name", "first-row-option", "grouping-id", "grouping-info", "has-linked-device", "has-users", "hero-image", "hex-background-color", "homepage-uri", "id", "info-module-data", "ios-app-link-info", "issuer-name", "kind", "language", "language-override", "list-template-override", "localized-description", "localized-issuer-name", "logo", "micros", "multiple-devices-and-holders-allowed-status", "origin-name", "origin-station-code", "other-restrictions", "passenger-names", "passenger-type", "period-millis", "platform", "purchase-date-time", "purchase-details", "purchase-price", "purchase-receipt-number", "redemption-issuers", "render-encoding", "review", "review-status", "rotating-barcode", "route-restrictions", "route-restrictions-details", "seat", "seat-assignment", "security-animation", "show-code-text", "show-last-update-time", "smart-tap-redemption-value", "sort-index", "source-uri", "start", "state", "target-uri", "ticket-cost", "ticket-leg", "ticket-number", "ticket-restrictions", "ticket-seat", "ticket-status", "time-restrictions", "title", "totp-details", "transit-operator-name", "transit-option", "transit-terminus-name", "transit-type", "trip-id", "trip-type", "type", "update-request-url", "uri", "url", "valid-time-interval", "value", "value-pattern", "version", "view-unlock-requirement", "watermark", "web-app-link-info", "word-mark", "zone"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -14368,6 +14622,7 @@ where
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
+                    "activation-status.state" => Some(("activationStatus.state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.android-app-link-info.app-logo-image.content-description.default-value.kind" => Some(("appLinkData.androidAppLinkInfo.appLogoImage.contentDescription.defaultValue.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.android-app-link-info.app-logo-image.content-description.default-value.language" => Some(("appLinkData.androidAppLinkInfo.appLogoImage.contentDescription.defaultValue.language", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.android-app-link-info.app-logo-image.content-description.default-value.value" => Some(("appLinkData.androidAppLinkInfo.appLogoImage.contentDescription.defaultValue.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -14459,6 +14714,8 @@ where
                     "barcode.type" => Some(("barcode.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "barcode.value" => Some(("barcode.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "class-id" => Some(("classId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "class-reference.activation-options.activation-url" => Some(("classReference.activationOptions.activationUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "class-reference.activation-options.allow-reactivation" => Some(("classReference.activationOptions.allowReactivation", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "class-reference.allow-multiple-users-per-object" => Some(("classReference.allowMultipleUsersPerObject", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "class-reference.callback-options.update-request-url" => Some(("classReference.callbackOptions.updateRequestUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "class-reference.callback-options.url" => Some(("classReference.callbackOptions.url", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -14624,6 +14881,7 @@ where
                     "custom-ticket-status.default-value.language" => Some(("customTicketStatus.defaultValue.language", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "custom-ticket-status.default-value.value" => Some(("customTicketStatus.defaultValue.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "custom-ticket-status.kind" => Some(("customTicketStatus.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "device-context.device-token" => Some(("deviceContext.deviceToken", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "disable-expiration-notification" => Some(("disableExpirationNotification", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "grouping-info.grouping-id" => Some(("groupingInfo.groupingId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "grouping-info.sort-index" => Some(("groupingInfo.sortIndex", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
@@ -14734,7 +14992,7 @@ where
                     "valid-time-interval.start.date" => Some(("validTimeInterval.start.date", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "version" => Some(("version", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id", "algorithm", "allow-multiple-users-per-object", "alternate-text", "android-app-link-info", "animation-type", "app-link-data", "app-logo-image", "app-target", "arrival-date-time", "barcode", "callback-options", "carriage", "class-id", "class-reference", "class-template-info", "coach", "comments", "concession-category", "confirmation-code", "content-description", "country-code", "currency-code", "custom-carriage-label", "custom-coach-label", "custom-concession-category", "custom-concession-category-label", "custom-confirmation-code-label", "custom-discount-message-label", "custom-fare-class", "custom-fare-class-label", "custom-fare-name-label", "custom-other-restrictions-label", "custom-platform-label", "custom-purchase-face-value-label", "custom-purchase-price-label", "custom-purchase-receipt-number-label", "custom-route-restrictions-details-label", "custom-route-restrictions-label", "custom-seat-label", "custom-ticket-number-label", "custom-ticket-status", "custom-time-restrictions-label", "custom-transit-terminus-name-label", "custom-zone-label", "date", "default-value", "departure-date-time", "description", "destination-name", "destination-station-code", "disable-expiration-notification", "discount-message", "enable-single-leg-itinerary", "enable-smart-tap", "end", "face-value", "fare-class", "fare-name", "first-row-option", "grouping-id", "grouping-info", "has-linked-device", "has-users", "hero-image", "hex-background-color", "homepage-uri", "id", "info-module-data", "ios-app-link-info", "issuer-name", "kind", "language", "language-override", "list-template-override", "localized-description", "localized-issuer-name", "logo", "micros", "multiple-devices-and-holders-allowed-status", "origin-name", "origin-station-code", "other-restrictions", "passenger-names", "passenger-type", "period-millis", "platform", "purchase-date-time", "purchase-details", "purchase-price", "purchase-receipt-number", "redemption-issuers", "render-encoding", "review", "review-status", "rotating-barcode", "route-restrictions", "route-restrictions-details", "seat", "seat-assignment", "security-animation", "show-code-text", "show-last-update-time", "smart-tap-redemption-value", "sort-index", "source-uri", "start", "state", "target-uri", "ticket-cost", "ticket-leg", "ticket-number", "ticket-restrictions", "ticket-seat", "ticket-status", "time-restrictions", "title", "totp-details", "transit-operator-name", "transit-option", "transit-terminus-name", "transit-type", "trip-id", "trip-type", "type", "update-request-url", "uri", "url", "valid-time-interval", "value", "value-pattern", "version", "view-unlock-requirement", "watermark", "web-app-link-info", "word-mark", "zone"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id", "activation-options", "activation-status", "activation-url", "algorithm", "allow-multiple-users-per-object", "allow-reactivation", "alternate-text", "android-app-link-info", "animation-type", "app-link-data", "app-logo-image", "app-target", "arrival-date-time", "barcode", "callback-options", "carriage", "class-id", "class-reference", "class-template-info", "coach", "comments", "concession-category", "confirmation-code", "content-description", "country-code", "currency-code", "custom-carriage-label", "custom-coach-label", "custom-concession-category", "custom-concession-category-label", "custom-confirmation-code-label", "custom-discount-message-label", "custom-fare-class", "custom-fare-class-label", "custom-fare-name-label", "custom-other-restrictions-label", "custom-platform-label", "custom-purchase-face-value-label", "custom-purchase-price-label", "custom-purchase-receipt-number-label", "custom-route-restrictions-details-label", "custom-route-restrictions-label", "custom-seat-label", "custom-ticket-number-label", "custom-ticket-status", "custom-time-restrictions-label", "custom-transit-terminus-name-label", "custom-zone-label", "date", "default-value", "departure-date-time", "description", "destination-name", "destination-station-code", "device-context", "device-token", "disable-expiration-notification", "discount-message", "enable-single-leg-itinerary", "enable-smart-tap", "end", "face-value", "fare-class", "fare-name", "first-row-option", "grouping-id", "grouping-info", "has-linked-device", "has-users", "hero-image", "hex-background-color", "homepage-uri", "id", "info-module-data", "ios-app-link-info", "issuer-name", "kind", "language", "language-override", "list-template-override", "localized-description", "localized-issuer-name", "logo", "micros", "multiple-devices-and-holders-allowed-status", "origin-name", "origin-station-code", "other-restrictions", "passenger-names", "passenger-type", "period-millis", "platform", "purchase-date-time", "purchase-details", "purchase-price", "purchase-receipt-number", "redemption-issuers", "render-encoding", "review", "review-status", "rotating-barcode", "route-restrictions", "route-restrictions-details", "seat", "seat-assignment", "security-animation", "show-code-text", "show-last-update-time", "smart-tap-redemption-value", "sort-index", "source-uri", "start", "state", "target-uri", "ticket-cost", "ticket-leg", "ticket-number", "ticket-restrictions", "ticket-seat", "ticket-status", "time-restrictions", "title", "totp-details", "transit-operator-name", "transit-option", "transit-terminus-name", "transit-type", "trip-id", "trip-type", "type", "update-request-url", "uri", "url", "valid-time-interval", "value", "value-pattern", "version", "view-unlock-requirement", "watermark", "web-app-link-info", "word-mark", "zone"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -14745,6 +15003,104 @@ where
         }
         let mut request: api::TransitObject = json::value::from_value(object).unwrap();
         let mut call = self.hub.transitobject().update(request, opt.value_of("resource-id").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _walletobjects_v1_private_content_upload_private_data(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "issuer-id" => Some(("issuerId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "text.body.default-value.kind" => Some(("text.body.defaultValue.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "text.body.default-value.language" => Some(("text.body.defaultValue.language", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "text.body.default-value.value" => Some(("text.body.defaultValue.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "text.body.kind" => Some(("text.body.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "text.header.default-value.kind" => Some(("text.header.defaultValue.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "text.header.default-value.language" => Some(("text.header.defaultValue.language", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "text.header.default-value.value" => Some(("text.header.defaultValue.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "text.header.kind" => Some(("text.header.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "uri.description.default-value.kind" => Some(("uri.description.defaultValue.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "uri.description.default-value.language" => Some(("uri.description.defaultValue.language", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "uri.description.default-value.value" => Some(("uri.description.defaultValue.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "uri.description.kind" => Some(("uri.description.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "uri.uri" => Some(("uri.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["body", "default-value", "description", "header", "issuer-id", "kind", "language", "text", "uri", "value"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::UploadPrivateDataRequest = json::value::from_value(object).unwrap();
+        let mut call = self.hub.walletobjects().v1_private_content_upload_private_data(request);
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
@@ -15093,6 +15449,17 @@ where
                     }
                 }
             },
+            ("media", Some(opt)) => {
+                match opt.subcommand() {
+                    ("upload", Some(opt)) => {
+                        call_result = self._media_upload(opt, dry_run, &mut err).await;
+                    },
+                    _ => {
+                        err.issues.push(CLIError::MissingMethodError("media".to_string()));
+                        writeln!(io::stderr(), "{}\n", opt.usage()).ok();
+                    }
+                }
+            },
             ("offerclass", Some(opt)) => {
                 match opt.subcommand() {
                     ("addmessage", Some(opt)) => {
@@ -15222,6 +15589,17 @@ where
                     }
                 }
             },
+            ("walletobjects", Some(opt)) => {
+                match opt.subcommand() {
+                    ("v1-private-content-upload-private-data", Some(opt)) => {
+                        call_result = self._walletobjects_v1_private_content_upload_private_data(opt, dry_run, &mut err).await;
+                    },
+                    _ => {
+                        err.issues.push(CLIError::MissingMethodError("walletobjects".to_string()));
+                        writeln!(io::stderr(), "{}\n", opt.usage()).ok();
+                    }
+                }
+            },
             _ => {
                 err.issues.push(CLIError::MissingCommandError);
                 writeln!(io::stderr(), "{}\n", self.opt.usage()).ok();
@@ -15294,6 +15672,7 @@ where
 #[tokio::main]
 async fn main() {
     let mut exit_status = 0i32;
+    let upload_value_names = ["mode", "file"];
     let arg_data = [
         ("eventticketclass", "methods: 'addmessage', 'get', 'insert', 'list', 'patch' and 'update'", vec![
             ("addmessage",
@@ -16909,6 +17288,43 @@ async fn main() {
                   ]),
             ]),
         
+        ("media", "methods: 'upload'", vec![
+            ("upload",
+                    Some(r##"Uploads a private image and returns an Id to be used in its place."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_walletobjects1_cli/media_upload",
+                  vec![
+                    (Some(r##"issuer-id"##),
+                     None,
+                     Some(r##"The ID of the issuer sending the image."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"mode"##),
+                     Some(r##"u"##),
+                     Some(r##"Specify the upload protocol (simple) and the file to upload"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ]),
+        
         ("offerclass", "methods: 'addmessage', 'get', 'insert', 'list', 'patch' and 'update'", vec![
             ("addmessage",
                     Some(r##"Adds a message to the offer class referenced by the given class ID."##),
@@ -17575,11 +17991,36 @@ async fn main() {
                   ]),
             ]),
         
+        ("walletobjects", "methods: 'v1-private-content-upload-private-data'", vec![
+            ("v1-private-content-upload-private-data",
+                    Some(r##"Upload private data (text or URI) and returns an Id to be used in its place."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_walletobjects1_cli/walletobjects_v1-private-content-upload-private-data",
+                  vec![
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ]),
+        
     ];
     
     let mut app = App::new("walletobjects1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("4.0.4+20220928")
+           .version("5.0.2+20230124")
            .about("API for issuers to save and manage Google Wallet Objects.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_walletobjects1_cli")
            .arg(Arg::with_name("url")
@@ -17631,6 +18072,17 @@ async fn main() {
                        }
                        if let &Some(multi) = multi {
                            arg = arg.multiple(multi);
+                       }
+                       if arg_name_str == "mode" {
+                           arg = arg.number_of_values(2);
+                           arg = arg.value_names(&upload_value_names);
+           
+                           scmd = scmd.arg(Arg::with_name("mime")
+                                               .short("m")
+                                               .requires("mode")
+                                               .required(false)
+                                               .help("The file's mime time, like 'application/octet-stream'")
+                                               .takes_value(true));
                        }
                        scmd = scmd.arg(arg);
                    }

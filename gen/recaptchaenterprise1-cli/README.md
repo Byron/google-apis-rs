@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Recaptcha Enterprise* API at revision *20220226*. The CLI is at version *4.0.1*.
+This documentation was generated from the *Recaptcha Enterprise* API at revision *20230115*. The CLI is at version *5.0.2*.
 
 ```bash
 recaptchaenterprise1 [options]
@@ -39,6 +39,7 @@ recaptchaenterprise1 [options]
                 keys-list <parent> [-p <v>]... [-o <out>]
                 keys-migrate <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 keys-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                keys-retrieve-legacy-secret-key <key> [-p <v>]... [-o <out>]
                 relatedaccountgroupmemberships-search <project> (-r <kv>)... [-p <v>]... [-o <out>]
                 relatedaccountgroups-list <parent> [-p <v>]... [-o <out>]
                 relatedaccountgroups-memberships-list <parent> [-p <v>]... [-o <out>]

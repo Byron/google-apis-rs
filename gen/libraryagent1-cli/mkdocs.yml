@@ -1,4 +1,4 @@
-site_name: Libraryagent v4.0.1+20220305
+site_name: Libraryagent v5.0.2+20230123
 site_url: http://byron.github.io/google-apis-rs/google-libraryagent1-cli
 site_description: A complete library to interact with Libraryagent (protocol v1)
 
@@ -7,14 +7,15 @@ repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/libraryagent1-cl
 docs_dir: docs
 site_dir: build_html
 
-pages:
-- ['index.md', 'Home']
-- ['shelves_books-borrow.md', 'Shelves', 'Books Borrow']
-- ['shelves_books-get.md', 'Shelves', 'Books Get']
-- ['shelves_books-list.md', 'Shelves', 'Books List']
-- ['shelves_books-return.md', 'Shelves', 'Books Return']
-- ['shelves_get.md', 'Shelves', 'Get']
-- ['shelves_list.md', 'Shelves', 'List']
+nav:
+- Home: 'index.md'
+- 'Shelves':
+    - 'Books Borrow': 'shelves_books-borrow.md'
+    - 'Books Get': 'shelves_books-get.md'
+    - 'Books List': 'shelves_books-list.md'
+    - 'Books Return': 'shelves_books-return.md'
+    - 'Get': 'shelves_get.md'
+    - 'List': 'shelves_list.md'
 
 theme: readthedocs
 

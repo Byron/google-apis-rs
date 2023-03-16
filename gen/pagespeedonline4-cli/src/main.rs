@@ -3,8 +3,6 @@
 // DO NOT EDIT !
 #![allow(unused_variables, unused_imports, dead_code, unused_mut)]
 
-extern crate tokio;
-
 #[macro_use]
 extern crate clap;
 
@@ -12,9 +10,10 @@ use std::env;
 use std::io::{self, Write};
 use clap::{App, SubCommand, Arg};
 
-use google_pagespeedonline4::{api, Error, oauth2};
+use google_pagespeedonline4::{api, Error, oauth2, client::chrono, FieldMask};
 
-mod client;
+
+use google_clis_common as client;
 
 use client::{InvalidOptionsError, CLIError, arg_from_str, writer_from_opts, parse_kv_arg,
           input_file_from_opts, input_mime_from_opts, FieldCursor, FieldError, CallType, UploadProtocol,
@@ -67,10 +66,10 @@ where
                     call = call.strategy(value.unwrap_or(""));
                 },
                 "snapshots" => {
-                    call = call.snapshots(arg_from_str(value.unwrap_or("false"), err, "snapshots", "boolean"));
+                    call = call.snapshots(        value.map(|v| arg_from_str(v, err, "snapshots", "boolean")).unwrap_or(false));
                 },
                 "screenshot" => {
-                    call = call.screenshot(arg_from_str(value.unwrap_or("false"), err, "screenshot", "boolean"));
+                    call = call.screenshot(        value.map(|v| arg_from_str(v, err, "screenshot", "boolean")).unwrap_or(false));
                 },
                 "rule" => {
                     call = call.add_rule(value.unwrap_or(""));
@@ -79,7 +78,7 @@ where
                     call = call.locale(value.unwrap_or(""));
                 },
                 "filter-third-party-resources" => {
-                    call = call.filter_third_party_resources(arg_from_str(value.unwrap_or("false"), err, "filter-third-party-resources", "boolean"));
+                    call = call.filter_third_party_resources(        value.map(|v| arg_from_str(v, err, "filter-third-party-resources", "boolean")).unwrap_or(false));
                 },
                 _ => {
                     let mut found = false;
@@ -240,7 +239,7 @@ async fn main() {
     
     let mut app = App::new("pagespeedonline4")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("4.0.1+20191206")
+           .version("5.0.2+20191206")
            .about("Analyzes the performance of a web page and provides tailored suggestions to make that page faster.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_pagespeedonline4_cli")
            .arg(Arg::with_name("folder")

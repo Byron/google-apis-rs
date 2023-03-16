@@ -25,13 +25,17 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Tag Manager* API at revision *20220301*. The CLI is at version *4.0.1*.
+This documentation was generated from the *Tag Manager* API at revision *20230123*. The CLI is at version *5.0.2*.
 
 ```bash
 tagmanager2 [options]
         accounts
+                containers-combine <path> [-p <v>]... [-o <out>]
                 containers-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 containers-delete <path> [-p <v>]...
+                containers-destinations-get <path> [-p <v>]... [-o <out>]
+                containers-destinations-link <parent> [-p <v>]... [-o <out>]
+                containers-destinations-list <parent> [-p <v>]... [-o <out>]
                 containers-environments-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 containers-environments-delete <path> [-p <v>]...
                 containers-environments-get <path> [-p <v>]... [-o <out>]
@@ -40,6 +44,9 @@ tagmanager2 [options]
                 containers-environments-update <path> (-r <kv>)... [-p <v>]... [-o <out>]
                 containers-get <path> [-p <v>]... [-o <out>]
                 containers-list <parent> [-p <v>]... [-o <out>]
+                containers-lookup [-p <v>]... [-o <out>]
+                containers-move-tag-id <path> [-p <v>]... [-o <out>]
+                containers-snippet <path> [-p <v>]... [-o <out>]
                 containers-update <path> (-r <kv>)... [-p <v>]... [-o <out>]
                 containers-version-headers-latest <parent> [-p <v>]... [-o <out>]
                 containers-version-headers-list <parent> [-p <v>]... [-o <out>]
@@ -73,6 +80,11 @@ tagmanager2 [options]
                 containers-workspaces-folders-update <path> (-r <kv>)... [-p <v>]... [-o <out>]
                 containers-workspaces-get <path> [-p <v>]... [-o <out>]
                 containers-workspaces-get-status <path> [-p <v>]... [-o <out>]
+                containers-workspaces-gtag-config-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                containers-workspaces-gtag-config-delete <path> [-p <v>]...
+                containers-workspaces-gtag-config-get <path> [-p <v>]... [-o <out>]
+                containers-workspaces-gtag-config-list <parent> [-p <v>]... [-o <out>]
+                containers-workspaces-gtag-config-update <path> (-r <kv>)... [-p <v>]... [-o <out>]
                 containers-workspaces-list <parent> [-p <v>]... [-o <out>]
                 containers-workspaces-quick-preview <path> [-p <v>]... [-o <out>]
                 containers-workspaces-resolve-conflict <path> (-r <kv>)... [-p <v>]...

@@ -25,11 +25,12 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Connectors* API at revision *20220214*. The CLI is at version *4.0.1*.
+This documentation was generated from the *Connectors* API at revision *20230103*. The CLI is at version *5.0.2*.
 
 ```bash
 connectors1 [options]
         projects
+                locations-connections-connection-schema-metadata-refresh <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-connections-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-connections-delete <name> [-p <v>]... [-o <out>]
                 locations-connections-get <name> [-p <v>]... [-o <out>]
@@ -43,18 +44,18 @@ connectors1 [options]
                 locations-connections-test-iam-permissions <resource> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-get <name> [-p <v>]... [-o <out>]
                 locations-get-runtime-config <name> [-p <v>]... [-o <out>]
-                locations-global-providers-connectors-get <name> [-p <v>]... [-o <out>]
-                locations-global-providers-connectors-list <parent> [-p <v>]... [-o <out>]
-                locations-global-providers-connectors-versions-get <name> [-p <v>]... [-o <out>]
-                locations-global-providers-connectors-versions-list <parent> [-p <v>]... [-o <out>]
-                locations-global-providers-get <name> [-p <v>]... [-o <out>]
-                locations-global-providers-list <parent> [-p <v>]... [-o <out>]
                 locations-list <name> [-p <v>]... [-o <out>]
                 locations-operations-cancel <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-operations-delete <name> [-p <v>]... [-o <out>]
                 locations-operations-get <name> [-p <v>]... [-o <out>]
                 locations-operations-list <name> [-p <v>]... [-o <out>]
+                locations-providers-connectors-get <name> [-p <v>]... [-o <out>]
+                locations-providers-connectors-list <parent> [-p <v>]... [-o <out>]
+                locations-providers-connectors-versions-get <name> [-p <v>]... [-o <out>]
+                locations-providers-connectors-versions-list <parent> [-p <v>]... [-o <out>]
+                locations-providers-get <name> [-p <v>]... [-o <out>]
                 locations-providers-get-iam-policy <resource> [-p <v>]... [-o <out>]
+                locations-providers-list <parent> [-p <v>]... [-o <out>]
                 locations-providers-set-iam-policy <resource> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-providers-test-iam-permissions <resource> (-r <kv>)... [-p <v>]... [-o <out>]
   connectors1 --help

@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Walletobjects* API at revision *20220928*. The CLI is at version *4.0.4*.
+This documentation was generated from the *Walletobjects* API at revision *20230124*. The CLI is at version *5.0.2*.
 
 ```bash
 walletobjects1 [options]
@@ -107,6 +107,8 @@ walletobjects1 [options]
                 modifylinkedofferobjects <resource-id> (-r <kv>)... [-p <v>]... [-o <out>]
                 patch <resource-id> (-r <kv>)... [-p <v>]... [-o <out>]
                 update <resource-id> (-r <kv>)... [-p <v>]... [-o <out>]
+        media
+                upload <issuer-id> (-r <kv>)... (-u simple -f <file> [-m <mime>]) [-p <v>]... [-o <out>]
         offerclass
                 addmessage <resource-id> (-r <kv>)... [-p <v>]... [-o <out>]
                 get <resource-id> [-p <v>]... [-o <out>]
@@ -140,6 +142,8 @@ walletobjects1 [options]
                 list [-p <v>]... [-o <out>]
                 patch <resource-id> (-r <kv>)... [-p <v>]... [-o <out>]
                 update <resource-id> (-r <kv>)... [-p <v>]... [-o <out>]
+        walletobjects
+                v1-private-content-upload-private-data (-r <kv>)... [-p <v>]... [-o <out>]
   walletobjects1 --help
 
 Configuration:

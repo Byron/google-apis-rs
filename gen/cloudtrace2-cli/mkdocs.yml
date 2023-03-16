@@ -1,4 +1,4 @@
-site_name: Cloud Trace v4.0.1+20220224
+site_name: Cloud Trace v5.0.2+20230112
 site_url: http://byron.github.io/google-apis-rs/google-cloudtrace2-cli
 site_description: A complete library to interact with Cloud Trace (protocol v2)
 
@@ -7,10 +7,11 @@ repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/cloudtrace2-cli
 docs_dir: docs
 site_dir: build_html
 
-pages:
-- ['index.md', 'Home']
-- ['projects_traces-batch-write.md', 'Projects', 'Traces Batch Write']
-- ['projects_traces-spans-create-span.md', 'Projects', 'Traces Spans Create Span']
+nav:
+- Home: 'index.md'
+- 'Projects':
+    - 'Traces Batch Write': 'projects_traces-batch-write.md'
+    - 'Traces Spans Create Span': 'projects_traces-spans-create-span.md'
 
 theme: readthedocs
 

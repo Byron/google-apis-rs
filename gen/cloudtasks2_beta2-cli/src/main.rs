@@ -3,8 +3,6 @@
 // DO NOT EDIT !
 #![allow(unused_variables, unused_imports, dead_code, unused_mut)]
 
-extern crate tokio;
-
 #[macro_use]
 extern crate clap;
 
@@ -12,9 +10,10 @@ use std::env;
 use std::io::{self, Write};
 use clap::{App, SubCommand, Arg};
 
-use google_cloudtasks2_beta2::{api, Error, oauth2};
+use google_cloudtasks2_beta2::{api, Error, oauth2, client::chrono, FieldMask};
 
-mod client;
+
+use google_clis_common as client;
 
 use client::{InvalidOptionsError, CLIError, arg_from_str, writer_from_opts, parse_kv_arg,
           input_file_from_opts, input_mime_from_opts, FieldCursor, FieldError, CallType, UploadProtocol,
@@ -51,6 +50,96 @@ where
     S::Future: Send + Unpin + 'static,
     S::Error: Into<Box<dyn StdError + Send + Sync>>,
 {
+    async fn _api_queue_update(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "content-type" => Some(("contentType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "data" => Some(("data", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["content-type", "data"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::HttpBody = json::value::from_value(object).unwrap();
+        let mut call = self.hub.api().queue_update(request);
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "app-id" => {
+                    call = call.app_id(value.unwrap_or(""));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["app-id"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
     async fn _projects_locations_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.projects().locations_get(opt.value_of("name").unwrap_or(""));
@@ -113,7 +202,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 "filter" => {
                     call = call.filter(value.unwrap_or(""));
@@ -192,6 +281,17 @@ where
                     "app-engine-http-target.app-engine-routing-override.instance" => Some(("appEngineHttpTarget.appEngineRoutingOverride.instance", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-engine-http-target.app-engine-routing-override.service" => Some(("appEngineHttpTarget.appEngineRoutingOverride.service", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-engine-http-target.app-engine-routing-override.version" => Some(("appEngineHttpTarget.appEngineRoutingOverride.version", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "http-target.http-method" => Some(("httpTarget.httpMethod", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "http-target.oauth-token.scope" => Some(("httpTarget.oauthToken.scope", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "http-target.oauth-token.service-account-email" => Some(("httpTarget.oauthToken.serviceAccountEmail", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "http-target.oidc-token.audience" => Some(("httpTarget.oidcToken.audience", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "http-target.oidc-token.service-account-email" => Some(("httpTarget.oidcToken.serviceAccountEmail", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "http-target.uri-override.host" => Some(("httpTarget.uriOverride.host", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "http-target.uri-override.path-override.path" => Some(("httpTarget.uriOverride.pathOverride.path", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "http-target.uri-override.port" => Some(("httpTarget.uriOverride.port", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "http-target.uri-override.query-override.query-params" => Some(("httpTarget.uriOverride.queryOverride.queryParams", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "http-target.uri-override.scheme" => Some(("httpTarget.uriOverride.scheme", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "http-target.uri-override.uri-override-enforce-mode" => Some(("httpTarget.uriOverride.uriOverrideEnforceMode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "purge-time" => Some(("purgeTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "rate-limits.max-burst-size" => Some(("rateLimits.maxBurstSize", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
@@ -212,7 +312,7 @@ where
                     "task-ttl" => Some(("taskTtl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "tombstone-ttl" => Some(("tombstoneTtl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["app-engine-http-target", "app-engine-routing-override", "concurrent-dispatches-count", "effective-execution-rate", "executed-last-minute-count", "host", "instance", "max-attempts", "max-backoff", "max-burst-size", "max-concurrent-tasks", "max-doublings", "max-retry-duration", "max-tasks-dispatched-per-second", "min-backoff", "name", "oldest-estimated-arrival-time", "purge-time", "rate-limits", "retry-config", "service", "state", "stats", "task-ttl", "tasks-count", "tombstone-ttl", "unlimited-attempts", "version"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["app-engine-http-target", "app-engine-routing-override", "audience", "concurrent-dispatches-count", "effective-execution-rate", "executed-last-minute-count", "host", "http-method", "http-target", "instance", "max-attempts", "max-backoff", "max-burst-size", "max-concurrent-tasks", "max-doublings", "max-retry-duration", "max-tasks-dispatched-per-second", "min-backoff", "name", "oauth-token", "oidc-token", "oldest-estimated-arrival-time", "path", "path-override", "port", "purge-time", "query-override", "query-params", "rate-limits", "retry-config", "scheme", "scope", "service", "service-account-email", "state", "stats", "task-ttl", "tasks-count", "tombstone-ttl", "unlimited-attempts", "uri-override", "uri-override-enforce-mode", "version"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -331,7 +431,7 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "read-mask" => {
-                    call = call.read_mask(value.unwrap_or(""));
+                    call = call.read_mask(        value.map(|v| arg_from_str(v, err, "read-mask", "google-fieldmask")).unwrap_or(FieldMask::default()));
                 },
                 _ => {
                     let mut found = false;
@@ -472,13 +572,13 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "read-mask" => {
-                    call = call.read_mask(value.unwrap_or(""));
+                    call = call.read_mask(        value.map(|v| arg_from_str(v, err, "read-mask", "google-fieldmask")).unwrap_or(FieldMask::default()));
                 },
                 "page-token" => {
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 "filter" => {
                     call = call.filter(value.unwrap_or(""));
@@ -557,6 +657,17 @@ where
                     "app-engine-http-target.app-engine-routing-override.instance" => Some(("appEngineHttpTarget.appEngineRoutingOverride.instance", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-engine-http-target.app-engine-routing-override.service" => Some(("appEngineHttpTarget.appEngineRoutingOverride.service", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-engine-http-target.app-engine-routing-override.version" => Some(("appEngineHttpTarget.appEngineRoutingOverride.version", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "http-target.http-method" => Some(("httpTarget.httpMethod", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "http-target.oauth-token.scope" => Some(("httpTarget.oauthToken.scope", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "http-target.oauth-token.service-account-email" => Some(("httpTarget.oauthToken.serviceAccountEmail", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "http-target.oidc-token.audience" => Some(("httpTarget.oidcToken.audience", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "http-target.oidc-token.service-account-email" => Some(("httpTarget.oidcToken.serviceAccountEmail", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "http-target.uri-override.host" => Some(("httpTarget.uriOverride.host", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "http-target.uri-override.path-override.path" => Some(("httpTarget.uriOverride.pathOverride.path", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "http-target.uri-override.port" => Some(("httpTarget.uriOverride.port", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "http-target.uri-override.query-override.query-params" => Some(("httpTarget.uriOverride.queryOverride.queryParams", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "http-target.uri-override.scheme" => Some(("httpTarget.uriOverride.scheme", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "http-target.uri-override.uri-override-enforce-mode" => Some(("httpTarget.uriOverride.uriOverrideEnforceMode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "purge-time" => Some(("purgeTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "rate-limits.max-burst-size" => Some(("rateLimits.maxBurstSize", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
@@ -577,7 +688,7 @@ where
                     "task-ttl" => Some(("taskTtl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "tombstone-ttl" => Some(("tombstoneTtl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["app-engine-http-target", "app-engine-routing-override", "concurrent-dispatches-count", "effective-execution-rate", "executed-last-minute-count", "host", "instance", "max-attempts", "max-backoff", "max-burst-size", "max-concurrent-tasks", "max-doublings", "max-retry-duration", "max-tasks-dispatched-per-second", "min-backoff", "name", "oldest-estimated-arrival-time", "purge-time", "rate-limits", "retry-config", "service", "state", "stats", "task-ttl", "tasks-count", "tombstone-ttl", "unlimited-attempts", "version"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["app-engine-http-target", "app-engine-routing-override", "audience", "concurrent-dispatches-count", "effective-execution-rate", "executed-last-minute-count", "host", "http-method", "http-target", "instance", "max-attempts", "max-backoff", "max-burst-size", "max-concurrent-tasks", "max-doublings", "max-retry-duration", "max-tasks-dispatched-per-second", "min-backoff", "name", "oauth-token", "oidc-token", "oldest-estimated-arrival-time", "path", "path-override", "port", "purge-time", "query-override", "query-params", "rate-limits", "retry-config", "scheme", "scope", "service", "service-account-email", "state", "stats", "task-ttl", "tasks-count", "tombstone-ttl", "unlimited-attempts", "uri-override", "uri-override-enforce-mode", "version"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -592,7 +703,7 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "update-mask" => {
-                    call = call.update_mask(value.unwrap_or(""));
+                    call = call.update_mask(        value.map(|v| arg_from_str(v, err, "update-mask", "google-fieldmask")).unwrap_or(FieldMask::default()));
                 },
                 _ => {
                     let mut found = false;
@@ -1064,6 +1175,92 @@ where
         }
     }
 
+    async fn _projects_locations_queues_tasks_buffer(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "body.content-type" => Some(("body.contentType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "body.data" => Some(("body.data", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["body", "content-type", "data"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::BufferTaskRequest = json::value::from_value(object).unwrap();
+        let mut call = self.hub.projects().locations_queues_tasks_buffer(request, opt.value_of("queue").unwrap_or(""), opt.value_of("task-id").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
     async fn _projects_locations_queues_tasks_cancel_lease(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
@@ -1183,6 +1380,14 @@ where
                     "task.app-engine-http-request.payload" => Some(("task.appEngineHttpRequest.payload", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "task.app-engine-http-request.relative-url" => Some(("task.appEngineHttpRequest.relativeUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "task.create-time" => Some(("task.createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "task.http-request.body" => Some(("task.httpRequest.body", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "task.http-request.headers" => Some(("task.httpRequest.headers", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "task.http-request.http-method" => Some(("task.httpRequest.httpMethod", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "task.http-request.oauth-token.scope" => Some(("task.httpRequest.oauthToken.scope", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "task.http-request.oauth-token.service-account-email" => Some(("task.httpRequest.oauthToken.serviceAccountEmail", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "task.http-request.oidc-token.audience" => Some(("task.httpRequest.oidcToken.audience", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "task.http-request.oidc-token.service-account-email" => Some(("task.httpRequest.oidcToken.serviceAccountEmail", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "task.http-request.url" => Some(("task.httpRequest.url", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "task.name" => Some(("task.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "task.pull-message.payload" => Some(("task.pullMessage.payload", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "task.pull-message.tag" => Some(("task.pullMessage.tag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -1201,7 +1406,7 @@ where
                     "task.status.last-attempt-status.schedule-time" => Some(("task.status.lastAttemptStatus.scheduleTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "task.view" => Some(("task.view", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["app-engine-http-request", "app-engine-routing", "attempt-dispatch-count", "attempt-response-count", "code", "create-time", "dispatch-time", "first-attempt-status", "headers", "host", "http-method", "instance", "last-attempt-status", "message", "name", "payload", "pull-message", "relative-url", "response-status", "response-time", "response-view", "schedule-time", "service", "status", "tag", "task", "version", "view"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["app-engine-http-request", "app-engine-routing", "attempt-dispatch-count", "attempt-response-count", "audience", "body", "code", "create-time", "dispatch-time", "first-attempt-status", "headers", "host", "http-method", "http-request", "instance", "last-attempt-status", "message", "name", "oauth-token", "oidc-token", "payload", "pull-message", "relative-url", "response-status", "response-time", "response-view", "schedule-time", "scope", "service", "service-account-email", "status", "tag", "task", "url", "version", "view"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1470,7 +1675,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -1781,6 +1986,17 @@ where
         let mut call_result: Result<(), DoitError> = Ok(());
         let mut err_opt: Option<InvalidOptionsError> = None;
         match self.opt.subcommand() {
+            ("api", Some(opt)) => {
+                match opt.subcommand() {
+                    ("queue-update", Some(opt)) => {
+                        call_result = self._api_queue_update(opt, dry_run, &mut err).await;
+                    },
+                    _ => {
+                        err.issues.push(CLIError::MissingMethodError("api".to_string()));
+                        writeln!(io::stderr(), "{}\n", opt.usage()).ok();
+                    }
+                }
+            },
             ("projects", Some(opt)) => {
                 match opt.subcommand() {
                     ("locations-get", Some(opt)) => {
@@ -1821,6 +2037,9 @@ where
                     },
                     ("locations-queues-tasks-acknowledge", Some(opt)) => {
                         call_result = self._projects_locations_queues_tasks_acknowledge(opt, dry_run, &mut err).await;
+                    },
+                    ("locations-queues-tasks-buffer", Some(opt)) => {
+                        call_result = self._projects_locations_queues_tasks_buffer(opt, dry_run, &mut err).await;
                     },
                     ("locations-queues-tasks-cancel-lease", Some(opt)) => {
                         call_result = self._projects_locations_queues_tasks_cancel_lease(opt, dry_run, &mut err).await;
@@ -1928,7 +2147,32 @@ where
 async fn main() {
     let mut exit_status = 0i32;
     let arg_data = [
-        ("projects", "methods: 'locations-get', 'locations-list', 'locations-queues-create', 'locations-queues-delete', 'locations-queues-get', 'locations-queues-get-iam-policy', 'locations-queues-list', 'locations-queues-patch', 'locations-queues-pause', 'locations-queues-purge', 'locations-queues-resume', 'locations-queues-set-iam-policy', 'locations-queues-tasks-acknowledge', 'locations-queues-tasks-cancel-lease', 'locations-queues-tasks-create', 'locations-queues-tasks-delete', 'locations-queues-tasks-get', 'locations-queues-tasks-lease', 'locations-queues-tasks-list', 'locations-queues-tasks-renew-lease', 'locations-queues-tasks-run' and 'locations-queues-test-iam-permissions'", vec![
+        ("api", "methods: 'queue-update'", vec![
+            ("queue-update",
+                    Some(r##"Update queue list by uploading a queue.yaml file. The queue.yaml file is supplied in the request body as a YAML encoded string. This method was added to support gcloud clients versions before 322.0.0. New clients should use CreateQueue instead of this method."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_cloudtasks2_beta2_cli/api_queue-update",
+                  vec![
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ]),
+        
+        ("projects", "methods: 'locations-get', 'locations-list', 'locations-queues-create', 'locations-queues-delete', 'locations-queues-get', 'locations-queues-get-iam-policy', 'locations-queues-list', 'locations-queues-patch', 'locations-queues-pause', 'locations-queues-purge', 'locations-queues-resume', 'locations-queues-set-iam-policy', 'locations-queues-tasks-acknowledge', 'locations-queues-tasks-buffer', 'locations-queues-tasks-cancel-lease', 'locations-queues-tasks-create', 'locations-queues-tasks-delete', 'locations-queues-tasks-get', 'locations-queues-tasks-lease', 'locations-queues-tasks-list', 'locations-queues-tasks-renew-lease', 'locations-queues-tasks-run' and 'locations-queues-test-iam-permissions'", vec![
             ("locations-get",
                     Some(r##"Gets information about a location."##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudtasks2_beta2_cli/projects_locations-get",
@@ -2051,7 +2295,7 @@ async fn main() {
                   vec![
                     (Some(r##"resource"##),
                      None,
-                     Some(r##"REQUIRED: The resource for which the policy is being requested. See the operation documentation for the appropriate value for this field."##),
+                     Some(r##"REQUIRED: The resource for which the policy is being requested. See [Resource names](https://cloud.google.com/apis/design/resource_names) for the appropriate value for this field."##),
                      Some(true),
                      Some(false)),
         
@@ -2213,7 +2457,7 @@ async fn main() {
                   vec![
                     (Some(r##"resource"##),
                      None,
-                     Some(r##"REQUIRED: The resource for which the policy is being specified. See the operation documentation for the appropriate value for this field."##),
+                     Some(r##"REQUIRED: The resource for which the policy is being specified. See [Resource names](https://cloud.google.com/apis/design/resource_names) for the appropriate value for this field."##),
                      Some(true),
                      Some(false)),
         
@@ -2242,6 +2486,40 @@ async fn main() {
                     (Some(r##"name"##),
                      None,
                      Some(r##"Required. The task name. For example: `projects/PROJECT_ID/locations/LOCATION_ID/queues/QUEUE_ID/tasks/TASK_ID`"##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-queues-tasks-buffer",
+                    Some(r##"Creates and buffers a new task without the need to explicitly define a Task message. The queue must have HTTP target. To create the task with a custom ID, use the following format and set TASK_ID to your desired ID: projects/PROJECT_ID/locations/LOCATION_ID/queues/QUEUE_ID/tasks/TASK_ID:buffer To create the task with an automatically generated ID, use the following format: projects/PROJECT_ID/locations/LOCATION_ID/queues/QUEUE_ID/tasks:buffer. Note: This feature is in its experimental stage. You must request access to the API through the [Cloud Tasks BufferTask Experiment Signup form](https://forms.gle/X8Zr5hiXH5tTGFqh8)."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_cloudtasks2_beta2_cli/projects_locations-queues-tasks-buffer",
+                  vec![
+                    (Some(r##"queue"##),
+                     None,
+                     Some(r##"Required. The parent queue name. For example: projects/PROJECT_ID/locations/LOCATION_ID/queues/QUEUE_ID` The queue must already exist."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"task-id"##),
+                     None,
+                     Some(r##"Optional. Task ID for the task being created. If not provided, a random task ID is assigned to the task."##),
                      Some(true),
                      Some(false)),
         
@@ -2475,7 +2753,7 @@ async fn main() {
                   vec![
                     (Some(r##"resource"##),
                      None,
-                     Some(r##"REQUIRED: The resource for which the policy detail is being requested. See the operation documentation for the appropriate value for this field."##),
+                     Some(r##"REQUIRED: The resource for which the policy detail is being requested. See [Resource names](https://cloud.google.com/apis/design/resource_names) for the appropriate value for this field."##),
                      Some(true),
                      Some(false)),
         
@@ -2503,7 +2781,7 @@ async fn main() {
     
     let mut app = App::new("cloudtasks2-beta2")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("4.0.1+20220212")
+           .version("5.0.2+20230105")
            .about("Manages the execution of large numbers of distributed requests.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_cloudtasks2_beta2_cli")
            .arg(Arg::with_name("url")

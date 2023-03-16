@@ -1,4 +1,4 @@
-site_name: Manufacturer Center v4.0.1+20220303
+site_name: Manufacturer Center v5.0.2+20230123
 site_url: http://byron.github.io/google-apis-rs/google-manufacturers1-cli
 site_description: A complete library to interact with Manufacturer Center (protocol v1)
 
@@ -7,12 +7,13 @@ repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/manufacturers1-c
 docs_dir: docs
 site_dir: build_html
 
-pages:
-- ['index.md', 'Home']
-- ['accounts_products-delete.md', 'Accounts', 'Products Delete']
-- ['accounts_products-get.md', 'Accounts', 'Products Get']
-- ['accounts_products-list.md', 'Accounts', 'Products List']
-- ['accounts_products-update.md', 'Accounts', 'Products Update']
+nav:
+- Home: 'index.md'
+- 'Accounts':
+    - 'Products Delete': 'accounts_products-delete.md'
+    - 'Products Get': 'accounts_products-get.md'
+    - 'Products List': 'accounts_products-list.md'
+    - 'Products Update': 'accounts_products-update.md'
 
 theme: readthedocs
 

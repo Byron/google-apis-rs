@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Real-time Bidding* API at revision *20220307*. The CLI is at version *4.0.1*.
+This documentation was generated from the *Real-time Bidding* API at revision *20230124*. The CLI is at version *5.0.2*.
 
 ```bash
 realtimebidding1 [options]
@@ -50,6 +50,10 @@ realtimebidding1 [options]
                 pretargeting-configs-remove-targeted-publishers <pretargeting-config> (-r <kv>)... [-p <v>]... [-o <out>]
                 pretargeting-configs-remove-targeted-sites <pretargeting-config> (-r <kv>)... [-p <v>]... [-o <out>]
                 pretargeting-configs-suspend <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                publisher-connections-batch-approve <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                publisher-connections-batch-reject <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                publisher-connections-get <name> [-p <v>]... [-o <out>]
+                publisher-connections-list <parent> [-p <v>]... [-o <out>]
         buyers
                 creatives-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 creatives-get <name> [-p <v>]... [-o <out>]

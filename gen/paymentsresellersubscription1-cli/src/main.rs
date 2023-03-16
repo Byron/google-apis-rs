@@ -3,8 +3,6 @@
 // DO NOT EDIT !
 #![allow(unused_variables, unused_imports, dead_code, unused_mut)]
 
-extern crate tokio;
-
 #[macro_use]
 extern crate clap;
 
@@ -12,9 +10,10 @@ use std::env;
 use std::io::{self, Write};
 use clap::{App, SubCommand, Arg};
 
-use google_paymentsresellersubscription1::{api, Error, oauth2};
+use google_paymentsresellersubscription1::{api, Error, oauth2, client::chrono, FieldMask};
 
-mod client;
+
+use google_clis_common as client;
 
 use client::{InvalidOptionsError, CLIError, arg_from_str, writer_from_opts, parse_kv_arg,
           input_file_from_opts, input_mime_from_opts, FieldCursor, FieldError, CallType, UploadProtocol,
@@ -61,7 +60,10 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
+                },
+                "filter" => {
+                    call = call.filter(value.unwrap_or(""));
                 },
                 _ => {
                     let mut found = false;
@@ -76,7 +78,91 @@ where
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["page-size", "page-token"].iter().map(|v|*v));
+                                                                           v.extend(["filter", "page-size", "page-token"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _partners_promotions_find_eligible(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "filter" => Some(("filter", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "page-size" => Some(("pageSize", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "page-token" => Some(("pageToken", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["filter", "page-size", "page-token"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::GoogleCloudPaymentsResellerSubscriptionV1FindEligiblePromotionsRequest = json::value::from_value(object).unwrap();
+        let mut call = self.hub.partners().promotions_find_eligible(request, opt.value_of("parent").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -117,7 +203,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 "filter" => {
                     call = call.filter(value.unwrap_or(""));
@@ -761,6 +847,9 @@ where
                     ("products-list", Some(opt)) => {
                         call_result = self._partners_products_list(opt, dry_run, &mut err).await;
                     },
+                    ("promotions-find-eligible", Some(opt)) => {
+                        call_result = self._partners_promotions_find_eligible(opt, dry_run, &mut err).await;
+                    },
                     ("promotions-list", Some(opt)) => {
                         call_result = self._partners_promotions_list(opt, dry_run, &mut err).await;
                     },
@@ -864,9 +953,9 @@ where
 async fn main() {
     let mut exit_status = 0i32;
     let arg_data = [
-        ("partners", "methods: 'products-list', 'promotions-list', 'subscriptions-cancel', 'subscriptions-create', 'subscriptions-entitle', 'subscriptions-extend', 'subscriptions-get', 'subscriptions-provision' and 'subscriptions-undo-cancel'", vec![
+        ("partners", "methods: 'products-list', 'promotions-find-eligible', 'promotions-list', 'subscriptions-cancel', 'subscriptions-create', 'subscriptions-entitle', 'subscriptions-extend', 'subscriptions-get', 'subscriptions-provision' and 'subscriptions-undo-cancel'", vec![
             ("products-list",
-                    Some(r##"Used by partners to list products that can be resold to their customers. It should be called directly by the partner using service accounts."##),
+                    Some(r##"To retrieve the products that can be resold by the partner. It should be autenticated with a service account."##),
                     "Details at http://byron.github.io/google-apis-rs/google_paymentsresellersubscription1_cli/partners_products-list",
                   vec![
                     (Some(r##"parent"##),
@@ -887,8 +976,36 @@ async fn main() {
                      Some(false),
                      Some(false)),
                   ]),
+            ("promotions-find-eligible",
+                    Some(r##"To find eligible promotions for the current user. The API requires user authorization via OAuth. The user is inferred from the authenticated OAuth credential."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_paymentsresellersubscription1_cli/partners_promotions-find-eligible",
+                  vec![
+                    (Some(r##"parent"##),
+                     None,
+                     Some(r##"Required. The parent, the partner that can resell. Format: partners/{partner}"##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
             ("promotions-list",
-                    Some(r##"Used by partners to list promotions, such as free trial, that can be applied on subscriptions. It should be called directly by the partner using service accounts."##),
+                    Some(r##"To retrieve the promotions, such as free trial, that can be used by the partner. It should be autenticated with a service account."##),
                     "Details at http://byron.github.io/google-apis-rs/google_paymentsresellersubscription1_cli/partners_promotions-list",
                   vec![
                     (Some(r##"parent"##),
@@ -994,7 +1111,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("subscriptions-extend",
-                    Some(r##"Used by partners to extend a subscription service for their customers on an ongoing basis for the subscription to remain active and renewable. It should be called directly by the partner using service accounts."##),
+                    Some(r##"[Deprecated] New partners should be on auto-extend by default. Used by partners to extend a subscription service for their customers on an ongoing basis for the subscription to remain active and renewable. It should be called directly by the partner using service accounts."##),
                     "Details at http://byron.github.io/google-apis-rs/google_paymentsresellersubscription1_cli/partners_subscriptions-extend",
                   vec![
                     (Some(r##"name"##),
@@ -1105,7 +1222,7 @@ async fn main() {
     
     let mut app = App::new("paymentsresellersubscription1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("4.0.1+20220307")
+           .version("5.0.2+20230123")
            .about("")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_paymentsresellersubscription1_cli")
            .arg(Arg::with_name("folder")

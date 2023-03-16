@@ -3,8 +3,6 @@
 // DO NOT EDIT !
 #![allow(unused_variables, unused_imports, dead_code, unused_mut)]
 
-extern crate tokio;
-
 #[macro_use]
 extern crate clap;
 
@@ -12,9 +10,10 @@ use std::env;
 use std::io::{self, Write};
 use clap::{App, SubCommand, Arg};
 
-use google_storage1::{api, Error, oauth2};
+use google_storage1::{api, Error, oauth2, client::chrono, FieldMask};
 
-mod client;
+
+use google_clis_common as client;
 
 use client::{InvalidOptionsError, CLIError, arg_from_str, writer_from_opts, parse_kv_arg,
           input_file_from_opts, input_mime_from_opts, FieldCursor, FieldError, CallType, UploadProtocol,
@@ -60,9 +59,6 @@ where
                 "user-project" => {
                     call = call.user_project(value.unwrap_or(""));
                 },
-                "provisional-user-project" => {
-                    call = call.provisional_user_project(value.unwrap_or(""));
-                },
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -76,7 +72,7 @@ where
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["provisional-user-project", "user-project"].iter().map(|v|*v));
+                                                                           v.extend(["user-project"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -111,9 +107,6 @@ where
                 "user-project" => {
                     call = call.user_project(value.unwrap_or(""));
                 },
-                "provisional-user-project" => {
-                    call = call.provisional_user_project(value.unwrap_or(""));
-                },
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -127,7 +120,7 @@ where
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["provisional-user-project", "user-project"].iter().map(|v|*v));
+                                                                           v.extend(["user-project"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -214,9 +207,6 @@ where
                 "user-project" => {
                     call = call.user_project(value.unwrap_or(""));
                 },
-                "provisional-user-project" => {
-                    call = call.provisional_user_project(value.unwrap_or(""));
-                },
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -230,7 +220,7 @@ where
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["provisional-user-project", "user-project"].iter().map(|v|*v));
+                                                                           v.extend(["user-project"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -273,9 +263,6 @@ where
                 "user-project" => {
                     call = call.user_project(value.unwrap_or(""));
                 },
-                "provisional-user-project" => {
-                    call = call.provisional_user_project(value.unwrap_or(""));
-                },
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -289,7 +276,7 @@ where
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["provisional-user-project", "user-project"].iter().map(|v|*v));
+                                                                           v.extend(["user-project"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -376,9 +363,6 @@ where
                 "user-project" => {
                     call = call.user_project(value.unwrap_or(""));
                 },
-                "provisional-user-project" => {
-                    call = call.provisional_user_project(value.unwrap_or(""));
-                },
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -392,7 +376,7 @@ where
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["provisional-user-project", "user-project"].iter().map(|v|*v));
+                                                                           v.extend(["user-project"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -479,9 +463,6 @@ where
                 "user-project" => {
                     call = call.user_project(value.unwrap_or(""));
                 },
-                "provisional-user-project" => {
-                    call = call.provisional_user_project(value.unwrap_or(""));
-                },
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -495,7 +476,7 @@ where
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["provisional-user-project", "user-project"].iter().map(|v|*v));
+                                                                           v.extend(["user-project"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -538,14 +519,11 @@ where
                 "user-project" => {
                     call = call.user_project(value.unwrap_or(""));
                 },
-                "provisional-user-project" => {
-                    call = call.provisional_user_project(value.unwrap_or(""));
-                },
                 "if-metageneration-not-match" => {
-                    call = call.if_metageneration_not_match(value.unwrap_or(""));
+                    call = call.if_metageneration_not_match(        value.map(|v| arg_from_str(v, err, "if-metageneration-not-match", "int64")).unwrap_or(-0));
                 },
                 "if-metageneration-match" => {
-                    call = call.if_metageneration_match(value.unwrap_or(""));
+                    call = call.if_metageneration_match(        value.map(|v| arg_from_str(v, err, "if-metageneration-match", "int64")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -560,7 +538,7 @@ where
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["if-metageneration-match", "if-metageneration-not-match", "provisional-user-project", "user-project"].iter().map(|v|*v));
+                                                                           v.extend(["if-metageneration-match", "if-metageneration-not-match", "user-project"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -595,17 +573,14 @@ where
                 "user-project" => {
                     call = call.user_project(value.unwrap_or(""));
                 },
-                "provisional-user-project" => {
-                    call = call.provisional_user_project(value.unwrap_or(""));
-                },
                 "projection" => {
                     call = call.projection(value.unwrap_or(""));
                 },
                 "if-metageneration-not-match" => {
-                    call = call.if_metageneration_not_match(value.unwrap_or(""));
+                    call = call.if_metageneration_not_match(        value.map(|v| arg_from_str(v, err, "if-metageneration-not-match", "int64")).unwrap_or(-0));
                 },
                 "if-metageneration-match" => {
-                    call = call.if_metageneration_match(value.unwrap_or(""));
+                    call = call.if_metageneration_match(        value.map(|v| arg_from_str(v, err, "if-metageneration-match", "int64")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -620,7 +595,7 @@ where
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["if-metageneration-match", "if-metageneration-not-match", "projection", "provisional-user-project", "user-project"].iter().map(|v|*v));
+                                                                           v.extend(["if-metageneration-match", "if-metageneration-not-match", "projection", "user-project"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -663,11 +638,8 @@ where
                 "user-project" => {
                     call = call.user_project(value.unwrap_or(""));
                 },
-                "provisional-user-project" => {
-                    call = call.provisional_user_project(value.unwrap_or(""));
-                },
                 "options-requested-policy-version" => {
-                    call = call.options_requested_policy_version(arg_from_str(value.unwrap_or("-0"), err, "options-requested-policy-version", "integer"));
+                    call = call.options_requested_policy_version(        value.map(|v| arg_from_str(v, err, "options-requested-policy-version", "int32")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -682,7 +654,7 @@ where
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["options-requested-policy-version", "provisional-user-project", "user-project"].iter().map(|v|*v));
+                                                                           v.extend(["options-requested-policy-version", "user-project"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -793,9 +765,6 @@ where
                 "user-project" => {
                     call = call.user_project(value.unwrap_or(""));
                 },
-                "provisional-user-project" => {
-                    call = call.provisional_user_project(value.unwrap_or(""));
-                },
                 "projection" => {
                     call = call.projection(value.unwrap_or(""));
                 },
@@ -818,7 +787,7 @@ where
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["predefined-acl", "predefined-default-object-acl", "projection", "provisional-user-project", "user-project"].iter().map(|v|*v));
+                                                                           v.extend(["predefined-acl", "predefined-default-object-acl", "projection", "user-project"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -861,9 +830,6 @@ where
                 "user-project" => {
                     call = call.user_project(value.unwrap_or(""));
                 },
-                "provisional-user-project" => {
-                    call = call.provisional_user_project(value.unwrap_or(""));
-                },
                 "projection" => {
                     call = call.projection(value.unwrap_or(""));
                 },
@@ -874,7 +840,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "max-results" => {
-                    call = call.max_results(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
+                    call = call.max_results(        value.map(|v| arg_from_str(v, err, "max-results", "uint32")).unwrap_or(0));
                 },
                 _ => {
                     let mut found = false;
@@ -889,7 +855,7 @@ where
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["max-results", "page-token", "prefix", "projection", "provisional-user-project", "user-project"].iter().map(|v|*v));
+                                                                           v.extend(["max-results", "page-token", "prefix", "projection", "user-project"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -932,9 +898,6 @@ where
                 "user-project" => {
                     call = call.user_project(value.unwrap_or(""));
                 },
-                "provisional-user-project" => {
-                    call = call.provisional_user_project(value.unwrap_or(""));
-                },
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -948,7 +911,7 @@ where
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["provisional-user-project", "user-project"].iter().map(|v|*v));
+                                                                           v.extend(["user-project"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -1059,9 +1022,6 @@ where
                 "user-project" => {
                     call = call.user_project(value.unwrap_or(""));
                 },
-                "provisional-user-project" => {
-                    call = call.provisional_user_project(value.unwrap_or(""));
-                },
                 "projection" => {
                     call = call.projection(value.unwrap_or(""));
                 },
@@ -1072,10 +1032,10 @@ where
                     call = call.predefined_acl(value.unwrap_or(""));
                 },
                 "if-metageneration-not-match" => {
-                    call = call.if_metageneration_not_match(value.unwrap_or(""));
+                    call = call.if_metageneration_not_match(        value.map(|v| arg_from_str(v, err, "if-metageneration-not-match", "int64")).unwrap_or(-0));
                 },
                 "if-metageneration-match" => {
-                    call = call.if_metageneration_match(value.unwrap_or(""));
+                    call = call.if_metageneration_match(        value.map(|v| arg_from_str(v, err, "if-metageneration-match", "int64")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -1090,7 +1050,7 @@ where
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["if-metageneration-match", "if-metageneration-not-match", "predefined-acl", "predefined-default-object-acl", "projection", "provisional-user-project", "user-project"].iter().map(|v|*v));
+                                                                           v.extend(["if-metageneration-match", "if-metageneration-not-match", "predefined-acl", "predefined-default-object-acl", "projection", "user-project"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -1169,9 +1129,6 @@ where
                 "user-project" => {
                     call = call.user_project(value.unwrap_or(""));
                 },
-                "provisional-user-project" => {
-                    call = call.provisional_user_project(value.unwrap_or(""));
-                },
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -1185,7 +1142,7 @@ where
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["provisional-user-project", "user-project"].iter().map(|v|*v));
+                                                                           v.extend(["user-project"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -1228,9 +1185,6 @@ where
                 "user-project" => {
                     call = call.user_project(value.unwrap_or(""));
                 },
-                "provisional-user-project" => {
-                    call = call.provisional_user_project(value.unwrap_or(""));
-                },
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -1244,7 +1198,7 @@ where
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["provisional-user-project", "user-project"].iter().map(|v|*v));
+                                                                           v.extend(["user-project"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -1355,9 +1309,6 @@ where
                 "user-project" => {
                     call = call.user_project(value.unwrap_or(""));
                 },
-                "provisional-user-project" => {
-                    call = call.provisional_user_project(value.unwrap_or(""));
-                },
                 "projection" => {
                     call = call.projection(value.unwrap_or(""));
                 },
@@ -1368,10 +1319,10 @@ where
                     call = call.predefined_acl(value.unwrap_or(""));
                 },
                 "if-metageneration-not-match" => {
-                    call = call.if_metageneration_not_match(value.unwrap_or(""));
+                    call = call.if_metageneration_not_match(        value.map(|v| arg_from_str(v, err, "if-metageneration-not-match", "int64")).unwrap_or(-0));
                 },
                 "if-metageneration-match" => {
-                    call = call.if_metageneration_match(value.unwrap_or(""));
+                    call = call.if_metageneration_match(        value.map(|v| arg_from_str(v, err, "if-metageneration-match", "int64")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -1386,7 +1337,7 @@ where
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["if-metageneration-match", "if-metageneration-not-match", "predefined-acl", "predefined-default-object-acl", "projection", "provisional-user-project", "user-project"].iter().map(|v|*v));
+                                                                           v.extend(["if-metageneration-match", "if-metageneration-not-match", "predefined-acl", "predefined-default-object-acl", "projection", "user-project"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -1515,9 +1466,6 @@ where
                 "user-project" => {
                     call = call.user_project(value.unwrap_or(""));
                 },
-                "provisional-user-project" => {
-                    call = call.provisional_user_project(value.unwrap_or(""));
-                },
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -1531,7 +1479,7 @@ where
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["provisional-user-project", "user-project"].iter().map(|v|*v));
+                                                                           v.extend(["user-project"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -1566,9 +1514,6 @@ where
                 "user-project" => {
                     call = call.user_project(value.unwrap_or(""));
                 },
-                "provisional-user-project" => {
-                    call = call.provisional_user_project(value.unwrap_or(""));
-                },
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -1582,7 +1527,7 @@ where
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["provisional-user-project", "user-project"].iter().map(|v|*v));
+                                                                           v.extend(["user-project"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -1671,9 +1616,6 @@ where
                 "user-project" => {
                     call = call.user_project(value.unwrap_or(""));
                 },
-                "provisional-user-project" => {
-                    call = call.provisional_user_project(value.unwrap_or(""));
-                },
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -1687,7 +1629,7 @@ where
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["provisional-user-project", "user-project"].iter().map(|v|*v));
+                                                                           v.extend(["user-project"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -1730,14 +1672,11 @@ where
                 "user-project" => {
                     call = call.user_project(value.unwrap_or(""));
                 },
-                "provisional-user-project" => {
-                    call = call.provisional_user_project(value.unwrap_or(""));
-                },
                 "if-metageneration-not-match" => {
-                    call = call.if_metageneration_not_match(value.unwrap_or(""));
+                    call = call.if_metageneration_not_match(        value.map(|v| arg_from_str(v, err, "if-metageneration-not-match", "int64")).unwrap_or(-0));
                 },
                 "if-metageneration-match" => {
-                    call = call.if_metageneration_match(value.unwrap_or(""));
+                    call = call.if_metageneration_match(        value.map(|v| arg_from_str(v, err, "if-metageneration-match", "int64")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -1752,7 +1691,7 @@ where
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["if-metageneration-match", "if-metageneration-not-match", "provisional-user-project", "user-project"].iter().map(|v|*v));
+                                                                           v.extend(["if-metageneration-match", "if-metageneration-not-match", "user-project"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -1841,9 +1780,6 @@ where
                 "user-project" => {
                     call = call.user_project(value.unwrap_or(""));
                 },
-                "provisional-user-project" => {
-                    call = call.provisional_user_project(value.unwrap_or(""));
-                },
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -1857,7 +1793,7 @@ where
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["provisional-user-project", "user-project"].iter().map(|v|*v));
+                                                                           v.extend(["user-project"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -1946,9 +1882,6 @@ where
                 "user-project" => {
                     call = call.user_project(value.unwrap_or(""));
                 },
-                "provisional-user-project" => {
-                    call = call.provisional_user_project(value.unwrap_or(""));
-                },
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -1962,7 +1895,7 @@ where
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["provisional-user-project", "user-project"].iter().map(|v|*v));
+                                                                           v.extend(["user-project"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -2005,9 +1938,6 @@ where
                 "user-project" => {
                     call = call.user_project(value.unwrap_or(""));
                 },
-                "provisional-user-project" => {
-                    call = call.provisional_user_project(value.unwrap_or(""));
-                },
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -2021,7 +1951,7 @@ where
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["provisional-user-project", "user-project"].iter().map(|v|*v));
+                                                                           v.extend(["user-project"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -2056,9 +1986,6 @@ where
                 "user-project" => {
                     call = call.user_project(value.unwrap_or(""));
                 },
-                "provisional-user-project" => {
-                    call = call.provisional_user_project(value.unwrap_or(""));
-                },
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -2072,7 +1999,7 @@ where
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["provisional-user-project", "user-project"].iter().map(|v|*v));
+                                                                           v.extend(["user-project"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -2156,9 +2083,6 @@ where
                 "user-project" => {
                     call = call.user_project(value.unwrap_or(""));
                 },
-                "provisional-user-project" => {
-                    call = call.provisional_user_project(value.unwrap_or(""));
-                },
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -2172,7 +2096,7 @@ where
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["provisional-user-project", "user-project"].iter().map(|v|*v));
+                                                                           v.extend(["user-project"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -2215,9 +2139,6 @@ where
                 "user-project" => {
                     call = call.user_project(value.unwrap_or(""));
                 },
-                "provisional-user-project" => {
-                    call = call.provisional_user_project(value.unwrap_or(""));
-                },
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -2231,7 +2152,7 @@ where
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["provisional-user-project", "user-project"].iter().map(|v|*v));
+                                                                           v.extend(["user-project"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -2274,11 +2195,8 @@ where
                 "user-project" => {
                     call = call.user_project(value.unwrap_or(""));
                 },
-                "provisional-user-project" => {
-                    call = call.provisional_user_project(value.unwrap_or(""));
-                },
                 "generation" => {
-                    call = call.generation(value.unwrap_or(""));
+                    call = call.generation(        value.map(|v| arg_from_str(v, err, "generation", "int64")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -2293,7 +2211,7 @@ where
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["generation", "provisional-user-project", "user-project"].iter().map(|v|*v));
+                                                                           v.extend(["generation", "user-project"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -2328,11 +2246,8 @@ where
                 "user-project" => {
                     call = call.user_project(value.unwrap_or(""));
                 },
-                "provisional-user-project" => {
-                    call = call.provisional_user_project(value.unwrap_or(""));
-                },
                 "generation" => {
-                    call = call.generation(value.unwrap_or(""));
+                    call = call.generation(        value.map(|v| arg_from_str(v, err, "generation", "int64")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -2347,7 +2262,7 @@ where
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["generation", "provisional-user-project", "user-project"].iter().map(|v|*v));
+                                                                           v.extend(["generation", "user-project"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -2436,11 +2351,8 @@ where
                 "user-project" => {
                     call = call.user_project(value.unwrap_or(""));
                 },
-                "provisional-user-project" => {
-                    call = call.provisional_user_project(value.unwrap_or(""));
-                },
                 "generation" => {
-                    call = call.generation(value.unwrap_or(""));
+                    call = call.generation(        value.map(|v| arg_from_str(v, err, "generation", "int64")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -2455,7 +2367,7 @@ where
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["generation", "provisional-user-project", "user-project"].iter().map(|v|*v));
+                                                                           v.extend(["generation", "user-project"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -2498,11 +2410,8 @@ where
                 "user-project" => {
                     call = call.user_project(value.unwrap_or(""));
                 },
-                "provisional-user-project" => {
-                    call = call.provisional_user_project(value.unwrap_or(""));
-                },
                 "generation" => {
-                    call = call.generation(value.unwrap_or(""));
+                    call = call.generation(        value.map(|v| arg_from_str(v, err, "generation", "int64")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -2517,7 +2426,7 @@ where
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["generation", "provisional-user-project", "user-project"].iter().map(|v|*v));
+                                                                           v.extend(["generation", "user-project"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -2606,11 +2515,8 @@ where
                 "user-project" => {
                     call = call.user_project(value.unwrap_or(""));
                 },
-                "provisional-user-project" => {
-                    call = call.provisional_user_project(value.unwrap_or(""));
-                },
                 "generation" => {
-                    call = call.generation(value.unwrap_or(""));
+                    call = call.generation(        value.map(|v| arg_from_str(v, err, "generation", "int64")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -2625,7 +2531,7 @@ where
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["generation", "provisional-user-project", "user-project"].iter().map(|v|*v));
+                                                                           v.extend(["generation", "user-project"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -2714,11 +2620,8 @@ where
                 "user-project" => {
                     call = call.user_project(value.unwrap_or(""));
                 },
-                "provisional-user-project" => {
-                    call = call.provisional_user_project(value.unwrap_or(""));
-                },
                 "generation" => {
-                    call = call.generation(value.unwrap_or(""));
+                    call = call.generation(        value.map(|v| arg_from_str(v, err, "generation", "int64")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -2733,7 +2636,7 @@ where
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["generation", "provisional-user-project", "user-project"].iter().map(|v|*v));
+                                                                           v.extend(["generation", "user-project"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -2842,17 +2745,14 @@ where
                 "user-project" => {
                     call = call.user_project(value.unwrap_or(""));
                 },
-                "provisional-user-project" => {
-                    call = call.provisional_user_project(value.unwrap_or(""));
-                },
                 "kms-key-name" => {
                     call = call.kms_key_name(value.unwrap_or(""));
                 },
                 "if-metageneration-match" => {
-                    call = call.if_metageneration_match(value.unwrap_or(""));
+                    call = call.if_metageneration_match(        value.map(|v| arg_from_str(v, err, "if-metageneration-match", "int64")).unwrap_or(-0));
                 },
                 "if-generation-match" => {
-                    call = call.if_generation_match(value.unwrap_or(""));
+                    call = call.if_generation_match(        value.map(|v| arg_from_str(v, err, "if-generation-match", "int64")).unwrap_or(-0));
                 },
                 "destination-predefined-acl" => {
                     call = call.destination_predefined_acl(value.unwrap_or(""));
@@ -2870,7 +2770,7 @@ where
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["destination-predefined-acl", "if-generation-match", "if-metageneration-match", "kms-key-name", "provisional-user-project", "user-project"].iter().map(|v|*v));
+                                                                           v.extend(["destination-predefined-acl", "if-generation-match", "if-metageneration-match", "kms-key-name", "user-project"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -2979,37 +2879,34 @@ where
                     call = call.user_project(value.unwrap_or(""));
                 },
                 "source-generation" => {
-                    call = call.source_generation(value.unwrap_or(""));
-                },
-                "provisional-user-project" => {
-                    call = call.provisional_user_project(value.unwrap_or(""));
+                    call = call.source_generation(        value.map(|v| arg_from_str(v, err, "source-generation", "int64")).unwrap_or(-0));
                 },
                 "projection" => {
                     call = call.projection(value.unwrap_or(""));
                 },
                 "if-source-metageneration-not-match" => {
-                    call = call.if_source_metageneration_not_match(value.unwrap_or(""));
+                    call = call.if_source_metageneration_not_match(        value.map(|v| arg_from_str(v, err, "if-source-metageneration-not-match", "int64")).unwrap_or(-0));
                 },
                 "if-source-metageneration-match" => {
-                    call = call.if_source_metageneration_match(value.unwrap_or(""));
+                    call = call.if_source_metageneration_match(        value.map(|v| arg_from_str(v, err, "if-source-metageneration-match", "int64")).unwrap_or(-0));
                 },
                 "if-source-generation-not-match" => {
-                    call = call.if_source_generation_not_match(value.unwrap_or(""));
+                    call = call.if_source_generation_not_match(        value.map(|v| arg_from_str(v, err, "if-source-generation-not-match", "int64")).unwrap_or(-0));
                 },
                 "if-source-generation-match" => {
-                    call = call.if_source_generation_match(value.unwrap_or(""));
+                    call = call.if_source_generation_match(        value.map(|v| arg_from_str(v, err, "if-source-generation-match", "int64")).unwrap_or(-0));
                 },
                 "if-metageneration-not-match" => {
-                    call = call.if_metageneration_not_match(value.unwrap_or(""));
+                    call = call.if_metageneration_not_match(        value.map(|v| arg_from_str(v, err, "if-metageneration-not-match", "int64")).unwrap_or(-0));
                 },
                 "if-metageneration-match" => {
-                    call = call.if_metageneration_match(value.unwrap_or(""));
+                    call = call.if_metageneration_match(        value.map(|v| arg_from_str(v, err, "if-metageneration-match", "int64")).unwrap_or(-0));
                 },
                 "if-generation-not-match" => {
-                    call = call.if_generation_not_match(value.unwrap_or(""));
+                    call = call.if_generation_not_match(        value.map(|v| arg_from_str(v, err, "if-generation-not-match", "int64")).unwrap_or(-0));
                 },
                 "if-generation-match" => {
-                    call = call.if_generation_match(value.unwrap_or(""));
+                    call = call.if_generation_match(        value.map(|v| arg_from_str(v, err, "if-generation-match", "int64")).unwrap_or(-0));
                 },
                 "destination-predefined-acl" => {
                     call = call.destination_predefined_acl(value.unwrap_or(""));
@@ -3030,7 +2927,7 @@ where
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["destination-kms-key-name", "destination-predefined-acl", "if-generation-match", "if-generation-not-match", "if-metageneration-match", "if-metageneration-not-match", "if-source-generation-match", "if-source-generation-not-match", "if-source-metageneration-match", "if-source-metageneration-not-match", "projection", "provisional-user-project", "source-generation", "user-project"].iter().map(|v|*v));
+                                                                           v.extend(["destination-kms-key-name", "destination-predefined-acl", "if-generation-match", "if-generation-not-match", "if-metageneration-match", "if-metageneration-not-match", "if-source-generation-match", "if-source-generation-not-match", "if-source-metageneration-match", "if-source-metageneration-not-match", "projection", "source-generation", "user-project"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -3073,23 +2970,20 @@ where
                 "user-project" => {
                     call = call.user_project(value.unwrap_or(""));
                 },
-                "provisional-user-project" => {
-                    call = call.provisional_user_project(value.unwrap_or(""));
-                },
                 "if-metageneration-not-match" => {
-                    call = call.if_metageneration_not_match(value.unwrap_or(""));
+                    call = call.if_metageneration_not_match(        value.map(|v| arg_from_str(v, err, "if-metageneration-not-match", "int64")).unwrap_or(-0));
                 },
                 "if-metageneration-match" => {
-                    call = call.if_metageneration_match(value.unwrap_or(""));
+                    call = call.if_metageneration_match(        value.map(|v| arg_from_str(v, err, "if-metageneration-match", "int64")).unwrap_or(-0));
                 },
                 "if-generation-not-match" => {
-                    call = call.if_generation_not_match(value.unwrap_or(""));
+                    call = call.if_generation_not_match(        value.map(|v| arg_from_str(v, err, "if-generation-not-match", "int64")).unwrap_or(-0));
                 },
                 "if-generation-match" => {
-                    call = call.if_generation_match(value.unwrap_or(""));
+                    call = call.if_generation_match(        value.map(|v| arg_from_str(v, err, "if-generation-match", "int64")).unwrap_or(-0));
                 },
                 "generation" => {
-                    call = call.generation(value.unwrap_or(""));
+                    call = call.generation(        value.map(|v| arg_from_str(v, err, "generation", "int64")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -3104,7 +2998,7 @@ where
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["generation", "if-generation-match", "if-generation-not-match", "if-metageneration-match", "if-metageneration-not-match", "provisional-user-project", "user-project"].iter().map(|v|*v));
+                                                                           v.extend(["generation", "if-generation-match", "if-generation-not-match", "if-metageneration-match", "if-metageneration-not-match", "user-project"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -3140,26 +3034,23 @@ where
                 "user-project" => {
                     call = call.user_project(value.unwrap_or(""));
                 },
-                "provisional-user-project" => {
-                    call = call.provisional_user_project(value.unwrap_or(""));
-                },
                 "projection" => {
                     call = call.projection(value.unwrap_or(""));
                 },
                 "if-metageneration-not-match" => {
-                    call = call.if_metageneration_not_match(value.unwrap_or(""));
+                    call = call.if_metageneration_not_match(        value.map(|v| arg_from_str(v, err, "if-metageneration-not-match", "int64")).unwrap_or(-0));
                 },
                 "if-metageneration-match" => {
-                    call = call.if_metageneration_match(value.unwrap_or(""));
+                    call = call.if_metageneration_match(        value.map(|v| arg_from_str(v, err, "if-metageneration-match", "int64")).unwrap_or(-0));
                 },
                 "if-generation-not-match" => {
-                    call = call.if_generation_not_match(value.unwrap_or(""));
+                    call = call.if_generation_not_match(        value.map(|v| arg_from_str(v, err, "if-generation-not-match", "int64")).unwrap_or(-0));
                 },
                 "if-generation-match" => {
-                    call = call.if_generation_match(value.unwrap_or(""));
+                    call = call.if_generation_match(        value.map(|v| arg_from_str(v, err, "if-generation-match", "int64")).unwrap_or(-0));
                 },
                 "generation" => {
-                    call = call.generation(value.unwrap_or(""));
+                    call = call.generation(        value.map(|v| arg_from_str(v, err, "generation", "int64")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -3177,7 +3068,7 @@ where
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["generation", "if-generation-match", "if-generation-not-match", "if-metageneration-match", "if-metageneration-not-match", "projection", "provisional-user-project", "user-project"].iter().map(|v|*v));
+                                                                           v.extend(["generation", "if-generation-match", "if-generation-not-match", "if-metageneration-match", "if-metageneration-not-match", "projection", "user-project"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -3226,11 +3117,8 @@ where
                 "user-project" => {
                     call = call.user_project(value.unwrap_or(""));
                 },
-                "provisional-user-project" => {
-                    call = call.provisional_user_project(value.unwrap_or(""));
-                },
                 "generation" => {
-                    call = call.generation(value.unwrap_or(""));
+                    call = call.generation(        value.map(|v| arg_from_str(v, err, "generation", "int64")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -3245,7 +3133,7 @@ where
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["generation", "provisional-user-project", "user-project"].iter().map(|v|*v));
+                                                                           v.extend(["generation", "user-project"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -3353,9 +3241,6 @@ where
                 "user-project" => {
                     call = call.user_project(value.unwrap_or(""));
                 },
-                "provisional-user-project" => {
-                    call = call.provisional_user_project(value.unwrap_or(""));
-                },
                 "projection" => {
                     call = call.projection(value.unwrap_or(""));
                 },
@@ -3369,16 +3254,16 @@ where
                     call = call.kms_key_name(value.unwrap_or(""));
                 },
                 "if-metageneration-not-match" => {
-                    call = call.if_metageneration_not_match(value.unwrap_or(""));
+                    call = call.if_metageneration_not_match(        value.map(|v| arg_from_str(v, err, "if-metageneration-not-match", "int64")).unwrap_or(-0));
                 },
                 "if-metageneration-match" => {
-                    call = call.if_metageneration_match(value.unwrap_or(""));
+                    call = call.if_metageneration_match(        value.map(|v| arg_from_str(v, err, "if-metageneration-match", "int64")).unwrap_or(-0));
                 },
                 "if-generation-not-match" => {
-                    call = call.if_generation_not_match(value.unwrap_or(""));
+                    call = call.if_generation_not_match(        value.map(|v| arg_from_str(v, err, "if-generation-not-match", "int64")).unwrap_or(-0));
                 },
                 "if-generation-match" => {
-                    call = call.if_generation_match(value.unwrap_or(""));
+                    call = call.if_generation_match(        value.map(|v| arg_from_str(v, err, "if-generation-match", "int64")).unwrap_or(-0));
                 },
                 "content-encoding" => {
                     call = call.content_encoding(value.unwrap_or(""));
@@ -3396,7 +3281,7 @@ where
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["content-encoding", "if-generation-match", "if-generation-not-match", "if-metageneration-match", "if-metageneration-not-match", "kms-key-name", "name", "predefined-acl", "projection", "provisional-user-project", "user-project"].iter().map(|v|*v));
+                                                                           v.extend(["content-encoding", "if-generation-match", "if-generation-not-match", "if-metageneration-match", "if-metageneration-not-match", "kms-key-name", "name", "predefined-acl", "projection", "user-project"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -3440,16 +3325,13 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "versions" => {
-                    call = call.versions(arg_from_str(value.unwrap_or("false"), err, "versions", "boolean"));
+                    call = call.versions(        value.map(|v| arg_from_str(v, err, "versions", "boolean")).unwrap_or(false));
                 },
                 "user-project" => {
                     call = call.user_project(value.unwrap_or(""));
                 },
                 "start-offset" => {
                     call = call.start_offset(value.unwrap_or(""));
-                },
-                "provisional-user-project" => {
-                    call = call.provisional_user_project(value.unwrap_or(""));
                 },
                 "projection" => {
                     call = call.projection(value.unwrap_or(""));
@@ -3461,10 +3343,10 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "max-results" => {
-                    call = call.max_results(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
+                    call = call.max_results(        value.map(|v| arg_from_str(v, err, "max-results", "uint32")).unwrap_or(0));
                 },
                 "include-trailing-delimiter" => {
-                    call = call.include_trailing_delimiter(arg_from_str(value.unwrap_or("false"), err, "include-trailing-delimiter", "boolean"));
+                    call = call.include_trailing_delimiter(        value.map(|v| arg_from_str(v, err, "include-trailing-delimiter", "boolean")).unwrap_or(false));
                 },
                 "end-offset" => {
                     call = call.end_offset(value.unwrap_or(""));
@@ -3485,7 +3367,7 @@ where
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["delimiter", "end-offset", "include-trailing-delimiter", "max-results", "page-token", "prefix", "projection", "provisional-user-project", "start-offset", "user-project", "versions"].iter().map(|v|*v));
+                                                                           v.extend(["delimiter", "end-offset", "include-trailing-delimiter", "max-results", "page-token", "prefix", "projection", "start-offset", "user-project", "versions"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -3593,9 +3475,6 @@ where
                 "user-project" => {
                     call = call.user_project(value.unwrap_or(""));
                 },
-                "provisional-user-project" => {
-                    call = call.provisional_user_project(value.unwrap_or(""));
-                },
                 "projection" => {
                     call = call.projection(value.unwrap_or(""));
                 },
@@ -3603,19 +3482,19 @@ where
                     call = call.predefined_acl(value.unwrap_or(""));
                 },
                 "if-metageneration-not-match" => {
-                    call = call.if_metageneration_not_match(value.unwrap_or(""));
+                    call = call.if_metageneration_not_match(        value.map(|v| arg_from_str(v, err, "if-metageneration-not-match", "int64")).unwrap_or(-0));
                 },
                 "if-metageneration-match" => {
-                    call = call.if_metageneration_match(value.unwrap_or(""));
+                    call = call.if_metageneration_match(        value.map(|v| arg_from_str(v, err, "if-metageneration-match", "int64")).unwrap_or(-0));
                 },
                 "if-generation-not-match" => {
-                    call = call.if_generation_not_match(value.unwrap_or(""));
+                    call = call.if_generation_not_match(        value.map(|v| arg_from_str(v, err, "if-generation-not-match", "int64")).unwrap_or(-0));
                 },
                 "if-generation-match" => {
-                    call = call.if_generation_match(value.unwrap_or(""));
+                    call = call.if_generation_match(        value.map(|v| arg_from_str(v, err, "if-generation-match", "int64")).unwrap_or(-0));
                 },
                 "generation" => {
-                    call = call.generation(value.unwrap_or(""));
+                    call = call.generation(        value.map(|v| arg_from_str(v, err, "generation", "int64")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -3630,7 +3509,7 @@ where
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["generation", "if-generation-match", "if-generation-not-match", "if-metageneration-match", "if-metageneration-not-match", "predefined-acl", "projection", "provisional-user-project", "user-project"].iter().map(|v|*v));
+                                                                           v.extend(["generation", "if-generation-match", "if-generation-not-match", "if-metageneration-match", "if-metageneration-not-match", "predefined-acl", "projection", "user-project"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -3739,43 +3618,40 @@ where
                     call = call.user_project(value.unwrap_or(""));
                 },
                 "source-generation" => {
-                    call = call.source_generation(value.unwrap_or(""));
+                    call = call.source_generation(        value.map(|v| arg_from_str(v, err, "source-generation", "int64")).unwrap_or(-0));
                 },
                 "rewrite-token" => {
                     call = call.rewrite_token(value.unwrap_or(""));
-                },
-                "provisional-user-project" => {
-                    call = call.provisional_user_project(value.unwrap_or(""));
                 },
                 "projection" => {
                     call = call.projection(value.unwrap_or(""));
                 },
                 "max-bytes-rewritten-per-call" => {
-                    call = call.max_bytes_rewritten_per_call(value.unwrap_or(""));
+                    call = call.max_bytes_rewritten_per_call(        value.map(|v| arg_from_str(v, err, "max-bytes-rewritten-per-call", "int64")).unwrap_or(-0));
                 },
                 "if-source-metageneration-not-match" => {
-                    call = call.if_source_metageneration_not_match(value.unwrap_or(""));
+                    call = call.if_source_metageneration_not_match(        value.map(|v| arg_from_str(v, err, "if-source-metageneration-not-match", "int64")).unwrap_or(-0));
                 },
                 "if-source-metageneration-match" => {
-                    call = call.if_source_metageneration_match(value.unwrap_or(""));
+                    call = call.if_source_metageneration_match(        value.map(|v| arg_from_str(v, err, "if-source-metageneration-match", "int64")).unwrap_or(-0));
                 },
                 "if-source-generation-not-match" => {
-                    call = call.if_source_generation_not_match(value.unwrap_or(""));
+                    call = call.if_source_generation_not_match(        value.map(|v| arg_from_str(v, err, "if-source-generation-not-match", "int64")).unwrap_or(-0));
                 },
                 "if-source-generation-match" => {
-                    call = call.if_source_generation_match(value.unwrap_or(""));
+                    call = call.if_source_generation_match(        value.map(|v| arg_from_str(v, err, "if-source-generation-match", "int64")).unwrap_or(-0));
                 },
                 "if-metageneration-not-match" => {
-                    call = call.if_metageneration_not_match(value.unwrap_or(""));
+                    call = call.if_metageneration_not_match(        value.map(|v| arg_from_str(v, err, "if-metageneration-not-match", "int64")).unwrap_or(-0));
                 },
                 "if-metageneration-match" => {
-                    call = call.if_metageneration_match(value.unwrap_or(""));
+                    call = call.if_metageneration_match(        value.map(|v| arg_from_str(v, err, "if-metageneration-match", "int64")).unwrap_or(-0));
                 },
                 "if-generation-not-match" => {
-                    call = call.if_generation_not_match(value.unwrap_or(""));
+                    call = call.if_generation_not_match(        value.map(|v| arg_from_str(v, err, "if-generation-not-match", "int64")).unwrap_or(-0));
                 },
                 "if-generation-match" => {
-                    call = call.if_generation_match(value.unwrap_or(""));
+                    call = call.if_generation_match(        value.map(|v| arg_from_str(v, err, "if-generation-match", "int64")).unwrap_or(-0));
                 },
                 "destination-predefined-acl" => {
                     call = call.destination_predefined_acl(value.unwrap_or(""));
@@ -3796,7 +3672,7 @@ where
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["destination-kms-key-name", "destination-predefined-acl", "if-generation-match", "if-generation-not-match", "if-metageneration-match", "if-metageneration-not-match", "if-source-generation-match", "if-source-generation-not-match", "if-source-metageneration-match", "if-source-metageneration-not-match", "max-bytes-rewritten-per-call", "projection", "provisional-user-project", "rewrite-token", "source-generation", "user-project"].iter().map(|v|*v));
+                                                                           v.extend(["destination-kms-key-name", "destination-predefined-acl", "if-generation-match", "if-generation-not-match", "if-metageneration-match", "if-metageneration-not-match", "if-source-generation-match", "if-source-generation-not-match", "if-source-metageneration-match", "if-source-metageneration-not-match", "max-bytes-rewritten-per-call", "projection", "rewrite-token", "source-generation", "user-project"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -3875,11 +3751,8 @@ where
                 "user-project" => {
                     call = call.user_project(value.unwrap_or(""));
                 },
-                "provisional-user-project" => {
-                    call = call.provisional_user_project(value.unwrap_or(""));
-                },
                 "generation" => {
-                    call = call.generation(value.unwrap_or(""));
+                    call = call.generation(        value.map(|v| arg_from_str(v, err, "generation", "int64")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -3894,7 +3767,7 @@ where
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["generation", "provisional-user-project", "user-project"].iter().map(|v|*v));
+                                                                           v.extend(["generation", "user-project"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -3937,11 +3810,8 @@ where
                 "user-project" => {
                     call = call.user_project(value.unwrap_or(""));
                 },
-                "provisional-user-project" => {
-                    call = call.provisional_user_project(value.unwrap_or(""));
-                },
                 "generation" => {
-                    call = call.generation(value.unwrap_or(""));
+                    call = call.generation(        value.map(|v| arg_from_str(v, err, "generation", "int64")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -3956,7 +3826,7 @@ where
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["generation", "provisional-user-project", "user-project"].iter().map(|v|*v));
+                                                                           v.extend(["generation", "user-project"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -4064,9 +3934,6 @@ where
                 "user-project" => {
                     call = call.user_project(value.unwrap_or(""));
                 },
-                "provisional-user-project" => {
-                    call = call.provisional_user_project(value.unwrap_or(""));
-                },
                 "projection" => {
                     call = call.projection(value.unwrap_or(""));
                 },
@@ -4074,19 +3941,19 @@ where
                     call = call.predefined_acl(value.unwrap_or(""));
                 },
                 "if-metageneration-not-match" => {
-                    call = call.if_metageneration_not_match(value.unwrap_or(""));
+                    call = call.if_metageneration_not_match(        value.map(|v| arg_from_str(v, err, "if-metageneration-not-match", "int64")).unwrap_or(-0));
                 },
                 "if-metageneration-match" => {
-                    call = call.if_metageneration_match(value.unwrap_or(""));
+                    call = call.if_metageneration_match(        value.map(|v| arg_from_str(v, err, "if-metageneration-match", "int64")).unwrap_or(-0));
                 },
                 "if-generation-not-match" => {
-                    call = call.if_generation_not_match(value.unwrap_or(""));
+                    call = call.if_generation_not_match(        value.map(|v| arg_from_str(v, err, "if-generation-not-match", "int64")).unwrap_or(-0));
                 },
                 "if-generation-match" => {
-                    call = call.if_generation_match(value.unwrap_or(""));
+                    call = call.if_generation_match(        value.map(|v| arg_from_str(v, err, "if-generation-match", "int64")).unwrap_or(-0));
                 },
                 "generation" => {
-                    call = call.generation(value.unwrap_or(""));
+                    call = call.generation(        value.map(|v| arg_from_str(v, err, "generation", "int64")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -4101,7 +3968,7 @@ where
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["generation", "if-generation-match", "if-generation-not-match", "if-metageneration-match", "if-metageneration-not-match", "predefined-acl", "projection", "provisional-user-project", "user-project"].iter().map(|v|*v));
+                                                                           v.extend(["generation", "if-generation-match", "if-generation-not-match", "if-metageneration-match", "if-metageneration-not-match", "predefined-acl", "projection", "user-project"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -4184,16 +4051,13 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "versions" => {
-                    call = call.versions(arg_from_str(value.unwrap_or("false"), err, "versions", "boolean"));
+                    call = call.versions(        value.map(|v| arg_from_str(v, err, "versions", "boolean")).unwrap_or(false));
                 },
                 "user-project" => {
                     call = call.user_project(value.unwrap_or(""));
                 },
                 "start-offset" => {
                     call = call.start_offset(value.unwrap_or(""));
-                },
-                "provisional-user-project" => {
-                    call = call.provisional_user_project(value.unwrap_or(""));
                 },
                 "projection" => {
                     call = call.projection(value.unwrap_or(""));
@@ -4205,10 +4069,10 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "max-results" => {
-                    call = call.max_results(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
+                    call = call.max_results(        value.map(|v| arg_from_str(v, err, "max-results", "uint32")).unwrap_or(0));
                 },
                 "include-trailing-delimiter" => {
-                    call = call.include_trailing_delimiter(arg_from_str(value.unwrap_or("false"), err, "include-trailing-delimiter", "boolean"));
+                    call = call.include_trailing_delimiter(        value.map(|v| arg_from_str(v, err, "include-trailing-delimiter", "boolean")).unwrap_or(false));
                 },
                 "end-offset" => {
                     call = call.end_offset(value.unwrap_or(""));
@@ -4229,7 +4093,7 @@ where
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["delimiter", "end-offset", "include-trailing-delimiter", "max-results", "page-token", "prefix", "projection", "provisional-user-project", "start-offset", "user-project", "versions"].iter().map(|v|*v));
+                                                                           v.extend(["delimiter", "end-offset", "include-trailing-delimiter", "max-results", "page-token", "prefix", "projection", "start-offset", "user-project", "versions"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -4433,7 +4297,7 @@ where
                     call = call.user_project(value.unwrap_or(""));
                 },
                 "show-deleted-keys" => {
-                    call = call.show_deleted_keys(arg_from_str(value.unwrap_or("false"), err, "show-deleted-keys", "boolean"));
+                    call = call.show_deleted_keys(        value.map(|v| arg_from_str(v, err, "show-deleted-keys", "boolean")).unwrap_or(false));
                 },
                 "service-account-email" => {
                     call = call.service_account_email(value.unwrap_or(""));
@@ -4442,7 +4306,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "max-results" => {
-                    call = call.max_results(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
+                    call = call.max_results(        value.map(|v| arg_from_str(v, err, "max-results", "uint32")).unwrap_or(0));
                 },
                 _ => {
                     let mut found = false;
@@ -4598,9 +4462,6 @@ where
                 "user-project" => {
                     call = call.user_project(value.unwrap_or(""));
                 },
-                "provisional-user-project" => {
-                    call = call.provisional_user_project(value.unwrap_or(""));
-                },
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -4614,7 +4475,7 @@ where
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["provisional-user-project", "user-project"].iter().map(|v|*v));
+                                                                           v.extend(["user-project"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -6459,7 +6320,7 @@ async fn main() {
     
     let mut app = App::new("storage1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("4.0.1+20220228")
+           .version("5.0.2+20230119")
            .about("Stores and retrieves potentially large, immutable data objects.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_storage1_cli")
            .arg(Arg::with_name("url")

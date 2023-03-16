@@ -1,4 +1,4 @@
-site_name: Cloud Scheduler v4.0.1+20220212
+site_name: Cloud Scheduler v5.0.2+20230106
 site_url: http://byron.github.io/google-apis-rs/google-cloudscheduler1_beta1-cli
 site_description: A complete library to interact with Cloud Scheduler (protocol v1beta1)
 
@@ -7,18 +7,19 @@ repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/cloudscheduler1_
 docs_dir: docs
 site_dir: build_html
 
-pages:
-- ['index.md', 'Home']
-- ['projects_locations-get.md', 'Projects', 'Locations Get']
-- ['projects_locations-jobs-create.md', 'Projects', 'Locations Jobs Create']
-- ['projects_locations-jobs-delete.md', 'Projects', 'Locations Jobs Delete']
-- ['projects_locations-jobs-get.md', 'Projects', 'Locations Jobs Get']
-- ['projects_locations-jobs-list.md', 'Projects', 'Locations Jobs List']
-- ['projects_locations-jobs-patch.md', 'Projects', 'Locations Jobs Patch']
-- ['projects_locations-jobs-pause.md', 'Projects', 'Locations Jobs Pause']
-- ['projects_locations-jobs-resume.md', 'Projects', 'Locations Jobs Resume']
-- ['projects_locations-jobs-run.md', 'Projects', 'Locations Jobs Run']
-- ['projects_locations-list.md', 'Projects', 'Locations List']
+nav:
+- Home: 'index.md'
+- 'Projects':
+    - 'Locations Get': 'projects_locations-get.md'
+    - 'Locations Jobs Create': 'projects_locations-jobs-create.md'
+    - 'Locations Jobs Delete': 'projects_locations-jobs-delete.md'
+    - 'Locations Jobs Get': 'projects_locations-jobs-get.md'
+    - 'Locations Jobs List': 'projects_locations-jobs-list.md'
+    - 'Locations Jobs Patch': 'projects_locations-jobs-patch.md'
+    - 'Locations Jobs Pause': 'projects_locations-jobs-pause.md'
+    - 'Locations Jobs Resume': 'projects_locations-jobs-resume.md'
+    - 'Locations Jobs Run': 'projects_locations-jobs-run.md'
+    - 'Locations List': 'projects_locations-list.md'
 
 theme: readthedocs
 

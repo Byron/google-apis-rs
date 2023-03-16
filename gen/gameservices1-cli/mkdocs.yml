@@ -1,4 +1,4 @@
-site_name: Game Services v4.0.1+20220223
+site_name: Game Services v5.0.2+20230105
 site_url: http://byron.github.io/google-apis-rs/google-gameservices1-cli
 site_description: A complete library to interact with Game Services (protocol v1)
 
@@ -7,44 +7,18 @@ repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/gameservices1-cl
 docs_dir: docs
 site_dir: build_html
 
-pages:
-- ['index.md', 'Home']
-- ['projects_locations-game-server-deployments-configs-create.md', 'Projects', 'Locations Game Server Deployments Configs Create']
-- ['projects_locations-game-server-deployments-configs-delete.md', 'Projects', 'Locations Game Server Deployments Configs Delete']
-- ['projects_locations-game-server-deployments-configs-get.md', 'Projects', 'Locations Game Server Deployments Configs Get']
-- ['projects_locations-game-server-deployments-configs-list.md', 'Projects', 'Locations Game Server Deployments Configs List']
-- ['projects_locations-game-server-deployments-create.md', 'Projects', 'Locations Game Server Deployments Create']
-- ['projects_locations-game-server-deployments-delete.md', 'Projects', 'Locations Game Server Deployments Delete']
-- ['projects_locations-game-server-deployments-fetch-deployment-state.md', 'Projects', 'Locations Game Server Deployments Fetch Deployment State']
-- ['projects_locations-game-server-deployments-get.md', 'Projects', 'Locations Game Server Deployments Get']
-- ['projects_locations-game-server-deployments-get-iam-policy.md', 'Projects', 'Locations Game Server Deployments Get Iam Policy']
-- ['projects_locations-game-server-deployments-get-rollout.md', 'Projects', 'Locations Game Server Deployments Get Rollout']
-- ['projects_locations-game-server-deployments-list.md', 'Projects', 'Locations Game Server Deployments List']
-- ['projects_locations-game-server-deployments-patch.md', 'Projects', 'Locations Game Server Deployments Patch']
-- ['projects_locations-game-server-deployments-preview-rollout.md', 'Projects', 'Locations Game Server Deployments Preview Rollout']
-- ['projects_locations-game-server-deployments-set-iam-policy.md', 'Projects', 'Locations Game Server Deployments Set Iam Policy']
-- ['projects_locations-game-server-deployments-test-iam-permissions.md', 'Projects', 'Locations Game Server Deployments Test Iam Permissions']
-- ['projects_locations-game-server-deployments-update-rollout.md', 'Projects', 'Locations Game Server Deployments Update Rollout']
-- ['projects_locations-get.md', 'Projects', 'Locations Get']
-- ['projects_locations-list.md', 'Projects', 'Locations List']
-- ['projects_locations-operations-cancel.md', 'Projects', 'Locations Operations Cancel']
-- ['projects_locations-operations-delete.md', 'Projects', 'Locations Operations Delete']
-- ['projects_locations-operations-get.md', 'Projects', 'Locations Operations Get']
-- ['projects_locations-operations-list.md', 'Projects', 'Locations Operations List']
-- ['projects_locations-realms-create.md', 'Projects', 'Locations Realms Create']
-- ['projects_locations-realms-delete.md', 'Projects', 'Locations Realms Delete']
-- ['projects_locations-realms-game-server-clusters-create.md', 'Projects', 'Locations Realms Game Server Clusters Create']
-- ['projects_locations-realms-game-server-clusters-delete.md', 'Projects', 'Locations Realms Game Server Clusters Delete']
-- ['projects_locations-realms-game-server-clusters-get.md', 'Projects', 'Locations Realms Game Server Clusters Get']
-- ['projects_locations-realms-game-server-clusters-list.md', 'Projects', 'Locations Realms Game Server Clusters List']
-- ['projects_locations-realms-game-server-clusters-patch.md', 'Projects', 'Locations Realms Game Server Clusters Patch']
-- ['projects_locations-realms-game-server-clusters-preview-create.md', 'Projects', 'Locations Realms Game Server Clusters Preview Create']
-- ['projects_locations-realms-game-server-clusters-preview-delete.md', 'Projects', 'Locations Realms Game Server Clusters Preview Delete']
-- ['projects_locations-realms-game-server-clusters-preview-update.md', 'Projects', 'Locations Realms Game Server Clusters Preview Update']
-- ['projects_locations-realms-get.md', 'Projects', 'Locations Realms Get']
-- ['projects_locations-realms-list.md', 'Projects', 'Locations Realms List']
-- ['projects_locations-realms-patch.md', 'Projects', 'Locations Realms Patch']
-- ['projects_locations-realms-preview-update.md', 'Projects', 'Locations Realms Preview Update']
+nav:
+- Home: 'index.md'
+- 'Projects':
+    - 'Locations Game Server Deployments Get Iam Policy': 'projects_locations-game-server-deployments-get-iam-policy.md'
+    - 'Locations Game Server Deployments Set Iam Policy': 'projects_locations-game-server-deployments-set-iam-policy.md'
+    - 'Locations Game Server Deployments Test Iam Permissions': 'projects_locations-game-server-deployments-test-iam-permissions.md'
+    - 'Locations Get': 'projects_locations-get.md'
+    - 'Locations List': 'projects_locations-list.md'
+    - 'Locations Operations Cancel': 'projects_locations-operations-cancel.md'
+    - 'Locations Operations Delete': 'projects_locations-operations-delete.md'
+    - 'Locations Operations Get': 'projects_locations-operations-get.md'
+    - 'Locations Operations List': 'projects_locations-operations-list.md'
 
 theme: readthedocs
 

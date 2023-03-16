@@ -3,8 +3,6 @@
 // DO NOT EDIT !
 #![allow(unused_variables, unused_imports, dead_code, unused_mut)]
 
-extern crate tokio;
-
 #[macro_use]
 extern crate clap;
 
@@ -12,9 +10,10 @@ use std::env;
 use std::io::{self, Write};
 use clap::{App, SubCommand, Arg};
 
-use google_androidenterprise1::{api, Error, oauth2};
+use google_androidenterprise1::{api, Error, oauth2, client::chrono, FieldMask};
 
-mod client;
+
+use google_clis_common as client;
 
 use client::{InvalidOptionsError, CLIError, arg_from_str, writer_from_opts, parse_kv_arg,
           input_file_from_opts, input_mime_from_opts, FieldCursor, FieldError, CallType, UploadProtocol,
@@ -539,6 +538,62 @@ where
         }
     }
 
+    async fn _enterprises_create_enrollment_token(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.enterprises().create_enrollment_token(opt.value_of("enterprise-id").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "device-type" => {
+                    call = call.device_type(value.unwrap_or(""));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["device-type"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
     async fn _enterprises_create_web_token(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
@@ -655,11 +710,13 @@ where
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
+                    "google-authentication-settings.dedicated-devices-allowed" => Some(("googleAuthenticationSettings.dedicatedDevicesAllowed", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "google-authentication-settings.google-authentication-required" => Some(("googleAuthenticationSettings.googleAuthenticationRequired", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "primary-domain" => Some(("primaryDomain", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["id", "name", "primary-domain"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["dedicated-devices-allowed", "google-authentication-required", "google-authentication-settings", "id", "name", "primary-domain"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1499,7 +1556,7 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "install" => {
-                    call = call.install(arg_from_str(value.unwrap_or("false"), err, "install", "boolean"));
+                    call = call.install(        value.map(|v| arg_from_str(v, err, "install", "boolean")).unwrap_or(false));
                 },
                 _ => {
                     let mut found = false;
@@ -2828,13 +2885,13 @@ where
                     call = call.query(value.unwrap_or(""));
                 },
                 "max-results" => {
-                    call = call.max_results(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
+                    call = call.max_results(        value.map(|v| arg_from_str(v, err, "max-results", "uint32")).unwrap_or(0));
                 },
                 "language" => {
                     call = call.language(value.unwrap_or(""));
                 },
                 "approved" => {
-                    call = call.approved(arg_from_str(value.unwrap_or("false"), err, "approved", "boolean"));
+                    call = call.approved(        value.map(|v| arg_from_str(v, err, "approved", "boolean")).unwrap_or(false));
                 },
                 _ => {
                     let mut found = false;
@@ -4682,6 +4739,9 @@ where
                     ("complete-signup", Some(opt)) => {
                         call_result = self._enterprises_complete_signup(opt, dry_run, &mut err).await;
                     },
+                    ("create-enrollment-token", Some(opt)) => {
+                        call_result = self._enterprises_create_enrollment_token(opt, dry_run, &mut err).await;
+                    },
                     ("create-web-token", Some(opt)) => {
                         call_result = self._enterprises_create_web_token(opt, dry_run, &mut err).await;
                     },
@@ -5281,7 +5341,7 @@ async fn main() {
                   ]),
             ]),
         
-        ("enterprises", "methods: 'acknowledge-notification-set', 'complete-signup', 'create-web-token', 'enroll', 'generate-signup-url', 'get', 'get-service-account', 'get-store-layout', 'list', 'pull-notification-set', 'send-test-push-notification', 'set-account', 'set-store-layout' and 'unenroll'", vec![
+        ("enterprises", "methods: 'acknowledge-notification-set', 'complete-signup', 'create-enrollment-token', 'create-web-token', 'enroll', 'generate-signup-url', 'get', 'get-service-account', 'get-store-layout', 'list', 'pull-notification-set', 'send-test-push-notification', 'set-account', 'set-store-layout' and 'unenroll'", vec![
             ("acknowledge-notification-set",
                     Some(r##"Acknowledges notifications that were received from Enterprises.PullNotificationSet to prevent subsequent calls from returning the same notifications."##),
                     "Details at http://byron.github.io/google-apis-rs/google_androidenterprise1_cli/enterprises_acknowledge-notification-set",
@@ -5296,6 +5356,28 @@ async fn main() {
                     Some(r##"Completes the signup flow, by specifying the Completion token and Enterprise token. This request must not be called multiple times for a given Enterprise Token."##),
                     "Details at http://byron.github.io/google-apis-rs/google_androidenterprise1_cli/enterprises_complete-signup",
                   vec![
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("create-enrollment-token",
+                    Some(r##"Returns a token for device enrollment. The DPC can encode this token within the QR/NFC/zero-touch enrollment payload or fetch it before calling the on-device API to authenticate the user. The token can be generated for each device or reused across multiple devices."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_androidenterprise1_cli/enterprises_create-enrollment-token",
+                  vec![
+                    (Some(r##"enterprise-id"##),
+                     None,
+                     Some(r##"The ID of the enterprise."##),
+                     Some(true),
+                     Some(false)),
+        
                     (Some(r##"v"##),
                      Some(r##"p"##),
                      Some(r##"Set various optional parameters, matching the key=value form"##),
@@ -5582,7 +5664,7 @@ async fn main() {
         
         ("entitlements", "methods: 'delete', 'get', 'list' and 'update'", vec![
             ("delete",
-                    Some(r##"Removes an entitlement to an app for a user."##),
+                    Some(r##"Removes an entitlement to an app for a user. **Note:** This item has been deprecated. New integrations cannot use this method and can refer to our new recommendations."##),
                     "Details at http://byron.github.io/google-apis-rs/google_androidenterprise1_cli/entitlements_delete",
                   vec![
                     (Some(r##"enterprise-id"##),
@@ -5610,7 +5692,7 @@ async fn main() {
                      Some(true)),
                   ]),
             ("get",
-                    Some(r##"Retrieves details of an entitlement."##),
+                    Some(r##"Retrieves details of an entitlement. **Note:** This item has been deprecated. New integrations cannot use this method and can refer to our new recommendations."##),
                     "Details at http://byron.github.io/google-apis-rs/google_androidenterprise1_cli/entitlements_get",
                   vec![
                     (Some(r##"enterprise-id"##),
@@ -5644,7 +5726,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("list",
-                    Some(r##"Lists all entitlements for the specified user. Only the ID is set."##),
+                    Some(r##"Lists all entitlements for the specified user. Only the ID is set. **Note:** This item has been deprecated. New integrations cannot use this method and can refer to our new recommendations."##),
                     "Details at http://byron.github.io/google-apis-rs/google_androidenterprise1_cli/entitlements_list",
                   vec![
                     (Some(r##"enterprise-id"##),
@@ -5672,7 +5754,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("update",
-                    Some(r##"Adds or updates an entitlement to an app for a user."##),
+                    Some(r##"Adds or updates an entitlement to an app for a user. **Note:** This item has been deprecated. New integrations cannot use this method and can refer to our new recommendations."##),
                     "Details at http://byron.github.io/google-apis-rs/google_androidenterprise1_cli/entitlements_update",
                   vec![
                     (Some(r##"enterprise-id"##),
@@ -5715,7 +5797,7 @@ async fn main() {
         
         ("grouplicenses", "methods: 'get' and 'list'", vec![
             ("get",
-                    Some(r##"Retrieves details of an enterprise's group license for a product."##),
+                    Some(r##"Retrieves details of an enterprise's group license for a product. **Note:** This item has been deprecated. New integrations cannot use this method and can refer to our new recommendations."##),
                     "Details at http://byron.github.io/google-apis-rs/google_androidenterprise1_cli/grouplicenses_get",
                   vec![
                     (Some(r##"enterprise-id"##),
@@ -5743,7 +5825,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("list",
-                    Some(r##"Retrieves IDs of all products for which the enterprise has a group license."##),
+                    Some(r##"Retrieves IDs of all products for which the enterprise has a group license. **Note:** This item has been deprecated. New integrations cannot use this method and can refer to our new recommendations."##),
                     "Details at http://byron.github.io/google-apis-rs/google_androidenterprise1_cli/grouplicenses_list",
                   vec![
                     (Some(r##"enterprise-id"##),
@@ -5768,7 +5850,7 @@ async fn main() {
         
         ("grouplicenseusers", "methods: 'list'", vec![
             ("list",
-                    Some(r##"Retrieves the IDs of the users who have been granted entitlements under the license."##),
+                    Some(r##"Retrieves the IDs of the users who have been granted entitlements under the license. **Note:** This item has been deprecated. New integrations cannot use this method and can refer to our new recommendations."##),
                     "Details at http://byron.github.io/google-apis-rs/google_androidenterprise1_cli/grouplicenseusers_list",
                   vec![
                     (Some(r##"enterprise-id"##),
@@ -6302,7 +6384,7 @@ async fn main() {
         
         ("products", "methods: 'approve', 'generate-approval-url', 'get', 'get-app-restrictions-schema', 'get-permissions', 'list' and 'unapprove'", vec![
             ("approve",
-                    Some(r##" Approves the specified product and the relevant app permissions, if any. The maximum number of products that you can approve per enterprise customer is 1,000. To learn how to use managed Google Play to design and create a store layout to display approved products to your users, see Store Layout Design. "##),
+                    Some(r##" Approves the specified product and the relevant app permissions, if any. The maximum number of products that you can approve per enterprise customer is 1,000. To learn how to use managed Google Play to design and create a store layout to display approved products to your users, see Store Layout Design. **Note:** This item has been deprecated. New integrations cannot use this method and can refer to our new recommendations. "##),
                     "Details at http://byron.github.io/google-apis-rs/google_androidenterprise1_cli/products_approve",
                   vec![
                     (Some(r##"enterprise-id"##),
@@ -6330,7 +6412,7 @@ async fn main() {
                      Some(true)),
                   ]),
             ("generate-approval-url",
-                    Some(r##"Generates a URL that can be rendered in an iframe to display the permissions (if any) of a product. An enterprise admin must view these permissions and accept them on behalf of their organization in order to approve that product. Admins should accept the displayed permissions by interacting with a separate UI element in the EMM console, which in turn should trigger the use of this URL as the approvalUrlInfo.approvalUrl property in a Products.approve call to approve the product. This URL can only be used to display permissions for up to 1 day."##),
+                    Some(r##"Generates a URL that can be rendered in an iframe to display the permissions (if any) of a product. An enterprise admin must view these permissions and accept them on behalf of their organization in order to approve that product. Admins should accept the displayed permissions by interacting with a separate UI element in the EMM console, which in turn should trigger the use of this URL as the approvalUrlInfo.approvalUrl property in a Products.approve call to approve the product. This URL can only be used to display permissions for up to 1 day. **Note:** This item has been deprecated. New integrations cannot use this method and can refer to our new recommendations. "##),
                     "Details at http://byron.github.io/google-apis-rs/google_androidenterprise1_cli/products_generate-approval-url",
                   vec![
                     (Some(r##"enterprise-id"##),
@@ -6442,7 +6524,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("list",
-                    Some(r##"Finds approved products that match a query, or all approved products if there is no query."##),
+                    Some(r##"Finds approved products that match a query, or all approved products if there is no query. **Note:** This item has been deprecated. New integrations cannot use this method and can refer to our new recommendations. "##),
                     "Details at http://byron.github.io/google-apis-rs/google_androidenterprise1_cli/products_list",
                   vec![
                     (Some(r##"enterprise-id"##),
@@ -6464,7 +6546,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("unapprove",
-                    Some(r##"Unapproves the specified product (and the relevant app permissions, if any)"##),
+                    Some(r##"Unapproves the specified product (and the relevant app permissions, if any) **Note:** This item has been deprecated. New integrations cannot use this method and can refer to our new recommendations."##),
                     "Details at http://byron.github.io/google-apis-rs/google_androidenterprise1_cli/products_unapprove",
                   vec![
                     (Some(r##"enterprise-id"##),
@@ -6946,7 +7028,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("get-available-product-set",
-                    Some(r##"Retrieves the set of products a user is entitled to access."##),
+                    Some(r##"Retrieves the set of products a user is entitled to access. **Note:** This item has been deprecated. New integrations cannot use this method and can refer to our new recommendations."##),
                     "Details at http://byron.github.io/google-apis-rs/google_androidenterprise1_cli/users_get-available-product-set",
                   vec![
                     (Some(r##"enterprise-id"##),
@@ -7052,7 +7134,7 @@ async fn main() {
                      Some(true)),
                   ]),
             ("set-available-product-set",
-                    Some(r##"Modifies the set of products that a user is entitled to access (referred to as *whitelisted* products). Only products that are approved or products that were previously approved (products with revoked approval) can be whitelisted."##),
+                    Some(r##"Modifies the set of products that a user is entitled to access (referred to as *whitelisted* products). Only products that are approved or products that were previously approved (products with revoked approval) can be whitelisted. **Note:** This item has been deprecated. New integrations cannot use this method and can refer to our new recommendations."##),
                     "Details at http://byron.github.io/google-apis-rs/google_androidenterprise1_cli/users_set-available-product-set",
                   vec![
                     (Some(r##"enterprise-id"##),
@@ -7262,7 +7344,7 @@ async fn main() {
     
     let mut app = App::new("androidenterprise1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("4.0.1+20220303")
+           .version("5.0.2+20230123")
            .about("Manages the deployment of apps to Android Enterprise devices.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_androidenterprise1_cli")
            .arg(Arg::with_name("url")

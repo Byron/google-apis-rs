@@ -1,4 +1,4 @@
-site_name: Cloudchannel v4.0.1+20220303
+site_name: Cloudchannel v5.0.2+20230123
 site_url: http://byron.github.io/google-apis-rs/google-cloudchannel1-cli
 site_description: A complete library to interact with Cloudchannel (protocol v1)
 
@@ -7,53 +7,69 @@ repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/cloudchannel1-cl
 docs_dir: docs
 site_dir: build_html
 
-pages:
-- ['index.md', 'Home']
-- ['accounts_channel-partner-links-create.md', 'Accounts', 'Channel Partner Links Create']
-- ['accounts_channel-partner-links-customers-create.md', 'Accounts', 'Channel Partner Links Customers Create']
-- ['accounts_channel-partner-links-customers-delete.md', 'Accounts', 'Channel Partner Links Customers Delete']
-- ['accounts_channel-partner-links-customers-get.md', 'Accounts', 'Channel Partner Links Customers Get']
-- ['accounts_channel-partner-links-customers-import.md', 'Accounts', 'Channel Partner Links Customers Import']
-- ['accounts_channel-partner-links-customers-list.md', 'Accounts', 'Channel Partner Links Customers List']
-- ['accounts_channel-partner-links-customers-patch.md', 'Accounts', 'Channel Partner Links Customers Patch']
-- ['accounts_channel-partner-links-get.md', 'Accounts', 'Channel Partner Links Get']
-- ['accounts_channel-partner-links-list.md', 'Accounts', 'Channel Partner Links List']
-- ['accounts_channel-partner-links-patch.md', 'Accounts', 'Channel Partner Links Patch']
-- ['accounts_check-cloud-identity-accounts-exist.md', 'Accounts', 'Check Cloud Identity Accounts Exist']
-- ['accounts_customers-create.md', 'Accounts', 'Customers Create']
-- ['accounts_customers-delete.md', 'Accounts', 'Customers Delete']
-- ['accounts_customers-entitlements-activate.md', 'Accounts', 'Customers Entitlements Activate']
-- ['accounts_customers-entitlements-cancel.md', 'Accounts', 'Customers Entitlements Cancel']
-- ['accounts_customers-entitlements-change-offer.md', 'Accounts', 'Customers Entitlements Change Offer']
-- ['accounts_customers-entitlements-change-parameters.md', 'Accounts', 'Customers Entitlements Change Parameters']
-- ['accounts_customers-entitlements-change-renewal-settings.md', 'Accounts', 'Customers Entitlements Change Renewal Settings']
-- ['accounts_customers-entitlements-create.md', 'Accounts', 'Customers Entitlements Create']
-- ['accounts_customers-entitlements-get.md', 'Accounts', 'Customers Entitlements Get']
-- ['accounts_customers-entitlements-list.md', 'Accounts', 'Customers Entitlements List']
-- ['accounts_customers-entitlements-lookup-offer.md', 'Accounts', 'Customers Entitlements Lookup Offer']
-- ['accounts_customers-entitlements-start-paid-service.md', 'Accounts', 'Customers Entitlements Start Paid Service']
-- ['accounts_customers-entitlements-suspend.md', 'Accounts', 'Customers Entitlements Suspend']
-- ['accounts_customers-get.md', 'Accounts', 'Customers Get']
-- ['accounts_customers-import.md', 'Accounts', 'Customers Import']
-- ['accounts_customers-list.md', 'Accounts', 'Customers List']
-- ['accounts_customers-list-purchasable-offers.md', 'Accounts', 'Customers List Purchasable Offers']
-- ['accounts_customers-list-purchasable-skus.md', 'Accounts', 'Customers List Purchasable Skus']
-- ['accounts_customers-patch.md', 'Accounts', 'Customers Patch']
-- ['accounts_customers-provision-cloud-identity.md', 'Accounts', 'Customers Provision Cloud Identity']
-- ['accounts_customers-transfer-entitlements.md', 'Accounts', 'Customers Transfer Entitlements']
-- ['accounts_customers-transfer-entitlements-to-google.md', 'Accounts', 'Customers Transfer Entitlements To Google']
-- ['accounts_list-subscribers.md', 'Accounts', 'List Subscribers']
-- ['accounts_list-transferable-offers.md', 'Accounts', 'List Transferable Offers']
-- ['accounts_list-transferable-skus.md', 'Accounts', 'List Transferable Skus']
-- ['accounts_offers-list.md', 'Accounts', 'Offers List']
-- ['accounts_register.md', 'Accounts', 'Register']
-- ['accounts_unregister.md', 'Accounts', 'Unregister']
-- ['operations_cancel.md', 'Operations', 'Cancel']
-- ['operations_delete.md', 'Operations', 'Delete']
-- ['operations_get.md', 'Operations', 'Get']
-- ['operations_list.md', 'Operations', 'List']
-- ['products_list.md', 'Products', 'List']
-- ['products_skus-list.md', 'Products', 'Skus List']
+nav:
+- Home: 'index.md'
+- 'Accounts':
+    - 'Channel Partner Links Channel Partner Repricing Configs Create': 'accounts_channel-partner-links-channel-partner-repricing-configs-create.md'
+    - 'Channel Partner Links Channel Partner Repricing Configs Delete': 'accounts_channel-partner-links-channel-partner-repricing-configs-delete.md'
+    - 'Channel Partner Links Channel Partner Repricing Configs Get': 'accounts_channel-partner-links-channel-partner-repricing-configs-get.md'
+    - 'Channel Partner Links Channel Partner Repricing Configs List': 'accounts_channel-partner-links-channel-partner-repricing-configs-list.md'
+    - 'Channel Partner Links Channel Partner Repricing Configs Patch': 'accounts_channel-partner-links-channel-partner-repricing-configs-patch.md'
+    - 'Channel Partner Links Create': 'accounts_channel-partner-links-create.md'
+    - 'Channel Partner Links Customers Create': 'accounts_channel-partner-links-customers-create.md'
+    - 'Channel Partner Links Customers Delete': 'accounts_channel-partner-links-customers-delete.md'
+    - 'Channel Partner Links Customers Get': 'accounts_channel-partner-links-customers-get.md'
+    - 'Channel Partner Links Customers Import': 'accounts_channel-partner-links-customers-import.md'
+    - 'Channel Partner Links Customers List': 'accounts_channel-partner-links-customers-list.md'
+    - 'Channel Partner Links Customers Patch': 'accounts_channel-partner-links-customers-patch.md'
+    - 'Channel Partner Links Get': 'accounts_channel-partner-links-get.md'
+    - 'Channel Partner Links List': 'accounts_channel-partner-links-list.md'
+    - 'Channel Partner Links Patch': 'accounts_channel-partner-links-patch.md'
+    - 'Check Cloud Identity Accounts Exist': 'accounts_check-cloud-identity-accounts-exist.md'
+    - 'Customers Create': 'accounts_customers-create.md'
+    - 'Customers Customer Repricing Configs Create': 'accounts_customers-customer-repricing-configs-create.md'
+    - 'Customers Customer Repricing Configs Delete': 'accounts_customers-customer-repricing-configs-delete.md'
+    - 'Customers Customer Repricing Configs Get': 'accounts_customers-customer-repricing-configs-get.md'
+    - 'Customers Customer Repricing Configs List': 'accounts_customers-customer-repricing-configs-list.md'
+    - 'Customers Customer Repricing Configs Patch': 'accounts_customers-customer-repricing-configs-patch.md'
+    - 'Customers Delete': 'accounts_customers-delete.md'
+    - 'Customers Entitlements Activate': 'accounts_customers-entitlements-activate.md'
+    - 'Customers Entitlements Cancel': 'accounts_customers-entitlements-cancel.md'
+    - 'Customers Entitlements Change Offer': 'accounts_customers-entitlements-change-offer.md'
+    - 'Customers Entitlements Change Parameters': 'accounts_customers-entitlements-change-parameters.md'
+    - 'Customers Entitlements Change Renewal Settings': 'accounts_customers-entitlements-change-renewal-settings.md'
+    - 'Customers Entitlements Create': 'accounts_customers-entitlements-create.md'
+    - 'Customers Entitlements Get': 'accounts_customers-entitlements-get.md'
+    - 'Customers Entitlements List': 'accounts_customers-entitlements-list.md'
+    - 'Customers Entitlements Lookup Offer': 'accounts_customers-entitlements-lookup-offer.md'
+    - 'Customers Entitlements Start Paid Service': 'accounts_customers-entitlements-start-paid-service.md'
+    - 'Customers Entitlements Suspend': 'accounts_customers-entitlements-suspend.md'
+    - 'Customers Get': 'accounts_customers-get.md'
+    - 'Customers Import': 'accounts_customers-import.md'
+    - 'Customers List': 'accounts_customers-list.md'
+    - 'Customers List Purchasable Offers': 'accounts_customers-list-purchasable-offers.md'
+    - 'Customers List Purchasable Skus': 'accounts_customers-list-purchasable-skus.md'
+    - 'Customers Patch': 'accounts_customers-patch.md'
+    - 'Customers Provision Cloud Identity': 'accounts_customers-provision-cloud-identity.md'
+    - 'Customers Transfer Entitlements': 'accounts_customers-transfer-entitlements.md'
+    - 'Customers Transfer Entitlements To Google': 'accounts_customers-transfer-entitlements-to-google.md'
+    - 'List Subscribers': 'accounts_list-subscribers.md'
+    - 'List Transferable Offers': 'accounts_list-transferable-offers.md'
+    - 'List Transferable Skus': 'accounts_list-transferable-skus.md'
+    - 'Offers List': 'accounts_offers-list.md'
+    - 'Register': 'accounts_register.md'
+    - 'Report Jobs Fetch Report Results': 'accounts_report-jobs-fetch-report-results.md'
+    - 'Reports List': 'accounts_reports-list.md'
+    - 'Reports Run': 'accounts_reports-run.md'
+    - 'Unregister': 'accounts_unregister.md'
+- 'Operations':
+    - 'Cancel': 'operations_cancel.md'
+    - 'Delete': 'operations_delete.md'
+    - 'Get': 'operations_get.md'
+    - 'List': 'operations_list.md'
+- 'Products':
+    - 'List': 'products_list.md'
+    - 'Skus List': 'products_skus-list.md'
 
 theme: readthedocs
 

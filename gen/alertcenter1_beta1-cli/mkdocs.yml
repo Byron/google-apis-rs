@@ -1,4 +1,4 @@
-site_name: AlertCenter v4.0.1+20220221
+site_name: AlertCenter v5.0.2+20230123
 site_url: http://byron.github.io/google-apis-rs/google-alertcenter1_beta1-cli
 site_description: A complete library to interact with AlertCenter (protocol v1beta1)
 
@@ -7,19 +7,21 @@ repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/alertcenter1_bet
 docs_dir: docs
 site_dir: build_html
 
-pages:
-- ['index.md', 'Home']
-- ['alerts_batch-delete.md', 'Alerts', 'Batch Delete']
-- ['alerts_batch-undelete.md', 'Alerts', 'Batch Undelete']
-- ['alerts_delete.md', 'Alerts', 'Delete']
-- ['alerts_feedback-create.md', 'Alerts', 'Feedback Create']
-- ['alerts_feedback-list.md', 'Alerts', 'Feedback List']
-- ['alerts_get.md', 'Alerts', 'Get']
-- ['alerts_get-metadata.md', 'Alerts', 'Get Metadata']
-- ['alerts_list.md', 'Alerts', 'List']
-- ['alerts_undelete.md', 'Alerts', 'Undelete']
-- ['methods_get-settings.md', 'Methods', 'Get Settings']
-- ['methods_update-settings.md', 'Methods', 'Update Settings']
+nav:
+- Home: 'index.md'
+- 'Alerts':
+    - 'Batch Delete': 'alerts_batch-delete.md'
+    - 'Batch Undelete': 'alerts_batch-undelete.md'
+    - 'Delete': 'alerts_delete.md'
+    - 'Feedback Create': 'alerts_feedback-create.md'
+    - 'Feedback List': 'alerts_feedback-list.md'
+    - 'Get': 'alerts_get.md'
+    - 'Get Metadata': 'alerts_get-metadata.md'
+    - 'List': 'alerts_list.md'
+    - 'Undelete': 'alerts_undelete.md'
+- 'Methods':
+    - 'Get Settings': 'methods_get-settings.md'
+    - 'Update Settings': 'methods_update-settings.md'
 
 theme: readthedocs
 

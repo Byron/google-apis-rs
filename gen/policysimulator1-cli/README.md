@@ -25,24 +25,30 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Policy Simulator* API at revision *20220227*. The CLI is at version *4.0.1*.
+This documentation was generated from the *Policy Simulator* API at revision *20230115*. The CLI is at version *5.0.2*.
 
 ```bash
 policysimulator1 [options]
         folders
                 locations-replays-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-replays-get <name> [-p <v>]... [-o <out>]
+                locations-replays-operations-get <name> [-p <v>]... [-o <out>]
+                locations-replays-operations-list <name> [-p <v>]... [-o <out>]
                 locations-replays-results-list <parent> [-p <v>]... [-o <out>]
         operations
                 get <name> [-p <v>]... [-o <out>]
-                list [-p <v>]... [-o <out>]
+                list <name> [-p <v>]... [-o <out>]
         organizations
                 locations-replays-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-replays-get <name> [-p <v>]... [-o <out>]
+                locations-replays-operations-get <name> [-p <v>]... [-o <out>]
+                locations-replays-operations-list <name> [-p <v>]... [-o <out>]
                 locations-replays-results-list <parent> [-p <v>]... [-o <out>]
         projects
                 locations-replays-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-replays-get <name> [-p <v>]... [-o <out>]
+                locations-replays-operations-get <name> [-p <v>]... [-o <out>]
+                locations-replays-operations-list <name> [-p <v>]... [-o <out>]
                 locations-replays-results-list <parent> [-p <v>]... [-o <out>]
   policysimulator1 --help
 

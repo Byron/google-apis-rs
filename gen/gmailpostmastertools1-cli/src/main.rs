@@ -3,8 +3,6 @@
 // DO NOT EDIT !
 #![allow(unused_variables, unused_imports, dead_code, unused_mut)]
 
-extern crate tokio;
-
 #[macro_use]
 extern crate clap;
 
@@ -12,9 +10,10 @@ use std::env;
 use std::io::{self, Write};
 use clap::{App, SubCommand, Arg};
 
-use google_gmailpostmastertools1::{api, Error, oauth2};
+use google_gmailpostmastertools1::{api, Error, oauth2, client::chrono, FieldMask};
 
-mod client;
+
+use google_clis_common as client;
 
 use client::{InvalidOptionsError, CLIError, arg_from_str, writer_from_opts, parse_kv_arg,
           input_file_from_opts, input_mime_from_opts, FieldCursor, FieldError, CallType, UploadProtocol,
@@ -113,7 +112,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -221,28 +220,28 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "start-date-year" => {
-                    call = call.start_date_year(arg_from_str(value.unwrap_or("-0"), err, "start-date-year", "integer"));
+                    call = call.start_date_year(        value.map(|v| arg_from_str(v, err, "start-date-year", "int32")).unwrap_or(-0));
                 },
                 "start-date-month" => {
-                    call = call.start_date_month(arg_from_str(value.unwrap_or("-0"), err, "start-date-month", "integer"));
+                    call = call.start_date_month(        value.map(|v| arg_from_str(v, err, "start-date-month", "int32")).unwrap_or(-0));
                 },
                 "start-date-day" => {
-                    call = call.start_date_day(arg_from_str(value.unwrap_or("-0"), err, "start-date-day", "integer"));
+                    call = call.start_date_day(        value.map(|v| arg_from_str(v, err, "start-date-day", "int32")).unwrap_or(-0));
                 },
                 "page-token" => {
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 "end-date-year" => {
-                    call = call.end_date_year(arg_from_str(value.unwrap_or("-0"), err, "end-date-year", "integer"));
+                    call = call.end_date_year(        value.map(|v| arg_from_str(v, err, "end-date-year", "int32")).unwrap_or(-0));
                 },
                 "end-date-month" => {
-                    call = call.end_date_month(arg_from_str(value.unwrap_or("-0"), err, "end-date-month", "integer"));
+                    call = call.end_date_month(        value.map(|v| arg_from_str(v, err, "end-date-month", "int32")).unwrap_or(-0));
                 },
                 "end-date-day" => {
-                    call = call.end_date_day(arg_from_str(value.unwrap_or("-0"), err, "end-date-day", "integer"));
+                    call = call.end_date_day(        value.map(|v| arg_from_str(v, err, "end-date-day", "int32")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -478,7 +477,7 @@ async fn main() {
     
     let mut app = App::new("gmailpostmastertools1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("4.0.1+20220305")
+           .version("5.0.2+20230123")
            .about("The Postmaster Tools API is a RESTful API that provides programmatic access to email traffic metrics (like spam reports, delivery errors etc) otherwise available through the Gmail Postmaster Tools UI currently.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_gmailpostmastertools1_cli")
            .arg(Arg::with_name("url")

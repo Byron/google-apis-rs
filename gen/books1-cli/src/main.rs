@@ -3,8 +3,6 @@
 // DO NOT EDIT !
 #![allow(unused_variables, unused_imports, dead_code, unused_mut)]
 
-extern crate tokio;
-
 #[macro_use]
 extern crate clap;
 
@@ -12,9 +10,10 @@ use std::env;
 use std::io::{self, Write};
 use clap::{App, SubCommand, Arg};
 
-use google_books1::{api, Error, oauth2};
+use google_books1::{api, Error, oauth2, client::chrono, FieldMask};
 
-mod client;
+
+use google_clis_common as client;
 
 use client::{InvalidOptionsError, CLIError, arg_from_str, writer_from_opts, parse_kv_arg,
           input_file_from_opts, input_mime_from_opts, FieldCursor, FieldError, CallType, UploadProtocol,
@@ -170,16 +169,16 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "start-index" => {
-                    call = call.start_index(arg_from_str(value.unwrap_or("-0"), err, "start-index", "integer"));
+                    call = call.start_index(        value.map(|v| arg_from_str(v, err, "start-index", "uint32")).unwrap_or(0));
                 },
                 "source" => {
                     call = call.source(value.unwrap_or(""));
                 },
                 "show-preorders" => {
-                    call = call.show_preorders(arg_from_str(value.unwrap_or("false"), err, "show-preorders", "boolean"));
+                    call = call.show_preorders(        value.map(|v| arg_from_str(v, err, "show-preorders", "boolean")).unwrap_or(false));
                 },
                 "max-results" => {
-                    call = call.max_results(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
+                    call = call.max_results(        value.map(|v| arg_from_str(v, err, "max-results", "uint32")).unwrap_or(0));
                 },
                 _ => {
                     let mut found = false;
@@ -672,22 +671,22 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "w" => {
-                    call = call.w(arg_from_str(value.unwrap_or("-0"), err, "w", "integer"));
+                    call = call.w(        value.map(|v| arg_from_str(v, err, "w", "int32")).unwrap_or(-0));
                 },
                 "source" => {
                     call = call.source(value.unwrap_or(""));
                 },
                 "scale" => {
-                    call = call.scale(arg_from_str(value.unwrap_or("-0"), err, "scale", "integer"));
+                    call = call.scale(        value.map(|v| arg_from_str(v, err, "scale", "int32")).unwrap_or(-0));
                 },
                 "locale" => {
                     call = call.locale(value.unwrap_or(""));
                 },
                 "h" => {
-                    call = call.h(arg_from_str(value.unwrap_or("-0"), err, "h", "integer"));
+                    call = call.h(        value.map(|v| arg_from_str(v, err, "h", "int32")).unwrap_or(-0));
                 },
                 "allow-web-definitions" => {
-                    call = call.allow_web_definitions(arg_from_str(value.unwrap_or("false"), err, "allow-web-definitions", "boolean"));
+                    call = call.allow_web_definitions(        value.map(|v| arg_from_str(v, err, "allow-web-definitions", "boolean")).unwrap_or(false));
                 },
                 _ => {
                     let mut found = false;
@@ -743,7 +742,7 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "w" => {
-                    call = call.w(arg_from_str(value.unwrap_or("-0"), err, "w", "integer"));
+                    call = call.w(        value.map(|v| arg_from_str(v, err, "w", "int32")).unwrap_or(-0));
                 },
                 "updated-min" => {
                     call = call.updated_min(value.unwrap_or(""));
@@ -755,19 +754,19 @@ where
                     call = call.source(value.unwrap_or(""));
                 },
                 "scale" => {
-                    call = call.scale(arg_from_str(value.unwrap_or("-0"), err, "scale", "integer"));
+                    call = call.scale(        value.map(|v| arg_from_str(v, err, "scale", "int32")).unwrap_or(-0));
                 },
                 "page-token" => {
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "max-results" => {
-                    call = call.max_results(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
+                    call = call.max_results(        value.map(|v| arg_from_str(v, err, "max-results", "uint32")).unwrap_or(0));
                 },
                 "locale" => {
                     call = call.locale(value.unwrap_or(""));
                 },
                 "h" => {
-                    call = call.h(arg_from_str(value.unwrap_or("-0"), err, "h", "integer"));
+                    call = call.h(        value.map(|v| arg_from_str(v, err, "h", "int32")).unwrap_or(-0));
                 },
                 "annotation-data-id" => {
                     call = call.add_annotation_data_id(value.unwrap_or(""));
@@ -891,7 +890,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "max-results" => {
-                    call = call.max_results(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
+                    call = call.max_results(        value.map(|v| arg_from_str(v, err, "max-results", "uint32")).unwrap_or(0));
                 },
                 "content-version" => {
                     call = call.content_version(value.unwrap_or(""));
@@ -1027,13 +1026,13 @@ where
                     call = call.source(value.unwrap_or(""));
                 },
                 "show-deleted" => {
-                    call = call.show_deleted(arg_from_str(value.unwrap_or("false"), err, "show-deleted", "boolean"));
+                    call = call.show_deleted(        value.map(|v| arg_from_str(v, err, "show-deleted", "boolean")).unwrap_or(false));
                 },
                 "page-token" => {
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "max-results" => {
-                    call = call.max_results(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
+                    call = call.max_results(        value.map(|v| arg_from_str(v, err, "max-results", "uint32")).unwrap_or(0));
                 },
                 "locale" => {
                     call = call.locale(value.unwrap_or(""));
@@ -1275,13 +1274,13 @@ where
                     call = call.add_volume_ids(value.unwrap_or(""));
                 },
                 "show-preorders" => {
-                    call = call.show_preorders(arg_from_str(value.unwrap_or("false"), err, "show-preorders", "boolean"));
+                    call = call.show_preorders(        value.map(|v| arg_from_str(v, err, "show-preorders", "boolean")).unwrap_or(false));
                 },
                 "locale" => {
                     call = call.locale(value.unwrap_or(""));
                 },
                 "include-non-comics-series" => {
-                    call = call.include_non_comics_series(arg_from_str(value.unwrap_or("false"), err, "include-non-comics-series", "boolean"));
+                    call = call.include_non_comics_series(        value.map(|v| arg_from_str(v, err, "include-non-comics-series", "boolean")).unwrap_or(false));
                 },
                 "features" => {
                     call = call.add_features(value.unwrap_or(""));
@@ -1574,7 +1573,7 @@ where
                     call = call.source(value.unwrap_or(""));
                 },
                 "show-only-summary-in-response" => {
-                    call = call.show_only_summary_in_response(arg_from_str(value.unwrap_or("false"), err, "show-only-summary-in-response", "boolean"));
+                    call = call.show_only_summary_in_response(        value.map(|v| arg_from_str(v, err, "show-only-summary-in-response", "boolean")).unwrap_or(false));
                 },
                 "country" => {
                     call = call.country(value.unwrap_or(""));
@@ -1648,13 +1647,13 @@ where
                     call = call.source(value.unwrap_or(""));
                 },
                 "show-deleted" => {
-                    call = call.show_deleted(arg_from_str(value.unwrap_or("false"), err, "show-deleted", "boolean"));
+                    call = call.show_deleted(        value.map(|v| arg_from_str(v, err, "show-deleted", "boolean")).unwrap_or(false));
                 },
                 "page-token" => {
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "max-results" => {
-                    call = call.max_results(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
+                    call = call.max_results(        value.map(|v| arg_from_str(v, err, "max-results", "uint32")).unwrap_or(0));
                 },
                 "layer-ids" => {
                     call = call.add_layer_ids(value.unwrap_or(""));
@@ -2253,13 +2252,13 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "start-index" => {
-                    call = call.start_index(arg_from_str(value.unwrap_or("-0"), err, "start-index", "integer"));
+                    call = call.start_index(        value.map(|v| arg_from_str(v, err, "start-index", "uint32")).unwrap_or(0));
                 },
                 "source" => {
                     call = call.source(value.unwrap_or(""));
                 },
                 "show-preorders" => {
-                    call = call.show_preorders(arg_from_str(value.unwrap_or("false"), err, "show-preorders", "boolean"));
+                    call = call.show_preorders(        value.map(|v| arg_from_str(v, err, "show-preorders", "boolean")).unwrap_or(false));
                 },
                 "q" => {
                     call = call.q(value.unwrap_or(""));
@@ -2268,7 +2267,7 @@ where
                     call = call.projection(value.unwrap_or(""));
                 },
                 "max-results" => {
-                    call = call.max_results(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
+                    call = call.max_results(        value.map(|v| arg_from_str(v, err, "max-results", "uint32")).unwrap_or(0));
                 },
                 "country" => {
                     call = call.country(value.unwrap_or(""));
@@ -2569,7 +2568,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "uint32")).unwrap_or(0));
                 },
                 "max-allowed-maturity-rating" => {
                     call = call.max_allowed_maturity_rating(value.unwrap_or(""));
@@ -2973,7 +2972,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "uint32")).unwrap_or(0));
                 },
                 _ => {
                     let mut found = false;
@@ -3094,7 +3093,7 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "user-library-consistent-read" => {
-                    call = call.user_library_consistent_read(arg_from_str(value.unwrap_or("false"), err, "user-library-consistent-read", "boolean"));
+                    call = call.user_library_consistent_read(        value.map(|v| arg_from_str(v, err, "user-library-consistent-read", "boolean")).unwrap_or(false));
                 },
                 "source" => {
                     call = call.source(value.unwrap_or(""));
@@ -3106,7 +3105,7 @@ where
                     call = call.partner(value.unwrap_or(""));
                 },
                 "include-non-comics-series" => {
-                    call = call.include_non_comics_series(arg_from_str(value.unwrap_or("false"), err, "include-non-comics-series", "boolean"));
+                    call = call.include_non_comics_series(        value.map(|v| arg_from_str(v, err, "include-non-comics-series", "boolean")).unwrap_or(false));
                 },
                 "country" => {
                     call = call.country(value.unwrap_or(""));
@@ -3165,13 +3164,13 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "start-index" => {
-                    call = call.start_index(arg_from_str(value.unwrap_or("-0"), err, "start-index", "integer"));
+                    call = call.start_index(        value.map(|v| arg_from_str(v, err, "start-index", "uint32")).unwrap_or(0));
                 },
                 "source" => {
                     call = call.source(value.unwrap_or(""));
                 },
                 "show-preorders" => {
-                    call = call.show_preorders(arg_from_str(value.unwrap_or("false"), err, "show-preorders", "boolean"));
+                    call = call.show_preorders(        value.map(|v| arg_from_str(v, err, "show-preorders", "boolean")).unwrap_or(false));
                 },
                 "projection" => {
                     call = call.projection(value.unwrap_or(""));
@@ -3186,7 +3185,7 @@ where
                     call = call.order_by(value.unwrap_or(""));
                 },
                 "max-results" => {
-                    call = call.max_results(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
+                    call = call.max_results(        value.map(|v| arg_from_str(v, err, "max-results", "uint32")).unwrap_or(0));
                 },
                 "max-allowed-maturity-rating" => {
                     call = call.max_allowed_maturity_rating(value.unwrap_or(""));
@@ -3257,7 +3256,7 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "start-index" => {
-                    call = call.start_index(arg_from_str(value.unwrap_or("-0"), err, "start-index", "integer"));
+                    call = call.start_index(        value.map(|v| arg_from_str(v, err, "start-index", "uint32")).unwrap_or(0));
                 },
                 "source" => {
                     call = call.source(value.unwrap_or(""));
@@ -3266,7 +3265,7 @@ where
                     call = call.add_processing_state(value.unwrap_or(""));
                 },
                 "max-results" => {
-                    call = call.max_results(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
+                    call = call.max_results(        value.map(|v| arg_from_str(v, err, "max-results", "uint32")).unwrap_or(0));
                 },
                 "locale" => {
                     call = call.locale(value.unwrap_or(""));
@@ -3455,7 +3454,7 @@ where
                     call = call.add_volume_id(value.unwrap_or(""));
                 },
                 "start-index" => {
-                    call = call.start_index(arg_from_str(value.unwrap_or("-0"), err, "start-index", "integer"));
+                    call = call.start_index(        value.map(|v| arg_from_str(v, err, "start-index", "uint32")).unwrap_or(0));
                 },
                 "source" => {
                     call = call.source(value.unwrap_or(""));
@@ -3464,7 +3463,7 @@ where
                     call = call.add_processing_state(value.unwrap_or(""));
                 },
                 "max-results" => {
-                    call = call.max_results(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
+                    call = call.max_results(        value.map(|v| arg_from_str(v, err, "max-results", "uint32")).unwrap_or(0));
                 },
                 "locale" => {
                     call = call.locale(value.unwrap_or(""));
@@ -5082,7 +5081,7 @@ async fn main() {
     
     let mut app = App::new("books1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("4.0.1+20220301")
+           .version("5.0.2+20230117")
            .about("The Google Books API allows clients to access the Google Books repository.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_books1_cli")
            .arg(Arg::with_name("url")

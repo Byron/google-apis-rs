@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Cloud Trace* API at revision *20220224*. The CLI is at version *4.0.1*.
+This documentation was generated from the *Cloud Trace* API at revision *20230112*. The CLI is at version *5.0.2*.
 
 ```bash
 cloudtrace2 [options]

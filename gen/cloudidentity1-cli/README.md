@@ -25,10 +25,16 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Cloud Identity* API at revision *20220301*. The CLI is at version *4.0.1*.
+This documentation was generated from the *Cloud Identity* API at revision *20230117*. The CLI is at version *5.0.2*.
 
 ```bash
 cloudidentity1 [options]
+        customers
+                userinvitations-cancel <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                userinvitations-get <name> [-p <v>]... [-o <out>]
+                userinvitations-is-invitable-user <name> [-p <v>]... [-o <out>]
+                userinvitations-list <parent> [-p <v>]... [-o <out>]
+                userinvitations-send <name> (-r <kv>)... [-p <v>]... [-o <out>]
         devices
                 cancel-wipe <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 create (-r <kv>)... [-p <v>]... [-o <out>]
@@ -67,6 +73,22 @@ cloudidentity1 [options]
                 patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 search [-p <v>]... [-o <out>]
                 update-security-settings <name> (-r <kv>)... [-p <v>]... [-o <out>]
+        inbound-saml-sso-profiles
+                create (-r <kv>)... [-p <v>]... [-o <out>]
+                delete <name> [-p <v>]... [-o <out>]
+                get <name> [-p <v>]... [-o <out>]
+                idp-credentials-add <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                idp-credentials-delete <name> [-p <v>]... [-o <out>]
+                idp-credentials-get <name> [-p <v>]... [-o <out>]
+                idp-credentials-list <parent> [-p <v>]... [-o <out>]
+                list [-p <v>]... [-o <out>]
+                patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
+        inbound-sso-assignments
+                create (-r <kv>)... [-p <v>]... [-o <out>]
+                delete <name> [-p <v>]... [-o <out>]
+                get <name> [-p <v>]... [-o <out>]
+                list [-p <v>]... [-o <out>]
+                patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
   cloudidentity1 --help
 
 Configuration:

@@ -1,4 +1,4 @@
-site_name: Essentialcontacts v4.0.1+20220227
+site_name: Essentialcontacts v5.0.2+20230123
 site_url: http://byron.github.io/google-apis-rs/google-essentialcontacts1-cli
 site_description: A complete library to interact with Essentialcontacts (protocol v1)
 
@@ -7,29 +7,32 @@ repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/essentialcontact
 docs_dir: docs
 site_dir: build_html
 
-pages:
-- ['index.md', 'Home']
-- ['folders_contacts-compute.md', 'Folders', 'Contacts Compute']
-- ['folders_contacts-create.md', 'Folders', 'Contacts Create']
-- ['folders_contacts-delete.md', 'Folders', 'Contacts Delete']
-- ['folders_contacts-get.md', 'Folders', 'Contacts Get']
-- ['folders_contacts-list.md', 'Folders', 'Contacts List']
-- ['folders_contacts-patch.md', 'Folders', 'Contacts Patch']
-- ['folders_contacts-send-test-message.md', 'Folders', 'Contacts Send Test Message']
-- ['organizations_contacts-compute.md', 'Organizations', 'Contacts Compute']
-- ['organizations_contacts-create.md', 'Organizations', 'Contacts Create']
-- ['organizations_contacts-delete.md', 'Organizations', 'Contacts Delete']
-- ['organizations_contacts-get.md', 'Organizations', 'Contacts Get']
-- ['organizations_contacts-list.md', 'Organizations', 'Contacts List']
-- ['organizations_contacts-patch.md', 'Organizations', 'Contacts Patch']
-- ['organizations_contacts-send-test-message.md', 'Organizations', 'Contacts Send Test Message']
-- ['projects_contacts-compute.md', 'Projects', 'Contacts Compute']
-- ['projects_contacts-create.md', 'Projects', 'Contacts Create']
-- ['projects_contacts-delete.md', 'Projects', 'Contacts Delete']
-- ['projects_contacts-get.md', 'Projects', 'Contacts Get']
-- ['projects_contacts-list.md', 'Projects', 'Contacts List']
-- ['projects_contacts-patch.md', 'Projects', 'Contacts Patch']
-- ['projects_contacts-send-test-message.md', 'Projects', 'Contacts Send Test Message']
+nav:
+- Home: 'index.md'
+- 'Folders':
+    - 'Contacts Compute': 'folders_contacts-compute.md'
+    - 'Contacts Create': 'folders_contacts-create.md'
+    - 'Contacts Delete': 'folders_contacts-delete.md'
+    - 'Contacts Get': 'folders_contacts-get.md'
+    - 'Contacts List': 'folders_contacts-list.md'
+    - 'Contacts Patch': 'folders_contacts-patch.md'
+    - 'Contacts Send Test Message': 'folders_contacts-send-test-message.md'
+- 'Organizations':
+    - 'Contacts Compute': 'organizations_contacts-compute.md'
+    - 'Contacts Create': 'organizations_contacts-create.md'
+    - 'Contacts Delete': 'organizations_contacts-delete.md'
+    - 'Contacts Get': 'organizations_contacts-get.md'
+    - 'Contacts List': 'organizations_contacts-list.md'
+    - 'Contacts Patch': 'organizations_contacts-patch.md'
+    - 'Contacts Send Test Message': 'organizations_contacts-send-test-message.md'
+- 'Projects':
+    - 'Contacts Compute': 'projects_contacts-compute.md'
+    - 'Contacts Create': 'projects_contacts-create.md'
+    - 'Contacts Delete': 'projects_contacts-delete.md'
+    - 'Contacts Get': 'projects_contacts-get.md'
+    - 'Contacts List': 'projects_contacts-list.md'
+    - 'Contacts Patch': 'projects_contacts-patch.md'
+    - 'Contacts Send Test Message': 'projects_contacts-send-test-message.md'
 
 theme: readthedocs
 

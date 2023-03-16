@@ -1,4 +1,4 @@
-site_name: Shopping Content v4.0.1+20181009
+site_name: Shopping Content v5.0.2+20181009
 site_url: http://byron.github.io/google-apis-rs/google-content2_sandbox-cli
 site_description: A complete library to interact with Shopping Content (protocol v2sandbox)
 
@@ -7,38 +7,42 @@ repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/content2_sandbox
 docs_dir: docs
 site_dir: build_html
 
-pages:
-- ['index.md', 'Home']
-- ['orderinvoices_createchargeinvoice.md', 'Orderinvoices', 'Createchargeinvoice']
-- ['orderinvoices_createrefundinvoice.md', 'Orderinvoices', 'Createrefundinvoice']
-- ['orderpayments_notifyauthapproved.md', 'Orderpayments', 'Notifyauthapproved']
-- ['orderpayments_notifyauthdeclined.md', 'Orderpayments', 'Notifyauthdeclined']
-- ['orderpayments_notifycharge.md', 'Orderpayments', 'Notifycharge']
-- ['orderpayments_notifyrefund.md', 'Orderpayments', 'Notifyrefund']
-- ['orderreturns_get.md', 'Orderreturns', 'Get']
-- ['orderreturns_list.md', 'Orderreturns', 'List']
-- ['orders_acknowledge.md', 'Orders', 'Acknowledge']
-- ['orders_advancetestorder.md', 'Orders', 'Advancetestorder']
-- ['orders_cancel.md', 'Orders', 'Cancel']
-- ['orders_cancellineitem.md', 'Orders', 'Cancellineitem']
-- ['orders_canceltestorderbycustomer.md', 'Orders', 'Canceltestorderbycustomer']
-- ['orders_createtestorder.md', 'Orders', 'Createtestorder']
-- ['orders_createtestreturn.md', 'Orders', 'Createtestreturn']
-- ['orders_custombatch.md', 'Orders', 'Custombatch']
-- ['orders_get.md', 'Orders', 'Get']
-- ['orders_getbymerchantorderid.md', 'Orders', 'Getbymerchantorderid']
-- ['orders_gettestordertemplate.md', 'Orders', 'Gettestordertemplate']
-- ['orders_instorerefundlineitem.md', 'Orders', 'Instorerefundlineitem']
-- ['orders_list.md', 'Orders', 'List']
-- ['orders_refund.md', 'Orders', 'Refund']
-- ['orders_rejectreturnlineitem.md', 'Orders', 'Rejectreturnlineitem']
-- ['orders_returnlineitem.md', 'Orders', 'Returnlineitem']
-- ['orders_returnrefundlineitem.md', 'Orders', 'Returnrefundlineitem']
-- ['orders_setlineitemmetadata.md', 'Orders', 'Setlineitemmetadata']
-- ['orders_shiplineitems.md', 'Orders', 'Shiplineitems']
-- ['orders_updatelineitemshippingdetails.md', 'Orders', 'Updatelineitemshippingdetails']
-- ['orders_updatemerchantorderid.md', 'Orders', 'Updatemerchantorderid']
-- ['orders_updateshipment.md', 'Orders', 'Updateshipment']
+nav:
+- Home: 'index.md'
+- 'Orderinvoices':
+    - 'Createchargeinvoice': 'orderinvoices_createchargeinvoice.md'
+    - 'Createrefundinvoice': 'orderinvoices_createrefundinvoice.md'
+- 'Orderpayments':
+    - 'Notifyauthapproved': 'orderpayments_notifyauthapproved.md'
+    - 'Notifyauthdeclined': 'orderpayments_notifyauthdeclined.md'
+    - 'Notifycharge': 'orderpayments_notifycharge.md'
+    - 'Notifyrefund': 'orderpayments_notifyrefund.md'
+- 'Orderreturns':
+    - 'Get': 'orderreturns_get.md'
+    - 'List': 'orderreturns_list.md'
+- 'Orders':
+    - 'Acknowledge': 'orders_acknowledge.md'
+    - 'Advancetestorder': 'orders_advancetestorder.md'
+    - 'Cancel': 'orders_cancel.md'
+    - 'Cancellineitem': 'orders_cancellineitem.md'
+    - 'Canceltestorderbycustomer': 'orders_canceltestorderbycustomer.md'
+    - 'Createtestorder': 'orders_createtestorder.md'
+    - 'Createtestreturn': 'orders_createtestreturn.md'
+    - 'Custombatch': 'orders_custombatch.md'
+    - 'Get': 'orders_get.md'
+    - 'Getbymerchantorderid': 'orders_getbymerchantorderid.md'
+    - 'Gettestordertemplate': 'orders_gettestordertemplate.md'
+    - 'Instorerefundlineitem': 'orders_instorerefundlineitem.md'
+    - 'List': 'orders_list.md'
+    - 'Refund': 'orders_refund.md'
+    - 'Rejectreturnlineitem': 'orders_rejectreturnlineitem.md'
+    - 'Returnlineitem': 'orders_returnlineitem.md'
+    - 'Returnrefundlineitem': 'orders_returnrefundlineitem.md'
+    - 'Setlineitemmetadata': 'orders_setlineitemmetadata.md'
+    - 'Shiplineitems': 'orders_shiplineitems.md'
+    - 'Updatelineitemshippingdetails': 'orders_updatelineitemshippingdetails.md'
+    - 'Updatemerchantorderid': 'orders_updatemerchantorderid.md'
+    - 'Updateshipment': 'orders_updateshipment.md'
 
 theme: readthedocs
 

@@ -1,4 +1,4 @@
-site_name: Chrome Policy v4.0.1+20220305
+site_name: Chrome Policy v5.0.2+20230123
 site_url: http://byron.github.io/google-apis-rs/google-chromepolicy1-cli
 site_description: A complete library to interact with Chrome Policy (protocol v1)
 
@@ -7,14 +7,24 @@ repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/chromepolicy1-cl
 docs_dir: docs
 site_dir: build_html
 
-pages:
-- ['index.md', 'Home']
-- ['customers_policies-orgunits-batch-inherit.md', 'Customers', 'Policies Orgunits Batch Inherit']
-- ['customers_policies-orgunits-batch-modify.md', 'Customers', 'Policies Orgunits Batch Modify']
-- ['customers_policies-resolve.md', 'Customers', 'Policies Resolve']
-- ['customers_policy-schemas-get.md', 'Customers', 'Policy Schemas Get']
-- ['customers_policy-schemas-list.md', 'Customers', 'Policy Schemas List']
-- ['media_upload.md', 'Media', 'Upload']
+nav:
+- Home: 'index.md'
+- 'Customers':
+    - 'Policies Groups Batch Delete': 'customers_policies-groups-batch-delete.md'
+    - 'Policies Groups Batch Modify': 'customers_policies-groups-batch-modify.md'
+    - 'Policies Groups List Group Priority Ordering': 'customers_policies-groups-list-group-priority-ordering.md'
+    - 'Policies Groups Update Group Priority Ordering': 'customers_policies-groups-update-group-priority-ordering.md'
+    - 'Policies Networks Define Certificate': 'customers_policies-networks-define-certificate.md'
+    - 'Policies Networks Define Network': 'customers_policies-networks-define-network.md'
+    - 'Policies Networks Remove Certificate': 'customers_policies-networks-remove-certificate.md'
+    - 'Policies Networks Remove Network': 'customers_policies-networks-remove-network.md'
+    - 'Policies Orgunits Batch Inherit': 'customers_policies-orgunits-batch-inherit.md'
+    - 'Policies Orgunits Batch Modify': 'customers_policies-orgunits-batch-modify.md'
+    - 'Policies Resolve': 'customers_policies-resolve.md'
+    - 'Policy Schemas Get': 'customers_policy-schemas-get.md'
+    - 'Policy Schemas List': 'customers_policy-schemas-list.md'
+- 'Media':
+    - 'Upload': 'media_upload.md'
 
 theme: readthedocs
 

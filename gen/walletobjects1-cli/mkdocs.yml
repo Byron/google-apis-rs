@@ -1,4 +1,4 @@
-site_name: Walletobjects v4.0.4+20220928
+site_name: Walletobjects v5.0.2+20230124
 site_url: http://byron.github.io/google-apis-rs/google-walletobjects1-cli
 site_description: A complete library to interact with Walletobjects (protocol v1)
 
@@ -87,6 +87,8 @@ nav:
     - 'Modifylinkedofferobjects': 'loyaltyobject_modifylinkedofferobjects.md'
     - 'Patch': 'loyaltyobject_patch.md'
     - 'Update': 'loyaltyobject_update.md'
+- 'Media':
+    - 'Upload': 'media_upload.md'
 - 'Offerclass':
     - 'Addmessage': 'offerclass_addmessage.md'
     - 'Get': 'offerclass_get.md'
@@ -120,6 +122,8 @@ nav:
     - 'List': 'transitobject_list.md'
     - 'Patch': 'transitobject_patch.md'
     - 'Update': 'transitobject_update.md'
+- 'Walletobjects':
+    - 'V1 Private Content Upload Private Data': 'walletobjects_v1-private-content-upload-private-data.md'
 
 theme: readthedocs
 

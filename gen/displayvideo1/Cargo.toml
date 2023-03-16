@@ -4,12 +4,12 @@
 [package]
 
 name = "google-displayvideo1"
-version = "5.0.2-beta-1+20230119"
+version = "5.0.2+20230119"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Display Video (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/displayvideo1"
 homepage = "https://developers.google.com/display-video/"
-documentation = "https://docs.rs/google-displayvideo1/5.0.2-beta-1+20230119"
+documentation = "https://docs.rs/google-displayvideo1/5.0.2+20230119"
 license = "MIT"
 keywords = ["displayvideo", "google", "protocol", "web", "api"]
 autobins = false

@@ -1,4 +1,4 @@
-site_name: Cloud Composer v4.0.1+20220224
+site_name: Cloud Composer v5.0.2+20230107
 site_url: http://byron.github.io/google-apis-rs/google-composer1-cli
 site_description: A complete library to interact with Cloud Composer (protocol v1)
 
@@ -7,17 +7,20 @@ repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/composer1-cli
 docs_dir: docs
 site_dir: build_html
 
-pages:
-- ['index.md', 'Home']
-- ['projects_locations-environments-create.md', 'Projects', 'Locations Environments Create']
-- ['projects_locations-environments-delete.md', 'Projects', 'Locations Environments Delete']
-- ['projects_locations-environments-get.md', 'Projects', 'Locations Environments Get']
-- ['projects_locations-environments-list.md', 'Projects', 'Locations Environments List']
-- ['projects_locations-environments-patch.md', 'Projects', 'Locations Environments Patch']
-- ['projects_locations-image-versions-list.md', 'Projects', 'Locations Image Versions List']
-- ['projects_locations-operations-delete.md', 'Projects', 'Locations Operations Delete']
-- ['projects_locations-operations-get.md', 'Projects', 'Locations Operations Get']
-- ['projects_locations-operations-list.md', 'Projects', 'Locations Operations List']
+nav:
+- Home: 'index.md'
+- 'Projects':
+    - 'Locations Environments Create': 'projects_locations-environments-create.md'
+    - 'Locations Environments Delete': 'projects_locations-environments-delete.md'
+    - 'Locations Environments Get': 'projects_locations-environments-get.md'
+    - 'Locations Environments List': 'projects_locations-environments-list.md'
+    - 'Locations Environments Load Snapshot': 'projects_locations-environments-load-snapshot.md'
+    - 'Locations Environments Patch': 'projects_locations-environments-patch.md'
+    - 'Locations Environments Save Snapshot': 'projects_locations-environments-save-snapshot.md'
+    - 'Locations Image Versions List': 'projects_locations-image-versions-list.md'
+    - 'Locations Operations Delete': 'projects_locations-operations-delete.md'
+    - 'Locations Operations Get': 'projects_locations-operations-get.md'
+    - 'Locations Operations List': 'projects_locations-operations-list.md'
 
 theme: readthedocs
 

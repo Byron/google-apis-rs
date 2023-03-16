@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Firestore* API at revision *20220221*. The CLI is at version *4.0.1*.
+This documentation was generated from the *Firestore* API at revision *20230118*. The CLI is at version *5.0.2*.
 
 ```bash
 firestore1 [options]
@@ -37,6 +37,8 @@ firestore1 [options]
                 databases-collection-groups-indexes-delete <name> [-p <v>]... [-o <out>]
                 databases-collection-groups-indexes-get <name> [-p <v>]... [-o <out>]
                 databases-collection-groups-indexes-list <parent> [-p <v>]... [-o <out>]
+                databases-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                databases-delete <name> [-p <v>]... [-o <out>]
                 databases-documents-batch-get <database> (-r <kv>)... [-p <v>]... [-o <out>]
                 databases-documents-batch-write <database> (-r <kv>)... [-p <v>]... [-o <out>]
                 databases-documents-begin-transaction <database> (-r <kv>)... [-p <v>]... [-o <out>]
@@ -46,10 +48,12 @@ firestore1 [options]
                 databases-documents-get <name> [-p <v>]... [-o <out>]
                 databases-documents-list <parent> <collection-id> [-p <v>]... [-o <out>]
                 databases-documents-list-collection-ids <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                databases-documents-list-documents <parent> <collection-id> [-p <v>]... [-o <out>]
                 databases-documents-listen <database> (-r <kv>)... [-p <v>]... [-o <out>]
                 databases-documents-partition-query <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 databases-documents-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 databases-documents-rollback <database> (-r <kv>)... [-p <v>]... [-o <out>]
+                databases-documents-run-aggregation-query <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 databases-documents-run-query <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 databases-documents-write <database> (-r <kv>)... [-p <v>]... [-o <out>]
                 databases-export-documents <name> (-r <kv>)... [-p <v>]... [-o <out>]

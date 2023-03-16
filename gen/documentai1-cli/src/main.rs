@@ -3,8 +3,6 @@
 // DO NOT EDIT !
 #![allow(unused_variables, unused_imports, dead_code, unused_mut)]
 
-extern crate tokio;
-
 #[macro_use]
 extern crate clap;
 
@@ -12,9 +10,10 @@ use std::env;
 use std::io::{self, Write};
 use clap::{App, SubCommand, Arg};
 
-use google_documentai1::{api, Error, oauth2};
+use google_documentai1::{api, Error, oauth2, client::chrono, FieldMask};
 
-mod client;
+
+use google_clis_common as client;
 
 use client::{InvalidOptionsError, CLIError, arg_from_str, writer_from_opts, parse_kv_arg,
           input_file_from_opts, input_mime_from_opts, FieldCursor, FieldError, CallType, UploadProtocol,
@@ -217,7 +216,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 "filter" => {
                     call = call.filter(value.unwrap_or(""));
@@ -383,7 +382,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 "filter" => {
                     call = call.filter(value.unwrap_or(""));
@@ -402,6 +401,117 @@ where
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
                                                                            v.extend(["filter", "page-size", "page-token"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_locations_processor_types_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.projects().locations_processor_types_get(opt.value_of("name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_locations_processor_types_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.projects().locations_processor_types_list(opt.value_of("parent").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "page-token" => {
+                    call = call.page_token(value.unwrap_or(""));
+                },
+                "page-size" => {
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["page-size", "page-token"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -458,11 +568,14 @@ where
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
+                    "document-output-config.gcs-output-config.field-mask" => Some(("documentOutputConfig.gcsOutputConfig.fieldMask", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "document-output-config.gcs-output-config.gcs-uri" => Some(("documentOutputConfig.gcsOutputConfig.gcsUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "document-output-config.gcs-output-config.sharding-config.pages-overlap" => Some(("documentOutputConfig.gcsOutputConfig.shardingConfig.pagesOverlap", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "document-output-config.gcs-output-config.sharding-config.pages-per-shard" => Some(("documentOutputConfig.gcsOutputConfig.shardingConfig.pagesPerShard", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "input-documents.gcs-prefix.gcs-uri-prefix" => Some(("inputDocuments.gcsPrefix.gcsUriPrefix", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "skip-human-review" => Some(("skipHumanReview", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["document-output-config", "gcs-output-config", "gcs-prefix", "gcs-uri", "gcs-uri-prefix", "input-documents", "skip-human-review"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["document-output-config", "field-mask", "gcs-output-config", "gcs-prefix", "gcs-uri", "gcs-uri-prefix", "input-documents", "pages-overlap", "pages-per-shard", "sharding-config", "skip-human-review"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -909,6 +1022,12 @@ where
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
+                    "document-schema.description" => Some(("documentSchema.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "document-schema.display-name" => Some(("documentSchema.displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "document-schema.metadata.document-allow-multiple-labels" => Some(("documentSchema.metadata.documentAllowMultipleLabels", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "document-schema.metadata.document-splitter" => Some(("documentSchema.metadata.documentSplitter", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "document-schema.metadata.prefixed-naming-on-properties" => Some(("documentSchema.metadata.prefixedNamingOnProperties", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "document-schema.metadata.skip-naming-validation" => Some(("documentSchema.metadata.skipNamingValidation", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "enable-schema-validation" => Some(("enableSchemaValidation", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "inline-document.content" => Some(("inlineDocument.content", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "inline-document.error.code" => Some(("inlineDocument.error.code", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
@@ -921,7 +1040,7 @@ where
                     "inline-document.uri" => Some(("inlineDocument.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "priority" => Some(("priority", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["code", "content", "enable-schema-validation", "error", "inline-document", "message", "mime-type", "priority", "shard-count", "shard-index", "shard-info", "text", "text-offset", "uri"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["code", "content", "description", "display-name", "document-allow-multiple-labels", "document-schema", "document-splitter", "enable-schema-validation", "error", "inline-document", "message", "metadata", "mime-type", "prefixed-naming-on-properties", "priority", "shard-count", "shard-index", "shard-info", "skip-naming-validation", "text", "text-offset", "uri"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -991,7 +1110,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -1063,6 +1182,7 @@ where
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
+                    "field-mask" => Some(("fieldMask", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "inline-document.content" => Some(("inlineDocument.content", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "inline-document.error.code" => Some(("inlineDocument.error.code", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "inline-document.error.message" => Some(("inlineDocument.error.message", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -1076,7 +1196,7 @@ where
                     "raw-document.mime-type" => Some(("rawDocument.mimeType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "skip-human-review" => Some(("skipHumanReview", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["code", "content", "error", "inline-document", "message", "mime-type", "raw-document", "shard-count", "shard-index", "shard-info", "skip-human-review", "text", "text-offset", "uri"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["code", "content", "error", "field-mask", "inline-document", "message", "mime-type", "raw-document", "shard-count", "shard-index", "shard-info", "skip-human-review", "text", "text-offset", "uri"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1159,11 +1279,14 @@ where
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
+                    "document-output-config.gcs-output-config.field-mask" => Some(("documentOutputConfig.gcsOutputConfig.fieldMask", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "document-output-config.gcs-output-config.gcs-uri" => Some(("documentOutputConfig.gcsOutputConfig.gcsUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "document-output-config.gcs-output-config.sharding-config.pages-overlap" => Some(("documentOutputConfig.gcsOutputConfig.shardingConfig.pagesOverlap", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "document-output-config.gcs-output-config.sharding-config.pages-per-shard" => Some(("documentOutputConfig.gcsOutputConfig.shardingConfig.pagesPerShard", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "input-documents.gcs-prefix.gcs-uri-prefix" => Some(("inputDocuments.gcsPrefix.gcsUriPrefix", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "skip-human-review" => Some(("skipHumanReview", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["document-output-config", "gcs-output-config", "gcs-prefix", "gcs-uri", "gcs-uri-prefix", "input-documents", "skip-human-review"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["document-output-config", "field-mask", "gcs-output-config", "gcs-prefix", "gcs-uri", "gcs-uri-prefix", "input-documents", "pages-overlap", "pages-per-shard", "sharding-config", "skip-human-review"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1359,6 +1482,202 @@ where
         }
     }
 
+    async fn _projects_locations_processors_processor_versions_evaluate_processor_version(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "evaluation-documents.gcs-prefix.gcs-uri-prefix" => Some(("evaluationDocuments.gcsPrefix.gcsUriPrefix", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["evaluation-documents", "gcs-prefix", "gcs-uri-prefix"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::GoogleCloudDocumentaiV1EvaluateProcessorVersionRequest = json::value::from_value(object).unwrap();
+        let mut call = self.hub.projects().locations_processors_processor_versions_evaluate_processor_version(request, opt.value_of("processor-version").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_locations_processors_processor_versions_evaluations_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.projects().locations_processors_processor_versions_evaluations_get(opt.value_of("name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_locations_processors_processor_versions_evaluations_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.projects().locations_processors_processor_versions_evaluations_list(opt.value_of("parent").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "page-token" => {
+                    call = call.page_token(value.unwrap_or(""));
+                },
+                "page-size" => {
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["page-size", "page-token"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
     async fn _projects_locations_processors_processor_versions_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.projects().locations_processors_processor_versions_get(opt.value_of("name").unwrap_or(""));
@@ -1421,7 +1740,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -1493,6 +1812,7 @@ where
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
+                    "field-mask" => Some(("fieldMask", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "inline-document.content" => Some(("inlineDocument.content", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "inline-document.error.code" => Some(("inlineDocument.error.code", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "inline-document.error.message" => Some(("inlineDocument.error.message", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -1506,7 +1826,7 @@ where
                     "raw-document.mime-type" => Some(("rawDocument.mimeType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "skip-human-review" => Some(("skipHumanReview", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["code", "content", "error", "inline-document", "message", "mime-type", "raw-document", "shard-count", "shard-index", "shard-info", "skip-human-review", "text", "text-offset", "uri"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["code", "content", "error", "field-mask", "inline-document", "message", "mime-type", "raw-document", "shard-count", "shard-index", "shard-info", "skip-human-review", "text", "text-offset", "uri"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1517,6 +1837,138 @@ where
         }
         let mut request: api::GoogleCloudDocumentaiV1ProcessRequest = json::value::from_value(object).unwrap();
         let mut call = self.hub.projects().locations_processors_processor_versions_process(request, opt.value_of("name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_locations_processors_processor_versions_train(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "base-processor-version" => Some(("baseProcessorVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "document-schema.description" => Some(("documentSchema.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "document-schema.display-name" => Some(("documentSchema.displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "document-schema.metadata.document-allow-multiple-labels" => Some(("documentSchema.metadata.documentAllowMultipleLabels", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "document-schema.metadata.document-splitter" => Some(("documentSchema.metadata.documentSplitter", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "document-schema.metadata.prefixed-naming-on-properties" => Some(("documentSchema.metadata.prefixedNamingOnProperties", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "document-schema.metadata.skip-naming-validation" => Some(("documentSchema.metadata.skipNamingValidation", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "input-data.test-documents.gcs-prefix.gcs-uri-prefix" => Some(("inputData.testDocuments.gcsPrefix.gcsUriPrefix", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "input-data.training-documents.gcs-prefix.gcs-uri-prefix" => Some(("inputData.trainingDocuments.gcsPrefix.gcsUriPrefix", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "processor-version.create-time" => Some(("processorVersion.createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "processor-version.deprecation-info.deprecation-time" => Some(("processorVersion.deprecationInfo.deprecationTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "processor-version.deprecation-info.replacement-processor-version" => Some(("processorVersion.deprecationInfo.replacementProcessorVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "processor-version.display-name" => Some(("processorVersion.displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "processor-version.document-schema.description" => Some(("processorVersion.documentSchema.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "processor-version.document-schema.display-name" => Some(("processorVersion.documentSchema.displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "processor-version.document-schema.metadata.document-allow-multiple-labels" => Some(("processorVersion.documentSchema.metadata.documentAllowMultipleLabels", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "processor-version.document-schema.metadata.document-splitter" => Some(("processorVersion.documentSchema.metadata.documentSplitter", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "processor-version.document-schema.metadata.prefixed-naming-on-properties" => Some(("processorVersion.documentSchema.metadata.prefixedNamingOnProperties", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "processor-version.document-schema.metadata.skip-naming-validation" => Some(("processorVersion.documentSchema.metadata.skipNamingValidation", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "processor-version.google-managed" => Some(("processorVersion.googleManaged", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "processor-version.kms-key-name" => Some(("processorVersion.kmsKeyName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "processor-version.kms-key-version-name" => Some(("processorVersion.kmsKeyVersionName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "processor-version.latest-evaluation.aggregate-metrics.f1-score" => Some(("processorVersion.latestEvaluation.aggregateMetrics.f1Score", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "processor-version.latest-evaluation.aggregate-metrics.false-negatives-count" => Some(("processorVersion.latestEvaluation.aggregateMetrics.falseNegativesCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "processor-version.latest-evaluation.aggregate-metrics.false-positives-count" => Some(("processorVersion.latestEvaluation.aggregateMetrics.falsePositivesCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "processor-version.latest-evaluation.aggregate-metrics.ground-truth-document-count" => Some(("processorVersion.latestEvaluation.aggregateMetrics.groundTruthDocumentCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "processor-version.latest-evaluation.aggregate-metrics.ground-truth-occurrences-count" => Some(("processorVersion.latestEvaluation.aggregateMetrics.groundTruthOccurrencesCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "processor-version.latest-evaluation.aggregate-metrics.precision" => Some(("processorVersion.latestEvaluation.aggregateMetrics.precision", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "processor-version.latest-evaluation.aggregate-metrics.predicted-document-count" => Some(("processorVersion.latestEvaluation.aggregateMetrics.predictedDocumentCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "processor-version.latest-evaluation.aggregate-metrics.predicted-occurrences-count" => Some(("processorVersion.latestEvaluation.aggregateMetrics.predictedOccurrencesCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "processor-version.latest-evaluation.aggregate-metrics.recall" => Some(("processorVersion.latestEvaluation.aggregateMetrics.recall", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "processor-version.latest-evaluation.aggregate-metrics.total-documents-count" => Some(("processorVersion.latestEvaluation.aggregateMetrics.totalDocumentsCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "processor-version.latest-evaluation.aggregate-metrics.true-positives-count" => Some(("processorVersion.latestEvaluation.aggregateMetrics.truePositivesCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "processor-version.latest-evaluation.aggregate-metrics-exact.f1-score" => Some(("processorVersion.latestEvaluation.aggregateMetricsExact.f1Score", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "processor-version.latest-evaluation.aggregate-metrics-exact.false-negatives-count" => Some(("processorVersion.latestEvaluation.aggregateMetricsExact.falseNegativesCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "processor-version.latest-evaluation.aggregate-metrics-exact.false-positives-count" => Some(("processorVersion.latestEvaluation.aggregateMetricsExact.falsePositivesCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "processor-version.latest-evaluation.aggregate-metrics-exact.ground-truth-document-count" => Some(("processorVersion.latestEvaluation.aggregateMetricsExact.groundTruthDocumentCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "processor-version.latest-evaluation.aggregate-metrics-exact.ground-truth-occurrences-count" => Some(("processorVersion.latestEvaluation.aggregateMetricsExact.groundTruthOccurrencesCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "processor-version.latest-evaluation.aggregate-metrics-exact.precision" => Some(("processorVersion.latestEvaluation.aggregateMetricsExact.precision", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "processor-version.latest-evaluation.aggregate-metrics-exact.predicted-document-count" => Some(("processorVersion.latestEvaluation.aggregateMetricsExact.predictedDocumentCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "processor-version.latest-evaluation.aggregate-metrics-exact.predicted-occurrences-count" => Some(("processorVersion.latestEvaluation.aggregateMetricsExact.predictedOccurrencesCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "processor-version.latest-evaluation.aggregate-metrics-exact.recall" => Some(("processorVersion.latestEvaluation.aggregateMetricsExact.recall", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "processor-version.latest-evaluation.aggregate-metrics-exact.total-documents-count" => Some(("processorVersion.latestEvaluation.aggregateMetricsExact.totalDocumentsCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "processor-version.latest-evaluation.aggregate-metrics-exact.true-positives-count" => Some(("processorVersion.latestEvaluation.aggregateMetricsExact.truePositivesCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "processor-version.latest-evaluation.evaluation" => Some(("processorVersion.latestEvaluation.evaluation", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "processor-version.latest-evaluation.operation" => Some(("processorVersion.latestEvaluation.operation", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "processor-version.name" => Some(("processorVersion.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "processor-version.state" => Some(("processorVersion.state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["aggregate-metrics", "aggregate-metrics-exact", "base-processor-version", "create-time", "deprecation-info", "deprecation-time", "description", "display-name", "document-allow-multiple-labels", "document-schema", "document-splitter", "evaluation", "f1-score", "false-negatives-count", "false-positives-count", "gcs-prefix", "gcs-uri-prefix", "google-managed", "ground-truth-document-count", "ground-truth-occurrences-count", "input-data", "kms-key-name", "kms-key-version-name", "latest-evaluation", "metadata", "name", "operation", "precision", "predicted-document-count", "predicted-occurrences-count", "prefixed-naming-on-properties", "processor-version", "recall", "replacement-processor-version", "skip-naming-validation", "state", "test-documents", "total-documents-count", "training-documents", "true-positives-count"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::GoogleCloudDocumentaiV1TrainProcessorVersionRequest = json::value::from_value(object).unwrap();
+        let mut call = self.hub.projects().locations_processors_processor_versions_train(request, opt.value_of("parent").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
@@ -1787,286 +2239,6 @@ where
         }
     }
 
-    async fn _uiv1beta3_projects_locations_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        let mut call = self.hub.uiv1beta3().projects_locations_get(opt.value_of("name").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-            let (key, value) = parse_kv_arg(&*parg, err, false);
-            match key {
-                _ => {
-                    let mut found = false;
-                    for param in &self.gp {
-                        if key == *param {
-                            found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
-                            break;
-                        }
-                    }
-                    if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v } ));
-                    }
-                }
-            }
-        }
-        let protocol = CallType::Standard;
-        if dry_run {
-            Ok(())
-        } else {
-            assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-                call = call.add_scope(scope);
-            }
-            let mut ostream = match writer_from_opts(opt.value_of("out")) {
-                Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
-            };
-            match match protocol {
-                CallType::Standard => call.doit().await,
-                _ => unreachable!()
-            } {
-                Err(api_err) => Err(DoitError::ApiError(api_err)),
-                Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
-                    remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
-                    ostream.flush().unwrap();
-                    Ok(())
-                }
-            }
-        }
-    }
-
-    async fn _uiv1beta3_projects_locations_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        let mut call = self.hub.uiv1beta3().projects_locations_list(opt.value_of("name").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-            let (key, value) = parse_kv_arg(&*parg, err, false);
-            match key {
-                "page-token" => {
-                    call = call.page_token(value.unwrap_or(""));
-                },
-                "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
-                },
-                "filter" => {
-                    call = call.filter(value.unwrap_or(""));
-                },
-                _ => {
-                    let mut found = false;
-                    for param in &self.gp {
-                        if key == *param {
-                            found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
-                            break;
-                        }
-                    }
-                    if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["filter", "page-size", "page-token"].iter().map(|v|*v));
-                                                                           v } ));
-                    }
-                }
-            }
-        }
-        let protocol = CallType::Standard;
-        if dry_run {
-            Ok(())
-        } else {
-            assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-                call = call.add_scope(scope);
-            }
-            let mut ostream = match writer_from_opts(opt.value_of("out")) {
-                Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
-            };
-            match match protocol {
-                CallType::Standard => call.doit().await,
-                _ => unreachable!()
-            } {
-                Err(api_err) => Err(DoitError::ApiError(api_err)),
-                Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
-                    remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
-                    ostream.flush().unwrap();
-                    Ok(())
-                }
-            }
-        }
-    }
-
-    async fn _uiv1beta3_projects_locations_operations_cancel(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        let mut call = self.hub.uiv1beta3().projects_locations_operations_cancel(opt.value_of("name").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-            let (key, value) = parse_kv_arg(&*parg, err, false);
-            match key {
-                _ => {
-                    let mut found = false;
-                    for param in &self.gp {
-                        if key == *param {
-                            found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
-                            break;
-                        }
-                    }
-                    if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v } ));
-                    }
-                }
-            }
-        }
-        let protocol = CallType::Standard;
-        if dry_run {
-            Ok(())
-        } else {
-            assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-                call = call.add_scope(scope);
-            }
-            let mut ostream = match writer_from_opts(opt.value_of("out")) {
-                Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
-            };
-            match match protocol {
-                CallType::Standard => call.doit().await,
-                _ => unreachable!()
-            } {
-                Err(api_err) => Err(DoitError::ApiError(api_err)),
-                Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
-                    remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
-                    ostream.flush().unwrap();
-                    Ok(())
-                }
-            }
-        }
-    }
-
-    async fn _uiv1beta3_projects_locations_operations_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        let mut call = self.hub.uiv1beta3().projects_locations_operations_get(opt.value_of("name").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-            let (key, value) = parse_kv_arg(&*parg, err, false);
-            match key {
-                _ => {
-                    let mut found = false;
-                    for param in &self.gp {
-                        if key == *param {
-                            found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
-                            break;
-                        }
-                    }
-                    if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v } ));
-                    }
-                }
-            }
-        }
-        let protocol = CallType::Standard;
-        if dry_run {
-            Ok(())
-        } else {
-            assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-                call = call.add_scope(scope);
-            }
-            let mut ostream = match writer_from_opts(opt.value_of("out")) {
-                Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
-            };
-            match match protocol {
-                CallType::Standard => call.doit().await,
-                _ => unreachable!()
-            } {
-                Err(api_err) => Err(DoitError::ApiError(api_err)),
-                Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
-                    remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
-                    ostream.flush().unwrap();
-                    Ok(())
-                }
-            }
-        }
-    }
-
-    async fn _uiv1beta3_projects_locations_operations_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        let mut call = self.hub.uiv1beta3().projects_locations_operations_list(opt.value_of("name").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-            let (key, value) = parse_kv_arg(&*parg, err, false);
-            match key {
-                "page-token" => {
-                    call = call.page_token(value.unwrap_or(""));
-                },
-                "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
-                },
-                "filter" => {
-                    call = call.filter(value.unwrap_or(""));
-                },
-                _ => {
-                    let mut found = false;
-                    for param in &self.gp {
-                        if key == *param {
-                            found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
-                            break;
-                        }
-                    }
-                    if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["filter", "page-size", "page-token"].iter().map(|v|*v));
-                                                                           v } ));
-                    }
-                }
-            }
-        }
-        let protocol = CallType::Standard;
-        if dry_run {
-            Ok(())
-        } else {
-            assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-                call = call.add_scope(scope);
-            }
-            let mut ostream = match writer_from_opts(opt.value_of("out")) {
-                Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
-            };
-            match match protocol {
-                CallType::Standard => call.doit().await,
-                _ => unreachable!()
-            } {
-                Err(api_err) => Err(DoitError::ApiError(api_err)),
-                Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
-                    remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
-                    ostream.flush().unwrap();
-                    Ok(())
-                }
-            }
-        }
-    }
-
     async fn _doit(&self, dry_run: bool) -> Result<Result<(), DoitError>, Option<InvalidOptionsError>> {
         let mut err = InvalidOptionsError::new();
         let mut call_result: Result<(), DoitError> = Ok(());
@@ -2102,6 +2274,12 @@ where
                     },
                     ("locations-operations-list", Some(opt)) => {
                         call_result = self._projects_locations_operations_list(opt, dry_run, &mut err).await;
+                    },
+                    ("locations-processor-types-get", Some(opt)) => {
+                        call_result = self._projects_locations_processor_types_get(opt, dry_run, &mut err).await;
+                    },
+                    ("locations-processor-types-list", Some(opt)) => {
+                        call_result = self._projects_locations_processor_types_list(opt, dry_run, &mut err).await;
                     },
                     ("locations-processors-batch-process", Some(opt)) => {
                         call_result = self._projects_locations_processors_batch_process(opt, dry_run, &mut err).await;
@@ -2139,6 +2317,15 @@ where
                     ("locations-processors-processor-versions-deploy", Some(opt)) => {
                         call_result = self._projects_locations_processors_processor_versions_deploy(opt, dry_run, &mut err).await;
                     },
+                    ("locations-processors-processor-versions-evaluate-processor-version", Some(opt)) => {
+                        call_result = self._projects_locations_processors_processor_versions_evaluate_processor_version(opt, dry_run, &mut err).await;
+                    },
+                    ("locations-processors-processor-versions-evaluations-get", Some(opt)) => {
+                        call_result = self._projects_locations_processors_processor_versions_evaluations_get(opt, dry_run, &mut err).await;
+                    },
+                    ("locations-processors-processor-versions-evaluations-list", Some(opt)) => {
+                        call_result = self._projects_locations_processors_processor_versions_evaluations_list(opt, dry_run, &mut err).await;
+                    },
                     ("locations-processors-processor-versions-get", Some(opt)) => {
                         call_result = self._projects_locations_processors_processor_versions_get(opt, dry_run, &mut err).await;
                     },
@@ -2147,6 +2334,9 @@ where
                     },
                     ("locations-processors-processor-versions-process", Some(opt)) => {
                         call_result = self._projects_locations_processors_processor_versions_process(opt, dry_run, &mut err).await;
+                    },
+                    ("locations-processors-processor-versions-train", Some(opt)) => {
+                        call_result = self._projects_locations_processors_processor_versions_train(opt, dry_run, &mut err).await;
                     },
                     ("locations-processors-processor-versions-undeploy", Some(opt)) => {
                         call_result = self._projects_locations_processors_processor_versions_undeploy(opt, dry_run, &mut err).await;
@@ -2159,29 +2349,6 @@ where
                     },
                     _ => {
                         err.issues.push(CLIError::MissingMethodError("projects".to_string()));
-                        writeln!(io::stderr(), "{}\n", opt.usage()).ok();
-                    }
-                }
-            },
-            ("uiv1beta3", Some(opt)) => {
-                match opt.subcommand() {
-                    ("projects-locations-get", Some(opt)) => {
-                        call_result = self._uiv1beta3_projects_locations_get(opt, dry_run, &mut err).await;
-                    },
-                    ("projects-locations-list", Some(opt)) => {
-                        call_result = self._uiv1beta3_projects_locations_list(opt, dry_run, &mut err).await;
-                    },
-                    ("projects-locations-operations-cancel", Some(opt)) => {
-                        call_result = self._uiv1beta3_projects_locations_operations_cancel(opt, dry_run, &mut err).await;
-                    },
-                    ("projects-locations-operations-get", Some(opt)) => {
-                        call_result = self._uiv1beta3_projects_locations_operations_get(opt, dry_run, &mut err).await;
-                    },
-                    ("projects-locations-operations-list", Some(opt)) => {
-                        call_result = self._uiv1beta3_projects_locations_operations_list(opt, dry_run, &mut err).await;
-                    },
-                    _ => {
-                        err.issues.push(CLIError::MissingMethodError("uiv1beta3".to_string()));
                         writeln!(io::stderr(), "{}\n", opt.usage()).ok();
                     }
                 }
@@ -2284,7 +2451,7 @@ async fn main() {
                   ]),
             ]),
         
-        ("projects", "methods: 'locations-fetch-processor-types', 'locations-get', 'locations-list', 'locations-operations-cancel', 'locations-operations-get', 'locations-operations-list', 'locations-processors-batch-process', 'locations-processors-create', 'locations-processors-delete', 'locations-processors-disable', 'locations-processors-enable', 'locations-processors-get', 'locations-processors-human-review-config-review-document', 'locations-processors-list', 'locations-processors-process', 'locations-processors-processor-versions-batch-process', 'locations-processors-processor-versions-delete', 'locations-processors-processor-versions-deploy', 'locations-processors-processor-versions-get', 'locations-processors-processor-versions-list', 'locations-processors-processor-versions-process', 'locations-processors-processor-versions-undeploy', 'locations-processors-set-default-processor-version' and 'operations-get'", vec![
+        ("projects", "methods: 'locations-fetch-processor-types', 'locations-get', 'locations-list', 'locations-operations-cancel', 'locations-operations-get', 'locations-operations-list', 'locations-processor-types-get', 'locations-processor-types-list', 'locations-processors-batch-process', 'locations-processors-create', 'locations-processors-delete', 'locations-processors-disable', 'locations-processors-enable', 'locations-processors-get', 'locations-processors-human-review-config-review-document', 'locations-processors-list', 'locations-processors-process', 'locations-processors-processor-versions-batch-process', 'locations-processors-processor-versions-delete', 'locations-processors-processor-versions-deploy', 'locations-processors-processor-versions-evaluate-processor-version', 'locations-processors-processor-versions-evaluations-get', 'locations-processors-processor-versions-evaluations-list', 'locations-processors-processor-versions-get', 'locations-processors-processor-versions-list', 'locations-processors-processor-versions-process', 'locations-processors-processor-versions-train', 'locations-processors-processor-versions-undeploy', 'locations-processors-set-default-processor-version' and 'operations-get'", vec![
             ("locations-fetch-processor-types",
                     Some(r##"Fetches processor types. Note that we do not use ListProcessorTypes here because it is not paginated."##),
                     "Details at http://byron.github.io/google-apis-rs/google_documentai1_cli/projects_locations-fetch-processor-types",
@@ -2402,6 +2569,50 @@ async fn main() {
                     (Some(r##"name"##),
                      None,
                      Some(r##"The name of the operation's parent resource."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-processor-types-get",
+                    Some(r##"Gets a processor type detail."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_documentai1_cli/projects_locations-processor-types-get",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. The processor type resource name."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-processor-types-list",
+                    Some(r##"Lists the processor types that exist."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_documentai1_cli/projects_locations-processor-types-list",
+                  vec![
+                    (Some(r##"parent"##),
+                     None,
+                     Some(r##"Required. The location of processor type to list. The available processor types may depend on the allow-listing on projects. Format: `projects/{project}/locations/{location}`"##),
                      Some(true),
                      Some(false)),
         
@@ -2729,6 +2940,78 @@ async fn main() {
                      Some(false),
                      Some(false)),
                   ]),
+            ("locations-processors-processor-versions-evaluate-processor-version",
+                    Some(r##"Evaluates a ProcessorVersion against annotated documents, producing an Evaluation."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_documentai1_cli/projects_locations-processors-processor-versions-evaluate-processor-version",
+                  vec![
+                    (Some(r##"processor-version"##),
+                     None,
+                     Some(r##"Required. The resource name of the ProcessorVersion to evaluate. `projects/{project}/locations/{location}/processors/{processor}/processorVersions/{processorVersion}`"##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-processors-processor-versions-evaluations-get",
+                    Some(r##"Retrieves a specific evaluation."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_documentai1_cli/projects_locations-processors-processor-versions-evaluations-get",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. The resource name of the Evaluation to get. `projects/{project}/locations/{location}/processors/{processor}/processorVersions/{processorVersion}/evaluations/{evaluation}`"##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-processors-processor-versions-evaluations-list",
+                    Some(r##"Retrieves a set of evaluations for a given processor version."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_documentai1_cli/projects_locations-processors-processor-versions-evaluations-list",
+                  vec![
+                    (Some(r##"parent"##),
+                     None,
+                     Some(r##"Required. The resource name of the ProcessorVersion to list evaluations for. `projects/{project}/locations/{location}/processors/{processor}/processorVersions/{processorVersion}`"##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
             ("locations-processors-processor-versions-get",
                     Some(r##"Gets a processor version detail."##),
                     "Details at http://byron.github.io/google-apis-rs/google_documentai1_cli/projects_locations-processors-processor-versions-get",
@@ -2780,6 +3063,34 @@ async fn main() {
                     (Some(r##"name"##),
                      None,
                      Some(r##"Required. The resource name of the Processor or ProcessorVersion to use for processing. If a Processor is specified, the server will use its default version. Format: `projects/{project}/locations/{location}/processors/{processor}`, or `projects/{project}/locations/{location}/processors/{processor}/processorVersions/{processorVersion}`"##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-processors-processor-versions-train",
+                    Some(r##"Trains a new processor version. Operation metadata is returned as cloud_documentai_core.TrainProcessorVersionMetadata."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_documentai1_cli/projects_locations-processors-processor-versions-train",
+                  vec![
+                    (Some(r##"parent"##),
+                     None,
+                     Some(r##"Required. The parent (project, location and processor) to create the new version for. Format: `projects/{project}/locations/{location}/processors/{processor}`."##),
                      Some(true),
                      Some(false)),
         
@@ -2881,124 +3192,11 @@ async fn main() {
                   ]),
             ]),
         
-        ("uiv1beta3", "methods: 'projects-locations-get', 'projects-locations-list', 'projects-locations-operations-cancel', 'projects-locations-operations-get' and 'projects-locations-operations-list'", vec![
-            ("projects-locations-get",
-                    Some(r##"Gets information about a location."##),
-                    "Details at http://byron.github.io/google-apis-rs/google_documentai1_cli/uiv1beta3_projects-locations-get",
-                  vec![
-                    (Some(r##"name"##),
-                     None,
-                     Some(r##"Resource name for the location."##),
-                     Some(true),
-                     Some(false)),
-        
-                    (Some(r##"v"##),
-                     Some(r##"p"##),
-                     Some(r##"Set various optional parameters, matching the key=value form"##),
-                     Some(false),
-                     Some(true)),
-        
-                    (Some(r##"out"##),
-                     Some(r##"o"##),
-                     Some(r##"Specify the file into which to write the program's output"##),
-                     Some(false),
-                     Some(false)),
-                  ]),
-            ("projects-locations-list",
-                    Some(r##"Lists information about the supported locations for this service."##),
-                    "Details at http://byron.github.io/google-apis-rs/google_documentai1_cli/uiv1beta3_projects-locations-list",
-                  vec![
-                    (Some(r##"name"##),
-                     None,
-                     Some(r##"The resource that owns the locations collection, if applicable."##),
-                     Some(true),
-                     Some(false)),
-        
-                    (Some(r##"v"##),
-                     Some(r##"p"##),
-                     Some(r##"Set various optional parameters, matching the key=value form"##),
-                     Some(false),
-                     Some(true)),
-        
-                    (Some(r##"out"##),
-                     Some(r##"o"##),
-                     Some(r##"Specify the file into which to write the program's output"##),
-                     Some(false),
-                     Some(false)),
-                  ]),
-            ("projects-locations-operations-cancel",
-                    Some(r##"Starts asynchronous cancellation on a long-running operation. The server makes a best effort to cancel the operation, but success is not guaranteed. If the server doesn't support this method, it returns `google.rpc.Code.UNIMPLEMENTED`. Clients can use Operations.GetOperation or other methods to check whether the cancellation succeeded or whether the operation completed despite cancellation. On successful cancellation, the operation is not deleted; instead, it becomes an operation with an Operation.error value with a google.rpc.Status.code of 1, corresponding to `Code.CANCELLED`."##),
-                    "Details at http://byron.github.io/google-apis-rs/google_documentai1_cli/uiv1beta3_projects-locations-operations-cancel",
-                  vec![
-                    (Some(r##"name"##),
-                     None,
-                     Some(r##"The name of the operation resource to be cancelled."##),
-                     Some(true),
-                     Some(false)),
-        
-                    (Some(r##"v"##),
-                     Some(r##"p"##),
-                     Some(r##"Set various optional parameters, matching the key=value form"##),
-                     Some(false),
-                     Some(true)),
-        
-                    (Some(r##"out"##),
-                     Some(r##"o"##),
-                     Some(r##"Specify the file into which to write the program's output"##),
-                     Some(false),
-                     Some(false)),
-                  ]),
-            ("projects-locations-operations-get",
-                    Some(r##"Gets the latest state of a long-running operation. Clients can use this method to poll the operation result at intervals as recommended by the API service."##),
-                    "Details at http://byron.github.io/google-apis-rs/google_documentai1_cli/uiv1beta3_projects-locations-operations-get",
-                  vec![
-                    (Some(r##"name"##),
-                     None,
-                     Some(r##"The name of the operation resource."##),
-                     Some(true),
-                     Some(false)),
-        
-                    (Some(r##"v"##),
-                     Some(r##"p"##),
-                     Some(r##"Set various optional parameters, matching the key=value form"##),
-                     Some(false),
-                     Some(true)),
-        
-                    (Some(r##"out"##),
-                     Some(r##"o"##),
-                     Some(r##"Specify the file into which to write the program's output"##),
-                     Some(false),
-                     Some(false)),
-                  ]),
-            ("projects-locations-operations-list",
-                    Some(r##"Lists operations that match the specified filter in the request. If the server doesn't support this method, it returns `UNIMPLEMENTED`. NOTE: the `name` binding allows API services to override the binding to use different resource name schemes, such as `users/*/operations`. To override the binding, API services can add a binding such as `"/v1/{name=users/*}/operations"` to their service configuration. For backwards compatibility, the default name includes the operations collection id, however overriding users must ensure the name binding is the parent resource, without the operations collection id."##),
-                    "Details at http://byron.github.io/google-apis-rs/google_documentai1_cli/uiv1beta3_projects-locations-operations-list",
-                  vec![
-                    (Some(r##"name"##),
-                     None,
-                     Some(r##"The name of the operation's parent resource."##),
-                     Some(true),
-                     Some(false)),
-        
-                    (Some(r##"v"##),
-                     Some(r##"p"##),
-                     Some(r##"Set various optional parameters, matching the key=value form"##),
-                     Some(false),
-                     Some(true)),
-        
-                    (Some(r##"out"##),
-                     Some(r##"o"##),
-                     Some(r##"Specify the file into which to write the program's output"##),
-                     Some(false),
-                     Some(false)),
-                  ]),
-            ]),
-        
     ];
     
     let mut app = App::new("documentai1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("4.0.1+20220226")
+           .version("5.0.2+20230117")
            .about("Service to parse structured information from unstructured or semi-structured documents using state-of-the-art Google AI such as natural language, computer vision, translation, and AutoML.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_documentai1_cli")
            .arg(Arg::with_name("url")

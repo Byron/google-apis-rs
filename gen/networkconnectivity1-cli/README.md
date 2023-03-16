@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *networkconnectivity* API at revision *20220210*. The CLI is at version *4.0.1*.
+This documentation was generated from the *networkconnectivity* API at revision *20230105*. The CLI is at version *5.0.2*.
 
 ```bash
 networkconnectivity1 [options]
@@ -42,11 +42,25 @@ networkconnectivity1 [options]
                 locations-global-policy-based-routes-get-iam-policy <resource> [-p <v>]... [-o <out>]
                 locations-global-policy-based-routes-set-iam-policy <resource> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-global-policy-based-routes-test-iam-permissions <resource> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-internal-ranges-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-internal-ranges-delete <name> [-p <v>]... [-o <out>]
+                locations-internal-ranges-get <name> [-p <v>]... [-o <out>]
+                locations-internal-ranges-list <parent> [-p <v>]... [-o <out>]
+                locations-internal-ranges-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-list <name> [-p <v>]... [-o <out>]
                 locations-operations-cancel <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-operations-delete <name> [-p <v>]... [-o <out>]
                 locations-operations-get <name> [-p <v>]... [-o <out>]
                 locations-operations-list <name> [-p <v>]... [-o <out>]
+                locations-service-classes-get-iam-policy <resource> [-p <v>]... [-o <out>]
+                locations-service-classes-set-iam-policy <resource> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-service-classes-test-iam-permissions <resource> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-service-connection-maps-get-iam-policy <resource> [-p <v>]... [-o <out>]
+                locations-service-connection-maps-set-iam-policy <resource> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-service-connection-maps-test-iam-permissions <resource> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-service-connection-policies-get-iam-policy <resource> [-p <v>]... [-o <out>]
+                locations-service-connection-policies-set-iam-policy <resource> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-service-connection-policies-test-iam-permissions <resource> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-spokes-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-spokes-delete <name> [-p <v>]... [-o <out>]
                 locations-spokes-get <name> [-p <v>]... [-o <out>]

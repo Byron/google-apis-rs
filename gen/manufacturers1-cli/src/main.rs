@@ -3,8 +3,6 @@
 // DO NOT EDIT !
 #![allow(unused_variables, unused_imports, dead_code, unused_mut)]
 
-extern crate tokio;
-
 #[macro_use]
 extern crate clap;
 
@@ -12,9 +10,10 @@ use std::env;
 use std::io::{self, Write};
 use clap::{App, SubCommand, Arg};
 
-use google_manufacturers1::{api, Error, oauth2};
+use google_manufacturers1::{api, Error, oauth2, client::chrono, FieldMask};
 
-mod client;
+
+use google_clis_common as client;
 
 use client::{InvalidOptionsError, CLIError, arg_from_str, writer_from_opts, parse_kv_arg,
           input_file_from_opts, input_mime_from_opts, FieldCursor, FieldError, CallType, UploadProtocol,
@@ -169,7 +168,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 "include" => {
                     call = call.add_include(value.unwrap_or(""));
@@ -257,6 +256,15 @@ where
                     "flavor" => Some(("flavor", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "format" => Some(("format", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "gender" => Some(("gender", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "grocery.active-ingredients" => Some(("grocery.activeIngredients", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "grocery.alcohol-by-volume" => Some(("grocery.alcoholByVolume", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "grocery.allergens" => Some(("grocery.allergens", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "grocery.derived-nutrition-claim" => Some(("grocery.derivedNutritionClaim", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "grocery.directions" => Some(("grocery.directions", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "grocery.indications" => Some(("grocery.indications", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "grocery.ingredients" => Some(("grocery.ingredients", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "grocery.nutrition-claim" => Some(("grocery.nutritionClaim", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "grocery.storage-instructions" => Some(("grocery.storageInstructions", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "gtin" => Some(("gtin", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "image-link.image-url" => Some(("imageLink.imageUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "image-link.status" => Some(("imageLink.status", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -265,6 +273,70 @@ where
                     "item-group-id" => Some(("itemGroupId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "material" => Some(("material", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "mpn" => Some(("mpn", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "nutrition.added-sugars.amount" => Some(("nutrition.addedSugars.amount", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "nutrition.added-sugars.unit" => Some(("nutrition.addedSugars.unit", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "nutrition.added-sugars-daily-percentage" => Some(("nutrition.addedSugarsDailyPercentage", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "nutrition.calcium.amount" => Some(("nutrition.calcium.amount", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "nutrition.calcium.unit" => Some(("nutrition.calcium.unit", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "nutrition.calcium-daily-percentage" => Some(("nutrition.calciumDailyPercentage", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "nutrition.cholesterol.amount" => Some(("nutrition.cholesterol.amount", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "nutrition.cholesterol.unit" => Some(("nutrition.cholesterol.unit", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "nutrition.cholesterol-daily-percentage" => Some(("nutrition.cholesterolDailyPercentage", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "nutrition.dietary-fiber.amount" => Some(("nutrition.dietaryFiber.amount", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "nutrition.dietary-fiber.unit" => Some(("nutrition.dietaryFiber.unit", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "nutrition.dietary-fiber-daily-percentage" => Some(("nutrition.dietaryFiberDailyPercentage", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "nutrition.energy.amount" => Some(("nutrition.energy.amount", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "nutrition.energy.unit" => Some(("nutrition.energy.unit", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "nutrition.energy-from-fat.amount" => Some(("nutrition.energyFromFat.amount", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "nutrition.energy-from-fat.unit" => Some(("nutrition.energyFromFat.unit", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "nutrition.folate-daily-percentage" => Some(("nutrition.folateDailyPercentage", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "nutrition.folate-folic-acid.amount" => Some(("nutrition.folateFolicAcid.amount", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "nutrition.folate-folic-acid.unit" => Some(("nutrition.folateFolicAcid.unit", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "nutrition.folate-mcg-dfe" => Some(("nutrition.folateMcgDfe", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "nutrition.iron.amount" => Some(("nutrition.iron.amount", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "nutrition.iron.unit" => Some(("nutrition.iron.unit", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "nutrition.iron-daily-percentage" => Some(("nutrition.ironDailyPercentage", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "nutrition.monounsaturated-fat.amount" => Some(("nutrition.monounsaturatedFat.amount", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "nutrition.monounsaturated-fat.unit" => Some(("nutrition.monounsaturatedFat.unit", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "nutrition.nutrition-fact-measure" => Some(("nutrition.nutritionFactMeasure", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "nutrition.polyols.amount" => Some(("nutrition.polyols.amount", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "nutrition.polyols.unit" => Some(("nutrition.polyols.unit", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "nutrition.polyunsaturated-fat.amount" => Some(("nutrition.polyunsaturatedFat.amount", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "nutrition.polyunsaturated-fat.unit" => Some(("nutrition.polyunsaturatedFat.unit", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "nutrition.potassium.amount" => Some(("nutrition.potassium.amount", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "nutrition.potassium.unit" => Some(("nutrition.potassium.unit", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "nutrition.potassium-daily-percentage" => Some(("nutrition.potassiumDailyPercentage", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "nutrition.prepared-size-description" => Some(("nutrition.preparedSizeDescription", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "nutrition.protein.amount" => Some(("nutrition.protein.amount", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "nutrition.protein.unit" => Some(("nutrition.protein.unit", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "nutrition.protein-daily-percentage" => Some(("nutrition.proteinDailyPercentage", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "nutrition.saturated-fat.amount" => Some(("nutrition.saturatedFat.amount", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "nutrition.saturated-fat.unit" => Some(("nutrition.saturatedFat.unit", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "nutrition.saturated-fat-daily-percentage" => Some(("nutrition.saturatedFatDailyPercentage", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "nutrition.serving-size-description" => Some(("nutrition.servingSizeDescription", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "nutrition.serving-size-measure.amount" => Some(("nutrition.servingSizeMeasure.amount", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "nutrition.serving-size-measure.unit" => Some(("nutrition.servingSizeMeasure.unit", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "nutrition.servings-per-container" => Some(("nutrition.servingsPerContainer", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "nutrition.sodium.amount" => Some(("nutrition.sodium.amount", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "nutrition.sodium.unit" => Some(("nutrition.sodium.unit", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "nutrition.sodium-daily-percentage" => Some(("nutrition.sodiumDailyPercentage", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "nutrition.starch.amount" => Some(("nutrition.starch.amount", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "nutrition.starch.unit" => Some(("nutrition.starch.unit", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "nutrition.total-carbohydrate.amount" => Some(("nutrition.totalCarbohydrate.amount", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "nutrition.total-carbohydrate.unit" => Some(("nutrition.totalCarbohydrate.unit", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "nutrition.total-carbohydrate-daily-percentage" => Some(("nutrition.totalCarbohydrateDailyPercentage", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "nutrition.total-fat.amount" => Some(("nutrition.totalFat.amount", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "nutrition.total-fat.unit" => Some(("nutrition.totalFat.unit", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "nutrition.total-fat-daily-percentage" => Some(("nutrition.totalFatDailyPercentage", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "nutrition.total-sugars.amount" => Some(("nutrition.totalSugars.amount", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "nutrition.total-sugars.unit" => Some(("nutrition.totalSugars.unit", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "nutrition.total-sugars-daily-percentage" => Some(("nutrition.totalSugarsDailyPercentage", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "nutrition.trans-fat.amount" => Some(("nutrition.transFat.amount", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "nutrition.trans-fat.unit" => Some(("nutrition.transFat.unit", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "nutrition.trans-fat-daily-percentage" => Some(("nutrition.transFatDailyPercentage", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "nutrition.vitamin-d.amount" => Some(("nutrition.vitaminD.amount", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "nutrition.vitamin-d.unit" => Some(("nutrition.vitaminD.unit", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "nutrition.vitamin-d-daily-percentage" => Some(("nutrition.vitaminDDailyPercentage", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "pattern" => Some(("pattern", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "product-highlight" => Some(("productHighlight", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "product-line" => Some(("productLine", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -284,7 +356,7 @@ where
                     "title" => Some(("title", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "video-link" => Some(("videoLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["age-group", "amount", "brand", "capacity", "color", "count", "currency", "description", "disclosure-date", "excluded-destination", "flavor", "format", "gender", "gtin", "image-link", "image-url", "included-destination", "item-group-id", "material", "mpn", "pattern", "product-highlight", "product-line", "product-name", "product-page-url", "product-type", "release-date", "rich-product-content", "scent", "size", "size-system", "size-type", "status", "suggested-retail-price", "target-client-id", "theme", "title", "type", "unit", "value", "video-link"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["active-ingredients", "added-sugars", "added-sugars-daily-percentage", "age-group", "alcohol-by-volume", "allergens", "amount", "brand", "calcium", "calcium-daily-percentage", "capacity", "cholesterol", "cholesterol-daily-percentage", "color", "count", "currency", "derived-nutrition-claim", "description", "dietary-fiber", "dietary-fiber-daily-percentage", "directions", "disclosure-date", "energy", "energy-from-fat", "excluded-destination", "flavor", "folate-daily-percentage", "folate-folic-acid", "folate-mcg-dfe", "format", "gender", "grocery", "gtin", "image-link", "image-url", "included-destination", "indications", "ingredients", "iron", "iron-daily-percentage", "item-group-id", "material", "monounsaturated-fat", "mpn", "nutrition", "nutrition-claim", "nutrition-fact-measure", "pattern", "polyols", "polyunsaturated-fat", "potassium", "potassium-daily-percentage", "prepared-size-description", "product-highlight", "product-line", "product-name", "product-page-url", "product-type", "protein", "protein-daily-percentage", "release-date", "rich-product-content", "saturated-fat", "saturated-fat-daily-percentage", "scent", "serving-size-description", "serving-size-measure", "servings-per-container", "size", "size-system", "size-type", "sodium", "sodium-daily-percentage", "starch", "status", "storage-instructions", "suggested-retail-price", "target-client-id", "theme", "title", "total-carbohydrate", "total-carbohydrate-daily-percentage", "total-fat", "total-fat-daily-percentage", "total-sugars", "total-sugars-daily-percentage", "trans-fat", "trans-fat-daily-percentage", "type", "unit", "value", "video-link", "vitamin-d", "vitamin-d-daily-percentage"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -561,7 +633,7 @@ async fn main() {
     
     let mut app = App::new("manufacturers1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("4.0.1+20220303")
+           .version("5.0.2+20230123")
            .about("Public API for managing Manufacturer Center related data.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_manufacturers1_cli")
            .arg(Arg::with_name("url")

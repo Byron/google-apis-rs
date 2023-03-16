@@ -3,8 +3,6 @@
 // DO NOT EDIT !
 #![allow(unused_variables, unused_imports, dead_code, unused_mut)]
 
-extern crate tokio;
-
 #[macro_use]
 extern crate clap;
 
@@ -12,9 +10,10 @@ use std::env;
 use std::io::{self, Write};
 use clap::{App, SubCommand, Arg};
 
-use google_webrisk1::{api, Error, oauth2};
+use google_webrisk1::{api, Error, oauth2, client::chrono, FieldMask};
 
-mod client;
+
+use google_clis_common as client;
 
 use client::{InvalidOptionsError, CLIError, arg_from_str, writer_from_opts, parse_kv_arg,
           input_file_from_opts, input_mime_from_opts, FieldCursor, FieldError, CallType, UploadProtocol,
@@ -61,7 +60,7 @@ where
                     call = call.add_threat_types(value.unwrap_or(""));
                 },
                 "hash-prefix" => {
-                    call = call.hash_prefix(value.unwrap_or(""));
+                    call = call.hash_prefix(        value.map(|v| arg_from_str(v, err, "hash-prefix", "byte")).unwrap_or(b"hello world"));
                 },
                 _ => {
                     let mut found = false;
@@ -302,7 +301,7 @@ where
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
                 "filter" => {
                     call = call.filter(value.unwrap_or(""));
@@ -530,7 +529,7 @@ where
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "version-token" => {
-                    call = call.version_token(value.unwrap_or(""));
+                    call = call.version_token(        value.map(|v| arg_from_str(v, err, "version-token", "byte")).unwrap_or(b"hello world"));
                 },
                 "threat-type" => {
                     call = call.threat_type(value.unwrap_or(""));
@@ -539,10 +538,10 @@ where
                     call = call.add_constraints_supported_compressions(value.unwrap_or(""));
                 },
                 "constraints-max-diff-entries" => {
-                    call = call.constraints_max_diff_entries(arg_from_str(value.unwrap_or("-0"), err, "constraints-max-diff-entries", "integer"));
+                    call = call.constraints_max_diff_entries(        value.map(|v| arg_from_str(v, err, "constraints-max-diff-entries", "int32")).unwrap_or(-0));
                 },
                 "constraints-max-database-entries" => {
-                    call = call.constraints_max_database_entries(arg_from_str(value.unwrap_or("-0"), err, "constraints-max-database-entries", "integer"));
+                    call = call.constraints_max_database_entries(        value.map(|v| arg_from_str(v, err, "constraints-max-database-entries", "int32")).unwrap_or(-0));
                 },
                 _ => {
                     let mut found = false;
@@ -1001,7 +1000,7 @@ async fn main() {
     
     let mut app = App::new("webrisk1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("4.0.1+20220226")
+           .version("5.0.2+20230121")
            .about("")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_webrisk1_cli")
            .arg(Arg::with_name("url")

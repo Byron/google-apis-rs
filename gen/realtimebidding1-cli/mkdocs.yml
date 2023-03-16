@@ -1,4 +1,4 @@
-site_name: Real-time Bidding v4.0.1+20220307
+site_name: Real-time Bidding v5.0.2+20230124
 site_url: http://byron.github.io/google-apis-rs/google-realtimebidding1-cli
 site_description: A complete library to interact with Real-time Bidding (protocol v1)
 
@@ -7,42 +7,48 @@ repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/realtimebidding1
 docs_dir: docs
 site_dir: build_html
 
-pages:
-- ['index.md', 'Home']
-- ['bidders_creatives-list.md', 'Bidders', 'Creatives List']
-- ['bidders_creatives-watch.md', 'Bidders', 'Creatives Watch']
-- ['bidders_endpoints-get.md', 'Bidders', 'Endpoints Get']
-- ['bidders_endpoints-list.md', 'Bidders', 'Endpoints List']
-- ['bidders_endpoints-patch.md', 'Bidders', 'Endpoints Patch']
-- ['bidders_get.md', 'Bidders', 'Get']
-- ['bidders_list.md', 'Bidders', 'List']
-- ['bidders_pretargeting-configs-activate.md', 'Bidders', 'Pretargeting Configs Activate']
-- ['bidders_pretargeting-configs-add-targeted-apps.md', 'Bidders', 'Pretargeting Configs Add Targeted Apps']
-- ['bidders_pretargeting-configs-add-targeted-publishers.md', 'Bidders', 'Pretargeting Configs Add Targeted Publishers']
-- ['bidders_pretargeting-configs-add-targeted-sites.md', 'Bidders', 'Pretargeting Configs Add Targeted Sites']
-- ['bidders_pretargeting-configs-create.md', 'Bidders', 'Pretargeting Configs Create']
-- ['bidders_pretargeting-configs-delete.md', 'Bidders', 'Pretargeting Configs Delete']
-- ['bidders_pretargeting-configs-get.md', 'Bidders', 'Pretargeting Configs Get']
-- ['bidders_pretargeting-configs-list.md', 'Bidders', 'Pretargeting Configs List']
-- ['bidders_pretargeting-configs-patch.md', 'Bidders', 'Pretargeting Configs Patch']
-- ['bidders_pretargeting-configs-remove-targeted-apps.md', 'Bidders', 'Pretargeting Configs Remove Targeted Apps']
-- ['bidders_pretargeting-configs-remove-targeted-publishers.md', 'Bidders', 'Pretargeting Configs Remove Targeted Publishers']
-- ['bidders_pretargeting-configs-remove-targeted-sites.md', 'Bidders', 'Pretargeting Configs Remove Targeted Sites']
-- ['bidders_pretargeting-configs-suspend.md', 'Bidders', 'Pretargeting Configs Suspend']
-- ['buyers_creatives-create.md', 'Buyers', 'Creatives Create']
-- ['buyers_creatives-get.md', 'Buyers', 'Creatives Get']
-- ['buyers_creatives-list.md', 'Buyers', 'Creatives List']
-- ['buyers_creatives-patch.md', 'Buyers', 'Creatives Patch']
-- ['buyers_get.md', 'Buyers', 'Get']
-- ['buyers_get-remarketing-tag.md', 'Buyers', 'Get Remarketing Tag']
-- ['buyers_list.md', 'Buyers', 'List']
-- ['buyers_user-lists-close.md', 'Buyers', 'User Lists Close']
-- ['buyers_user-lists-create.md', 'Buyers', 'User Lists Create']
-- ['buyers_user-lists-get.md', 'Buyers', 'User Lists Get']
-- ['buyers_user-lists-get-remarketing-tag.md', 'Buyers', 'User Lists Get Remarketing Tag']
-- ['buyers_user-lists-list.md', 'Buyers', 'User Lists List']
-- ['buyers_user-lists-open.md', 'Buyers', 'User Lists Open']
-- ['buyers_user-lists-update.md', 'Buyers', 'User Lists Update']
+nav:
+- Home: 'index.md'
+- 'Bidders':
+    - 'Creatives List': 'bidders_creatives-list.md'
+    - 'Creatives Watch': 'bidders_creatives-watch.md'
+    - 'Endpoints Get': 'bidders_endpoints-get.md'
+    - 'Endpoints List': 'bidders_endpoints-list.md'
+    - 'Endpoints Patch': 'bidders_endpoints-patch.md'
+    - 'Get': 'bidders_get.md'
+    - 'List': 'bidders_list.md'
+    - 'Pretargeting Configs Activate': 'bidders_pretargeting-configs-activate.md'
+    - 'Pretargeting Configs Add Targeted Apps': 'bidders_pretargeting-configs-add-targeted-apps.md'
+    - 'Pretargeting Configs Add Targeted Publishers': 'bidders_pretargeting-configs-add-targeted-publishers.md'
+    - 'Pretargeting Configs Add Targeted Sites': 'bidders_pretargeting-configs-add-targeted-sites.md'
+    - 'Pretargeting Configs Create': 'bidders_pretargeting-configs-create.md'
+    - 'Pretargeting Configs Delete': 'bidders_pretargeting-configs-delete.md'
+    - 'Pretargeting Configs Get': 'bidders_pretargeting-configs-get.md'
+    - 'Pretargeting Configs List': 'bidders_pretargeting-configs-list.md'
+    - 'Pretargeting Configs Patch': 'bidders_pretargeting-configs-patch.md'
+    - 'Pretargeting Configs Remove Targeted Apps': 'bidders_pretargeting-configs-remove-targeted-apps.md'
+    - 'Pretargeting Configs Remove Targeted Publishers': 'bidders_pretargeting-configs-remove-targeted-publishers.md'
+    - 'Pretargeting Configs Remove Targeted Sites': 'bidders_pretargeting-configs-remove-targeted-sites.md'
+    - 'Pretargeting Configs Suspend': 'bidders_pretargeting-configs-suspend.md'
+    - 'Publisher Connections Batch Approve': 'bidders_publisher-connections-batch-approve.md'
+    - 'Publisher Connections Batch Reject': 'bidders_publisher-connections-batch-reject.md'
+    - 'Publisher Connections Get': 'bidders_publisher-connections-get.md'
+    - 'Publisher Connections List': 'bidders_publisher-connections-list.md'
+- 'Buyers':
+    - 'Creatives Create': 'buyers_creatives-create.md'
+    - 'Creatives Get': 'buyers_creatives-get.md'
+    - 'Creatives List': 'buyers_creatives-list.md'
+    - 'Creatives Patch': 'buyers_creatives-patch.md'
+    - 'Get': 'buyers_get.md'
+    - 'Get Remarketing Tag': 'buyers_get-remarketing-tag.md'
+    - 'List': 'buyers_list.md'
+    - 'User Lists Close': 'buyers_user-lists-close.md'
+    - 'User Lists Create': 'buyers_user-lists-create.md'
+    - 'User Lists Get': 'buyers_user-lists-get.md'
+    - 'User Lists Get Remarketing Tag': 'buyers_user-lists-get-remarketing-tag.md'
+    - 'User Lists List': 'buyers_user-lists-list.md'
+    - 'User Lists Open': 'buyers_user-lists-open.md'
+    - 'User Lists Update': 'buyers_user-lists-update.md'
 
 theme: readthedocs
 

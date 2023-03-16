@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Firebaseappcheck* API at revision *20220225*. The CLI is at version *4.0.1*.
+This documentation was generated from the *Firebaseappcheck* API at revision *20230116*. The CLI is at version *5.0.2*.
 
 ```bash
 firebaseappcheck1-beta [options]
@@ -48,16 +48,25 @@ firebaseappcheck1-beta [options]
                 apps-exchange-custom-token <app> (-r <kv>)... [-p <v>]... [-o <out>]
                 apps-exchange-debug-token <app> (-r <kv>)... [-p <v>]... [-o <out>]
                 apps-exchange-device-check-token <app> (-r <kv>)... [-p <v>]... [-o <out>]
+                apps-exchange-play-integrity-token <app> (-r <kv>)... [-p <v>]... [-o <out>]
                 apps-exchange-recaptcha-enterprise-token <app> (-r <kv>)... [-p <v>]... [-o <out>]
                 apps-exchange-recaptcha-token <app> (-r <kv>)... [-p <v>]... [-o <out>]
+                apps-exchange-recaptcha-v3-token <app> (-r <kv>)... [-p <v>]... [-o <out>]
                 apps-exchange-safety-net-token <app> (-r <kv>)... [-p <v>]... [-o <out>]
                 apps-generate-app-attest-challenge <app> (-r <kv>)... [-p <v>]... [-o <out>]
+                apps-generate-play-integrity-challenge <app> (-r <kv>)... [-p <v>]... [-o <out>]
+                apps-play-integrity-config-batch-get <parent> [-p <v>]... [-o <out>]
+                apps-play-integrity-config-get <name> [-p <v>]... [-o <out>]
+                apps-play-integrity-config-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 apps-recaptcha-config-batch-get <parent> [-p <v>]... [-o <out>]
                 apps-recaptcha-config-get <name> [-p <v>]... [-o <out>]
                 apps-recaptcha-config-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 apps-recaptcha-enterprise-config-batch-get <parent> [-p <v>]... [-o <out>]
                 apps-recaptcha-enterprise-config-get <name> [-p <v>]... [-o <out>]
                 apps-recaptcha-enterprise-config-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                apps-recaptcha-v3-config-batch-get <parent> [-p <v>]... [-o <out>]
+                apps-recaptcha-v3-config-get <name> [-p <v>]... [-o <out>]
+                apps-recaptcha-v3-config-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 apps-safety-net-config-batch-get <parent> [-p <v>]... [-o <out>]
                 apps-safety-net-config-get <name> [-p <v>]... [-o <out>]
                 apps-safety-net-config-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]

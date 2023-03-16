@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Document* API at revision *20220226*. The CLI is at version *4.0.1*.
+This documentation was generated from the *Document* API at revision *20230117*. The CLI is at version *5.0.2*.
 
 ```bash
 documentai1 [options]
@@ -38,6 +38,8 @@ documentai1 [options]
                 locations-operations-cancel <name> [-p <v>]... [-o <out>]
                 locations-operations-get <name> [-p <v>]... [-o <out>]
                 locations-operations-list <name> [-p <v>]... [-o <out>]
+                locations-processor-types-get <name> [-p <v>]... [-o <out>]
+                locations-processor-types-list <parent> [-p <v>]... [-o <out>]
                 locations-processors-batch-process <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-processors-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-processors-delete <name> [-p <v>]... [-o <out>]
@@ -50,18 +52,16 @@ documentai1 [options]
                 locations-processors-processor-versions-batch-process <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-processors-processor-versions-delete <name> [-p <v>]... [-o <out>]
                 locations-processors-processor-versions-deploy <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-processors-processor-versions-evaluate-processor-version <processor-version> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-processors-processor-versions-evaluations-get <name> [-p <v>]... [-o <out>]
+                locations-processors-processor-versions-evaluations-list <parent> [-p <v>]... [-o <out>]
                 locations-processors-processor-versions-get <name> [-p <v>]... [-o <out>]
                 locations-processors-processor-versions-list <parent> [-p <v>]... [-o <out>]
                 locations-processors-processor-versions-process <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-processors-processor-versions-train <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-processors-processor-versions-undeploy <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-processors-set-default-processor-version <processor> (-r <kv>)... [-p <v>]... [-o <out>]
                 operations-get <name> [-p <v>]... [-o <out>]
-        uiv1beta3
-                projects-locations-get <name> [-p <v>]... [-o <out>]
-                projects-locations-list <name> [-p <v>]... [-o <out>]
-                projects-locations-operations-cancel <name> [-p <v>]... [-o <out>]
-                projects-locations-operations-get <name> [-p <v>]... [-o <out>]
-                projects-locations-operations-list <name> [-p <v>]... [-o <out>]
   documentai1 --help
 
 Configuration:

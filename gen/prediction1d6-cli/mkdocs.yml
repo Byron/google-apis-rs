@@ -1,4 +1,4 @@
-site_name: prediction v4.0.1+20160511
+site_name: prediction v5.0.2+20160511
 site_url: http://byron.github.io/google-apis-rs/google-prediction1d6-cli
 site_description: A complete library to interact with prediction (protocol v1.6)
 
@@ -7,16 +7,18 @@ repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/prediction1d6-cl
 docs_dir: docs
 site_dir: build_html
 
-pages:
-- ['index.md', 'Home']
-- ['hostedmodels_predict.md', 'Hostedmodels', 'Predict']
-- ['trainedmodels_analyze.md', 'Trainedmodels', 'Analyze']
-- ['trainedmodels_delete.md', 'Trainedmodels', 'Delete']
-- ['trainedmodels_get.md', 'Trainedmodels', 'Get']
-- ['trainedmodels_insert.md', 'Trainedmodels', 'Insert']
-- ['trainedmodels_list.md', 'Trainedmodels', 'List']
-- ['trainedmodels_predict.md', 'Trainedmodels', 'Predict']
-- ['trainedmodels_update.md', 'Trainedmodels', 'Update']
+nav:
+- Home: 'index.md'
+- 'Hostedmodels':
+    - 'Predict': 'hostedmodels_predict.md'
+- 'Trainedmodels':
+    - 'Analyze': 'trainedmodels_analyze.md'
+    - 'Delete': 'trainedmodels_delete.md'
+    - 'Get': 'trainedmodels_get.md'
+    - 'Insert': 'trainedmodels_insert.md'
+    - 'List': 'trainedmodels_list.md'
+    - 'Predict': 'trainedmodels_predict.md'
+    - 'Update': 'trainedmodels_update.md'
 
 theme: readthedocs
 

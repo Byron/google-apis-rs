@@ -25,12 +25,13 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Doubleclicksearch* API at revision *20220301*. The CLI is at version *4.0.1*.
+This documentation was generated from the *Doubleclicksearch* API at revision *20230118*. The CLI is at version *5.0.2*.
 
 ```bash
 doubleclicksearch2 [options]
         conversion
                 get <agency-id> <advertiser-id> <engine-account-id> <end-date> <row-count> <start-date> <start-row> [-p <v>]... [-o <out>]
+                get-by-customer-id <customer-id> <end-date> <row-count> <start-date> <start-row> [-p <v>]... [-o <out>]
                 insert (-r <kv>)... [-p <v>]... [-o <out>]
                 update (-r <kv>)... [-p <v>]... [-o <out>]
                 update-availability (-r <kv>)... [-p <v>]... [-o <out>]
@@ -38,6 +39,7 @@ doubleclicksearch2 [options]
                 generate (-r <kv>)... [-p <v>]... [-o <out>]
                 get <report-id> [-p <v>]... [-o <out>]
                 get-file <report-id> <report-fragment> [-p <v>]... [-o <out>]
+                get-id-mapping-file <agency-id> <advertiser-id> [-p <v>]... [-o <out>]
                 request (-r <kv>)... [-p <v>]... [-o <out>]
         saved-columns
                 list <agency-id> <advertiser-id> [-p <v>]... [-o <out>]

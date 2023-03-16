@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Api Keys Service* API at revision *20220305*. The CLI is at version *4.0.1*.
+This documentation was generated from the *Api Keys Service* API at revision *20230118*. The CLI is at version *5.0.2*.
 
 ```bash
 apikeys2 [options]
@@ -34,7 +34,6 @@ apikeys2 [options]
         operations
                 get <name> [-p <v>]... [-o <out>]
         projects
-                locations-keys-clone <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-keys-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-keys-delete <name> [-p <v>]... [-o <out>]
                 locations-keys-get <name> [-p <v>]... [-o <out>]

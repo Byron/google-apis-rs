@@ -1,4 +1,4 @@
-site_name: Cloud Natural Language v4.0.1+20220218
+site_name: Cloud Natural Language v5.0.2+20230121
 site_url: http://byron.github.io/google-apis-rs/google-language1-cli
 site_description: A complete library to interact with Cloud Natural Language (protocol v1)
 
@@ -7,14 +7,15 @@ repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/language1-cli
 docs_dir: docs
 site_dir: build_html
 
-pages:
-- ['index.md', 'Home']
-- ['documents_analyze-entities.md', 'Documents', 'Analyze Entities']
-- ['documents_analyze-entity-sentiment.md', 'Documents', 'Analyze Entity Sentiment']
-- ['documents_analyze-sentiment.md', 'Documents', 'Analyze Sentiment']
-- ['documents_analyze-syntax.md', 'Documents', 'Analyze Syntax']
-- ['documents_annotate-text.md', 'Documents', 'Annotate Text']
-- ['documents_classify-text.md', 'Documents', 'Classify Text']
+nav:
+- Home: 'index.md'
+- 'Documents':
+    - 'Analyze Entities': 'documents_analyze-entities.md'
+    - 'Analyze Entity Sentiment': 'documents_analyze-entity-sentiment.md'
+    - 'Analyze Sentiment': 'documents_analyze-sentiment.md'
+    - 'Analyze Syntax': 'documents_analyze-syntax.md'
+    - 'Annotate Text': 'documents_annotate-text.md'
+    - 'Classify Text': 'documents_classify-text.md'
 
 theme: readthedocs
 

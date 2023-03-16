@@ -1,4 +1,4 @@
-site_name: calendar v4.0.1+20220217
+site_name: calendar v5.0.2+20221229
 site_url: http://byron.github.io/google-apis-rs/google-calendar3-cli
 site_description: A complete library to interact with calendar (protocol v3)
 
@@ -7,45 +7,53 @@ repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/calendar3-cli
 docs_dir: docs
 site_dir: build_html
 
-pages:
-- ['index.md', 'Home']
-- ['acl_delete.md', 'Acl', 'Delete']
-- ['acl_get.md', 'Acl', 'Get']
-- ['acl_insert.md', 'Acl', 'Insert']
-- ['acl_list.md', 'Acl', 'List']
-- ['acl_patch.md', 'Acl', 'Patch']
-- ['acl_update.md', 'Acl', 'Update']
-- ['acl_watch.md', 'Acl', 'Watch']
-- ['calendar-list_delete.md', 'Calendar List', 'Delete']
-- ['calendar-list_get.md', 'Calendar List', 'Get']
-- ['calendar-list_insert.md', 'Calendar List', 'Insert']
-- ['calendar-list_list.md', 'Calendar List', 'List']
-- ['calendar-list_patch.md', 'Calendar List', 'Patch']
-- ['calendar-list_update.md', 'Calendar List', 'Update']
-- ['calendar-list_watch.md', 'Calendar List', 'Watch']
-- ['calendars_clear.md', 'Calendars', 'Clear']
-- ['calendars_delete.md', 'Calendars', 'Delete']
-- ['calendars_get.md', 'Calendars', 'Get']
-- ['calendars_insert.md', 'Calendars', 'Insert']
-- ['calendars_patch.md', 'Calendars', 'Patch']
-- ['calendars_update.md', 'Calendars', 'Update']
-- ['channels_stop.md', 'Channels', 'Stop']
-- ['colors_get.md', 'Colors', 'Get']
-- ['events_delete.md', 'Events', 'Delete']
-- ['events_get.md', 'Events', 'Get']
-- ['events_import.md', 'Events', 'Import']
-- ['events_insert.md', 'Events', 'Insert']
-- ['events_instances.md', 'Events', 'Instances']
-- ['events_list.md', 'Events', 'List']
-- ['events_move.md', 'Events', 'Move']
-- ['events_patch.md', 'Events', 'Patch']
-- ['events_quick-add.md', 'Events', 'Quick Add']
-- ['events_update.md', 'Events', 'Update']
-- ['events_watch.md', 'Events', 'Watch']
-- ['freebusy_query.md', 'Freebusy', 'Query']
-- ['settings_get.md', 'Settings', 'Get']
-- ['settings_list.md', 'Settings', 'List']
-- ['settings_watch.md', 'Settings', 'Watch']
+nav:
+- Home: 'index.md'
+- 'Acl':
+    - 'Delete': 'acl_delete.md'
+    - 'Get': 'acl_get.md'
+    - 'Insert': 'acl_insert.md'
+    - 'List': 'acl_list.md'
+    - 'Patch': 'acl_patch.md'
+    - 'Update': 'acl_update.md'
+    - 'Watch': 'acl_watch.md'
+- 'Calendar List':
+    - 'Delete': 'calendar-list_delete.md'
+    - 'Get': 'calendar-list_get.md'
+    - 'Insert': 'calendar-list_insert.md'
+    - 'List': 'calendar-list_list.md'
+    - 'Patch': 'calendar-list_patch.md'
+    - 'Update': 'calendar-list_update.md'
+    - 'Watch': 'calendar-list_watch.md'
+- 'Calendars':
+    - 'Clear': 'calendars_clear.md'
+    - 'Delete': 'calendars_delete.md'
+    - 'Get': 'calendars_get.md'
+    - 'Insert': 'calendars_insert.md'
+    - 'Patch': 'calendars_patch.md'
+    - 'Update': 'calendars_update.md'
+- 'Channels':
+    - 'Stop': 'channels_stop.md'
+- 'Colors':
+    - 'Get': 'colors_get.md'
+- 'Events':
+    - 'Delete': 'events_delete.md'
+    - 'Get': 'events_get.md'
+    - 'Import': 'events_import.md'
+    - 'Insert': 'events_insert.md'
+    - 'Instances': 'events_instances.md'
+    - 'List': 'events_list.md'
+    - 'Move': 'events_move.md'
+    - 'Patch': 'events_patch.md'
+    - 'Quick Add': 'events_quick-add.md'
+    - 'Update': 'events_update.md'
+    - 'Watch': 'events_watch.md'
+- 'Freebusy':
+    - 'Query': 'freebusy_query.md'
+- 'Settings':
+    - 'Get': 'settings_get.md'
+    - 'List': 'settings_list.md'
+    - 'Watch': 'settings_watch.md'
 
 theme: readthedocs
 
