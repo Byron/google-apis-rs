@@ -4,12 +4,12 @@
 [package]
 
 name = "google-fcm1"
-version = "5.0.2-beta-1+20230106"
+version = "5.0.2+20230106"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Firebase Cloud Messaging (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/fcm1"
 homepage = "https://firebase.google.com/docs/cloud-messaging"
-documentation = "https://docs.rs/google-fcm1/5.0.2-beta-1+20230106"
+documentation = "https://docs.rs/google-fcm1/5.0.2+20230106"
 license = "MIT"
 keywords = ["fcm", "google", "protocol", "web", "api"]
 autobins = false
