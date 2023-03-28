@@ -1,6 +1,7 @@
 import os
 import re
 import subprocess
+import urllib
 
 import inflect
 from dataclasses import dataclass
@@ -1173,6 +1174,33 @@ def string_impl(p):
         "string": lambda x: x
     }.get(p.get("format", p["type"]), lambda x: f"{x}.to_string()")
 
+MD_LINKS_CAPTURE = re.compile(r'''
+    \[          # Opening bracket for the "name" part of the url
+        ([^]]+?) # Some amount of non-closing bracket `]` symbols,
+                # Captured in a group
+    \]          # Close the name part
+    \s*         # maybe a whitespace
+    \(          # Opening a paren for the url part
+        ([^)]+?) # Url, captured in a group
+    \)          # closing paren
+''', re.VERBOSE)
+
+# FIXME: combine with links handling in <lib.mako>.docs
+def fix_relative_links(url_base):
+    url_parsed = urllib.parse.urlparse(url_base)
+    url_base = f"{url_parsed.scheme}://{url_parsed.netloc}"
+    def replace_url(url_match: re.match):
+        original_url = url_match.group(0)
+        name = url_match.group(1)
+        url = url_match.group(2)
+        if url.startswith('/'):
+            return f"[{name}]({url_base}{url})"
+        return original_url
+
+    def fixer(docs):
+        # FIXME: replace with proper markdown parser and documentationLink value
+        return MD_LINKS_CAPTURE.sub(replace_url, docs)
+    return fixer
 
 if __name__ == '__main__':
     raise AssertionError('For import only')
