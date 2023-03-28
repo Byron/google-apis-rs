@@ -289,7 +289,7 @@ impl<'a, S> AmpUrlMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Returns AMP URL(s) and equivalent [AMP Cache URL(s)](/amp/cache/overview#amp-cache-url-format).
+    /// Returns AMP URL(s) and equivalent [AMP Cache URL(s)](https://developers.google.com/amp/cache/overview#amp-cache-url-format).
     /// 
     /// # Arguments
     ///

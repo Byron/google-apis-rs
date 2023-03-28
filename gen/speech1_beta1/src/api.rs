@@ -657,8 +657,7 @@ impl<'a, S> SpeechMethods<'a, S> {
     /// Create a builder to help you perform the following task:
     ///
     /// Performs asynchronous speech recognition: receive results via the
-    /// [google.longrunning.Operations]
-    /// (/speech/reference/rest/v1beta1/operations#Operation)
+    /// [google.longrunning.Operations](https://cloud.google.com/speech/reference/rest/v1beta1/operations#Operation)
     /// interface. Returns either an
     /// `Operation.error` or an `Operation.response` which contains
     /// an `AsyncRecognizeResponse` message.

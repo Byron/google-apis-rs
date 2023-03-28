@@ -1914,7 +1914,7 @@ impl<'a, S> BidderMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Lists creatives as they are at the time of the initial request. This call may take multiple hours to complete. For large, paginated requests, this method returns a snapshot of creatives at the time of request for the first page. `lastStatusUpdate` and `creativeServingDecision` may be outdated for creatives on sequential pages. We recommend [Google Cloud Pub/Sub](//cloud.google.com/pubsub/docs/overview) to view the latest status.
+    /// Lists creatives as they are at the time of the initial request. This call may take multiple hours to complete. For large, paginated requests, this method returns a snapshot of creatives at the time of request for the first page. `lastStatusUpdate` and `creativeServingDecision` may be outdated for creatives on sequential pages. We recommend [Google Cloud Pub/Sub](https://developers.google.com//cloud.google.com/pubsub/docs/overview) to view the latest status.
     /// 
     /// # Arguments
     ///
@@ -2439,7 +2439,7 @@ impl<'a, S> BuyerMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Lists creatives as they are at the time of the initial request. This call may take multiple hours to complete. For large, paginated requests, this method returns a snapshot of creatives at the time of request for the first page. `lastStatusUpdate` and `creativeServingDecision` may be outdated for creatives on sequential pages. We recommend [Google Cloud Pub/Sub](//cloud.google.com/pubsub/docs/overview) to view the latest status.
+    /// Lists creatives as they are at the time of the initial request. This call may take multiple hours to complete. For large, paginated requests, this method returns a snapshot of creatives at the time of request for the first page. `lastStatusUpdate` and `creativeServingDecision` may be outdated for creatives on sequential pages. We recommend [Google Cloud Pub/Sub](https://developers.google.com//cloud.google.com/pubsub/docs/overview) to view the latest status.
     /// 
     /// # Arguments
     ///
