@@ -334,7 +334,7 @@ You can read the full text at the repository's [license file][repo-license].
 #[derive(PartialEq, Eq, Hash)]
 pub enum Scope {
 % for url, scope in auth.oauth2.scopes.items():
-    ${scope.description | rust_doc_sanitize, rust_doc_comment}
+    ${scope.description | rust_doc_sanitize(documentationLink), rust_doc_comment}
     ${scope_url_to_variant(name, url, fully_qualified=False)},
     % if not loop.last:
 

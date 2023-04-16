@@ -66,7 +66,7 @@
     parts = get_parts(part_prop)
 %>\
 % if 'description' in m:
-${m.description | rust_doc_sanitize, rust_doc_comment}
+${m.description | rust_doc_sanitize(documentationLink), rust_doc_comment}
 ///
 % endif
 % if m.get('supportsMediaDownload', False):
@@ -90,7 +90,7 @@ ${m.description | rust_doc_sanitize, rust_doc_comment}
 /// It is not used directly, but through a [`${rb_type(resource)}`] instance.
 ///
 % if part_desc:
-${part_desc | rust_doc_sanitize, rust_doc_comment}
+${part_desc | rust_doc_sanitize(documentationLink), rust_doc_comment}
 ///
 % if m.get('scopes'):
 /// # Scopes
@@ -248,7 +248,7 @@ ${self._setter_fn(resource, method, m, p, part_prop, ThisType, c)}\
     # end part description
 %>\
     % if 'description' in p:
-    ${p.description | rust_doc_sanitize, rust_doc_comment, indent_all_but_first_by(1)}
+    ${p.description | rust_doc_sanitize(documentationLink), rust_doc_comment, indent_all_but_first_by(1)}
     % endif
     % if is_repeated_property(p):
     ///
@@ -272,7 +272,7 @@ ${self._setter_fn(resource, method, m, p, part_prop, ThisType, c)}\
     % endif
     % if part_desc:
     ///
-    ${part_desc | rust_doc_sanitize, rust_doc_comment, indent_all_but_first_by(1)}
+    ${part_desc | rust_doc_sanitize(documentationLink), rust_doc_comment, indent_all_but_first_by(1)}
     % endif
     pub fn ${mangle_ident(setter_fn_name(p))}(mut self, ${value_name}: ${InType}) -> ${ThisType} {
         % if p.get('repeated', False):
@@ -898,7 +898,7 @@ if enable_resource_parsing \
     }
 
     % for p in media_params:
-    ${p.description | rust_doc_sanitize, rust_doc_comment, indent_all_but_first_by(1)}
+    ${p.description | rust_doc_sanitize(documentationLink), rust_doc_comment, indent_all_but_first_by(1)}
     ///
     % for item_name, item in p.info.items():
     /// * *${split_camelcase_s(item_name)}*: ${isinstance(item, (list, tuple)) and put_and(enclose_in("'", item)) or str(item)}
