@@ -36,7 +36,8 @@ To generate the APIs yourself, you will need to meet the following prerequisites
 - **make**
 - Make is used to automate and efficiently call all involved programs
 - **python**
-- As [_mako_][mako] is a python program, you will need python installed on your system to run it. Some other programs we call depend on python being present as well. Note that you need python 3.8, as 3.9+ introduced some breaking changes that breaks the dependencies.
+- As [_mako_][mako] is a python program, you will need python installed on your system to run it. Some other programs we call depend on python being present as well.
+  Note that you need python 3.8, as 3.9+ introduced some breaking changes that breaks the dependencies.
 - **an internet connection and wget**
 - Make will download all other prerequisites automatically into hidden directories within this repository, which requires it to make some downloads via wget.
 - **Rust Stable**
