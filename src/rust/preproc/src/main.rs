@@ -13,15 +13,15 @@ fn main() {
     };
 
     let mut output = String::with_capacity(2048);
-    let url_base = std::env::var("URL_BASE").unwrap_or(String::new());
+    let url_base = std::env::var("URL_BASE").unwrap_or_default();
     // FIXME: for urls starting with /, use only the netloc
     let url_base = url_base
-        .strip_suffix("/")
+        .strip_suffix('/')
         .map(String::from)
         .unwrap_or(url_base);
 
     fn fix_url<'a>(base: &str, url: CowStr<'a>) -> CowStr<'a> {
-        if url.starts_with("/") {
+        if url.starts_with('/') {
             format!("{base}{url}").into()
         } else if url.starts_with("..") {
             format!("{base}/{url}").into()
