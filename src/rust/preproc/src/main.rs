@@ -2,7 +2,7 @@ extern crate pulldown_cmark;
 extern crate pulldown_cmark_to_cmark;
 
 use pulldown_cmark::Parser;
-use pulldown_cmark_to_cmark::fmt::cmark;
+use pulldown_cmark_to_cmark::cmark;
 use std::io::{self, Read, Write};
 
 fn main() {
@@ -20,7 +20,9 @@ fn main() {
                 Start(ref tag) => {
                     use pulldown_cmark::Tag::*;
                     match tag {
-                        CodeBlock(code) => Start(CodeBlock(format!("text{}", code).into())),
+                        CodeBlock(pulldown_cmark::CodeBlockKind::Indented) => Start(CodeBlock(
+                            pulldown_cmark::CodeBlockKind::Fenced("text".into()),
+                        )),
                         _ => e,
                     }
                 }
@@ -28,7 +30,6 @@ fn main() {
             }
         }),
         &mut output,
-        None,
     )
     .unwrap();
     io::stdout().write_all(output.as_bytes()).unwrap();

@@ -14,5 +14,5 @@ test = false
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-pulldown-cmark-to-cmark = "1.2.2"
-pulldown-cmark = "0.5.2"
+pulldown-cmark-to-cmark = "10.0.0"
+pulldown-cmark = "0.9.0"
