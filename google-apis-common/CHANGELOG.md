@@ -5,6 +5,32 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 5.0.4 (2023-04-19)
+
+### Bug Fixes
+
+ - <csr-id-f5b37c3f71989c25bff9d7954ede21c3455e56cb/> pin `yup-oauth2` to the latest known working version of yup-oauth2.
+   It comes with hyper-rustls 0.23 which the currently released batch of
+   google crates requires.
+
+### Commit Statistics
+
+<csr-read-only-do-not-edit/>
+
+ - 1 commit contributed to the release.
+ - 1 commit was understood as [conventional](https://www.conventionalcommits.org).
+ - 0 issues like '(#ID)' were seen in commit messages
+
+### Commit Details
+
+<csr-read-only-do-not-edit/>
+
+<details><summary>view details</summary>
+
+ * **Uncategorized**
+    - Pin `yup-oauth2` to the latest known working version of yup-oauth2. ([`f5b37c3`](https://github.com/Byron/google-apis-rs/commit/f5b37c3f71989c25bff9d7954ede21c3455e56cb))
+</details>
+
 ## 5.0.3 (2023-04-19)
 
 ### Bug Fixes
@@ -17,7 +43,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 <csr-read-only-do-not-edit/>
 
- - 4 commits contributed to the release over the course of 55 calendar days.
+ - 5 commits contributed to the release over the course of 55 calendar days.
  - 136 days passed between releases.
  - 1 commit was understood as [conventional](https://www.conventionalcommits.org).
  - 0 issues like '(#ID)' were seen in commit messages
@@ -29,6 +55,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 <details><summary>view details</summary>
 
  * **Uncategorized**
+    - Release google-apis-common v5.0.3 ([`843f3dc`](https://github.com/Byron/google-apis-rs/commit/843f3dcf1f1fae352613d9a256f11e58e535498c))
     - Update `hyper-rustls` to latest version for compatibility with latest `yup-oauth2`. ([`0be367a`](https://github.com/Byron/google-apis-rs/commit/0be367a4c116959ba9391679b0859d0b8985b7cc))
     - Chore: update google-apis-common Cargo.toml ([`d9ce1ea`](https://github.com/Byron/google-apis-rs/commit/d9ce1eaf969d27a63c8d43aeabfebde54273733e))
     - Replace a few unwraps() with `?` where possible ([`6e0caa3`](https://github.com/Byron/google-apis-rs/commit/6e0caa3b220df3939d0b2cd2b4789219f9e8fcfd))
