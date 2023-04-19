@@ -1,6 +1,6 @@
 [package]
 name = "google-apis-common"
-version = "5.0.4"
+version = "6.0.0"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 repository = "https://github.com/Byron/google-apis-rs"
 homepage = "https://github.com/Byron/google-apis-rs/google-apis-common"
@@ -26,7 +26,7 @@ chrono = { version = "0.4.22", default-features = false, features = ["clock", "s
 url = "= 1.7"
 
 # 8.1 needed for hyper-rustls 0.23, as >= 8.2 comes with 0.24 which is incompatible
-yup-oauth2 = { version = "= 8.1", optional = true }
+yup-oauth2 = { version = "^ 8.2", optional = true }
 itertools = "^ 0.10"
 hyper = { version = "^ 0.14", features = ["client", "http2"] }
 http = "^0.2"

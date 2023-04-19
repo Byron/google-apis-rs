@@ -2,7 +2,7 @@
 # This library is just to try out the code that should ultimately go into the code generator !
 [package]
 name = "google-clis-common"
-version = "5.0.0"
+version = "6.0.0"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 repository = "https://github.com/Byron/google-apis-rs"
 homepage = "https://github.com/Byron/google-apis-rs/google-clis-common"
@@ -17,7 +17,7 @@ doctest = false
 
 [dependencies]
 mime = "^ 0.3"
-yup-oauth2 = "^ 8.0"
+yup-oauth2 = "^ 8.2"
 serde = "1"
 serde_json = "1"
 strsim = "0.10.0"
