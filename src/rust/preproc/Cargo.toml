@@ -16,3 +16,4 @@ test = false
 [dependencies]
 pulldown-cmark-to-cmark = "10.0.0"
 pulldown-cmark = "0.9.0"
+url = "2.3.1"
