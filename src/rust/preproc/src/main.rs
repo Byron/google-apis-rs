@@ -14,15 +14,25 @@ fn main() {
 
     let mut output = String::with_capacity(2048);
     let url_base = std::env::var("URL_BASE").unwrap_or_default();
-    // FIXME: for urls starting with /, use only the netloc
+
     let url_base = url_base
         .strip_suffix('/')
         .map(String::from)
         .unwrap_or(url_base);
 
-    fn fix_url<'a>(base: &str, url: CowStr<'a>) -> CowStr<'a> {
+    let url_root = if url_base.is_empty() {
+        String::new()
+    } else {
+        let parsed = url::Url::parse(&url_base).unwrap();
+        let scheme = parsed.scheme();
+        let host = parsed.host_str().unwrap_or_default();
+        let port = parsed.port().map(|p| format!(":{p}")).unwrap_or_default();
+        format!("{scheme}://{host}{port}")
+    };
+
+    fn fix_url<'a>(root: &str, base: &str, url: CowStr<'a>) -> CowStr<'a> {
         if url.starts_with('/') {
-            format!("{base}{url}").into()
+            format!("{root}{url}").into()
         } else if url.starts_with("..") {
             format!("{base}/{url}").into()
         } else {
@@ -40,14 +50,16 @@ fn main() {
                         CodeBlock(pulldown_cmark::CodeBlockKind::Indented) => Start(CodeBlock(
                             pulldown_cmark::CodeBlockKind::Fenced("text".into()),
                         )),
-                        Link(lt, url, title) => {
-                            Start(Link(*lt, fix_url(&url_base, url.clone()), title.clone()))
-                        }
+                        Link(lt, url, title) => Start(Link(
+                            *lt,
+                            fix_url(&url_root, &url_base, url.clone()),
+                            title.clone(),
+                        )),
                         _ => e,
                     }
                 }
                 End(Tag::Link(lt, url, title)) => {
-                    End(Tag::Link(lt, fix_url(&url_base, url), title))
+                    End(Tag::Link(lt, fix_url(&url_root, &url_base, url), title))
                 }
                 _ => e,
             }

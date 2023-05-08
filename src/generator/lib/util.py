@@ -136,7 +136,7 @@ def has_markdown_codeblock_with_indentation(s):
 
 def preprocess(base_url, s):
     if base_url is None:
-        printl(f"WARNING {s} has no base_url")
+        print(f"WARNING {s} has no base_url")
     p = subprocess.Popen(
         [os.environ['PREPROC']],
         close_fds=True,
