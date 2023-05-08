@@ -80,7 +80,7 @@ impl${rb_params} ${ThisType} {
     % if 'description' in m:
     /// Create a builder to help you perform the following task:
     ///
-    ${m.description | rust_doc_sanitize, rust_doc_comment, indent_all_but_first_by(1)}
+    ${m.description | rust_doc_sanitize(documentationLink), rust_doc_comment, indent_all_but_first_by(1)}
     % endif
     % if required_props:
     /// 
@@ -91,7 +91,7 @@ impl${rb_params} ${ThisType} {
         arg_prefix = "/// * `" + p.name + "` - "
 %>\
     ${arg_prefix}${p.get('description', "No description provided.")
-        | remove_empty_lines, prefix_all_but_first_with(' ' * SPACES_PER_TAB + '///'  + ' ' * (len(arg_prefix) - len('///')))}
+        | rust_doc_sanitize(documentationLink), remove_empty_lines, prefix_all_but_first_with(' ' * SPACES_PER_TAB + '///'  + ' ' * (len(arg_prefix) - len('///')))}
     % endfor
     % endif
     pub fn ${mangle_ident(a)}${type_params}(&self${method_args}) -> ${RType}${mb_tparams} {

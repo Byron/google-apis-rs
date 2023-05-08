@@ -6683,13 +6683,13 @@ impl<'a, S> SpreadsheetMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Appends values to a spreadsheet. The input range is used to search for existing data and find a "table" within that range. Values will be appended to the next row of the table, starting with the first column of the table. See the [guide](/sheets/api/guides/values#appending_values) and [sample code](/sheets/api/samples/writing#append_values) for specific details of how tables are detected and data is appended. The caller must specify the spreadsheet ID, range, and a valueInputOption. The `valueInputOption` only controls how the input data will be added to the sheet (column-wise or row-wise), it does not influence what cell the data starts being written to.
+    /// Appends values to a spreadsheet. The input range is used to search for existing data and find a "table" within that range. Values will be appended to the next row of the table, starting with the first column of the table. See the [guide](https://developers.google.com/sheets/api/guides/values#appending_values) and [sample code](https://developers.google.com/sheets/api/samples/writing#append_values) for specific details of how tables are detected and data is appended. The caller must specify the spreadsheet ID, range, and a valueInputOption. The `valueInputOption` only controls how the input data will be added to the sheet (column-wise or row-wise), it does not influence what cell the data starts being written to.
     /// 
     /// # Arguments
     ///
     /// * `request` - No description provided.
     /// * `spreadsheetId` - The ID of the spreadsheet to update.
-    /// * `range` - The [A1 notation](/sheets/api/guides/concepts#cell) of a range to search for a logical table of data. Values are appended after the last row of the table.
+    /// * `range` - The [A1 notation](https://developers.google.com/sheets/api/guides/concepts#cell) of a range to search for a logical table of data. Values are appended after the last row of the table.
     pub fn values_append(&self, request: ValueRange, spreadsheet_id: &str, range: &str) -> SpreadsheetValueAppendCall<'a, S> {
         SpreadsheetValueAppendCall {
             hub: self.hub,
@@ -6831,7 +6831,7 @@ impl<'a, S> SpreadsheetMethods<'a, S> {
     ///
     /// * `request` - No description provided.
     /// * `spreadsheetId` - The ID of the spreadsheet to update.
-    /// * `range` - The [A1 notation or R1C1 notation](/sheets/api/guides/concepts#cell) of the values to clear.
+    /// * `range` - The [A1 notation or R1C1 notation](https://developers.google.com/sheets/api/guides/concepts#cell) of the values to clear.
     pub fn values_clear(&self, request: ClearValuesRequest, spreadsheet_id: &str, range: &str) -> SpreadsheetValueClearCall<'a, S> {
         SpreadsheetValueClearCall {
             hub: self.hub,
@@ -6851,7 +6851,7 @@ impl<'a, S> SpreadsheetMethods<'a, S> {
     /// # Arguments
     ///
     /// * `spreadsheetId` - The ID of the spreadsheet to retrieve data from.
-    /// * `range` - The [A1 notation or R1C1 notation](/sheets/api/guides/concepts#cell) of the range to retrieve values from.
+    /// * `range` - The [A1 notation or R1C1 notation](https://developers.google.com/sheets/api/guides/concepts#cell) of the range to retrieve values from.
     pub fn values_get(&self, spreadsheet_id: &str, range: &str) -> SpreadsheetValueGetCall<'a, S> {
         SpreadsheetValueGetCall {
             hub: self.hub,
@@ -6874,7 +6874,7 @@ impl<'a, S> SpreadsheetMethods<'a, S> {
     ///
     /// * `request` - No description provided.
     /// * `spreadsheetId` - The ID of the spreadsheet to update.
-    /// * `range` - The [A1 notation](/sheets/api/guides/concepts#cell) of the values to update.
+    /// * `range` - The [A1 notation](https://developers.google.com/sheets/api/guides/concepts#cell) of the values to update.
     pub fn values_update(&self, request: ValueRange, spreadsheet_id: &str, range: &str) -> SpreadsheetValueUpdateCall<'a, S> {
         SpreadsheetValueUpdateCall {
             hub: self.hub,
@@ -6929,7 +6929,7 @@ impl<'a, S> SpreadsheetMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Returns the spreadsheet at the given ID. The caller must specify the spreadsheet ID. By default, data within grids is not returned. You can include grid data in one of 2 ways: * Specify a [field mask](https://developers.google.com/sheets/api/guides/field-masks) listing your desired fields using the `fields` URL parameter in HTTP * Set the includeGridData URL parameter to true. If a field mask is set, the `includeGridData` parameter is ignored For large spreadsheets, as a best practice, retrieve only the specific spreadsheet fields that you want. To retrieve only subsets of spreadsheet data, use the ranges URL parameter. Ranges are specified using [A1 notation](/sheets/api/guides/concepts#cell). You can define a single cell (for example, `A1`) or multiple cells (for example, `A1:D5`). You can also get cells from other sheets within the same spreadsheet (for example, `Sheet2!A1:C4`) or retrieve multiple ranges at once (for example, `?ranges=A1:D5&ranges=Sheet2!A1:C4`). Limiting the range returns only the portions of the spreadsheet that intersect the requested ranges.
+    /// Returns the spreadsheet at the given ID. The caller must specify the spreadsheet ID. By default, data within grids is not returned. You can include grid data in one of 2 ways: * Specify a [field mask](https://developers.google.com/sheets/api/guides/field-masks) listing your desired fields using the `fields` URL parameter in HTTP * Set the includeGridData URL parameter to true. If a field mask is set, the `includeGridData` parameter is ignored For large spreadsheets, as a best practice, retrieve only the specific spreadsheet fields that you want. To retrieve only subsets of spreadsheet data, use the ranges URL parameter. Ranges are specified using [A1 notation](https://developers.google.com/sheets/api/guides/concepts#cell). You can define a single cell (for example, `A1`) or multiple cells (for example, `A1:D5`). You can also get cells from other sheets within the same spreadsheet (for example, `Sheet2!A1:C4`) or retrieve multiple ranges at once (for example, `?ranges=A1:D5&ranges=Sheet2!A1:C4`). Limiting the range returns only the portions of the spreadsheet that intersect the requested ranges.
     /// 
     /// # Arguments
     ///

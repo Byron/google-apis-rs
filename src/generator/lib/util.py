@@ -1,6 +1,7 @@
 import os
 import re
 import subprocess
+import urllib
 
 import inflect
 from dataclasses import dataclass
@@ -17,6 +18,7 @@ re_desc_parts = re.compile(
     flags=re.IGNORECASE | re.MULTILINE)
 
 re_find_replacements = re.compile(r"\{[/\+]?\w+\*?\}")
+re_relative_links = re.compile(r"\]\s*\([^h]")
 
 HTTP_METHODS = set(("OPTIONS", "GET", "POST", "PUT", "DELETE", "HEAD", "TRACE", "CONNECT", "PATCH"))
 
@@ -132,19 +134,34 @@ def rust_doc_comment(s):
 def has_markdown_codeblock_with_indentation(s):
     return re_spaces_after_newline.search(s) != None
 
-
-def preprocess(s):
-    p = subprocess.Popen([os.environ['PREPROC']], close_fds=True, stdin=subprocess.PIPE, stdout=subprocess.PIPE)
+def preprocess(base_url, s):
+    if base_url is None:
+        print(f"WARNING {s} has no base_url")
+    p = subprocess.Popen(
+        [os.environ['PREPROC']],
+        close_fds=True,
+        stdin=subprocess.PIPE,
+        stdout=subprocess.PIPE,
+        env={"URL_BASE": base_url or ""}
+    )
+    
     res = p.communicate(s.encode('utf-8'))
+    exitcode = p.wait(timeout=1)
+    if exitcode != 0:
+        raise ValueError(f"Child process exited with non-zero code {exitcode}")
     return res[0].decode('utf-8')
 
+def has_relative_links(s):
+    return re_relative_links.search(s) is not None
 
 # runs the preprocessor in case there is evidence for code blocks using indentation
-def rust_doc_sanitize(s):
-    if has_markdown_codeblock_with_indentation(s):
-        return preprocess(s)
-    else:
-        return s
+def rust_doc_sanitize(base_url):
+    def fixer(s):
+        if has_markdown_codeblock_with_indentation(s) or has_relative_links(s):
+            return preprocess(base_url, s)
+        else:
+            return s
+    return fixer
 
 
 # rust comment filter
@@ -1172,7 +1189,6 @@ def string_impl(p):
         "google-fieldmask": lambda x: f"{x}.to_string()",
         "string": lambda x: x
     }.get(p.get("format", p["type"]), lambda x: f"{x}.to_string()")
-
 
 if __name__ == '__main__':
     raise AssertionError('For import only')

@@ -8157,7 +8157,7 @@ impl<'a, S> AdvertiserMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Uploads an asset. Returns the ID of the newly uploaded asset if successful. The asset file size should be no more than 10 MB for images, 200 MB for ZIP files, and 1 GB for videos. Must be used within the [multipart media upload process](/display-video/api/guides/how-tos/upload#multipart). Examples using provided client libraries can be found in our [Creating Creatives guide](/display-video/api/guides/creating-creatives/overview#upload_an_asset).
+    /// Uploads an asset. Returns the ID of the newly uploaded asset if successful. The asset file size should be no more than 10 MB for images, 200 MB for ZIP files, and 1 GB for videos. Must be used within the [multipart media upload process](https://developers.google.com/display-video/api/guides/how-tos/upload#multipart). Examples using provided client libraries can be found in our [Creating Creatives guide](https://developers.google.com/display-video/api/guides/creating-creatives/overview#upload_an_asset).
     /// 
     /// # Arguments
     ///

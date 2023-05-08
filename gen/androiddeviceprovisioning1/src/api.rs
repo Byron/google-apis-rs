@@ -1604,7 +1604,7 @@ impl<'a, S> PartnerMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Claims a batch of devices for a customer asynchronously. Adds the devices to zero-touch enrollment. To learn more, read [Long‑running batch operations](/zero-touch/guides/how-it-works#operations).
+    /// Claims a batch of devices for a customer asynchronously. Adds the devices to zero-touch enrollment. To learn more, read [Long‑running batch operations](https://developers.google.com/zero-touch/guides/how-it-works#operations).
     /// 
     /// # Arguments
     ///
@@ -1712,7 +1712,7 @@ impl<'a, S> PartnerMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Unclaims a batch of devices for a customer asynchronously. Removes the devices from zero-touch enrollment. To learn more, read [Long‑running batch operations](/zero-touch/guides/how-it-works#operations).
+    /// Unclaims a batch of devices for a customer asynchronously. Removes the devices from zero-touch enrollment. To learn more, read [Long‑running batch operations](https://developers.google.com/zero-touch/guides/how-it-works#operations).
     /// 
     /// # Arguments
     ///
@@ -1730,7 +1730,7 @@ impl<'a, S> PartnerMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates the reseller metadata attached to a batch of devices. This method updates devices asynchronously and returns an `Operation` that can be used to track progress. Read [Long‑running batch operations](/zero-touch/guides/how-it-works#operations). Android Devices only.
+    /// Updates the reseller metadata attached to a batch of devices. This method updates devices asynchronously and returns an `Operation` that can be used to track progress. Read [Long‑running batch operations](https://developers.google.com/zero-touch/guides/how-it-works#operations). Android Devices only.
     /// 
     /// # Arguments
     ///

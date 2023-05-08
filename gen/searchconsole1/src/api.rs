@@ -1067,7 +1067,7 @@ impl<'a, S> SitemapMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
-    ///  Lists the [sitemaps-entries](/webmaster-tools/v3/sitemaps) submitted for this site, or included in the sitemap index file (if `sitemapIndex` is specified in the request).
+    ///  Lists the [sitemaps-entries](https://developers.google.com/webmaster-tools/v3/sitemaps) submitted for this site, or included in the sitemap index file (if `sitemapIndex` is specified in the request).
     /// 
     /// # Arguments
     ///

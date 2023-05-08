@@ -13,7 +13,7 @@
 % if properties:
 ${struct} {
 % for pn, p in items(properties):
-    ${p.get('description', 'no description provided') | rust_doc_sanitize, rust_doc_comment, indent_all_but_first_by(1)}
+    ${p.get('description', 'no description provided') | rust_doc_sanitize(documentationLink), rust_doc_comment, indent_all_but_first_by(1)}
     % if pn != mangle_ident(pn):
     #[serde(rename="${pn}")]
     % endif
@@ -36,7 +36,7 @@ ${struct}(pub ${to_rust_type(schemas, s.id, NESTED_TYPE_SUFFIX, s, allow_optiona
 %>\
 pub enum ${et} {
 % for p in s.variant.map:
-    ${p.get('description', 'no description provided') | rust_doc_sanitize, rust_doc_comment, indent_all_but_first_by(1)}
+    ${p.get('description', 'no description provided') | rust_doc_sanitize(documentationLink), rust_doc_comment, indent_all_but_first_by(1)}
     % if variant_type(p) != p.type_value:
     #[serde(rename="${p.type_value}")]
     % endif
@@ -80,7 +80,7 @@ ${struct} { _never_set: Option<bool> }
 
     s_type = s.id
 %>\
-<%block filter="rust_doc_sanitize, rust_doc_comment">\
+<%block filter="rust_doc_sanitize(documentationLink), rust_doc_comment">\
 ${doc(s, c)}\
 </%block>
 #[serde_with::serde_as(crate = "::client::serde_with")]

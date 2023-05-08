@@ -4229,7 +4229,7 @@ impl<'a, S> TierMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Lists all available machine types (tiers) for Cloud SQL, for example, `db-custom-1-3840`. For related information, see [Pricing](/sql/pricing).
+    /// Lists all available machine types (tiers) for Cloud SQL, for example, `db-custom-1-3840`. For related information, see [Pricing](https://developers.google.com/sql/pricing).
     /// 
     /// # Arguments
     ///
