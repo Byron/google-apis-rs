@@ -6,7 +6,7 @@ pub mod url;
 use std::error;
 use std::error::Error as StdError;
 use std::fmt::{self, Display};
-use std::io::{self, Cursor, Read, Seek, SeekFrom, Write};
+use std::io::{self, Cursor, Read, SeekFrom, Write};
 use std::str::FromStr;
 use std::time::Duration;
 
@@ -22,7 +22,7 @@ use mime::Mime;
 
 use serde_json as json;
 
-use tokio::io::{AsyncRead, AsyncWrite};
+use tokio::io::{AsyncRead, AsyncReadExt, AsyncSeek, AsyncSeekExt, AsyncWrite};
 use tokio::time::sleep;
 
 pub use auth::{GetToken, NoToken};
@@ -79,10 +79,6 @@ pub trait Part {}
 /// Identifies types which are only used by other types internally.
 /// They have no special meaning, this trait just marks them for completeness.
 pub trait NestedType {}
-
-/// A utility to specify reader types which provide seeking capabilities too
-pub trait ReadSeek: Seek + Read + Send {}
-impl<T: Seek + Read + Send> ReadSeek for T {}
 
 /// A trait for all types that can convert themselves into a *parts* string
 pub trait ToParts {
@@ -399,11 +395,7 @@ impl<'a> Read for MultiPartReader<'a> {
             self.last_part_boundary.is_none(),
         ) {
             (_, _, false) => {
-                let br = self
-                    .last_part_boundary
-                    .as_mut()
-                    .unwrap()
-                    .read(buf)
+                let br = std::io::Read::read(self.last_part_boundary.as_mut().unwrap(), buf)
                     .unwrap_or(0);
                 if br < buf.len() {
                     self.last_part_boundary = None;
@@ -429,7 +421,7 @@ impl<'a> Read for MultiPartReader<'a> {
                     LINE_ENDING,
                     LINE_ENDING,
                 ))?;
-                c.rewind()?;
+                std::io::Seek::rewind(&mut c)?;
                 self.current_part = Some((c, reader));
             }
             _ => {}
@@ -438,7 +430,7 @@ impl<'a> Read for MultiPartReader<'a> {
         // read headers as long as possible
         let (hb, rr) = {
             let &mut (ref mut c, ref mut reader) = self.current_part.as_mut().unwrap();
-            let b = c.read(buf).unwrap_or(0);
+            let b = std::io::Read::read(c, buf).unwrap_or(0);
             (b, reader.read(&mut buf[b..]))
         };
 
@@ -575,13 +567,14 @@ impl RangeResponseHeader {
 }
 
 /// A utility type to perform a resumable upload from start to end.
-pub struct ResumableUploadHelper<'a, A: 'a, S>
+pub struct ResumableUploadHelper<'a, A: 'a, S, R>
 where
     S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
     S::Response:
         hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
     S::Future: Send + Unpin + 'static,
     S::Error: Into<Box<dyn StdError + Send + Sync>>,
+    R: AsyncRead + AsyncSeek + Unpin + 'static,
 {
     pub client: &'a hyper::client::Client<S, hyper::body::Body>,
     pub delegate: &'a mut dyn Delegate,
@@ -590,17 +583,18 @@ where
     pub user_agent: &'a str,
     pub auth_header: String,
     pub url: &'a str,
-    pub reader: &'a mut dyn ReadSeek,
+    pub reader: &'a mut R,
     pub media_type: Mime,
     pub content_length: u64,
 }
-impl<'a, A, S> ResumableUploadHelper<'a, A, S>
+impl<'a, A, S, R> ResumableUploadHelper<'a, A, S, R>
 where
     S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
     S::Response:
         hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
     S::Future: Send + Unpin + 'static,
     S::Error: Into<Box<dyn StdError + Send + Sync>>,
+    R: AsyncRead + AsyncSeek + Unpin + 'static,
 {
     async fn query_transfer_status(
         &mut self,
@@ -674,7 +668,7 @@ where
         };
 
         loop {
-            self.reader.seek(SeekFrom::Start(start)).unwrap();
+            self.reader.seek(SeekFrom::Start(start)).await.unwrap();
 
             let request_size = match self.content_length - start {
                 rs if rs > chunk_size => chunk_size,
@@ -683,7 +677,7 @@ where
 
             let mut section_reader = self.reader.take(request_size);
             let mut req_bytes = vec![];
-            section_reader.read_to_end(&mut req_bytes).unwrap();
+            section_reader.read_to_end(&mut req_bytes).await.unwrap();
             let range_header = ContentRange {
                 range: Some(Chunk {
                     first: start,
