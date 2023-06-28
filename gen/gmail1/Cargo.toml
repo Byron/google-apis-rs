@@ -23,13 +23,12 @@ mime = "^ 0.3.0"
 serde = { version = "^ 1.0", features = ["derive"] }
 serde_json = "^ 1.0"
 itertools = "^ 0.10"
-google-apis-common = { path = "../../google-apis-common", version = "5.0.1" }
-hyper = "^ 0.14"
+google-apis-common = { path = "../../google-apis-common", version = "6" }
+hyper = { version = "^ 0.14", features = ["client", "http2"] }
 http = "^0.2"
 tokio = "^1.0"
 tower-service = "^0.3.1"
 url = "= 1.7"
-
 
 
 [features]
