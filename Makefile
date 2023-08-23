@@ -1,9 +1,8 @@
 .PHONY: help deps regen-apis license test-gen test clean
 .SUFFIXES:
 
-VIRTUALENV_VERSION = 16.0.0
 VENV_BIN = .virtualenv.marker
-VENV_VERSION = 20.2.2
+VENV_VERSION = 20.24.3
 
 VENV_DIR := .pyenv-$(shell uname)
 PYTHON_BIN := $(VENV_DIR)/bin/python
