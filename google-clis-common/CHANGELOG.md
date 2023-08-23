@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## Unreleased
+## 6.0.0 (2023-08-23)
 
 A maintenance release that bumps the yup-oauth2 crate's version.
 
@@ -13,7 +13,7 @@ A maintenance release that bumps the yup-oauth2 crate's version.
 
 <csr-read-only-do-not-edit/>
 
- - 3 commits contributed to the release over the course of 266 calendar days.
+ - 4 commits contributed to the release over the course of 266 calendar days.
  - 307 days passed between releases.
  - 0 commits were understood as [conventional](https://www.conventionalcommits.org).
  - 0 issues like '(#ID)' were seen in commit messages
@@ -25,6 +25,7 @@ A maintenance release that bumps the yup-oauth2 crate's version.
 <details><summary>view details</summary>
 
  * **Uncategorized**
+    - Update changelog prior to common crate releases ([`0cf81f1`](https://github.com/Byron/google-apis-rs/commit/0cf81f1df4fa79b8eaffdb56d892d392dc580812))
     - Bump yup-oauth2 to the latest version, bringing in `hyper-rustls` v0.24. ([`58189b3`](https://github.com/Byron/google-apis-rs/commit/58189b31498fb324175721ab5bb46e8e12379636))
     - Merge branch 'update_yup_oauth' ([`5f601f8`](https://github.com/Byron/google-apis-rs/commit/5f601f89074d9f944aa1bc0db26ae14a0808d265))
     - Update yup-oauth2 to 8.0.0. ([`c6039c0`](https://github.com/Byron/google-apis-rs/commit/c6039c085db68835757bc5c9c09000ef5b18164a))
