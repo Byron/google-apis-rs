@@ -90,7 +90,7 @@ directories:
   # The subdirectory to contain documentation from all APIs and related programs
   doc_subdir: doc
 cargo:
-  build_version: "5.0.2"
+  build_version: "5.0.3"
   repo_base_url: https://github.com/Byron/google-apis-rs
   authors:
     # don't forget to possibly add them to copyright authors
