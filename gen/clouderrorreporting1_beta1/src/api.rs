@@ -77,7 +77,7 @@ impl Default for Scope {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Clouderrorreporting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = Clouderrorreporting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -125,7 +125,7 @@ impl<'a, S> Clouderrorreporting<S> {
         Clouderrorreporting {
             client,
             auth: Box::new(auth),
-            _user_agent: "google-api-rust-client/5.0.2".to_string(),
+            _user_agent: "google-api-rust-client/5.0.3".to_string(),
             _base_url: "https://clouderrorreporting.googleapis.com/".to_string(),
             _root_url: "https://clouderrorreporting.googleapis.com/".to_string(),
         }
@@ -136,7 +136,7 @@ impl<'a, S> Clouderrorreporting<S> {
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/5.0.2`.
+    /// It defaults to `google-api-rust-client/5.0.3`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -172,7 +172,6 @@ impl<'a, S> Clouderrorreporting<S> {
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [delete events projects](ProjectDeleteEventCall) (response)
-/// 
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct DeleteEventsResponse { _never_set: Option<bool> }
@@ -242,7 +241,6 @@ impl client::Part for ErrorEvent {}
 /// 
 /// * [groups get projects](ProjectGroupGetCall) (response)
 /// * [groups update projects](ProjectGroupUpdateCall) (request|response)
-/// 
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ErrorGroup {
@@ -355,7 +353,6 @@ impl client::Part for HttpRequestContext {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [events list projects](ProjectEventListCall) (response)
-/// 
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ListEventsResponse {
@@ -384,7 +381,6 @@ impl client::ResponseResult for ListEventsResponse {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [group stats list projects](ProjectGroupStatListCall) (response)
-/// 
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ListGroupStatsResponse {
@@ -413,7 +409,6 @@ impl client::ResponseResult for ListGroupStatsResponse {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [events report projects](ProjectEventReportCall) (response)
-/// 
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ReportErrorEventResponse { _never_set: Option<bool> }
@@ -429,7 +424,6 @@ impl client::ResponseResult for ReportErrorEventResponse {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [events report projects](ProjectEventReportCall) (request)
-/// 
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ReportedErrorEvent {
@@ -582,7 +576,7 @@ impl client::Part for TrackingIssue {}
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Clouderrorreporting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = Clouderrorreporting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `delete_events(...)`, `events_list(...)`, `events_report(...)`, `group_stats_list(...)`, `groups_get(...)` and `groups_update(...)`
 /// // to build up your call.
@@ -754,7 +748,7 @@ impl<'a, S> ProjectMethods<'a, S> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Clouderrorreporting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Clouderrorreporting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -960,21 +954,21 @@ where
         self._time_range_period = Some(new_value.to_string());
         self
     }
-    /// Optional. The exact value to match against [`ServiceContext.version`](/error-reporting/reference/rest/v1beta1/ServiceContext#FIELDS.version).
+    /// Optional. The exact value to match against [`ServiceContext.version`](https://cloud.google.com/error-reporting/reference/rest/v1beta1/ServiceContext#FIELDS.version).
     ///
     /// Sets the *service filter.version* query property to the given value.
     pub fn service_filter_version(mut self, new_value: &str) -> ProjectEventListCall<'a, S> {
         self._service_filter_version = Some(new_value.to_string());
         self
     }
-    /// Optional. The exact value to match against [`ServiceContext.service`](/error-reporting/reference/rest/v1beta1/ServiceContext#FIELDS.service).
+    /// Optional. The exact value to match against [`ServiceContext.service`](https://cloud.google.com/error-reporting/reference/rest/v1beta1/ServiceContext#FIELDS.service).
     ///
     /// Sets the *service filter.service* query property to the given value.
     pub fn service_filter_service(mut self, new_value: &str) -> ProjectEventListCall<'a, S> {
         self._service_filter_service = Some(new_value.to_string());
         self
     }
-    /// Optional. The exact value to match against [`ServiceContext.resource_type`](/error-reporting/reference/rest/v1beta1/ServiceContext#FIELDS.resource_type).
+    /// Optional. The exact value to match against [`ServiceContext.resource_type`](https://cloud.google.com/error-reporting/reference/rest/v1beta1/ServiceContext#FIELDS.resource_type).
     ///
     /// Sets the *service filter.resource type* query property to the given value.
     pub fn service_filter_resource_type(mut self, new_value: &str) -> ProjectEventListCall<'a, S> {
@@ -1006,7 +1000,8 @@ where
     /// while executing the actual API request.
     /// 
     /// ````text
-    ///                   It should be used to handle progress information, and to implement a certain level of resilience.````
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
     ///
     /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectEventListCall<'a, S> {
@@ -1100,7 +1095,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Clouderrorreporting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Clouderrorreporting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -1297,7 +1292,8 @@ where
     /// while executing the actual API request.
     /// 
     /// ````text
-    ///                   It should be used to handle progress information, and to implement a certain level of resilience.````
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
     ///
     /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectEventReportCall<'a, S> {
@@ -1390,7 +1386,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Clouderrorreporting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Clouderrorreporting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -1625,21 +1621,21 @@ where
         self._time_range_period = Some(new_value.to_string());
         self
     }
-    /// Optional. The exact value to match against [`ServiceContext.version`](/error-reporting/reference/rest/v1beta1/ServiceContext#FIELDS.version).
+    /// Optional. The exact value to match against [`ServiceContext.version`](https://cloud.google.com/error-reporting/reference/rest/v1beta1/ServiceContext#FIELDS.version).
     ///
     /// Sets the *service filter.version* query property to the given value.
     pub fn service_filter_version(mut self, new_value: &str) -> ProjectGroupStatListCall<'a, S> {
         self._service_filter_version = Some(new_value.to_string());
         self
     }
-    /// Optional. The exact value to match against [`ServiceContext.service`](/error-reporting/reference/rest/v1beta1/ServiceContext#FIELDS.service).
+    /// Optional. The exact value to match against [`ServiceContext.service`](https://cloud.google.com/error-reporting/reference/rest/v1beta1/ServiceContext#FIELDS.service).
     ///
     /// Sets the *service filter.service* query property to the given value.
     pub fn service_filter_service(mut self, new_value: &str) -> ProjectGroupStatListCall<'a, S> {
         self._service_filter_service = Some(new_value.to_string());
         self
     }
-    /// Optional. The exact value to match against [`ServiceContext.resource_type`](/error-reporting/reference/rest/v1beta1/ServiceContext#FIELDS.resource_type).
+    /// Optional. The exact value to match against [`ServiceContext.resource_type`](https://cloud.google.com/error-reporting/reference/rest/v1beta1/ServiceContext#FIELDS.resource_type).
     ///
     /// Sets the *service filter.resource type* query property to the given value.
     pub fn service_filter_resource_type(mut self, new_value: &str) -> ProjectGroupStatListCall<'a, S> {
@@ -1693,7 +1689,8 @@ where
     /// while executing the actual API request.
     /// 
     /// ````text
-    ///                   It should be used to handle progress information, and to implement a certain level of resilience.````
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
     ///
     /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectGroupStatListCall<'a, S> {
@@ -1786,7 +1783,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Clouderrorreporting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Clouderrorreporting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -1954,7 +1951,8 @@ where
     /// while executing the actual API request.
     /// 
     /// ````text
-    ///                   It should be used to handle progress information, and to implement a certain level of resilience.````
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
     ///
     /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectGroupGetCall<'a, S> {
@@ -2048,7 +2046,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Clouderrorreporting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Clouderrorreporting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -2245,7 +2243,8 @@ where
     /// while executing the actual API request.
     /// 
     /// ````text
-    ///                   It should be used to handle progress information, and to implement a certain level of resilience.````
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
     ///
     /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectGroupUpdateCall<'a, S> {
@@ -2338,7 +2337,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Clouderrorreporting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Clouderrorreporting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -2506,7 +2505,8 @@ where
     /// while executing the actual API request.
     /// 
     /// ````text
-    ///                   It should be used to handle progress information, and to implement a certain level of resilience.````
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
     ///
     /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectDeleteEventCall<'a, S> {

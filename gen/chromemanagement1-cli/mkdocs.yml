@@ -1,4 +1,4 @@
-site_name: Chrome Management v5.0.2+20230123
+site_name: Chrome Management v5.0.3+20230123
 site_url: http://byron.github.io/google-apis-rs/google-chromemanagement1-cli
 site_description: A complete library to interact with Chrome Management (protocol v1)
 

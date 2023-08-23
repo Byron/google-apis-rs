@@ -1,4 +1,4 @@
-site_name: Resource Settings v5.0.2+20230123
+site_name: Resource Settings v5.0.3+20230123
 site_url: http://byron.github.io/google-apis-rs/google-resourcesettings1-cli
 site_description: A complete library to interact with Resource Settings (protocol v1)
 

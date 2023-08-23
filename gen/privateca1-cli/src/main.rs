@@ -4980,7 +4980,7 @@ async fn main() {
     
     let mut app = App::new("privateca1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("5.0.2+20230105")
+           .version("5.0.3+20230105")
            .about("The Certificate Authority Service API is a highly-available, scalable service that enables you to simplify and automate the management of private certificate authorities (CAs) while staying in control of your private keys. ")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_privateca1_cli")
            .arg(Arg::with_name("url")
@@ -5046,7 +5046,6 @@ async fn main() {
     let connector = hyper_rustls::HttpsConnectorBuilder::new().with_native_roots()
         .https_or_http()
         .enable_http1()
-        .enable_http2()
         .build();
 
     match Engine::new(matches, connector).await {

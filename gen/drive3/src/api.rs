@@ -162,7 +162,7 @@ impl<'a, S> DriveHub<S> {
         DriveHub {
             client,
             auth: Box::new(auth),
-            _user_agent: "google-api-rust-client/5.0.2".to_string(),
+            _user_agent: "google-api-rust-client/5.0.3".to_string(),
             _base_url: "https://www.googleapis.com/drive/v3/".to_string(),
             _root_url: "https://www.googleapis.com/".to_string(),
         }
@@ -200,7 +200,7 @@ impl<'a, S> DriveHub<S> {
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/5.0.2`.
+    /// It defaults to `google-api-rust-client/5.0.3`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {

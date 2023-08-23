@@ -9642,7 +9642,7 @@ async fn main() {
     
     let mut app = App::new("androidpublisher3")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("5.0.2+20230124")
+           .version("5.0.3+20230124")
            .about("Lets Android application developers access their Google Play accounts. At a high level, the expected workflow is to \"insert\" an Edit, make changes as necessary, and then \"commit\" it. ")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_androidpublisher3_cli")
            .arg(Arg::with_name("url")
@@ -9719,7 +9719,6 @@ async fn main() {
     let connector = hyper_rustls::HttpsConnectorBuilder::new().with_native_roots()
         .https_or_http()
         .enable_http1()
-        .enable_http2()
         .build();
 
     match Engine::new(matches, connector).await {

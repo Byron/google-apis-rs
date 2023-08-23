@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/generator/templates/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Firestore* crate version *5.0.2+20230118*, where *20230118* is the exact revision of the *firestore:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.2*.
+//! This documentation was generated from *Firestore* crate version *5.0.3+20230118*, where *20230118* is the exact revision of the *firestore:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.3*.
 //! 
 //! Everything else about the *Firestore* *v1* API can be found at the
 //! [official documentation site](https://cloud.google.com/firestore).
@@ -98,7 +98,7 @@
 //!         secret,
 //!         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 //!     ).build().await.unwrap();
-//! let mut hub = Firestore::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+//! let mut hub = Firestore::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
 //! // You can configure optional parameters by calling the respective setters at will, and
 //! // execute the final call using `doit()`.
 //! // Values shown here are possibly random and not representative !

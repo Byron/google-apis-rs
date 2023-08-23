@@ -955,7 +955,7 @@ async fn main() {
     
     let mut app = App::new("prediction1d6")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("5.0.2+20160511")
+           .version("5.0.3+20160511")
            .about("Lets you access a cloud hosted machine learning service that makes it easy to build smart apps")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_prediction1d6_cli")
            .arg(Arg::with_name("url")
@@ -1021,7 +1021,6 @@ async fn main() {
     let connector = hyper_rustls::HttpsConnectorBuilder::new().with_native_roots()
         .https_or_http()
         .enable_http1()
-        .enable_http2()
         .build();
 
     match Engine::new(matches, connector).await {

@@ -55,7 +55,7 @@ use crate::{client, client::GetToken, client::serde_with};
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Acceleratedmobilepageurl::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = Acceleratedmobilepageurl::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -103,7 +103,7 @@ impl<'a, S> Acceleratedmobilepageurl<S> {
         Acceleratedmobilepageurl {
             client,
             auth: Box::new(auth),
-            _user_agent: "google-api-rust-client/5.0.2".to_string(),
+            _user_agent: "google-api-rust-client/5.0.3".to_string(),
             _base_url: "https://acceleratedmobilepageurl.googleapis.com/".to_string(),
             _root_url: "https://acceleratedmobilepageurl.googleapis.com/".to_string(),
         }
@@ -114,7 +114,7 @@ impl<'a, S> Acceleratedmobilepageurl<S> {
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/5.0.2`.
+    /// It defaults to `google-api-rust-client/5.0.3`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -150,7 +150,6 @@ impl<'a, S> Acceleratedmobilepageurl<S> {
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [batch get amp urls](AmpUrlBatchGetCall) (none)
-/// 
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AmpUrl {
@@ -158,7 +157,7 @@ pub struct AmpUrl {
     #[serde(rename="ampUrl")]
     
     pub amp_url: Option<String>,
-    /// The [AMP Cache URL](/amp/cache/overview#amp-cache-url-format) pointing to the cached document in the Google AMP Cache.
+    /// The [AMP Cache URL](https://developers.google.com/amp/cache/overview#amp-cache-url-format) pointing to the cached document in the Google AMP Cache.
     #[serde(rename="cdnAmpUrl")]
     
     pub cdn_amp_url: Option<String>,
@@ -203,7 +202,6 @@ impl client::Part for AmpUrlError {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [batch get amp urls](AmpUrlBatchGetCall) (request)
-/// 
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct BatchGetAmpUrlsRequest {
@@ -211,7 +209,7 @@ pub struct BatchGetAmpUrlsRequest {
     #[serde(rename="lookupStrategy")]
     
     pub lookup_strategy: Option<String>,
-    /// List of URLs to look up for the paired AMP URLs. The URLs are case-sensitive. Up to 50 URLs per lookup (see [Usage Limits](/amp/cache/reference/limits)).
+    /// List of URLs to look up for the paired AMP URLs. The URLs are case-sensitive. Up to 50 URLs per lookup (see [Usage Limits](https://developers.google.com/amp/cache/reference/limits)).
     
     pub urls: Option<Vec<String>>,
 }
@@ -227,7 +225,6 @@ impl client::RequestValue for BatchGetAmpUrlsRequest {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [batch get amp urls](AmpUrlBatchGetCall) (response)
-/// 
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct BatchGetAmpUrlsResponse {
@@ -270,7 +267,7 @@ impl client::ResponseResult for BatchGetAmpUrlsResponse {}
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Acceleratedmobilepageurl::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = Acceleratedmobilepageurl::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `batch_get(...)`
 /// // to build up your call.
@@ -312,7 +309,7 @@ impl<'a, S> AmpUrlMethods<'a, S> {
 // CallBuilders   ###
 // #################
 
-/// Returns AMP URL(s) and equivalent [AMP Cache URL(s)](/amp/cache/overview#amp-cache-url-format).
+/// Returns AMP URL(s) and equivalent [AMP Cache URL(s)](https://developers.google.com/amp/cache/overview#amp-cache-url-format).
 ///
 /// A builder for the *batchGet* method supported by a *ampUrl* resource.
 /// It is not used directly, but through a [`AmpUrlMethods`] instance.
@@ -335,7 +332,7 @@ impl<'a, S> AmpUrlMethods<'a, S> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Acceleratedmobilepageurl::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Acceleratedmobilepageurl::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -502,7 +499,8 @@ where
     /// while executing the actual API request.
     /// 
     /// ````text
-    ///                   It should be used to handle progress information, and to implement a certain level of resilience.````
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
     ///
     /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AmpUrlBatchGetCall<'a, S> {

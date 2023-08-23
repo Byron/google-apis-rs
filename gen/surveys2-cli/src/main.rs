@@ -967,7 +967,7 @@ async fn main() {
     
     let mut app = App::new("surveys2")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("5.0.2+20180508")
+           .version("5.0.3+20180508")
            .about("Creates and conducts surveys, lists the surveys that an authenticated user owns, and retrieves survey results and information about specified surveys.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_surveys2_cli")
            .arg(Arg::with_name("url")
@@ -1033,7 +1033,6 @@ async fn main() {
     let connector = hyper_rustls::HttpsConnectorBuilder::new().with_native_roots()
         .https_or_http()
         .enable_http1()
-        .enable_http2()
         .build();
 
     match Engine::new(matches, connector).await {

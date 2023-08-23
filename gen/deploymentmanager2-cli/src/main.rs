@@ -2140,7 +2140,7 @@ async fn main() {
     
     let mut app = App::new("deploymentmanager2")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("5.0.2+20221208")
+           .version("5.0.3+20221208")
            .about("The Google Cloud Deployment Manager v2 API provides services for configuring, deploying, and viewing Google Cloud services and APIs via templates which specify deployments of Cloud resources.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_deploymentmanager2_cli")
            .arg(Arg::with_name("url")
@@ -2206,7 +2206,6 @@ async fn main() {
     let connector = hyper_rustls::HttpsConnectorBuilder::new().with_native_roots()
         .https_or_http()
         .enable_http1()
-        .enable_http2()
         .build();
 
     match Engine::new(matches, connector).await {

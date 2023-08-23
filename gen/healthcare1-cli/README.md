@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Cloud Healthcare* API at revision *20221220*. The CLI is at version *5.0.2*.
+This documentation was generated from the *Cloud Healthcare* API at revision *20221220*. The CLI is at version *5.0.3*.
 
 ```bash
 healthcare1 [options]

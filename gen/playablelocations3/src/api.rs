@@ -55,7 +55,7 @@ use crate::{client, client::GetToken, client::serde_with};
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = PlayableLocations::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = PlayableLocations::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -103,7 +103,7 @@ impl<'a, S> PlayableLocations<S> {
         PlayableLocations {
             client,
             auth: Box::new(auth),
-            _user_agent: "google-api-rust-client/5.0.2".to_string(),
+            _user_agent: "google-api-rust-client/5.0.3".to_string(),
             _base_url: "https://playablelocations.googleapis.com/".to_string(),
             _root_url: "https://playablelocations.googleapis.com/".to_string(),
         }
@@ -114,7 +114,7 @@ impl<'a, S> PlayableLocations<S> {
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/5.0.2`.
+    /// It defaults to `google-api-rust-client/5.0.3`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -183,7 +183,6 @@ impl client::Part for GoogleMapsPlayablelocationsV3Impression {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [log impressions](MethodLogImpressionCall) (request)
-/// 
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleMapsPlayablelocationsV3LogImpressionsRequest {
@@ -220,7 +219,6 @@ impl client::RequestValue for GoogleMapsPlayablelocationsV3LogImpressionsRequest
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [log impressions](MethodLogImpressionCall) (response)
-/// 
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleMapsPlayablelocationsV3LogImpressionsResponse { _never_set: Option<bool> }
@@ -228,7 +226,7 @@ pub struct GoogleMapsPlayablelocationsV3LogImpressionsResponse { _never_set: Opt
 impl client::ResponseResult for GoogleMapsPlayablelocationsV3LogImpressionsResponse {}
 
 
-/// A request for logging your player's bad location reports.
+/// A request for logging your player’s bad location reports.
 /// 
 /// # Activities
 /// 
@@ -236,7 +234,6 @@ impl client::ResponseResult for GoogleMapsPlayablelocationsV3LogImpressionsRespo
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [log player reports](MethodLogPlayerReportCall) (request)
-/// 
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleMapsPlayablelocationsV3LogPlayerReportsRequest {
@@ -276,7 +273,6 @@ impl client::RequestValue for GoogleMapsPlayablelocationsV3LogPlayerReportsReque
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [log player reports](MethodLogPlayerReportCall) (response)
-/// 
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleMapsPlayablelocationsV3LogPlayerReportsResponse { _never_set: Option<bool> }
@@ -396,7 +392,7 @@ impl client::Part for GoogleMapsPlayablelocationsV3SampleCriterion {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleMapsPlayablelocationsV3SampleFilter {
     /// Restricts the set of playable locations to just the
-    /// [types](/maps/documentation/gaming/tt/types) that you want.
+    /// [types](https://developers.google.com/maps/documentation/gaming/tt/types) that you want.
     #[serde(rename="includedTypes")]
     
     pub included_types: Option<Vec<String>>,
@@ -450,7 +446,7 @@ pub struct GoogleMapsPlayablelocationsV3SamplePlayableLocation {
     
     pub snapped_point: Option<GoogleTypeLatLng>,
     /// A collection of [Playable Location
-    /// Types](/maps/documentation/gaming/tt/types) for this playable location. The
+    /// Types](https://developers.google.com/maps/documentation/gaming/tt/types) for this playable location. The
     /// first type in the collection is the primary type.
     /// 
     /// Type information might not be available for all playable locations.
@@ -476,18 +472,20 @@ pub struct GoogleMapsPlayablelocationsV3SamplePlayableLocationList {
 impl client::Part for GoogleMapsPlayablelocationsV3SamplePlayableLocationList {}
 
 
-/// 
 /// Life of a query:
 /// 
-/// - When a game starts in a new location, your game server issues a
-/// SamplePlayableLocations
-/// request. The request specifies the S2 cell, and contains one or more
-/// "criteria" for filtering:
+/// * When a game starts in a new location, your game server issues a
+///   SamplePlayableLocations
+///   request. The request specifies the S2 cell, and contains one or more
+///   “criteria” for filtering:
 /// 
-/// - Criterion 0: i locations for long-lived bases, or level 0 monsters, or...
-/// - Criterion 1: j locations for short-lived bases, or level 1 monsters, ...
-/// - Criterion 2: k locations for random objects.
-/// - etc (up to 5 criterion may be specified).
+/// * Criterion 0: i locations for long-lived bases, or level 0 monsters, or…
+/// 
+/// * Criterion 1: j locations for short-lived bases, or level 1 monsters, …
+/// 
+/// * Criterion 2: k locations for random objects.
+/// 
+/// * etc (up to 5 criterion may be specified).
 /// 
 /// `PlayableLocationList` will then contain mutually
 /// exclusive lists of `PlayableLocation` objects that satisfy each of
@@ -507,7 +505,6 @@ impl client::Part for GoogleMapsPlayablelocationsV3SamplePlayableLocationList {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [sample playable locations](MethodSamplePlayableLocationCall) (request)
-/// 
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleMapsPlayablelocationsV3SamplePlayableLocationsRequest {
@@ -524,7 +521,6 @@ pub struct GoogleMapsPlayablelocationsV3SamplePlayableLocationsRequest {
 impl client::RequestValue for GoogleMapsPlayablelocationsV3SamplePlayableLocationsRequest {}
 
 
-/// 
 /// Response for the
 /// SamplePlayableLocations
 /// method.
@@ -535,7 +531,6 @@ impl client::RequestValue for GoogleMapsPlayablelocationsV3SamplePlayableLocatio
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [sample playable locations](MethodSamplePlayableLocationCall) (response)
-/// 
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleMapsPlayablelocationsV3SamplePlayableLocationsResponse {
@@ -725,7 +720,7 @@ impl client::Part for GoogleTypeLatLng {}
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = PlayableLocations::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = PlayableLocations::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `log_impressions(...)`, `log_player_reports(...)` and `sample_playable_locations(...)`
 /// // to build up your call.
@@ -837,7 +832,7 @@ impl<'a, S> MethodMethods<'a, S> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = PlayableLocations::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = PlayableLocations::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -1004,7 +999,8 @@ where
     /// while executing the actual API request.
     /// 
     /// ````text
-    ///                   It should be used to handle progress information, and to implement a certain level of resilience.````
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
     ///
     /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MethodLogImpressionCall<'a, S> {
@@ -1067,7 +1063,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = PlayableLocations::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = PlayableLocations::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -1234,7 +1230,8 @@ where
     /// while executing the actual API request.
     /// 
     /// ````text
-    ///                   It should be used to handle progress information, and to implement a certain level of resilience.````
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
     ///
     /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MethodLogPlayerReportCall<'a, S> {
@@ -1298,7 +1295,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = PlayableLocations::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = PlayableLocations::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -1465,7 +1462,8 @@ where
     /// while executing the actual API request.
     /// 
     /// ````text
-    ///                   It should be used to handle progress information, and to implement a certain level of resilience.````
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
     ///
     /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MethodSamplePlayableLocationCall<'a, S> {

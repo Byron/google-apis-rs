@@ -2010,7 +2010,7 @@ async fn main() {
     
     let mut app = App::new("datafusion1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("5.0.2+20221213")
+           .version("5.0.3+20221213")
            .about("Cloud Data Fusion is a fully-managed, cloud native, enterprise data integration service for quickly building and managing data pipelines. It provides a graphical interface to increase time efficiency and reduce complexity, and allows business users, developers, and data scientists to easily and reliably build scalable data integration solutions to cleanse, prepare, blend, transfer and transform data without having to wrestle with infrastructure.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_datafusion1_cli")
            .arg(Arg::with_name("url")
@@ -2076,7 +2076,6 @@ async fn main() {
     let connector = hyper_rustls::HttpsConnectorBuilder::new().with_native_roots()
         .https_or_http()
         .enable_http1()
-        .enable_http2()
         .build();
 
     match Engine::new(matches, connector).await {

@@ -1661,7 +1661,7 @@ async fn main() {
     
     let mut app = App::new("binaryauthorization1-beta1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("5.0.2+20230113")
+           .version("5.0.3+20230113")
            .about("The management interface for Binary Authorization, a service that provides policy-based deployment validation and control for images deployed to Google Kubernetes Engine (GKE), Anthos Service Mesh, Anthos Clusters, and Cloud Run. ")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_binaryauthorization1_beta1_cli")
            .arg(Arg::with_name("url")
@@ -1727,7 +1727,6 @@ async fn main() {
     let connector = hyper_rustls::HttpsConnectorBuilder::new().with_native_roots()
         .https_or_http()
         .enable_http1()
-        .enable_http2()
         .build();
 
     match Engine::new(matches, connector).await {

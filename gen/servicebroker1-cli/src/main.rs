@@ -465,7 +465,7 @@ async fn main() {
     
     let mut app = App::new("servicebroker1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("5.0.2+20190624")
+           .version("5.0.3+20190624")
            .about("The Google Cloud Platform Service Broker API provides Google hosted
            implementation of the Open Service Broker API
            (https://www.openservicebrokerapi.org/).
@@ -534,7 +534,6 @@ async fn main() {
     let connector = hyper_rustls::HttpsConnectorBuilder::new().with_native_roots()
         .https_or_http()
         .enable_http1()
-        .enable_http2()
         .build();
 
     match Engine::new(matches, connector).await {

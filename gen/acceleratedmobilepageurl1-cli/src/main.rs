@@ -251,7 +251,7 @@ async fn main() {
     
     let mut app = App::new("acceleratedmobilepageurl1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("5.0.2+20230123")
+           .version("5.0.3+20230123")
            .about("Retrieves the list of AMP URLs (and equivalent AMP Cache URLs) for a given list of public URL(s). ")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_acceleratedmobilepageurl1_cli")
            .arg(Arg::with_name("folder")
@@ -312,7 +312,6 @@ async fn main() {
     let connector = hyper_rustls::HttpsConnectorBuilder::new().with_native_roots()
         .https_or_http()
         .enable_http1()
-        .enable_http2()
         .build();
 
     match Engine::new(matches, connector).await {

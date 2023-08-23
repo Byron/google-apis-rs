@@ -953,7 +953,7 @@ async fn main() {
     
     let mut app = App::new("spectrum1-explorer")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("5.0.2+20170306")
+           .version("5.0.3+20170306")
            .about("API for spectrum-management functions.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_spectrum1_explorer_cli")
            .arg(Arg::with_name("folder")
@@ -1014,7 +1014,6 @@ async fn main() {
     let connector = hyper_rustls::HttpsConnectorBuilder::new().with_native_roots()
         .https_or_http()
         .enable_http1()
-        .enable_http2()
         .build();
 
     match Engine::new(matches, connector).await {

@@ -4101,7 +4101,7 @@ async fn main() {
     
     let mut app = App::new("networkconnectivity1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("5.0.2+20230105")
+           .version("5.0.3+20230105")
            .about("This API enables connectivity with and between Google Cloud resources.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_networkconnectivity1_cli")
            .arg(Arg::with_name("url")
@@ -4167,7 +4167,6 @@ async fn main() {
     let connector = hyper_rustls::HttpsConnectorBuilder::new().with_native_roots()
         .https_or_http()
         .enable_http1()
-        .enable_http2()
         .build();
 
     match Engine::new(matches, connector).await {

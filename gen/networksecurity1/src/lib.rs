@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/generator/templates/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *NetworkSecurity* crate version *5.0.2+20230106*, where *20230106* is the exact revision of the *networksecurity:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.2*.
+//! This documentation was generated from *NetworkSecurity* crate version *5.0.3+20230106*, where *20230106* is the exact revision of the *networksecurity:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.3*.
 //! 
 //! Everything else about the *NetworkSecurity* *v1* API can be found at the
 //! [official documentation site](https://cloud.google.com/networking).
@@ -101,7 +101,7 @@
 //!         secret,
 //!         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 //!     ).build().await.unwrap();
-//! let mut hub = NetworkSecurity::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+//! let mut hub = NetworkSecurity::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
 //! // As the method needs a request, you would usually fill it with the desired information
 //! // into the respective structure. Some of the parts shown here might not be applicable !
 //! // Values shown here are possibly random and not representative !

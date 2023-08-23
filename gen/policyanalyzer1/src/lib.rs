@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/generator/templates/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Policy Analyzer* crate version *5.0.2+20230122*, where *20230122* is the exact revision of the *policyanalyzer:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.2*.
+//! This documentation was generated from *Policy Analyzer* crate version *5.0.3+20230122*, where *20230122* is the exact revision of the *policyanalyzer:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.3*.
 //! 
 //! Everything else about the *Policy Analyzer* *v1* API can be found at the
 //! [official documentation site](https://www.google.com).
@@ -91,7 +91,7 @@
 //!         secret,
 //!         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 //!     ).build().await.unwrap();
-//! let mut hub = PolicyAnalyzer::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+//! let mut hub = PolicyAnalyzer::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
 //! // You can configure optional parameters by calling the respective setters at will, and
 //! // execute the final call using `doit()`.
 //! // Values shown here are possibly random and not representative !

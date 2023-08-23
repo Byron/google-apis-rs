@@ -1,4 +1,4 @@
-site_name: Safebrowsing v5.0.2+20230108
+site_name: Safebrowsing v5.0.3+20230108
 site_url: http://byron.github.io/google-apis-rs/google-safebrowsing4-cli
 site_description: A complete library to interact with Safebrowsing (protocol v4)
 

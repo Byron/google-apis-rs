@@ -887,7 +887,7 @@ async fn main() {
     
     let mut app = App::new("safebrowsing4")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("5.0.2+20230108")
+           .version("5.0.3+20230108")
            .about("Enables client applications to check web resources (most commonly URLs) against Google-generated lists of unsafe web resources. The Safe Browsing APIs are for non-commercial use only. If you need to use APIs to detect malicious URLs for commercial purposes – meaning “for sale or revenue-generating purposes” – please refer to the Web Risk API.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_safebrowsing4_cli")
            .arg(Arg::with_name("folder")
@@ -948,7 +948,6 @@ async fn main() {
     let connector = hyper_rustls::HttpsConnectorBuilder::new().with_native_roots()
         .https_or_http()
         .enable_http1()
-        .enable_http2()
         .build();
 
     match Engine::new(matches, connector).await {

@@ -789,7 +789,7 @@ async fn main() {
     
     let mut app = App::new("documentai1-beta2")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("5.0.2+20230117")
+           .version("5.0.3+20230117")
            .about("Service to parse structured information from unstructured or semi-structured documents using state-of-the-art Google AI such as natural language, computer vision, translation, and AutoML.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_documentai1_beta2_cli")
            .arg(Arg::with_name("url")
@@ -855,7 +855,6 @@ async fn main() {
     let connector = hyper_rustls::HttpsConnectorBuilder::new().with_native_roots()
         .https_or_http()
         .enable_http1()
-        .enable_http2()
         .build();
 
     match Engine::new(matches, connector).await {

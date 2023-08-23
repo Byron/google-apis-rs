@@ -2676,7 +2676,7 @@ async fn main() {
     
     let mut app = App::new("containeranalysis1-beta1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("5.0.2+20230106")
+           .version("5.0.3+20230106")
            .about("An implementation of the Grafeas API, which stores, and enables querying and retrieval of critical metadata about all of your software artifacts.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_containeranalysis1_beta1_cli")
            .arg(Arg::with_name("url")
@@ -2742,7 +2742,6 @@ async fn main() {
     let connector = hyper_rustls::HttpsConnectorBuilder::new().with_native_roots()
         .https_or_http()
         .enable_http1()
-        .enable_http2()
         .build();
 
     match Engine::new(matches, connector).await {

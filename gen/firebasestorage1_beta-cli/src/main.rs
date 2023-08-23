@@ -534,7 +534,7 @@ async fn main() {
     
     let mut app = App::new("firebasestorage1-beta")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("5.0.2+20230106")
+           .version("5.0.3+20230106")
            .about("The Cloud Storage for Firebase API enables programmatic management of Cloud Storage buckets for use in Firebase projects")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_firebasestorage1_beta_cli")
            .arg(Arg::with_name("url")
@@ -600,7 +600,6 @@ async fn main() {
     let connector = hyper_rustls::HttpsConnectorBuilder::new().with_native_roots()
         .https_or_http()
         .enable_http1()
-        .enable_http2()
         .build();
 
     match Engine::new(matches, connector).await {

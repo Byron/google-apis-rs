@@ -1,4 +1,4 @@
-site_name: PubsubLite v5.0.2+20230114
+site_name: PubsubLite v5.0.3+20230114
 site_url: http://byron.github.io/google-apis-rs/google-pubsublite1-cli
 site_description: A complete library to interact with PubsubLite (protocol v1)
 
