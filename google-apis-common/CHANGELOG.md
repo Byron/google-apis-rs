@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## Unreleased
+## 6.0.0 (2023-08-23)
 
 A maintenance release with updated yup-oauth2 dependency
 
@@ -13,7 +13,7 @@ A maintenance release with updated yup-oauth2 dependency
 
 <csr-read-only-do-not-edit/>
 
- - 1 commit contributed to the release over the course of 126 calendar days.
+ - 2 commits contributed to the release over the course of 126 calendar days.
  - 126 days passed between releases.
  - 0 commits were understood as [conventional](https://www.conventionalcommits.org).
  - 0 issues like '(#ID)' were seen in commit messages
@@ -25,6 +25,7 @@ A maintenance release with updated yup-oauth2 dependency
 <details><summary>view details</summary>
 
  * **Uncategorized**
+    - Update changelog prior to common crate releases ([`0cf81f1`](https://github.com/Byron/google-apis-rs/commit/0cf81f1df4fa79b8eaffdb56d892d392dc580812))
     - Bump yup-oauth2 to the latest version, bringing in `hyper-rustls` v0.24. ([`58189b3`](https://github.com/Byron/google-apis-rs/commit/58189b31498fb324175721ab5bb46e8e12379636))
 </details>
 
