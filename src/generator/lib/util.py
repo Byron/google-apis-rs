@@ -1183,7 +1183,7 @@ def string_impl(p):
     """Returns a function which will convert instances of p to a string"""
     return {
         "google-duration": lambda x: f"::client::serde::duration::to_string(&{x})",
-        "byte": lambda x: f"::client::serde::urlsafe_base64::to_string(&{x})",
+        "byte": lambda x: f"::client::serde::standard_base64::to_string(&{x})",
         "google-datetime": lambda x: f"::client::serde::datetime_to_string(&{x})",
         "date-time": lambda x: f"::client::serde::datetime_to_string(&{x})",
         "google-fieldmask": lambda x: f"{x}.to_string()",

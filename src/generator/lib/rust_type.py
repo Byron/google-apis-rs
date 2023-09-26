@@ -35,7 +35,7 @@ class RustType:
     def serde_as(self) -> Tuple["RustType", bool]:
         copied = deepcopy(self)
         from_to = {
-            Vec(Base("u8")): Base("::client::serde::urlsafe_base64::Wrapper"),
+            Vec(Base("u8")): Base("::client::serde::standard_base64::Wrapper"),
             Base("client::chrono::Duration"): Base("::client::serde::duration::Wrapper"),
             Base("i64"): Base("::client::serde_with::DisplayFromStr"),
             Base("u64"): Base("::client::serde_with::DisplayFromStr"),
