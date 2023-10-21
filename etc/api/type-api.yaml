@@ -20,7 +20,17 @@ make:
     - source: ../Cargo.toml
     - source: lib.rs
       output_dir: src
-    - source: api.rs
+    - source: api/mod.rs
+      output_dir: src
+    - source: api/utilities.rs
+      output_dir: src
+    - source: api/hub.rs
+      output_dir: src
+    - source: api/method_builders.rs
+      output_dir: src
+    - source: api/schemas.rs
+      output_dir: src
+    - source: api/call_builders.rs
       output_dir: src
 cargo:
   keywords: [protocol, web, api]

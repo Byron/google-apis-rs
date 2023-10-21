@@ -46,7 +46,7 @@ let rb = hub.${mangle_ident(resource)}();
 pub struct ${ThisType}
     where ${struct_type_bounds_s()} {
 
-    hub: &'a ${hub_type_name}${hub_type_params_s()},
+   pub(super) hub: &'a ${hub_type_name}${hub_type_params_s()},
 }
 
 impl${rb_params} ${METHODS_BUILDER_MARKER_TRAIT} for ${ThisType} {}

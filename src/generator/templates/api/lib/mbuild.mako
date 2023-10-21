@@ -120,10 +120,10 @@ ${self.usage(resource, method, m, params, request_value, parts)}\
 pub struct ${ThisType}
     where ${struct_type_bounds_s()} {
 
-    hub: &'a ${hub_type_name}${hub_type_params_s()},
+   pub(super) hub: &'a ${hub_type_name}${hub_type_params_s()},
 ## PROPERTIES ###############
 % for p in params:
-    ${property(p.name)}:\
+   pub(super) ${property(p.name)}:\
     % if is_required_property(p):
  ${activity_rust_type(schemas, p, allow_optionals=False)},
     % else:
@@ -131,10 +131,10 @@ pub struct ${ThisType}
     % endif
 % endfor
 ## A generic map for additinal parameters. Sometimes you can set some that are documented online only
-    ${api.properties.params}: HashMap<String, String>,
+   pub(super) ${api.properties.params}: HashMap<String, String>,
     % if method_default_scope(m):
 ## We need the scopes sorted, to not unnecessarily query new tokens
-    ${api.properties.scopes}: BTreeSet<String>
+   pub(super) ${api.properties.scopes}: BTreeSet<String>
     % endif
 }
 
