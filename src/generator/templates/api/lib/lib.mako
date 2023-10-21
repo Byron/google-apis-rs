@@ -331,7 +331,7 @@ You can read the full text at the repository's [license file][repo-license].
 /// Identifies the an OAuth2 authorization scope.
 /// A scope is needed when requesting an
 /// [authorization token](https://developers.google.com/youtube/v3/guides/authentication).
-#[derive(PartialEq, Eq, Hash, Debug)]
+#[derive(PartialEq, Eq, Hash, Debug, Clone)]
 pub enum Scope {
 % for url, scope in auth.oauth2.scopes.items():
     ${scope.description | rust_doc_sanitize(documentationLink), rust_doc_comment}
