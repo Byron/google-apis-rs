@@ -9,7 +9,7 @@
 //! The original source code is [on github](https://github.com/Byron/google-apis-rs/tree/main/gen/cloudchannel1).
 //! # Features
 //! 
-//! Handle the following *Resources* with ease from the central [hub](Cloudchannel) ... 
+//! Handle the following *Resources* with ease from the central [hub](Cloudchannel) ...
 //! 
 //! * accounts
 //!  * [*channel partner links channel partner repricing configs create*](api::AccountChannelPartnerLinkChannelPartnerRepricingConfigCreateCall), [*channel partner links channel partner repricing configs delete*](api::AccountChannelPartnerLinkChannelPartnerRepricingConfigDeleteCall), [*channel partner links channel partner repricing configs get*](api::AccountChannelPartnerLinkChannelPartnerRepricingConfigGetCall), [*channel partner links channel partner repricing configs list*](api::AccountChannelPartnerLinkChannelPartnerRepricingConfigListCall), [*channel partner links channel partner repricing configs patch*](api::AccountChannelPartnerLinkChannelPartnerRepricingConfigPatchCall), [*channel partner links create*](api::AccountChannelPartnerLinkCreateCall), [*channel partner links customers create*](api::AccountChannelPartnerLinkCustomerCreateCall), [*channel partner links customers delete*](api::AccountChannelPartnerLinkCustomerDeleteCall), [*channel partner links customers get*](api::AccountChannelPartnerLinkCustomerGetCall), [*channel partner links customers import*](api::AccountChannelPartnerLinkCustomerImportCall), [*channel partner links customers list*](api::AccountChannelPartnerLinkCustomerListCall), [*channel partner links customers patch*](api::AccountChannelPartnerLinkCustomerPatchCall), [*channel partner links get*](api::AccountChannelPartnerLinkGetCall), [*channel partner links list*](api::AccountChannelPartnerLinkListCall), [*channel partner links patch*](api::AccountChannelPartnerLinkPatchCall), [*check cloud identity accounts exist*](api::AccountCheckCloudIdentityAccountsExistCall), [*customers create*](api::AccountCustomerCreateCall), [*customers customer repricing configs create*](api::AccountCustomerCustomerRepricingConfigCreateCall), [*customers customer repricing configs delete*](api::AccountCustomerCustomerRepricingConfigDeleteCall), [*customers customer repricing configs get*](api::AccountCustomerCustomerRepricingConfigGetCall), [*customers customer repricing configs list*](api::AccountCustomerCustomerRepricingConfigListCall), [*customers customer repricing configs patch*](api::AccountCustomerCustomerRepricingConfigPatchCall), [*customers delete*](api::AccountCustomerDeleteCall), [*customers entitlements activate*](api::AccountCustomerEntitlementActivateCall), [*customers entitlements cancel*](api::AccountCustomerEntitlementCancelCall), [*customers entitlements change offer*](api::AccountCustomerEntitlementChangeOfferCall), [*customers entitlements change parameters*](api::AccountCustomerEntitlementChangeParameterCall), [*customers entitlements change renewal settings*](api::AccountCustomerEntitlementChangeRenewalSettingCall), [*customers entitlements create*](api::AccountCustomerEntitlementCreateCall), [*customers entitlements get*](api::AccountCustomerEntitlementGetCall), [*customers entitlements list*](api::AccountCustomerEntitlementListCall), [*customers entitlements list entitlement changes*](api::AccountCustomerEntitlementListEntitlementChangeCall), [*customers entitlements lookup offer*](api::AccountCustomerEntitlementLookupOfferCall), [*customers entitlements start paid service*](api::AccountCustomerEntitlementStartPaidServiceCall), [*customers entitlements suspend*](api::AccountCustomerEntitlementSuspendCall), [*customers get*](api::AccountCustomerGetCall), [*customers import*](api::AccountCustomerImportCall), [*customers list*](api::AccountCustomerListCall), [*customers list purchasable offers*](api::AccountCustomerListPurchasableOfferCall), [*customers list purchasable skus*](api::AccountCustomerListPurchasableSkuCall), [*customers patch*](api::AccountCustomerPatchCall), [*customers provision cloud identity*](api::AccountCustomerProvisionCloudIdentityCall), [*customers query eligible billing accounts*](api::AccountCustomerQueryEligibleBillingAccountCall), [*customers transfer entitlements*](api::AccountCustomerTransferEntitlementCall), [*customers transfer entitlements to google*](api::AccountCustomerTransferEntitlementsToGoogleCall), [*list subscribers*](api::AccountListSubscriberCall), [*list transferable offers*](api::AccountListTransferableOfferCall), [*list transferable skus*](api::AccountListTransferableSkuCall), [*offers list*](api::AccountOfferListCall), [*register*](api::AccountRegisterCall), [*report jobs fetch report results*](api::AccountReportJobFetchReportResultCall), [*reports list*](api::AccountReportListCall), [*reports run*](api::AccountReportRunCall), [*sku groups billable skus list*](api::AccountSkuGroupBillableSkuListCall), [*sku groups list*](api::AccountSkuGroupListCall) and [*unregister*](api::AccountUnregisterCall)
@@ -66,8 +66,8 @@
 //! let r = hub.operations().get(...).doit().await
 //! ```
 //! 
-//! The `resource()` and `activity(...)` calls create [builders][builder-pattern]. The second one dealing with `Activities` 
-//! supports various methods to configure the impending operation (not shown here). It is made such that all required arguments have to be 
+//! The `resource()` and `activity(...)` calls create [builders][builder-pattern]. The second one dealing with `Activities`
+//! supports various methods to configure the impending operation (not shown here). It is made such that all required arguments have to be
 //! specified right away (i.e. `(...)`), whereas all optional ones can be [build up][builder-pattern] as desired.
 //! The `doit()` method performs the actual communication with the server and returns the respective result.
 //! 
@@ -96,12 +96,12 @@
 //! use std::default::Default;
 //! use cloudchannel1::{Cloudchannel, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 //! 
-//! // Get an ApplicationSecret instance by some means. It contains the `client_id` and 
+//! // Get an ApplicationSecret instance by some means. It contains the `client_id` and
 //! // `client_secret`, among other things.
 //! let secret: oauth2::ApplicationSecret = Default::default();
-//! // Instantiate the authenticator. It will choose a suitable authentication flow for you, 
+//! // Instantiate the authenticator. It will choose a suitable authentication flow for you,
 //! // unless you replace  `None` with the desired Flow.
-//! // Provide your own `AuthenticatorDelegate` to adjust the way it operates and get feedback about 
+//! // Provide your own `AuthenticatorDelegate` to adjust the way it operates and get feedback about
 //! // what's going on. You probably want to bring in your own `TokenStorage` to persist tokens and
 //! // retrieve them from storage.
 //! let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -142,10 +142,10 @@
 //! ## Handling Errors
 //! 
 //! All errors produced by the system are provided either as [Result](client::Result) enumeration as return value of
-//! the doit() methods, or handed as possibly intermediate results to either the 
+//! the doit() methods, or handed as possibly intermediate results to either the
 //! [Hub Delegate](client::Delegate), or the [Authenticator Delegate](https://docs.rs/yup-oauth2/*/yup_oauth2/trait.AuthenticatorDelegate.html).
 //! 
-//! When delegates handle errors or intermediate values, they may have a chance to instruct the system to retry. This 
+//! When delegates handle errors or intermediate values, they may have a chance to instruct the system to retry. This
 //! makes the system potentially resilient to all kinds of errors.
 //! 
 //! ## Uploads and Downloads
@@ -155,25 +155,25 @@
 //! You can see it as meta-data for the actual media. To trigger a media download, you will have to set up the builder by making
 //! this call: `.param("alt", "media")`.
 //! 
-//! Methods supporting uploads can do so using up to 2 different protocols: 
-//! *simple* and *resumable*. The distinctiveness of each is represented by customized 
+//! Methods supporting uploads can do so using up to 2 different protocols:
+//! *simple* and *resumable*. The distinctiveness of each is represented by customized
 //! `doit(...)` methods, which are then named `upload(...)` and `upload_resumable(...)` respectively.
 //! 
 //! ## Customization and Callbacks
 //! 
-//! You may alter the way an `doit()` method is called by providing a [delegate](client::Delegate) to the 
-//! [Method Builder](client::CallBuilder) before making the final `doit()` call. 
-//! Respective methods will be called to provide progress information, as well as determine whether the system should 
+//! You may alter the way an `doit()` method is called by providing a [delegate](client::Delegate) to the
+//! [Method Builder](client::CallBuilder) before making the final `doit()` call.
+//! Respective methods will be called to provide progress information, as well as determine whether the system should
 //! retry on failure.
 //! 
 //! The [delegate trait](client::Delegate) is default-implemented, allowing you to customize it with minimal effort.
 //! 
 //! ## Optional Parts in Server-Requests
 //! 
-//! All structures provided by this library are made to be [encodable](client::RequestValue) and 
-//! [decodable](client::ResponseResult) via *json*. Optionals are used to indicate that partial requests are responses 
+//! All structures provided by this library are made to be [encodable](client::RequestValue) and
+//! [decodable](client::ResponseResult) via *json*. Optionals are used to indicate that partial requests are responses
 //! are valid.
-//! Most optionals are are considered [Parts](client::Part) which are identifiable by name, which will be sent to 
+//! Most optionals are are considered [Parts](client::Part) which are identifiable by name, which will be sent to
 //! the server to indicate either the set parts of the request or the desired parts in the response.
 //! 
 //! ## Builder Arguments

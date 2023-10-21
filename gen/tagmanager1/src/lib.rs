@@ -9,7 +9,7 @@
 //! The original source code is [on github](https://github.com/Byron/google-apis-rs/tree/main/gen/tagmanager1).
 //! # Features
 //! 
-//! Handle the following *Resources* with ease from the central [hub](TagManager) ... 
+//! Handle the following *Resources* with ease from the central [hub](TagManager) ...
 //! 
 //! * [accounts](api::Account)
 //!  * [*containers create*](api::AccountContainerCreateCall), [*containers delete*](api::AccountContainerDeleteCall), [*containers environments create*](api::AccountContainerEnvironmentCreateCall), [*containers environments delete*](api::AccountContainerEnvironmentDeleteCall), [*containers environments get*](api::AccountContainerEnvironmentGetCall), [*containers environments list*](api::AccountContainerEnvironmentListCall), [*containers environments update*](api::AccountContainerEnvironmentUpdateCall), [*containers folders create*](api::AccountContainerFolderCreateCall), [*containers folders delete*](api::AccountContainerFolderDeleteCall), [*containers folders entities list*](api::AccountContainerFolderEntityListCall), [*containers folders get*](api::AccountContainerFolderGetCall), [*containers folders list*](api::AccountContainerFolderListCall), [*containers folders update*](api::AccountContainerFolderUpdateCall), [*containers get*](api::AccountContainerGetCall), [*containers list*](api::AccountContainerListCall), [*containers move_folders update*](api::AccountContainerMoveFolderUpdateCall), [*containers reauthorize_environments update*](api::AccountContainerReauthorizeEnvironmentUpdateCall), [*containers tags create*](api::AccountContainerTagCreateCall), [*containers tags delete*](api::AccountContainerTagDeleteCall), [*containers tags get*](api::AccountContainerTagGetCall), [*containers tags list*](api::AccountContainerTagListCall), [*containers tags update*](api::AccountContainerTagUpdateCall), [*containers triggers create*](api::AccountContainerTriggerCreateCall), [*containers triggers delete*](api::AccountContainerTriggerDeleteCall), [*containers triggers get*](api::AccountContainerTriggerGetCall), [*containers triggers list*](api::AccountContainerTriggerListCall), [*containers triggers update*](api::AccountContainerTriggerUpdateCall), [*containers update*](api::AccountContainerUpdateCall), [*containers variables create*](api::AccountContainerVariableCreateCall), [*containers variables delete*](api::AccountContainerVariableDeleteCall), [*containers variables get*](api::AccountContainerVariableGetCall), [*containers variables list*](api::AccountContainerVariableListCall), [*containers variables update*](api::AccountContainerVariableUpdateCall), [*containers versions create*](api::AccountContainerVersionCreateCall), [*containers versions delete*](api::AccountContainerVersionDeleteCall), [*containers versions get*](api::AccountContainerVersionGetCall), [*containers versions list*](api::AccountContainerVersionListCall), [*containers versions publish*](api::AccountContainerVersionPublishCall), [*containers versions restore*](api::AccountContainerVersionRestoreCall), [*containers versions undelete*](api::AccountContainerVersionUndeleteCall), [*containers versions update*](api::AccountContainerVersionUpdateCall), [*get*](api::AccountGetCall), [*list*](api::AccountListCall), [*permissions create*](api::AccountPermissionCreateCall), [*permissions delete*](api::AccountPermissionDeleteCall), [*permissions get*](api::AccountPermissionGetCall), [*permissions list*](api::AccountPermissionListCall), [*permissions update*](api::AccountPermissionUpdateCall) and [*update*](api::AccountUpdateCall)
@@ -98,8 +98,8 @@
 //! let r = hub.accounts().update(...).doit().await
 //! ```
 //! 
-//! The `resource()` and `activity(...)` calls create [builders][builder-pattern]. The second one dealing with `Activities` 
-//! supports various methods to configure the impending operation (not shown here). It is made such that all required arguments have to be 
+//! The `resource()` and `activity(...)` calls create [builders][builder-pattern]. The second one dealing with `Activities`
+//! supports various methods to configure the impending operation (not shown here). It is made such that all required arguments have to be
 //! specified right away (i.e. `(...)`), whereas all optional ones can be [build up][builder-pattern] as desired.
 //! The `doit()` method performs the actual communication with the server and returns the respective result.
 //! 
@@ -128,12 +128,12 @@
 //! use std::default::Default;
 //! use tagmanager1::{TagManager, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 //! 
-//! // Get an ApplicationSecret instance by some means. It contains the `client_id` and 
+//! // Get an ApplicationSecret instance by some means. It contains the `client_id` and
 //! // `client_secret`, among other things.
 //! let secret: oauth2::ApplicationSecret = Default::default();
-//! // Instantiate the authenticator. It will choose a suitable authentication flow for you, 
+//! // Instantiate the authenticator. It will choose a suitable authentication flow for you,
 //! // unless you replace  `None` with the desired Flow.
-//! // Provide your own `AuthenticatorDelegate` to adjust the way it operates and get feedback about 
+//! // Provide your own `AuthenticatorDelegate` to adjust the way it operates and get feedback about
 //! // what's going on. You probably want to bring in your own `TokenStorage` to persist tokens and
 //! // retrieve them from storage.
 //! let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -177,10 +177,10 @@
 //! ## Handling Errors
 //! 
 //! All errors produced by the system are provided either as [Result](client::Result) enumeration as return value of
-//! the doit() methods, or handed as possibly intermediate results to either the 
+//! the doit() methods, or handed as possibly intermediate results to either the
 //! [Hub Delegate](client::Delegate), or the [Authenticator Delegate](https://docs.rs/yup-oauth2/*/yup_oauth2/trait.AuthenticatorDelegate.html).
 //! 
-//! When delegates handle errors or intermediate values, they may have a chance to instruct the system to retry. This 
+//! When delegates handle errors or intermediate values, they may have a chance to instruct the system to retry. This
 //! makes the system potentially resilient to all kinds of errors.
 //! 
 //! ## Uploads and Downloads
@@ -190,25 +190,25 @@
 //! You can see it as meta-data for the actual media. To trigger a media download, you will have to set up the builder by making
 //! this call: `.param("alt", "media")`.
 //! 
-//! Methods supporting uploads can do so using up to 2 different protocols: 
-//! *simple* and *resumable*. The distinctiveness of each is represented by customized 
+//! Methods supporting uploads can do so using up to 2 different protocols:
+//! *simple* and *resumable*. The distinctiveness of each is represented by customized
 //! `doit(...)` methods, which are then named `upload(...)` and `upload_resumable(...)` respectively.
 //! 
 //! ## Customization and Callbacks
 //! 
-//! You may alter the way an `doit()` method is called by providing a [delegate](client::Delegate) to the 
-//! [Method Builder](client::CallBuilder) before making the final `doit()` call. 
-//! Respective methods will be called to provide progress information, as well as determine whether the system should 
+//! You may alter the way an `doit()` method is called by providing a [delegate](client::Delegate) to the
+//! [Method Builder](client::CallBuilder) before making the final `doit()` call.
+//! Respective methods will be called to provide progress information, as well as determine whether the system should
 //! retry on failure.
 //! 
 //! The [delegate trait](client::Delegate) is default-implemented, allowing you to customize it with minimal effort.
 //! 
 //! ## Optional Parts in Server-Requests
 //! 
-//! All structures provided by this library are made to be [encodable](client::RequestValue) and 
-//! [decodable](client::ResponseResult) via *json*. Optionals are used to indicate that partial requests are responses 
+//! All structures provided by this library are made to be [encodable](client::RequestValue) and
+//! [decodable](client::ResponseResult) via *json*. Optionals are used to indicate that partial requests are responses
 //! are valid.
-//! Most optionals are are considered [Parts](client::Part) which are identifiable by name, which will be sent to 
+//! Most optionals are are considered [Parts](client::Part) which are identifiable by name, which will be sent to
 //! the server to indicate either the set parts of the request or the desired parts in the response.
 //! 
 //! ## Builder Arguments

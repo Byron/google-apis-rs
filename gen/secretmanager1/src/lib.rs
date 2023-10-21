@@ -9,7 +9,7 @@
 //! The original source code is [on github](https://github.com/Byron/google-apis-rs/tree/main/gen/secretmanager1).
 //! # Features
 //! 
-//! Handle the following *Resources* with ease from the central [hub](SecretManager) ... 
+//! Handle the following *Resources* with ease from the central [hub](SecretManager) ...
 //! 
 //! * projects
 //!  * [*locations get*](api::ProjectLocationGetCall), [*locations list*](api::ProjectLocationListCall), [*locations secrets add version*](api::ProjectLocationSecretAddVersionCall), [*locations secrets create*](api::ProjectLocationSecretCreateCall), [*locations secrets delete*](api::ProjectLocationSecretDeleteCall), [*locations secrets get*](api::ProjectLocationSecretGetCall), [*locations secrets get iam policy*](api::ProjectLocationSecretGetIamPolicyCall), [*locations secrets list*](api::ProjectLocationSecretListCall), [*locations secrets patch*](api::ProjectLocationSecretPatchCall), [*locations secrets set iam policy*](api::ProjectLocationSecretSetIamPolicyCall), [*locations secrets test iam permissions*](api::ProjectLocationSecretTestIamPermissionCall), [*locations secrets versions access*](api::ProjectLocationSecretVersionAccesCall), [*locations secrets versions destroy*](api::ProjectLocationSecretVersionDestroyCall), [*locations secrets versions disable*](api::ProjectLocationSecretVersionDisableCall), [*locations secrets versions enable*](api::ProjectLocationSecretVersionEnableCall), [*locations secrets versions get*](api::ProjectLocationSecretVersionGetCall), [*locations secrets versions list*](api::ProjectLocationSecretVersionListCall), [*secrets add version*](api::ProjectSecretAddVersionCall), [*secrets create*](api::ProjectSecretCreateCall), [*secrets delete*](api::ProjectSecretDeleteCall), [*secrets get*](api::ProjectSecretGetCall), [*secrets get iam policy*](api::ProjectSecretGetIamPolicyCall), [*secrets list*](api::ProjectSecretListCall), [*secrets patch*](api::ProjectSecretPatchCall), [*secrets set iam policy*](api::ProjectSecretSetIamPolicyCall), [*secrets test iam permissions*](api::ProjectSecretTestIamPermissionCall), [*secrets versions access*](api::ProjectSecretVersionAccesCall), [*secrets versions destroy*](api::ProjectSecretVersionDestroyCall), [*secrets versions disable*](api::ProjectSecretVersionDisableCall), [*secrets versions enable*](api::ProjectSecretVersionEnableCall), [*secrets versions get*](api::ProjectSecretVersionGetCall) and [*secrets versions list*](api::ProjectSecretVersionListCall)
@@ -59,8 +59,8 @@
 //! let r = hub.projects().secrets_add_version(...).doit().await
 //! ```
 //! 
-//! The `resource()` and `activity(...)` calls create [builders][builder-pattern]. The second one dealing with `Activities` 
-//! supports various methods to configure the impending operation (not shown here). It is made such that all required arguments have to be 
+//! The `resource()` and `activity(...)` calls create [builders][builder-pattern]. The second one dealing with `Activities`
+//! supports various methods to configure the impending operation (not shown here). It is made such that all required arguments have to be
 //! specified right away (i.e. `(...)`), whereas all optional ones can be [build up][builder-pattern] as desired.
 //! The `doit()` method performs the actual communication with the server and returns the respective result.
 //! 
@@ -89,12 +89,12 @@
 //! use std::default::Default;
 //! use secretmanager1::{SecretManager, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 //! 
-//! // Get an ApplicationSecret instance by some means. It contains the `client_id` and 
+//! // Get an ApplicationSecret instance by some means. It contains the `client_id` and
 //! // `client_secret`, among other things.
 //! let secret: oauth2::ApplicationSecret = Default::default();
-//! // Instantiate the authenticator. It will choose a suitable authentication flow for you, 
+//! // Instantiate the authenticator. It will choose a suitable authentication flow for you,
 //! // unless you replace  `None` with the desired Flow.
-//! // Provide your own `AuthenticatorDelegate` to adjust the way it operates and get feedback about 
+//! // Provide your own `AuthenticatorDelegate` to adjust the way it operates and get feedback about
 //! // what's going on. You probably want to bring in your own `TokenStorage` to persist tokens and
 //! // retrieve them from storage.
 //! let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -135,10 +135,10 @@
 //! ## Handling Errors
 //! 
 //! All errors produced by the system are provided either as [Result](client::Result) enumeration as return value of
-//! the doit() methods, or handed as possibly intermediate results to either the 
+//! the doit() methods, or handed as possibly intermediate results to either the
 //! [Hub Delegate](client::Delegate), or the [Authenticator Delegate](https://docs.rs/yup-oauth2/*/yup_oauth2/trait.AuthenticatorDelegate.html).
 //! 
-//! When delegates handle errors or intermediate values, they may have a chance to instruct the system to retry. This 
+//! When delegates handle errors or intermediate values, they may have a chance to instruct the system to retry. This
 //! makes the system potentially resilient to all kinds of errors.
 //! 
 //! ## Uploads and Downloads
@@ -148,25 +148,25 @@
 //! You can see it as meta-data for the actual media. To trigger a media download, you will have to set up the builder by making
 //! this call: `.param("alt", "media")`.
 //! 
-//! Methods supporting uploads can do so using up to 2 different protocols: 
-//! *simple* and *resumable*. The distinctiveness of each is represented by customized 
+//! Methods supporting uploads can do so using up to 2 different protocols:
+//! *simple* and *resumable*. The distinctiveness of each is represented by customized
 //! `doit(...)` methods, which are then named `upload(...)` and `upload_resumable(...)` respectively.
 //! 
 //! ## Customization and Callbacks
 //! 
-//! You may alter the way an `doit()` method is called by providing a [delegate](client::Delegate) to the 
-//! [Method Builder](client::CallBuilder) before making the final `doit()` call. 
-//! Respective methods will be called to provide progress information, as well as determine whether the system should 
+//! You may alter the way an `doit()` method is called by providing a [delegate](client::Delegate) to the
+//! [Method Builder](client::CallBuilder) before making the final `doit()` call.
+//! Respective methods will be called to provide progress information, as well as determine whether the system should
 //! retry on failure.
 //! 
 //! The [delegate trait](client::Delegate) is default-implemented, allowing you to customize it with minimal effort.
 //! 
 //! ## Optional Parts in Server-Requests
 //! 
-//! All structures provided by this library are made to be [encodable](client::RequestValue) and 
-//! [decodable](client::ResponseResult) via *json*. Optionals are used to indicate that partial requests are responses 
+//! All structures provided by this library are made to be [encodable](client::RequestValue) and
+//! [decodable](client::ResponseResult) via *json*. Optionals are used to indicate that partial requests are responses
 //! are valid.
-//! Most optionals are are considered [Parts](client::Part) which are identifiable by name, which will be sent to 
+//! Most optionals are are considered [Parts](client::Part) which are identifiable by name, which will be sent to
 //! the server to indicate either the set parts of the request or the desired parts in the response.
 //! 
 //! ## Builder Arguments

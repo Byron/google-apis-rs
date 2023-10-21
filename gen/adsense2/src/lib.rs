@@ -9,7 +9,7 @@
 //! The original source code is [on github](https://github.com/Byron/google-apis-rs/tree/main/gen/adsense2).
 //! # Features
 //! 
-//! Handle the following *Resources* with ease from the central [hub](Adsense) ... 
+//! Handle the following *Resources* with ease from the central [hub](Adsense) ...
 //! 
 //! * [accounts](api::Account)
 //!  * [*adclients adunits create*](api::AccountAdclientAdunitCreateCall), [*adclients adunits get*](api::AccountAdclientAdunitGetCall), [*adclients adunits get adcode*](api::AccountAdclientAdunitGetAdcodeCall), [*adclients adunits list*](api::AccountAdclientAdunitListCall), [*adclients adunits list linked custom channels*](api::AccountAdclientAdunitListLinkedCustomChannelCall), [*adclients adunits patch*](api::AccountAdclientAdunitPatchCall), [*adclients customchannels create*](api::AccountAdclientCustomchannelCreateCall), [*adclients customchannels delete*](api::AccountAdclientCustomchannelDeleteCall), [*adclients customchannels get*](api::AccountAdclientCustomchannelGetCall), [*adclients customchannels list*](api::AccountAdclientCustomchannelListCall), [*adclients customchannels list linked ad units*](api::AccountAdclientCustomchannelListLinkedAdUnitCall), [*adclients customchannels patch*](api::AccountAdclientCustomchannelPatchCall), [*adclients get*](api::AccountAdclientGetCall), [*adclients get adcode*](api::AccountAdclientGetAdcodeCall), [*adclients list*](api::AccountAdclientListCall), [*adclients urlchannels get*](api::AccountAdclientUrlchannelGetCall), [*adclients urlchannels list*](api::AccountAdclientUrlchannelListCall), [*alerts list*](api::AccountAlertListCall), [*get*](api::AccountGetCall), [*get ad blocking recovery tag*](api::AccountGetAdBlockingRecoveryTagCall), [*list*](api::AccountListCall), [*list child accounts*](api::AccountListChildAccountCall), [*payments list*](api::AccountPaymentListCall), [*reports generate*](api::AccountReportGenerateCall), [*reports generate csv*](api::AccountReportGenerateCsvCall), [*reports get saved*](api::AccountReportGetSavedCall), [*reports saved generate*](api::AccountReportSavedGenerateCall), [*reports saved generate csv*](api::AccountReportSavedGenerateCsvCall), [*reports saved list*](api::AccountReportSavedListCall), [*sites get*](api::AccountSiteGetCall) and [*sites list*](api::AccountSiteListCall)
@@ -80,8 +80,8 @@
 //! let r = hub.accounts().list_child_accounts(...).doit().await
 //! ```
 //! 
-//! The `resource()` and `activity(...)` calls create [builders][builder-pattern]. The second one dealing with `Activities` 
-//! supports various methods to configure the impending operation (not shown here). It is made such that all required arguments have to be 
+//! The `resource()` and `activity(...)` calls create [builders][builder-pattern]. The second one dealing with `Activities`
+//! supports various methods to configure the impending operation (not shown here). It is made such that all required arguments have to be
 //! specified right away (i.e. `(...)`), whereas all optional ones can be [build up][builder-pattern] as desired.
 //! The `doit()` method performs the actual communication with the server and returns the respective result.
 //! 
@@ -109,12 +109,12 @@
 //! use std::default::Default;
 //! use adsense2::{Adsense, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 //! 
-//! // Get an ApplicationSecret instance by some means. It contains the `client_id` and 
+//! // Get an ApplicationSecret instance by some means. It contains the `client_id` and
 //! // `client_secret`, among other things.
 //! let secret: oauth2::ApplicationSecret = Default::default();
-//! // Instantiate the authenticator. It will choose a suitable authentication flow for you, 
+//! // Instantiate the authenticator. It will choose a suitable authentication flow for you,
 //! // unless you replace  `None` with the desired Flow.
-//! // Provide your own `AuthenticatorDelegate` to adjust the way it operates and get feedback about 
+//! // Provide your own `AuthenticatorDelegate` to adjust the way it operates and get feedback about
 //! // what's going on. You probably want to bring in your own `TokenStorage` to persist tokens and
 //! // retrieve them from storage.
 //! let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -165,10 +165,10 @@
 //! ## Handling Errors
 //! 
 //! All errors produced by the system are provided either as [Result](client::Result) enumeration as return value of
-//! the doit() methods, or handed as possibly intermediate results to either the 
+//! the doit() methods, or handed as possibly intermediate results to either the
 //! [Hub Delegate](client::Delegate), or the [Authenticator Delegate](https://docs.rs/yup-oauth2/*/yup_oauth2/trait.AuthenticatorDelegate.html).
 //! 
-//! When delegates handle errors or intermediate values, they may have a chance to instruct the system to retry. This 
+//! When delegates handle errors or intermediate values, they may have a chance to instruct the system to retry. This
 //! makes the system potentially resilient to all kinds of errors.
 //! 
 //! ## Uploads and Downloads
@@ -178,25 +178,25 @@
 //! You can see it as meta-data for the actual media. To trigger a media download, you will have to set up the builder by making
 //! this call: `.param("alt", "media")`.
 //! 
-//! Methods supporting uploads can do so using up to 2 different protocols: 
-//! *simple* and *resumable*. The distinctiveness of each is represented by customized 
+//! Methods supporting uploads can do so using up to 2 different protocols:
+//! *simple* and *resumable*. The distinctiveness of each is represented by customized
 //! `doit(...)` methods, which are then named `upload(...)` and `upload_resumable(...)` respectively.
 //! 
 //! ## Customization and Callbacks
 //! 
-//! You may alter the way an `doit()` method is called by providing a [delegate](client::Delegate) to the 
-//! [Method Builder](client::CallBuilder) before making the final `doit()` call. 
-//! Respective methods will be called to provide progress information, as well as determine whether the system should 
+//! You may alter the way an `doit()` method is called by providing a [delegate](client::Delegate) to the
+//! [Method Builder](client::CallBuilder) before making the final `doit()` call.
+//! Respective methods will be called to provide progress information, as well as determine whether the system should
 //! retry on failure.
 //! 
 //! The [delegate trait](client::Delegate) is default-implemented, allowing you to customize it with minimal effort.
 //! 
 //! ## Optional Parts in Server-Requests
 //! 
-//! All structures provided by this library are made to be [encodable](client::RequestValue) and 
-//! [decodable](client::ResponseResult) via *json*. Optionals are used to indicate that partial requests are responses 
+//! All structures provided by this library are made to be [encodable](client::RequestValue) and
+//! [decodable](client::ResponseResult) via *json*. Optionals are used to indicate that partial requests are responses
 //! are valid.
-//! Most optionals are are considered [Parts](client::Part) which are identifiable by name, which will be sent to 
+//! Most optionals are are considered [Parts](client::Part) which are identifiable by name, which will be sent to
 //! the server to indicate either the set parts of the request or the desired parts in the response.
 //! 
 //! ## Builder Arguments

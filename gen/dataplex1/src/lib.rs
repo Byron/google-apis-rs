@@ -9,7 +9,7 @@
 //! The original source code is [on github](https://github.com/Byron/google-apis-rs/tree/main/gen/dataplex1).
 //! # Features
 //! 
-//! Handle the following *Resources* with ease from the central [hub](CloudDataplex) ... 
+//! Handle the following *Resources* with ease from the central [hub](CloudDataplex) ...
 //! 
 //! * projects
 //!  * [*locations aspect types get iam policy*](api::ProjectLocationAspectTypeGetIamPolicyCall), [*locations aspect types set iam policy*](api::ProjectLocationAspectTypeSetIamPolicyCall), [*locations aspect types test iam permissions*](api::ProjectLocationAspectTypeTestIamPermissionCall), [*locations data attribute bindings create*](api::ProjectLocationDataAttributeBindingCreateCall), [*locations data attribute bindings delete*](api::ProjectLocationDataAttributeBindingDeleteCall), [*locations data attribute bindings get*](api::ProjectLocationDataAttributeBindingGetCall), [*locations data attribute bindings get iam policy*](api::ProjectLocationDataAttributeBindingGetIamPolicyCall), [*locations data attribute bindings list*](api::ProjectLocationDataAttributeBindingListCall), [*locations data attribute bindings patch*](api::ProjectLocationDataAttributeBindingPatchCall), [*locations data attribute bindings set iam policy*](api::ProjectLocationDataAttributeBindingSetIamPolicyCall), [*locations data attribute bindings test iam permissions*](api::ProjectLocationDataAttributeBindingTestIamPermissionCall), [*locations data scans create*](api::ProjectLocationDataScanCreateCall), [*locations data scans delete*](api::ProjectLocationDataScanDeleteCall), [*locations data scans get*](api::ProjectLocationDataScanGetCall), [*locations data scans get iam policy*](api::ProjectLocationDataScanGetIamPolicyCall), [*locations data scans jobs get*](api::ProjectLocationDataScanJobGetCall), [*locations data scans jobs list*](api::ProjectLocationDataScanJobListCall), [*locations data scans list*](api::ProjectLocationDataScanListCall), [*locations data scans patch*](api::ProjectLocationDataScanPatchCall), [*locations data scans run*](api::ProjectLocationDataScanRunCall), [*locations data scans set iam policy*](api::ProjectLocationDataScanSetIamPolicyCall), [*locations data scans test iam permissions*](api::ProjectLocationDataScanTestIamPermissionCall), [*locations data taxonomies attributes create*](api::ProjectLocationDataTaxonomyAttributeCreateCall), [*locations data taxonomies attributes delete*](api::ProjectLocationDataTaxonomyAttributeDeleteCall), [*locations data taxonomies attributes get*](api::ProjectLocationDataTaxonomyAttributeGetCall), [*locations data taxonomies attributes get iam policy*](api::ProjectLocationDataTaxonomyAttributeGetIamPolicyCall), [*locations data taxonomies attributes list*](api::ProjectLocationDataTaxonomyAttributeListCall), [*locations data taxonomies attributes patch*](api::ProjectLocationDataTaxonomyAttributePatchCall), [*locations data taxonomies attributes set iam policy*](api::ProjectLocationDataTaxonomyAttributeSetIamPolicyCall), [*locations data taxonomies attributes test iam permissions*](api::ProjectLocationDataTaxonomyAttributeTestIamPermissionCall), [*locations data taxonomies create*](api::ProjectLocationDataTaxonomyCreateCall), [*locations data taxonomies delete*](api::ProjectLocationDataTaxonomyDeleteCall), [*locations data taxonomies get*](api::ProjectLocationDataTaxonomyGetCall), [*locations data taxonomies get iam policy*](api::ProjectLocationDataTaxonomyGetIamPolicyCall), [*locations data taxonomies list*](api::ProjectLocationDataTaxonomyListCall), [*locations data taxonomies patch*](api::ProjectLocationDataTaxonomyPatchCall), [*locations data taxonomies set iam policy*](api::ProjectLocationDataTaxonomySetIamPolicyCall), [*locations data taxonomies test iam permissions*](api::ProjectLocationDataTaxonomyTestIamPermissionCall), [*locations entry groups get iam policy*](api::ProjectLocationEntryGroupGetIamPolicyCall), [*locations entry groups set iam policy*](api::ProjectLocationEntryGroupSetIamPolicyCall), [*locations entry groups test iam permissions*](api::ProjectLocationEntryGroupTestIamPermissionCall), [*locations entry types get iam policy*](api::ProjectLocationEntryTypeGetIamPolicyCall), [*locations entry types set iam policy*](api::ProjectLocationEntryTypeSetIamPolicyCall), [*locations entry types test iam permissions*](api::ProjectLocationEntryTypeTestIamPermissionCall), [*locations get*](api::ProjectLocationGetCall), [*locations governance rules get iam policy*](api::ProjectLocationGovernanceRuleGetIamPolicyCall), [*locations governance rules set iam policy*](api::ProjectLocationGovernanceRuleSetIamPolicyCall), [*locations governance rules test iam permissions*](api::ProjectLocationGovernanceRuleTestIamPermissionCall), [*locations lakes actions list*](api::ProjectLocationLakeActionListCall), [*locations lakes content create*](api::ProjectLocationLakeContentCreateCall), [*locations lakes content delete*](api::ProjectLocationLakeContentDeleteCall), [*locations lakes content get*](api::ProjectLocationLakeContentGetCall), [*locations lakes content get iam policy*](api::ProjectLocationLakeContentGetIamPolicyCall), [*locations lakes content list*](api::ProjectLocationLakeContentListCall), [*locations lakes content patch*](api::ProjectLocationLakeContentPatchCall), [*locations lakes content set iam policy*](api::ProjectLocationLakeContentSetIamPolicyCall), [*locations lakes content test iam permissions*](api::ProjectLocationLakeContentTestIamPermissionCall), [*locations lakes contentitems create*](api::ProjectLocationLakeContentitemCreateCall), [*locations lakes contentitems delete*](api::ProjectLocationLakeContentitemDeleteCall), [*locations lakes contentitems get*](api::ProjectLocationLakeContentitemGetCall), [*locations lakes contentitems get iam policy*](api::ProjectLocationLakeContentitemGetIamPolicyCall), [*locations lakes contentitems list*](api::ProjectLocationLakeContentitemListCall), [*locations lakes contentitems patch*](api::ProjectLocationLakeContentitemPatchCall), [*locations lakes contentitems set iam policy*](api::ProjectLocationLakeContentitemSetIamPolicyCall), [*locations lakes contentitems test iam permissions*](api::ProjectLocationLakeContentitemTestIamPermissionCall), [*locations lakes create*](api::ProjectLocationLakeCreateCall), [*locations lakes delete*](api::ProjectLocationLakeDeleteCall), [*locations lakes environments create*](api::ProjectLocationLakeEnvironmentCreateCall), [*locations lakes environments delete*](api::ProjectLocationLakeEnvironmentDeleteCall), [*locations lakes environments get*](api::ProjectLocationLakeEnvironmentGetCall), [*locations lakes environments get iam policy*](api::ProjectLocationLakeEnvironmentGetIamPolicyCall), [*locations lakes environments list*](api::ProjectLocationLakeEnvironmentListCall), [*locations lakes environments patch*](api::ProjectLocationLakeEnvironmentPatchCall), [*locations lakes environments sessions list*](api::ProjectLocationLakeEnvironmentSessionListCall), [*locations lakes environments set iam policy*](api::ProjectLocationLakeEnvironmentSetIamPolicyCall), [*locations lakes environments test iam permissions*](api::ProjectLocationLakeEnvironmentTestIamPermissionCall), [*locations lakes get*](api::ProjectLocationLakeGetCall), [*locations lakes get iam policy*](api::ProjectLocationLakeGetIamPolicyCall), [*locations lakes list*](api::ProjectLocationLakeListCall), [*locations lakes patch*](api::ProjectLocationLakePatchCall), [*locations lakes set iam policy*](api::ProjectLocationLakeSetIamPolicyCall), [*locations lakes tasks create*](api::ProjectLocationLakeTaskCreateCall), [*locations lakes tasks delete*](api::ProjectLocationLakeTaskDeleteCall), [*locations lakes tasks get*](api::ProjectLocationLakeTaskGetCall), [*locations lakes tasks get iam policy*](api::ProjectLocationLakeTaskGetIamPolicyCall), [*locations lakes tasks jobs cancel*](api::ProjectLocationLakeTaskJobCancelCall), [*locations lakes tasks jobs get*](api::ProjectLocationLakeTaskJobGetCall), [*locations lakes tasks jobs list*](api::ProjectLocationLakeTaskJobListCall), [*locations lakes tasks list*](api::ProjectLocationLakeTaskListCall), [*locations lakes tasks patch*](api::ProjectLocationLakeTaskPatchCall), [*locations lakes tasks run*](api::ProjectLocationLakeTaskRunCall), [*locations lakes tasks set iam policy*](api::ProjectLocationLakeTaskSetIamPolicyCall), [*locations lakes tasks test iam permissions*](api::ProjectLocationLakeTaskTestIamPermissionCall), [*locations lakes test iam permissions*](api::ProjectLocationLakeTestIamPermissionCall), [*locations lakes zones actions list*](api::ProjectLocationLakeZoneActionListCall), [*locations lakes zones assets actions list*](api::ProjectLocationLakeZoneAssetActionListCall), [*locations lakes zones assets create*](api::ProjectLocationLakeZoneAssetCreateCall), [*locations lakes zones assets delete*](api::ProjectLocationLakeZoneAssetDeleteCall), [*locations lakes zones assets get*](api::ProjectLocationLakeZoneAssetGetCall), [*locations lakes zones assets get iam policy*](api::ProjectLocationLakeZoneAssetGetIamPolicyCall), [*locations lakes zones assets list*](api::ProjectLocationLakeZoneAssetListCall), [*locations lakes zones assets patch*](api::ProjectLocationLakeZoneAssetPatchCall), [*locations lakes zones assets set iam policy*](api::ProjectLocationLakeZoneAssetSetIamPolicyCall), [*locations lakes zones assets test iam permissions*](api::ProjectLocationLakeZoneAssetTestIamPermissionCall), [*locations lakes zones create*](api::ProjectLocationLakeZoneCreateCall), [*locations lakes zones delete*](api::ProjectLocationLakeZoneDeleteCall), [*locations lakes zones entities create*](api::ProjectLocationLakeZoneEntityCreateCall), [*locations lakes zones entities delete*](api::ProjectLocationLakeZoneEntityDeleteCall), [*locations lakes zones entities get*](api::ProjectLocationLakeZoneEntityGetCall), [*locations lakes zones entities list*](api::ProjectLocationLakeZoneEntityListCall), [*locations lakes zones entities partitions create*](api::ProjectLocationLakeZoneEntityPartitionCreateCall), [*locations lakes zones entities partitions delete*](api::ProjectLocationLakeZoneEntityPartitionDeleteCall), [*locations lakes zones entities partitions get*](api::ProjectLocationLakeZoneEntityPartitionGetCall), [*locations lakes zones entities partitions list*](api::ProjectLocationLakeZoneEntityPartitionListCall), [*locations lakes zones entities update*](api::ProjectLocationLakeZoneEntityUpdateCall), [*locations lakes zones get*](api::ProjectLocationLakeZoneGetCall), [*locations lakes zones get iam policy*](api::ProjectLocationLakeZoneGetIamPolicyCall), [*locations lakes zones list*](api::ProjectLocationLakeZoneListCall), [*locations lakes zones patch*](api::ProjectLocationLakeZonePatchCall), [*locations lakes zones set iam policy*](api::ProjectLocationLakeZoneSetIamPolicyCall), [*locations lakes zones test iam permissions*](api::ProjectLocationLakeZoneTestIamPermissionCall), [*locations list*](api::ProjectLocationListCall), [*locations operations cancel*](api::ProjectLocationOperationCancelCall), [*locations operations delete*](api::ProjectLocationOperationDeleteCall), [*locations operations get*](api::ProjectLocationOperationGetCall) and [*locations operations list*](api::ProjectLocationOperationListCall)
@@ -79,8 +79,8 @@
 //! let r = hub.projects().locations_lakes_set_iam_policy(...).doit().await
 //! ```
 //! 
-//! The `resource()` and `activity(...)` calls create [builders][builder-pattern]. The second one dealing with `Activities` 
-//! supports various methods to configure the impending operation (not shown here). It is made such that all required arguments have to be 
+//! The `resource()` and `activity(...)` calls create [builders][builder-pattern]. The second one dealing with `Activities`
+//! supports various methods to configure the impending operation (not shown here). It is made such that all required arguments have to be
 //! specified right away (i.e. `(...)`), whereas all optional ones can be [build up][builder-pattern] as desired.
 //! The `doit()` method performs the actual communication with the server and returns the respective result.
 //! 
@@ -108,12 +108,12 @@
 //! use std::default::Default;
 //! use dataplex1::{CloudDataplex, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 //! 
-//! // Get an ApplicationSecret instance by some means. It contains the `client_id` and 
+//! // Get an ApplicationSecret instance by some means. It contains the `client_id` and
 //! // `client_secret`, among other things.
 //! let secret: oauth2::ApplicationSecret = Default::default();
-//! // Instantiate the authenticator. It will choose a suitable authentication flow for you, 
+//! // Instantiate the authenticator. It will choose a suitable authentication flow for you,
 //! // unless you replace  `None` with the desired Flow.
-//! // Provide your own `AuthenticatorDelegate` to adjust the way it operates and get feedback about 
+//! // Provide your own `AuthenticatorDelegate` to adjust the way it operates and get feedback about
 //! // what's going on. You probably want to bring in your own `TokenStorage` to persist tokens and
 //! // retrieve them from storage.
 //! let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -150,10 +150,10 @@
 //! ## Handling Errors
 //! 
 //! All errors produced by the system are provided either as [Result](client::Result) enumeration as return value of
-//! the doit() methods, or handed as possibly intermediate results to either the 
+//! the doit() methods, or handed as possibly intermediate results to either the
 //! [Hub Delegate](client::Delegate), or the [Authenticator Delegate](https://docs.rs/yup-oauth2/*/yup_oauth2/trait.AuthenticatorDelegate.html).
 //! 
-//! When delegates handle errors or intermediate values, they may have a chance to instruct the system to retry. This 
+//! When delegates handle errors or intermediate values, they may have a chance to instruct the system to retry. This
 //! makes the system potentially resilient to all kinds of errors.
 //! 
 //! ## Uploads and Downloads
@@ -163,25 +163,25 @@
 //! You can see it as meta-data for the actual media. To trigger a media download, you will have to set up the builder by making
 //! this call: `.param("alt", "media")`.
 //! 
-//! Methods supporting uploads can do so using up to 2 different protocols: 
-//! *simple* and *resumable*. The distinctiveness of each is represented by customized 
+//! Methods supporting uploads can do so using up to 2 different protocols:
+//! *simple* and *resumable*. The distinctiveness of each is represented by customized
 //! `doit(...)` methods, which are then named `upload(...)` and `upload_resumable(...)` respectively.
 //! 
 //! ## Customization and Callbacks
 //! 
-//! You may alter the way an `doit()` method is called by providing a [delegate](client::Delegate) to the 
-//! [Method Builder](client::CallBuilder) before making the final `doit()` call. 
-//! Respective methods will be called to provide progress information, as well as determine whether the system should 
+//! You may alter the way an `doit()` method is called by providing a [delegate](client::Delegate) to the
+//! [Method Builder](client::CallBuilder) before making the final `doit()` call.
+//! Respective methods will be called to provide progress information, as well as determine whether the system should
 //! retry on failure.
 //! 
 //! The [delegate trait](client::Delegate) is default-implemented, allowing you to customize it with minimal effort.
 //! 
 //! ## Optional Parts in Server-Requests
 //! 
-//! All structures provided by this library are made to be [encodable](client::RequestValue) and 
-//! [decodable](client::ResponseResult) via *json*. Optionals are used to indicate that partial requests are responses 
+//! All structures provided by this library are made to be [encodable](client::RequestValue) and
+//! [decodable](client::ResponseResult) via *json*. Optionals are used to indicate that partial requests are responses
 //! are valid.
-//! Most optionals are are considered [Parts](client::Part) which are identifiable by name, which will be sent to 
+//! Most optionals are are considered [Parts](client::Part) which are identifiable by name, which will be sent to
 //! the server to indicate either the set parts of the request or the desired parts in the response.
 //! 
 //! ## Builder Arguments

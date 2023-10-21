@@ -9,7 +9,7 @@
 //! The original source code is [on github](https://github.com/Byron/google-apis-rs/tree/main/gen/datastream1).
 //! # Features
 //! 
-//! Handle the following *Resources* with ease from the central [hub](Datastream) ... 
+//! Handle the following *Resources* with ease from the central [hub](Datastream) ...
 //! 
 //! * projects
 //!  * [*locations connection profiles create*](api::ProjectLocationConnectionProfileCreateCall), [*locations connection profiles delete*](api::ProjectLocationConnectionProfileDeleteCall), [*locations connection profiles discover*](api::ProjectLocationConnectionProfileDiscoverCall), [*locations connection profiles get*](api::ProjectLocationConnectionProfileGetCall), [*locations connection profiles list*](api::ProjectLocationConnectionProfileListCall), [*locations connection profiles patch*](api::ProjectLocationConnectionProfilePatchCall), [*locations fetch static ips*](api::ProjectLocationFetchStaticIpCall), [*locations get*](api::ProjectLocationGetCall), [*locations list*](api::ProjectLocationListCall), [*locations operations cancel*](api::ProjectLocationOperationCancelCall), [*locations operations delete*](api::ProjectLocationOperationDeleteCall), [*locations operations get*](api::ProjectLocationOperationGetCall), [*locations operations list*](api::ProjectLocationOperationListCall), [*locations private connections create*](api::ProjectLocationPrivateConnectionCreateCall), [*locations private connections delete*](api::ProjectLocationPrivateConnectionDeleteCall), [*locations private connections get*](api::ProjectLocationPrivateConnectionGetCall), [*locations private connections list*](api::ProjectLocationPrivateConnectionListCall), [*locations private connections routes create*](api::ProjectLocationPrivateConnectionRouteCreateCall), [*locations private connections routes delete*](api::ProjectLocationPrivateConnectionRouteDeleteCall), [*locations private connections routes get*](api::ProjectLocationPrivateConnectionRouteGetCall), [*locations private connections routes list*](api::ProjectLocationPrivateConnectionRouteListCall), [*locations streams create*](api::ProjectLocationStreamCreateCall), [*locations streams delete*](api::ProjectLocationStreamDeleteCall), [*locations streams get*](api::ProjectLocationStreamGetCall), [*locations streams list*](api::ProjectLocationStreamListCall), [*locations streams objects get*](api::ProjectLocationStreamObjectGetCall), [*locations streams objects list*](api::ProjectLocationStreamObjectListCall), [*locations streams objects lookup*](api::ProjectLocationStreamObjectLookupCall), [*locations streams objects start backfill job*](api::ProjectLocationStreamObjectStartBackfillJobCall), [*locations streams objects stop backfill job*](api::ProjectLocationStreamObjectStopBackfillJobCall), [*locations streams patch*](api::ProjectLocationStreamPatchCall) and [*locations streams run*](api::ProjectLocationStreamRunCall)
@@ -61,8 +61,8 @@
 //! let r = hub.projects().locations_streams_run(...).doit().await
 //! ```
 //! 
-//! The `resource()` and `activity(...)` calls create [builders][builder-pattern]. The second one dealing with `Activities` 
-//! supports various methods to configure the impending operation (not shown here). It is made such that all required arguments have to be 
+//! The `resource()` and `activity(...)` calls create [builders][builder-pattern]. The second one dealing with `Activities`
+//! supports various methods to configure the impending operation (not shown here). It is made such that all required arguments have to be
 //! specified right away (i.e. `(...)`), whereas all optional ones can be [build up][builder-pattern] as desired.
 //! The `doit()` method performs the actual communication with the server and returns the respective result.
 //! 
@@ -91,12 +91,12 @@
 //! use std::default::Default;
 //! use datastream1::{Datastream, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 //! 
-//! // Get an ApplicationSecret instance by some means. It contains the `client_id` and 
+//! // Get an ApplicationSecret instance by some means. It contains the `client_id` and
 //! // `client_secret`, among other things.
 //! let secret: oauth2::ApplicationSecret = Default::default();
-//! // Instantiate the authenticator. It will choose a suitable authentication flow for you, 
+//! // Instantiate the authenticator. It will choose a suitable authentication flow for you,
 //! // unless you replace  `None` with the desired Flow.
-//! // Provide your own `AuthenticatorDelegate` to adjust the way it operates and get feedback about 
+//! // Provide your own `AuthenticatorDelegate` to adjust the way it operates and get feedback about
 //! // what's going on. You probably want to bring in your own `TokenStorage` to persist tokens and
 //! // retrieve them from storage.
 //! let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -141,10 +141,10 @@
 //! ## Handling Errors
 //! 
 //! All errors produced by the system are provided either as [Result](client::Result) enumeration as return value of
-//! the doit() methods, or handed as possibly intermediate results to either the 
+//! the doit() methods, or handed as possibly intermediate results to either the
 //! [Hub Delegate](client::Delegate), or the [Authenticator Delegate](https://docs.rs/yup-oauth2/*/yup_oauth2/trait.AuthenticatorDelegate.html).
 //! 
-//! When delegates handle errors or intermediate values, they may have a chance to instruct the system to retry. This 
+//! When delegates handle errors or intermediate values, they may have a chance to instruct the system to retry. This
 //! makes the system potentially resilient to all kinds of errors.
 //! 
 //! ## Uploads and Downloads
@@ -154,25 +154,25 @@
 //! You can see it as meta-data for the actual media. To trigger a media download, you will have to set up the builder by making
 //! this call: `.param("alt", "media")`.
 //! 
-//! Methods supporting uploads can do so using up to 2 different protocols: 
-//! *simple* and *resumable*. The distinctiveness of each is represented by customized 
+//! Methods supporting uploads can do so using up to 2 different protocols:
+//! *simple* and *resumable*. The distinctiveness of each is represented by customized
 //! `doit(...)` methods, which are then named `upload(...)` and `upload_resumable(...)` respectively.
 //! 
 //! ## Customization and Callbacks
 //! 
-//! You may alter the way an `doit()` method is called by providing a [delegate](client::Delegate) to the 
-//! [Method Builder](client::CallBuilder) before making the final `doit()` call. 
-//! Respective methods will be called to provide progress information, as well as determine whether the system should 
+//! You may alter the way an `doit()` method is called by providing a [delegate](client::Delegate) to the
+//! [Method Builder](client::CallBuilder) before making the final `doit()` call.
+//! Respective methods will be called to provide progress information, as well as determine whether the system should
 //! retry on failure.
 //! 
 //! The [delegate trait](client::Delegate) is default-implemented, allowing you to customize it with minimal effort.
 //! 
 //! ## Optional Parts in Server-Requests
 //! 
-//! All structures provided by this library are made to be [encodable](client::RequestValue) and 
-//! [decodable](client::ResponseResult) via *json*. Optionals are used to indicate that partial requests are responses 
+//! All structures provided by this library are made to be [encodable](client::RequestValue) and
+//! [decodable](client::ResponseResult) via *json*. Optionals are used to indicate that partial requests are responses
 //! are valid.
-//! Most optionals are are considered [Parts](client::Part) which are identifiable by name, which will be sent to 
+//! Most optionals are are considered [Parts](client::Part) which are identifiable by name, which will be sent to
 //! the server to indicate either the set parts of the request or the desired parts in the response.
 //! 
 //! ## Builder Arguments
