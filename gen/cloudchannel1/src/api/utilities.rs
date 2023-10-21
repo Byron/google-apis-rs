@@ -1,0 +1,28 @@
+use super::*;
+/// Identifies the an OAuth2 authorization scope.
+/// A scope is needed when requesting an
+/// [authorization token](https://developers.google.com/youtube/v3/guides/authentication).
+#[derive(PartialEq, Eq, Hash, Debug, Clone)]
+pub enum Scope {
+    /// Manage users on your domain
+    AppOrder,
+
+    /// View usage reports for your G Suite domain
+    AppReportUsageReadonly,
+}
+
+impl AsRef<str> for Scope {
+    fn as_ref(&self) -> &str {
+        match *self {
+            Scope::AppOrder => "https://www.googleapis.com/auth/apps.order",
+            Scope::AppReportUsageReadonly => "https://www.googleapis.com/auth/apps.reports.usage.readonly",
+        }
+    }
+}
+
+impl Default for Scope {
+    fn default() -> Scope {
+        Scope::AppReportUsageReadonly
+    }
+}
+
