@@ -1,4 +1,5 @@
 <%namespace name="lib" file="../lib/lib.mako"/>\
+<%namespace name="enum" file="../lib/enum.mako"/>\
 <%namespace name="util" file="../../../lib/util.mako"/>\
 <%namespace name="rbuild" file="../lib/rbuild.mako"/>\
 <%namespace name="mbuild" file="../lib/mbuild.mako"/>\
@@ -13,4 +14,4 @@
     default_user_agent = "google-api-rust-client/" + cargo.build_version
 %>\
 use super::*;
-${lib.scope_enum()}
+${enum.scope_enum()}
