@@ -1,8 +1,8 @@
-<%namespace name="lib" file="lib/lib.mako"/>\
-<%namespace name="util" file="../../lib/util.mako"/>\
-<%namespace name="rbuild" file="lib/rbuild.mako"/>\
-<%namespace name="mbuild" file="lib/mbuild.mako"/>\
-<%namespace name="schema" file="lib/schema.mako"/>\
+<%namespace name="lib" file="../lib/lib.mako"/>\
+<%namespace name="util" file="../../../lib/util.mako"/>\
+<%namespace name="rbuild" file="../lib/rbuild.mako"/>\
+<%namespace name="mbuild" file="../lib/mbuild.mako"/>\
+<%namespace name="schema" file="../lib/schema.mako"/>\
 <%
     from generator.lib.util import (new_context, rust_comment, rust_doc_comment, rust_module_doc_comment,
                       rb_type, hub_type, mangle_ident, hub_type_params_s,
@@ -15,34 +15,7 @@
 
     default_user_agent = "google-api-rust-client/" + cargo.build_version
 %>\
-use std::collections::HashMap;
-use std::cell::RefCell;
-use std::default::Default;
-use std::collections::BTreeSet;
-use std::error::Error as StdError;
-use serde_json as json;
-use std::io;
-use std::fs;
-use std::mem;
-
-use hyper::client::connect;
-use tokio::io::{AsyncRead, AsyncWrite};
-use tokio::time::sleep;
-use tower_service;
-use serde::{Serialize, Deserialize};
-
-use crate::{client, client::GetToken, client::serde_with};
-
-// ##############
-// UTILITIES ###
-// ############
-
-${lib.scope_enum()}
-
-
-// ########
-// HUB ###
-// ######
+use super::*;
 
 /// Central instance to access all ${hub_type} related resource activities
 ///
@@ -57,9 +30,9 @@ ${lib.hub_usage_example(c)}\
 pub struct ${hub_type}${ht_params} {
     pub client: hyper::Client<S, hyper::body::Body>,
     pub auth: Box<dyn client::GetToken>,
-    _user_agent: String,
-    _base_url: String,
-    _root_url: String,
+    pub(super) _user_agent: String,
+    pub(super) _base_url: String,
+    pub(super) _root_url: String,
 }
 
 impl<'a, ${', '.join(HUB_TYPE_PARAMETERS)}> client::Hub for ${hub_type}${ht_params} {}
@@ -106,37 +79,3 @@ impl<'a, ${', '.join(HUB_TYPE_PARAMETERS)}> ${hub_type}${ht_params} {
         mem::replace(&mut self._root_url, new_root_url)
     }
 }
-
-
-% if c.schemas:
-// ############
-// SCHEMAS ###
-// ##########
-% for s in c.schemas.values():
-% if UNUSED_TYPE_MARKER not in schema_markers(s, c, transitive=True):
-${schema.new(s, c)}
-% endif
-% endfor
-% endif
-
-// ###################
-// MethodBuilders ###
-// #################
-
-% for resource in c.rta_map:
-${rbuild.new(resource, c)}
-
-
-% endfor
-
-
-// ###################
-// CallBuilders   ###
-// #################
-
-% for resource, methods in c.rta_map.items():
-% for method in methods:
-${mbuild.new(resource, method, c)}
-
-% endfor ## method in methods
-% endfor ## resource, methods
