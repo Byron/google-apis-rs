@@ -11,7 +11,7 @@ Everything else about the *AI Platform Notebooks* *v1* API can be found at the
 [official documentation site](https://cloud.google.com/notebooks/docs/).
 # Features
 
-Handle the following *Resources* with ease from the central [hub](https://docs.rs/google-notebooks1/5.0.3+20221213/google_notebooks1/AIPlatformNotebooks) ... 
+Handle the following *Resources* with ease from the central [hub](https://docs.rs/google-notebooks1/5.0.3+20221213/google_notebooks1/AIPlatformNotebooks) ...
 
 * projects
  * [*locations environments create*](https://docs.rs/google-notebooks1/5.0.3+20221213/google_notebooks1/api::ProjectLocationEnvironmentCreateCall), [*locations environments delete*](https://docs.rs/google-notebooks1/5.0.3+20221213/google_notebooks1/api::ProjectLocationEnvironmentDeleteCall), [*locations environments get*](https://docs.rs/google-notebooks1/5.0.3+20221213/google_notebooks1/api::ProjectLocationEnvironmentGetCall), [*locations environments list*](https://docs.rs/google-notebooks1/5.0.3+20221213/google_notebooks1/api::ProjectLocationEnvironmentListCall), [*locations executions create*](https://docs.rs/google-notebooks1/5.0.3+20221213/google_notebooks1/api::ProjectLocationExecutionCreateCall), [*locations executions delete*](https://docs.rs/google-notebooks1/5.0.3+20221213/google_notebooks1/api::ProjectLocationExecutionDeleteCall), [*locations executions get*](https://docs.rs/google-notebooks1/5.0.3+20221213/google_notebooks1/api::ProjectLocationExecutionGetCall), [*locations executions list*](https://docs.rs/google-notebooks1/5.0.3+20221213/google_notebooks1/api::ProjectLocationExecutionListCall), [*locations get*](https://docs.rs/google-notebooks1/5.0.3+20221213/google_notebooks1/api::ProjectLocationGetCall), [*locations instances create*](https://docs.rs/google-notebooks1/5.0.3+20221213/google_notebooks1/api::ProjectLocationInstanceCreateCall), [*locations instances delete*](https://docs.rs/google-notebooks1/5.0.3+20221213/google_notebooks1/api::ProjectLocationInstanceDeleteCall), [*locations instances diagnose*](https://docs.rs/google-notebooks1/5.0.3+20221213/google_notebooks1/api::ProjectLocationInstanceDiagnoseCall), [*locations instances get*](https://docs.rs/google-notebooks1/5.0.3+20221213/google_notebooks1/api::ProjectLocationInstanceGetCall), [*locations instances get iam policy*](https://docs.rs/google-notebooks1/5.0.3+20221213/google_notebooks1/api::ProjectLocationInstanceGetIamPolicyCall), [*locations instances get instance health*](https://docs.rs/google-notebooks1/5.0.3+20221213/google_notebooks1/api::ProjectLocationInstanceGetInstanceHealthCall), [*locations instances is upgradeable*](https://docs.rs/google-notebooks1/5.0.3+20221213/google_notebooks1/api::ProjectLocationInstanceIsUpgradeableCall), [*locations instances list*](https://docs.rs/google-notebooks1/5.0.3+20221213/google_notebooks1/api::ProjectLocationInstanceListCall), [*locations instances register*](https://docs.rs/google-notebooks1/5.0.3+20221213/google_notebooks1/api::ProjectLocationInstanceRegisterCall), [*locations instances report*](https://docs.rs/google-notebooks1/5.0.3+20221213/google_notebooks1/api::ProjectLocationInstanceReportCall), [*locations instances reset*](https://docs.rs/google-notebooks1/5.0.3+20221213/google_notebooks1/api::ProjectLocationInstanceResetCall), [*locations instances rollback*](https://docs.rs/google-notebooks1/5.0.3+20221213/google_notebooks1/api::ProjectLocationInstanceRollbackCall), [*locations instances set accelerator*](https://docs.rs/google-notebooks1/5.0.3+20221213/google_notebooks1/api::ProjectLocationInstanceSetAcceleratorCall), [*locations instances set iam policy*](https://docs.rs/google-notebooks1/5.0.3+20221213/google_notebooks1/api::ProjectLocationInstanceSetIamPolicyCall), [*locations instances set labels*](https://docs.rs/google-notebooks1/5.0.3+20221213/google_notebooks1/api::ProjectLocationInstanceSetLabelCall), [*locations instances set machine type*](https://docs.rs/google-notebooks1/5.0.3+20221213/google_notebooks1/api::ProjectLocationInstanceSetMachineTypeCall), [*locations instances start*](https://docs.rs/google-notebooks1/5.0.3+20221213/google_notebooks1/api::ProjectLocationInstanceStartCall), [*locations instances stop*](https://docs.rs/google-notebooks1/5.0.3+20221213/google_notebooks1/api::ProjectLocationInstanceStopCall), [*locations instances test iam permissions*](https://docs.rs/google-notebooks1/5.0.3+20221213/google_notebooks1/api::ProjectLocationInstanceTestIamPermissionCall), [*locations instances update config*](https://docs.rs/google-notebooks1/5.0.3+20221213/google_notebooks1/api::ProjectLocationInstanceUpdateConfigCall), [*locations instances update metadata items*](https://docs.rs/google-notebooks1/5.0.3+20221213/google_notebooks1/api::ProjectLocationInstanceUpdateMetadataItemCall), [*locations instances update shielded instance config*](https://docs.rs/google-notebooks1/5.0.3+20221213/google_notebooks1/api::ProjectLocationInstanceUpdateShieldedInstanceConfigCall), [*locations instances upgrade*](https://docs.rs/google-notebooks1/5.0.3+20221213/google_notebooks1/api::ProjectLocationInstanceUpgradeCall), [*locations instances upgrade internal*](https://docs.rs/google-notebooks1/5.0.3+20221213/google_notebooks1/api::ProjectLocationInstanceUpgradeInternalCall), [*locations list*](https://docs.rs/google-notebooks1/5.0.3+20221213/google_notebooks1/api::ProjectLocationListCall), [*locations operations cancel*](https://docs.rs/google-notebooks1/5.0.3+20221213/google_notebooks1/api::ProjectLocationOperationCancelCall), [*locations operations delete*](https://docs.rs/google-notebooks1/5.0.3+20221213/google_notebooks1/api::ProjectLocationOperationDeleteCall), [*locations operations get*](https://docs.rs/google-notebooks1/5.0.3+20221213/google_notebooks1/api::ProjectLocationOperationGetCall), [*locations operations list*](https://docs.rs/google-notebooks1/5.0.3+20221213/google_notebooks1/api::ProjectLocationOperationListCall), [*locations runtimes create*](https://docs.rs/google-notebooks1/5.0.3+20221213/google_notebooks1/api::ProjectLocationRuntimeCreateCall), [*locations runtimes delete*](https://docs.rs/google-notebooks1/5.0.3+20221213/google_notebooks1/api::ProjectLocationRuntimeDeleteCall), [*locations runtimes diagnose*](https://docs.rs/google-notebooks1/5.0.3+20221213/google_notebooks1/api::ProjectLocationRuntimeDiagnoseCall), [*locations runtimes get*](https://docs.rs/google-notebooks1/5.0.3+20221213/google_notebooks1/api::ProjectLocationRuntimeGetCall), [*locations runtimes get iam policy*](https://docs.rs/google-notebooks1/5.0.3+20221213/google_notebooks1/api::ProjectLocationRuntimeGetIamPolicyCall), [*locations runtimes list*](https://docs.rs/google-notebooks1/5.0.3+20221213/google_notebooks1/api::ProjectLocationRuntimeListCall), [*locations runtimes patch*](https://docs.rs/google-notebooks1/5.0.3+20221213/google_notebooks1/api::ProjectLocationRuntimePatchCall), [*locations runtimes refresh runtime token internal*](https://docs.rs/google-notebooks1/5.0.3+20221213/google_notebooks1/api::ProjectLocationRuntimeRefreshRuntimeTokenInternalCall), [*locations runtimes report event*](https://docs.rs/google-notebooks1/5.0.3+20221213/google_notebooks1/api::ProjectLocationRuntimeReportEventCall), [*locations runtimes reset*](https://docs.rs/google-notebooks1/5.0.3+20221213/google_notebooks1/api::ProjectLocationRuntimeResetCall), [*locations runtimes set iam policy*](https://docs.rs/google-notebooks1/5.0.3+20221213/google_notebooks1/api::ProjectLocationRuntimeSetIamPolicyCall), [*locations runtimes start*](https://docs.rs/google-notebooks1/5.0.3+20221213/google_notebooks1/api::ProjectLocationRuntimeStartCall), [*locations runtimes stop*](https://docs.rs/google-notebooks1/5.0.3+20221213/google_notebooks1/api::ProjectLocationRuntimeStopCall), [*locations runtimes switch*](https://docs.rs/google-notebooks1/5.0.3+20221213/google_notebooks1/api::ProjectLocationRuntimeSwitchCall), [*locations runtimes test iam permissions*](https://docs.rs/google-notebooks1/5.0.3+20221213/google_notebooks1/api::ProjectLocationRuntimeTestIamPermissionCall), [*locations runtimes upgrade*](https://docs.rs/google-notebooks1/5.0.3+20221213/google_notebooks1/api::ProjectLocationRuntimeUpgradeCall), [*locations schedules create*](https://docs.rs/google-notebooks1/5.0.3+20221213/google_notebooks1/api::ProjectLocationScheduleCreateCall), [*locations schedules delete*](https://docs.rs/google-notebooks1/5.0.3+20221213/google_notebooks1/api::ProjectLocationScheduleDeleteCall), [*locations schedules get*](https://docs.rs/google-notebooks1/5.0.3+20221213/google_notebooks1/api::ProjectLocationScheduleGetCall), [*locations schedules list*](https://docs.rs/google-notebooks1/5.0.3+20221213/google_notebooks1/api::ProjectLocationScheduleListCall) and [*locations schedules trigger*](https://docs.rs/google-notebooks1/5.0.3+20221213/google_notebooks1/api::ProjectLocationScheduleTriggerCall)
@@ -83,8 +83,8 @@ let r = hub.projects().locations_schedules_delete(...).doit().await
 let r = hub.projects().locations_schedules_trigger(...).doit().await
 ```
 
-The `resource()` and `activity(...)` calls create [builders][builder-pattern]. The second one dealing with `Activities` 
-supports various methods to configure the impending operation (not shown here). It is made such that all required arguments have to be 
+The `resource()` and `activity(...)` calls create [builders][builder-pattern]. The second one dealing with `Activities`
+supports various methods to configure the impending operation (not shown here). It is made such that all required arguments have to be
 specified right away (i.e. `(...)`), whereas all optional ones can be [build up][builder-pattern] as desired.
 The `doit()` method performs the actual communication with the server and returns the respective result.
 
@@ -112,12 +112,12 @@ use notebooks1::{Result, Error};
 use std::default::Default;
 use notebooks1::{AIPlatformNotebooks, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 
-// Get an ApplicationSecret instance by some means. It contains the `client_id` and 
+// Get an ApplicationSecret instance by some means. It contains the `client_id` and
 // `client_secret`, among other things.
 let secret: oauth2::ApplicationSecret = Default::default();
-// Instantiate the authenticator. It will choose a suitable authentication flow for you, 
+// Instantiate the authenticator. It will choose a suitable authentication flow for you,
 // unless you replace  `None` with the desired Flow.
-// Provide your own `AuthenticatorDelegate` to adjust the way it operates and get feedback about 
+// Provide your own `AuthenticatorDelegate` to adjust the way it operates and get feedback about
 // what's going on. You probably want to bring in your own `TokenStorage` to persist tokens and
 // retrieve them from storage.
 let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -160,10 +160,10 @@ match result {
 ## Handling Errors
 
 All errors produced by the system are provided either as [Result](https://docs.rs/google-notebooks1/5.0.3+20221213/google_notebooks1/client::Result) enumeration as return value of
-the doit() methods, or handed as possibly intermediate results to either the 
+the doit() methods, or handed as possibly intermediate results to either the
 [Hub Delegate](https://docs.rs/google-notebooks1/5.0.3+20221213/google_notebooks1/client::Delegate), or the [Authenticator Delegate](https://docs.rs/yup-oauth2/*/yup_oauth2/trait.AuthenticatorDelegate.html).
 
-When delegates handle errors or intermediate values, they may have a chance to instruct the system to retry. This 
+When delegates handle errors or intermediate values, they may have a chance to instruct the system to retry. This
 makes the system potentially resilient to all kinds of errors.
 
 ## Uploads and Downloads
@@ -173,25 +173,25 @@ If such a method also supports a [Response Result](https://docs.rs/google-notebo
 You can see it as meta-data for the actual media. To trigger a media download, you will have to set up the builder by making
 this call: `.param("alt", "media")`.
 
-Methods supporting uploads can do so using up to 2 different protocols: 
-*simple* and *resumable*. The distinctiveness of each is represented by customized 
+Methods supporting uploads can do so using up to 2 different protocols:
+*simple* and *resumable*. The distinctiveness of each is represented by customized
 `doit(...)` methods, which are then named `upload(...)` and `upload_resumable(...)` respectively.
 
 ## Customization and Callbacks
 
-You may alter the way an `doit()` method is called by providing a [delegate](https://docs.rs/google-notebooks1/5.0.3+20221213/google_notebooks1/client::Delegate) to the 
-[Method Builder](https://docs.rs/google-notebooks1/5.0.3+20221213/google_notebooks1/client::CallBuilder) before making the final `doit()` call. 
-Respective methods will be called to provide progress information, as well as determine whether the system should 
+You may alter the way an `doit()` method is called by providing a [delegate](https://docs.rs/google-notebooks1/5.0.3+20221213/google_notebooks1/client::Delegate) to the
+[Method Builder](https://docs.rs/google-notebooks1/5.0.3+20221213/google_notebooks1/client::CallBuilder) before making the final `doit()` call.
+Respective methods will be called to provide progress information, as well as determine whether the system should
 retry on failure.
 
 The [delegate trait](https://docs.rs/google-notebooks1/5.0.3+20221213/google_notebooks1/client::Delegate) is default-implemented, allowing you to customize it with minimal effort.
 
 ## Optional Parts in Server-Requests
 
-All structures provided by this library are made to be [encodable](https://docs.rs/google-notebooks1/5.0.3+20221213/google_notebooks1/client::RequestValue) and 
-[decodable](https://docs.rs/google-notebooks1/5.0.3+20221213/google_notebooks1/client::ResponseResult) via *json*. Optionals are used to indicate that partial requests are responses 
+All structures provided by this library are made to be [encodable](https://docs.rs/google-notebooks1/5.0.3+20221213/google_notebooks1/client::RequestValue) and
+[decodable](https://docs.rs/google-notebooks1/5.0.3+20221213/google_notebooks1/client::ResponseResult) via *json*. Optionals are used to indicate that partial requests are responses
 are valid.
-Most optionals are are considered [Parts](https://docs.rs/google-notebooks1/5.0.3+20221213/google_notebooks1/client::Part) which are identifiable by name, which will be sent to 
+Most optionals are are considered [Parts](https://docs.rs/google-notebooks1/5.0.3+20221213/google_notebooks1/client::Part) which are identifiable by name, which will be sent to
 the server to indicate either the set parts of the request or the desired parts in the response.
 
 ## Builder Arguments
@@ -210,7 +210,7 @@ Arguments will always be copied or cloned into the builder, to make them indepen
 [google-go-api]: https://github.com/google/google-api-go-client
 
 # License
-The **notebooks1** library was generated by Sebastian Thiel, and is placed 
+The **notebooks1** library was generated by Sebastian Thiel, and is placed
 under the *MIT* license.
 You can read the full text at the repository's [license file][repo-license].
 

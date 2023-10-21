@@ -9,7 +9,7 @@
 //! The original source code is [on github](https://github.com/Byron/google-apis-rs/tree/main/gen/vmmigration1).
 //! # Features
 //! 
-//! Handle the following *Resources* with ease from the central [hub](VMMigrationService) ... 
+//! Handle the following *Resources* with ease from the central [hub](VMMigrationService) ...
 //! 
 //! * projects
 //!  * [*locations get*](api::ProjectLocationGetCall), [*locations groups add group migration*](api::ProjectLocationGroupAddGroupMigrationCall), [*locations groups create*](api::ProjectLocationGroupCreateCall), [*locations groups delete*](api::ProjectLocationGroupDeleteCall), [*locations groups get*](api::ProjectLocationGroupGetCall), [*locations groups list*](api::ProjectLocationGroupListCall), [*locations groups patch*](api::ProjectLocationGroupPatchCall), [*locations groups remove group migration*](api::ProjectLocationGroupRemoveGroupMigrationCall), [*locations list*](api::ProjectLocationListCall), [*locations operations cancel*](api::ProjectLocationOperationCancelCall), [*locations operations delete*](api::ProjectLocationOperationDeleteCall), [*locations operations get*](api::ProjectLocationOperationGetCall), [*locations operations list*](api::ProjectLocationOperationListCall), [*locations sources create*](api::ProjectLocationSourceCreateCall), [*locations sources datacenter connectors create*](api::ProjectLocationSourceDatacenterConnectorCreateCall), [*locations sources datacenter connectors delete*](api::ProjectLocationSourceDatacenterConnectorDeleteCall), [*locations sources datacenter connectors get*](api::ProjectLocationSourceDatacenterConnectorGetCall), [*locations sources datacenter connectors list*](api::ProjectLocationSourceDatacenterConnectorListCall), [*locations sources datacenter connectors upgrade appliance*](api::ProjectLocationSourceDatacenterConnectorUpgradeApplianceCall), [*locations sources delete*](api::ProjectLocationSourceDeleteCall), [*locations sources fetch inventory*](api::ProjectLocationSourceFetchInventoryCall), [*locations sources get*](api::ProjectLocationSourceGetCall), [*locations sources list*](api::ProjectLocationSourceListCall), [*locations sources migrating vms clone jobs cancel*](api::ProjectLocationSourceMigratingVmCloneJobCancelCall), [*locations sources migrating vms clone jobs create*](api::ProjectLocationSourceMigratingVmCloneJobCreateCall), [*locations sources migrating vms clone jobs get*](api::ProjectLocationSourceMigratingVmCloneJobGetCall), [*locations sources migrating vms clone jobs list*](api::ProjectLocationSourceMigratingVmCloneJobListCall), [*locations sources migrating vms create*](api::ProjectLocationSourceMigratingVmCreateCall), [*locations sources migrating vms cutover jobs cancel*](api::ProjectLocationSourceMigratingVmCutoverJobCancelCall), [*locations sources migrating vms cutover jobs create*](api::ProjectLocationSourceMigratingVmCutoverJobCreateCall), [*locations sources migrating vms cutover jobs get*](api::ProjectLocationSourceMigratingVmCutoverJobGetCall), [*locations sources migrating vms cutover jobs list*](api::ProjectLocationSourceMigratingVmCutoverJobListCall), [*locations sources migrating vms delete*](api::ProjectLocationSourceMigratingVmDeleteCall), [*locations sources migrating vms finalize migration*](api::ProjectLocationSourceMigratingVmFinalizeMigrationCall), [*locations sources migrating vms get*](api::ProjectLocationSourceMigratingVmGetCall), [*locations sources migrating vms list*](api::ProjectLocationSourceMigratingVmListCall), [*locations sources migrating vms patch*](api::ProjectLocationSourceMigratingVmPatchCall), [*locations sources migrating vms pause migration*](api::ProjectLocationSourceMigratingVmPauseMigrationCall), [*locations sources migrating vms replication cycles get*](api::ProjectLocationSourceMigratingVmReplicationCycleGetCall), [*locations sources migrating vms replication cycles list*](api::ProjectLocationSourceMigratingVmReplicationCycleListCall), [*locations sources migrating vms resume migration*](api::ProjectLocationSourceMigratingVmResumeMigrationCall), [*locations sources migrating vms start migration*](api::ProjectLocationSourceMigratingVmStartMigrationCall), [*locations sources patch*](api::ProjectLocationSourcePatchCall), [*locations sources utilization reports create*](api::ProjectLocationSourceUtilizationReportCreateCall), [*locations sources utilization reports delete*](api::ProjectLocationSourceUtilizationReportDeleteCall), [*locations sources utilization reports get*](api::ProjectLocationSourceUtilizationReportGetCall), [*locations sources utilization reports list*](api::ProjectLocationSourceUtilizationReportListCall), [*locations target projects create*](api::ProjectLocationTargetProjectCreateCall), [*locations target projects delete*](api::ProjectLocationTargetProjectDeleteCall), [*locations target projects get*](api::ProjectLocationTargetProjectGetCall), [*locations target projects list*](api::ProjectLocationTargetProjectListCall) and [*locations target projects patch*](api::ProjectLocationTargetProjectPatchCall)
@@ -77,8 +77,8 @@
 //! let r = hub.projects().locations_target_projects_patch(...).doit().await
 //! ```
 //! 
-//! The `resource()` and `activity(...)` calls create [builders][builder-pattern]. The second one dealing with `Activities` 
-//! supports various methods to configure the impending operation (not shown here). It is made such that all required arguments have to be 
+//! The `resource()` and `activity(...)` calls create [builders][builder-pattern]. The second one dealing with `Activities`
+//! supports various methods to configure the impending operation (not shown here). It is made such that all required arguments have to be
 //! specified right away (i.e. `(...)`), whereas all optional ones can be [build up][builder-pattern] as desired.
 //! The `doit()` method performs the actual communication with the server and returns the respective result.
 //! 
@@ -107,12 +107,12 @@
 //! use std::default::Default;
 //! use vmmigration1::{VMMigrationService, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 //! 
-//! // Get an ApplicationSecret instance by some means. It contains the `client_id` and 
+//! // Get an ApplicationSecret instance by some means. It contains the `client_id` and
 //! // `client_secret`, among other things.
 //! let secret: oauth2::ApplicationSecret = Default::default();
-//! // Instantiate the authenticator. It will choose a suitable authentication flow for you, 
+//! // Instantiate the authenticator. It will choose a suitable authentication flow for you,
 //! // unless you replace  `None` with the desired Flow.
-//! // Provide your own `AuthenticatorDelegate` to adjust the way it operates and get feedback about 
+//! // Provide your own `AuthenticatorDelegate` to adjust the way it operates and get feedback about
 //! // what's going on. You probably want to bring in your own `TokenStorage` to persist tokens and
 //! // retrieve them from storage.
 //! let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -155,10 +155,10 @@
 //! ## Handling Errors
 //! 
 //! All errors produced by the system are provided either as [Result](client::Result) enumeration as return value of
-//! the doit() methods, or handed as possibly intermediate results to either the 
+//! the doit() methods, or handed as possibly intermediate results to either the
 //! [Hub Delegate](client::Delegate), or the [Authenticator Delegate](https://docs.rs/yup-oauth2/*/yup_oauth2/trait.AuthenticatorDelegate.html).
 //! 
-//! When delegates handle errors or intermediate values, they may have a chance to instruct the system to retry. This 
+//! When delegates handle errors or intermediate values, they may have a chance to instruct the system to retry. This
 //! makes the system potentially resilient to all kinds of errors.
 //! 
 //! ## Uploads and Downloads
@@ -168,25 +168,25 @@
 //! You can see it as meta-data for the actual media. To trigger a media download, you will have to set up the builder by making
 //! this call: `.param("alt", "media")`.
 //! 
-//! Methods supporting uploads can do so using up to 2 different protocols: 
-//! *simple* and *resumable*. The distinctiveness of each is represented by customized 
+//! Methods supporting uploads can do so using up to 2 different protocols:
+//! *simple* and *resumable*. The distinctiveness of each is represented by customized
 //! `doit(...)` methods, which are then named `upload(...)` and `upload_resumable(...)` respectively.
 //! 
 //! ## Customization and Callbacks
 //! 
-//! You may alter the way an `doit()` method is called by providing a [delegate](client::Delegate) to the 
-//! [Method Builder](client::CallBuilder) before making the final `doit()` call. 
-//! Respective methods will be called to provide progress information, as well as determine whether the system should 
+//! You may alter the way an `doit()` method is called by providing a [delegate](client::Delegate) to the
+//! [Method Builder](client::CallBuilder) before making the final `doit()` call.
+//! Respective methods will be called to provide progress information, as well as determine whether the system should
 //! retry on failure.
 //! 
 //! The [delegate trait](client::Delegate) is default-implemented, allowing you to customize it with minimal effort.
 //! 
 //! ## Optional Parts in Server-Requests
 //! 
-//! All structures provided by this library are made to be [encodable](client::RequestValue) and 
-//! [decodable](client::ResponseResult) via *json*. Optionals are used to indicate that partial requests are responses 
+//! All structures provided by this library are made to be [encodable](client::RequestValue) and
+//! [decodable](client::ResponseResult) via *json*. Optionals are used to indicate that partial requests are responses
 //! are valid.
-//! Most optionals are are considered [Parts](client::Part) which are identifiable by name, which will be sent to 
+//! Most optionals are are considered [Parts](client::Part) which are identifiable by name, which will be sent to
 //! the server to indicate either the set parts of the request or the desired parts in the response.
 //! 
 //! ## Builder Arguments

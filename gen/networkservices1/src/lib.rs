@@ -9,7 +9,7 @@
 //! The original source code is [on github](https://github.com/Byron/google-apis-rs/tree/main/gen/networkservices1).
 //! # Features
 //! 
-//! Handle the following *Resources* with ease from the central [hub](NetworkServices) ... 
+//! Handle the following *Resources* with ease from the central [hub](NetworkServices) ...
 //! 
 //! * projects
 //!  * [*locations edge cache keysets get iam policy*](api::ProjectLocationEdgeCacheKeysetGetIamPolicyCall), [*locations edge cache keysets set iam policy*](api::ProjectLocationEdgeCacheKeysetSetIamPolicyCall), [*locations edge cache keysets test iam permissions*](api::ProjectLocationEdgeCacheKeysetTestIamPermissionCall), [*locations edge cache origins get iam policy*](api::ProjectLocationEdgeCacheOriginGetIamPolicyCall), [*locations edge cache origins set iam policy*](api::ProjectLocationEdgeCacheOriginSetIamPolicyCall), [*locations edge cache origins test iam permissions*](api::ProjectLocationEdgeCacheOriginTestIamPermissionCall), [*locations edge cache services get iam policy*](api::ProjectLocationEdgeCacheServiceGetIamPolicyCall), [*locations edge cache services set iam policy*](api::ProjectLocationEdgeCacheServiceSetIamPolicyCall), [*locations edge cache services test iam permissions*](api::ProjectLocationEdgeCacheServiceTestIamPermissionCall), [*locations endpoint policies create*](api::ProjectLocationEndpointPolicyCreateCall), [*locations endpoint policies delete*](api::ProjectLocationEndpointPolicyDeleteCall), [*locations endpoint policies get*](api::ProjectLocationEndpointPolicyGetCall), [*locations endpoint policies get iam policy*](api::ProjectLocationEndpointPolicyGetIamPolicyCall), [*locations endpoint policies list*](api::ProjectLocationEndpointPolicyListCall), [*locations endpoint policies patch*](api::ProjectLocationEndpointPolicyPatchCall), [*locations endpoint policies set iam policy*](api::ProjectLocationEndpointPolicySetIamPolicyCall), [*locations endpoint policies test iam permissions*](api::ProjectLocationEndpointPolicyTestIamPermissionCall), [*locations gateways create*](api::ProjectLocationGatewayCreateCall), [*locations gateways delete*](api::ProjectLocationGatewayDeleteCall), [*locations gateways get*](api::ProjectLocationGatewayGetCall), [*locations gateways get iam policy*](api::ProjectLocationGatewayGetIamPolicyCall), [*locations gateways list*](api::ProjectLocationGatewayListCall), [*locations gateways patch*](api::ProjectLocationGatewayPatchCall), [*locations gateways set iam policy*](api::ProjectLocationGatewaySetIamPolicyCall), [*locations gateways test iam permissions*](api::ProjectLocationGatewayTestIamPermissionCall), [*locations get*](api::ProjectLocationGetCall), [*locations grpc routes create*](api::ProjectLocationGrpcRouteCreateCall), [*locations grpc routes delete*](api::ProjectLocationGrpcRouteDeleteCall), [*locations grpc routes get*](api::ProjectLocationGrpcRouteGetCall), [*locations grpc routes list*](api::ProjectLocationGrpcRouteListCall), [*locations grpc routes patch*](api::ProjectLocationGrpcRoutePatchCall), [*locations http routes create*](api::ProjectLocationHttpRouteCreateCall), [*locations http routes delete*](api::ProjectLocationHttpRouteDeleteCall), [*locations http routes get*](api::ProjectLocationHttpRouteGetCall), [*locations http routes list*](api::ProjectLocationHttpRouteListCall), [*locations http routes patch*](api::ProjectLocationHttpRoutePatchCall), [*locations list*](api::ProjectLocationListCall), [*locations meshes create*](api::ProjectLocationMeshCreateCall), [*locations meshes delete*](api::ProjectLocationMeshDeleteCall), [*locations meshes get*](api::ProjectLocationMeshGetCall), [*locations meshes get iam policy*](api::ProjectLocationMeshGetIamPolicyCall), [*locations meshes list*](api::ProjectLocationMeshListCall), [*locations meshes patch*](api::ProjectLocationMeshPatchCall), [*locations meshes set iam policy*](api::ProjectLocationMeshSetIamPolicyCall), [*locations meshes test iam permissions*](api::ProjectLocationMeshTestIamPermissionCall), [*locations operations cancel*](api::ProjectLocationOperationCancelCall), [*locations operations delete*](api::ProjectLocationOperationDeleteCall), [*locations operations get*](api::ProjectLocationOperationGetCall), [*locations operations list*](api::ProjectLocationOperationListCall), [*locations service bindings create*](api::ProjectLocationServiceBindingCreateCall), [*locations service bindings delete*](api::ProjectLocationServiceBindingDeleteCall), [*locations service bindings get*](api::ProjectLocationServiceBindingGetCall), [*locations service bindings get iam policy*](api::ProjectLocationServiceBindingGetIamPolicyCall), [*locations service bindings list*](api::ProjectLocationServiceBindingListCall), [*locations service bindings set iam policy*](api::ProjectLocationServiceBindingSetIamPolicyCall), [*locations service bindings test iam permissions*](api::ProjectLocationServiceBindingTestIamPermissionCall), [*locations tcp routes create*](api::ProjectLocationTcpRouteCreateCall), [*locations tcp routes delete*](api::ProjectLocationTcpRouteDeleteCall), [*locations tcp routes get*](api::ProjectLocationTcpRouteGetCall), [*locations tcp routes list*](api::ProjectLocationTcpRouteListCall), [*locations tcp routes patch*](api::ProjectLocationTcpRoutePatchCall), [*locations tls routes create*](api::ProjectLocationTlsRouteCreateCall), [*locations tls routes delete*](api::ProjectLocationTlsRouteDeleteCall), [*locations tls routes get*](api::ProjectLocationTlsRouteGetCall), [*locations tls routes list*](api::ProjectLocationTlsRouteListCall) and [*locations tls routes patch*](api::ProjectLocationTlsRoutePatchCall)
@@ -73,8 +73,8 @@
 //! let r = hub.projects().locations_tls_routes_patch(...).doit().await
 //! ```
 //! 
-//! The `resource()` and `activity(...)` calls create [builders][builder-pattern]. The second one dealing with `Activities` 
-//! supports various methods to configure the impending operation (not shown here). It is made such that all required arguments have to be 
+//! The `resource()` and `activity(...)` calls create [builders][builder-pattern]. The second one dealing with `Activities`
+//! supports various methods to configure the impending operation (not shown here). It is made such that all required arguments have to be
 //! specified right away (i.e. `(...)`), whereas all optional ones can be [build up][builder-pattern] as desired.
 //! The `doit()` method performs the actual communication with the server and returns the respective result.
 //! 
@@ -103,12 +103,12 @@
 //! use std::default::Default;
 //! use networkservices1::{NetworkServices, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 //! 
-//! // Get an ApplicationSecret instance by some means. It contains the `client_id` and 
+//! // Get an ApplicationSecret instance by some means. It contains the `client_id` and
 //! // `client_secret`, among other things.
 //! let secret: oauth2::ApplicationSecret = Default::default();
-//! // Instantiate the authenticator. It will choose a suitable authentication flow for you, 
+//! // Instantiate the authenticator. It will choose a suitable authentication flow for you,
 //! // unless you replace  `None` with the desired Flow.
-//! // Provide your own `AuthenticatorDelegate` to adjust the way it operates and get feedback about 
+//! // Provide your own `AuthenticatorDelegate` to adjust the way it operates and get feedback about
 //! // what's going on. You probably want to bring in your own `TokenStorage` to persist tokens and
 //! // retrieve them from storage.
 //! let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -150,10 +150,10 @@
 //! ## Handling Errors
 //! 
 //! All errors produced by the system are provided either as [Result](client::Result) enumeration as return value of
-//! the doit() methods, or handed as possibly intermediate results to either the 
+//! the doit() methods, or handed as possibly intermediate results to either the
 //! [Hub Delegate](client::Delegate), or the [Authenticator Delegate](https://docs.rs/yup-oauth2/*/yup_oauth2/trait.AuthenticatorDelegate.html).
 //! 
-//! When delegates handle errors or intermediate values, they may have a chance to instruct the system to retry. This 
+//! When delegates handle errors or intermediate values, they may have a chance to instruct the system to retry. This
 //! makes the system potentially resilient to all kinds of errors.
 //! 
 //! ## Uploads and Downloads
@@ -163,25 +163,25 @@
 //! You can see it as meta-data for the actual media. To trigger a media download, you will have to set up the builder by making
 //! this call: `.param("alt", "media")`.
 //! 
-//! Methods supporting uploads can do so using up to 2 different protocols: 
-//! *simple* and *resumable*. The distinctiveness of each is represented by customized 
+//! Methods supporting uploads can do so using up to 2 different protocols:
+//! *simple* and *resumable*. The distinctiveness of each is represented by customized
 //! `doit(...)` methods, which are then named `upload(...)` and `upload_resumable(...)` respectively.
 //! 
 //! ## Customization and Callbacks
 //! 
-//! You may alter the way an `doit()` method is called by providing a [delegate](client::Delegate) to the 
-//! [Method Builder](client::CallBuilder) before making the final `doit()` call. 
-//! Respective methods will be called to provide progress information, as well as determine whether the system should 
+//! You may alter the way an `doit()` method is called by providing a [delegate](client::Delegate) to the
+//! [Method Builder](client::CallBuilder) before making the final `doit()` call.
+//! Respective methods will be called to provide progress information, as well as determine whether the system should
 //! retry on failure.
 //! 
 //! The [delegate trait](client::Delegate) is default-implemented, allowing you to customize it with minimal effort.
 //! 
 //! ## Optional Parts in Server-Requests
 //! 
-//! All structures provided by this library are made to be [encodable](client::RequestValue) and 
-//! [decodable](client::ResponseResult) via *json*. Optionals are used to indicate that partial requests are responses 
+//! All structures provided by this library are made to be [encodable](client::RequestValue) and
+//! [decodable](client::ResponseResult) via *json*. Optionals are used to indicate that partial requests are responses
 //! are valid.
-//! Most optionals are are considered [Parts](client::Part) which are identifiable by name, which will be sent to 
+//! Most optionals are are considered [Parts](client::Part) which are identifiable by name, which will be sent to
 //! the server to indicate either the set parts of the request or the desired parts in the response.
 //! 
 //! ## Builder Arguments

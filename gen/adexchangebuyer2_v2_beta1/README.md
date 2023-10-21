@@ -11,7 +11,7 @@ Everything else about the *AdExchangeBuyerII* *v2_beta1* API can be found at the
 [official documentation site](https://developers.google.com/authorized-buyers/apis/reference/rest/).
 # Features
 
-Handle the following *Resources* with ease from the central [hub](https://docs.rs/google-adexchangebuyer2_v2_beta1/5.0.3+20230124/google_adexchangebuyer2_v2_beta1/AdExchangeBuyerII) ... 
+Handle the following *Resources* with ease from the central [hub](https://docs.rs/google-adexchangebuyer2_v2_beta1/5.0.3+20230124/google_adexchangebuyer2_v2_beta1/AdExchangeBuyerII) ...
 
 * accounts
  * [*clients create*](https://docs.rs/google-adexchangebuyer2_v2_beta1/5.0.3+20230124/google_adexchangebuyer2_v2_beta1/api::AccountClientCreateCall), [*clients get*](https://docs.rs/google-adexchangebuyer2_v2_beta1/5.0.3+20230124/google_adexchangebuyer2_v2_beta1/api::AccountClientGetCall), [*clients invitations create*](https://docs.rs/google-adexchangebuyer2_v2_beta1/5.0.3+20230124/google_adexchangebuyer2_v2_beta1/api::AccountClientInvitationCreateCall), [*clients invitations get*](https://docs.rs/google-adexchangebuyer2_v2_beta1/5.0.3+20230124/google_adexchangebuyer2_v2_beta1/api::AccountClientInvitationGetCall), [*clients invitations list*](https://docs.rs/google-adexchangebuyer2_v2_beta1/5.0.3+20230124/google_adexchangebuyer2_v2_beta1/api::AccountClientInvitationListCall), [*clients list*](https://docs.rs/google-adexchangebuyer2_v2_beta1/5.0.3+20230124/google_adexchangebuyer2_v2_beta1/api::AccountClientListCall), [*clients update*](https://docs.rs/google-adexchangebuyer2_v2_beta1/5.0.3+20230124/google_adexchangebuyer2_v2_beta1/api::AccountClientUpdateCall), [*clients users get*](https://docs.rs/google-adexchangebuyer2_v2_beta1/5.0.3+20230124/google_adexchangebuyer2_v2_beta1/api::AccountClientUserGetCall), [*clients users list*](https://docs.rs/google-adexchangebuyer2_v2_beta1/5.0.3+20230124/google_adexchangebuyer2_v2_beta1/api::AccountClientUserListCall), [*clients users update*](https://docs.rs/google-adexchangebuyer2_v2_beta1/5.0.3+20230124/google_adexchangebuyer2_v2_beta1/api::AccountClientUserUpdateCall), [*creatives create*](https://docs.rs/google-adexchangebuyer2_v2_beta1/5.0.3+20230124/google_adexchangebuyer2_v2_beta1/api::AccountCreativeCreateCall), [*creatives deal associations add*](https://docs.rs/google-adexchangebuyer2_v2_beta1/5.0.3+20230124/google_adexchangebuyer2_v2_beta1/api::AccountCreativeDealAssociationAddCall), [*creatives deal associations list*](https://docs.rs/google-adexchangebuyer2_v2_beta1/5.0.3+20230124/google_adexchangebuyer2_v2_beta1/api::AccountCreativeDealAssociationListCall), [*creatives deal associations remove*](https://docs.rs/google-adexchangebuyer2_v2_beta1/5.0.3+20230124/google_adexchangebuyer2_v2_beta1/api::AccountCreativeDealAssociationRemoveCall), [*creatives get*](https://docs.rs/google-adexchangebuyer2_v2_beta1/5.0.3+20230124/google_adexchangebuyer2_v2_beta1/api::AccountCreativeGetCall), [*creatives list*](https://docs.rs/google-adexchangebuyer2_v2_beta1/5.0.3+20230124/google_adexchangebuyer2_v2_beta1/api::AccountCreativeListCall), [*creatives stop watching*](https://docs.rs/google-adexchangebuyer2_v2_beta1/5.0.3+20230124/google_adexchangebuyer2_v2_beta1/api::AccountCreativeStopWatchingCall), [*creatives update*](https://docs.rs/google-adexchangebuyer2_v2_beta1/5.0.3+20230124/google_adexchangebuyer2_v2_beta1/api::AccountCreativeUpdateCall), [*creatives watch*](https://docs.rs/google-adexchangebuyer2_v2_beta1/5.0.3+20230124/google_adexchangebuyer2_v2_beta1/api::AccountCreativeWatchCall), [*finalized proposals list*](https://docs.rs/google-adexchangebuyer2_v2_beta1/5.0.3+20230124/google_adexchangebuyer2_v2_beta1/api::AccountFinalizedProposalListCall), [*finalized proposals pause*](https://docs.rs/google-adexchangebuyer2_v2_beta1/5.0.3+20230124/google_adexchangebuyer2_v2_beta1/api::AccountFinalizedProposalPauseCall), [*finalized proposals resume*](https://docs.rs/google-adexchangebuyer2_v2_beta1/5.0.3+20230124/google_adexchangebuyer2_v2_beta1/api::AccountFinalizedProposalResumeCall), [*products get*](https://docs.rs/google-adexchangebuyer2_v2_beta1/5.0.3+20230124/google_adexchangebuyer2_v2_beta1/api::AccountProductGetCall), [*products list*](https://docs.rs/google-adexchangebuyer2_v2_beta1/5.0.3+20230124/google_adexchangebuyer2_v2_beta1/api::AccountProductListCall), [*proposals accept*](https://docs.rs/google-adexchangebuyer2_v2_beta1/5.0.3+20230124/google_adexchangebuyer2_v2_beta1/api::AccountProposalAcceptCall), [*proposals add note*](https://docs.rs/google-adexchangebuyer2_v2_beta1/5.0.3+20230124/google_adexchangebuyer2_v2_beta1/api::AccountProposalAddNoteCall), [*proposals cancel negotiation*](https://docs.rs/google-adexchangebuyer2_v2_beta1/5.0.3+20230124/google_adexchangebuyer2_v2_beta1/api::AccountProposalCancelNegotiationCall), [*proposals complete setup*](https://docs.rs/google-adexchangebuyer2_v2_beta1/5.0.3+20230124/google_adexchangebuyer2_v2_beta1/api::AccountProposalCompleteSetupCall), [*proposals create*](https://docs.rs/google-adexchangebuyer2_v2_beta1/5.0.3+20230124/google_adexchangebuyer2_v2_beta1/api::AccountProposalCreateCall), [*proposals get*](https://docs.rs/google-adexchangebuyer2_v2_beta1/5.0.3+20230124/google_adexchangebuyer2_v2_beta1/api::AccountProposalGetCall), [*proposals list*](https://docs.rs/google-adexchangebuyer2_v2_beta1/5.0.3+20230124/google_adexchangebuyer2_v2_beta1/api::AccountProposalListCall), [*proposals pause*](https://docs.rs/google-adexchangebuyer2_v2_beta1/5.0.3+20230124/google_adexchangebuyer2_v2_beta1/api::AccountProposalPauseCall), [*proposals resume*](https://docs.rs/google-adexchangebuyer2_v2_beta1/5.0.3+20230124/google_adexchangebuyer2_v2_beta1/api::AccountProposalResumeCall), [*proposals update*](https://docs.rs/google-adexchangebuyer2_v2_beta1/5.0.3+20230124/google_adexchangebuyer2_v2_beta1/api::AccountProposalUpdateCall), [*publisher profiles get*](https://docs.rs/google-adexchangebuyer2_v2_beta1/5.0.3+20230124/google_adexchangebuyer2_v2_beta1/api::AccountPublisherProfileGetCall) and [*publisher profiles list*](https://docs.rs/google-adexchangebuyer2_v2_beta1/5.0.3+20230124/google_adexchangebuyer2_v2_beta1/api::AccountPublisherProfileListCall)
@@ -61,8 +61,8 @@ let r = hub.accounts().proposals_resume(...).doit().await
 let r = hub.accounts().proposals_update(...).doit().await
 ```
 
-The `resource()` and `activity(...)` calls create [builders][builder-pattern]. The second one dealing with `Activities` 
-supports various methods to configure the impending operation (not shown here). It is made such that all required arguments have to be 
+The `resource()` and `activity(...)` calls create [builders][builder-pattern]. The second one dealing with `Activities`
+supports various methods to configure the impending operation (not shown here). It is made such that all required arguments have to be
 specified right away (i.e. `(...)`), whereas all optional ones can be [build up][builder-pattern] as desired.
 The `doit()` method performs the actual communication with the server and returns the respective result.
 
@@ -90,12 +90,12 @@ use adexchangebuyer2_v2_beta1::{Result, Error};
 use std::default::Default;
 use adexchangebuyer2_v2_beta1::{AdExchangeBuyerII, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 
-// Get an ApplicationSecret instance by some means. It contains the `client_id` and 
+// Get an ApplicationSecret instance by some means. It contains the `client_id` and
 // `client_secret`, among other things.
 let secret: oauth2::ApplicationSecret = Default::default();
-// Instantiate the authenticator. It will choose a suitable authentication flow for you, 
+// Instantiate the authenticator. It will choose a suitable authentication flow for you,
 // unless you replace  `None` with the desired Flow.
-// Provide your own `AuthenticatorDelegate` to adjust the way it operates and get feedback about 
+// Provide your own `AuthenticatorDelegate` to adjust the way it operates and get feedback about
 // what's going on. You probably want to bring in your own `TokenStorage` to persist tokens and
 // retrieve them from storage.
 let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -136,10 +136,10 @@ match result {
 ## Handling Errors
 
 All errors produced by the system are provided either as [Result](https://docs.rs/google-adexchangebuyer2_v2_beta1/5.0.3+20230124/google_adexchangebuyer2_v2_beta1/client::Result) enumeration as return value of
-the doit() methods, or handed as possibly intermediate results to either the 
+the doit() methods, or handed as possibly intermediate results to either the
 [Hub Delegate](https://docs.rs/google-adexchangebuyer2_v2_beta1/5.0.3+20230124/google_adexchangebuyer2_v2_beta1/client::Delegate), or the [Authenticator Delegate](https://docs.rs/yup-oauth2/*/yup_oauth2/trait.AuthenticatorDelegate.html).
 
-When delegates handle errors or intermediate values, they may have a chance to instruct the system to retry. This 
+When delegates handle errors or intermediate values, they may have a chance to instruct the system to retry. This
 makes the system potentially resilient to all kinds of errors.
 
 ## Uploads and Downloads
@@ -149,25 +149,25 @@ If such a method also supports a [Response Result](https://docs.rs/google-adexch
 You can see it as meta-data for the actual media. To trigger a media download, you will have to set up the builder by making
 this call: `.param("alt", "media")`.
 
-Methods supporting uploads can do so using up to 2 different protocols: 
-*simple* and *resumable*. The distinctiveness of each is represented by customized 
+Methods supporting uploads can do so using up to 2 different protocols:
+*simple* and *resumable*. The distinctiveness of each is represented by customized
 `doit(...)` methods, which are then named `upload(...)` and `upload_resumable(...)` respectively.
 
 ## Customization and Callbacks
 
-You may alter the way an `doit()` method is called by providing a [delegate](https://docs.rs/google-adexchangebuyer2_v2_beta1/5.0.3+20230124/google_adexchangebuyer2_v2_beta1/client::Delegate) to the 
-[Method Builder](https://docs.rs/google-adexchangebuyer2_v2_beta1/5.0.3+20230124/google_adexchangebuyer2_v2_beta1/client::CallBuilder) before making the final `doit()` call. 
-Respective methods will be called to provide progress information, as well as determine whether the system should 
+You may alter the way an `doit()` method is called by providing a [delegate](https://docs.rs/google-adexchangebuyer2_v2_beta1/5.0.3+20230124/google_adexchangebuyer2_v2_beta1/client::Delegate) to the
+[Method Builder](https://docs.rs/google-adexchangebuyer2_v2_beta1/5.0.3+20230124/google_adexchangebuyer2_v2_beta1/client::CallBuilder) before making the final `doit()` call.
+Respective methods will be called to provide progress information, as well as determine whether the system should
 retry on failure.
 
 The [delegate trait](https://docs.rs/google-adexchangebuyer2_v2_beta1/5.0.3+20230124/google_adexchangebuyer2_v2_beta1/client::Delegate) is default-implemented, allowing you to customize it with minimal effort.
 
 ## Optional Parts in Server-Requests
 
-All structures provided by this library are made to be [encodable](https://docs.rs/google-adexchangebuyer2_v2_beta1/5.0.3+20230124/google_adexchangebuyer2_v2_beta1/client::RequestValue) and 
-[decodable](https://docs.rs/google-adexchangebuyer2_v2_beta1/5.0.3+20230124/google_adexchangebuyer2_v2_beta1/client::ResponseResult) via *json*. Optionals are used to indicate that partial requests are responses 
+All structures provided by this library are made to be [encodable](https://docs.rs/google-adexchangebuyer2_v2_beta1/5.0.3+20230124/google_adexchangebuyer2_v2_beta1/client::RequestValue) and
+[decodable](https://docs.rs/google-adexchangebuyer2_v2_beta1/5.0.3+20230124/google_adexchangebuyer2_v2_beta1/client::ResponseResult) via *json*. Optionals are used to indicate that partial requests are responses
 are valid.
-Most optionals are are considered [Parts](https://docs.rs/google-adexchangebuyer2_v2_beta1/5.0.3+20230124/google_adexchangebuyer2_v2_beta1/client::Part) which are identifiable by name, which will be sent to 
+Most optionals are are considered [Parts](https://docs.rs/google-adexchangebuyer2_v2_beta1/5.0.3+20230124/google_adexchangebuyer2_v2_beta1/client::Part) which are identifiable by name, which will be sent to
 the server to indicate either the set parts of the request or the desired parts in the response.
 
 ## Builder Arguments
@@ -186,7 +186,7 @@ Arguments will always be copied or cloned into the builder, to make them indepen
 [google-go-api]: https://github.com/google/google-api-go-client
 
 # License
-The **adexchangebuyer2_v2_beta1** library was generated by Sebastian Thiel, and is placed 
+The **adexchangebuyer2_v2_beta1** library was generated by Sebastian Thiel, and is placed
 under the *MIT* license.
 You can read the full text at the repository's [license file][repo-license].
 

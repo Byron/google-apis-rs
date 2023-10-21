@@ -23,7 +23,7 @@ use crate::{client, client::GetToken, client::serde_with};
 /// Identifies the an OAuth2 authorization scope.
 /// A scope is needed when requesting an
 /// [authorization token](https://developers.google.com/youtube/v3/guides/authentication).
-#[derive(PartialEq, Eq, Hash)]
+#[derive(PartialEq, Eq, Hash, Debug)]
 pub enum Scope {
     /// Manage DoubleClick Digital Marketing conversions
     Ddmconversion,
@@ -72,12 +72,12 @@ impl Default for Scope {
 /// use std::default::Default;
 /// use dfareporting3d4::{Dfareporting, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 /// 
-/// // Get an ApplicationSecret instance by some means. It contains the `client_id` and 
+/// // Get an ApplicationSecret instance by some means. It contains the `client_id` and
 /// // `client_secret`, among other things.
 /// let secret: oauth2::ApplicationSecret = Default::default();
-/// // Instantiate the authenticator. It will choose a suitable authentication flow for you, 
+/// // Instantiate the authenticator. It will choose a suitable authentication flow for you,
 /// // unless you replace  `None` with the desired Flow.
-/// // Provide your own `AuthenticatorDelegate` to adjust the way it operates and get feedback about 
+/// // Provide your own `AuthenticatorDelegate` to adjust the way it operates and get feedback about
 /// // what's going on. You probably want to bring in your own `TokenStorage` to persist tokens and
 /// // retrieve them from storage.
 /// let auth = oauth2::InstalledFlowAuthenticator::builder(

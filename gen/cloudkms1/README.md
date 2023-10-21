@@ -11,7 +11,7 @@ Everything else about the *Cloud KMS* *v1* API can be found at the
 [official documentation site](https://cloud.google.com/kms/).
 # Features
 
-Handle the following *Resources* with ease from the central [hub](https://docs.rs/google-cloudkms1/5.0.3+20230106/google_cloudkms1/CloudKMS) ... 
+Handle the following *Resources* with ease from the central [hub](https://docs.rs/google-cloudkms1/5.0.3+20230106/google_cloudkms1/CloudKMS) ...
 
 * projects
  * [*locations ekm config get iam policy*](https://docs.rs/google-cloudkms1/5.0.3+20230106/google_cloudkms1/api::ProjectLocationEkmConfigGetIamPolicyCall), [*locations ekm config set iam policy*](https://docs.rs/google-cloudkms1/5.0.3+20230106/google_cloudkms1/api::ProjectLocationEkmConfigSetIamPolicyCall), [*locations ekm config test iam permissions*](https://docs.rs/google-cloudkms1/5.0.3+20230106/google_cloudkms1/api::ProjectLocationEkmConfigTestIamPermissionCall), [*locations ekm connections create*](https://docs.rs/google-cloudkms1/5.0.3+20230106/google_cloudkms1/api::ProjectLocationEkmConnectionCreateCall), [*locations ekm connections get*](https://docs.rs/google-cloudkms1/5.0.3+20230106/google_cloudkms1/api::ProjectLocationEkmConnectionGetCall), [*locations ekm connections get iam policy*](https://docs.rs/google-cloudkms1/5.0.3+20230106/google_cloudkms1/api::ProjectLocationEkmConnectionGetIamPolicyCall), [*locations ekm connections list*](https://docs.rs/google-cloudkms1/5.0.3+20230106/google_cloudkms1/api::ProjectLocationEkmConnectionListCall), [*locations ekm connections patch*](https://docs.rs/google-cloudkms1/5.0.3+20230106/google_cloudkms1/api::ProjectLocationEkmConnectionPatchCall), [*locations ekm connections set iam policy*](https://docs.rs/google-cloudkms1/5.0.3+20230106/google_cloudkms1/api::ProjectLocationEkmConnectionSetIamPolicyCall), [*locations ekm connections test iam permissions*](https://docs.rs/google-cloudkms1/5.0.3+20230106/google_cloudkms1/api::ProjectLocationEkmConnectionTestIamPermissionCall), [*locations generate random bytes*](https://docs.rs/google-cloudkms1/5.0.3+20230106/google_cloudkms1/api::ProjectLocationGenerateRandomByteCall), [*locations get*](https://docs.rs/google-cloudkms1/5.0.3+20230106/google_cloudkms1/api::ProjectLocationGetCall), [*locations key rings create*](https://docs.rs/google-cloudkms1/5.0.3+20230106/google_cloudkms1/api::ProjectLocationKeyRingCreateCall), [*locations key rings crypto keys create*](https://docs.rs/google-cloudkms1/5.0.3+20230106/google_cloudkms1/api::ProjectLocationKeyRingCryptoKeyCreateCall), [*locations key rings crypto keys crypto key versions asymmetric decrypt*](https://docs.rs/google-cloudkms1/5.0.3+20230106/google_cloudkms1/api::ProjectLocationKeyRingCryptoKeyCryptoKeyVersionAsymmetricDecryptCall), [*locations key rings crypto keys crypto key versions asymmetric sign*](https://docs.rs/google-cloudkms1/5.0.3+20230106/google_cloudkms1/api::ProjectLocationKeyRingCryptoKeyCryptoKeyVersionAsymmetricSignCall), [*locations key rings crypto keys crypto key versions create*](https://docs.rs/google-cloudkms1/5.0.3+20230106/google_cloudkms1/api::ProjectLocationKeyRingCryptoKeyCryptoKeyVersionCreateCall), [*locations key rings crypto keys crypto key versions destroy*](https://docs.rs/google-cloudkms1/5.0.3+20230106/google_cloudkms1/api::ProjectLocationKeyRingCryptoKeyCryptoKeyVersionDestroyCall), [*locations key rings crypto keys crypto key versions get*](https://docs.rs/google-cloudkms1/5.0.3+20230106/google_cloudkms1/api::ProjectLocationKeyRingCryptoKeyCryptoKeyVersionGetCall), [*locations key rings crypto keys crypto key versions get public key*](https://docs.rs/google-cloudkms1/5.0.3+20230106/google_cloudkms1/api::ProjectLocationKeyRingCryptoKeyCryptoKeyVersionGetPublicKeyCall), [*locations key rings crypto keys crypto key versions import*](https://docs.rs/google-cloudkms1/5.0.3+20230106/google_cloudkms1/api::ProjectLocationKeyRingCryptoKeyCryptoKeyVersionImportCall), [*locations key rings crypto keys crypto key versions list*](https://docs.rs/google-cloudkms1/5.0.3+20230106/google_cloudkms1/api::ProjectLocationKeyRingCryptoKeyCryptoKeyVersionListCall), [*locations key rings crypto keys crypto key versions mac sign*](https://docs.rs/google-cloudkms1/5.0.3+20230106/google_cloudkms1/api::ProjectLocationKeyRingCryptoKeyCryptoKeyVersionMacSignCall), [*locations key rings crypto keys crypto key versions mac verify*](https://docs.rs/google-cloudkms1/5.0.3+20230106/google_cloudkms1/api::ProjectLocationKeyRingCryptoKeyCryptoKeyVersionMacVerifyCall), [*locations key rings crypto keys crypto key versions patch*](https://docs.rs/google-cloudkms1/5.0.3+20230106/google_cloudkms1/api::ProjectLocationKeyRingCryptoKeyCryptoKeyVersionPatchCall), [*locations key rings crypto keys crypto key versions restore*](https://docs.rs/google-cloudkms1/5.0.3+20230106/google_cloudkms1/api::ProjectLocationKeyRingCryptoKeyCryptoKeyVersionRestoreCall), [*locations key rings crypto keys decrypt*](https://docs.rs/google-cloudkms1/5.0.3+20230106/google_cloudkms1/api::ProjectLocationKeyRingCryptoKeyDecryptCall), [*locations key rings crypto keys encrypt*](https://docs.rs/google-cloudkms1/5.0.3+20230106/google_cloudkms1/api::ProjectLocationKeyRingCryptoKeyEncryptCall), [*locations key rings crypto keys get*](https://docs.rs/google-cloudkms1/5.0.3+20230106/google_cloudkms1/api::ProjectLocationKeyRingCryptoKeyGetCall), [*locations key rings crypto keys get iam policy*](https://docs.rs/google-cloudkms1/5.0.3+20230106/google_cloudkms1/api::ProjectLocationKeyRingCryptoKeyGetIamPolicyCall), [*locations key rings crypto keys list*](https://docs.rs/google-cloudkms1/5.0.3+20230106/google_cloudkms1/api::ProjectLocationKeyRingCryptoKeyListCall), [*locations key rings crypto keys patch*](https://docs.rs/google-cloudkms1/5.0.3+20230106/google_cloudkms1/api::ProjectLocationKeyRingCryptoKeyPatchCall), [*locations key rings crypto keys set iam policy*](https://docs.rs/google-cloudkms1/5.0.3+20230106/google_cloudkms1/api::ProjectLocationKeyRingCryptoKeySetIamPolicyCall), [*locations key rings crypto keys test iam permissions*](https://docs.rs/google-cloudkms1/5.0.3+20230106/google_cloudkms1/api::ProjectLocationKeyRingCryptoKeyTestIamPermissionCall), [*locations key rings crypto keys update primary version*](https://docs.rs/google-cloudkms1/5.0.3+20230106/google_cloudkms1/api::ProjectLocationKeyRingCryptoKeyUpdatePrimaryVersionCall), [*locations key rings get*](https://docs.rs/google-cloudkms1/5.0.3+20230106/google_cloudkms1/api::ProjectLocationKeyRingGetCall), [*locations key rings get iam policy*](https://docs.rs/google-cloudkms1/5.0.3+20230106/google_cloudkms1/api::ProjectLocationKeyRingGetIamPolicyCall), [*locations key rings import jobs create*](https://docs.rs/google-cloudkms1/5.0.3+20230106/google_cloudkms1/api::ProjectLocationKeyRingImportJobCreateCall), [*locations key rings import jobs get*](https://docs.rs/google-cloudkms1/5.0.3+20230106/google_cloudkms1/api::ProjectLocationKeyRingImportJobGetCall), [*locations key rings import jobs get iam policy*](https://docs.rs/google-cloudkms1/5.0.3+20230106/google_cloudkms1/api::ProjectLocationKeyRingImportJobGetIamPolicyCall), [*locations key rings import jobs list*](https://docs.rs/google-cloudkms1/5.0.3+20230106/google_cloudkms1/api::ProjectLocationKeyRingImportJobListCall), [*locations key rings import jobs set iam policy*](https://docs.rs/google-cloudkms1/5.0.3+20230106/google_cloudkms1/api::ProjectLocationKeyRingImportJobSetIamPolicyCall), [*locations key rings import jobs test iam permissions*](https://docs.rs/google-cloudkms1/5.0.3+20230106/google_cloudkms1/api::ProjectLocationKeyRingImportJobTestIamPermissionCall), [*locations key rings list*](https://docs.rs/google-cloudkms1/5.0.3+20230106/google_cloudkms1/api::ProjectLocationKeyRingListCall), [*locations key rings set iam policy*](https://docs.rs/google-cloudkms1/5.0.3+20230106/google_cloudkms1/api::ProjectLocationKeyRingSetIamPolicyCall), [*locations key rings test iam permissions*](https://docs.rs/google-cloudkms1/5.0.3+20230106/google_cloudkms1/api::ProjectLocationKeyRingTestIamPermissionCall) and [*locations list*](https://docs.rs/google-cloudkms1/5.0.3+20230106/google_cloudkms1/api::ProjectLocationListCall)
@@ -59,8 +59,8 @@ let r = hub.projects().locations_key_rings_get_iam_policy(...).doit().await
 let r = hub.projects().locations_key_rings_set_iam_policy(...).doit().await
 ```
 
-The `resource()` and `activity(...)` calls create [builders][builder-pattern]. The second one dealing with `Activities` 
-supports various methods to configure the impending operation (not shown here). It is made such that all required arguments have to be 
+The `resource()` and `activity(...)` calls create [builders][builder-pattern]. The second one dealing with `Activities`
+supports various methods to configure the impending operation (not shown here). It is made such that all required arguments have to be
 specified right away (i.e. `(...)`), whereas all optional ones can be [build up][builder-pattern] as desired.
 The `doit()` method performs the actual communication with the server and returns the respective result.
 
@@ -87,12 +87,12 @@ use cloudkms1::{Result, Error};
 use std::default::Default;
 use cloudkms1::{CloudKMS, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 
-// Get an ApplicationSecret instance by some means. It contains the `client_id` and 
+// Get an ApplicationSecret instance by some means. It contains the `client_id` and
 // `client_secret`, among other things.
 let secret: oauth2::ApplicationSecret = Default::default();
-// Instantiate the authenticator. It will choose a suitable authentication flow for you, 
+// Instantiate the authenticator. It will choose a suitable authentication flow for you,
 // unless you replace  `None` with the desired Flow.
-// Provide your own `AuthenticatorDelegate` to adjust the way it operates and get feedback about 
+// Provide your own `AuthenticatorDelegate` to adjust the way it operates and get feedback about
 // what's going on. You probably want to bring in your own `TokenStorage` to persist tokens and
 // retrieve them from storage.
 let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -129,10 +129,10 @@ match result {
 ## Handling Errors
 
 All errors produced by the system are provided either as [Result](https://docs.rs/google-cloudkms1/5.0.3+20230106/google_cloudkms1/client::Result) enumeration as return value of
-the doit() methods, or handed as possibly intermediate results to either the 
+the doit() methods, or handed as possibly intermediate results to either the
 [Hub Delegate](https://docs.rs/google-cloudkms1/5.0.3+20230106/google_cloudkms1/client::Delegate), or the [Authenticator Delegate](https://docs.rs/yup-oauth2/*/yup_oauth2/trait.AuthenticatorDelegate.html).
 
-When delegates handle errors or intermediate values, they may have a chance to instruct the system to retry. This 
+When delegates handle errors or intermediate values, they may have a chance to instruct the system to retry. This
 makes the system potentially resilient to all kinds of errors.
 
 ## Uploads and Downloads
@@ -142,25 +142,25 @@ If such a method also supports a [Response Result](https://docs.rs/google-cloudk
 You can see it as meta-data for the actual media. To trigger a media download, you will have to set up the builder by making
 this call: `.param("alt", "media")`.
 
-Methods supporting uploads can do so using up to 2 different protocols: 
-*simple* and *resumable*. The distinctiveness of each is represented by customized 
+Methods supporting uploads can do so using up to 2 different protocols:
+*simple* and *resumable*. The distinctiveness of each is represented by customized
 `doit(...)` methods, which are then named `upload(...)` and `upload_resumable(...)` respectively.
 
 ## Customization and Callbacks
 
-You may alter the way an `doit()` method is called by providing a [delegate](https://docs.rs/google-cloudkms1/5.0.3+20230106/google_cloudkms1/client::Delegate) to the 
-[Method Builder](https://docs.rs/google-cloudkms1/5.0.3+20230106/google_cloudkms1/client::CallBuilder) before making the final `doit()` call. 
-Respective methods will be called to provide progress information, as well as determine whether the system should 
+You may alter the way an `doit()` method is called by providing a [delegate](https://docs.rs/google-cloudkms1/5.0.3+20230106/google_cloudkms1/client::Delegate) to the
+[Method Builder](https://docs.rs/google-cloudkms1/5.0.3+20230106/google_cloudkms1/client::CallBuilder) before making the final `doit()` call.
+Respective methods will be called to provide progress information, as well as determine whether the system should
 retry on failure.
 
 The [delegate trait](https://docs.rs/google-cloudkms1/5.0.3+20230106/google_cloudkms1/client::Delegate) is default-implemented, allowing you to customize it with minimal effort.
 
 ## Optional Parts in Server-Requests
 
-All structures provided by this library are made to be [encodable](https://docs.rs/google-cloudkms1/5.0.3+20230106/google_cloudkms1/client::RequestValue) and 
-[decodable](https://docs.rs/google-cloudkms1/5.0.3+20230106/google_cloudkms1/client::ResponseResult) via *json*. Optionals are used to indicate that partial requests are responses 
+All structures provided by this library are made to be [encodable](https://docs.rs/google-cloudkms1/5.0.3+20230106/google_cloudkms1/client::RequestValue) and
+[decodable](https://docs.rs/google-cloudkms1/5.0.3+20230106/google_cloudkms1/client::ResponseResult) via *json*. Optionals are used to indicate that partial requests are responses
 are valid.
-Most optionals are are considered [Parts](https://docs.rs/google-cloudkms1/5.0.3+20230106/google_cloudkms1/client::Part) which are identifiable by name, which will be sent to 
+Most optionals are are considered [Parts](https://docs.rs/google-cloudkms1/5.0.3+20230106/google_cloudkms1/client::Part) which are identifiable by name, which will be sent to
 the server to indicate either the set parts of the request or the desired parts in the response.
 
 ## Builder Arguments
@@ -179,7 +179,7 @@ Arguments will always be copied or cloned into the builder, to make them indepen
 [google-go-api]: https://github.com/google/google-api-go-client
 
 # License
-The **cloudkms1** library was generated by Sebastian Thiel, and is placed 
+The **cloudkms1** library was generated by Sebastian Thiel, and is placed
 under the *MIT* license.
 You can read the full text at the repository's [license file][repo-license].
 

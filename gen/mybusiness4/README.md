@@ -11,7 +11,7 @@ Everything else about the *My Business* *v4* API can be found at the
 [official documentation site](https://developers.google.com/my-business/).
 # Features
 
-Handle the following *Resources* with ease from the central [hub](https://docs.rs/google-mybusiness4/5.0.3+0/google_mybusiness4/MyBusiness) ... 
+Handle the following *Resources* with ease from the central [hub](https://docs.rs/google-mybusiness4/5.0.3+0/google_mybusiness4/MyBusiness) ...
 
 * [accounts](https://docs.rs/google-mybusiness4/5.0.3+0/google_mybusiness4/api::Account)
  * [*admins create*](https://docs.rs/google-mybusiness4/5.0.3+0/google_mybusiness4/api::AccountAdminCreateCall), [*admins delete*](https://docs.rs/google-mybusiness4/5.0.3+0/google_mybusiness4/api::AccountAdminDeleteCall), [*admins list*](https://docs.rs/google-mybusiness4/5.0.3+0/google_mybusiness4/api::AccountAdminListCall), [*admins patch*](https://docs.rs/google-mybusiness4/5.0.3+0/google_mybusiness4/api::AccountAdminPatchCall), [*create*](https://docs.rs/google-mybusiness4/5.0.3+0/google_mybusiness4/api::AccountCreateCall), [*delete notifications*](https://docs.rs/google-mybusiness4/5.0.3+0/google_mybusiness4/api::AccountDeleteNotificationCall), [*generate account number*](https://docs.rs/google-mybusiness4/5.0.3+0/google_mybusiness4/api::AccountGenerateAccountNumberCall), [*get*](https://docs.rs/google-mybusiness4/5.0.3+0/google_mybusiness4/api::AccountGetCall), [*get notifications*](https://docs.rs/google-mybusiness4/5.0.3+0/google_mybusiness4/api::AccountGetNotificationCall), [*invitations accept*](https://docs.rs/google-mybusiness4/5.0.3+0/google_mybusiness4/api::AccountInvitationAcceptCall), [*invitations decline*](https://docs.rs/google-mybusiness4/5.0.3+0/google_mybusiness4/api::AccountInvitationDeclineCall), [*invitations list*](https://docs.rs/google-mybusiness4/5.0.3+0/google_mybusiness4/api::AccountInvitationListCall), [*list*](https://docs.rs/google-mybusiness4/5.0.3+0/google_mybusiness4/api::AccountListCall), [*list recommend google locations*](https://docs.rs/google-mybusiness4/5.0.3+0/google_mybusiness4/api::AccountListRecommendGoogleLocationCall), [*locations admins create*](https://docs.rs/google-mybusiness4/5.0.3+0/google_mybusiness4/api::AccountLocationAdminCreateCall), [*locations admins delete*](https://docs.rs/google-mybusiness4/5.0.3+0/google_mybusiness4/api::AccountLocationAdminDeleteCall), [*locations admins list*](https://docs.rs/google-mybusiness4/5.0.3+0/google_mybusiness4/api::AccountLocationAdminListCall), [*locations admins patch*](https://docs.rs/google-mybusiness4/5.0.3+0/google_mybusiness4/api::AccountLocationAdminPatchCall), [*locations associate*](https://docs.rs/google-mybusiness4/5.0.3+0/google_mybusiness4/api::AccountLocationAssociateCall), [*locations batch get*](https://docs.rs/google-mybusiness4/5.0.3+0/google_mybusiness4/api::AccountLocationBatchGetCall), [*locations batch get reviews*](https://docs.rs/google-mybusiness4/5.0.3+0/google_mybusiness4/api::AccountLocationBatchGetReviewCall), [*locations clear association*](https://docs.rs/google-mybusiness4/5.0.3+0/google_mybusiness4/api::AccountLocationClearAssociationCall), [*locations create*](https://docs.rs/google-mybusiness4/5.0.3+0/google_mybusiness4/api::AccountLocationCreateCall), [*locations delete*](https://docs.rs/google-mybusiness4/5.0.3+0/google_mybusiness4/api::AccountLocationDeleteCall), [*locations fetch verification options*](https://docs.rs/google-mybusiness4/5.0.3+0/google_mybusiness4/api::AccountLocationFetchVerificationOptionCall), [*locations find matches*](https://docs.rs/google-mybusiness4/5.0.3+0/google_mybusiness4/api::AccountLocationFindMatchCall), [*locations followers get metadata*](https://docs.rs/google-mybusiness4/5.0.3+0/google_mybusiness4/api::AccountLocationFollowerGetMetadataCall), [*locations get*](https://docs.rs/google-mybusiness4/5.0.3+0/google_mybusiness4/api::AccountLocationGetCall), [*locations get google updated*](https://docs.rs/google-mybusiness4/5.0.3+0/google_mybusiness4/api::AccountLocationGetGoogleUpdatedCall), [*locations list*](https://docs.rs/google-mybusiness4/5.0.3+0/google_mybusiness4/api::AccountLocationListCall), [*locations local posts create*](https://docs.rs/google-mybusiness4/5.0.3+0/google_mybusiness4/api::AccountLocationLocalPostCreateCall), [*locations local posts delete*](https://docs.rs/google-mybusiness4/5.0.3+0/google_mybusiness4/api::AccountLocationLocalPostDeleteCall), [*locations local posts get*](https://docs.rs/google-mybusiness4/5.0.3+0/google_mybusiness4/api::AccountLocationLocalPostGetCall), [*locations local posts list*](https://docs.rs/google-mybusiness4/5.0.3+0/google_mybusiness4/api::AccountLocationLocalPostListCall), [*locations local posts patch*](https://docs.rs/google-mybusiness4/5.0.3+0/google_mybusiness4/api::AccountLocationLocalPostPatchCall), [*locations local posts report insights*](https://docs.rs/google-mybusiness4/5.0.3+0/google_mybusiness4/api::AccountLocationLocalPostReportInsightCall), [*locations media create*](https://docs.rs/google-mybusiness4/5.0.3+0/google_mybusiness4/api::AccountLocationMediaCreateCall), [*locations media customers get*](https://docs.rs/google-mybusiness4/5.0.3+0/google_mybusiness4/api::AccountLocationMediaCustomerGetCall), [*locations media customers list*](https://docs.rs/google-mybusiness4/5.0.3+0/google_mybusiness4/api::AccountLocationMediaCustomerListCall), [*locations media delete*](https://docs.rs/google-mybusiness4/5.0.3+0/google_mybusiness4/api::AccountLocationMediaDeleteCall), [*locations media get*](https://docs.rs/google-mybusiness4/5.0.3+0/google_mybusiness4/api::AccountLocationMediaGetCall), [*locations media list*](https://docs.rs/google-mybusiness4/5.0.3+0/google_mybusiness4/api::AccountLocationMediaListCall), [*locations media patch*](https://docs.rs/google-mybusiness4/5.0.3+0/google_mybusiness4/api::AccountLocationMediaPatchCall), [*locations media start upload*](https://docs.rs/google-mybusiness4/5.0.3+0/google_mybusiness4/api::AccountLocationMediaStartUploadCall), [*locations patch*](https://docs.rs/google-mybusiness4/5.0.3+0/google_mybusiness4/api::AccountLocationPatchCall), [*locations questions answers delete*](https://docs.rs/google-mybusiness4/5.0.3+0/google_mybusiness4/api::AccountLocationQuestionAnswerDeleteCall), [*locations questions answers list*](https://docs.rs/google-mybusiness4/5.0.3+0/google_mybusiness4/api::AccountLocationQuestionAnswerListCall), [*locations questions answers upsert*](https://docs.rs/google-mybusiness4/5.0.3+0/google_mybusiness4/api::AccountLocationQuestionAnswerUpsertCall), [*locations questions create*](https://docs.rs/google-mybusiness4/5.0.3+0/google_mybusiness4/api::AccountLocationQuestionCreateCall), [*locations questions delete*](https://docs.rs/google-mybusiness4/5.0.3+0/google_mybusiness4/api::AccountLocationQuestionDeleteCall), [*locations questions list*](https://docs.rs/google-mybusiness4/5.0.3+0/google_mybusiness4/api::AccountLocationQuestionListCall), [*locations questions patch*](https://docs.rs/google-mybusiness4/5.0.3+0/google_mybusiness4/api::AccountLocationQuestionPatchCall), [*locations report insights*](https://docs.rs/google-mybusiness4/5.0.3+0/google_mybusiness4/api::AccountLocationReportInsightCall), [*locations reviews delete reply*](https://docs.rs/google-mybusiness4/5.0.3+0/google_mybusiness4/api::AccountLocationReviewDeleteReplyCall), [*locations reviews get*](https://docs.rs/google-mybusiness4/5.0.3+0/google_mybusiness4/api::AccountLocationReviewGetCall), [*locations reviews list*](https://docs.rs/google-mybusiness4/5.0.3+0/google_mybusiness4/api::AccountLocationReviewListCall), [*locations reviews update reply*](https://docs.rs/google-mybusiness4/5.0.3+0/google_mybusiness4/api::AccountLocationReviewUpdateReplyCall), [*locations transfer*](https://docs.rs/google-mybusiness4/5.0.3+0/google_mybusiness4/api::AccountLocationTransferCall), [*locations verifications complete*](https://docs.rs/google-mybusiness4/5.0.3+0/google_mybusiness4/api::AccountLocationVerificationCompleteCall), [*locations verifications list*](https://docs.rs/google-mybusiness4/5.0.3+0/google_mybusiness4/api::AccountLocationVerificationListCall), [*locations verify*](https://docs.rs/google-mybusiness4/5.0.3+0/google_mybusiness4/api::AccountLocationVerifyCall), [*update*](https://docs.rs/google-mybusiness4/5.0.3+0/google_mybusiness4/api::AccountUpdateCall) and [*update notifications*](https://docs.rs/google-mybusiness4/5.0.3+0/google_mybusiness4/api::AccountUpdateNotificationCall)
@@ -122,8 +122,8 @@ let r = hub.accounts().update(...).doit().await
 let r = hub.accounts().update_notifications(...).doit().await
 ```
 
-The `resource()` and `activity(...)` calls create [builders][builder-pattern]. The second one dealing with `Activities` 
-supports various methods to configure the impending operation (not shown here). It is made such that all required arguments have to be 
+The `resource()` and `activity(...)` calls create [builders][builder-pattern]. The second one dealing with `Activities`
+supports various methods to configure the impending operation (not shown here). It is made such that all required arguments have to be
 specified right away (i.e. `(...)`), whereas all optional ones can be [build up][builder-pattern] as desired.
 The `doit()` method performs the actual communication with the server and returns the respective result.
 
@@ -150,12 +150,12 @@ use mybusiness4::{Result, Error};
 use std::default::Default;
 use mybusiness4::{MyBusiness, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 
-// Get an ApplicationSecret instance by some means. It contains the `client_id` and 
+// Get an ApplicationSecret instance by some means. It contains the `client_id` and
 // `client_secret`, among other things.
 let secret: oauth2::ApplicationSecret = Default::default();
-// Instantiate the authenticator. It will choose a suitable authentication flow for you, 
+// Instantiate the authenticator. It will choose a suitable authentication flow for you,
 // unless you replace  `None` with the desired Flow.
-// Provide your own `AuthenticatorDelegate` to adjust the way it operates and get feedback about 
+// Provide your own `AuthenticatorDelegate` to adjust the way it operates and get feedback about
 // what's going on. You probably want to bring in your own `TokenStorage` to persist tokens and
 // retrieve them from storage.
 let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -196,10 +196,10 @@ match result {
 ## Handling Errors
 
 All errors produced by the system are provided either as [Result](https://docs.rs/google-mybusiness4/5.0.3+0/google_mybusiness4/client::Result) enumeration as return value of
-the doit() methods, or handed as possibly intermediate results to either the 
+the doit() methods, or handed as possibly intermediate results to either the
 [Hub Delegate](https://docs.rs/google-mybusiness4/5.0.3+0/google_mybusiness4/client::Delegate), or the [Authenticator Delegate](https://docs.rs/yup-oauth2/*/yup_oauth2/trait.AuthenticatorDelegate.html).
 
-When delegates handle errors or intermediate values, they may have a chance to instruct the system to retry. This 
+When delegates handle errors or intermediate values, they may have a chance to instruct the system to retry. This
 makes the system potentially resilient to all kinds of errors.
 
 ## Uploads and Downloads
@@ -209,25 +209,25 @@ If such a method also supports a [Response Result](https://docs.rs/google-mybusi
 You can see it as meta-data for the actual media. To trigger a media download, you will have to set up the builder by making
 this call: `.param("alt", "media")`.
 
-Methods supporting uploads can do so using up to 2 different protocols: 
-*simple* and *resumable*. The distinctiveness of each is represented by customized 
+Methods supporting uploads can do so using up to 2 different protocols:
+*simple* and *resumable*. The distinctiveness of each is represented by customized
 `doit(...)` methods, which are then named `upload(...)` and `upload_resumable(...)` respectively.
 
 ## Customization and Callbacks
 
-You may alter the way an `doit()` method is called by providing a [delegate](https://docs.rs/google-mybusiness4/5.0.3+0/google_mybusiness4/client::Delegate) to the 
-[Method Builder](https://docs.rs/google-mybusiness4/5.0.3+0/google_mybusiness4/client::CallBuilder) before making the final `doit()` call. 
-Respective methods will be called to provide progress information, as well as determine whether the system should 
+You may alter the way an `doit()` method is called by providing a [delegate](https://docs.rs/google-mybusiness4/5.0.3+0/google_mybusiness4/client::Delegate) to the
+[Method Builder](https://docs.rs/google-mybusiness4/5.0.3+0/google_mybusiness4/client::CallBuilder) before making the final `doit()` call.
+Respective methods will be called to provide progress information, as well as determine whether the system should
 retry on failure.
 
 The [delegate trait](https://docs.rs/google-mybusiness4/5.0.3+0/google_mybusiness4/client::Delegate) is default-implemented, allowing you to customize it with minimal effort.
 
 ## Optional Parts in Server-Requests
 
-All structures provided by this library are made to be [encodable](https://docs.rs/google-mybusiness4/5.0.3+0/google_mybusiness4/client::RequestValue) and 
-[decodable](https://docs.rs/google-mybusiness4/5.0.3+0/google_mybusiness4/client::ResponseResult) via *json*. Optionals are used to indicate that partial requests are responses 
+All structures provided by this library are made to be [encodable](https://docs.rs/google-mybusiness4/5.0.3+0/google_mybusiness4/client::RequestValue) and
+[decodable](https://docs.rs/google-mybusiness4/5.0.3+0/google_mybusiness4/client::ResponseResult) via *json*. Optionals are used to indicate that partial requests are responses
 are valid.
-Most optionals are are considered [Parts](https://docs.rs/google-mybusiness4/5.0.3+0/google_mybusiness4/client::Part) which are identifiable by name, which will be sent to 
+Most optionals are are considered [Parts](https://docs.rs/google-mybusiness4/5.0.3+0/google_mybusiness4/client::Part) which are identifiable by name, which will be sent to
 the server to indicate either the set parts of the request or the desired parts in the response.
 
 ## Builder Arguments
@@ -246,7 +246,7 @@ Arguments will always be copied or cloned into the builder, to make them indepen
 [google-go-api]: https://github.com/google/google-api-go-client
 
 # License
-The **mybusiness4** library was generated by Sebastian Thiel, and is placed 
+The **mybusiness4** library was generated by Sebastian Thiel, and is placed
 under the *MIT* license.
 You can read the full text at the repository's [license file][repo-license].
 

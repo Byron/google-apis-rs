@@ -11,7 +11,7 @@ Everything else about the *Gmail* *v1* API can be found at the
 [official documentation site](https://developers.google.com/gmail/api/).
 # Features
 
-Handle the following *Resources* with ease from the central [hub](https://docs.rs/google-gmail1/5.0.3+20230116/google_gmail1/Gmail) ... 
+Handle the following *Resources* with ease from the central [hub](https://docs.rs/google-gmail1/5.0.3+20230116/google_gmail1/Gmail) ...
 
 * users
  * [*drafts create*](https://docs.rs/google-gmail1/5.0.3+20230116/google_gmail1/api::UserDraftCreateCall), [*drafts delete*](https://docs.rs/google-gmail1/5.0.3+20230116/google_gmail1/api::UserDraftDeleteCall), [*drafts get*](https://docs.rs/google-gmail1/5.0.3+20230116/google_gmail1/api::UserDraftGetCall), [*drafts list*](https://docs.rs/google-gmail1/5.0.3+20230116/google_gmail1/api::UserDraftListCall), [*drafts send*](https://docs.rs/google-gmail1/5.0.3+20230116/google_gmail1/api::UserDraftSendCall), [*drafts update*](https://docs.rs/google-gmail1/5.0.3+20230116/google_gmail1/api::UserDraftUpdateCall), [*get profile*](https://docs.rs/google-gmail1/5.0.3+20230116/google_gmail1/api::UserGetProfileCall), [*history list*](https://docs.rs/google-gmail1/5.0.3+20230116/google_gmail1/api::UserHistoryListCall), [*labels create*](https://docs.rs/google-gmail1/5.0.3+20230116/google_gmail1/api::UserLabelCreateCall), [*labels delete*](https://docs.rs/google-gmail1/5.0.3+20230116/google_gmail1/api::UserLabelDeleteCall), [*labels get*](https://docs.rs/google-gmail1/5.0.3+20230116/google_gmail1/api::UserLabelGetCall), [*labels list*](https://docs.rs/google-gmail1/5.0.3+20230116/google_gmail1/api::UserLabelListCall), [*labels patch*](https://docs.rs/google-gmail1/5.0.3+20230116/google_gmail1/api::UserLabelPatchCall), [*labels update*](https://docs.rs/google-gmail1/5.0.3+20230116/google_gmail1/api::UserLabelUpdateCall), [*messages attachments get*](https://docs.rs/google-gmail1/5.0.3+20230116/google_gmail1/api::UserMessageAttachmentGetCall), [*messages batch delete*](https://docs.rs/google-gmail1/5.0.3+20230116/google_gmail1/api::UserMessageBatchDeleteCall), [*messages batch modify*](https://docs.rs/google-gmail1/5.0.3+20230116/google_gmail1/api::UserMessageBatchModifyCall), [*messages delete*](https://docs.rs/google-gmail1/5.0.3+20230116/google_gmail1/api::UserMessageDeleteCall), [*messages get*](https://docs.rs/google-gmail1/5.0.3+20230116/google_gmail1/api::UserMessageGetCall), [*messages import*](https://docs.rs/google-gmail1/5.0.3+20230116/google_gmail1/api::UserMessageImportCall), [*messages insert*](https://docs.rs/google-gmail1/5.0.3+20230116/google_gmail1/api::UserMessageInsertCall), [*messages list*](https://docs.rs/google-gmail1/5.0.3+20230116/google_gmail1/api::UserMessageListCall), [*messages modify*](https://docs.rs/google-gmail1/5.0.3+20230116/google_gmail1/api::UserMessageModifyCall), [*messages send*](https://docs.rs/google-gmail1/5.0.3+20230116/google_gmail1/api::UserMessageSendCall), [*messages trash*](https://docs.rs/google-gmail1/5.0.3+20230116/google_gmail1/api::UserMessageTrashCall), [*messages untrash*](https://docs.rs/google-gmail1/5.0.3+20230116/google_gmail1/api::UserMessageUntrashCall), [*settings cse identities create*](https://docs.rs/google-gmail1/5.0.3+20230116/google_gmail1/api::UserSettingCseIdentityCreateCall), [*settings cse identities delete*](https://docs.rs/google-gmail1/5.0.3+20230116/google_gmail1/api::UserSettingCseIdentityDeleteCall), [*settings cse identities get*](https://docs.rs/google-gmail1/5.0.3+20230116/google_gmail1/api::UserSettingCseIdentityGetCall), [*settings cse identities list*](https://docs.rs/google-gmail1/5.0.3+20230116/google_gmail1/api::UserSettingCseIdentityListCall), [*settings cse identities patch*](https://docs.rs/google-gmail1/5.0.3+20230116/google_gmail1/api::UserSettingCseIdentityPatchCall), [*settings cse keypairs create*](https://docs.rs/google-gmail1/5.0.3+20230116/google_gmail1/api::UserSettingCseKeypairCreateCall), [*settings cse keypairs disable*](https://docs.rs/google-gmail1/5.0.3+20230116/google_gmail1/api::UserSettingCseKeypairDisableCall), [*settings cse keypairs enable*](https://docs.rs/google-gmail1/5.0.3+20230116/google_gmail1/api::UserSettingCseKeypairEnableCall), [*settings cse keypairs get*](https://docs.rs/google-gmail1/5.0.3+20230116/google_gmail1/api::UserSettingCseKeypairGetCall), [*settings cse keypairs list*](https://docs.rs/google-gmail1/5.0.3+20230116/google_gmail1/api::UserSettingCseKeypairListCall), [*settings cse keypairs obliterate*](https://docs.rs/google-gmail1/5.0.3+20230116/google_gmail1/api::UserSettingCseKeypairObliterateCall), [*settings delegates create*](https://docs.rs/google-gmail1/5.0.3+20230116/google_gmail1/api::UserSettingDelegateCreateCall), [*settings delegates delete*](https://docs.rs/google-gmail1/5.0.3+20230116/google_gmail1/api::UserSettingDelegateDeleteCall), [*settings delegates get*](https://docs.rs/google-gmail1/5.0.3+20230116/google_gmail1/api::UserSettingDelegateGetCall), [*settings delegates list*](https://docs.rs/google-gmail1/5.0.3+20230116/google_gmail1/api::UserSettingDelegateListCall), [*settings filters create*](https://docs.rs/google-gmail1/5.0.3+20230116/google_gmail1/api::UserSettingFilterCreateCall), [*settings filters delete*](https://docs.rs/google-gmail1/5.0.3+20230116/google_gmail1/api::UserSettingFilterDeleteCall), [*settings filters get*](https://docs.rs/google-gmail1/5.0.3+20230116/google_gmail1/api::UserSettingFilterGetCall), [*settings filters list*](https://docs.rs/google-gmail1/5.0.3+20230116/google_gmail1/api::UserSettingFilterListCall), [*settings forwarding addresses create*](https://docs.rs/google-gmail1/5.0.3+20230116/google_gmail1/api::UserSettingForwardingAddressCreateCall), [*settings forwarding addresses delete*](https://docs.rs/google-gmail1/5.0.3+20230116/google_gmail1/api::UserSettingForwardingAddressDeleteCall), [*settings forwarding addresses get*](https://docs.rs/google-gmail1/5.0.3+20230116/google_gmail1/api::UserSettingForwardingAddressGetCall), [*settings forwarding addresses list*](https://docs.rs/google-gmail1/5.0.3+20230116/google_gmail1/api::UserSettingForwardingAddressListCall), [*settings get auto forwarding*](https://docs.rs/google-gmail1/5.0.3+20230116/google_gmail1/api::UserSettingGetAutoForwardingCall), [*settings get imap*](https://docs.rs/google-gmail1/5.0.3+20230116/google_gmail1/api::UserSettingGetImapCall), [*settings get language*](https://docs.rs/google-gmail1/5.0.3+20230116/google_gmail1/api::UserSettingGetLanguageCall), [*settings get pop*](https://docs.rs/google-gmail1/5.0.3+20230116/google_gmail1/api::UserSettingGetPopCall), [*settings get vacation*](https://docs.rs/google-gmail1/5.0.3+20230116/google_gmail1/api::UserSettingGetVacationCall), [*settings send as create*](https://docs.rs/google-gmail1/5.0.3+20230116/google_gmail1/api::UserSettingSendACreateCall), [*settings send as delete*](https://docs.rs/google-gmail1/5.0.3+20230116/google_gmail1/api::UserSettingSendADeleteCall), [*settings send as get*](https://docs.rs/google-gmail1/5.0.3+20230116/google_gmail1/api::UserSettingSendAGetCall), [*settings send as list*](https://docs.rs/google-gmail1/5.0.3+20230116/google_gmail1/api::UserSettingSendAListCall), [*settings send as patch*](https://docs.rs/google-gmail1/5.0.3+20230116/google_gmail1/api::UserSettingSendAPatchCall), [*settings send as smime info delete*](https://docs.rs/google-gmail1/5.0.3+20230116/google_gmail1/api::UserSettingSendASmimeInfoDeleteCall), [*settings send as smime info get*](https://docs.rs/google-gmail1/5.0.3+20230116/google_gmail1/api::UserSettingSendASmimeInfoGetCall), [*settings send as smime info insert*](https://docs.rs/google-gmail1/5.0.3+20230116/google_gmail1/api::UserSettingSendASmimeInfoInsertCall), [*settings send as smime info list*](https://docs.rs/google-gmail1/5.0.3+20230116/google_gmail1/api::UserSettingSendASmimeInfoListCall), [*settings send as smime info set default*](https://docs.rs/google-gmail1/5.0.3+20230116/google_gmail1/api::UserSettingSendASmimeInfoSetDefaultCall), [*settings send as update*](https://docs.rs/google-gmail1/5.0.3+20230116/google_gmail1/api::UserSettingSendAUpdateCall), [*settings send as verify*](https://docs.rs/google-gmail1/5.0.3+20230116/google_gmail1/api::UserSettingSendAVerifyCall), [*settings update auto forwarding*](https://docs.rs/google-gmail1/5.0.3+20230116/google_gmail1/api::UserSettingUpdateAutoForwardingCall), [*settings update imap*](https://docs.rs/google-gmail1/5.0.3+20230116/google_gmail1/api::UserSettingUpdateImapCall), [*settings update language*](https://docs.rs/google-gmail1/5.0.3+20230116/google_gmail1/api::UserSettingUpdateLanguageCall), [*settings update pop*](https://docs.rs/google-gmail1/5.0.3+20230116/google_gmail1/api::UserSettingUpdatePopCall), [*settings update vacation*](https://docs.rs/google-gmail1/5.0.3+20230116/google_gmail1/api::UserSettingUpdateVacationCall), [*stop*](https://docs.rs/google-gmail1/5.0.3+20230116/google_gmail1/api::UserStopCall), [*threads delete*](https://docs.rs/google-gmail1/5.0.3+20230116/google_gmail1/api::UserThreadDeleteCall), [*threads get*](https://docs.rs/google-gmail1/5.0.3+20230116/google_gmail1/api::UserThreadGetCall), [*threads list*](https://docs.rs/google-gmail1/5.0.3+20230116/google_gmail1/api::UserThreadListCall), [*threads modify*](https://docs.rs/google-gmail1/5.0.3+20230116/google_gmail1/api::UserThreadModifyCall), [*threads trash*](https://docs.rs/google-gmail1/5.0.3+20230116/google_gmail1/api::UserThreadTrashCall), [*threads untrash*](https://docs.rs/google-gmail1/5.0.3+20230116/google_gmail1/api::UserThreadUntrashCall) and [*watch*](https://docs.rs/google-gmail1/5.0.3+20230116/google_gmail1/api::UserWatchCall)
@@ -66,8 +66,8 @@ let r = hub.users().messages_trash(...).doit().await
 let r = hub.users().messages_untrash(...).doit().await
 ```
 
-The `resource()` and `activity(...)` calls create [builders][builder-pattern]. The second one dealing with `Activities` 
-supports various methods to configure the impending operation (not shown here). It is made such that all required arguments have to be 
+The `resource()` and `activity(...)` calls create [builders][builder-pattern]. The second one dealing with `Activities`
+supports various methods to configure the impending operation (not shown here). It is made such that all required arguments have to be
 specified right away (i.e. `(...)`), whereas all optional ones can be [build up][builder-pattern] as desired.
 The `doit()` method performs the actual communication with the server and returns the respective result.
 
@@ -96,12 +96,12 @@ use std::fs;
 use std::default::Default;
 use gmail1::{Gmail, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 
-// Get an ApplicationSecret instance by some means. It contains the `client_id` and 
+// Get an ApplicationSecret instance by some means. It contains the `client_id` and
 // `client_secret`, among other things.
 let secret: oauth2::ApplicationSecret = Default::default();
-// Instantiate the authenticator. It will choose a suitable authentication flow for you, 
+// Instantiate the authenticator. It will choose a suitable authentication flow for you,
 // unless you replace  `None` with the desired Flow.
-// Provide your own `AuthenticatorDelegate` to adjust the way it operates and get feedback about 
+// Provide your own `AuthenticatorDelegate` to adjust the way it operates and get feedback about
 // what's going on. You probably want to bring in your own `TokenStorage` to persist tokens and
 // retrieve them from storage.
 let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -146,10 +146,10 @@ match result {
 ## Handling Errors
 
 All errors produced by the system are provided either as [Result](https://docs.rs/google-gmail1/5.0.3+20230116/google_gmail1/client::Result) enumeration as return value of
-the doit() methods, or handed as possibly intermediate results to either the 
+the doit() methods, or handed as possibly intermediate results to either the
 [Hub Delegate](https://docs.rs/google-gmail1/5.0.3+20230116/google_gmail1/client::Delegate), or the [Authenticator Delegate](https://docs.rs/yup-oauth2/*/yup_oauth2/trait.AuthenticatorDelegate.html).
 
-When delegates handle errors or intermediate values, they may have a chance to instruct the system to retry. This 
+When delegates handle errors or intermediate values, they may have a chance to instruct the system to retry. This
 makes the system potentially resilient to all kinds of errors.
 
 ## Uploads and Downloads
@@ -159,25 +159,25 @@ If such a method also supports a [Response Result](https://docs.rs/google-gmail1
 You can see it as meta-data for the actual media. To trigger a media download, you will have to set up the builder by making
 this call: `.param("alt", "media")`.
 
-Methods supporting uploads can do so using up to 2 different protocols: 
-*simple* and *resumable*. The distinctiveness of each is represented by customized 
+Methods supporting uploads can do so using up to 2 different protocols:
+*simple* and *resumable*. The distinctiveness of each is represented by customized
 `doit(...)` methods, which are then named `upload(...)` and `upload_resumable(...)` respectively.
 
 ## Customization and Callbacks
 
-You may alter the way an `doit()` method is called by providing a [delegate](https://docs.rs/google-gmail1/5.0.3+20230116/google_gmail1/client::Delegate) to the 
-[Method Builder](https://docs.rs/google-gmail1/5.0.3+20230116/google_gmail1/client::CallBuilder) before making the final `doit()` call. 
-Respective methods will be called to provide progress information, as well as determine whether the system should 
+You may alter the way an `doit()` method is called by providing a [delegate](https://docs.rs/google-gmail1/5.0.3+20230116/google_gmail1/client::Delegate) to the
+[Method Builder](https://docs.rs/google-gmail1/5.0.3+20230116/google_gmail1/client::CallBuilder) before making the final `doit()` call.
+Respective methods will be called to provide progress information, as well as determine whether the system should
 retry on failure.
 
 The [delegate trait](https://docs.rs/google-gmail1/5.0.3+20230116/google_gmail1/client::Delegate) is default-implemented, allowing you to customize it with minimal effort.
 
 ## Optional Parts in Server-Requests
 
-All structures provided by this library are made to be [encodable](https://docs.rs/google-gmail1/5.0.3+20230116/google_gmail1/client::RequestValue) and 
-[decodable](https://docs.rs/google-gmail1/5.0.3+20230116/google_gmail1/client::ResponseResult) via *json*. Optionals are used to indicate that partial requests are responses 
+All structures provided by this library are made to be [encodable](https://docs.rs/google-gmail1/5.0.3+20230116/google_gmail1/client::RequestValue) and
+[decodable](https://docs.rs/google-gmail1/5.0.3+20230116/google_gmail1/client::ResponseResult) via *json*. Optionals are used to indicate that partial requests are responses
 are valid.
-Most optionals are are considered [Parts](https://docs.rs/google-gmail1/5.0.3+20230116/google_gmail1/client::Part) which are identifiable by name, which will be sent to 
+Most optionals are are considered [Parts](https://docs.rs/google-gmail1/5.0.3+20230116/google_gmail1/client::Part) which are identifiable by name, which will be sent to
 the server to indicate either the set parts of the request or the desired parts in the response.
 
 ## Builder Arguments
@@ -196,7 +196,7 @@ Arguments will always be copied or cloned into the builder, to make them indepen
 [google-go-api]: https://github.com/google/google-api-go-client
 
 # License
-The **gmail1** library was generated by Sebastian Thiel, and is placed 
+The **gmail1** library was generated by Sebastian Thiel, and is placed
 under the *MIT* license.
 You can read the full text at the repository's [license file][repo-license].
 

@@ -9,7 +9,7 @@
 //! The original source code is [on github](https://github.com/Byron/google-apis-rs/tree/main/gen/retail2).
 //! # Features
 //! 
-//! Handle the following *Resources* with ease from the central [hub](CloudRetail) ... 
+//! Handle the following *Resources* with ease from the central [hub](CloudRetail) ...
 //! 
 //! * projects
 //!  * [*locations catalogs attributes config add catalog attribute*](api::ProjectLocationCatalogAttributesConfigAddCatalogAttributeCall), [*locations catalogs attributes config remove catalog attribute*](api::ProjectLocationCatalogAttributesConfigRemoveCatalogAttributeCall), [*locations catalogs attributes config replace catalog attribute*](api::ProjectLocationCatalogAttributesConfigReplaceCatalogAttributeCall), [*locations catalogs branches operations get*](api::ProjectLocationCatalogBranchOperationGetCall), [*locations catalogs branches products add fulfillment places*](api::ProjectLocationCatalogBranchProductAddFulfillmentPlaceCall), [*locations catalogs branches products add local inventories*](api::ProjectLocationCatalogBranchProductAddLocalInventoryCall), [*locations catalogs branches products create*](api::ProjectLocationCatalogBranchProductCreateCall), [*locations catalogs branches products delete*](api::ProjectLocationCatalogBranchProductDeleteCall), [*locations catalogs branches products get*](api::ProjectLocationCatalogBranchProductGetCall), [*locations catalogs branches products import*](api::ProjectLocationCatalogBranchProductImportCall), [*locations catalogs branches products list*](api::ProjectLocationCatalogBranchProductListCall), [*locations catalogs branches products patch*](api::ProjectLocationCatalogBranchProductPatchCall), [*locations catalogs branches products remove fulfillment places*](api::ProjectLocationCatalogBranchProductRemoveFulfillmentPlaceCall), [*locations catalogs branches products remove local inventories*](api::ProjectLocationCatalogBranchProductRemoveLocalInventoryCall), [*locations catalogs branches products set inventory*](api::ProjectLocationCatalogBranchProductSetInventoryCall), [*locations catalogs complete query*](api::ProjectLocationCatalogCompleteQueryCall), [*locations catalogs completion data import*](api::ProjectLocationCatalogCompletionDataImportCall), [*locations catalogs controls create*](api::ProjectLocationCatalogControlCreateCall), [*locations catalogs controls delete*](api::ProjectLocationCatalogControlDeleteCall), [*locations catalogs controls get*](api::ProjectLocationCatalogControlGetCall), [*locations catalogs controls list*](api::ProjectLocationCatalogControlListCall), [*locations catalogs controls patch*](api::ProjectLocationCatalogControlPatchCall), [*locations catalogs get attributes config*](api::ProjectLocationCatalogGetAttributesConfigCall), [*locations catalogs get completion config*](api::ProjectLocationCatalogGetCompletionConfigCall), [*locations catalogs get default branch*](api::ProjectLocationCatalogGetDefaultBranchCall), [*locations catalogs list*](api::ProjectLocationCatalogListCall), [*locations catalogs operations get*](api::ProjectLocationCatalogOperationGetCall), [*locations catalogs operations list*](api::ProjectLocationCatalogOperationListCall), [*locations catalogs patch*](api::ProjectLocationCatalogPatchCall), [*locations catalogs placements predict*](api::ProjectLocationCatalogPlacementPredictCall), [*locations catalogs placements search*](api::ProjectLocationCatalogPlacementSearchCall), [*locations catalogs serving configs add control*](api::ProjectLocationCatalogServingConfigAddControlCall), [*locations catalogs serving configs create*](api::ProjectLocationCatalogServingConfigCreateCall), [*locations catalogs serving configs delete*](api::ProjectLocationCatalogServingConfigDeleteCall), [*locations catalogs serving configs get*](api::ProjectLocationCatalogServingConfigGetCall), [*locations catalogs serving configs list*](api::ProjectLocationCatalogServingConfigListCall), [*locations catalogs serving configs patch*](api::ProjectLocationCatalogServingConfigPatchCall), [*locations catalogs serving configs predict*](api::ProjectLocationCatalogServingConfigPredictCall), [*locations catalogs serving configs remove control*](api::ProjectLocationCatalogServingConfigRemoveControlCall), [*locations catalogs serving configs search*](api::ProjectLocationCatalogServingConfigSearchCall), [*locations catalogs set default branch*](api::ProjectLocationCatalogSetDefaultBranchCall), [*locations catalogs update attributes config*](api::ProjectLocationCatalogUpdateAttributesConfigCall), [*locations catalogs update completion config*](api::ProjectLocationCatalogUpdateCompletionConfigCall), [*locations catalogs user events collect*](api::ProjectLocationCatalogUserEventCollectCall), [*locations catalogs user events import*](api::ProjectLocationCatalogUserEventImportCall), [*locations catalogs user events purge*](api::ProjectLocationCatalogUserEventPurgeCall), [*locations catalogs user events rejoin*](api::ProjectLocationCatalogUserEventRejoinCall), [*locations catalogs user events write*](api::ProjectLocationCatalogUserEventWriteCall), [*locations operations get*](api::ProjectLocationOperationGetCall), [*locations operations list*](api::ProjectLocationOperationListCall), [*operations get*](api::ProjectOperationGetCall) and [*operations list*](api::ProjectOperationListCall)
@@ -63,8 +63,8 @@
 //! let r = hub.projects().operations_get(...).doit().await
 //! ```
 //! 
-//! The `resource()` and `activity(...)` calls create [builders][builder-pattern]. The second one dealing with `Activities` 
-//! supports various methods to configure the impending operation (not shown here). It is made such that all required arguments have to be 
+//! The `resource()` and `activity(...)` calls create [builders][builder-pattern]. The second one dealing with `Activities`
+//! supports various methods to configure the impending operation (not shown here). It is made such that all required arguments have to be
 //! specified right away (i.e. `(...)`), whereas all optional ones can be [build up][builder-pattern] as desired.
 //! The `doit()` method performs the actual communication with the server and returns the respective result.
 //! 
@@ -93,12 +93,12 @@
 //! use std::default::Default;
 //! use retail2::{CloudRetail, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 //! 
-//! // Get an ApplicationSecret instance by some means. It contains the `client_id` and 
+//! // Get an ApplicationSecret instance by some means. It contains the `client_id` and
 //! // `client_secret`, among other things.
 //! let secret: oauth2::ApplicationSecret = Default::default();
-//! // Instantiate the authenticator. It will choose a suitable authentication flow for you, 
+//! // Instantiate the authenticator. It will choose a suitable authentication flow for you,
 //! // unless you replace  `None` with the desired Flow.
-//! // Provide your own `AuthenticatorDelegate` to adjust the way it operates and get feedback about 
+//! // Provide your own `AuthenticatorDelegate` to adjust the way it operates and get feedback about
 //! // what's going on. You probably want to bring in your own `TokenStorage` to persist tokens and
 //! // retrieve them from storage.
 //! let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -139,10 +139,10 @@
 //! ## Handling Errors
 //! 
 //! All errors produced by the system are provided either as [Result](client::Result) enumeration as return value of
-//! the doit() methods, or handed as possibly intermediate results to either the 
+//! the doit() methods, or handed as possibly intermediate results to either the
 //! [Hub Delegate](client::Delegate), or the [Authenticator Delegate](https://docs.rs/yup-oauth2/*/yup_oauth2/trait.AuthenticatorDelegate.html).
 //! 
-//! When delegates handle errors or intermediate values, they may have a chance to instruct the system to retry. This 
+//! When delegates handle errors or intermediate values, they may have a chance to instruct the system to retry. This
 //! makes the system potentially resilient to all kinds of errors.
 //! 
 //! ## Uploads and Downloads
@@ -152,25 +152,25 @@
 //! You can see it as meta-data for the actual media. To trigger a media download, you will have to set up the builder by making
 //! this call: `.param("alt", "media")`.
 //! 
-//! Methods supporting uploads can do so using up to 2 different protocols: 
-//! *simple* and *resumable*. The distinctiveness of each is represented by customized 
+//! Methods supporting uploads can do so using up to 2 different protocols:
+//! *simple* and *resumable*. The distinctiveness of each is represented by customized
 //! `doit(...)` methods, which are then named `upload(...)` and `upload_resumable(...)` respectively.
 //! 
 //! ## Customization and Callbacks
 //! 
-//! You may alter the way an `doit()` method is called by providing a [delegate](client::Delegate) to the 
-//! [Method Builder](client::CallBuilder) before making the final `doit()` call. 
-//! Respective methods will be called to provide progress information, as well as determine whether the system should 
+//! You may alter the way an `doit()` method is called by providing a [delegate](client::Delegate) to the
+//! [Method Builder](client::CallBuilder) before making the final `doit()` call.
+//! Respective methods will be called to provide progress information, as well as determine whether the system should
 //! retry on failure.
 //! 
 //! The [delegate trait](client::Delegate) is default-implemented, allowing you to customize it with minimal effort.
 //! 
 //! ## Optional Parts in Server-Requests
 //! 
-//! All structures provided by this library are made to be [encodable](client::RequestValue) and 
-//! [decodable](client::ResponseResult) via *json*. Optionals are used to indicate that partial requests are responses 
+//! All structures provided by this library are made to be [encodable](client::RequestValue) and
+//! [decodable](client::ResponseResult) via *json*. Optionals are used to indicate that partial requests are responses
 //! are valid.
-//! Most optionals are are considered [Parts](client::Part) which are identifiable by name, which will be sent to 
+//! Most optionals are are considered [Parts](client::Part) which are identifiable by name, which will be sent to
 //! the server to indicate either the set parts of the request or the desired parts in the response.
 //! 
 //! ## Builder Arguments

@@ -11,7 +11,7 @@ Everything else about the *Cloud Tasks* *v2_beta3* API can be found at the
 [official documentation site](https://cloud.google.com/tasks/).
 # Features
 
-Handle the following *Resources* with ease from the central [hub](https://docs.rs/google-cloudtasks2_beta3/5.0.3+20230105/google_cloudtasks2_beta3/CloudTasks) ... 
+Handle the following *Resources* with ease from the central [hub](https://docs.rs/google-cloudtasks2_beta3/5.0.3+20230105/google_cloudtasks2_beta3/CloudTasks) ...
 
 * projects
  * [*locations get*](https://docs.rs/google-cloudtasks2_beta3/5.0.3+20230105/google_cloudtasks2_beta3/api::ProjectLocationGetCall), [*locations list*](https://docs.rs/google-cloudtasks2_beta3/5.0.3+20230105/google_cloudtasks2_beta3/api::ProjectLocationListCall), [*locations queues create*](https://docs.rs/google-cloudtasks2_beta3/5.0.3+20230105/google_cloudtasks2_beta3/api::ProjectLocationQueueCreateCall), [*locations queues delete*](https://docs.rs/google-cloudtasks2_beta3/5.0.3+20230105/google_cloudtasks2_beta3/api::ProjectLocationQueueDeleteCall), [*locations queues get*](https://docs.rs/google-cloudtasks2_beta3/5.0.3+20230105/google_cloudtasks2_beta3/api::ProjectLocationQueueGetCall), [*locations queues get iam policy*](https://docs.rs/google-cloudtasks2_beta3/5.0.3+20230105/google_cloudtasks2_beta3/api::ProjectLocationQueueGetIamPolicyCall), [*locations queues list*](https://docs.rs/google-cloudtasks2_beta3/5.0.3+20230105/google_cloudtasks2_beta3/api::ProjectLocationQueueListCall), [*locations queues patch*](https://docs.rs/google-cloudtasks2_beta3/5.0.3+20230105/google_cloudtasks2_beta3/api::ProjectLocationQueuePatchCall), [*locations queues pause*](https://docs.rs/google-cloudtasks2_beta3/5.0.3+20230105/google_cloudtasks2_beta3/api::ProjectLocationQueuePauseCall), [*locations queues purge*](https://docs.rs/google-cloudtasks2_beta3/5.0.3+20230105/google_cloudtasks2_beta3/api::ProjectLocationQueuePurgeCall), [*locations queues resume*](https://docs.rs/google-cloudtasks2_beta3/5.0.3+20230105/google_cloudtasks2_beta3/api::ProjectLocationQueueResumeCall), [*locations queues set iam policy*](https://docs.rs/google-cloudtasks2_beta3/5.0.3+20230105/google_cloudtasks2_beta3/api::ProjectLocationQueueSetIamPolicyCall), [*locations queues tasks buffer*](https://docs.rs/google-cloudtasks2_beta3/5.0.3+20230105/google_cloudtasks2_beta3/api::ProjectLocationQueueTaskBufferCall), [*locations queues tasks create*](https://docs.rs/google-cloudtasks2_beta3/5.0.3+20230105/google_cloudtasks2_beta3/api::ProjectLocationQueueTaskCreateCall), [*locations queues tasks delete*](https://docs.rs/google-cloudtasks2_beta3/5.0.3+20230105/google_cloudtasks2_beta3/api::ProjectLocationQueueTaskDeleteCall), [*locations queues tasks get*](https://docs.rs/google-cloudtasks2_beta3/5.0.3+20230105/google_cloudtasks2_beta3/api::ProjectLocationQueueTaskGetCall), [*locations queues tasks list*](https://docs.rs/google-cloudtasks2_beta3/5.0.3+20230105/google_cloudtasks2_beta3/api::ProjectLocationQueueTaskListCall), [*locations queues tasks run*](https://docs.rs/google-cloudtasks2_beta3/5.0.3+20230105/google_cloudtasks2_beta3/api::ProjectLocationQueueTaskRunCall) and [*locations queues test iam permissions*](https://docs.rs/google-cloudtasks2_beta3/5.0.3+20230105/google_cloudtasks2_beta3/api::ProjectLocationQueueTestIamPermissionCall)
@@ -55,8 +55,8 @@ let r = hub.projects().locations_queues_purge(...).doit().await
 let r = hub.projects().locations_queues_resume(...).doit().await
 ```
 
-The `resource()` and `activity(...)` calls create [builders][builder-pattern]. The second one dealing with `Activities` 
-supports various methods to configure the impending operation (not shown here). It is made such that all required arguments have to be 
+The `resource()` and `activity(...)` calls create [builders][builder-pattern]. The second one dealing with `Activities`
+supports various methods to configure the impending operation (not shown here). It is made such that all required arguments have to be
 specified right away (i.e. `(...)`), whereas all optional ones can be [build up][builder-pattern] as desired.
 The `doit()` method performs the actual communication with the server and returns the respective result.
 
@@ -84,12 +84,12 @@ use cloudtasks2_beta3::{Result, Error};
 use std::default::Default;
 use cloudtasks2_beta3::{CloudTasks, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 
-// Get an ApplicationSecret instance by some means. It contains the `client_id` and 
+// Get an ApplicationSecret instance by some means. It contains the `client_id` and
 // `client_secret`, among other things.
 let secret: oauth2::ApplicationSecret = Default::default();
-// Instantiate the authenticator. It will choose a suitable authentication flow for you, 
+// Instantiate the authenticator. It will choose a suitable authentication flow for you,
 // unless you replace  `None` with the desired Flow.
-// Provide your own `AuthenticatorDelegate` to adjust the way it operates and get feedback about 
+// Provide your own `AuthenticatorDelegate` to adjust the way it operates and get feedback about
 // what's going on. You probably want to bring in your own `TokenStorage` to persist tokens and
 // retrieve them from storage.
 let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -131,10 +131,10 @@ match result {
 ## Handling Errors
 
 All errors produced by the system are provided either as [Result](https://docs.rs/google-cloudtasks2_beta3/5.0.3+20230105/google_cloudtasks2_beta3/client::Result) enumeration as return value of
-the doit() methods, or handed as possibly intermediate results to either the 
+the doit() methods, or handed as possibly intermediate results to either the
 [Hub Delegate](https://docs.rs/google-cloudtasks2_beta3/5.0.3+20230105/google_cloudtasks2_beta3/client::Delegate), or the [Authenticator Delegate](https://docs.rs/yup-oauth2/*/yup_oauth2/trait.AuthenticatorDelegate.html).
 
-When delegates handle errors or intermediate values, they may have a chance to instruct the system to retry. This 
+When delegates handle errors or intermediate values, they may have a chance to instruct the system to retry. This
 makes the system potentially resilient to all kinds of errors.
 
 ## Uploads and Downloads
@@ -144,25 +144,25 @@ If such a method also supports a [Response Result](https://docs.rs/google-cloudt
 You can see it as meta-data for the actual media. To trigger a media download, you will have to set up the builder by making
 this call: `.param("alt", "media")`.
 
-Methods supporting uploads can do so using up to 2 different protocols: 
-*simple* and *resumable*. The distinctiveness of each is represented by customized 
+Methods supporting uploads can do so using up to 2 different protocols:
+*simple* and *resumable*. The distinctiveness of each is represented by customized
 `doit(...)` methods, which are then named `upload(...)` and `upload_resumable(...)` respectively.
 
 ## Customization and Callbacks
 
-You may alter the way an `doit()` method is called by providing a [delegate](https://docs.rs/google-cloudtasks2_beta3/5.0.3+20230105/google_cloudtasks2_beta3/client::Delegate) to the 
-[Method Builder](https://docs.rs/google-cloudtasks2_beta3/5.0.3+20230105/google_cloudtasks2_beta3/client::CallBuilder) before making the final `doit()` call. 
-Respective methods will be called to provide progress information, as well as determine whether the system should 
+You may alter the way an `doit()` method is called by providing a [delegate](https://docs.rs/google-cloudtasks2_beta3/5.0.3+20230105/google_cloudtasks2_beta3/client::Delegate) to the
+[Method Builder](https://docs.rs/google-cloudtasks2_beta3/5.0.3+20230105/google_cloudtasks2_beta3/client::CallBuilder) before making the final `doit()` call.
+Respective methods will be called to provide progress information, as well as determine whether the system should
 retry on failure.
 
 The [delegate trait](https://docs.rs/google-cloudtasks2_beta3/5.0.3+20230105/google_cloudtasks2_beta3/client::Delegate) is default-implemented, allowing you to customize it with minimal effort.
 
 ## Optional Parts in Server-Requests
 
-All structures provided by this library are made to be [encodable](https://docs.rs/google-cloudtasks2_beta3/5.0.3+20230105/google_cloudtasks2_beta3/client::RequestValue) and 
-[decodable](https://docs.rs/google-cloudtasks2_beta3/5.0.3+20230105/google_cloudtasks2_beta3/client::ResponseResult) via *json*. Optionals are used to indicate that partial requests are responses 
+All structures provided by this library are made to be [encodable](https://docs.rs/google-cloudtasks2_beta3/5.0.3+20230105/google_cloudtasks2_beta3/client::RequestValue) and
+[decodable](https://docs.rs/google-cloudtasks2_beta3/5.0.3+20230105/google_cloudtasks2_beta3/client::ResponseResult) via *json*. Optionals are used to indicate that partial requests are responses
 are valid.
-Most optionals are are considered [Parts](https://docs.rs/google-cloudtasks2_beta3/5.0.3+20230105/google_cloudtasks2_beta3/client::Part) which are identifiable by name, which will be sent to 
+Most optionals are are considered [Parts](https://docs.rs/google-cloudtasks2_beta3/5.0.3+20230105/google_cloudtasks2_beta3/client::Part) which are identifiable by name, which will be sent to
 the server to indicate either the set parts of the request or the desired parts in the response.
 
 ## Builder Arguments
@@ -181,7 +181,7 @@ Arguments will always be copied or cloned into the builder, to make them indepen
 [google-go-api]: https://github.com/google/google-api-go-client
 
 # License
-The **cloudtasks2_beta3** library was generated by Sebastian Thiel, and is placed 
+The **cloudtasks2_beta3** library was generated by Sebastian Thiel, and is placed
 under the *MIT* license.
 You can read the full text at the repository's [license file][repo-license].
 

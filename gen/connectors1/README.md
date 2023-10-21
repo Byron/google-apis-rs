@@ -11,7 +11,7 @@ Everything else about the *Connectors* *v1* API can be found at the
 [official documentation site](https://cloud.google.com/apigee/docs/api-platform/connectors/about-connectors).
 # Features
 
-Handle the following *Resources* with ease from the central [hub](https://docs.rs/google-connectors1/5.0.3+20230103/google_connectors1/Connectors) ... 
+Handle the following *Resources* with ease from the central [hub](https://docs.rs/google-connectors1/5.0.3+20230103/google_connectors1/Connectors) ...
 
 * projects
  * [*locations connections connection schema metadata refresh*](https://docs.rs/google-connectors1/5.0.3+20230103/google_connectors1/api::ProjectLocationConnectionConnectionSchemaMetadataRefreshCall), [*locations connections create*](https://docs.rs/google-connectors1/5.0.3+20230103/google_connectors1/api::ProjectLocationConnectionCreateCall), [*locations connections delete*](https://docs.rs/google-connectors1/5.0.3+20230103/google_connectors1/api::ProjectLocationConnectionDeleteCall), [*locations connections get*](https://docs.rs/google-connectors1/5.0.3+20230103/google_connectors1/api::ProjectLocationConnectionGetCall), [*locations connections get connection schema metadata*](https://docs.rs/google-connectors1/5.0.3+20230103/google_connectors1/api::ProjectLocationConnectionGetConnectionSchemaMetadataCall), [*locations connections get iam policy*](https://docs.rs/google-connectors1/5.0.3+20230103/google_connectors1/api::ProjectLocationConnectionGetIamPolicyCall), [*locations connections list*](https://docs.rs/google-connectors1/5.0.3+20230103/google_connectors1/api::ProjectLocationConnectionListCall), [*locations connections patch*](https://docs.rs/google-connectors1/5.0.3+20230103/google_connectors1/api::ProjectLocationConnectionPatchCall), [*locations connections runtime action schemas list*](https://docs.rs/google-connectors1/5.0.3+20230103/google_connectors1/api::ProjectLocationConnectionRuntimeActionSchemaListCall), [*locations connections runtime entity schemas list*](https://docs.rs/google-connectors1/5.0.3+20230103/google_connectors1/api::ProjectLocationConnectionRuntimeEntitySchemaListCall), [*locations connections set iam policy*](https://docs.rs/google-connectors1/5.0.3+20230103/google_connectors1/api::ProjectLocationConnectionSetIamPolicyCall), [*locations connections test iam permissions*](https://docs.rs/google-connectors1/5.0.3+20230103/google_connectors1/api::ProjectLocationConnectionTestIamPermissionCall), [*locations get*](https://docs.rs/google-connectors1/5.0.3+20230103/google_connectors1/api::ProjectLocationGetCall), [*locations get runtime config*](https://docs.rs/google-connectors1/5.0.3+20230103/google_connectors1/api::ProjectLocationGetRuntimeConfigCall), [*locations list*](https://docs.rs/google-connectors1/5.0.3+20230103/google_connectors1/api::ProjectLocationListCall), [*locations operations cancel*](https://docs.rs/google-connectors1/5.0.3+20230103/google_connectors1/api::ProjectLocationOperationCancelCall), [*locations operations delete*](https://docs.rs/google-connectors1/5.0.3+20230103/google_connectors1/api::ProjectLocationOperationDeleteCall), [*locations operations get*](https://docs.rs/google-connectors1/5.0.3+20230103/google_connectors1/api::ProjectLocationOperationGetCall), [*locations operations list*](https://docs.rs/google-connectors1/5.0.3+20230103/google_connectors1/api::ProjectLocationOperationListCall), [*locations providers connectors get*](https://docs.rs/google-connectors1/5.0.3+20230103/google_connectors1/api::ProjectLocationProviderConnectorGetCall), [*locations providers connectors list*](https://docs.rs/google-connectors1/5.0.3+20230103/google_connectors1/api::ProjectLocationProviderConnectorListCall), [*locations providers connectors versions get*](https://docs.rs/google-connectors1/5.0.3+20230103/google_connectors1/api::ProjectLocationProviderConnectorVersionGetCall), [*locations providers connectors versions list*](https://docs.rs/google-connectors1/5.0.3+20230103/google_connectors1/api::ProjectLocationProviderConnectorVersionListCall), [*locations providers get*](https://docs.rs/google-connectors1/5.0.3+20230103/google_connectors1/api::ProjectLocationProviderGetCall), [*locations providers get iam policy*](https://docs.rs/google-connectors1/5.0.3+20230103/google_connectors1/api::ProjectLocationProviderGetIamPolicyCall), [*locations providers list*](https://docs.rs/google-connectors1/5.0.3+20230103/google_connectors1/api::ProjectLocationProviderListCall), [*locations providers set iam policy*](https://docs.rs/google-connectors1/5.0.3+20230103/google_connectors1/api::ProjectLocationProviderSetIamPolicyCall) and [*locations providers test iam permissions*](https://docs.rs/google-connectors1/5.0.3+20230103/google_connectors1/api::ProjectLocationProviderTestIamPermissionCall)
@@ -54,8 +54,8 @@ let r = hub.projects().locations_connections_patch(...).doit().await
 let r = hub.projects().locations_operations_get(...).doit().await
 ```
 
-The `resource()` and `activity(...)` calls create [builders][builder-pattern]. The second one dealing with `Activities` 
-supports various methods to configure the impending operation (not shown here). It is made such that all required arguments have to be 
+The `resource()` and `activity(...)` calls create [builders][builder-pattern]. The second one dealing with `Activities`
+supports various methods to configure the impending operation (not shown here). It is made such that all required arguments have to be
 specified right away (i.e. `(...)`), whereas all optional ones can be [build up][builder-pattern] as desired.
 The `doit()` method performs the actual communication with the server and returns the respective result.
 
@@ -83,12 +83,12 @@ use connectors1::{Result, Error};
 use std::default::Default;
 use connectors1::{Connectors, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 
-// Get an ApplicationSecret instance by some means. It contains the `client_id` and 
+// Get an ApplicationSecret instance by some means. It contains the `client_id` and
 // `client_secret`, among other things.
 let secret: oauth2::ApplicationSecret = Default::default();
-// Instantiate the authenticator. It will choose a suitable authentication flow for you, 
+// Instantiate the authenticator. It will choose a suitable authentication flow for you,
 // unless you replace  `None` with the desired Flow.
-// Provide your own `AuthenticatorDelegate` to adjust the way it operates and get feedback about 
+// Provide your own `AuthenticatorDelegate` to adjust the way it operates and get feedback about
 // what's going on. You probably want to bring in your own `TokenStorage` to persist tokens and
 // retrieve them from storage.
 let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -130,10 +130,10 @@ match result {
 ## Handling Errors
 
 All errors produced by the system are provided either as [Result](https://docs.rs/google-connectors1/5.0.3+20230103/google_connectors1/client::Result) enumeration as return value of
-the doit() methods, or handed as possibly intermediate results to either the 
+the doit() methods, or handed as possibly intermediate results to either the
 [Hub Delegate](https://docs.rs/google-connectors1/5.0.3+20230103/google_connectors1/client::Delegate), or the [Authenticator Delegate](https://docs.rs/yup-oauth2/*/yup_oauth2/trait.AuthenticatorDelegate.html).
 
-When delegates handle errors or intermediate values, they may have a chance to instruct the system to retry. This 
+When delegates handle errors or intermediate values, they may have a chance to instruct the system to retry. This
 makes the system potentially resilient to all kinds of errors.
 
 ## Uploads and Downloads
@@ -143,25 +143,25 @@ If such a method also supports a [Response Result](https://docs.rs/google-connec
 You can see it as meta-data for the actual media. To trigger a media download, you will have to set up the builder by making
 this call: `.param("alt", "media")`.
 
-Methods supporting uploads can do so using up to 2 different protocols: 
-*simple* and *resumable*. The distinctiveness of each is represented by customized 
+Methods supporting uploads can do so using up to 2 different protocols:
+*simple* and *resumable*. The distinctiveness of each is represented by customized
 `doit(...)` methods, which are then named `upload(...)` and `upload_resumable(...)` respectively.
 
 ## Customization and Callbacks
 
-You may alter the way an `doit()` method is called by providing a [delegate](https://docs.rs/google-connectors1/5.0.3+20230103/google_connectors1/client::Delegate) to the 
-[Method Builder](https://docs.rs/google-connectors1/5.0.3+20230103/google_connectors1/client::CallBuilder) before making the final `doit()` call. 
-Respective methods will be called to provide progress information, as well as determine whether the system should 
+You may alter the way an `doit()` method is called by providing a [delegate](https://docs.rs/google-connectors1/5.0.3+20230103/google_connectors1/client::Delegate) to the
+[Method Builder](https://docs.rs/google-connectors1/5.0.3+20230103/google_connectors1/client::CallBuilder) before making the final `doit()` call.
+Respective methods will be called to provide progress information, as well as determine whether the system should
 retry on failure.
 
 The [delegate trait](https://docs.rs/google-connectors1/5.0.3+20230103/google_connectors1/client::Delegate) is default-implemented, allowing you to customize it with minimal effort.
 
 ## Optional Parts in Server-Requests
 
-All structures provided by this library are made to be [encodable](https://docs.rs/google-connectors1/5.0.3+20230103/google_connectors1/client::RequestValue) and 
-[decodable](https://docs.rs/google-connectors1/5.0.3+20230103/google_connectors1/client::ResponseResult) via *json*. Optionals are used to indicate that partial requests are responses 
+All structures provided by this library are made to be [encodable](https://docs.rs/google-connectors1/5.0.3+20230103/google_connectors1/client::RequestValue) and
+[decodable](https://docs.rs/google-connectors1/5.0.3+20230103/google_connectors1/client::ResponseResult) via *json*. Optionals are used to indicate that partial requests are responses
 are valid.
-Most optionals are are considered [Parts](https://docs.rs/google-connectors1/5.0.3+20230103/google_connectors1/client::Part) which are identifiable by name, which will be sent to 
+Most optionals are are considered [Parts](https://docs.rs/google-connectors1/5.0.3+20230103/google_connectors1/client::Part) which are identifiable by name, which will be sent to
 the server to indicate either the set parts of the request or the desired parts in the response.
 
 ## Builder Arguments
@@ -180,7 +180,7 @@ Arguments will always be copied or cloned into the builder, to make them indepen
 [google-go-api]: https://github.com/google/google-api-go-client
 
 # License
-The **connectors1** library was generated by Sebastian Thiel, and is placed 
+The **connectors1** library was generated by Sebastian Thiel, and is placed
 under the *MIT* license.
 You can read the full text at the repository's [license file][repo-license].
 

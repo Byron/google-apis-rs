@@ -9,7 +9,7 @@
 //! The original source code is [on github](https://github.com/Byron/google-apis-rs/tree/main/gen/container1).
 //! # Features
 //! 
-//! Handle the following *Resources* with ease from the central [hub](Container) ... 
+//! Handle the following *Resources* with ease from the central [hub](Container) ...
 //! 
 //! * projects
 //!  * [*aggregated usable subnetworks list*](api::ProjectAggregatedUsableSubnetworkListCall), [*locations clusters complete ip rotation*](api::ProjectLocationClusterCompleteIpRotationCall), [*locations clusters create*](api::ProjectLocationClusterCreateCall), [*locations clusters delete*](api::ProjectLocationClusterDeleteCall), [*locations clusters get*](api::ProjectLocationClusterGetCall), [*locations clusters get jwks*](api::ProjectLocationClusterGetJwkCall), [*locations clusters list*](api::ProjectLocationClusterListCall), [*locations clusters node pools complete upgrade*](api::ProjectLocationClusterNodePoolCompleteUpgradeCall), [*locations clusters node pools create*](api::ProjectLocationClusterNodePoolCreateCall), [*locations clusters node pools delete*](api::ProjectLocationClusterNodePoolDeleteCall), [*locations clusters node pools get*](api::ProjectLocationClusterNodePoolGetCall), [*locations clusters node pools list*](api::ProjectLocationClusterNodePoolListCall), [*locations clusters node pools rollback*](api::ProjectLocationClusterNodePoolRollbackCall), [*locations clusters node pools set autoscaling*](api::ProjectLocationClusterNodePoolSetAutoscalingCall), [*locations clusters node pools set management*](api::ProjectLocationClusterNodePoolSetManagementCall), [*locations clusters node pools set size*](api::ProjectLocationClusterNodePoolSetSizeCall), [*locations clusters node pools update*](api::ProjectLocationClusterNodePoolUpdateCall), [*locations clusters set addons*](api::ProjectLocationClusterSetAddonCall), [*locations clusters set legacy abac*](api::ProjectLocationClusterSetLegacyAbacCall), [*locations clusters set locations*](api::ProjectLocationClusterSetLocationCall), [*locations clusters set logging*](api::ProjectLocationClusterSetLoggingCall), [*locations clusters set maintenance policy*](api::ProjectLocationClusterSetMaintenancePolicyCall), [*locations clusters set master auth*](api::ProjectLocationClusterSetMasterAuthCall), [*locations clusters set monitoring*](api::ProjectLocationClusterSetMonitoringCall), [*locations clusters set network policy*](api::ProjectLocationClusterSetNetworkPolicyCall), [*locations clusters set resource labels*](api::ProjectLocationClusterSetResourceLabelCall), [*locations clusters start ip rotation*](api::ProjectLocationClusterStartIpRotationCall), [*locations clusters update*](api::ProjectLocationClusterUpdateCall), [*locations clusters update master*](api::ProjectLocationClusterUpdateMasterCall), [*locations clusters well-known get openid-configuration*](api::ProjectLocationClusterWellKnownGetOpenidConfigurationCall), [*locations get server config*](api::ProjectLocationGetServerConfigCall), [*locations operations cancel*](api::ProjectLocationOperationCancelCall), [*locations operations get*](api::ProjectLocationOperationGetCall), [*locations operations list*](api::ProjectLocationOperationListCall), [*zones clusters addons*](api::ProjectZoneClusterAddonCall), [*zones clusters complete ip rotation*](api::ProjectZoneClusterCompleteIpRotationCall), [*zones clusters create*](api::ProjectZoneClusterCreateCall), [*zones clusters delete*](api::ProjectZoneClusterDeleteCall), [*zones clusters get*](api::ProjectZoneClusterGetCall), [*zones clusters legacy abac*](api::ProjectZoneClusterLegacyAbacCall), [*zones clusters list*](api::ProjectZoneClusterListCall), [*zones clusters locations*](api::ProjectZoneClusterLocationCall), [*zones clusters logging*](api::ProjectZoneClusterLoggingCall), [*zones clusters master*](api::ProjectZoneClusterMasterCall), [*zones clusters monitoring*](api::ProjectZoneClusterMonitoringCall), [*zones clusters node pools autoscaling*](api::ProjectZoneClusterNodePoolAutoscalingCall), [*zones clusters node pools create*](api::ProjectZoneClusterNodePoolCreateCall), [*zones clusters node pools delete*](api::ProjectZoneClusterNodePoolDeleteCall), [*zones clusters node pools get*](api::ProjectZoneClusterNodePoolGetCall), [*zones clusters node pools list*](api::ProjectZoneClusterNodePoolListCall), [*zones clusters node pools rollback*](api::ProjectZoneClusterNodePoolRollbackCall), [*zones clusters node pools set management*](api::ProjectZoneClusterNodePoolSetManagementCall), [*zones clusters node pools set size*](api::ProjectZoneClusterNodePoolSetSizeCall), [*zones clusters node pools update*](api::ProjectZoneClusterNodePoolUpdateCall), [*zones clusters resource labels*](api::ProjectZoneClusterResourceLabelCall), [*zones clusters set maintenance policy*](api::ProjectZoneClusterSetMaintenancePolicyCall), [*zones clusters set master auth*](api::ProjectZoneClusterSetMasterAuthCall), [*zones clusters set network policy*](api::ProjectZoneClusterSetNetworkPolicyCall), [*zones clusters start ip rotation*](api::ProjectZoneClusterStartIpRotationCall), [*zones clusters update*](api::ProjectZoneClusterUpdateCall), [*zones get serverconfig*](api::ProjectZoneGetServerconfigCall), [*zones operations cancel*](api::ProjectZoneOperationCancelCall), [*zones operations get*](api::ProjectZoneOperationGetCall) and [*zones operations list*](api::ProjectZoneOperationListCall)
@@ -95,8 +95,8 @@
 //! let r = hub.projects().zones_operations_get(...).doit().await
 //! ```
 //! 
-//! The `resource()` and `activity(...)` calls create [builders][builder-pattern]. The second one dealing with `Activities` 
-//! supports various methods to configure the impending operation (not shown here). It is made such that all required arguments have to be 
+//! The `resource()` and `activity(...)` calls create [builders][builder-pattern]. The second one dealing with `Activities`
+//! supports various methods to configure the impending operation (not shown here). It is made such that all required arguments have to be
 //! specified right away (i.e. `(...)`), whereas all optional ones can be [build up][builder-pattern] as desired.
 //! The `doit()` method performs the actual communication with the server and returns the respective result.
 //! 
@@ -124,12 +124,12 @@
 //! use std::default::Default;
 //! use container1::{Container, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 //! 
-//! // Get an ApplicationSecret instance by some means. It contains the `client_id` and 
+//! // Get an ApplicationSecret instance by some means. It contains the `client_id` and
 //! // `client_secret`, among other things.
 //! let secret: oauth2::ApplicationSecret = Default::default();
-//! // Instantiate the authenticator. It will choose a suitable authentication flow for you, 
+//! // Instantiate the authenticator. It will choose a suitable authentication flow for you,
 //! // unless you replace  `None` with the desired Flow.
-//! // Provide your own `AuthenticatorDelegate` to adjust the way it operates and get feedback about 
+//! // Provide your own `AuthenticatorDelegate` to adjust the way it operates and get feedback about
 //! // what's going on. You probably want to bring in your own `TokenStorage` to persist tokens and
 //! // retrieve them from storage.
 //! let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -169,10 +169,10 @@
 //! ## Handling Errors
 //! 
 //! All errors produced by the system are provided either as [Result](client::Result) enumeration as return value of
-//! the doit() methods, or handed as possibly intermediate results to either the 
+//! the doit() methods, or handed as possibly intermediate results to either the
 //! [Hub Delegate](client::Delegate), or the [Authenticator Delegate](https://docs.rs/yup-oauth2/*/yup_oauth2/trait.AuthenticatorDelegate.html).
 //! 
-//! When delegates handle errors or intermediate values, they may have a chance to instruct the system to retry. This 
+//! When delegates handle errors or intermediate values, they may have a chance to instruct the system to retry. This
 //! makes the system potentially resilient to all kinds of errors.
 //! 
 //! ## Uploads and Downloads
@@ -182,25 +182,25 @@
 //! You can see it as meta-data for the actual media. To trigger a media download, you will have to set up the builder by making
 //! this call: `.param("alt", "media")`.
 //! 
-//! Methods supporting uploads can do so using up to 2 different protocols: 
-//! *simple* and *resumable*. The distinctiveness of each is represented by customized 
+//! Methods supporting uploads can do so using up to 2 different protocols:
+//! *simple* and *resumable*. The distinctiveness of each is represented by customized
 //! `doit(...)` methods, which are then named `upload(...)` and `upload_resumable(...)` respectively.
 //! 
 //! ## Customization and Callbacks
 //! 
-//! You may alter the way an `doit()` method is called by providing a [delegate](client::Delegate) to the 
-//! [Method Builder](client::CallBuilder) before making the final `doit()` call. 
-//! Respective methods will be called to provide progress information, as well as determine whether the system should 
+//! You may alter the way an `doit()` method is called by providing a [delegate](client::Delegate) to the
+//! [Method Builder](client::CallBuilder) before making the final `doit()` call.
+//! Respective methods will be called to provide progress information, as well as determine whether the system should
 //! retry on failure.
 //! 
 //! The [delegate trait](client::Delegate) is default-implemented, allowing you to customize it with minimal effort.
 //! 
 //! ## Optional Parts in Server-Requests
 //! 
-//! All structures provided by this library are made to be [encodable](client::RequestValue) and 
-//! [decodable](client::ResponseResult) via *json*. Optionals are used to indicate that partial requests are responses 
+//! All structures provided by this library are made to be [encodable](client::RequestValue) and
+//! [decodable](client::ResponseResult) via *json*. Optionals are used to indicate that partial requests are responses
 //! are valid.
-//! Most optionals are are considered [Parts](client::Part) which are identifiable by name, which will be sent to 
+//! Most optionals are are considered [Parts](client::Part) which are identifiable by name, which will be sent to
 //! the server to indicate either the set parts of the request or the desired parts in the response.
 //! 
 //! ## Builder Arguments

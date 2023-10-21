@@ -11,7 +11,7 @@ Everything else about the *adsense* *v2* API can be found at the
 [official documentation site](https://developers.google.com/adsense/management/).
 # Features
 
-Handle the following *Resources* with ease from the central [hub](https://docs.rs/google-adsense2/5.0.3+20230124/google_adsense2/Adsense) ... 
+Handle the following *Resources* with ease from the central [hub](https://docs.rs/google-adsense2/5.0.3+20230124/google_adsense2/Adsense) ...
 
 * [accounts](https://docs.rs/google-adsense2/5.0.3+20230124/google_adsense2/api::Account)
  * [*adclients adunits create*](https://docs.rs/google-adsense2/5.0.3+20230124/google_adsense2/api::AccountAdclientAdunitCreateCall), [*adclients adunits get*](https://docs.rs/google-adsense2/5.0.3+20230124/google_adsense2/api::AccountAdclientAdunitGetCall), [*adclients adunits get adcode*](https://docs.rs/google-adsense2/5.0.3+20230124/google_adsense2/api::AccountAdclientAdunitGetAdcodeCall), [*adclients adunits list*](https://docs.rs/google-adsense2/5.0.3+20230124/google_adsense2/api::AccountAdclientAdunitListCall), [*adclients adunits list linked custom channels*](https://docs.rs/google-adsense2/5.0.3+20230124/google_adsense2/api::AccountAdclientAdunitListLinkedCustomChannelCall), [*adclients adunits patch*](https://docs.rs/google-adsense2/5.0.3+20230124/google_adsense2/api::AccountAdclientAdunitPatchCall), [*adclients customchannels create*](https://docs.rs/google-adsense2/5.0.3+20230124/google_adsense2/api::AccountAdclientCustomchannelCreateCall), [*adclients customchannels delete*](https://docs.rs/google-adsense2/5.0.3+20230124/google_adsense2/api::AccountAdclientCustomchannelDeleteCall), [*adclients customchannels get*](https://docs.rs/google-adsense2/5.0.3+20230124/google_adsense2/api::AccountAdclientCustomchannelGetCall), [*adclients customchannels list*](https://docs.rs/google-adsense2/5.0.3+20230124/google_adsense2/api::AccountAdclientCustomchannelListCall), [*adclients customchannels list linked ad units*](https://docs.rs/google-adsense2/5.0.3+20230124/google_adsense2/api::AccountAdclientCustomchannelListLinkedAdUnitCall), [*adclients customchannels patch*](https://docs.rs/google-adsense2/5.0.3+20230124/google_adsense2/api::AccountAdclientCustomchannelPatchCall), [*adclients get*](https://docs.rs/google-adsense2/5.0.3+20230124/google_adsense2/api::AccountAdclientGetCall), [*adclients get adcode*](https://docs.rs/google-adsense2/5.0.3+20230124/google_adsense2/api::AccountAdclientGetAdcodeCall), [*adclients list*](https://docs.rs/google-adsense2/5.0.3+20230124/google_adsense2/api::AccountAdclientListCall), [*adclients urlchannels get*](https://docs.rs/google-adsense2/5.0.3+20230124/google_adsense2/api::AccountAdclientUrlchannelGetCall), [*adclients urlchannels list*](https://docs.rs/google-adsense2/5.0.3+20230124/google_adsense2/api::AccountAdclientUrlchannelListCall), [*alerts list*](https://docs.rs/google-adsense2/5.0.3+20230124/google_adsense2/api::AccountAlertListCall), [*get*](https://docs.rs/google-adsense2/5.0.3+20230124/google_adsense2/api::AccountGetCall), [*get ad blocking recovery tag*](https://docs.rs/google-adsense2/5.0.3+20230124/google_adsense2/api::AccountGetAdBlockingRecoveryTagCall), [*list*](https://docs.rs/google-adsense2/5.0.3+20230124/google_adsense2/api::AccountListCall), [*list child accounts*](https://docs.rs/google-adsense2/5.0.3+20230124/google_adsense2/api::AccountListChildAccountCall), [*payments list*](https://docs.rs/google-adsense2/5.0.3+20230124/google_adsense2/api::AccountPaymentListCall), [*reports generate*](https://docs.rs/google-adsense2/5.0.3+20230124/google_adsense2/api::AccountReportGenerateCall), [*reports generate csv*](https://docs.rs/google-adsense2/5.0.3+20230124/google_adsense2/api::AccountReportGenerateCsvCall), [*reports get saved*](https://docs.rs/google-adsense2/5.0.3+20230124/google_adsense2/api::AccountReportGetSavedCall), [*reports saved generate*](https://docs.rs/google-adsense2/5.0.3+20230124/google_adsense2/api::AccountReportSavedGenerateCall), [*reports saved generate csv*](https://docs.rs/google-adsense2/5.0.3+20230124/google_adsense2/api::AccountReportSavedGenerateCsvCall), [*reports saved list*](https://docs.rs/google-adsense2/5.0.3+20230124/google_adsense2/api::AccountReportSavedListCall), [*sites get*](https://docs.rs/google-adsense2/5.0.3+20230124/google_adsense2/api::AccountSiteGetCall) and [*sites list*](https://docs.rs/google-adsense2/5.0.3+20230124/google_adsense2/api::AccountSiteListCall)
@@ -80,8 +80,8 @@ let r = hub.accounts().list(...).doit().await
 let r = hub.accounts().list_child_accounts(...).doit().await
 ```
 
-The `resource()` and `activity(...)` calls create [builders][builder-pattern]. The second one dealing with `Activities` 
-supports various methods to configure the impending operation (not shown here). It is made such that all required arguments have to be 
+The `resource()` and `activity(...)` calls create [builders][builder-pattern]. The second one dealing with `Activities`
+supports various methods to configure the impending operation (not shown here). It is made such that all required arguments have to be
 specified right away (i.e. `(...)`), whereas all optional ones can be [build up][builder-pattern] as desired.
 The `doit()` method performs the actual communication with the server and returns the respective result.
 
@@ -108,12 +108,12 @@ use adsense2::{Result, Error};
 use std::default::Default;
 use adsense2::{Adsense, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 
-// Get an ApplicationSecret instance by some means. It contains the `client_id` and 
+// Get an ApplicationSecret instance by some means. It contains the `client_id` and
 // `client_secret`, among other things.
 let secret: oauth2::ApplicationSecret = Default::default();
-// Instantiate the authenticator. It will choose a suitable authentication flow for you, 
+// Instantiate the authenticator. It will choose a suitable authentication flow for you,
 // unless you replace  `None` with the desired Flow.
-// Provide your own `AuthenticatorDelegate` to adjust the way it operates and get feedback about 
+// Provide your own `AuthenticatorDelegate` to adjust the way it operates and get feedback about
 // what's going on. You probably want to bring in your own `TokenStorage` to persist tokens and
 // retrieve them from storage.
 let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -164,10 +164,10 @@ match result {
 ## Handling Errors
 
 All errors produced by the system are provided either as [Result](https://docs.rs/google-adsense2/5.0.3+20230124/google_adsense2/client::Result) enumeration as return value of
-the doit() methods, or handed as possibly intermediate results to either the 
+the doit() methods, or handed as possibly intermediate results to either the
 [Hub Delegate](https://docs.rs/google-adsense2/5.0.3+20230124/google_adsense2/client::Delegate), or the [Authenticator Delegate](https://docs.rs/yup-oauth2/*/yup_oauth2/trait.AuthenticatorDelegate.html).
 
-When delegates handle errors or intermediate values, they may have a chance to instruct the system to retry. This 
+When delegates handle errors or intermediate values, they may have a chance to instruct the system to retry. This
 makes the system potentially resilient to all kinds of errors.
 
 ## Uploads and Downloads
@@ -177,25 +177,25 @@ If such a method also supports a [Response Result](https://docs.rs/google-adsens
 You can see it as meta-data for the actual media. To trigger a media download, you will have to set up the builder by making
 this call: `.param("alt", "media")`.
 
-Methods supporting uploads can do so using up to 2 different protocols: 
-*simple* and *resumable*. The distinctiveness of each is represented by customized 
+Methods supporting uploads can do so using up to 2 different protocols:
+*simple* and *resumable*. The distinctiveness of each is represented by customized
 `doit(...)` methods, which are then named `upload(...)` and `upload_resumable(...)` respectively.
 
 ## Customization and Callbacks
 
-You may alter the way an `doit()` method is called by providing a [delegate](https://docs.rs/google-adsense2/5.0.3+20230124/google_adsense2/client::Delegate) to the 
-[Method Builder](https://docs.rs/google-adsense2/5.0.3+20230124/google_adsense2/client::CallBuilder) before making the final `doit()` call. 
-Respective methods will be called to provide progress information, as well as determine whether the system should 
+You may alter the way an `doit()` method is called by providing a [delegate](https://docs.rs/google-adsense2/5.0.3+20230124/google_adsense2/client::Delegate) to the
+[Method Builder](https://docs.rs/google-adsense2/5.0.3+20230124/google_adsense2/client::CallBuilder) before making the final `doit()` call.
+Respective methods will be called to provide progress information, as well as determine whether the system should
 retry on failure.
 
 The [delegate trait](https://docs.rs/google-adsense2/5.0.3+20230124/google_adsense2/client::Delegate) is default-implemented, allowing you to customize it with minimal effort.
 
 ## Optional Parts in Server-Requests
 
-All structures provided by this library are made to be [encodable](https://docs.rs/google-adsense2/5.0.3+20230124/google_adsense2/client::RequestValue) and 
-[decodable](https://docs.rs/google-adsense2/5.0.3+20230124/google_adsense2/client::ResponseResult) via *json*. Optionals are used to indicate that partial requests are responses 
+All structures provided by this library are made to be [encodable](https://docs.rs/google-adsense2/5.0.3+20230124/google_adsense2/client::RequestValue) and
+[decodable](https://docs.rs/google-adsense2/5.0.3+20230124/google_adsense2/client::ResponseResult) via *json*. Optionals are used to indicate that partial requests are responses
 are valid.
-Most optionals are are considered [Parts](https://docs.rs/google-adsense2/5.0.3+20230124/google_adsense2/client::Part) which are identifiable by name, which will be sent to 
+Most optionals are are considered [Parts](https://docs.rs/google-adsense2/5.0.3+20230124/google_adsense2/client::Part) which are identifiable by name, which will be sent to
 the server to indicate either the set parts of the request or the desired parts in the response.
 
 ## Builder Arguments
@@ -214,7 +214,7 @@ Arguments will always be copied or cloned into the builder, to make them indepen
 [google-go-api]: https://github.com/google/google-api-go-client
 
 # License
-The **adsense2** library was generated by Sebastian Thiel, and is placed 
+The **adsense2** library was generated by Sebastian Thiel, and is placed
 under the *MIT* license.
 You can read the full text at the repository's [license file][repo-license].
 

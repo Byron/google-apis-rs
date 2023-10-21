@@ -9,7 +9,7 @@
 //! The original source code is [on github](https://github.com/Byron/google-apis-rs/tree/main/gen/artifactregistry1_beta1).
 //! # Features
 //! 
-//! Handle the following *Resources* with ease from the central [hub](ArtifactRegistry) ... 
+//! Handle the following *Resources* with ease from the central [hub](ArtifactRegistry) ...
 //! 
 //! * projects
 //!  * [*locations get*](api::ProjectLocationGetCall), [*locations list*](api::ProjectLocationListCall), [*locations operations get*](api::ProjectLocationOperationGetCall), [*locations repositories create*](api::ProjectLocationRepositoryCreateCall), [*locations repositories delete*](api::ProjectLocationRepositoryDeleteCall), [*locations repositories files get*](api::ProjectLocationRepositoryFileGetCall), [*locations repositories files list*](api::ProjectLocationRepositoryFileListCall), [*locations repositories get*](api::ProjectLocationRepositoryGetCall), [*locations repositories get iam policy*](api::ProjectLocationRepositoryGetIamPolicyCall), [*locations repositories list*](api::ProjectLocationRepositoryListCall), [*locations repositories packages delete*](api::ProjectLocationRepositoryPackageDeleteCall), [*locations repositories packages get*](api::ProjectLocationRepositoryPackageGetCall), [*locations repositories packages list*](api::ProjectLocationRepositoryPackageListCall), [*locations repositories packages tags create*](api::ProjectLocationRepositoryPackageTagCreateCall), [*locations repositories packages tags delete*](api::ProjectLocationRepositoryPackageTagDeleteCall), [*locations repositories packages tags get*](api::ProjectLocationRepositoryPackageTagGetCall), [*locations repositories packages tags list*](api::ProjectLocationRepositoryPackageTagListCall), [*locations repositories packages tags patch*](api::ProjectLocationRepositoryPackageTagPatchCall), [*locations repositories packages versions delete*](api::ProjectLocationRepositoryPackageVersionDeleteCall), [*locations repositories packages versions get*](api::ProjectLocationRepositoryPackageVersionGetCall), [*locations repositories packages versions list*](api::ProjectLocationRepositoryPackageVersionListCall), [*locations repositories patch*](api::ProjectLocationRepositoryPatchCall), [*locations repositories set iam policy*](api::ProjectLocationRepositorySetIamPolicyCall) and [*locations repositories test iam permissions*](api::ProjectLocationRepositoryTestIamPermissionCall)
@@ -54,8 +54,8 @@
 //! let r = hub.projects().locations_repositories_delete(...).doit().await
 //! ```
 //! 
-//! The `resource()` and `activity(...)` calls create [builders][builder-pattern]. The second one dealing with `Activities` 
-//! supports various methods to configure the impending operation (not shown here). It is made such that all required arguments have to be 
+//! The `resource()` and `activity(...)` calls create [builders][builder-pattern]. The second one dealing with `Activities`
+//! supports various methods to configure the impending operation (not shown here). It is made such that all required arguments have to be
 //! specified right away (i.e. `(...)`), whereas all optional ones can be [build up][builder-pattern] as desired.
 //! The `doit()` method performs the actual communication with the server and returns the respective result.
 //! 
@@ -84,12 +84,12 @@
 //! use std::default::Default;
 //! use artifactregistry1_beta1::{ArtifactRegistry, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 //! 
-//! // Get an ApplicationSecret instance by some means. It contains the `client_id` and 
+//! // Get an ApplicationSecret instance by some means. It contains the `client_id` and
 //! // `client_secret`, among other things.
 //! let secret: oauth2::ApplicationSecret = Default::default();
-//! // Instantiate the authenticator. It will choose a suitable authentication flow for you, 
+//! // Instantiate the authenticator. It will choose a suitable authentication flow for you,
 //! // unless you replace  `None` with the desired Flow.
-//! // Provide your own `AuthenticatorDelegate` to adjust the way it operates and get feedback about 
+//! // Provide your own `AuthenticatorDelegate` to adjust the way it operates and get feedback about
 //! // what's going on. You probably want to bring in your own `TokenStorage` to persist tokens and
 //! // retrieve them from storage.
 //! let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -131,10 +131,10 @@
 //! ## Handling Errors
 //! 
 //! All errors produced by the system are provided either as [Result](client::Result) enumeration as return value of
-//! the doit() methods, or handed as possibly intermediate results to either the 
+//! the doit() methods, or handed as possibly intermediate results to either the
 //! [Hub Delegate](client::Delegate), or the [Authenticator Delegate](https://docs.rs/yup-oauth2/*/yup_oauth2/trait.AuthenticatorDelegate.html).
 //! 
-//! When delegates handle errors or intermediate values, they may have a chance to instruct the system to retry. This 
+//! When delegates handle errors or intermediate values, they may have a chance to instruct the system to retry. This
 //! makes the system potentially resilient to all kinds of errors.
 //! 
 //! ## Uploads and Downloads
@@ -144,25 +144,25 @@
 //! You can see it as meta-data for the actual media. To trigger a media download, you will have to set up the builder by making
 //! this call: `.param("alt", "media")`.
 //! 
-//! Methods supporting uploads can do so using up to 2 different protocols: 
-//! *simple* and *resumable*. The distinctiveness of each is represented by customized 
+//! Methods supporting uploads can do so using up to 2 different protocols:
+//! *simple* and *resumable*. The distinctiveness of each is represented by customized
 //! `doit(...)` methods, which are then named `upload(...)` and `upload_resumable(...)` respectively.
 //! 
 //! ## Customization and Callbacks
 //! 
-//! You may alter the way an `doit()` method is called by providing a [delegate](client::Delegate) to the 
-//! [Method Builder](client::CallBuilder) before making the final `doit()` call. 
-//! Respective methods will be called to provide progress information, as well as determine whether the system should 
+//! You may alter the way an `doit()` method is called by providing a [delegate](client::Delegate) to the
+//! [Method Builder](client::CallBuilder) before making the final `doit()` call.
+//! Respective methods will be called to provide progress information, as well as determine whether the system should
 //! retry on failure.
 //! 
 //! The [delegate trait](client::Delegate) is default-implemented, allowing you to customize it with minimal effort.
 //! 
 //! ## Optional Parts in Server-Requests
 //! 
-//! All structures provided by this library are made to be [encodable](client::RequestValue) and 
-//! [decodable](client::ResponseResult) via *json*. Optionals are used to indicate that partial requests are responses 
+//! All structures provided by this library are made to be [encodable](client::RequestValue) and
+//! [decodable](client::ResponseResult) via *json*. Optionals are used to indicate that partial requests are responses
 //! are valid.
-//! Most optionals are are considered [Parts](client::Part) which are identifiable by name, which will be sent to 
+//! Most optionals are are considered [Parts](client::Part) which are identifiable by name, which will be sent to
 //! the server to indicate either the set parts of the request or the desired parts in the response.
 //! 
 //! ## Builder Arguments

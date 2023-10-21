@@ -11,7 +11,7 @@ Everything else about the *Cloud RuntimeConfig* *v1_beta1* API can be found at t
 [official documentation site](https://cloud.google.com/deployment-manager/runtime-configurator/).
 # Features
 
-Handle the following *Resources* with ease from the central [hub](https://docs.rs/google-runtimeconfig1_beta1/5.0.3+20230123/google_runtimeconfig1_beta1/CloudRuntimeConfig) ... 
+Handle the following *Resources* with ease from the central [hub](https://docs.rs/google-runtimeconfig1_beta1/5.0.3+20230123/google_runtimeconfig1_beta1/CloudRuntimeConfig) ...
 
 * projects
  * [*configs create*](https://docs.rs/google-runtimeconfig1_beta1/5.0.3+20230123/google_runtimeconfig1_beta1/api::ProjectConfigCreateCall), [*configs delete*](https://docs.rs/google-runtimeconfig1_beta1/5.0.3+20230123/google_runtimeconfig1_beta1/api::ProjectConfigDeleteCall), [*configs get*](https://docs.rs/google-runtimeconfig1_beta1/5.0.3+20230123/google_runtimeconfig1_beta1/api::ProjectConfigGetCall), [*configs get iam policy*](https://docs.rs/google-runtimeconfig1_beta1/5.0.3+20230123/google_runtimeconfig1_beta1/api::ProjectConfigGetIamPolicyCall), [*configs list*](https://docs.rs/google-runtimeconfig1_beta1/5.0.3+20230123/google_runtimeconfig1_beta1/api::ProjectConfigListCall), [*configs operations get*](https://docs.rs/google-runtimeconfig1_beta1/5.0.3+20230123/google_runtimeconfig1_beta1/api::ProjectConfigOperationGetCall), [*configs operations test iam permissions*](https://docs.rs/google-runtimeconfig1_beta1/5.0.3+20230123/google_runtimeconfig1_beta1/api::ProjectConfigOperationTestIamPermissionCall), [*configs set iam policy*](https://docs.rs/google-runtimeconfig1_beta1/5.0.3+20230123/google_runtimeconfig1_beta1/api::ProjectConfigSetIamPolicyCall), [*configs test iam permissions*](https://docs.rs/google-runtimeconfig1_beta1/5.0.3+20230123/google_runtimeconfig1_beta1/api::ProjectConfigTestIamPermissionCall), [*configs update*](https://docs.rs/google-runtimeconfig1_beta1/5.0.3+20230123/google_runtimeconfig1_beta1/api::ProjectConfigUpdateCall), [*configs variables create*](https://docs.rs/google-runtimeconfig1_beta1/5.0.3+20230123/google_runtimeconfig1_beta1/api::ProjectConfigVariableCreateCall), [*configs variables delete*](https://docs.rs/google-runtimeconfig1_beta1/5.0.3+20230123/google_runtimeconfig1_beta1/api::ProjectConfigVariableDeleteCall), [*configs variables get*](https://docs.rs/google-runtimeconfig1_beta1/5.0.3+20230123/google_runtimeconfig1_beta1/api::ProjectConfigVariableGetCall), [*configs variables list*](https://docs.rs/google-runtimeconfig1_beta1/5.0.3+20230123/google_runtimeconfig1_beta1/api::ProjectConfigVariableListCall), [*configs variables test iam permissions*](https://docs.rs/google-runtimeconfig1_beta1/5.0.3+20230123/google_runtimeconfig1_beta1/api::ProjectConfigVariableTestIamPermissionCall), [*configs variables update*](https://docs.rs/google-runtimeconfig1_beta1/5.0.3+20230123/google_runtimeconfig1_beta1/api::ProjectConfigVariableUpdateCall), [*configs variables watch*](https://docs.rs/google-runtimeconfig1_beta1/5.0.3+20230123/google_runtimeconfig1_beta1/api::ProjectConfigVariableWatchCall), [*configs waiters create*](https://docs.rs/google-runtimeconfig1_beta1/5.0.3+20230123/google_runtimeconfig1_beta1/api::ProjectConfigWaiterCreateCall), [*configs waiters delete*](https://docs.rs/google-runtimeconfig1_beta1/5.0.3+20230123/google_runtimeconfig1_beta1/api::ProjectConfigWaiterDeleteCall), [*configs waiters get*](https://docs.rs/google-runtimeconfig1_beta1/5.0.3+20230123/google_runtimeconfig1_beta1/api::ProjectConfigWaiterGetCall), [*configs waiters list*](https://docs.rs/google-runtimeconfig1_beta1/5.0.3+20230123/google_runtimeconfig1_beta1/api::ProjectConfigWaiterListCall) and [*configs waiters test iam permissions*](https://docs.rs/google-runtimeconfig1_beta1/5.0.3+20230123/google_runtimeconfig1_beta1/api::ProjectConfigWaiterTestIamPermissionCall)
@@ -53,8 +53,8 @@ let r = hub.projects().configs_variables_update(...).doit().await
 let r = hub.projects().configs_variables_watch(...).doit().await
 ```
 
-The `resource()` and `activity(...)` calls create [builders][builder-pattern]. The second one dealing with `Activities` 
-supports various methods to configure the impending operation (not shown here). It is made such that all required arguments have to be 
+The `resource()` and `activity(...)` calls create [builders][builder-pattern]. The second one dealing with `Activities`
+supports various methods to configure the impending operation (not shown here). It is made such that all required arguments have to be
 specified right away (i.e. `(...)`), whereas all optional ones can be [build up][builder-pattern] as desired.
 The `doit()` method performs the actual communication with the server and returns the respective result.
 
@@ -82,12 +82,12 @@ use runtimeconfig1_beta1::{Result, Error};
 use std::default::Default;
 use runtimeconfig1_beta1::{CloudRuntimeConfig, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 
-// Get an ApplicationSecret instance by some means. It contains the `client_id` and 
+// Get an ApplicationSecret instance by some means. It contains the `client_id` and
 // `client_secret`, among other things.
 let secret: oauth2::ApplicationSecret = Default::default();
-// Instantiate the authenticator. It will choose a suitable authentication flow for you, 
+// Instantiate the authenticator. It will choose a suitable authentication flow for you,
 // unless you replace  `None` with the desired Flow.
-// Provide your own `AuthenticatorDelegate` to adjust the way it operates and get feedback about 
+// Provide your own `AuthenticatorDelegate` to adjust the way it operates and get feedback about
 // what's going on. You probably want to bring in your own `TokenStorage` to persist tokens and
 // retrieve them from storage.
 let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -129,10 +129,10 @@ match result {
 ## Handling Errors
 
 All errors produced by the system are provided either as [Result](https://docs.rs/google-runtimeconfig1_beta1/5.0.3+20230123/google_runtimeconfig1_beta1/client::Result) enumeration as return value of
-the doit() methods, or handed as possibly intermediate results to either the 
+the doit() methods, or handed as possibly intermediate results to either the
 [Hub Delegate](https://docs.rs/google-runtimeconfig1_beta1/5.0.3+20230123/google_runtimeconfig1_beta1/client::Delegate), or the [Authenticator Delegate](https://docs.rs/yup-oauth2/*/yup_oauth2/trait.AuthenticatorDelegate.html).
 
-When delegates handle errors or intermediate values, they may have a chance to instruct the system to retry. This 
+When delegates handle errors or intermediate values, they may have a chance to instruct the system to retry. This
 makes the system potentially resilient to all kinds of errors.
 
 ## Uploads and Downloads
@@ -142,25 +142,25 @@ If such a method also supports a [Response Result](https://docs.rs/google-runtim
 You can see it as meta-data for the actual media. To trigger a media download, you will have to set up the builder by making
 this call: `.param("alt", "media")`.
 
-Methods supporting uploads can do so using up to 2 different protocols: 
-*simple* and *resumable*. The distinctiveness of each is represented by customized 
+Methods supporting uploads can do so using up to 2 different protocols:
+*simple* and *resumable*. The distinctiveness of each is represented by customized
 `doit(...)` methods, which are then named `upload(...)` and `upload_resumable(...)` respectively.
 
 ## Customization and Callbacks
 
-You may alter the way an `doit()` method is called by providing a [delegate](https://docs.rs/google-runtimeconfig1_beta1/5.0.3+20230123/google_runtimeconfig1_beta1/client::Delegate) to the 
-[Method Builder](https://docs.rs/google-runtimeconfig1_beta1/5.0.3+20230123/google_runtimeconfig1_beta1/client::CallBuilder) before making the final `doit()` call. 
-Respective methods will be called to provide progress information, as well as determine whether the system should 
+You may alter the way an `doit()` method is called by providing a [delegate](https://docs.rs/google-runtimeconfig1_beta1/5.0.3+20230123/google_runtimeconfig1_beta1/client::Delegate) to the
+[Method Builder](https://docs.rs/google-runtimeconfig1_beta1/5.0.3+20230123/google_runtimeconfig1_beta1/client::CallBuilder) before making the final `doit()` call.
+Respective methods will be called to provide progress information, as well as determine whether the system should
 retry on failure.
 
 The [delegate trait](https://docs.rs/google-runtimeconfig1_beta1/5.0.3+20230123/google_runtimeconfig1_beta1/client::Delegate) is default-implemented, allowing you to customize it with minimal effort.
 
 ## Optional Parts in Server-Requests
 
-All structures provided by this library are made to be [encodable](https://docs.rs/google-runtimeconfig1_beta1/5.0.3+20230123/google_runtimeconfig1_beta1/client::RequestValue) and 
-[decodable](https://docs.rs/google-runtimeconfig1_beta1/5.0.3+20230123/google_runtimeconfig1_beta1/client::ResponseResult) via *json*. Optionals are used to indicate that partial requests are responses 
+All structures provided by this library are made to be [encodable](https://docs.rs/google-runtimeconfig1_beta1/5.0.3+20230123/google_runtimeconfig1_beta1/client::RequestValue) and
+[decodable](https://docs.rs/google-runtimeconfig1_beta1/5.0.3+20230123/google_runtimeconfig1_beta1/client::ResponseResult) via *json*. Optionals are used to indicate that partial requests are responses
 are valid.
-Most optionals are are considered [Parts](https://docs.rs/google-runtimeconfig1_beta1/5.0.3+20230123/google_runtimeconfig1_beta1/client::Part) which are identifiable by name, which will be sent to 
+Most optionals are are considered [Parts](https://docs.rs/google-runtimeconfig1_beta1/5.0.3+20230123/google_runtimeconfig1_beta1/client::Part) which are identifiable by name, which will be sent to
 the server to indicate either the set parts of the request or the desired parts in the response.
 
 ## Builder Arguments
@@ -179,7 +179,7 @@ Arguments will always be copied or cloned into the builder, to make them indepen
 [google-go-api]: https://github.com/google/google-api-go-client
 
 # License
-The **runtimeconfig1_beta1** library was generated by Sebastian Thiel, and is placed 
+The **runtimeconfig1_beta1** library was generated by Sebastian Thiel, and is placed
 under the *MIT* license.
 You can read the full text at the repository's [license file][repo-license].
 

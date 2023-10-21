@@ -11,7 +11,7 @@ Everything else about the *Database Migration Service* *v1* API can be found at 
 [official documentation site](https://cloud.google.com/database-migration/).
 # Features
 
-Handle the following *Resources* with ease from the central [hub](https://docs.rs/google-datamigration1/5.0.3+20230105/google_datamigration1/DatabaseMigrationService) ... 
+Handle the following *Resources* with ease from the central [hub](https://docs.rs/google-datamigration1/5.0.3+20230105/google_datamigration1/DatabaseMigrationService) ...
 
 * projects
  * [*locations connection profiles create*](https://docs.rs/google-datamigration1/5.0.3+20230105/google_datamigration1/api::ProjectLocationConnectionProfileCreateCall), [*locations connection profiles delete*](https://docs.rs/google-datamigration1/5.0.3+20230105/google_datamigration1/api::ProjectLocationConnectionProfileDeleteCall), [*locations connection profiles get*](https://docs.rs/google-datamigration1/5.0.3+20230105/google_datamigration1/api::ProjectLocationConnectionProfileGetCall), [*locations connection profiles get iam policy*](https://docs.rs/google-datamigration1/5.0.3+20230105/google_datamigration1/api::ProjectLocationConnectionProfileGetIamPolicyCall), [*locations connection profiles list*](https://docs.rs/google-datamigration1/5.0.3+20230105/google_datamigration1/api::ProjectLocationConnectionProfileListCall), [*locations connection profiles patch*](https://docs.rs/google-datamigration1/5.0.3+20230105/google_datamigration1/api::ProjectLocationConnectionProfilePatchCall), [*locations connection profiles set iam policy*](https://docs.rs/google-datamigration1/5.0.3+20230105/google_datamigration1/api::ProjectLocationConnectionProfileSetIamPolicyCall), [*locations connection profiles test iam permissions*](https://docs.rs/google-datamigration1/5.0.3+20230105/google_datamigration1/api::ProjectLocationConnectionProfileTestIamPermissionCall), [*locations conversion workspaces apply*](https://docs.rs/google-datamigration1/5.0.3+20230105/google_datamigration1/api::ProjectLocationConversionWorkspaceApplyCall), [*locations conversion workspaces commit*](https://docs.rs/google-datamigration1/5.0.3+20230105/google_datamigration1/api::ProjectLocationConversionWorkspaceCommitCall), [*locations conversion workspaces convert*](https://docs.rs/google-datamigration1/5.0.3+20230105/google_datamigration1/api::ProjectLocationConversionWorkspaceConvertCall), [*locations conversion workspaces create*](https://docs.rs/google-datamigration1/5.0.3+20230105/google_datamigration1/api::ProjectLocationConversionWorkspaceCreateCall), [*locations conversion workspaces delete*](https://docs.rs/google-datamigration1/5.0.3+20230105/google_datamigration1/api::ProjectLocationConversionWorkspaceDeleteCall), [*locations conversion workspaces describe conversion workspace revisions*](https://docs.rs/google-datamigration1/5.0.3+20230105/google_datamigration1/api::ProjectLocationConversionWorkspaceDescribeConversionWorkspaceRevisionCall), [*locations conversion workspaces describe database entities*](https://docs.rs/google-datamigration1/5.0.3+20230105/google_datamigration1/api::ProjectLocationConversionWorkspaceDescribeDatabaseEntityCall), [*locations conversion workspaces get*](https://docs.rs/google-datamigration1/5.0.3+20230105/google_datamigration1/api::ProjectLocationConversionWorkspaceGetCall), [*locations conversion workspaces list*](https://docs.rs/google-datamigration1/5.0.3+20230105/google_datamigration1/api::ProjectLocationConversionWorkspaceListCall), [*locations conversion workspaces mapping rules import*](https://docs.rs/google-datamigration1/5.0.3+20230105/google_datamigration1/api::ProjectLocationConversionWorkspaceMappingRuleImportCall), [*locations conversion workspaces patch*](https://docs.rs/google-datamigration1/5.0.3+20230105/google_datamigration1/api::ProjectLocationConversionWorkspacePatchCall), [*locations conversion workspaces rollback*](https://docs.rs/google-datamigration1/5.0.3+20230105/google_datamigration1/api::ProjectLocationConversionWorkspaceRollbackCall), [*locations conversion workspaces search background jobs*](https://docs.rs/google-datamigration1/5.0.3+20230105/google_datamigration1/api::ProjectLocationConversionWorkspaceSearchBackgroundJobCall), [*locations conversion workspaces seed*](https://docs.rs/google-datamigration1/5.0.3+20230105/google_datamigration1/api::ProjectLocationConversionWorkspaceSeedCall), [*locations get*](https://docs.rs/google-datamigration1/5.0.3+20230105/google_datamigration1/api::ProjectLocationGetCall), [*locations list*](https://docs.rs/google-datamigration1/5.0.3+20230105/google_datamigration1/api::ProjectLocationListCall), [*locations migration jobs create*](https://docs.rs/google-datamigration1/5.0.3+20230105/google_datamigration1/api::ProjectLocationMigrationJobCreateCall), [*locations migration jobs delete*](https://docs.rs/google-datamigration1/5.0.3+20230105/google_datamigration1/api::ProjectLocationMigrationJobDeleteCall), [*locations migration jobs generate ssh script*](https://docs.rs/google-datamigration1/5.0.3+20230105/google_datamigration1/api::ProjectLocationMigrationJobGenerateSshScriptCall), [*locations migration jobs get*](https://docs.rs/google-datamigration1/5.0.3+20230105/google_datamigration1/api::ProjectLocationMigrationJobGetCall), [*locations migration jobs get iam policy*](https://docs.rs/google-datamigration1/5.0.3+20230105/google_datamigration1/api::ProjectLocationMigrationJobGetIamPolicyCall), [*locations migration jobs list*](https://docs.rs/google-datamigration1/5.0.3+20230105/google_datamigration1/api::ProjectLocationMigrationJobListCall), [*locations migration jobs patch*](https://docs.rs/google-datamigration1/5.0.3+20230105/google_datamigration1/api::ProjectLocationMigrationJobPatchCall), [*locations migration jobs promote*](https://docs.rs/google-datamigration1/5.0.3+20230105/google_datamigration1/api::ProjectLocationMigrationJobPromoteCall), [*locations migration jobs restart*](https://docs.rs/google-datamigration1/5.0.3+20230105/google_datamigration1/api::ProjectLocationMigrationJobRestartCall), [*locations migration jobs resume*](https://docs.rs/google-datamigration1/5.0.3+20230105/google_datamigration1/api::ProjectLocationMigrationJobResumeCall), [*locations migration jobs set iam policy*](https://docs.rs/google-datamigration1/5.0.3+20230105/google_datamigration1/api::ProjectLocationMigrationJobSetIamPolicyCall), [*locations migration jobs start*](https://docs.rs/google-datamigration1/5.0.3+20230105/google_datamigration1/api::ProjectLocationMigrationJobStartCall), [*locations migration jobs stop*](https://docs.rs/google-datamigration1/5.0.3+20230105/google_datamigration1/api::ProjectLocationMigrationJobStopCall), [*locations migration jobs test iam permissions*](https://docs.rs/google-datamigration1/5.0.3+20230105/google_datamigration1/api::ProjectLocationMigrationJobTestIamPermissionCall), [*locations migration jobs verify*](https://docs.rs/google-datamigration1/5.0.3+20230105/google_datamigration1/api::ProjectLocationMigrationJobVerifyCall), [*locations operations cancel*](https://docs.rs/google-datamigration1/5.0.3+20230105/google_datamigration1/api::ProjectLocationOperationCancelCall), [*locations operations delete*](https://docs.rs/google-datamigration1/5.0.3+20230105/google_datamigration1/api::ProjectLocationOperationDeleteCall), [*locations operations get*](https://docs.rs/google-datamigration1/5.0.3+20230105/google_datamigration1/api::ProjectLocationOperationGetCall), [*locations operations list*](https://docs.rs/google-datamigration1/5.0.3+20230105/google_datamigration1/api::ProjectLocationOperationListCall), [*locations private connections create*](https://docs.rs/google-datamigration1/5.0.3+20230105/google_datamigration1/api::ProjectLocationPrivateConnectionCreateCall), [*locations private connections delete*](https://docs.rs/google-datamigration1/5.0.3+20230105/google_datamigration1/api::ProjectLocationPrivateConnectionDeleteCall), [*locations private connections get*](https://docs.rs/google-datamigration1/5.0.3+20230105/google_datamigration1/api::ProjectLocationPrivateConnectionGetCall) and [*locations private connections list*](https://docs.rs/google-datamigration1/5.0.3+20230105/google_datamigration1/api::ProjectLocationPrivateConnectionListCall)
@@ -73,8 +73,8 @@ let r = hub.projects().locations_private_connections_create(...).doit().await
 let r = hub.projects().locations_private_connections_delete(...).doit().await
 ```
 
-The `resource()` and `activity(...)` calls create [builders][builder-pattern]. The second one dealing with `Activities` 
-supports various methods to configure the impending operation (not shown here). It is made such that all required arguments have to be 
+The `resource()` and `activity(...)` calls create [builders][builder-pattern]. The second one dealing with `Activities`
+supports various methods to configure the impending operation (not shown here). It is made such that all required arguments have to be
 specified right away (i.e. `(...)`), whereas all optional ones can be [build up][builder-pattern] as desired.
 The `doit()` method performs the actual communication with the server and returns the respective result.
 
@@ -102,12 +102,12 @@ use datamigration1::{Result, Error};
 use std::default::Default;
 use datamigration1::{DatabaseMigrationService, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 
-// Get an ApplicationSecret instance by some means. It contains the `client_id` and 
+// Get an ApplicationSecret instance by some means. It contains the `client_id` and
 // `client_secret`, among other things.
 let secret: oauth2::ApplicationSecret = Default::default();
-// Instantiate the authenticator. It will choose a suitable authentication flow for you, 
+// Instantiate the authenticator. It will choose a suitable authentication flow for you,
 // unless you replace  `None` with the desired Flow.
-// Provide your own `AuthenticatorDelegate` to adjust the way it operates and get feedback about 
+// Provide your own `AuthenticatorDelegate` to adjust the way it operates and get feedback about
 // what's going on. You probably want to bring in your own `TokenStorage` to persist tokens and
 // retrieve them from storage.
 let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -152,10 +152,10 @@ match result {
 ## Handling Errors
 
 All errors produced by the system are provided either as [Result](https://docs.rs/google-datamigration1/5.0.3+20230105/google_datamigration1/client::Result) enumeration as return value of
-the doit() methods, or handed as possibly intermediate results to either the 
+the doit() methods, or handed as possibly intermediate results to either the
 [Hub Delegate](https://docs.rs/google-datamigration1/5.0.3+20230105/google_datamigration1/client::Delegate), or the [Authenticator Delegate](https://docs.rs/yup-oauth2/*/yup_oauth2/trait.AuthenticatorDelegate.html).
 
-When delegates handle errors or intermediate values, they may have a chance to instruct the system to retry. This 
+When delegates handle errors or intermediate values, they may have a chance to instruct the system to retry. This
 makes the system potentially resilient to all kinds of errors.
 
 ## Uploads and Downloads
@@ -165,25 +165,25 @@ If such a method also supports a [Response Result](https://docs.rs/google-datami
 You can see it as meta-data for the actual media. To trigger a media download, you will have to set up the builder by making
 this call: `.param("alt", "media")`.
 
-Methods supporting uploads can do so using up to 2 different protocols: 
-*simple* and *resumable*. The distinctiveness of each is represented by customized 
+Methods supporting uploads can do so using up to 2 different protocols:
+*simple* and *resumable*. The distinctiveness of each is represented by customized
 `doit(...)` methods, which are then named `upload(...)` and `upload_resumable(...)` respectively.
 
 ## Customization and Callbacks
 
-You may alter the way an `doit()` method is called by providing a [delegate](https://docs.rs/google-datamigration1/5.0.3+20230105/google_datamigration1/client::Delegate) to the 
-[Method Builder](https://docs.rs/google-datamigration1/5.0.3+20230105/google_datamigration1/client::CallBuilder) before making the final `doit()` call. 
-Respective methods will be called to provide progress information, as well as determine whether the system should 
+You may alter the way an `doit()` method is called by providing a [delegate](https://docs.rs/google-datamigration1/5.0.3+20230105/google_datamigration1/client::Delegate) to the
+[Method Builder](https://docs.rs/google-datamigration1/5.0.3+20230105/google_datamigration1/client::CallBuilder) before making the final `doit()` call.
+Respective methods will be called to provide progress information, as well as determine whether the system should
 retry on failure.
 
 The [delegate trait](https://docs.rs/google-datamigration1/5.0.3+20230105/google_datamigration1/client::Delegate) is default-implemented, allowing you to customize it with minimal effort.
 
 ## Optional Parts in Server-Requests
 
-All structures provided by this library are made to be [encodable](https://docs.rs/google-datamigration1/5.0.3+20230105/google_datamigration1/client::RequestValue) and 
-[decodable](https://docs.rs/google-datamigration1/5.0.3+20230105/google_datamigration1/client::ResponseResult) via *json*. Optionals are used to indicate that partial requests are responses 
+All structures provided by this library are made to be [encodable](https://docs.rs/google-datamigration1/5.0.3+20230105/google_datamigration1/client::RequestValue) and
+[decodable](https://docs.rs/google-datamigration1/5.0.3+20230105/google_datamigration1/client::ResponseResult) via *json*. Optionals are used to indicate that partial requests are responses
 are valid.
-Most optionals are are considered [Parts](https://docs.rs/google-datamigration1/5.0.3+20230105/google_datamigration1/client::Part) which are identifiable by name, which will be sent to 
+Most optionals are are considered [Parts](https://docs.rs/google-datamigration1/5.0.3+20230105/google_datamigration1/client::Part) which are identifiable by name, which will be sent to
 the server to indicate either the set parts of the request or the desired parts in the response.
 
 ## Builder Arguments
@@ -202,7 +202,7 @@ Arguments will always be copied or cloned into the builder, to make them indepen
 [google-go-api]: https://github.com/google/google-api-go-client
 
 # License
-The **datamigration1** library was generated by Sebastian Thiel, and is placed 
+The **datamigration1** library was generated by Sebastian Thiel, and is placed
 under the *MIT* license.
 You can read the full text at the repository's [license file][repo-license].
 

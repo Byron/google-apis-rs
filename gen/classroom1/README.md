@@ -11,7 +11,7 @@ Everything else about the *classroom* *v1* API can be found at the
 [official documentation site](https://developers.google.com/classroom/).
 # Features
 
-Handle the following *Resources* with ease from the central [hub](https://docs.rs/google-classroom1/5.0.3+20230119/google_classroom1/Classroom) ... 
+Handle the following *Resources* with ease from the central [hub](https://docs.rs/google-classroom1/5.0.3+20230119/google_classroom1/Classroom) ...
 
 * [courses](https://docs.rs/google-classroom1/5.0.3+20230119/google_classroom1/api::Course)
  * [*aliases create*](https://docs.rs/google-classroom1/5.0.3+20230119/google_classroom1/api::CourseAliasCreateCall), [*aliases delete*](https://docs.rs/google-classroom1/5.0.3+20230119/google_classroom1/api::CourseAliasDeleteCall), [*aliases list*](https://docs.rs/google-classroom1/5.0.3+20230119/google_classroom1/api::CourseAliasListCall), [*announcements create*](https://docs.rs/google-classroom1/5.0.3+20230119/google_classroom1/api::CourseAnnouncementCreateCall), [*announcements delete*](https://docs.rs/google-classroom1/5.0.3+20230119/google_classroom1/api::CourseAnnouncementDeleteCall), [*announcements get*](https://docs.rs/google-classroom1/5.0.3+20230119/google_classroom1/api::CourseAnnouncementGetCall), [*announcements list*](https://docs.rs/google-classroom1/5.0.3+20230119/google_classroom1/api::CourseAnnouncementListCall), [*announcements modify assignees*](https://docs.rs/google-classroom1/5.0.3+20230119/google_classroom1/api::CourseAnnouncementModifyAssigneeCall), [*announcements patch*](https://docs.rs/google-classroom1/5.0.3+20230119/google_classroom1/api::CourseAnnouncementPatchCall), [*course work create*](https://docs.rs/google-classroom1/5.0.3+20230119/google_classroom1/api::CourseCourseWorkCreateCall), [*course work delete*](https://docs.rs/google-classroom1/5.0.3+20230119/google_classroom1/api::CourseCourseWorkDeleteCall), [*course work get*](https://docs.rs/google-classroom1/5.0.3+20230119/google_classroom1/api::CourseCourseWorkGetCall), [*course work list*](https://docs.rs/google-classroom1/5.0.3+20230119/google_classroom1/api::CourseCourseWorkListCall), [*course work modify assignees*](https://docs.rs/google-classroom1/5.0.3+20230119/google_classroom1/api::CourseCourseWorkModifyAssigneeCall), [*course work patch*](https://docs.rs/google-classroom1/5.0.3+20230119/google_classroom1/api::CourseCourseWorkPatchCall), [*course work student submissions get*](https://docs.rs/google-classroom1/5.0.3+20230119/google_classroom1/api::CourseCourseWorkStudentSubmissionGetCall), [*course work student submissions list*](https://docs.rs/google-classroom1/5.0.3+20230119/google_classroom1/api::CourseCourseWorkStudentSubmissionListCall), [*course work student submissions modify attachments*](https://docs.rs/google-classroom1/5.0.3+20230119/google_classroom1/api::CourseCourseWorkStudentSubmissionModifyAttachmentCall), [*course work student submissions patch*](https://docs.rs/google-classroom1/5.0.3+20230119/google_classroom1/api::CourseCourseWorkStudentSubmissionPatchCall), [*course work student submissions reclaim*](https://docs.rs/google-classroom1/5.0.3+20230119/google_classroom1/api::CourseCourseWorkStudentSubmissionReclaimCall), [*course work student submissions return*](https://docs.rs/google-classroom1/5.0.3+20230119/google_classroom1/api::CourseCourseWorkStudentSubmissionReturnCall), [*course work student submissions turn in*](https://docs.rs/google-classroom1/5.0.3+20230119/google_classroom1/api::CourseCourseWorkStudentSubmissionTurnInCall), [*course work materials create*](https://docs.rs/google-classroom1/5.0.3+20230119/google_classroom1/api::CourseCourseWorkMaterialCreateCall), [*course work materials delete*](https://docs.rs/google-classroom1/5.0.3+20230119/google_classroom1/api::CourseCourseWorkMaterialDeleteCall), [*course work materials get*](https://docs.rs/google-classroom1/5.0.3+20230119/google_classroom1/api::CourseCourseWorkMaterialGetCall), [*course work materials list*](https://docs.rs/google-classroom1/5.0.3+20230119/google_classroom1/api::CourseCourseWorkMaterialListCall), [*course work materials patch*](https://docs.rs/google-classroom1/5.0.3+20230119/google_classroom1/api::CourseCourseWorkMaterialPatchCall), [*create*](https://docs.rs/google-classroom1/5.0.3+20230119/google_classroom1/api::CourseCreateCall), [*delete*](https://docs.rs/google-classroom1/5.0.3+20230119/google_classroom1/api::CourseDeleteCall), [*get*](https://docs.rs/google-classroom1/5.0.3+20230119/google_classroom1/api::CourseGetCall), [*list*](https://docs.rs/google-classroom1/5.0.3+20230119/google_classroom1/api::CourseListCall), [*patch*](https://docs.rs/google-classroom1/5.0.3+20230119/google_classroom1/api::CoursePatchCall), [*students create*](https://docs.rs/google-classroom1/5.0.3+20230119/google_classroom1/api::CourseStudentCreateCall), [*students delete*](https://docs.rs/google-classroom1/5.0.3+20230119/google_classroom1/api::CourseStudentDeleteCall), [*students get*](https://docs.rs/google-classroom1/5.0.3+20230119/google_classroom1/api::CourseStudentGetCall), [*students list*](https://docs.rs/google-classroom1/5.0.3+20230119/google_classroom1/api::CourseStudentListCall), [*teachers create*](https://docs.rs/google-classroom1/5.0.3+20230119/google_classroom1/api::CourseTeacherCreateCall), [*teachers delete*](https://docs.rs/google-classroom1/5.0.3+20230119/google_classroom1/api::CourseTeacherDeleteCall), [*teachers get*](https://docs.rs/google-classroom1/5.0.3+20230119/google_classroom1/api::CourseTeacherGetCall), [*teachers list*](https://docs.rs/google-classroom1/5.0.3+20230119/google_classroom1/api::CourseTeacherListCall), [*topics create*](https://docs.rs/google-classroom1/5.0.3+20230119/google_classroom1/api::CourseTopicCreateCall), [*topics delete*](https://docs.rs/google-classroom1/5.0.3+20230119/google_classroom1/api::CourseTopicDeleteCall), [*topics get*](https://docs.rs/google-classroom1/5.0.3+20230119/google_classroom1/api::CourseTopicGetCall), [*topics list*](https://docs.rs/google-classroom1/5.0.3+20230119/google_classroom1/api::CourseTopicListCall), [*topics patch*](https://docs.rs/google-classroom1/5.0.3+20230119/google_classroom1/api::CourseTopicPatchCall) and [*update*](https://docs.rs/google-classroom1/5.0.3+20230119/google_classroom1/api::CourseUpdateCall)
@@ -101,8 +101,8 @@ let r = hub.courses().patch(...).doit().await
 let r = hub.courses().update(...).doit().await
 ```
 
-The `resource()` and `activity(...)` calls create [builders][builder-pattern]. The second one dealing with `Activities` 
-supports various methods to configure the impending operation (not shown here). It is made such that all required arguments have to be 
+The `resource()` and `activity(...)` calls create [builders][builder-pattern]. The second one dealing with `Activities`
+supports various methods to configure the impending operation (not shown here). It is made such that all required arguments have to be
 specified right away (i.e. `(...)`), whereas all optional ones can be [build up][builder-pattern] as desired.
 The `doit()` method performs the actual communication with the server and returns the respective result.
 
@@ -129,12 +129,12 @@ use classroom1::{Result, Error};
 use std::default::Default;
 use classroom1::{Classroom, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 
-// Get an ApplicationSecret instance by some means. It contains the `client_id` and 
+// Get an ApplicationSecret instance by some means. It contains the `client_id` and
 // `client_secret`, among other things.
 let secret: oauth2::ApplicationSecret = Default::default();
-// Instantiate the authenticator. It will choose a suitable authentication flow for you, 
+// Instantiate the authenticator. It will choose a suitable authentication flow for you,
 // unless you replace  `None` with the desired Flow.
-// Provide your own `AuthenticatorDelegate` to adjust the way it operates and get feedback about 
+// Provide your own `AuthenticatorDelegate` to adjust the way it operates and get feedback about
 // what's going on. You probably want to bring in your own `TokenStorage` to persist tokens and
 // retrieve them from storage.
 let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -175,10 +175,10 @@ match result {
 ## Handling Errors
 
 All errors produced by the system are provided either as [Result](https://docs.rs/google-classroom1/5.0.3+20230119/google_classroom1/client::Result) enumeration as return value of
-the doit() methods, or handed as possibly intermediate results to either the 
+the doit() methods, or handed as possibly intermediate results to either the
 [Hub Delegate](https://docs.rs/google-classroom1/5.0.3+20230119/google_classroom1/client::Delegate), or the [Authenticator Delegate](https://docs.rs/yup-oauth2/*/yup_oauth2/trait.AuthenticatorDelegate.html).
 
-When delegates handle errors or intermediate values, they may have a chance to instruct the system to retry. This 
+When delegates handle errors or intermediate values, they may have a chance to instruct the system to retry. This
 makes the system potentially resilient to all kinds of errors.
 
 ## Uploads and Downloads
@@ -188,25 +188,25 @@ If such a method also supports a [Response Result](https://docs.rs/google-classr
 You can see it as meta-data for the actual media. To trigger a media download, you will have to set up the builder by making
 this call: `.param("alt", "media")`.
 
-Methods supporting uploads can do so using up to 2 different protocols: 
-*simple* and *resumable*. The distinctiveness of each is represented by customized 
+Methods supporting uploads can do so using up to 2 different protocols:
+*simple* and *resumable*. The distinctiveness of each is represented by customized
 `doit(...)` methods, which are then named `upload(...)` and `upload_resumable(...)` respectively.
 
 ## Customization and Callbacks
 
-You may alter the way an `doit()` method is called by providing a [delegate](https://docs.rs/google-classroom1/5.0.3+20230119/google_classroom1/client::Delegate) to the 
-[Method Builder](https://docs.rs/google-classroom1/5.0.3+20230119/google_classroom1/client::CallBuilder) before making the final `doit()` call. 
-Respective methods will be called to provide progress information, as well as determine whether the system should 
+You may alter the way an `doit()` method is called by providing a [delegate](https://docs.rs/google-classroom1/5.0.3+20230119/google_classroom1/client::Delegate) to the
+[Method Builder](https://docs.rs/google-classroom1/5.0.3+20230119/google_classroom1/client::CallBuilder) before making the final `doit()` call.
+Respective methods will be called to provide progress information, as well as determine whether the system should
 retry on failure.
 
 The [delegate trait](https://docs.rs/google-classroom1/5.0.3+20230119/google_classroom1/client::Delegate) is default-implemented, allowing you to customize it with minimal effort.
 
 ## Optional Parts in Server-Requests
 
-All structures provided by this library are made to be [encodable](https://docs.rs/google-classroom1/5.0.3+20230119/google_classroom1/client::RequestValue) and 
-[decodable](https://docs.rs/google-classroom1/5.0.3+20230119/google_classroom1/client::ResponseResult) via *json*. Optionals are used to indicate that partial requests are responses 
+All structures provided by this library are made to be [encodable](https://docs.rs/google-classroom1/5.0.3+20230119/google_classroom1/client::RequestValue) and
+[decodable](https://docs.rs/google-classroom1/5.0.3+20230119/google_classroom1/client::ResponseResult) via *json*. Optionals are used to indicate that partial requests are responses
 are valid.
-Most optionals are are considered [Parts](https://docs.rs/google-classroom1/5.0.3+20230119/google_classroom1/client::Part) which are identifiable by name, which will be sent to 
+Most optionals are are considered [Parts](https://docs.rs/google-classroom1/5.0.3+20230119/google_classroom1/client::Part) which are identifiable by name, which will be sent to
 the server to indicate either the set parts of the request or the desired parts in the response.
 
 ## Builder Arguments
@@ -225,7 +225,7 @@ Arguments will always be copied or cloned into the builder, to make them indepen
 [google-go-api]: https://github.com/google/google-api-go-client
 
 # License
-The **classroom1** library was generated by Sebastian Thiel, and is placed 
+The **classroom1** library was generated by Sebastian Thiel, and is placed
 under the *MIT* license.
 You can read the full text at the repository's [license file][repo-license].
 

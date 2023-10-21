@@ -9,7 +9,7 @@
 //! The original source code is [on github](https://github.com/Byron/google-apis-rs/tree/main/gen/dialogflow3).
 //! # Features
 //! 
-//! Handle the following *Resources* with ease from the central [hub](Dialogflow) ... 
+//! Handle the following *Resources* with ease from the central [hub](Dialogflow) ...
 //! 
 //! * projects
 //!  * [*locations agents changelogs get*](api::ProjectLocationAgentChangelogGetCall), [*locations agents changelogs list*](api::ProjectLocationAgentChangelogListCall), [*locations agents create*](api::ProjectLocationAgentCreateCall), [*locations agents delete*](api::ProjectLocationAgentDeleteCall), [*locations agents entity types create*](api::ProjectLocationAgentEntityTypeCreateCall), [*locations agents entity types delete*](api::ProjectLocationAgentEntityTypeDeleteCall), [*locations agents entity types get*](api::ProjectLocationAgentEntityTypeGetCall), [*locations agents entity types list*](api::ProjectLocationAgentEntityTypeListCall), [*locations agents entity types patch*](api::ProjectLocationAgentEntityTypePatchCall), [*locations agents environments continuous test results list*](api::ProjectLocationAgentEnvironmentContinuousTestResultListCall), [*locations agents environments create*](api::ProjectLocationAgentEnvironmentCreateCall), [*locations agents environments delete*](api::ProjectLocationAgentEnvironmentDeleteCall), [*locations agents environments deploy flow*](api::ProjectLocationAgentEnvironmentDeployFlowCall), [*locations agents environments deployments get*](api::ProjectLocationAgentEnvironmentDeploymentGetCall), [*locations agents environments deployments list*](api::ProjectLocationAgentEnvironmentDeploymentListCall), [*locations agents environments experiments create*](api::ProjectLocationAgentEnvironmentExperimentCreateCall), [*locations agents environments experiments delete*](api::ProjectLocationAgentEnvironmentExperimentDeleteCall), [*locations agents environments experiments get*](api::ProjectLocationAgentEnvironmentExperimentGetCall), [*locations agents environments experiments list*](api::ProjectLocationAgentEnvironmentExperimentListCall), [*locations agents environments experiments patch*](api::ProjectLocationAgentEnvironmentExperimentPatchCall), [*locations agents environments experiments start*](api::ProjectLocationAgentEnvironmentExperimentStartCall), [*locations agents environments experiments stop*](api::ProjectLocationAgentEnvironmentExperimentStopCall), [*locations agents environments get*](api::ProjectLocationAgentEnvironmentGetCall), [*locations agents environments list*](api::ProjectLocationAgentEnvironmentListCall), [*locations agents environments lookup environment history*](api::ProjectLocationAgentEnvironmentLookupEnvironmentHistoryCall), [*locations agents environments patch*](api::ProjectLocationAgentEnvironmentPatchCall), [*locations agents environments run continuous test*](api::ProjectLocationAgentEnvironmentRunContinuousTestCall), [*locations agents environments sessions detect intent*](api::ProjectLocationAgentEnvironmentSessionDetectIntentCall), [*locations agents environments sessions entity types create*](api::ProjectLocationAgentEnvironmentSessionEntityTypeCreateCall), [*locations agents environments sessions entity types delete*](api::ProjectLocationAgentEnvironmentSessionEntityTypeDeleteCall), [*locations agents environments sessions entity types get*](api::ProjectLocationAgentEnvironmentSessionEntityTypeGetCall), [*locations agents environments sessions entity types list*](api::ProjectLocationAgentEnvironmentSessionEntityTypeListCall), [*locations agents environments sessions entity types patch*](api::ProjectLocationAgentEnvironmentSessionEntityTypePatchCall), [*locations agents environments sessions fulfill intent*](api::ProjectLocationAgentEnvironmentSessionFulfillIntentCall), [*locations agents environments sessions match intent*](api::ProjectLocationAgentEnvironmentSessionMatchIntentCall), [*locations agents export*](api::ProjectLocationAgentExportCall), [*locations agents flows create*](api::ProjectLocationAgentFlowCreateCall), [*locations agents flows delete*](api::ProjectLocationAgentFlowDeleteCall), [*locations agents flows export*](api::ProjectLocationAgentFlowExportCall), [*locations agents flows get*](api::ProjectLocationAgentFlowGetCall), [*locations agents flows get validation result*](api::ProjectLocationAgentFlowGetValidationResultCall), [*locations agents flows import*](api::ProjectLocationAgentFlowImportCall), [*locations agents flows list*](api::ProjectLocationAgentFlowListCall), [*locations agents flows pages create*](api::ProjectLocationAgentFlowPageCreateCall), [*locations agents flows pages delete*](api::ProjectLocationAgentFlowPageDeleteCall), [*locations agents flows pages get*](api::ProjectLocationAgentFlowPageGetCall), [*locations agents flows pages list*](api::ProjectLocationAgentFlowPageListCall), [*locations agents flows pages patch*](api::ProjectLocationAgentFlowPagePatchCall), [*locations agents flows patch*](api::ProjectLocationAgentFlowPatchCall), [*locations agents flows train*](api::ProjectLocationAgentFlowTrainCall), [*locations agents flows transition route groups create*](api::ProjectLocationAgentFlowTransitionRouteGroupCreateCall), [*locations agents flows transition route groups delete*](api::ProjectLocationAgentFlowTransitionRouteGroupDeleteCall), [*locations agents flows transition route groups get*](api::ProjectLocationAgentFlowTransitionRouteGroupGetCall), [*locations agents flows transition route groups list*](api::ProjectLocationAgentFlowTransitionRouteGroupListCall), [*locations agents flows transition route groups patch*](api::ProjectLocationAgentFlowTransitionRouteGroupPatchCall), [*locations agents flows validate*](api::ProjectLocationAgentFlowValidateCall), [*locations agents flows versions compare versions*](api::ProjectLocationAgentFlowVersionCompareVersionCall), [*locations agents flows versions create*](api::ProjectLocationAgentFlowVersionCreateCall), [*locations agents flows versions delete*](api::ProjectLocationAgentFlowVersionDeleteCall), [*locations agents flows versions get*](api::ProjectLocationAgentFlowVersionGetCall), [*locations agents flows versions list*](api::ProjectLocationAgentFlowVersionListCall), [*locations agents flows versions load*](api::ProjectLocationAgentFlowVersionLoadCall), [*locations agents flows versions patch*](api::ProjectLocationAgentFlowVersionPatchCall), [*locations agents get*](api::ProjectLocationAgentGetCall), [*locations agents get validation result*](api::ProjectLocationAgentGetValidationResultCall), [*locations agents intents create*](api::ProjectLocationAgentIntentCreateCall), [*locations agents intents delete*](api::ProjectLocationAgentIntentDeleteCall), [*locations agents intents get*](api::ProjectLocationAgentIntentGetCall), [*locations agents intents list*](api::ProjectLocationAgentIntentListCall), [*locations agents intents patch*](api::ProjectLocationAgentIntentPatchCall), [*locations agents list*](api::ProjectLocationAgentListCall), [*locations agents patch*](api::ProjectLocationAgentPatchCall), [*locations agents restore*](api::ProjectLocationAgentRestoreCall), [*locations agents sessions detect intent*](api::ProjectLocationAgentSessionDetectIntentCall), [*locations agents sessions entity types create*](api::ProjectLocationAgentSessionEntityTypeCreateCall), [*locations agents sessions entity types delete*](api::ProjectLocationAgentSessionEntityTypeDeleteCall), [*locations agents sessions entity types get*](api::ProjectLocationAgentSessionEntityTypeGetCall), [*locations agents sessions entity types list*](api::ProjectLocationAgentSessionEntityTypeListCall), [*locations agents sessions entity types patch*](api::ProjectLocationAgentSessionEntityTypePatchCall), [*locations agents sessions fulfill intent*](api::ProjectLocationAgentSessionFulfillIntentCall), [*locations agents sessions match intent*](api::ProjectLocationAgentSessionMatchIntentCall), [*locations agents test cases batch delete*](api::ProjectLocationAgentTestCaseBatchDeleteCall), [*locations agents test cases batch run*](api::ProjectLocationAgentTestCaseBatchRunCall), [*locations agents test cases calculate coverage*](api::ProjectLocationAgentTestCaseCalculateCoverageCall), [*locations agents test cases create*](api::ProjectLocationAgentTestCaseCreateCall), [*locations agents test cases export*](api::ProjectLocationAgentTestCaseExportCall), [*locations agents test cases get*](api::ProjectLocationAgentTestCaseGetCall), [*locations agents test cases import*](api::ProjectLocationAgentTestCaseImportCall), [*locations agents test cases list*](api::ProjectLocationAgentTestCaseListCall), [*locations agents test cases patch*](api::ProjectLocationAgentTestCasePatchCall), [*locations agents test cases results get*](api::ProjectLocationAgentTestCaseResultGetCall), [*locations agents test cases results list*](api::ProjectLocationAgentTestCaseResultListCall), [*locations agents test cases run*](api::ProjectLocationAgentTestCaseRunCall), [*locations agents validate*](api::ProjectLocationAgentValidateCall), [*locations agents webhooks create*](api::ProjectLocationAgentWebhookCreateCall), [*locations agents webhooks delete*](api::ProjectLocationAgentWebhookDeleteCall), [*locations agents webhooks get*](api::ProjectLocationAgentWebhookGetCall), [*locations agents webhooks list*](api::ProjectLocationAgentWebhookListCall), [*locations agents webhooks patch*](api::ProjectLocationAgentWebhookPatchCall), [*locations get*](api::ProjectLocationGetCall), [*locations list*](api::ProjectLocationListCall), [*locations operations cancel*](api::ProjectLocationOperationCancelCall), [*locations operations get*](api::ProjectLocationOperationGetCall), [*locations operations list*](api::ProjectLocationOperationListCall), [*locations security settings create*](api::ProjectLocationSecuritySettingCreateCall), [*locations security settings delete*](api::ProjectLocationSecuritySettingDeleteCall), [*locations security settings get*](api::ProjectLocationSecuritySettingGetCall), [*locations security settings list*](api::ProjectLocationSecuritySettingListCall), [*locations security settings patch*](api::ProjectLocationSecuritySettingPatchCall), [*operations cancel*](api::ProjectOperationCancelCall), [*operations get*](api::ProjectOperationGetCall) and [*operations list*](api::ProjectOperationListCall)
@@ -66,8 +66,8 @@
 //! let r = hub.projects().operations_get(...).doit().await
 //! ```
 //! 
-//! The `resource()` and `activity(...)` calls create [builders][builder-pattern]. The second one dealing with `Activities` 
-//! supports various methods to configure the impending operation (not shown here). It is made such that all required arguments have to be 
+//! The `resource()` and `activity(...)` calls create [builders][builder-pattern]. The second one dealing with `Activities`
+//! supports various methods to configure the impending operation (not shown here). It is made such that all required arguments have to be
 //! specified right away (i.e. `(...)`), whereas all optional ones can be [build up][builder-pattern] as desired.
 //! The `doit()` method performs the actual communication with the server and returns the respective result.
 //! 
@@ -96,12 +96,12 @@
 //! use std::default::Default;
 //! use dialogflow3::{Dialogflow, oauth2, hyper, hyper_rustls, chrono, FieldMask};
 //! 
-//! // Get an ApplicationSecret instance by some means. It contains the `client_id` and 
+//! // Get an ApplicationSecret instance by some means. It contains the `client_id` and
 //! // `client_secret`, among other things.
 //! let secret: oauth2::ApplicationSecret = Default::default();
-//! // Instantiate the authenticator. It will choose a suitable authentication flow for you, 
+//! // Instantiate the authenticator. It will choose a suitable authentication flow for you,
 //! // unless you replace  `None` with the desired Flow.
-//! // Provide your own `AuthenticatorDelegate` to adjust the way it operates and get feedback about 
+//! // Provide your own `AuthenticatorDelegate` to adjust the way it operates and get feedback about
 //! // what's going on. You probably want to bring in your own `TokenStorage` to persist tokens and
 //! // retrieve them from storage.
 //! let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -143,10 +143,10 @@
 //! ## Handling Errors
 //! 
 //! All errors produced by the system are provided either as [Result](client::Result) enumeration as return value of
-//! the doit() methods, or handed as possibly intermediate results to either the 
+//! the doit() methods, or handed as possibly intermediate results to either the
 //! [Hub Delegate](client::Delegate), or the [Authenticator Delegate](https://docs.rs/yup-oauth2/*/yup_oauth2/trait.AuthenticatorDelegate.html).
 //! 
-//! When delegates handle errors or intermediate values, they may have a chance to instruct the system to retry. This 
+//! When delegates handle errors or intermediate values, they may have a chance to instruct the system to retry. This
 //! makes the system potentially resilient to all kinds of errors.
 //! 
 //! ## Uploads and Downloads
@@ -156,25 +156,25 @@
 //! You can see it as meta-data for the actual media. To trigger a media download, you will have to set up the builder by making
 //! this call: `.param("alt", "media")`.
 //! 
-//! Methods supporting uploads can do so using up to 2 different protocols: 
-//! *simple* and *resumable*. The distinctiveness of each is represented by customized 
+//! Methods supporting uploads can do so using up to 2 different protocols:
+//! *simple* and *resumable*. The distinctiveness of each is represented by customized
 //! `doit(...)` methods, which are then named `upload(...)` and `upload_resumable(...)` respectively.
 //! 
 //! ## Customization and Callbacks
 //! 
-//! You may alter the way an `doit()` method is called by providing a [delegate](client::Delegate) to the 
-//! [Method Builder](client::CallBuilder) before making the final `doit()` call. 
-//! Respective methods will be called to provide progress information, as well as determine whether the system should 
+//! You may alter the way an `doit()` method is called by providing a [delegate](client::Delegate) to the
+//! [Method Builder](client::CallBuilder) before making the final `doit()` call.
+//! Respective methods will be called to provide progress information, as well as determine whether the system should
 //! retry on failure.
 //! 
 //! The [delegate trait](client::Delegate) is default-implemented, allowing you to customize it with minimal effort.
 //! 
 //! ## Optional Parts in Server-Requests
 //! 
-//! All structures provided by this library are made to be [encodable](client::RequestValue) and 
-//! [decodable](client::ResponseResult) via *json*. Optionals are used to indicate that partial requests are responses 
+//! All structures provided by this library are made to be [encodable](client::RequestValue) and
+//! [decodable](client::ResponseResult) via *json*. Optionals are used to indicate that partial requests are responses
 //! are valid.
-//! Most optionals are are considered [Parts](client::Part) which are identifiable by name, which will be sent to 
+//! Most optionals are are considered [Parts](client::Part) which are identifiable by name, which will be sent to
 //! the server to indicate either the set parts of the request or the desired parts in the response.
 //! 
 //! ## Builder Arguments
