@@ -9,6 +9,8 @@
                       upload_action_fn, METHODS_BUILDER_MARKER_TRAIT, DELEGATE_TYPE,
                       to_extern_crate_name, rust_doc_sanitize)
 
+    from generator.lib.enum_utils import (to_enum_variant_name)
+
     def pretty_name(name):
         return ' '.join(split_camelcase_s(name).split('.'))
 %>\
@@ -64,4 +66,50 @@ impl Default for Scope {
         ${scope_url_to_variant(name, default_url)}
     }
 }
+</%def>
+
+
+<%def name="new(enum_type, e, c)">\
+#[derive(Clone, Copy, Eq, Hash, Debug, PartialEq, Serialize, Deserialize)]
+% if e.get('description'):
+/// ${e.description}
+% endif
+pub enum ${enum_type} {
+% for (variant_name,description) in zip(e.get('enum'), e.get('enumDescriptions')):
+    <% #print(variant_name, '=>', description)
+    %>
+    % if description:
+
+    /// ${description}
+    ///
+    % endif\
+    /// value:
+    /// "${variant_name}"
+    ${to_enum_variant_name(variant_name)},
+% endfor
+}
+
+impl AsRef<str> for ${enum_type} {
+    fn as_ref(&self) -> &str {
+        match *self {
+            % for variant in e.get('enum'):
+            ${enum_type}::${to_enum_variant_name(variant)} => "${variant_name}",
+            % endfor
+        }
+    }
+}
+
+impl<'a> Into<std::borrow::Cow<'a, str>> for &'a ${enum_type} {
+    fn into(self) -> std::borrow::Cow<'a, str> {
+        self.as_ref().into()
+    }
+}
+
+% if e.get('default') is not None:
+impl Default for ${enum_type} {
+    fn default() -> ${enum_type} {
+        ${enum_type}::${to_enum_variant_name(e.get('default'))}
+    }
+}
+% endif
 </%def>
