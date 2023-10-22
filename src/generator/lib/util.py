@@ -371,9 +371,16 @@ def nested_type_name(sn, pn):
 
 # Make properties which are reserved keywords usable
 def mangle_ident(n):
-    n = camel_to_under(n).replace('-', '.').replace('.', '_').replace('$', '')
+    n = camel_to_under(n)
+    return remove_invalid_chars_in_ident(n)
+
+
+def remove_invalid_chars_in_ident(n):
+    n = n.replace('-', '.').replace('.', '_').replace('$', '')
     if n in RESERVED_WORDS:
-        return n + '_'
+        n = n + '_'
+    if n[0] in '0123456789':
+        n = '_' + n
     return n
 
 
@@ -421,6 +428,7 @@ def to_rust_type_inner(
         allow_optionals=True,
         _is_recursive=False
 ) -> RustType:
+    from .enum_utils import is_property_enum, get_enum_type
     def nested_type(nt) -> RustType:
         if 'items' in nt:
             nt = nt['items']
@@ -448,6 +456,9 @@ def to_rust_type_inner(
             rt = Option(Box(rt))
         return wrap_type(rt)
     try:
+        if is_property_enum(t):
+            x = get_enum_type(schema_name, property_name, t, schemas)
+            return wrap_type(x)
         # prefer format if present
         rust_type = RUST_TYPE_MAP[t.get("format", t["type"])]
         if rust_type == Vec(None):
@@ -478,10 +489,10 @@ def is_nested_type(s):
 
 # convert a rust-type to something that would be taken as input of a function
 # even though our storage type is different
-def activity_input_type(schemas, p):
+def activity_input_type(schemas, p, parent=None):
     if 'input_type' in p:
         return p.input_type
-    n = activity_rust_type(schemas, p, allow_optionals=False)
+    n = activity_rust_type(schemas, p, allow_optionals=False, parent=parent)
     if n == 'String':
         n = 'str'
     # pods are copied anyway
@@ -580,8 +591,8 @@ def activity_split(fqan: str) -> Tuple[str, str, str]:
 
 
 # Shorthand to get a type from parameters of activities
-def activity_rust_type(schemas, p, allow_optionals=True):
-    return to_rust_type(schemas, None, p.name, p, allow_optionals=allow_optionals)
+def activity_rust_type(schemas, p, allow_optionals=True, parent=None):
+    return to_rust_type(schemas, parent, p.name, p, allow_optionals=allow_optionals)
 
 
 # the inverse of activity-split, but needs to know the 'name' of the API

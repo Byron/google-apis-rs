@@ -125,9 +125,9 @@ pub struct ${ThisType}
 % for p in params:
    pub(super) ${property(p.name)}:\
     % if is_required_property(p):
- ${activity_rust_type(schemas, p, allow_optionals=False)},
+ ${activity_rust_type(schemas, p, allow_optionals=False, parent=resource)},
     % else:
- ${activity_rust_type(schemas, p)},
+ ${activity_rust_type(schemas, p, parent=resource)},
     % endif
 % endfor
 ## A generic map for additinal parameters. Sometimes you can set some that are documented online only
@@ -223,11 +223,11 @@ ${self._setter_fn(resource, method, m, p, part_prop, ThisType, c)}\
 ###############################################################################################
 <%def name="_setter_fn(resource, method, m, p, part_prop, ThisType, c)">\
 <%
-    InType = activity_input_type(schemas, p)
+    InType = activity_input_type(schemas, p, parent=resource)
 
     if is_repeated_property(p):
         p.repeated = False
-        InType = activity_input_type(schemas, p)
+        InType = activity_input_type(schemas, p, parent=resource)
         p.repeated = True
 
     def show_part_info(m, p):
@@ -312,7 +312,7 @@ ${self._setter_fn(resource, method, m, p, part_prop, ThisType, c)}\
         # could also just skip the first element, but ... let's be safe
         if request_value and request_value.id == p.get(TREF):
             continue
-        v = rnd_arg_val_for_type(activity_input_type(schemas, p))
+        v = rnd_arg_val_for_type(activity_input_type(schemas, p, parent=resource))
         # we chose to replace random strings with their meaning, as indicated by the name !
         if is_string_value(v):
             v = '"%s"' % p.name
@@ -590,7 +590,7 @@ match result {
             params.push("${p.name}", ${to_string_impl("value")});
         }
         % else:
-        params.push("${p.name}", ${to_string_impl(pname)});
+        params.push("${p.name}", &${to_string_impl(pname)});
         % endif
         % endfor
 

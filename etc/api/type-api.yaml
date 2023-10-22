@@ -32,6 +32,8 @@ make:
       output_dir: src
     - source: api/call_builders.rs
       output_dir: src
+    - source: api/enums.rs
+      output_dir: src
 cargo:
   keywords: [protocol, web, api]
   doc_base_url: https://docs.rs
