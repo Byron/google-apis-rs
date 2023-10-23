@@ -153,7 +153,7 @@ pub struct Hash {
     /// The algorithm used to compute the hash value.
     #[serde(rename="type")]
     
-    pub type_: Option<String>,
+    pub type_: Option<HashTypeEnum>,
     /// The hash value.
     
     #[serde_as(as = "Option<::client::serde::urlsafe_base64::Wrapper>")]
@@ -564,7 +564,7 @@ pub struct MavenRepositoryConfig {
     /// Version policy defines the versions that the registry will accept.
     #[serde(rename="versionPolicy")]
     
-    pub version_policy: Option<String>,
+    pub version_policy: Option<MavenRepositoryConfigVersionPolicyEnum>,
 }
 
 impl client::Part for MavenRepositoryConfig {}
@@ -717,7 +717,7 @@ pub struct ProjectSettings {
     /// The redirection state of the legacy repositories in this project.
     #[serde(rename="legacyRedirectionState")]
     
-    pub legacy_redirection_state: Option<String>,
+    pub legacy_redirection_state: Option<ProjectSettingLegacyRedirectionStateEnum>,
     /// The name of the project's settings. Always of the form: projects/{project-id}/projectSettings In update request: never set In response: always set
     
     pub name: Option<String>,
@@ -786,7 +786,7 @@ pub struct Repository {
     pub description: Option<String>,
     /// The format of packages that are stored in the repository.
     
-    pub format: Option<String>,
+    pub format: Option<RepositoryFormatEnum>,
     /// The Cloud KMS resource name of the customer managed encryption key that's used to encrypt the contents of the Repository. Has the form: `projects/my-project/locations/my-region/keyRings/my-kr/cryptoKeys/my-key`. This value may not be changed after the Repository has been created.
     #[serde(rename="kmsKeyName")]
     

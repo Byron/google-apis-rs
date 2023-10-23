@@ -70,7 +70,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -339,7 +339,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
 
         params.extend(self._additional_params.iter());
 
@@ -624,7 +624,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -844,8 +844,8 @@ where
 /// let result = hub.organizations().batch_get_assets_history("parent")
 ///              .read_time_window_start_time(chrono::Utc::now())
 ///              .read_time_window_end_time(chrono::Utc::now())
-///              .content_type("sed")
-///              .add_asset_names("amet.")
+///              .content_type(&Default::default())
+///              .add_asset_names("sed")
 ///              .doit().await;
 /// # }
 /// ```
@@ -856,7 +856,7 @@ pub struct OrganizationBatchGetAssetsHistoryCall<'a, S>
    pub(super) _parent: String,
    pub(super) _read_time_window_start_time: Option<client::chrono::DateTime<client::chrono::offset::Utc>>,
    pub(super) _read_time_window_end_time: Option<client::chrono::DateTime<client::chrono::offset::Utc>>,
-   pub(super) _content_type: Option<String>,
+   pub(super) _content_type: Option<OrganizationContentTypeEnum>,
    pub(super) _asset_names: Vec<String>,
    pub(super) _delegate: Option<&'a mut dyn client::Delegate>,
    pub(super) _additional_params: HashMap<String, String>,
@@ -894,7 +894,7 @@ where
         }
 
         let mut params = Params::with_capacity(7 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
         if let Some(value) = self._read_time_window_start_time.as_ref() {
             params.push("readTimeWindow.startTime", ::client::serde::datetime_to_string(&value));
         }
@@ -1040,8 +1040,8 @@ where
     /// Optional. The content type.
     ///
     /// Sets the *content type* query property to the given value.
-    pub fn content_type(mut self, new_value: &str) -> OrganizationBatchGetAssetsHistoryCall<'a, S> {
-        self._content_type = Some(new_value.to_string());
+    pub fn content_type(mut self, new_value: &OrganizationContentTypeEnum) -> OrganizationBatchGetAssetsHistoryCall<'a, S> {
+        self._content_type = Some(new_value.clone());
         self
     }
     /// A list of the full names of the assets. For example: `//compute.googleapis.com/projects/my_project_123/zones/zone1/instances/instance1`. See [Resource Names](https://cloud.google.com/apis/design/resource_names#full_resource_name) for more info. The request becomes a no-op if the asset name list is empty, and the max size of the asset name list is 100 in one request.
@@ -1206,7 +1206,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
 
         params.extend(self._additional_params.iter());
 
@@ -1491,7 +1491,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -1711,8 +1711,8 @@ where
 /// let result = hub.projects().batch_get_assets_history("parent")
 ///              .read_time_window_start_time(chrono::Utc::now())
 ///              .read_time_window_end_time(chrono::Utc::now())
-///              .content_type("ipsum")
-///              .add_asset_names("gubergren")
+///              .content_type(&Default::default())
+///              .add_asset_names("duo")
 ///              .doit().await;
 /// # }
 /// ```
@@ -1723,7 +1723,7 @@ pub struct ProjectBatchGetAssetsHistoryCall<'a, S>
    pub(super) _parent: String,
    pub(super) _read_time_window_start_time: Option<client::chrono::DateTime<client::chrono::offset::Utc>>,
    pub(super) _read_time_window_end_time: Option<client::chrono::DateTime<client::chrono::offset::Utc>>,
-   pub(super) _content_type: Option<String>,
+   pub(super) _content_type: Option<ProjectContentTypeEnum>,
    pub(super) _asset_names: Vec<String>,
    pub(super) _delegate: Option<&'a mut dyn client::Delegate>,
    pub(super) _additional_params: HashMap<String, String>,
@@ -1761,7 +1761,7 @@ where
         }
 
         let mut params = Params::with_capacity(7 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
         if let Some(value) = self._read_time_window_start_time.as_ref() {
             params.push("readTimeWindow.startTime", ::client::serde::datetime_to_string(&value));
         }
@@ -1907,8 +1907,8 @@ where
     /// Optional. The content type.
     ///
     /// Sets the *content type* query property to the given value.
-    pub fn content_type(mut self, new_value: &str) -> ProjectBatchGetAssetsHistoryCall<'a, S> {
-        self._content_type = Some(new_value.to_string());
+    pub fn content_type(mut self, new_value: &ProjectContentTypeEnum) -> ProjectBatchGetAssetsHistoryCall<'a, S> {
+        self._content_type = Some(new_value.clone());
         self
     }
     /// A list of the full names of the assets. For example: `//compute.googleapis.com/projects/my_project_123/zones/zone1/instances/instance1`. See [Resource Names](https://cloud.google.com/apis/design/resource_names#full_resource_name) for more info. The request becomes a no-op if the asset name list is empty, and the max size of the asset name list is 100 in one request.
@@ -2073,7 +2073,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
 
         params.extend(self._additional_params.iter());
 

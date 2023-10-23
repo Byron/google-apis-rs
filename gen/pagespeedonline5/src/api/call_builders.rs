@@ -26,12 +26,12 @@ use super::*;
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.pagespeedapi().runpagespeed("url")
-///              .utm_source("duo")
-///              .utm_campaign("ipsum")
-///              .strategy("sed")
-///              .locale("ut")
-///              .add_category("gubergren")
-///              .captcha_token("rebum.")
+///              .utm_source("eos")
+///              .utm_campaign("dolor")
+///              .strategy(&Default::default())
+///              .locale("ea")
+///              .add_category(&Default::default())
+///              .captcha_token("ipsum")
 ///              .doit().await;
 /// # }
 /// ```
@@ -42,9 +42,9 @@ pub struct PagespeedapiRunpagespeedCall<'a, S>
    pub(super) _url: String,
    pub(super) _utm_source: Option<String>,
    pub(super) _utm_campaign: Option<String>,
-   pub(super) _strategy: Option<String>,
+   pub(super) _strategy: Option<PagespeedapiStrategyEnum>,
    pub(super) _locale: Option<String>,
-   pub(super) _category: Vec<String>,
+   pub(super) _category: Option<PagespeedapiCategoryEnum>,
    pub(super) _captcha_token: Option<String>,
    pub(super) _delegate: Option<&'a mut dyn client::Delegate>,
    pub(super) _additional_params: HashMap<String, String>,
@@ -82,7 +82,7 @@ where
         }
 
         let mut params = Params::with_capacity(9 + self._additional_params.len());
-        params.push("url", self._url);
+        params.push("url", &self._url);
         if let Some(value) = self._utm_source.as_ref() {
             params.push("utm_source", value);
         }
@@ -227,8 +227,8 @@ where
     /// The analysis strategy (desktop or mobile) to use, and desktop is the default
     ///
     /// Sets the *strategy* query property to the given value.
-    pub fn strategy(mut self, new_value: &str) -> PagespeedapiRunpagespeedCall<'a, S> {
-        self._strategy = Some(new_value.to_string());
+    pub fn strategy(mut self, new_value: &PagespeedapiStrategyEnum) -> PagespeedapiRunpagespeedCall<'a, S> {
+        self._strategy = Some(new_value.clone());
         self
     }
     /// The locale used to localize formatted results
@@ -242,8 +242,8 @@ where
     ///
     /// Append the given value to the *category* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_category(mut self, new_value: &str) -> PagespeedapiRunpagespeedCall<'a, S> {
-        self._category.push(new_value.to_string());
+    pub fn add_category(mut self, new_value: &PagespeedapiCategoryEnum) -> PagespeedapiRunpagespeedCall<'a, S> {
+        self._category.push(new_value.clone());
         self
     }
     /// The captcha token passed when filling out a captcha.

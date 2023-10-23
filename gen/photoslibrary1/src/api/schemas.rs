@@ -110,7 +110,7 @@ impl client::ResponseResult for Album {}
 pub struct AlbumPosition {
     /// Type of position, for a media or enrichment item.
     
-    pub position: Option<String>,
+    pub position: Option<AlbumPositionPositionEnum>,
     /// The enrichment item to which the position is relative to. Only used when position type is AFTER_ENRICHMENT_ITEM.
     #[serde(rename="relativeEnrichmentItemId")]
     
@@ -272,11 +272,11 @@ pub struct ContentFilter {
     /// The set of categories which are not to be included in the media item search results. The items in the set are ORed. There's a maximum of 10 `excludedContentCategories` per request.
     #[serde(rename="excludedContentCategories")]
     
-    pub excluded_content_categories: Option<Vec<String>>,
+    pub excluded_content_categories: Option<Vec<ContentFilterExcludedContentCategoriesEnum>>,
     /// The set of categories to be included in the media item search results. The items in the set are ORed. There's a maximum of 10 `includedContentCategories` per request.
     #[serde(rename="includedContentCategories")]
     
-    pub included_content_categories: Option<Vec<String>>,
+    pub included_content_categories: Option<Vec<ContentFilterIncludedContentCategoriesEnum>>,
 }
 
 impl client::Part for ContentFilter {}
@@ -405,7 +405,7 @@ pub struct FeatureFilter {
     /// The set of features to be included in the media item search results. The items in the set are ORed and may match any of the specified features.
     #[serde(rename="includedFeatures")]
     
-    pub included_features: Option<Vec<String>>,
+    pub included_features: Option<Vec<FeatureFilterIncludedFeaturesEnum>>,
 }
 
 impl client::Part for FeatureFilter {}
@@ -773,7 +773,7 @@ pub struct MediaTypeFilter {
     /// The types of media items to be included. This field should be populated with only one media type. If you specify multiple media types, it results in an error.
     #[serde(rename="mediaTypes")]
     
-    pub media_types: Option<Vec<String>>,
+    pub media_types: Option<Vec<MediaTypeFilterMediaTypesEnum>>,
 }
 
 impl client::Part for MediaTypeFilter {}
@@ -1143,7 +1143,7 @@ pub struct Video {
     pub fps: Option<f64>,
     /// Processing status of the video.
     
-    pub status: Option<String>,
+    pub status: Option<VideoStatusEnum>,
 }
 
 impl client::Part for Video {}

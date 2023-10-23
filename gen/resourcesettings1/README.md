@@ -104,7 +104,7 @@ let mut hub = ResourceSettings::new(hyper::Client::builder().build(hyper_rustls:
 // execute the final call using `doit()`.
 // Values shown here are possibly random and not representative !
 let result = hub.folders().settings_get("name")
-             .view("magna")
+             .view(&Default::default())
              .doit().await;
 
 match result {

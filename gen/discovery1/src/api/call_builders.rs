@@ -70,8 +70,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("api", self._api);
-        params.push("version", self._version);
+        params.push("api", &self._api);
+        params.push("version", &self._version);
 
         params.extend(self._additional_params.iter());
 

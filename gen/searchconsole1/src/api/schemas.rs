@@ -9,7 +9,7 @@ pub struct AmpInspectionResult {
     /// Index status of the AMP URL.
     #[serde(rename="ampIndexStatusVerdict")]
     
-    pub amp_index_status_verdict: Option<String>,
+    pub amp_index_status_verdict: Option<AmpInspectionResultAmpIndexStatusVerdictEnum>,
     /// URL of the AMP that was inspected. If the submitted URL is a desktop page that refers to an AMP version, the AMP version will be inspected.
     #[serde(rename="ampUrl")]
     
@@ -17,7 +17,7 @@ pub struct AmpInspectionResult {
     /// Whether or not the page blocks indexing through a noindex rule.
     #[serde(rename="indexingState")]
     
-    pub indexing_state: Option<String>,
+    pub indexing_state: Option<AmpInspectionResultIndexingStateEnum>,
     /// A list of zero or more AMP issues found for the inspected URL.
     
     pub issues: Option<Vec<AmpIssue>>,
@@ -28,14 +28,14 @@ pub struct AmpInspectionResult {
     /// Whether or not Google could fetch the AMP.
     #[serde(rename="pageFetchState")]
     
-    pub page_fetch_state: Option<String>,
+    pub page_fetch_state: Option<AmpInspectionResultPageFetchStateEnum>,
     /// Whether or not the page is blocked to Google by a robots.txt rule.
     #[serde(rename="robotsTxtState")]
     
-    pub robots_txt_state: Option<String>,
+    pub robots_txt_state: Option<AmpInspectionResultRobotsTxtStateEnum>,
     /// The status of the most severe error on the page. If a page has both warnings and errors, the page status is error. Error status means the page cannot be shown in Search results.
     
-    pub verdict: Option<String>,
+    pub verdict: Option<AmpInspectionResultVerdictEnum>,
 }
 
 impl client::Part for AmpInspectionResult {}
@@ -54,7 +54,7 @@ pub struct AmpIssue {
     pub issue_message: Option<String>,
     /// Severity of this issue: WARNING or ERROR.
     
-    pub severity: Option<String>,
+    pub severity: Option<AmpIssueSeverityEnum>,
 }
 
 impl client::Part for AmpIssue {}
@@ -96,13 +96,13 @@ impl client::Part for ApiDataRow {}
 pub struct ApiDimensionFilter {
     /// no description provided
     
-    pub dimension: Option<String>,
+    pub dimension: Option<ApiDimensionFilterDimensionEnum>,
     /// no description provided
     
     pub expression: Option<String>,
     /// no description provided
     
-    pub operator: Option<String>,
+    pub operator: Option<ApiDimensionFilterOperatorEnum>,
 }
 
 impl client::Part for ApiDimensionFilter {}
@@ -121,7 +121,7 @@ pub struct ApiDimensionFilterGroup {
     /// no description provided
     #[serde(rename="groupType")]
     
-    pub group_type: Option<String>,
+    pub group_type: Option<ApiDimensionFilterGroupGroupTypeEnum>,
 }
 
 impl client::Part for ApiDimensionFilterGroup {}
@@ -195,7 +195,7 @@ pub struct IndexStatusInspectionResult {
     /// Primary crawler that was used by Google to crawl your site.
     #[serde(rename="crawledAs")]
     
-    pub crawled_as: Option<String>,
+    pub crawled_as: Option<IndexStatusInspectionResultCrawledAsEnum>,
     /// The URL of the page that Google selected as canonical. If the page was not indexed, this field is absent.
     #[serde(rename="googleCanonical")]
     
@@ -203,7 +203,7 @@ pub struct IndexStatusInspectionResult {
     /// Whether or not the page blocks indexing through a noindex rule.
     #[serde(rename="indexingState")]
     
-    pub indexing_state: Option<String>,
+    pub indexing_state: Option<IndexStatusInspectionResultIndexingStateEnum>,
     /// Last time this URL was crawled by Google using the [primary crawler](https://support.google.com/webmasters/answer/7440203#primary_crawler). Absent if the URL was never crawled successfully.
     #[serde(rename="lastCrawlTime")]
     
@@ -211,7 +211,7 @@ pub struct IndexStatusInspectionResult {
     /// Whether or not Google could retrieve the page from your server. Equivalent to ["page fetch"](https://support.google.com/webmasters/answer/9012289#index_coverage) in the URL inspection report.
     #[serde(rename="pageFetchState")]
     
-    pub page_fetch_state: Option<String>,
+    pub page_fetch_state: Option<IndexStatusInspectionResultPageFetchStateEnum>,
     /// URLs that link to the inspected URL, directly and indirectly.
     #[serde(rename="referringUrls")]
     
@@ -219,7 +219,7 @@ pub struct IndexStatusInspectionResult {
     /// Whether or not the page is blocked to Google by a robots.txt rule.
     #[serde(rename="robotsTxtState")]
     
-    pub robots_txt_state: Option<String>,
+    pub robots_txt_state: Option<IndexStatusInspectionResultRobotsTxtStateEnum>,
     /// Any sitemaps that this URL was listed in, as known by Google. Not guaranteed to be an exhaustive list, especially if Google did not discover this URL through a sitemap. Absent if no sitemaps were found.
     
     pub sitemap: Option<Vec<String>>,
@@ -229,7 +229,7 @@ pub struct IndexStatusInspectionResult {
     pub user_canonical: Option<String>,
     /// High level verdict about whether the URL *is* indexed (indexed status), or *can be* indexed (live inspection).
     
-    pub verdict: Option<String>,
+    pub verdict: Option<IndexStatusInspectionResultVerdictEnum>,
 }
 
 impl client::Part for IndexStatusInspectionResult {}
@@ -310,7 +310,7 @@ impl client::Part for Item {}
 pub struct MobileFriendlyIssue {
     /// Rule violated.
     
-    pub rule: Option<String>,
+    pub rule: Option<MobileFriendlyIssueRuleEnum>,
 }
 
 impl client::Part for MobileFriendlyIssue {}
@@ -328,7 +328,7 @@ pub struct MobileUsabilityInspectionResult {
     pub issues: Option<Vec<MobileUsabilityIssue>>,
     /// High-level mobile-usability inspection result for this URL.
     
-    pub verdict: Option<String>,
+    pub verdict: Option<MobileUsabilityInspectionResultVerdictEnum>,
 }
 
 impl client::Part for MobileUsabilityInspectionResult {}
@@ -344,13 +344,13 @@ pub struct MobileUsabilityIssue {
     /// Mobile-usability issue type.
     #[serde(rename="issueType")]
     
-    pub issue_type: Option<String>,
+    pub issue_type: Option<MobileUsabilityIssueIssueTypeEnum>,
     /// Additional information regarding the issue.
     
     pub message: Option<String>,
     /// Not returned; reserved for future use.
     
-    pub severity: Option<String>,
+    pub severity: Option<MobileUsabilityIssueSeverityEnum>,
 }
 
 impl client::Part for MobileUsabilityIssue {}
@@ -385,7 +385,7 @@ pub struct RichResultsInspectionResult {
     pub detected_items: Option<Vec<DetectedItems>>,
     /// High-level rich results inspection result for this URL.
     
-    pub verdict: Option<String>,
+    pub verdict: Option<RichResultsInspectionResultVerdictEnum>,
 }
 
 impl client::Part for RichResultsInspectionResult {}
@@ -404,7 +404,7 @@ pub struct RichResultsIssue {
     pub issue_message: Option<String>,
     /// Severity of this issue: WARNING, or ERROR. Items with an issue of status ERROR cannot appear with rich result features in Google Search results.
     
-    pub severity: Option<String>,
+    pub severity: Option<RichResultsIssueSeverityEnum>,
 }
 
 impl client::Part for RichResultsIssue {}
@@ -447,7 +447,7 @@ pub struct RunMobileFriendlyTestResponse {
     /// Test verdict, whether the page is mobile friendly or not.
     #[serde(rename="mobileFriendliness")]
     
-    pub mobile_friendliness: Option<String>,
+    pub mobile_friendliness: Option<RunMobileFriendlyTestResponseMobileFriendlinessEnum>,
     /// List of mobile-usability issues.
     #[serde(rename="mobileFriendlyIssues")]
     
@@ -482,18 +482,18 @@ pub struct SearchAnalyticsQueryRequest {
     /// [Optional; Default is \"auto\"] How data is aggregated. If aggregated by property, all data for the same property is aggregated; if aggregated by page, all data is aggregated by canonical URI. If you filter or group by page, choose AUTO; otherwise you can aggregate either by property or by page, depending on how you want your data calculated; see the help documentation to learn how data is calculated differently by site versus by page. **Note:** If you group or filter by page, you cannot aggregate by property. If you specify any value other than AUTO, the aggregation type in the result will match the requested type, or if you request an invalid type, you will get an error. The API will never change your aggregation type if the requested type is invalid.
     #[serde(rename="aggregationType")]
     
-    pub aggregation_type: Option<String>,
+    pub aggregation_type: Option<SearchAnalyticsQueryRequestAggregationTypeEnum>,
     /// The data state to be fetched, can be full or all, the latter including full and partial data.
     #[serde(rename="dataState")]
     
-    pub data_state: Option<String>,
+    pub data_state: Option<SearchAnalyticsQueryRequestDataStateEnum>,
     /// [Optional] Zero or more filters to apply to the dimension grouping values; for example, 'query contains \"buy\"' to see only data where the query string contains the substring \"buy\" (not case-sensitive). You can filter by a dimension without grouping by it.
     #[serde(rename="dimensionFilterGroups")]
     
     pub dimension_filter_groups: Option<Vec<ApiDimensionFilterGroup>>,
     /// [Optional] Zero or more dimensions to group results by. Dimensions are the group-by values in the Search Analytics page. Dimensions are combined to create a unique row key for each row. Results are grouped in the order that you supply these dimensions.
     
-    pub dimensions: Option<Vec<String>>,
+    pub dimensions: Option<Vec<SearchAnalyticsQueryRequestDimensionsEnum>>,
     /// [Required] End date of the requested date range, in YYYY-MM-DD format, in PST (UTC - 8:00). Must be greater than or equal to the start date. This value is included in the range.
     #[serde(rename="endDate")]
     
@@ -505,7 +505,7 @@ pub struct SearchAnalyticsQueryRequest {
     /// [Optional; Default is \"web\"] The search type to filter for.
     #[serde(rename="searchType")]
     
-    pub search_type: Option<String>,
+    pub search_type: Option<SearchAnalyticsQueryRequestSearchTypeEnum>,
     ///  [Required] Start date of the requested date range, in YYYY-MM-DD format, in PST time (UTC - 8:00). Must be less than or equal to the end date. This value is included in the range.
     #[serde(rename="startDate")]
     
@@ -517,7 +517,7 @@ pub struct SearchAnalyticsQueryRequest {
     /// Optional. [Optional; Default is \"web\"] Type of report: search type, or either Discover or Gnews.
     #[serde(rename="type")]
     
-    pub type_: Option<String>,
+    pub type_: Option<SearchAnalyticsQueryRequestTypeEnum>,
 }
 
 impl client::RequestValue for SearchAnalyticsQueryRequest {}
@@ -537,7 +537,7 @@ pub struct SearchAnalyticsQueryResponse {
     /// How the results were aggregated.
     #[serde(rename="responseAggregationType")]
     
-    pub response_aggregation_type: Option<String>,
+    pub response_aggregation_type: Option<SearchAnalyticsQueryResponseResponseAggregationTypeEnum>,
     /// A list of rows grouped by the key values in the order given in the query.
     
     pub rows: Option<Vec<ApiDataRow>>,
@@ -597,7 +597,7 @@ pub struct TestStatus {
     pub details: Option<String>,
     /// Status of the test.
     
-    pub status: Option<String>,
+    pub status: Option<TestStatuStatusEnum>,
 }
 
 impl client::Part for TestStatus {}
@@ -649,7 +649,7 @@ pub struct WmxSite {
     /// The user's permission level for the site.
     #[serde(rename="permissionLevel")]
     
-    pub permission_level: Option<String>,
+    pub permission_level: Option<WmxSitePermissionLevelEnum>,
     /// The URL of the site.
     #[serde(rename="siteUrl")]
     
@@ -699,7 +699,7 @@ pub struct WmxSitemap {
     /// The type of the sitemap. For example: `rssFeed`.
     #[serde(rename="type")]
     
-    pub type_: Option<String>,
+    pub type_: Option<WmxSitemapTypeEnum>,
     /// Number of warnings for the sitemap. These are generally non-critical issues with URLs in the sitemaps.
     
     #[serde_as(as = "Option<::client::serde_with::DisplayFromStr>")]
@@ -727,7 +727,7 @@ pub struct WmxSitemapContent {
     /// The specific type of content in this sitemap. For example: `web`.
     #[serde(rename="type")]
     
-    pub type_: Option<String>,
+    pub type_: Option<WmxSitemapContentTypeEnum>,
 }
 
 impl client::Part for WmxSitemapContent {}

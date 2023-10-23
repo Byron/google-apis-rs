@@ -800,7 +800,7 @@ where
         }
 
         let mut params = Params::with_capacity(2 + self._additional_params.len());
-        params.push("tasklist", self._tasklist);
+        params.push("tasklist", &self._tasklist);
 
         params.extend(self._additional_params.iter());
 
@@ -1051,7 +1051,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("tasklist", self._tasklist);
+        params.push("tasklist", &self._tasklist);
 
         params.extend(self._additional_params.iter());
 
@@ -1860,7 +1860,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("tasklist", self._tasklist);
+        params.push("tasklist", &self._tasklist);
 
         params.extend(self._additional_params.iter());
 
@@ -2152,7 +2152,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("tasklist", self._tasklist);
+        params.push("tasklist", &self._tasklist);
 
         params.extend(self._additional_params.iter());
 
@@ -2437,7 +2437,7 @@ where
         }
 
         let mut params = Params::with_capacity(2 + self._additional_params.len());
-        params.push("tasklist", self._tasklist);
+        params.push("tasklist", &self._tasklist);
 
         params.extend(self._additional_params.iter());
 
@@ -2689,8 +2689,8 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("tasklist", self._tasklist);
-        params.push("task", self._task);
+        params.push("tasklist", &self._tasklist);
+        params.push("task", &self._task);
 
         params.extend(self._additional_params.iter());
 
@@ -2952,8 +2952,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("tasklist", self._tasklist);
-        params.push("task", self._task);
+        params.push("tasklist", &self._tasklist);
+        params.push("task", &self._task);
 
         params.extend(self._additional_params.iter());
 
@@ -3236,7 +3236,7 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("tasklist", self._tasklist);
+        params.push("tasklist", &self._tasklist);
         if let Some(value) = self._previous.as_ref() {
             params.push("previous", value);
         }
@@ -3561,7 +3561,7 @@ where
         }
 
         let mut params = Params::with_capacity(13 + self._additional_params.len());
-        params.push("tasklist", self._tasklist);
+        params.push("tasklist", &self._tasklist);
         if let Some(value) = self._updated_min.as_ref() {
             params.push("updatedMin", value);
         }
@@ -3928,8 +3928,8 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("tasklist", self._tasklist);
-        params.push("task", self._task);
+        params.push("tasklist", &self._tasklist);
+        params.push("task", &self._task);
         if let Some(value) = self._previous.as_ref() {
             params.push("previous", value);
         }
@@ -4229,8 +4229,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("tasklist", self._tasklist);
-        params.push("task", self._task);
+        params.push("tasklist", &self._tasklist);
+        params.push("task", &self._task);
 
         params.extend(self._additional_params.iter());
 
@@ -4533,8 +4533,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("tasklist", self._tasklist);
-        params.push("task", self._task);
+        params.push("tasklist", &self._tasklist);
+        params.push("task", &self._task);
 
         params.extend(self._additional_params.iter());
 

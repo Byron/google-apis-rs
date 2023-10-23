@@ -97,11 +97,11 @@ let mut hub = Pagespeedonline::new(hyper::Client::builder().build(hyper_rustls::
 let result = hub.pagespeedapi().runpagespeed("url")
              .utm_source("magna")
              .utm_campaign("no")
-             .strategy("ipsum")
-             .snapshots(false)
-             .screenshot(true)
+             .strategy(&Default::default())
+             .snapshots(true)
+             .screenshot(false)
              .add_rule("amet.")
-             .locale("duo")
+             .locale("takimata")
              .filter_third_party_resources(true)
              .doit().await;
 

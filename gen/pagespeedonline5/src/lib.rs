@@ -96,12 +96,12 @@
 //! // execute the final call using `doit()`.
 //! // Values shown here are possibly random and not representative !
 //! let result = hub.pagespeedapi().runpagespeed("url")
-//!              .utm_source("amet.")
-//!              .utm_campaign("takimata")
-//!              .strategy("amet.")
-//!              .locale("duo")
-//!              .add_category("ipsum")
-//!              .captcha_token("gubergren")
+//!              .utm_source("sanctus")
+//!              .utm_campaign("sed")
+//!              .strategy(&Default::default())
+//!              .locale("amet.")
+//!              .add_category(&Default::default())
+//!              .captcha_token("takimata")
 //!              .doit().await;
 //! 
 //! match result {

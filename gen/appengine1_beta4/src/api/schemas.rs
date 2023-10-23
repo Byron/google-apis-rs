@@ -9,17 +9,17 @@ pub struct ApiConfigHandler {
     /// Action to take when users access resources that require authentication. Defaults to redirect.
     #[serde(rename="authFailAction")]
     
-    pub auth_fail_action: Option<String>,
+    pub auth_fail_action: Option<ApiConfigHandlerAuthFailActionEnum>,
     /// Level of login required to access this resource. Defaults to optional.
     
-    pub login: Option<String>,
+    pub login: Option<ApiConfigHandlerLoginEnum>,
     /// Path to the script from the application root directory.
     
     pub script: Option<String>,
     /// Security (HTTPS) enforcement for this URL.
     #[serde(rename="securityLevel")]
     
-    pub security_level: Option<String>,
+    pub security_level: Option<ApiConfigHandlerSecurityLevelEnum>,
     /// URL to serve the endpoint at.
     
     pub url: Option<String>,
@@ -313,7 +313,7 @@ pub struct EndpointsApiService {
     /// Endpoints rollout strategy. If FIXED, config_id must be specified. If MANAGED, config_id must be omitted.
     #[serde(rename="rolloutStrategy")]
     
-    pub rollout_strategy: Option<String>,
+    pub rollout_strategy: Option<EndpointsApiServiceRolloutStrategyEnum>,
 }
 
 impl client::Part for EndpointsApiService {}
@@ -329,7 +329,7 @@ pub struct ErrorHandler {
     /// Error condition this handler applies to.
     #[serde(rename="errorCode")]
     
-    pub error_code: Option<String>,
+    pub error_code: Option<ErrorHandlerErrorCodeEnum>,
     /// MIME type of file. Defaults to text/html.
     #[serde(rename="mimeType")]
     
@@ -451,7 +451,7 @@ pub struct Instance {
     pub app_engine_release: Option<String>,
     /// Availability of the instance.@OutputOnly
     
-    pub availability: Option<String>,
+    pub availability: Option<InstanceAvailabilityEnum>,
     /// Average latency (ms) over the last minute.@OutputOnly
     #[serde(rename="averageLatency")]
     
@@ -1006,7 +1006,7 @@ pub struct TrafficSplit {
     /// Mechanism used to determine which version a request is sent to. The traffic selection algorithm will be stable for either type until allocations are changed.
     #[serde(rename="shardBy")]
     
-    pub shard_by: Option<String>,
+    pub shard_by: Option<TrafficSplitShardByEnum>,
 }
 
 impl client::Part for TrafficSplit {}
@@ -1047,21 +1047,21 @@ pub struct UrlMap {
     /// Action to take when users access resources that require authentication. Defaults to redirect.
     #[serde(rename="authFailAction")]
     
-    pub auth_fail_action: Option<String>,
+    pub auth_fail_action: Option<UrlMapAuthFailActionEnum>,
     /// Level of login required to access this resource.
     
-    pub login: Option<String>,
+    pub login: Option<UrlMapLoginEnum>,
     /// 30x code to use when performing redirects for the secure field. Defaults to 302.
     #[serde(rename="redirectHttpResponseCode")]
     
-    pub redirect_http_response_code: Option<String>,
+    pub redirect_http_response_code: Option<UrlMapRedirectHttpResponseCodeEnum>,
     /// Executes a script to handle the request that matches this URL pattern.
     
     pub script: Option<ScriptHandler>,
     /// Security (HTTPS) enforcement for this URL.
     #[serde(rename="securityLevel")]
     
-    pub security_level: Option<String>,
+    pub security_level: Option<UrlMapSecurityLevelEnum>,
     /// Serves the entire contents of a directory as static files.This attribute is deprecated. You can mimic the behavior of static directories using static files.
     #[serde(rename="staticDirectory")]
     
@@ -1151,7 +1151,7 @@ pub struct Version {
     /// Before an application can receive email or XMPP messages, the application must be configured to enable the service.
     #[serde(rename="inboundServices")]
     
-    pub inbound_services: Option<Vec<String>>,
+    pub inbound_services: Option<Vec<VersionInboundServicesEnum>>,
     /// Instance class that is used to run this version. Valid values are:
     /// AutomaticScaling: F1, F2, F4, F4_1G
     /// ManualScaling or BasicScaling: B1, B2, B4, B8, B4_1GDefaults to F1 for AutomaticScaling and B1 for ManualScaling or BasicScaling.
@@ -1188,7 +1188,7 @@ pub struct Version {
     /// Current serving status of this version. Only the versions with a SERVING status create instances and can be billed.SERVING_STATUS_UNSPECIFIED is an invalid value. Defaults to SERVING.
     #[serde(rename="servingStatus")]
     
-    pub serving_status: Option<String>,
+    pub serving_status: Option<VersionServingStatusEnum>,
     /// Whether multiple requests can be dispatched to this version at once.
     
     pub threadsafe: Option<bool>,

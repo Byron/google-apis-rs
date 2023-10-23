@@ -274,13 +274,13 @@ impl<'a, S> EditMethods<'a, S> {
     /// * `editId` - Unique identifier for this edit.
     /// * `apkVersionCode` - The version code of the APK whose deobfuscation file is being uploaded.
     /// * `deobfuscationFileType` - No description provided.
-    pub fn deobfuscationfiles_upload(&self, package_name: &str, edit_id: &str, apk_version_code: i32, deobfuscation_file_type: &str) -> EditDeobfuscationfileUploadCall<'a, S> {
+    pub fn deobfuscationfiles_upload(&self, package_name: &str, edit_id: &str, apk_version_code: i32, deobfuscation_file_type: &EditDeobfuscationFileTypeEnum) -> EditDeobfuscationfileUploadCall<'a, S> {
         EditDeobfuscationfileUploadCall {
             hub: self.hub,
             _package_name: package_name.to_string(),
             _edit_id: edit_id.to_string(),
             _apk_version_code: apk_version_code,
-            _deobfuscation_file_type: deobfuscation_file_type.to_string(),
+            _deobfuscation_file_type: deobfuscation_file_type.clone(),
             _delegate: Default::default(),
             _additional_params: Default::default(),
             _scopes: Default::default(),
@@ -358,13 +358,13 @@ impl<'a, S> EditMethods<'a, S> {
     /// * `editId` - Unique identifier for this edit.
     /// * `apkVersionCode` - The version code of the APK whose Expansion File configuration is being read or modified.
     /// * `expansionFileType` - No description provided.
-    pub fn expansionfiles_get(&self, package_name: &str, edit_id: &str, apk_version_code: i32, expansion_file_type: &str) -> EditExpansionfileGetCall<'a, S> {
+    pub fn expansionfiles_get(&self, package_name: &str, edit_id: &str, apk_version_code: i32, expansion_file_type: &EditExpansionFileTypeEnum) -> EditExpansionfileGetCall<'a, S> {
         EditExpansionfileGetCall {
             hub: self.hub,
             _package_name: package_name.to_string(),
             _edit_id: edit_id.to_string(),
             _apk_version_code: apk_version_code,
-            _expansion_file_type: expansion_file_type.to_string(),
+            _expansion_file_type: expansion_file_type.clone(),
             _delegate: Default::default(),
             _additional_params: Default::default(),
             _scopes: Default::default(),
@@ -382,14 +382,14 @@ impl<'a, S> EditMethods<'a, S> {
     /// * `editId` - Unique identifier for this edit.
     /// * `apkVersionCode` - The version code of the APK whose Expansion File configuration is being read or modified.
     /// * `expansionFileType` - No description provided.
-    pub fn expansionfiles_patch(&self, request: ExpansionFile, package_name: &str, edit_id: &str, apk_version_code: i32, expansion_file_type: &str) -> EditExpansionfilePatchCall<'a, S> {
+    pub fn expansionfiles_patch(&self, request: ExpansionFile, package_name: &str, edit_id: &str, apk_version_code: i32, expansion_file_type: &EditExpansionFileTypeEnum) -> EditExpansionfilePatchCall<'a, S> {
         EditExpansionfilePatchCall {
             hub: self.hub,
             _request: request,
             _package_name: package_name.to_string(),
             _edit_id: edit_id.to_string(),
             _apk_version_code: apk_version_code,
-            _expansion_file_type: expansion_file_type.to_string(),
+            _expansion_file_type: expansion_file_type.clone(),
             _delegate: Default::default(),
             _additional_params: Default::default(),
             _scopes: Default::default(),
@@ -407,14 +407,14 @@ impl<'a, S> EditMethods<'a, S> {
     /// * `editId` - Unique identifier for this edit.
     /// * `apkVersionCode` - The version code of the APK whose Expansion File configuration is being read or modified.
     /// * `expansionFileType` - No description provided.
-    pub fn expansionfiles_update(&self, request: ExpansionFile, package_name: &str, edit_id: &str, apk_version_code: i32, expansion_file_type: &str) -> EditExpansionfileUpdateCall<'a, S> {
+    pub fn expansionfiles_update(&self, request: ExpansionFile, package_name: &str, edit_id: &str, apk_version_code: i32, expansion_file_type: &EditExpansionFileTypeEnum) -> EditExpansionfileUpdateCall<'a, S> {
         EditExpansionfileUpdateCall {
             hub: self.hub,
             _request: request,
             _package_name: package_name.to_string(),
             _edit_id: edit_id.to_string(),
             _apk_version_code: apk_version_code,
-            _expansion_file_type: expansion_file_type.to_string(),
+            _expansion_file_type: expansion_file_type.clone(),
             _delegate: Default::default(),
             _additional_params: Default::default(),
             _scopes: Default::default(),
@@ -431,13 +431,13 @@ impl<'a, S> EditMethods<'a, S> {
     /// * `editId` - Unique identifier for this edit.
     /// * `apkVersionCode` - The version code of the APK whose Expansion File configuration is being read or modified.
     /// * `expansionFileType` - No description provided.
-    pub fn expansionfiles_upload(&self, package_name: &str, edit_id: &str, apk_version_code: i32, expansion_file_type: &str) -> EditExpansionfileUploadCall<'a, S> {
+    pub fn expansionfiles_upload(&self, package_name: &str, edit_id: &str, apk_version_code: i32, expansion_file_type: &EditExpansionFileTypeEnum) -> EditExpansionfileUploadCall<'a, S> {
         EditExpansionfileUploadCall {
             hub: self.hub,
             _package_name: package_name.to_string(),
             _edit_id: edit_id.to_string(),
             _apk_version_code: apk_version_code,
-            _expansion_file_type: expansion_file_type.to_string(),
+            _expansion_file_type: expansion_file_type.clone(),
             _delegate: Default::default(),
             _additional_params: Default::default(),
             _scopes: Default::default(),
@@ -455,13 +455,13 @@ impl<'a, S> EditMethods<'a, S> {
     /// * `language` - The language code (a BCP-47 language tag) of the localized listing whose images are to read or modified. For example, to select Austrian German, pass "de-AT".
     /// * `imageType` - No description provided.
     /// * `imageId` - Unique identifier an image within the set of images attached to this edit.
-    pub fn images_delete(&self, package_name: &str, edit_id: &str, language: &str, image_type: &str, image_id: &str) -> EditImageDeleteCall<'a, S> {
+    pub fn images_delete(&self, package_name: &str, edit_id: &str, language: &str, image_type: &EditImageTypeEnum, image_id: &str) -> EditImageDeleteCall<'a, S> {
         EditImageDeleteCall {
             hub: self.hub,
             _package_name: package_name.to_string(),
             _edit_id: edit_id.to_string(),
             _language: language.to_string(),
-            _image_type: image_type.to_string(),
+            _image_type: image_type.clone(),
             _image_id: image_id.to_string(),
             _delegate: Default::default(),
             _additional_params: Default::default(),
@@ -479,13 +479,13 @@ impl<'a, S> EditMethods<'a, S> {
     /// * `editId` - Unique identifier for this edit.
     /// * `language` - The language code (a BCP-47 language tag) of the localized listing whose images are to read or modified. For example, to select Austrian German, pass "de-AT".
     /// * `imageType` - No description provided.
-    pub fn images_deleteall(&self, package_name: &str, edit_id: &str, language: &str, image_type: &str) -> EditImageDeleteallCall<'a, S> {
+    pub fn images_deleteall(&self, package_name: &str, edit_id: &str, language: &str, image_type: &EditImageTypeEnum) -> EditImageDeleteallCall<'a, S> {
         EditImageDeleteallCall {
             hub: self.hub,
             _package_name: package_name.to_string(),
             _edit_id: edit_id.to_string(),
             _language: language.to_string(),
-            _image_type: image_type.to_string(),
+            _image_type: image_type.clone(),
             _delegate: Default::default(),
             _additional_params: Default::default(),
             _scopes: Default::default(),
@@ -502,13 +502,13 @@ impl<'a, S> EditMethods<'a, S> {
     /// * `editId` - Unique identifier for this edit.
     /// * `language` - The language code (a BCP-47 language tag) of the localized listing whose images are to read or modified. For example, to select Austrian German, pass "de-AT".
     /// * `imageType` - No description provided.
-    pub fn images_list(&self, package_name: &str, edit_id: &str, language: &str, image_type: &str) -> EditImageListCall<'a, S> {
+    pub fn images_list(&self, package_name: &str, edit_id: &str, language: &str, image_type: &EditImageTypeEnum) -> EditImageListCall<'a, S> {
         EditImageListCall {
             hub: self.hub,
             _package_name: package_name.to_string(),
             _edit_id: edit_id.to_string(),
             _language: language.to_string(),
-            _image_type: image_type.to_string(),
+            _image_type: image_type.clone(),
             _delegate: Default::default(),
             _additional_params: Default::default(),
             _scopes: Default::default(),
@@ -525,13 +525,13 @@ impl<'a, S> EditMethods<'a, S> {
     /// * `editId` - Unique identifier for this edit.
     /// * `language` - The language code (a BCP-47 language tag) of the localized listing whose images are to read or modified. For example, to select Austrian German, pass "de-AT".
     /// * `imageType` - No description provided.
-    pub fn images_upload(&self, package_name: &str, edit_id: &str, language: &str, image_type: &str) -> EditImageUploadCall<'a, S> {
+    pub fn images_upload(&self, package_name: &str, edit_id: &str, language: &str, image_type: &EditImageTypeEnum) -> EditImageUploadCall<'a, S> {
         EditImageUploadCall {
             hub: self.hub,
             _package_name: package_name.to_string(),
             _edit_id: edit_id.to_string(),
             _language: language.to_string(),
-            _image_type: image_type.to_string(),
+            _image_type: image_type.clone(),
             _delegate: Default::default(),
             _additional_params: Default::default(),
             _scopes: Default::default(),

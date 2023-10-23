@@ -20,7 +20,7 @@ pub struct Announcement {
     /// Assignee mode of the announcement. If unspecified, the default value is `ALL_STUDENTS`.
     #[serde(rename="assigneeMode")]
     
-    pub assignee_mode: Option<String>,
+    pub assignee_mode: Option<AnnouncementAssigneeModeEnum>,
     /// Identifier of the course. Read-only.
     #[serde(rename="courseId")]
     
@@ -49,7 +49,7 @@ pub struct Announcement {
     pub scheduled_time: Option<client::chrono::DateTime<client::chrono::offset::Utc>>,
     /// Status of this announcement. If unspecified, the default state is `DRAFT`.
     
-    pub state: Option<String>,
+    pub state: Option<AnnouncementStateEnum>,
     /// Description of this announcement. The text must be a valid UTF-8 string containing no more than 30,000 characters.
     
     pub text: Option<String>,
@@ -211,7 +211,7 @@ pub struct Course {
     /// State of the course. If unspecified, the default state is `PROVISIONED`.
     #[serde(rename="courseState")]
     
-    pub course_state: Option<String>,
+    pub course_state: Option<CourseCourseStateEnum>,
     /// Creation time of the course. Specifying this field in a course update mask results in an error. Read-only.
     #[serde(rename="creationTime")]
     
@@ -371,7 +371,7 @@ pub struct CourseWork {
     /// Assignee mode of the coursework. If unspecified, the default value is `ALL_STUDENTS`.
     #[serde(rename="assigneeMode")]
     
-    pub assignee_mode: Option<String>,
+    pub assignee_mode: Option<CourseWorkAssigneeModeEnum>,
     /// Assignment details. This is populated only when `work_type` is `ASSIGNMENT`. Read-only.
     
     pub assignment: Option<Assignment>,
@@ -430,11 +430,11 @@ pub struct CourseWork {
     pub scheduled_time: Option<client::chrono::DateTime<client::chrono::offset::Utc>>,
     /// Status of this course work. If unspecified, the default state is `DRAFT`.
     
-    pub state: Option<String>,
+    pub state: Option<CourseWorkStateEnum>,
     /// Setting to determine when students are allowed to modify submissions. If unspecified, the default value is `MODIFIABLE_UNTIL_TURNED_IN`.
     #[serde(rename="submissionModificationMode")]
     
-    pub submission_modification_mode: Option<String>,
+    pub submission_modification_mode: Option<CourseWorkSubmissionModificationModeEnum>,
     /// Title of this course work. The title must be a valid UTF-8 string containing between 1 and 3000 characters.
     
     pub title: Option<String>,
@@ -449,7 +449,7 @@ pub struct CourseWork {
     /// Type of this course work. The type is set when the course work is created and cannot be changed.
     #[serde(rename="workType")]
     
-    pub work_type: Option<String>,
+    pub work_type: Option<CourseWorkWorkTypeEnum>,
 }
 
 impl client::RequestValue for CourseWork {}
@@ -492,7 +492,7 @@ pub struct CourseWorkMaterial {
     /// Assignee mode of the course work material. If unspecified, the default value is `ALL_STUDENTS`.
     #[serde(rename="assigneeMode")]
     
-    pub assignee_mode: Option<String>,
+    pub assignee_mode: Option<CourseWorkMaterialAssigneeModeEnum>,
     /// Identifier of the course. Read-only.
     #[serde(rename="courseId")]
     
@@ -524,7 +524,7 @@ pub struct CourseWorkMaterial {
     pub scheduled_time: Option<client::chrono::DateTime<client::chrono::offset::Utc>>,
     /// Status of this course work material. If unspecified, the default state is `DRAFT`.
     
-    pub state: Option<String>,
+    pub state: Option<CourseWorkMaterialStateEnum>,
     /// Title of this course work material. The title must be a valid UTF-8 string containing between 1 and 3000 characters.
     
     pub title: Option<String>,
@@ -658,7 +658,7 @@ pub struct Feed {
     /// The type of feed.
     #[serde(rename="feedType")]
     
-    pub feed_type: Option<String>,
+    pub feed_type: Option<FeedFeedTypeEnum>,
 }
 
 impl client::Part for Feed {}
@@ -700,7 +700,7 @@ impl client::Part for Form {}
 pub struct GlobalPermission {
     /// Permission value.
     
-    pub permission: Option<String>,
+    pub permission: Option<GlobalPermissionPermissionEnum>,
 }
 
 impl client::Part for GlobalPermission {}
@@ -745,7 +745,7 @@ pub struct GradeHistory {
     /// The type of grade change at this time in the submission grade history.
     #[serde(rename="gradeChangeType")]
     
-    pub grade_change_type: Option<String>,
+    pub grade_change_type: Option<GradeHistoryGradeChangeTypeEnum>,
     /// When the grade of the submission was changed.
     #[serde(rename="gradeTimestamp")]
     
@@ -773,11 +773,11 @@ pub struct GradebookSettings {
     /// Indicates how the overall grade is calculated.
     #[serde(rename="calculationType")]
     
-    pub calculation_type: Option<String>,
+    pub calculation_type: Option<GradebookSettingCalculationTypeEnum>,
     /// Indicates who can see the overall grade..
     #[serde(rename="displaySetting")]
     
-    pub display_setting: Option<String>,
+    pub display_setting: Option<GradebookSettingDisplaySettingEnum>,
     /// Grade categories that are available for coursework in the course.
     #[serde(rename="gradeCategories")]
     
@@ -846,7 +846,7 @@ pub struct GuardianInvitation {
     pub invited_email_address: Option<String>,
     /// The state that this invitation is in.
     
-    pub state: Option<String>,
+    pub state: Option<GuardianInvitationStateEnum>,
     /// ID of the student (in standard format)
     #[serde(rename="studentId")]
     
@@ -897,7 +897,7 @@ pub struct Invitation {
     pub id: Option<String>,
     /// Role to invite the user to have. Must not be `COURSE_ROLE_UNSPECIFIED`.
     
-    pub role: Option<String>,
+    pub role: Option<InvitationRoleEnum>,
     /// Identifier of the invited user. When specified as a parameter of a request, this identifier can be set to one of the following: * the numeric identifier for the user * the email address of the user * the string literal `"me"`, indicating the requesting user
     #[serde(rename="userId")]
     
@@ -1251,7 +1251,7 @@ pub struct ModifyAnnouncementAssigneesRequest {
     /// Mode of the announcement describing whether it is accessible by all students or specified individual students.
     #[serde(rename="assigneeMode")]
     
-    pub assignee_mode: Option<String>,
+    pub assignee_mode: Option<ModifyAnnouncementAssigneesRequestAssigneeModeEnum>,
     /// Set which students can view or cannot view the announcement. Must be specified only when `assigneeMode` is `INDIVIDUAL_STUDENTS`.
     #[serde(rename="modifyIndividualStudentsOptions")]
     
@@ -1295,7 +1295,7 @@ pub struct ModifyCourseWorkAssigneesRequest {
     /// Mode of the coursework describing whether it will be assigned to all students or specified individual students.
     #[serde(rename="assigneeMode")]
     
-    pub assignee_mode: Option<String>,
+    pub assignee_mode: Option<ModifyCourseWorkAssigneesRequestAssigneeModeEnum>,
     /// Set which students are assigned or not assigned to the coursework. Must be specified only when `assigneeMode` is `INDIVIDUAL_STUDENTS`.
     #[serde(rename="modifyIndividualStudentsOptions")]
     
@@ -1457,7 +1457,7 @@ pub struct SharedDriveFile {
     /// Mechanism by which students access the Drive item.
     #[serde(rename="shareMode")]
     
-    pub share_mode: Option<String>,
+    pub share_mode: Option<SharedDriveFileShareModeEnum>,
 }
 
 impl client::Part for SharedDriveFile {}
@@ -1491,7 +1491,7 @@ pub struct StateHistory {
     pub actor_user_id: Option<String>,
     /// The workflow pipeline stage.
     
-    pub state: Option<String>,
+    pub state: Option<StateHistoryStateEnum>,
     /// When the submission entered this state.
     #[serde(rename="stateTimestamp")]
     
@@ -1574,7 +1574,7 @@ pub struct StudentSubmission {
     /// Type of course work this submission is for. Read-only.
     #[serde(rename="courseWorkType")]
     
-    pub course_work_type: Option<String>,
+    pub course_work_type: Option<StudentSubmissionCourseWorkTypeEnum>,
     /// Creation time of this submission. This may be unset if the student has not accessed this item. Read-only.
     #[serde(rename="creationTime")]
     
@@ -1599,7 +1599,7 @@ pub struct StudentSubmission {
     pub short_answer_submission: Option<ShortAnswerSubmission>,
     /// State of this submission. Read-only.
     
-    pub state: Option<String>,
+    pub state: Option<StudentSubmissionStateEnum>,
     /// The history of the submission (includes state and grade histories). Read-only.
     #[serde(rename="submissionHistory")]
     

@@ -218,7 +218,7 @@ pub struct Workflow {
     pub source_contents: Option<String>,
     /// Output only. State of the workflow deployment.
     
-    pub state: Option<String>,
+    pub state: Option<WorkflowStateEnum>,
     /// Output only. The timestamp for when the workflow was last updated.
     #[serde(rename="updateTime")]
     

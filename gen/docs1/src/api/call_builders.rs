@@ -77,7 +77,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("documentId", self._document_id);
+        params.push("documentId", &self._document_id);
 
         params.extend(self._additional_params.iter());
 
@@ -591,7 +591,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.documents().get("documentId")
-///              .suggestions_view_mode("At")
+///              .suggestions_view_mode(&Default::default())
 ///              .doit().await;
 /// # }
 /// ```
@@ -600,7 +600,7 @@ pub struct DocumentGetCall<'a, S>
 
    pub(super) hub: &'a Docs<S>,
    pub(super) _document_id: String,
-   pub(super) _suggestions_view_mode: Option<String>,
+   pub(super) _suggestions_view_mode: Option<DocumentSuggestionsViewModeEnum>,
    pub(super) _delegate: Option<&'a mut dyn client::Delegate>,
    pub(super) _additional_params: HashMap<String, String>,
    pub(super) _scopes: BTreeSet<String>
@@ -637,7 +637,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("documentId", self._document_id);
+        params.push("documentId", &self._document_id);
         if let Some(value) = self._suggestions_view_mode.as_ref() {
             params.push("suggestionsViewMode", value);
         }
@@ -758,8 +758,8 @@ where
     /// The suggestions view mode to apply to the document. This allows viewing the document with all suggestions inline, accepted or rejected. If one is not specified, DEFAULT_FOR_CURRENT_ACCESS is used.
     ///
     /// Sets the *suggestions view mode* query property to the given value.
-    pub fn suggestions_view_mode(mut self, new_value: &str) -> DocumentGetCall<'a, S> {
-        self._suggestions_view_mode = Some(new_value.to_string());
+    pub fn suggestions_view_mode(mut self, new_value: &DocumentSuggestionsViewModeEnum) -> DocumentGetCall<'a, S> {
+        self._suggestions_view_mode = Some(new_value.clone());
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong

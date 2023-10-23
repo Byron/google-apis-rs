@@ -73,7 +73,7 @@ pub struct GoogleCloudResourcesettingsV1SettingMetadata {
     /// The data type for this setting.
     #[serde(rename="dataType")]
     
-    pub data_type: Option<String>,
+    pub data_type: Option<GoogleCloudResourcesettingsV1SettingMetadataDataTypeEnum>,
     /// The value provided by Setting.effective_value if no setting value is explicitly set. Note: not all settings have a default value.
     #[serde(rename="defaultValue")]
     

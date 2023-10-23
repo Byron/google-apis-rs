@@ -481,7 +481,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("stateKey", self._state_key.to_string());
+        params.push("stateKey", &self._state_key.to_string());
         if let Some(value) = self._current_data_version.as_ref() {
             params.push("currentDataVersion", value);
         }
@@ -749,7 +749,7 @@ where
         }
 
         let mut params = Params::with_capacity(2 + self._additional_params.len());
-        params.push("stateKey", self._state_key.to_string());
+        params.push("stateKey", &self._state_key.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -996,7 +996,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("stateKey", self._state_key.to_string());
+        params.push("stateKey", &self._state_key.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -1514,7 +1514,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("stateKey", self._state_key.to_string());
+        params.push("stateKey", &self._state_key.to_string());
         if let Some(value) = self._current_state_version.as_ref() {
             params.push("currentStateVersion", value);
         }

@@ -145,21 +145,21 @@
 //! // execute the final call using `doit()`.
 //! // Values shown here are possibly random and not representative !
 //! let result = hub.files().list()
-//!              .team_drive_id("invidunt")
-//!              .supports_team_drives(true)
+//!              .team_drive_id("ipsum")
+//!              .supports_team_drives(false)
 //!              .supports_all_drives(true)
-//!              .spaces("sed")
-//!              .q("ut")
-//!              .page_token("gubergren")
-//!              .page_size(-16)
-//!              .order_by("est")
+//!              .spaces("duo")
+//!              .q("ipsum")
+//!              .page_token("sed")
+//!              .page_size(-37)
+//!              .order_by("gubergren")
 //!              .include_team_drive_items(true)
 //!              .include_permissions_for_view("ipsum")
-//!              .include_labels("est")
+//!              .include_labels("ipsum")
 //!              .include_items_from_all_drives(true)
 //!              .drive_id("ea")
-//!              .corpus("dolor")
-//!              .corpora("Lorem")
+//!              .corpus(&Default::default())
+//!              .corpora("dolor")
 //!              .doit().await;
 //! 
 //! match result {

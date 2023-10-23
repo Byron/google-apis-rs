@@ -328,7 +328,7 @@ pub struct GoogleCloudDialogflowCxV3ContinuousTestResult {
     pub name: Option<String>,
     /// The result of this continuous test run, i.e. whether all the tests in this continuous test run pass or not.
     
-    pub result: Option<String>,
+    pub result: Option<GoogleCloudDialogflowCxV3ContinuousTestResultResultEnum>,
     /// Time when the continuous testing run starts.
     #[serde(rename="runTime")]
     
@@ -478,7 +478,7 @@ pub struct GoogleCloudDialogflowCxV3Deployment {
     pub start_time: Option<client::chrono::DateTime<client::chrono::offset::Utc>>,
     /// The current state of the deployment.
     
-    pub state: Option<String>,
+    pub state: Option<GoogleCloudDialogflowCxV3DeploymentStateEnum>,
 }
 
 impl client::ResponseResult for GoogleCloudDialogflowCxV3Deployment {}
@@ -568,7 +568,7 @@ pub struct GoogleCloudDialogflowCxV3DetectIntentResponse {
     /// Response type.
     #[serde(rename="responseType")]
     
-    pub response_type: Option<String>,
+    pub response_type: Option<GoogleCloudDialogflowCxV3DetectIntentResponseResponseTypeEnum>,
 }
 
 impl client::ResponseResult for GoogleCloudDialogflowCxV3DetectIntentResponse {}
@@ -609,7 +609,7 @@ pub struct GoogleCloudDialogflowCxV3EntityType {
     /// Indicates whether the entity type can be automatically expanded.
     #[serde(rename="autoExpansionMode")]
     
-    pub auto_expansion_mode: Option<String>,
+    pub auto_expansion_mode: Option<GoogleCloudDialogflowCxV3EntityTypeAutoExpansionModeEnum>,
     /// Required. The human-readable name of the entity type, unique within the agent.
     #[serde(rename="displayName")]
     
@@ -627,7 +627,7 @@ pub struct GoogleCloudDialogflowCxV3EntityType {
     pub excluded_phrases: Option<Vec<GoogleCloudDialogflowCxV3EntityTypeExcludedPhrase>>,
     /// Required. Indicates the kind of entity type.
     
-    pub kind: Option<String>,
+    pub kind: Option<GoogleCloudDialogflowCxV3EntityTypeKindEnum>,
     /// The unique identifier of the entity type. Required for EntityTypes.UpdateEntityType. Format: `projects//locations//agents//entityTypes/`.
     
     pub name: Option<String>,
@@ -884,7 +884,7 @@ pub struct GoogleCloudDialogflowCxV3Experiment {
     pub start_time: Option<client::chrono::DateTime<client::chrono::offset::Utc>>,
     /// The current state of the experiment. Transition triggered by Experiments.StartExperiment: DRAFT->RUNNING. Transition triggered by Experiments.CancelExperiment: DRAFT->DONE or RUNNING->DONE.
     
-    pub state: Option<String>,
+    pub state: Option<GoogleCloudDialogflowCxV3ExperimentStateEnum>,
     /// The history of updates to the experiment variants.
     #[serde(rename="variantsHistory")]
     
@@ -978,14 +978,14 @@ pub struct GoogleCloudDialogflowCxV3ExperimentResultMetric {
     /// Count-based metric type. Only one of type or count_type is specified in each Metric.
     #[serde(rename="countType")]
     
-    pub count_type: Option<String>,
+    pub count_type: Option<GoogleCloudDialogflowCxV3ExperimentResultMetricCountTypeEnum>,
     /// Ratio value of a metric.
     
     pub ratio: Option<f64>,
     /// Ratio-based metric type. Only one of type or count_type is specified in each Metric.
     #[serde(rename="type")]
     
-    pub type_: Option<String>,
+    pub type_: Option<GoogleCloudDialogflowCxV3ExperimentResultMetricTypeEnum>,
 }
 
 impl client::Part for GoogleCloudDialogflowCxV3ExperimentResultMetric {}
@@ -1031,7 +1031,7 @@ pub struct GoogleCloudDialogflowCxV3ExportAgentRequest {
     /// Optional. The data format of the exported agent. If not specified, `BLOB` is assumed.
     #[serde(rename="dataFormat")]
     
-    pub data_format: Option<String>,
+    pub data_format: Option<GoogleCloudDialogflowCxV3ExportAgentRequestDataFormatEnum>,
     /// Optional. Environment name. If not set, draft environment is assumed. Format: `projects//locations//agents//environments/`.
     
     pub environment: Option<String>,
@@ -1078,7 +1078,7 @@ pub struct GoogleCloudDialogflowCxV3ExportTestCasesRequest {
     /// The data format of the exported test cases. If not specified, `BLOB` is assumed.
     #[serde(rename="dataFormat")]
     
-    pub data_format: Option<String>,
+    pub data_format: Option<GoogleCloudDialogflowCxV3ExportTestCasesRequestDataFormatEnum>,
     /// The filter expression used to filter exported test cases, see [API Filtering](https://aip.dev/160). The expression is case insensitive and supports the following syntax: name = [OR name = ] ... For example: * "name = t1 OR name = t2" matches the test case with the exact resource name "t1" or "t2".
     
     pub filter: Option<String>,
@@ -1427,7 +1427,7 @@ pub struct GoogleCloudDialogflowCxV3ImportFlowRequest {
     /// Flow import mode. If not specified, `KEEP` is assumed.
     #[serde(rename="importOption")]
     
-    pub import_option: Option<String>,
+    pub import_option: Option<GoogleCloudDialogflowCxV3ImportFlowRequestImportOptionEnum>,
 }
 
 impl client::RequestValue for GoogleCloudDialogflowCxV3ImportFlowRequest {}
@@ -1467,7 +1467,7 @@ pub struct GoogleCloudDialogflowCxV3InputAudioConfig {
     /// Required. Audio encoding of the audio content to process.
     #[serde(rename="audioEncoding")]
     
-    pub audio_encoding: Option<String>,
+    pub audio_encoding: Option<GoogleCloudDialogflowCxV3InputAudioConfigAudioEncodingEnum>,
     /// Optional. If `true`, Dialogflow returns SpeechWordInfo in StreamingRecognitionResult with information about the recognized speech words, e.g. start and end time offsets. If false or unspecified, Speech doesn't return any word-level information.
     #[serde(rename="enableWordInfo")]
     
@@ -1478,7 +1478,7 @@ pub struct GoogleCloudDialogflowCxV3InputAudioConfig {
     /// Optional. Which variant of the Speech model to use.
     #[serde(rename="modelVariant")]
     
-    pub model_variant: Option<String>,
+    pub model_variant: Option<GoogleCloudDialogflowCxV3InputAudioConfigModelVariantEnum>,
     /// Optional. A list of strings containing words and phrases that the speech recognizer should recognize with higher likelihood. See [the Cloud Speech documentation](https://cloud.google.com/speech-to-text/docs/basics#phrase-hints) for more details.
     #[serde(rename="phraseHints")]
     
@@ -2122,7 +2122,7 @@ pub struct GoogleCloudDialogflowCxV3Match {
     /// Type of this Match.
     #[serde(rename="matchType")]
     
-    pub match_type: Option<String>,
+    pub match_type: Option<GoogleCloudDialogflowCxV3MatchMatchTypeEnum>,
     /// The collection of parameters extracted from the query. Depending on your protocol or client library language, this is a map, associative array, symbol table, dictionary, or JSON object composed of a collection of (MapKey, MapValue) pairs: * MapKey type: string * MapKey value: parameter name * MapValue type: If parameter's entity type is a composite entity then use map, otherwise, depending on the parameter value type, it could be one of string, number, boolean, null, list or map. * MapValue value: If parameter's entity type is a composite entity then use map from composite entity property names to property values, otherwise, use parameter value.
     
     pub parameters: Option<HashMap<String, json::Value>>,
@@ -2212,11 +2212,11 @@ pub struct GoogleCloudDialogflowCxV3NluSettings {
     /// Indicates NLU model training mode.
     #[serde(rename="modelTrainingMode")]
     
-    pub model_training_mode: Option<String>,
+    pub model_training_mode: Option<GoogleCloudDialogflowCxV3NluSettingModelTrainingModeEnum>,
     /// Indicates the type of NLU model.
     #[serde(rename="modelType")]
     
-    pub model_type: Option<String>,
+    pub model_type: Option<GoogleCloudDialogflowCxV3NluSettingModelTypeEnum>,
 }
 
 impl client::Part for GoogleCloudDialogflowCxV3NluSettings {}
@@ -2232,7 +2232,7 @@ pub struct GoogleCloudDialogflowCxV3OutputAudioConfig {
     /// Required. Audio encoding of the synthesized audio content.
     #[serde(rename="audioEncoding")]
     
-    pub audio_encoding: Option<String>,
+    pub audio_encoding: Option<GoogleCloudDialogflowCxV3OutputAudioConfigAudioEncodingEnum>,
     /// Optional. The synthesis sample rate (in hertz) for this audio. If not provided, then the synthesizer will use the default sample rate based on the audio encoding. If this is different from the voice's natural sample rate, then the synthesizer will honor this request by converting to the desired sample rate (which might result in worse audio quality).
     #[serde(rename="sampleRateHertz")]
     
@@ -2693,7 +2693,7 @@ pub struct GoogleCloudDialogflowCxV3RestoreAgentRequest {
     /// Agent restore mode. If not specified, `KEEP` is assumed.
     #[serde(rename="restoreOption")]
     
-    pub restore_option: Option<String>,
+    pub restore_option: Option<GoogleCloudDialogflowCxV3RestoreAgentRequestRestoreOptionEnum>,
 }
 
 impl client::RequestValue for GoogleCloudDialogflowCxV3RestoreAgentRequest {}
@@ -2844,15 +2844,15 @@ pub struct GoogleCloudDialogflowCxV3SecuritySettings {
     /// List of types of data to remove when retention settings triggers purge.
     #[serde(rename="purgeDataTypes")]
     
-    pub purge_data_types: Option<Vec<String>>,
+    pub purge_data_types: Option<Vec<GoogleCloudDialogflowCxV3SecuritySettingPurgeDataTypesEnum>>,
     /// Defines the data for which Dialogflow applies redaction. Dialogflow does not redact data that it does not have access to – for example, Cloud logging.
     #[serde(rename="redactionScope")]
     
-    pub redaction_scope: Option<String>,
+    pub redaction_scope: Option<GoogleCloudDialogflowCxV3SecuritySettingRedactionScopeEnum>,
     /// Strategy that defines how we do redaction.
     #[serde(rename="redactionStrategy")]
     
-    pub redaction_strategy: Option<String>,
+    pub redaction_strategy: Option<GoogleCloudDialogflowCxV3SecuritySettingRedactionStrategyEnum>,
     /// Retains the data for the specified number of days. User must set a value lower than Dialogflow's default 365d TTL (30 days for Agent Assist traffic), higher value will be ignored and use default. Setting a value higher than that has no effect. A missing value or setting to 0 also means we use default TTL.
     #[serde(rename="retentionWindowDays")]
     
@@ -2877,7 +2877,7 @@ pub struct GoogleCloudDialogflowCxV3SecuritySettingsAudioExportSettings {
     /// File format for exported audio file. Currently only in telephony recordings.
     #[serde(rename="audioFormat")]
     
-    pub audio_format: Option<String>,
+    pub audio_format: Option<GoogleCloudDialogflowCxV3SecuritySettingsAudioExportSettingAudioFormatEnum>,
     /// Enable audio redaction if it is true.
     #[serde(rename="enableAudioRedaction")]
     
@@ -2947,7 +2947,7 @@ pub struct GoogleCloudDialogflowCxV3SessionEntityType {
     /// Required. Indicates whether the additional data should override or supplement the custom entity type definition.
     #[serde(rename="entityOverrideMode")]
     
-    pub entity_override_mode: Option<String>,
+    pub entity_override_mode: Option<GoogleCloudDialogflowCxV3SessionEntityTypeEntityOverrideModeEnum>,
     /// Required. The unique identifier of the session entity type. Format: `projects//locations//agents//sessions//entityTypes/` or `projects//locations//agents//environments//sessions//entityTypes/`. If `Environment ID` is not specified, we assume default 'draft' environment.
     
     pub name: Option<String>,
@@ -3105,7 +3105,7 @@ pub struct GoogleCloudDialogflowCxV3TestCaseResult {
     /// Whether the test case passed in the agent environment.
     #[serde(rename="testResult")]
     
-    pub test_result: Option<String>,
+    pub test_result: Option<GoogleCloudDialogflowCxV3TestCaseResultTestResultEnum>,
     /// The time that the test was run.
     #[serde(rename="testTime")]
     
@@ -3150,7 +3150,7 @@ pub struct GoogleCloudDialogflowCxV3TestRunDifference {
     /// The type of diff.
     #[serde(rename="type")]
     
-    pub type_: Option<String>,
+    pub type_: Option<GoogleCloudDialogflowCxV3TestRunDifferenceTypeEnum>,
 }
 
 impl client::Part for GoogleCloudDialogflowCxV3TestRunDifference {}
@@ -3436,13 +3436,13 @@ pub struct GoogleCloudDialogflowCxV3ValidationMessage {
     /// The type of the resources where the message is found.
     #[serde(rename="resourceType")]
     
-    pub resource_type: Option<String>,
+    pub resource_type: Option<GoogleCloudDialogflowCxV3ValidationMessageResourceTypeEnum>,
     /// The names of the resources where the message is found.
     
     pub resources: Option<Vec<String>>,
     /// Indicates the severity of the message.
     
-    pub severity: Option<String>,
+    pub severity: Option<GoogleCloudDialogflowCxV3ValidationMessageSeverityEnum>,
 }
 
 impl client::Part for GoogleCloudDialogflowCxV3ValidationMessage {}
@@ -3501,7 +3501,7 @@ pub struct GoogleCloudDialogflowCxV3Version {
     pub nlu_settings: Option<GoogleCloudDialogflowCxV3NluSettings>,
     /// Output only. The state of this version. This field is read-only and cannot be set by create and update methods.
     
-    pub state: Option<String>,
+    pub state: Option<GoogleCloudDialogflowCxV3VersionStateEnum>,
 }
 
 impl client::RequestValue for GoogleCloudDialogflowCxV3Version {}
@@ -3559,7 +3559,7 @@ pub struct GoogleCloudDialogflowCxV3VoiceSelectionParams {
     /// Optional. The preferred gender of the voice. If not set, the service will choose a voice based on the other parameters such as language_code and name. Note that this is only a preference, not requirement. If a voice of the appropriate gender is not available, the synthesizer substitutes a voice with a different gender rather than failing the request.
     #[serde(rename="ssmlGender")]
     
-    pub ssml_gender: Option<String>,
+    pub ssml_gender: Option<GoogleCloudDialogflowCxV3VoiceSelectionParamSsmlGenderEnum>,
 }
 
 impl client::Part for GoogleCloudDialogflowCxV3VoiceSelectionParams {}

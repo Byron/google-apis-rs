@@ -101,10 +101,10 @@
 //! // You can configure optional parameters by calling the respective setters at will, and
 //! // execute the final call using `doit()`.
 //! // Values shown here are possibly random and not representative !
-//! let result = hub.people().list("userId", "collection")
-//!              .page_token("sed")
-//!              .order_by("amet.")
-//!              .max_results(42)
+//! let result = hub.people().list("userId", &Default::default())
+//!              .page_token("voluptua.")
+//!              .order_by(&Default::default())
+//!              .max_results(74)
 //!              .doit().await;
 //! 
 //! match result {

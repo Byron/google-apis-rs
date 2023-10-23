@@ -13,7 +13,7 @@ pub struct ActiveMetricRestriction {
     /// The reason for this metric's restriction.
     #[serde(rename="restrictedMetricTypes")]
     
-    pub restricted_metric_types: Option<Vec<String>>,
+    pub restricted_metric_types: Option<Vec<ActiveMetricRestrictionRestrictedMetricTypesEnum>>,
 }
 
 impl client::Part for ActiveMetricRestriction {}
@@ -152,7 +152,7 @@ pub struct CheckCompatibilityRequest {
     /// Filters the dimensions and metrics in the response to just this compatibility. Commonly used as `”compatibilityFilter”: “COMPATIBLE”` to only return compatible dimensions & metrics.
     #[serde(rename="compatibilityFilter")]
     
-    pub compatibility_filter: Option<String>,
+    pub compatibility_filter: Option<CheckCompatibilityRequestCompatibilityFilterEnum>,
     /// The filter clause of dimensions. `dimensionFilter` should be the same value as in your `runReport` request.
     #[serde(rename="dimensionFilter")]
     
@@ -269,7 +269,7 @@ pub struct CohortsRange {
     pub end_offset: Option<i32>,
     /// Required. The granularity used to interpret the `startOffset` and `endOffset` for the extended reporting date range for a cohort report.
     
-    pub granularity: Option<String>,
+    pub granularity: Option<CohortsRangeGranularityEnum>,
     /// `startOffset` specifies the start date of the extended reporting date range for a cohort report. `startOffset` is commonly set to 0 so that reports contain data from the acquisition of the cohort forward. If `granularity` is `DAILY`, the `startDate` of the extended reporting date range is `startDate` of the cohort plus `startOffset` days. If `granularity` is `WEEKLY`, the `startDate` of the extended reporting date range is `startDate` of the cohort plus `startOffset * 7` days. If `granularity` is `MONTHLY`, the `startDate` of the extended reporting date range is `startDate` of the cohort plus `startOffset * 30` days.
     #[serde(rename="startOffset")]
     
@@ -349,7 +349,7 @@ impl client::Part for Dimension {}
 pub struct DimensionCompatibility {
     /// The compatibility of this dimension. If the compatibility is COMPATIBLE, this dimension can be successfully added to the report.
     
-    pub compatibility: Option<String>,
+    pub compatibility: Option<DimensionCompatibilityCompatibilityEnum>,
     /// The dimension metadata contains the API name for this compatibility information. The dimension metadata also contains other helpful information like the UI name and description.
     #[serde(rename="dimensionMetadata")]
     
@@ -445,7 +445,7 @@ pub struct DimensionOrderBy {
     /// Controls the rule for dimension value ordering.
     #[serde(rename="orderType")]
     
-    pub order_type: Option<String>,
+    pub order_type: Option<DimensionOrderByOrderTypeEnum>,
 }
 
 impl client::Part for DimensionOrderBy {}
@@ -614,7 +614,7 @@ impl client::Part for Metric {}
 pub struct MetricCompatibility {
     /// The compatibility of this metric. If the compatibility is COMPATIBLE, this metric can be successfully added to the report.
     
-    pub compatibility: Option<String>,
+    pub compatibility: Option<MetricCompatibilityCompatibilityEnum>,
     /// The metric metadata contains the API name for this compatibility information. The metric metadata also contains other helpful information like the UI name and description.
     #[serde(rename="metricMetadata")]
     
@@ -637,7 +637,7 @@ pub struct MetricHeader {
     /// The metric's data type.
     #[serde(rename="type")]
     
-    pub type_: Option<String>,
+    pub type_: Option<MetricHeaderTypeEnum>,
 }
 
 impl client::Part for MetricHeader {}
@@ -657,7 +657,7 @@ pub struct MetricMetadata {
     /// If reasons are specified, your access is blocked to this metric for this property. API requests from you to this property for this metric will succeed; however, the report will contain only zeros for this metric. API requests with metric filters on blocked metrics will fail. If reasons are empty, you have access to this metric. To learn more, see [Access and data-restriction management](https://support.google.com/analytics/answer/10851388).
     #[serde(rename="blockedReasons")]
     
-    pub blocked_reasons: Option<Vec<String>>,
+    pub blocked_reasons: Option<Vec<MetricMetadataBlockedReasonsEnum>>,
     /// The display name of the category that this metrics belongs to. Similar dimensions and metrics are categorized together.
     
     pub category: Option<String>,
@@ -678,7 +678,7 @@ pub struct MetricMetadata {
     /// The type of this metric.
     #[serde(rename="type")]
     
-    pub type_: Option<String>,
+    pub type_: Option<MetricMetadataTypeEnum>,
     /// This metric's name within the Google Analytics user interface. For example, `Event count`.
     #[serde(rename="uiName")]
     
@@ -751,7 +751,7 @@ impl client::Part for MinuteRange {}
 pub struct NumericFilter {
     /// The operation type for this filter.
     
-    pub operation: Option<String>,
+    pub operation: Option<NumericFilterOperationEnum>,
     /// A numeric value or a date value.
     
     pub value: Option<NumericValue>,
@@ -823,7 +823,7 @@ pub struct Pivot {
     /// Aggregate the metrics by dimensions in this pivot using the specified metric_aggregations.
     #[serde(rename="metricAggregations")]
     
-    pub metric_aggregations: Option<Vec<String>>,
+    pub metric_aggregations: Option<Vec<PivotMetricAggregationsEnum>>,
     /// The row count of the start row. The first row is counted as row 0.
     
     #[serde_as(as = "Option<::client::serde_with::DisplayFromStr>")]
@@ -1148,7 +1148,7 @@ pub struct RunRealtimeReportRequest {
     /// Aggregation of metrics. Aggregated metric values will be shown in rows where the dimension_values are set to "RESERVED_(MetricAggregation)".
     #[serde(rename="metricAggregations")]
     
-    pub metric_aggregations: Option<Vec<String>>,
+    pub metric_aggregations: Option<Vec<RunRealtimeReportRequestMetricAggregationsEnum>>,
     /// The filter clause of metrics. Applied at post aggregation phase, similar to SQL having-clause. Dimensions cannot be used in this filter.
     #[serde(rename="metricFilter")]
     
@@ -1261,7 +1261,7 @@ pub struct RunReportRequest {
     /// Aggregation of metrics. Aggregated metric values will be shown in rows where the dimension_values are set to "RESERVED_(MetricAggregation)".
     #[serde(rename="metricAggregations")]
     
-    pub metric_aggregations: Option<Vec<String>>,
+    pub metric_aggregations: Option<Vec<RunReportRequestMetricAggregationsEnum>>,
     /// The filter clause of metrics. Applied after aggregating the report's rows, similar to SQL having-clause. Dimensions cannot be used in this filter.
     #[serde(rename="metricFilter")]
     
@@ -1369,7 +1369,7 @@ pub struct StringFilter {
     /// The match type for this filter.
     #[serde(rename="matchType")]
     
-    pub match_type: Option<String>,
+    pub match_type: Option<StringFilterMatchTypeEnum>,
     /// The string value used for the matching.
     
     pub value: Option<String>,

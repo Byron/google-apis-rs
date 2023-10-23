@@ -557,9 +557,9 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("productId", self._product_id);
-        params.push("skuId", self._sku_id);
-        params.push("userId", self._user_id);
+        params.push("productId", &self._product_id);
+        params.push("skuId", &self._sku_id);
+        params.push("userId", &self._user_id);
 
         params.extend(self._additional_params.iter());
 
@@ -843,9 +843,9 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("productId", self._product_id);
-        params.push("skuId", self._sku_id);
-        params.push("userId", self._user_id);
+        params.push("productId", &self._product_id);
+        params.push("skuId", &self._sku_id);
+        params.push("userId", &self._user_id);
 
         params.extend(self._additional_params.iter());
 
@@ -1135,8 +1135,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("productId", self._product_id);
-        params.push("skuId", self._sku_id);
+        params.push("productId", &self._product_id);
+        params.push("skuId", &self._sku_id);
 
         params.extend(self._additional_params.iter());
 
@@ -1436,8 +1436,8 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("productId", self._product_id);
-        params.push("customerId", self._customer_id);
+        params.push("productId", &self._product_id);
+        params.push("customerId", &self._customer_id);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -1735,9 +1735,9 @@ where
         }
 
         let mut params = Params::with_capacity(7 + self._additional_params.len());
-        params.push("productId", self._product_id);
-        params.push("skuId", self._sku_id);
-        params.push("customerId", self._customer_id);
+        params.push("productId", &self._product_id);
+        params.push("skuId", &self._sku_id);
+        params.push("customerId", &self._customer_id);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -2048,9 +2048,9 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("productId", self._product_id);
-        params.push("skuId", self._sku_id);
-        params.push("userId", self._user_id);
+        params.push("productId", &self._product_id);
+        params.push("skuId", &self._sku_id);
+        params.push("userId", &self._user_id);
 
         params.extend(self._additional_params.iter());
 
@@ -2364,9 +2364,9 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("productId", self._product_id);
-        params.push("skuId", self._sku_id);
-        params.push("userId", self._user_id);
+        params.push("productId", &self._product_id);
+        params.push("skuId", &self._sku_id);
+        params.push("userId", &self._user_id);
 
         params.extend(self._additional_params.iter());
 

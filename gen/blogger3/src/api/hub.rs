@@ -32,17 +32,17 @@ use super::*;
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.posts().list("blogId")
-///              .view("gubergren")
-///              .add_status("rebum.")
-///              .start_date("est")
-///              .sort_option("ipsum")
+///              .view(&Default::default())
+///              .add_status(&Default::default())
+///              .start_date("duo")
+///              .sort_option(&Default::default())
 ///              .page_token("ipsum")
-///              .order_by("est")
-///              .max_results(39)
-///              .labels("ea")
-///              .fetch_images(false)
+///              .order_by(&Default::default())
+///              .max_results(8)
+///              .labels("ut")
+///              .fetch_images(true)
 ///              .fetch_bodies(true)
-///              .end_date("eos")
+///              .end_date("ipsum")
 ///              .doit().await;
 /// 
 /// match result {

@@ -43,7 +43,7 @@ pub struct Backup {
     pub name: Option<String>,
     /// Output only. The current state of the backup.
     
-    pub state: Option<String>,
+    pub state: Option<BackupStateEnum>,
     /// Output only. Additional information about the current status of this backup, if available.
     #[serde(rename="statusMessage")]
     
@@ -51,7 +51,7 @@ pub struct Backup {
     /// Output only. Indicates whether it’s an on-demand backup or scheduled.
     #[serde(rename="type")]
     
-    pub type_: Option<String>,
+    pub type_: Option<BackupTypeEnum>,
     /// Output only. Last update time.
     #[serde(rename="updateTime")]
     
@@ -193,7 +193,7 @@ pub struct Domain {
     pub reserved_ip_range: Option<String>,
     /// Output only. The current state of this domain.
     
-    pub state: Option<String>,
+    pub state: Option<DomainStateEnum>,
     /// Output only. Additional information about the current status of this domain, if available.
     #[serde(rename="statusMessage")]
     
@@ -308,7 +308,7 @@ pub struct LDAPSSettings {
     pub name: Option<String>,
     /// Output only. The current state of this LDAPS settings.
     
-    pub state: Option<String>,
+    pub state: Option<LDAPSSettingStateEnum>,
     /// Output only. Last update time.
     #[serde(rename="updateTime")]
     
@@ -583,7 +583,7 @@ pub struct Peering {
     pub name: Option<String>,
     /// Output only. The current state of this Peering.
     
-    pub state: Option<String>,
+    pub state: Option<PeeringStateEnum>,
     /// Output only. Additional information about the current status of this peering, if available.
     #[serde(rename="statusMessage")]
     
@@ -752,7 +752,7 @@ pub struct SqlIntegration {
     pub sql_instance: Option<String>,
     /// Output only. The current state of the SQL integration.
     
-    pub state: Option<String>,
+    pub state: Option<SqlIntegrationStateEnum>,
     /// Output only. The time the SQL integration was updated.
     #[serde(rename="updateTime")]
     
@@ -846,7 +846,7 @@ pub struct Trust {
     pub selective_authentication: Option<bool>,
     /// Output only. The current state of the trust.
     
-    pub state: Option<String>,
+    pub state: Option<TrustStateEnum>,
     /// Output only. Additional information about the current state of the trust, if available.
     #[serde(rename="stateDescription")]
     
@@ -862,7 +862,7 @@ pub struct Trust {
     /// Required. The trust direction, which decides if the current domain is trusted, trusting, or both.
     #[serde(rename="trustDirection")]
     
-    pub trust_direction: Option<String>,
+    pub trust_direction: Option<TrustTrustDirectionEnum>,
     /// Required. The trust secret used for the handshake with the target domain. This will not be stored.
     #[serde(rename="trustHandshakeSecret")]
     
@@ -870,7 +870,7 @@ pub struct Trust {
     /// Required. The type of trust represented by the trust resource.
     #[serde(rename="trustType")]
     
-    pub trust_type: Option<String>,
+    pub trust_type: Option<TrustTrustTypeEnum>,
     /// Output only. The last update time.
     #[serde(rename="updateTime")]
     

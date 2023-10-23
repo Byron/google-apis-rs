@@ -119,17 +119,17 @@
 //! // execute the final call using `doit()`.
 //! // Values shown here are possibly random and not representative !
 //! let result = hub.posts().list("blogId")
-//!              .view("gubergren")
-//!              .add_status("Lorem")
-//!              .start_date("gubergren")
-//!              .sort_option("eos")
-//!              .page_token("dolor")
-//!              .order_by("ea")
-//!              .max_results(46)
-//!              .labels("invidunt")
-//!              .fetch_images(true)
+//!              .view(&Default::default())
+//!              .add_status(&Default::default())
+//!              .start_date("ipsum")
+//!              .sort_option(&Default::default())
+//!              .page_token("gubergren")
+//!              .order_by(&Default::default())
+//!              .max_results(50)
+//!              .labels("gubergren")
+//!              .fetch_images(false)
 //!              .fetch_bodies(true)
-//!              .end_date("sed")
+//!              .end_date("invidunt")
 //!              .doit().await;
 //! 
 //! match result {

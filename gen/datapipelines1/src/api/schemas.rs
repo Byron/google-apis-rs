@@ -45,11 +45,11 @@ pub struct GoogleCloudDatapipelinesV1FlexTemplateRuntimeEnvironment {
     /// Set FlexRS goal for the job. https://cloud.google.com/dataflow/docs/guides/flexrs
     #[serde(rename="flexrsGoal")]
     
-    pub flexrs_goal: Option<String>,
+    pub flexrs_goal: Option<GoogleCloudDatapipelinesV1FlexTemplateRuntimeEnvironmentFlexrsGoalEnum>,
     /// Configuration for VM IPs.
     #[serde(rename="ipConfiguration")]
     
-    pub ip_configuration: Option<String>,
+    pub ip_configuration: Option<GoogleCloudDatapipelinesV1FlexTemplateRuntimeEnvironmentIpConfigurationEnum>,
     /// Name for the Cloud KMS key for the job. Key format is: projects//locations//keyRings//cryptoKeys/
     #[serde(rename="kmsKeyName")]
     
@@ -123,7 +123,7 @@ pub struct GoogleCloudDatapipelinesV1Job {
     pub name: Option<String>,
     /// The current state of the job.
     
-    pub state: Option<String>,
+    pub state: Option<GoogleCloudDatapipelinesV1JobStateEnum>,
     /// Status capturing any error code or message related to job creation or execution.
     
     pub status: Option<GoogleRpcStatus>,
@@ -349,11 +349,11 @@ pub struct GoogleCloudDatapipelinesV1Pipeline {
     pub scheduler_service_account_email: Option<String>,
     /// Required. The state of the pipeline. When the pipeline is created, the state is set to 'PIPELINE_STATE_ACTIVE' by default. State changes can be requested by setting the state to stopping, paused, or resuming. State cannot be changed through UpdatePipeline requests.
     
-    pub state: Option<String>,
+    pub state: Option<GoogleCloudDatapipelinesV1PipelineStateEnum>,
     /// Required. The type of the pipeline. This field affects the scheduling of the pipeline and the type of metrics to show for the pipeline.
     #[serde(rename="type")]
     
-    pub type_: Option<String>,
+    pub type_: Option<GoogleCloudDatapipelinesV1PipelineTypeEnum>,
     /// Workload information for creating new jobs.
     
     pub workload: Option<GoogleCloudDatapipelinesV1Workload>,
@@ -423,7 +423,7 @@ pub struct GoogleCloudDatapipelinesV1RuntimeEnvironment {
     /// Configuration for VM IPs.
     #[serde(rename="ipConfiguration")]
     
-    pub ip_configuration: Option<String>,
+    pub ip_configuration: Option<GoogleCloudDatapipelinesV1RuntimeEnvironmentIpConfigurationEnum>,
     /// Name for the Cloud KMS key for the job. The key format is: projects//locations//keyRings//cryptoKeys/
     #[serde(rename="kmsKeyName")]
     
@@ -503,7 +503,7 @@ pub struct GoogleCloudDatapipelinesV1SdkVersion {
     /// The support status for this SDK version.
     #[serde(rename="sdkSupportStatus")]
     
-    pub sdk_support_status: Option<String>,
+    pub sdk_support_status: Option<GoogleCloudDatapipelinesV1SdkVersionSdkSupportStatusEnum>,
     /// The version of the SDK used to run the job.
     
     pub version: Option<String>,

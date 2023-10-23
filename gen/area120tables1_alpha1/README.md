@@ -106,11 +106,11 @@ let mut hub = Area120Tables::new(hyper::Client::builder().build(hyper_rustls::Ht
 // execute the final call using `doit()`.
 // Values shown here are possibly random and not representative !
 let result = hub.tables().rows_list("parent")
-             .view("magna")
-             .page_token("no")
-             .page_size(-55)
-             .order_by("voluptua.")
-             .filter("At")
+             .view(&Default::default())
+             .page_token("magna")
+             .page_size(-11)
+             .order_by("ipsum")
+             .filter("voluptua.")
              .doit().await;
 
 match result {

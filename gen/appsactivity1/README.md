@@ -99,9 +99,9 @@ let result = hub.activities().list()
              .source("magna")
              .page_token("no")
              .page_size(-55)
-             .grouping_strategy("voluptua.")
-             .drive_file_id("At")
-             .drive_ancestor_id("sanctus")
+             .grouping_strategy(&Default::default())
+             .drive_file_id("voluptua.")
+             .drive_ancestor_id("At")
              .doit().await;
 
 match result {

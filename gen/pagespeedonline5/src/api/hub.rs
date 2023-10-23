@@ -32,12 +32,12 @@ use super::*;
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.pagespeedapi().runpagespeed("url")
-///              .utm_source("gubergren")
-///              .utm_campaign("eos")
-///              .strategy("dolor")
-///              .locale("ea")
-///              .add_category("ipsum")
-///              .captcha_token("invidunt")
+///              .utm_source("duo")
+///              .utm_campaign("ipsum")
+///              .strategy(&Default::default())
+///              .locale("gubergren")
+///              .add_category(&Default::default())
+///              .captcha_token("Lorem")
 ///              .doit().await;
 /// 
 /// match result {

@@ -37,7 +37,7 @@ pub struct AmpUrlError {
     /// The error code of an API call.
     #[serde(rename="errorCode")]
     
-    pub error_code: Option<String>,
+    pub error_code: Option<AmpUrlErrorErrorCodeEnum>,
     /// An optional descriptive error message.
     #[serde(rename="errorMessage")]
     
@@ -65,7 +65,7 @@ pub struct BatchGetAmpUrlsRequest {
     /// The lookup_strategy being requested.
     #[serde(rename="lookupStrategy")]
     
-    pub lookup_strategy: Option<String>,
+    pub lookup_strategy: Option<BatchGetAmpUrlsRequestLookupStrategyEnum>,
     /// List of URLs to look up for the paired AMP URLs. The URLs are case-sensitive. Up to 50 URLs per lookup (see [Usage Limits](https://developers.google.com/amp/cache/reference/limits)).
     
     pub urls: Option<Vec<String>>,

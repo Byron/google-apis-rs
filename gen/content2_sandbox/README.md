@@ -122,12 +122,12 @@ let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::
 // execute the final call using `doit()`.
 // Values shown here are possibly random and not representative !
 let result = hub.orders().list(79)
-             .add_statuses("magna")
-             .placed_date_start("no")
-             .placed_date_end("ipsum")
-             .page_token("voluptua.")
-             .order_by("At")
-             .max_results(93)
+             .add_statuses(&Default::default())
+             .placed_date_start("magna")
+             .placed_date_end("no")
+             .page_token("ipsum")
+             .order_by(&Default::default())
+             .max_results(73)
              .acknowledged(false)
              .doit().await;
 

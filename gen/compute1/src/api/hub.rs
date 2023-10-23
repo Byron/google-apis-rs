@@ -38,9 +38,9 @@ use super::*;
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.instances().update(req, "project", "zone", "instance")
-///              .request_id("gubergren")
-///              .most_disruptive_allowed_action("eos")
-///              .minimal_action("dolor")
+///              .request_id("duo")
+///              .most_disruptive_allowed_action(&Default::default())
+///              .minimal_action(&Default::default())
 ///              .doit().await;
 /// 
 /// match result {

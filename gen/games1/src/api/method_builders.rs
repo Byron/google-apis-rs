@@ -531,11 +531,11 @@ impl<'a, S> MetagameMethods<'a, S> {
     ///
     /// * `playerId` - A player ID. A value of `me` may be used in place of the authenticated player's ID.
     /// * `collection` - The collection of categories for which data will be returned.
-    pub fn list_categories_by_player(&self, player_id: &str, collection: &str) -> MetagameListCategoriesByPlayerCall<'a, S> {
+    pub fn list_categories_by_player(&self, player_id: &str, collection: &MetagameCollectionEnum) -> MetagameListCategoriesByPlayerCall<'a, S> {
         MetagameListCategoriesByPlayerCall {
             hub: self.hub,
             _player_id: player_id.to_string(),
-            _collection: collection.to_string(),
+            _collection: collection.clone(),
             _page_token: Default::default(),
             _max_results: Default::default(),
             _language: Default::default(),
@@ -624,10 +624,10 @@ impl<'a, S> PlayerMethods<'a, S> {
     /// # Arguments
     ///
     /// * `collection` - Collection of players being retrieved
-    pub fn list(&self, collection: &str) -> PlayerListCall<'a, S> {
+    pub fn list(&self, collection: &PlayerCollectionEnum) -> PlayerListCall<'a, S> {
         PlayerListCall {
             hub: self.hub,
-            _collection: collection.to_string(),
+            _collection: collection.clone(),
             _page_token: Default::default(),
             _max_results: Default::default(),
             _language: Default::default(),
@@ -745,12 +745,12 @@ impl<'a, S> ScoreMethods<'a, S> {
     /// * `playerId` - A player ID. A value of `me` may be used in place of the authenticated player's ID.
     /// * `leaderboardId` - The ID of the leaderboard. Can be set to 'ALL' to retrieve data for all leaderboards for this application.
     /// * `timeSpan` - The time span for the scores and ranks you're requesting.
-    pub fn get(&self, player_id: &str, leaderboard_id: &str, time_span: &str) -> ScoreGetCall<'a, S> {
+    pub fn get(&self, player_id: &str, leaderboard_id: &str, time_span: &ScoreTimeSpanEnum) -> ScoreGetCall<'a, S> {
         ScoreGetCall {
             hub: self.hub,
             _player_id: player_id.to_string(),
             _leaderboard_id: leaderboard_id.to_string(),
-            _time_span: time_span.to_string(),
+            _time_span: time_span.clone(),
             _page_token: Default::default(),
             _max_results: Default::default(),
             _language: Default::default(),
@@ -770,12 +770,12 @@ impl<'a, S> ScoreMethods<'a, S> {
     /// * `leaderboardId` - The ID of the leaderboard.
     /// * `collection` - The collection of scores you're requesting.
     /// * `timeSpan` - The time span for the scores and ranks you're requesting.
-    pub fn list(&self, leaderboard_id: &str, collection: &str, time_span: &str) -> ScoreListCall<'a, S> {
+    pub fn list(&self, leaderboard_id: &str, collection: &ScoreCollectionEnum, time_span: &ScoreTimeSpanEnum) -> ScoreListCall<'a, S> {
         ScoreListCall {
             hub: self.hub,
             _leaderboard_id: leaderboard_id.to_string(),
-            _collection: collection.to_string(),
-            _time_span: time_span.to_string(),
+            _collection: collection.clone(),
+            _time_span: time_span.clone(),
             _page_token: Default::default(),
             _max_results: Default::default(),
             _language: Default::default(),
@@ -794,12 +794,12 @@ impl<'a, S> ScoreMethods<'a, S> {
     /// * `leaderboardId` - The ID of the leaderboard.
     /// * `collection` - The collection of scores you're requesting.
     /// * `timeSpan` - The time span for the scores and ranks you're requesting.
-    pub fn list_window(&self, leaderboard_id: &str, collection: &str, time_span: &str) -> ScoreListWindowCall<'a, S> {
+    pub fn list_window(&self, leaderboard_id: &str, collection: &ScoreCollectionEnum, time_span: &ScoreTimeSpanEnum) -> ScoreListWindowCall<'a, S> {
         ScoreListWindowCall {
             hub: self.hub,
             _leaderboard_id: leaderboard_id.to_string(),
-            _collection: collection.to_string(),
-            _time_span: time_span.to_string(),
+            _collection: collection.clone(),
+            _time_span: time_span.clone(),
             _return_top_if_absent: Default::default(),
             _results_above: Default::default(),
             _page_token: Default::default(),

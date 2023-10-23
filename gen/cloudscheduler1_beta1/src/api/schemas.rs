@@ -20,7 +20,7 @@ pub struct AppEngineHttpTarget {
     /// The HTTP method to use for the request. PATCH and OPTIONS are not permitted.
     #[serde(rename="httpMethod")]
     
-    pub http_method: Option<String>,
+    pub http_method: Option<AppEngineHttpTargetHttpMethodEnum>,
     /// The relative URI. The relative URL must begin with "/" and must be a valid HTTP relative URL. It can contain a path, query string arguments, and `#` fragments. If the relative URL is empty, then the root path "/" will be used. No spaces are allowed, and the maximum length allowed is 2083 characters.
     #[serde(rename="relativeUri")]
     
@@ -86,7 +86,7 @@ pub struct HttpTarget {
     /// Which HTTP method to use for the request.
     #[serde(rename="httpMethod")]
     
-    pub http_method: Option<String>,
+    pub http_method: Option<HttpTargetHttpMethodEnum>,
     /// If specified, an [OAuth token](https://developers.google.com/identity/protocols/OAuth2) will be generated and attached as an `Authorization` header in the HTTP request. This type of authorization should generally only be used when calling Google APIs hosted on *.googleapis.com.
     #[serde(rename="oauthToken")]
     
@@ -163,7 +163,7 @@ pub struct Job {
     pub schedule_time: Option<client::chrono::DateTime<client::chrono::offset::Utc>>,
     /// Output only. State of the job.
     
-    pub state: Option<String>,
+    pub state: Option<JobStateEnum>,
     /// Output only. The response from the target for the last attempted execution.
     
     pub status: Option<Status>,

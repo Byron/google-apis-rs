@@ -116,7 +116,7 @@ pub struct Environment {
     pub ssh_username: Option<String>,
     /// Output only. Current execution state of this environment.
     
-    pub state: Option<String>,
+    pub state: Option<EnvironmentStateEnum>,
     /// Output only. Host to which clients can connect to initiate HTTPS or WSS connections with the environment.
     #[serde(rename="webHost")]
     

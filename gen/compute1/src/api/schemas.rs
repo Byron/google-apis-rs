@@ -196,7 +196,7 @@ pub struct AccessConfig {
     /// This signifies the networking tier used for configuring this access configuration and can only take the following values: PREMIUM, STANDARD. If an AccessConfig is specified without a valid external IP address, an ephemeral IP will be created with this networkTier. If an AccessConfig with a valid external IP address is specified, it must match that of the networkTier associated with the Address resource owning that IP.
     #[serde(rename="networkTier")]
     
-    pub network_tier: Option<String>,
+    pub network_tier: Option<AccessConfigNetworkTierEnum>,
     /// The DNS domain name for the public PTR record. You can set this field only if the `setPublicPtr` field is enabled in accessConfig. If this field is unspecified in ipv6AccessConfig, a default PTR record will be createc for first IP in associated external IPv6 range.
     #[serde(rename="publicPtrDomainName")]
     
@@ -208,7 +208,7 @@ pub struct AccessConfig {
     /// The type of configuration. The default and only option is ONE_TO_ONE_NAT.
     #[serde(rename="type")]
     
-    pub type_: Option<String>,
+    pub type_: Option<AccessConfigTypeEnum>,
 }
 
 impl client::RequestValue for AccessConfig {}
@@ -234,7 +234,7 @@ pub struct Address {
     /// The type of address to reserve, either INTERNAL or EXTERNAL. If unspecified, defaults to EXTERNAL.
     #[serde(rename="addressType")]
     
-    pub address_type: Option<String>,
+    pub address_type: Option<AddresAddressTypeEnum>,
     /// [Output Only] Creation timestamp in RFC3339 text format.
     #[serde(rename="creationTimestamp")]
     
@@ -249,11 +249,11 @@ pub struct Address {
     /// The IP version that will be used by this address. Valid options are IPV4 or IPV6. This can only be specified for a global address.
     #[serde(rename="ipVersion")]
     
-    pub ip_version: Option<String>,
+    pub ip_version: Option<AddresIpVersionEnum>,
     /// The endpoint type of this address, which should be VM or NETLB. This is used for deciding which type of endpoint this address can be used after the external IPv6 address reservation.
     #[serde(rename="ipv6EndpointType")]
     
-    pub ipv6_endpoint_type: Option<String>,
+    pub ipv6_endpoint_type: Option<AddresIpv6EndpointTypeEnum>,
     /// [Output Only] Type of the resource. Always compute#address for addresses.
     
     pub kind: Option<String>,
@@ -266,14 +266,14 @@ pub struct Address {
     /// This signifies the networking tier used for configuring this address and can only take the following values: PREMIUM or STANDARD. Internal IP addresses are always Premium Tier; global external IP addresses are always Premium Tier; regional external IP addresses can be either Standard or Premium Tier. If this field is not specified, it is assumed to be PREMIUM.
     #[serde(rename="networkTier")]
     
-    pub network_tier: Option<String>,
+    pub network_tier: Option<AddresNetworkTierEnum>,
     /// The prefix length if the resource represents an IP range.
     #[serde(rename="prefixLength")]
     
     pub prefix_length: Option<i32>,
     /// The purpose of this resource, which can be one of the following values: - GCE_ENDPOINT for addresses that are used by VM instances, alias IP ranges, load balancers, and similar resources. - DNS_RESOLVER for a DNS resolver address in a subnetwork for a Cloud DNS inbound forwarder IP addresses (regional internal IP address in a subnet of a VPC network) - VPC_PEERING for global internal IP addresses used for private services access allocated ranges. - NAT_AUTO for the regional external IP addresses used by Cloud NAT when allocating addresses using automatic NAT IP address allocation. - IPSEC_INTERCONNECT for addresses created from a private IP range that are reserved for a VLAN attachment in an *HA VPN over Cloud Interconnect* configuration. These addresses are regional resources. - `SHARED_LOADBALANCER_VIP` for an internal IP address that is assigned to multiple internal forwarding rules. - `PRIVATE_SERVICE_CONNECT` for a private network address that is used to configure Private Service Connect. Only global internal addresses can use this purpose. 
     
-    pub purpose: Option<String>,
+    pub purpose: Option<AddresPurposeEnum>,
     /// [Output Only] The URL of the region where a regional address resides. For regional addresses, you must specify the region as a path parameter in the HTTP request URL. *This field is not applicable to global addresses.*
     
     pub region: Option<String>,
@@ -283,7 +283,7 @@ pub struct Address {
     pub self_link: Option<String>,
     /// [Output Only] The status of the address, which can be one of RESERVING, RESERVED, or IN_USE. An address that is RESERVING is currently in the process of being reserved. A RESERVED address is currently reserved and available to use. An IN_USE address is currently being used by another resource and is not available.
     
-    pub status: Option<String>,
+    pub status: Option<AddresStatusEnum>,
     /// The URL of the subnetwork in which to reserve the address. If an IP address is specified, it must be within the subnetwork's IP range. This field can only be used with INTERNAL type with a GCE_ENDPOINT or DNS_RESOLVER purpose.
     
     pub subnetwork: Option<String>,
@@ -484,7 +484,7 @@ pub struct AllocationSpecificSKUAllocationAllocatedInstancePropertiesReservedDis
     pub disk_size_gb: Option<i64>,
     /// Specifies the disk interface to use for attaching this disk, which is either SCSI or NVME. The default is SCSI. For performance characteristics of SCSI over NVMe, see Local SSD performance.
     
-    pub interface: Option<String>,
+    pub interface: Option<AllocationSpecificSKUAllocationAllocatedInstancePropertiesReservedDiskInterfaceEnum>,
 }
 
 impl client::Part for AllocationSpecificSKUAllocationAllocatedInstancePropertiesReservedDisk {}
@@ -569,7 +569,7 @@ impl client::Part for AllocationSpecificSKUReservation {}
 pub struct AttachedDisk {
     /// [Output Only] The architecture of the attached disk. Valid values are ARM64 or X86_64.
     
-    pub architecture: Option<String>,
+    pub architecture: Option<AttachedDiskArchitectureEnum>,
     /// Specifies whether the disk will be auto-deleted when the instance is deleted (but not when the disk is detached from the instance).
     #[serde(rename="autoDelete")]
     
@@ -607,7 +607,7 @@ pub struct AttachedDisk {
     pub initialize_params: Option<AttachedDiskInitializeParams>,
     /// Specifies the disk interface to use for attaching this disk, which is either SCSI or NVME. For most machine types, the default is SCSI. Local SSDs can use either NVME or SCSI. In certain configurations, persistent disks can use NVMe. For more information, see About persistent disks.
     
-    pub interface: Option<String>,
+    pub interface: Option<AttachedDiskInterfaceEnum>,
     /// [Output Only] Type of the resource. Always compute#attachedDisk for attached disks.
     
     pub kind: Option<String>,
@@ -616,7 +616,7 @@ pub struct AttachedDisk {
     pub licenses: Option<Vec<String>>,
     /// The mode in which to attach this disk, either READ_WRITE or READ_ONLY. If not specified, the default is to attach the disk in READ_WRITE mode.
     
-    pub mode: Option<String>,
+    pub mode: Option<AttachedDiskModeEnum>,
     /// [Output Only] shielded vm initial state stored on disk
     #[serde(rename="shieldedInstanceInitialState")]
     
@@ -627,7 +627,7 @@ pub struct AttachedDisk {
     /// Specifies the type of the disk, either SCRATCH or PERSISTENT. If not specified, the default is PERSISTENT.
     #[serde(rename="type")]
     
-    pub type_: Option<String>,
+    pub type_: Option<AttachedDiskTypeEnum>,
 }
 
 impl client::RequestValue for AttachedDisk {}
@@ -642,7 +642,7 @@ impl client::RequestValue for AttachedDisk {}
 pub struct AttachedDiskInitializeParams {
     /// The architecture of the attached disk. Valid values are arm64 or x86_64.
     
-    pub architecture: Option<String>,
+    pub architecture: Option<AttachedDiskInitializeParamArchitectureEnum>,
     /// An optional description. Provide this property when creating the disk.
     
     pub description: Option<String>,
@@ -668,7 +668,7 @@ pub struct AttachedDiskInitializeParams {
     /// Specifies which action to take on instance update with this disk. Default is to use the existing disk.
     #[serde(rename="onUpdateAction")]
     
-    pub on_update_action: Option<String>,
+    pub on_update_action: Option<AttachedDiskInitializeParamOnUpdateActionEnum>,
     /// Indicates how many IOPS to provision for the disk. This sets the number of I/O operations per second that the disk can handle. Values must be between 10,000 and 120,000. For more details, see the Extreme persistent disk documentation.
     #[serde(rename="provisionedIops")]
     
@@ -744,7 +744,7 @@ pub struct AuditLogConfig {
     /// The log type that this config enables.
     #[serde(rename="logType")]
     
-    pub log_type: Option<String>,
+    pub log_type: Option<AuditLogConfigLogTypeEnum>,
 }
 
 impl client::Part for AuditLogConfig {}
@@ -760,7 +760,7 @@ pub struct AuthorizationLoggingOptions {
     /// This is deprecated and has no effect. Do not use.
     #[serde(rename="permissionType")]
     
-    pub permission_type: Option<String>,
+    pub permission_type: Option<AuthorizationLoggingOptionPermissionTypeEnum>,
 }
 
 impl client::Part for AuthorizationLoggingOptions {}
@@ -825,7 +825,7 @@ pub struct Autoscaler {
     pub self_link: Option<String>,
     /// [Output Only] The status of the autoscaler configuration. Current set of possible values: - PENDING: Autoscaler backend hasn't read new/updated configuration. - DELETING: Configuration is being deleted. - ACTIVE: Configuration is acknowledged to be effective. Some warnings might be present in the statusDetails field. - ERROR: Configuration has errors. Actionable for users. Details are present in the statusDetails field. New values might be added in the future.
     
-    pub status: Option<String>,
+    pub status: Option<AutoscalerStatusEnum>,
     /// [Output Only] Human-readable details about the current state of the autoscaler. Read the documentation for Commonly returned status messages for examples of status messages you might encounter.
     #[serde(rename="statusDetails")]
     
@@ -931,7 +931,7 @@ pub struct AutoscalerStatusDetails {
     /// The type of error, warning, or notice returned. Current set of possible values: - ALL_INSTANCES_UNHEALTHY (WARNING): All instances in the instance group are unhealthy (not in RUNNING state). - BACKEND_SERVICE_DOES_NOT_EXIST (ERROR): There is no backend service attached to the instance group. - CAPPED_AT_MAX_NUM_REPLICAS (WARNING): Autoscaler recommends a size greater than maxNumReplicas. - CUSTOM_METRIC_DATA_POINTS_TOO_SPARSE (WARNING): The custom metric samples are not exported often enough to be a credible base for autoscaling. - CUSTOM_METRIC_INVALID (ERROR): The custom metric that was specified does not exist or does not have the necessary labels. - MIN_EQUALS_MAX (WARNING): The minNumReplicas is equal to maxNumReplicas. This means the autoscaler cannot add or remove instances from the instance group. - MISSING_CUSTOM_METRIC_DATA_POINTS (WARNING): The autoscaler did not receive any data from the custom metric configured for autoscaling. - MISSING_LOAD_BALANCING_DATA_POINTS (WARNING): The autoscaler is configured to scale based on a load balancing signal but the instance group has not received any requests from the load balancer. - MODE_OFF (WARNING): Autoscaling is turned off. The number of instances in the group won't change automatically. The autoscaling configuration is preserved. - MODE_ONLY_UP (WARNING): Autoscaling is in the "Autoscale only out" mode. The autoscaler can add instances but not remove any. - MORE_THAN_ONE_BACKEND_SERVICE (ERROR): The instance group cannot be autoscaled because it has more than one backend service attached to it. - NOT_ENOUGH_QUOTA_AVAILABLE (ERROR): There is insufficient quota for the necessary resources, such as CPU or number of instances. - REGION_RESOURCE_STOCKOUT (ERROR): Shown only for regional autoscalers: there is a resource stockout in the chosen region. - SCALING_TARGET_DOES_NOT_EXIST (ERROR): The target to be scaled does not exist. - UNSUPPORTED_MAX_RATE_LOAD_BALANCING_CONFIGURATION (ERROR): Autoscaling does not work with an HTTP/S load balancer that has been configured for maxRate. - ZONE_RESOURCE_STOCKOUT (ERROR): For zonal autoscalers: there is a resource stockout in the chosen zone. For regional autoscalers: in at least one of the zones you're using there is a resource stockout. New values might be added in the future. Some of the values might not be available in all API versions.
     #[serde(rename="type")]
     
-    pub type_: Option<String>,
+    pub type_: Option<AutoscalerStatusDetailTypeEnum>,
 }
 
 impl client::Part for AutoscalerStatusDetails {}
@@ -988,7 +988,7 @@ pub struct AutoscalingPolicy {
     pub min_num_replicas: Option<i32>,
     /// Defines operating mode for this policy.
     
-    pub mode: Option<String>,
+    pub mode: Option<AutoscalingPolicyModeEnum>,
     /// no description provided
     #[serde(rename="scaleInControl")]
     
@@ -1012,7 +1012,7 @@ pub struct AutoscalingPolicyCpuUtilization {
     /// Indicates whether predictive autoscaling based on CPU metric is enabled. Valid values are: * NONE (default). No predictive method is used. The autoscaler scales the group to meet current demand based on real-time metrics. * OPTIMIZE_AVAILABILITY. Predictive autoscaling improves availability by monitoring daily and weekly load patterns and scaling out ahead of anticipated demand.
     #[serde(rename="predictiveMethod")]
     
-    pub predictive_method: Option<String>,
+    pub predictive_method: Option<AutoscalingPolicyCpuUtilizationPredictiveMethodEnum>,
     /// The target CPU utilization that the autoscaler maintains. Must be a float value in the range (0, 1]. If not specified, the default is 0.6. If the CPU level is below the target utilization, the autoscaler scales in the number of instances until it reaches the minimum number of instances you specified or until the average CPU of your instances reaches the target utilization. If the average CPU is above the target utilization, the autoscaler scales out until it reaches the maximum number of instances you specified or until the average utilization reaches the target utilization.
     #[serde(rename="utilizationTarget")]
     
@@ -1046,7 +1046,7 @@ pub struct AutoscalingPolicyCustomMetricUtilization {
     /// Defines how target utilization value is expressed for a Stackdriver Monitoring metric. Either GAUGE, DELTA_PER_SECOND, or DELTA_PER_MINUTE.
     #[serde(rename="utilizationTargetType")]
     
-    pub utilization_target_type: Option<String>,
+    pub utilization_target_type: Option<AutoscalingPolicyCustomMetricUtilizationUtilizationTargetTypeEnum>,
 }
 
 impl client::Part for AutoscalingPolicyCustomMetricUtilization {}
@@ -1131,7 +1131,7 @@ pub struct Backend {
     /// Specifies how to determine whether the backend of a load balancer can handle additional traffic or is fully loaded. For usage guidelines, see Connection balancing mode. Backends must use compatible balancing modes. For more information, see Supported balancing modes and target capacity settings and Restrictions and guidance for instance groups. Note: Currently, if you use the API to configure incompatible balancing modes, the configuration might be accepted even though it has no impact and is ignored. Specifically, Backend.maxUtilization is ignored when Backend.balancingMode is RATE. In the future, this incompatible combination will be rejected.
     #[serde(rename="balancingMode")]
     
-    pub balancing_mode: Option<String>,
+    pub balancing_mode: Option<BackendBalancingModeEnum>,
     /// A multiplier applied to the backend's target capacity of its balancing mode. The default value is 1, which means the group serves up to 100% of its configured capacity (depending on balancingMode). A setting of 0 means the group is completely drained, offering 0% of its available capacity. The valid ranges are 0.0 and [0.1,1.0]. You cannot configure a setting larger than 0 and smaller than 0.1. You cannot configure a setting of 0 when there is only one backend attached to the backend service. Not available with backends that don't support using a balancingMode. This includes backends such as global internet NEGs, regional serverless NEGs, and PSC NEGs.
     #[serde(rename="capacityScaler")]
     
@@ -1208,7 +1208,7 @@ pub struct BackendBucket {
     /// Compress text responses using Brotli or gzip compression, based on the client's Accept-Encoding header.
     #[serde(rename="compressionMode")]
     
-    pub compression_mode: Option<String>,
+    pub compression_mode: Option<BackendBucketCompressionModeEnum>,
     /// [Output Only] Creation timestamp in RFC3339 text format.
     #[serde(rename="creationTimestamp")]
     
@@ -1267,7 +1267,7 @@ pub struct BackendBucketCdnPolicy {
     /// Specifies the cache setting for all responses from this backend. The possible values are: USE_ORIGIN_HEADERS Requires the origin to set valid caching headers to cache content. Responses without these headers will not be cached at Google's edge, and will require a full trip to the origin on every request, potentially impacting performance and increasing load on the origin server. FORCE_CACHE_ALL Cache all content, ignoring any "private", "no-store" or "no-cache" directives in Cache-Control response headers. Warning: this may result in Cloud CDN caching private, per-user (user identifiable) content. CACHE_ALL_STATIC Automatically cache static content, including common image formats, media (video and audio), and web assets (JavaScript and CSS). Requests and responses that are marked as uncacheable, as well as dynamic content (including HTML), will not be cached.
     #[serde(rename="cacheMode")]
     
-    pub cache_mode: Option<String>,
+    pub cache_mode: Option<BackendBucketCdnPolicyCacheModeEnum>,
     /// Specifies a separate client (e.g. browser client) maximum TTL. This is used to clamp the max-age (or Expires) value sent to the client. With FORCE_CACHE_ALL, the lesser of client_ttl and default_ttl is used for the response max-age directive, along with a "public" directive. For cacheable content in CACHE_ALL_STATIC mode, client_ttl clamps the max-age from the origin (if specified), or else sets the response max-age directive to the lesser of the client_ttl and default_ttl, and also ensures a "public" cache-control directive is present. If a client TTL is not specified, a default value (1 hour) will be used. The maximum allowed value is 31,622,400s (1 year).
     #[serde(rename="clientTtl")]
     
@@ -1446,7 +1446,7 @@ pub struct BackendService {
     /// Compress text responses using Brotli or gzip compression, based on the client's Accept-Encoding header.
     #[serde(rename="compressionMode")]
     
-    pub compression_mode: Option<String>,
+    pub compression_mode: Option<BackendServiceCompressionModeEnum>,
     /// no description provided
     #[serde(rename="connectionDraining")]
     
@@ -1507,7 +1507,7 @@ pub struct BackendService {
     /// Specifies the load balancer type. A backend service created for one type of load balancer cannot be used with another. For more information, refer to Choosing a load balancer.
     #[serde(rename="loadBalancingScheme")]
     
-    pub load_balancing_scheme: Option<String>,
+    pub load_balancing_scheme: Option<BackendServiceLoadBalancingSchemeEnum>,
     /// A list of locality load balancing policies to be used in order of preference. Either the policy or the customPolicy field should be set. Overrides any value set in the localityLbPolicy field. localityLbPolicies is only supported when the BackendService is referenced by a URL Map that is referenced by a target gRPC proxy that has the validateForProxyless field set to true.
     #[serde(rename="localityLbPolicies")]
     
@@ -1515,7 +1515,7 @@ pub struct BackendService {
     /// The load balancing algorithm used within the scope of the locality. The possible values are: - ROUND_ROBIN: This is a simple policy in which each healthy backend is selected in round robin order. This is the default. - LEAST_REQUEST: An O(1) algorithm which selects two random healthy hosts and picks the host which has fewer active requests. - RING_HASH: The ring/modulo hash load balancer implements consistent hashing to backends. The algorithm has the property that the addition/removal of a host from a set of N hosts only affects 1/N of the requests. - RANDOM: The load balancer selects a random healthy host. - ORIGINAL_DESTINATION: Backend host is selected based on the client connection metadata, i.e., connections are opened to the same address as the destination address of the incoming connection before the connection was redirected to the load balancer. - MAGLEV: used as a drop in replacement for the ring hash load balancer. Maglev is not as stable as ring hash but has faster table lookup build times and host selection times. For more information about Maglev, see https://ai.google/research/pubs/pub44824 This field is applicable to either: - A regional backend service with the service_protocol set to HTTP, HTTPS, or HTTP2, and load_balancing_scheme set to INTERNAL_MANAGED. - A global backend service with the load_balancing_scheme set to INTERNAL_SELF_MANAGED. If sessionAffinity is not NONE, and this field is not set to MAGLEV or RING_HASH, session affinity settings will not take effect. Only ROUND_ROBIN and RING_HASH are supported when the backend service is referenced by a URL map that is bound to target gRPC proxy that has validateForProxyless field set to true.
     #[serde(rename="localityLbPolicy")]
     
-    pub locality_lb_policy: Option<String>,
+    pub locality_lb_policy: Option<BackendServiceLocalityLbPolicyEnum>,
     /// This field denotes the logging options for the load balancer traffic served by this backend service. If logging is enabled, logs will be exported to Stackdriver.
     #[serde(rename="logConfig")]
     
@@ -1543,7 +1543,7 @@ pub struct BackendService {
     pub port_name: Option<String>,
     /// The protocol this BackendService uses to communicate with backends. Possible values are HTTP, HTTPS, HTTP2, TCP, SSL, UDP or GRPC. depending on the chosen load balancer or Traffic Director configuration. Refer to the documentation for the load balancers or for Traffic Director for more information. Must be set to GRPC when the backend service is referenced by a URL map that is bound to target gRPC proxy.
     
-    pub protocol: Option<String>,
+    pub protocol: Option<BackendServiceProtocolEnum>,
     /// [Output Only] URL of the region where the regional backend service resides. This field is not applicable to global backend services. You must specify this field as part of the HTTP request URL. It is not settable as a field in the request body.
     
     pub region: Option<String>,
@@ -1566,7 +1566,7 @@ pub struct BackendService {
     /// Type of session affinity to use. The default is NONE. Only NONE and HEADER_FIELD are supported when the backend service is referenced by a URL map that is bound to target gRPC proxy that has validateForProxyless field set to true. For more details, see: [Session Affinity](https://cloud.google.com/load-balancing/docs/backend-service#session_affinity).
     #[serde(rename="sessionAffinity")]
     
-    pub session_affinity: Option<String>,
+    pub session_affinity: Option<BackendServiceSessionAffinityEnum>,
     /// no description provided
     
     pub subsetting: Option<Subsetting>,
@@ -1638,7 +1638,7 @@ pub struct BackendServiceCdnPolicy {
     /// Specifies the cache setting for all responses from this backend. The possible values are: USE_ORIGIN_HEADERS Requires the origin to set valid caching headers to cache content. Responses without these headers will not be cached at Google's edge, and will require a full trip to the origin on every request, potentially impacting performance and increasing load on the origin server. FORCE_CACHE_ALL Cache all content, ignoring any "private", "no-store" or "no-cache" directives in Cache-Control response headers. Warning: this may result in Cloud CDN caching private, per-user (user identifiable) content. CACHE_ALL_STATIC Automatically cache static content, including common image formats, media (video and audio), and web assets (JavaScript and CSS). Requests and responses that are marked as uncacheable, as well as dynamic content (including HTML), will not be cached.
     #[serde(rename="cacheMode")]
     
-    pub cache_mode: Option<String>,
+    pub cache_mode: Option<BackendServiceCdnPolicyCacheModeEnum>,
     /// Specifies a separate client (e.g. browser client) maximum TTL. This is used to clamp the max-age (or Expires) value sent to the client. With FORCE_CACHE_ALL, the lesser of client_ttl and default_ttl is used for the response max-age directive, along with a "public" directive. For cacheable content in CACHE_ALL_STATIC mode, client_ttl clamps the max-age from the origin (if specified), or else sets the response max-age directive to the lesser of the client_ttl and default_ttl, and also ensures a "public" cache-control directive is present. If a client TTL is not specified, a default value (1 hour) will be used. The maximum allowed value is 31,622,400s (1 year).
     #[serde(rename="clientTtl")]
     
@@ -1725,7 +1725,7 @@ pub struct BackendServiceConnectionTrackingPolicy {
     /// Specifies connection persistence when backends are unhealthy. The default value is DEFAULT_FOR_PROTOCOL. If set to DEFAULT_FOR_PROTOCOL, the existing connections persist on unhealthy backends only for connection-oriented protocols (TCP and SCTP) and only if the Tracking Mode is PER_CONNECTION (default tracking mode) or the Session Affinity is configured for 5-tuple. They do not persist for UDP. If set to NEVER_PERSIST, after a backend becomes unhealthy, the existing connections on the unhealthy backend are never persisted on the unhealthy backend. They are always diverted to newly selected healthy backends (unless all backends are unhealthy). If set to ALWAYS_PERSIST, existing connections always persist on unhealthy backends regardless of protocol and session affinity. It is generally not recommended to use this mode overriding the default. For more details, see [Connection Persistence for Network Load Balancing](https://cloud.google.com/load-balancing/docs/network/networklb-backend-service#connection-persistence) and [Connection Persistence for Internal TCP/UDP Load Balancing](https://cloud.google.com/load-balancing/docs/internal#connection-persistence).
     #[serde(rename="connectionPersistenceOnUnhealthyBackends")]
     
-    pub connection_persistence_on_unhealthy_backends: Option<String>,
+    pub connection_persistence_on_unhealthy_backends: Option<BackendServiceConnectionTrackingPolicyConnectionPersistenceOnUnhealthyBackendsEnum>,
     /// Enable Strong Session Affinity for Network Load Balancing. This option is not available publicly.
     #[serde(rename="enableStrongAffinity")]
     
@@ -1737,7 +1737,7 @@ pub struct BackendServiceConnectionTrackingPolicy {
     /// Specifies the key used for connection tracking. There are two options: - PER_CONNECTION: This is the default mode. The Connection Tracking is performed as per the Connection Key (default Hash Method) for the specific protocol. - PER_SESSION: The Connection Tracking is performed as per the configured Session Affinity. It matches the configured Session Affinity. For more details, see [Tracking Mode for Network Load Balancing](https://cloud.google.com/load-balancing/docs/network/networklb-backend-service#tracking-mode) and [Tracking Mode for Internal TCP/UDP Load Balancing](https://cloud.google.com/load-balancing/docs/internal#tracking-mode).
     #[serde(rename="trackingMode")]
     
-    pub tracking_mode: Option<String>,
+    pub tracking_mode: Option<BackendServiceConnectionTrackingPolicyTrackingModeEnum>,
 }
 
 impl client::Part for BackendServiceConnectionTrackingPolicy {}
@@ -1904,7 +1904,7 @@ impl client::Part for BackendServiceLocalityLoadBalancingPolicyConfigCustomPolic
 pub struct BackendServiceLocalityLoadBalancingPolicyConfigPolicy {
     /// The name of a locality load balancer policy to be used. The value should be one of the predefined ones as supported by localityLbPolicy, although at the moment only ROUND_ROBIN is supported. This field should only be populated when the customPolicy field is not used. Note that specifying the same policy more than once for a backend is not a valid configuration and will be rejected.
     
-    pub name: Option<String>,
+    pub name: Option<BackendServiceLocalityLoadBalancingPolicyConfigPolicyNameEnum>,
 }
 
 impl client::Part for BackendServiceLocalityLoadBalancingPolicyConfigPolicy {}
@@ -1984,7 +1984,7 @@ pub struct BfdPacket {
     pub demand: Option<bool>,
     /// The diagnostic code specifies the local system's reason for the last change in session state. This allows remote systems to determine the reason that the previous session failed, for example. These diagnostic codes are specified in section 4.1 of RFC5880
     
-    pub diagnostic: Option<String>,
+    pub diagnostic: Option<BfdPacketDiagnosticEnum>,
     /// The Final bit of the BFD packet. This is specified in section 4.1 of RFC5880
     #[serde(rename="final")]
     
@@ -2019,7 +2019,7 @@ pub struct BfdPacket {
     pub poll: Option<bool>,
     /// The current BFD session state as seen by the transmitting system. These states are specified in section 4.1 of RFC5880
     
-    pub state: Option<String>,
+    pub state: Option<BfdPacketStateEnum>,
     /// The version number of the BFD protocol, as specified in section 4.1 of RFC5880.
     
     pub version: Option<u32>,
@@ -2042,7 +2042,7 @@ pub struct BfdStatus {
     /// The BFD session initialization mode for this BGP peer. If set to ACTIVE, the Cloud Router will initiate the BFD session for this BGP peer. If set to PASSIVE, the Cloud Router will wait for the peer router to initiate the BFD session for this BGP peer. If set to DISABLED, BFD is disabled for this BGP peer.
     #[serde(rename="bfdSessionInitializationMode")]
     
-    pub bfd_session_initialization_mode: Option<String>,
+    pub bfd_session_initialization_mode: Option<BfdStatuBfdSessionInitializationModeEnum>,
     /// Unix timestamp of the most recent config update.
     #[serde(rename="configUpdateTimestampMicros")]
     
@@ -2059,11 +2059,11 @@ pub struct BfdStatus {
     /// The diagnostic code specifies the local system's reason for the last change in session state. This allows remote systems to determine the reason that the previous session failed, for example. These diagnostic codes are specified in section 4.1 of RFC5880
     #[serde(rename="localDiagnostic")]
     
-    pub local_diagnostic: Option<String>,
+    pub local_diagnostic: Option<BfdStatuLocalDiagnosticEnum>,
     /// The current BFD session state as seen by the transmitting system. These states are specified in section 4.1 of RFC5880
     #[serde(rename="localState")]
     
-    pub local_state: Option<String>,
+    pub local_state: Option<BfdStatuLocalStateEnum>,
     /// Negotiated transmit interval for control packets.
     #[serde(rename="negotiatedLocalControlTxIntervalMs")]
     
@@ -2313,7 +2313,7 @@ pub struct Commitment {
     pub auto_renew: Option<bool>,
     /// The category of the commitment. Category MACHINE specifies commitments composed of machine resources such as VCPU or MEMORY, listed in resources. Category LICENSE specifies commitments composed of software licenses, listed in licenseResources. Note that only MACHINE commitments should have a Type specified.
     
-    pub category: Option<String>,
+    pub category: Option<CommitmentCategoryEnum>,
     /// [Output Only] Creation timestamp in RFC3339 text format.
     #[serde(rename="creationTimestamp")]
     
@@ -2345,7 +2345,7 @@ pub struct Commitment {
     pub name: Option<String>,
     /// The plan for this commitment, which determines duration and discount rate. The currently supported plans are TWELVE_MONTH (1 year), and THIRTY_SIX_MONTH (3 years).
     
-    pub plan: Option<String>,
+    pub plan: Option<CommitmentPlanEnum>,
     /// [Output Only] URL of the region where this commitment may be used.
     
     pub region: Option<String>,
@@ -2369,7 +2369,7 @@ pub struct Commitment {
     pub start_timestamp: Option<String>,
     /// [Output Only] Status of the commitment with regards to eventual expiration (each commitment has an end date defined). One of the following values: NOT_YET_ACTIVE, ACTIVE, EXPIRED.
     
-    pub status: Option<String>,
+    pub status: Option<CommitmentStatusEnum>,
     /// [Output Only] An optional, human-readable explanation of the status.
     #[serde(rename="statusMessage")]
     
@@ -2377,7 +2377,7 @@ pub struct Commitment {
     /// The type of commitment, which affects the discount rate and the eligible resources. Type MEMORY_OPTIMIZED specifies a commitment that will only apply to memory optimized machines. Type ACCELERATOR_OPTIMIZED specifies a commitment that will only apply to accelerator optimized machines.
     #[serde(rename="type")]
     
-    pub type_: Option<String>,
+    pub type_: Option<CommitmentTypeEnum>,
 }
 
 impl client::RequestValue for Commitment {}
@@ -2486,16 +2486,16 @@ impl client::Part for CommitmentsScopedList {}
 pub struct Condition {
     /// This is deprecated and has no effect. Do not use.
     
-    pub iam: Option<String>,
+    pub iam: Option<ConditionIamEnum>,
     /// This is deprecated and has no effect. Do not use.
     
-    pub op: Option<String>,
+    pub op: Option<ConditionOpEnum>,
     /// This is deprecated and has no effect. Do not use.
     
     pub svc: Option<String>,
     /// This is deprecated and has no effect. Do not use.
     
-    pub sys: Option<String>,
+    pub sys: Option<ConditionSysEnum>,
     /// This is deprecated and has no effect. Do not use.
     
     pub values: Option<Vec<String>>,
@@ -2700,7 +2700,7 @@ pub struct DeprecationStatus {
     pub replacement: Option<String>,
     /// The deprecation state of this resource. This can be ACTIVE, DEPRECATED, OBSOLETE, or DELETED. Operations which communicate the end of life date for an image, can use ACTIVE. Operations which create a new resource using a DEPRECATED resource will return successfully, but with a warning indicating the deprecated resource and recommending its replacement. Operations which use OBSOLETE or DELETED resources will be rejected and result in an error.
     
-    pub state: Option<String>,
+    pub state: Option<DeprecationStatuStateEnum>,
 }
 
 impl client::RequestValue for DeprecationStatus {}
@@ -2733,7 +2733,7 @@ impl client::RequestValue for DeprecationStatus {}
 pub struct Disk {
     /// The architecture of the disk. Valid values are ARM64 or X86_64.
     
-    pub architecture: Option<String>,
+    pub architecture: Option<DiskArchitectureEnum>,
     /// [Output Only] Creation timestamp in RFC3339 text format.
     #[serde(rename="creationTimestamp")]
     
@@ -2865,7 +2865,7 @@ pub struct Disk {
     pub source_storage_object: Option<String>,
     /// [Output Only] The status of disk creation. - CREATING: Disk is provisioning. - RESTORING: Source data is being copied into the disk. - FAILED: Disk creation failed. - READY: Disk is ready for use. - DELETING: Disk is deleting. 
     
-    pub status: Option<String>,
+    pub status: Option<DiskStatusEnum>,
     /// URL of the disk type resource describing which disk type to use to create the disk. Provide this when creating the disk. For example: projects/project /zones/zone/diskTypes/pd-ssd . See Persistent disk types.
     #[serde(rename="type")]
     
@@ -2944,7 +2944,7 @@ pub struct DiskInstantiationConfig {
     /// Specifies whether to include the disk and what image to use. Possible values are: - source-image: to use the same image that was used to create the source instance's corresponding disk. Applicable to the boot disk and additional read-write disks. - source-image-family: to use the same image family that was used to create the source instance's corresponding disk. Applicable to the boot disk and additional read-write disks. - custom-image: to use a user-provided image url for disk creation. Applicable to the boot disk and additional read-write disks. - attach-read-only: to attach a read-only disk. Applicable to read-only disks. - do-not-include: to exclude a disk from the template. Applicable to additional read-write disks, local SSDs, and read-only disks. 
     #[serde(rename="instantiateFrom")]
     
-    pub instantiate_from: Option<String>,
+    pub instantiate_from: Option<DiskInstantiationConfigInstantiateFromEnum>,
 }
 
 impl client::Part for DiskInstantiationConfig {}
@@ -3289,7 +3289,7 @@ pub struct DistributionPolicy {
     /// The distribution shape to which the group converges either proactively or on resize events (depending on the value set in updatePolicy.instanceRedistributionType).
     #[serde(rename="targetShape")]
     
-    pub target_shape: Option<String>,
+    pub target_shape: Option<DistributionPolicyTargetShapeEnum>,
     /// Zones where the regional managed instance group will create and manage its instances.
     
     pub zones: Option<Vec<DistributionPolicyZoneConfiguration>>,
@@ -3377,7 +3377,7 @@ pub struct ExchangedPeeringRoute {
     /// The type of the peering route.
     #[serde(rename="type")]
     
-    pub type_: Option<String>,
+    pub type_: Option<ExchangedPeeringRouteTypeEnum>,
 }
 
 impl client::Part for ExchangedPeeringRoute {}
@@ -3490,7 +3490,7 @@ pub struct ExternalVpnGateway {
     /// Indicates the user-supplied redundancy type of this external VPN gateway.
     #[serde(rename="redundancyType")]
     
-    pub redundancy_type: Option<String>,
+    pub redundancy_type: Option<ExternalVpnGatewayRedundancyTypeEnum>,
     /// [Output Only] Server-defined URL for the resource.
     #[serde(rename="selfLink")]
     
@@ -3574,7 +3574,7 @@ pub struct FileContentBuffer {
     /// The file type of source file.
     #[serde(rename="fileType")]
     
-    pub file_type: Option<String>,
+    pub file_type: Option<FileContentBufferFileTypeEnum>,
 }
 
 impl client::Part for FileContentBuffer {}
@@ -3615,7 +3615,7 @@ pub struct Firewall {
     pub destination_ranges: Option<Vec<String>>,
     /// Direction of traffic to which this firewall applies, either `INGRESS` or `EGRESS`. The default is `INGRESS`. For `EGRESS` traffic, you cannot specify the sourceTags fields.
     
-    pub direction: Option<String>,
+    pub direction: Option<FirewallDirectionEnum>,
     /// Denotes whether the firewall rule is disabled. When set to true, the firewall rule is not enforced and the network behaves as if it did not exist. If this is unspecified, the firewall rule will be enabled.
     
     pub disabled: Option<bool>,
@@ -3718,7 +3718,7 @@ pub struct FirewallLogConfig {
     pub enable: Option<bool>,
     /// This field can only be specified for a particular firewall rule if logging is enabled for that rule. This field denotes whether to include or exclude metadata for firewall logs.
     
-    pub metadata: Option<String>,
+    pub metadata: Option<FirewallLogConfigMetadataEnum>,
 }
 
 impl client::Part for FirewallLogConfig {}
@@ -3926,7 +3926,7 @@ pub struct FirewallPolicyRule {
     pub description: Option<String>,
     /// The direction in which this rule applies.
     
-    pub direction: Option<String>,
+    pub direction: Option<FirewallPolicyRuleDirectionEnum>,
     /// Denotes whether the firewall policy rule is disabled. When set to true, the firewall policy rule is not enforced and traffic behaves as if it did not exist. If this is unspecified, the firewall policy rule will be enabled.
     
     pub disabled: Option<bool>,
@@ -4029,7 +4029,7 @@ pub struct FirewallPolicyRuleSecureTag {
     pub name: Option<String>,
     /// [Output Only] State of the secure tag, either `EFFECTIVE` or `INEFFECTIVE`. A secure tag is `INEFFECTIVE` when it is deleted or its network is deleted.
     
-    pub state: Option<String>,
+    pub state: Option<FirewallPolicyRuleSecureTagStateEnum>,
 }
 
 impl client::Part for FirewallPolicyRuleSecureTag {}
@@ -4084,7 +4084,7 @@ pub struct ForwardingRule {
     /// The IP protocol to which this rule applies. For protocol forwarding, valid options are TCP, UDP, ESP, AH, SCTP, ICMP and L3_DEFAULT. The valid IP protocols are different for different load balancing products as described in [Load balancing features](https://cloud.google.com/load-balancing/docs/features#protocols_from_the_load_balancer_to_the_backends).
     #[serde(rename="IPProtocol")]
     
-    pub ip_protocol: Option<String>,
+    pub ip_protocol: Option<ForwardingRuleIPProtocolEnum>,
     /// This field can only be used: - If IPProtocol is one of TCP, UDP, or SCTP. - By internal TCP/UDP load balancers, backend service-based network load balancers, and internal and external protocol forwarding. Set this field to true to allow packets addressed to any port or packets lacking destination port information (for example, UDP fragments after the first fragment) to be forwarded to the backends configured with this forwarding rule. The ports, port_range, and allPorts fields are mutually exclusive.
     #[serde(rename="allPorts")]
     
@@ -4115,7 +4115,7 @@ pub struct ForwardingRule {
     /// The IP Version that will be used by this forwarding rule. Valid options are IPV4 or IPV6.
     #[serde(rename="ipVersion")]
     
-    pub ip_version: Option<String>,
+    pub ip_version: Option<ForwardingRuleIpVersionEnum>,
     /// Indicates whether or not this load balancer can be used as a collector for packet mirroring. To prevent mirroring loops, instances behind this load balancer will not have their traffic mirrored even if a PacketMirroring rule applies to them. This can only be set to true for load balancers that have their loadBalancingScheme set to INTERNAL.
     #[serde(rename="isMirroringCollector")]
     
@@ -4134,7 +4134,7 @@ pub struct ForwardingRule {
     /// Specifies the forwarding rule type. For more information about forwarding rules, refer to Forwarding rule concepts.
     #[serde(rename="loadBalancingScheme")]
     
-    pub load_balancing_scheme: Option<String>,
+    pub load_balancing_scheme: Option<ForwardingRuleLoadBalancingSchemeEnum>,
     /// Opaque filter criteria used by load balancer to restrict routing configuration to a limited set of xDS compliant clients. In their xDS requests to load balancer, xDS clients present node metadata. When there is a match, the relevant configuration is made available to those proxies. Otherwise, all the resources (e.g. TargetHttpProxy, UrlMap) referenced by the ForwardingRule are not visible to those proxies. For each metadataFilter in this list, if its filterMatchCriteria is set to MATCH_ANY, at least one of the filterLabels must match the corresponding label provided in the metadata. If its filterMatchCriteria is set to MATCH_ALL, then all of its filterLabels must match with corresponding labels provided in the metadata. If multiple metadataFilters are specified, all of them need to be satisfied in order to be considered a match. metadataFilters specified here will be applifed before those specified in the UrlMap that this ForwardingRule references. metadataFilters only applies to Loadbalancers that have their loadBalancingScheme set to INTERNAL_SELF_MANAGED.
     #[serde(rename="metadataFilters")]
     
@@ -4148,7 +4148,7 @@ pub struct ForwardingRule {
     /// This signifies the networking tier used for configuring this load balancer and can only take the following values: PREMIUM, STANDARD. For regional ForwardingRule, the valid values are PREMIUM and STANDARD. For GlobalForwardingRule, the valid value is PREMIUM. If this field is not specified, it is assumed to be PREMIUM. If IPAddress is specified, this value must be equal to the networkTier of the Address.
     #[serde(rename="networkTier")]
     
-    pub network_tier: Option<String>,
+    pub network_tier: Option<ForwardingRuleNetworkTierEnum>,
     /// This is used in PSC consumer ForwardingRule to control whether it should try to auto-generate a DNS zone or not. Non-PSC forwarding rules do not use this field.
     #[serde(rename="noAutomateDnsZone")]
     
@@ -4168,7 +4168,7 @@ pub struct ForwardingRule {
     /// no description provided
     #[serde(rename="pscConnectionStatus")]
     
-    pub psc_connection_status: Option<String>,
+    pub psc_connection_status: Option<ForwardingRulePscConnectionStatusEnum>,
     /// [Output Only] URL of the region where the regional forwarding rule resides. This field is not applicable to global forwarding rules. You must specify this field as part of the HTTP request URL. It is not settable as a field in the request body.
     
     pub region: Option<String>,
@@ -4355,7 +4355,7 @@ pub struct GRPCHealthCheck {
     /// Specifies how a port is selected for health checking. Can be one of the following values: USE_FIXED_PORT: Specifies a port number explicitly using the port field in the health check. Supported by backend services for pass-through load balancers and backend services for proxy load balancers. Not supported by target pools. The health check supports all backends supported by the backend service provided the backend can be health checked. For example, GCE_VM_IP network endpoint groups, GCE_VM_IP_PORT network endpoint groups, and instance group backends. USE_NAMED_PORT: Not supported. USE_SERVING_PORT: Provides an indirect method of specifying the health check port by referring to the backend service. Only supported by backend services for proxy load balancers. Not supported by target pools. Not supported by backend services for pass-through load balancers. Supports all backends that can be health checked; for example, GCE_VM_IP_PORT network endpoint groups and instance group backends. For GCE_VM_IP_PORT network endpoint group backends, the health check uses the port number specified for each endpoint in the network endpoint group. For instance group backends, the health check uses the port number determined by looking up the backend service's named port in the instance group's list of named ports.
     #[serde(rename="portSpecification")]
     
-    pub port_specification: Option<String>,
+    pub port_specification: Option<GRPCHealthCheckPortSpecificationEnum>,
 }
 
 impl client::Part for GRPCHealthCheck {}
@@ -4574,7 +4574,7 @@ pub struct GuestOsFeature {
     /// The ID of a supported feature. To add multiple values, use commas to separate values. Set to one or more of the following values: - VIRTIO_SCSI_MULTIQUEUE - WINDOWS - MULTI_IP_SUBNET - UEFI_COMPATIBLE - GVNIC - SEV_CAPABLE - SUSPEND_RESUME_COMPATIBLE - SEV_SNP_CAPABLE For more information, see Enabling guest operating system features.
     #[serde(rename="type")]
     
-    pub type_: Option<String>,
+    pub type_: Option<GuestOsFeatureTypeEnum>,
 }
 
 impl client::Part for GuestOsFeature {}
@@ -4600,11 +4600,11 @@ pub struct HTTP2HealthCheck {
     /// Specifies how a port is selected for health checking. Can be one of the following values: USE_FIXED_PORT: Specifies a port number explicitly using the port field in the health check. Supported by backend services for pass-through load balancers and backend services for proxy load balancers. Not supported by target pools. The health check supports all backends supported by the backend service provided the backend can be health checked. For example, GCE_VM_IP network endpoint groups, GCE_VM_IP_PORT network endpoint groups, and instance group backends. USE_NAMED_PORT: Not supported. USE_SERVING_PORT: Provides an indirect method of specifying the health check port by referring to the backend service. Only supported by backend services for proxy load balancers. Not supported by target pools. Not supported by backend services for pass-through load balancers. Supports all backends that can be health checked; for example, GCE_VM_IP_PORT network endpoint groups and instance group backends. For GCE_VM_IP_PORT network endpoint group backends, the health check uses the port number specified for each endpoint in the network endpoint group. For instance group backends, the health check uses the port number determined by looking up the backend service's named port in the instance group's list of named ports.
     #[serde(rename="portSpecification")]
     
-    pub port_specification: Option<String>,
+    pub port_specification: Option<HTTP2HealthCheckPortSpecificationEnum>,
     /// Specifies the type of proxy header to append before sending data to the backend, either NONE or PROXY_V1. The default is NONE.
     #[serde(rename="proxyHeader")]
     
-    pub proxy_header: Option<String>,
+    pub proxy_header: Option<HTTP2HealthCheckProxyHeaderEnum>,
     /// The request path of the HTTP/2 health check request. The default value is /.
     #[serde(rename="requestPath")]
     
@@ -4637,11 +4637,11 @@ pub struct HTTPHealthCheck {
     /// Specifies how a port is selected for health checking. Can be one of the following values: USE_FIXED_PORT: Specifies a port number explicitly using the port field in the health check. Supported by backend services for pass-through load balancers and backend services for proxy load balancers. Also supported in legacy HTTP health checks for target pools. The health check supports all backends supported by the backend service provided the backend can be health checked. For example, GCE_VM_IP network endpoint groups, GCE_VM_IP_PORT network endpoint groups, and instance group backends. USE_NAMED_PORT: Not supported. USE_SERVING_PORT: Provides an indirect method of specifying the health check port by referring to the backend service. Only supported by backend services for proxy load balancers. Not supported by target pools. Not supported by backend services for pass-through load balancers. Supports all backends that can be health checked; for example, GCE_VM_IP_PORT network endpoint groups and instance group backends. For GCE_VM_IP_PORT network endpoint group backends, the health check uses the port number specified for each endpoint in the network endpoint group. For instance group backends, the health check uses the port number determined by looking up the backend service's named port in the instance group's list of named ports.
     #[serde(rename="portSpecification")]
     
-    pub port_specification: Option<String>,
+    pub port_specification: Option<HTTPHealthCheckPortSpecificationEnum>,
     /// Specifies the type of proxy header to append before sending data to the backend, either NONE or PROXY_V1. The default is NONE.
     #[serde(rename="proxyHeader")]
     
-    pub proxy_header: Option<String>,
+    pub proxy_header: Option<HTTPHealthCheckProxyHeaderEnum>,
     /// The request path of the HTTP health check request. The default value is /.
     #[serde(rename="requestPath")]
     
@@ -4674,11 +4674,11 @@ pub struct HTTPSHealthCheck {
     /// Specifies how a port is selected for health checking. Can be one of the following values: USE_FIXED_PORT: Specifies a port number explicitly using the port field in the health check. Supported by backend services for pass-through load balancers and backend services for proxy load balancers. Not supported by target pools. The health check supports all backends supported by the backend service provided the backend can be health checked. For example, GCE_VM_IP network endpoint groups, GCE_VM_IP_PORT network endpoint groups, and instance group backends. USE_NAMED_PORT: Not supported. USE_SERVING_PORT: Provides an indirect method of specifying the health check port by referring to the backend service. Only supported by backend services for proxy load balancers. Not supported by target pools. Not supported by backend services for pass-through load balancers. Supports all backends that can be health checked; for example, GCE_VM_IP_PORT network endpoint groups and instance group backends. For GCE_VM_IP_PORT network endpoint group backends, the health check uses the port number specified for each endpoint in the network endpoint group. For instance group backends, the health check uses the port number determined by looking up the backend service's named port in the instance group's list of named ports.
     #[serde(rename="portSpecification")]
     
-    pub port_specification: Option<String>,
+    pub port_specification: Option<HTTPSHealthCheckPortSpecificationEnum>,
     /// Specifies the type of proxy header to append before sending data to the backend, either NONE or PROXY_V1. The default is NONE.
     #[serde(rename="proxyHeader")]
     
-    pub proxy_header: Option<String>,
+    pub proxy_header: Option<HTTPSHealthCheckProxyHeaderEnum>,
     /// The request path of the HTTPS health check request. The default value is /.
     #[serde(rename="requestPath")]
     
@@ -4779,7 +4779,7 @@ pub struct HealthCheck {
     /// Specifies the type of the healthCheck, either TCP, SSL, HTTP, HTTPS, HTTP2 or GRPC. Exactly one of the protocol-specific health check fields must be specified, which must match type field.
     #[serde(rename="type")]
     
-    pub type_: Option<String>,
+    pub type_: Option<HealthCheckTypeEnum>,
     /// A so-far healthy instance will be marked unhealthy after this many consecutive failures. The default value is 2.
     #[serde(rename="unhealthyThreshold")]
     
@@ -4890,7 +4890,7 @@ pub struct HealthCheckService {
     /// Optional. Policy for how the results from multiple health checks for the same endpoint are aggregated. Defaults to NO_AGGREGATION if unspecified. - NO_AGGREGATION. An EndpointHealth message is returned for each pair in the health check service. - AND. If any health check of an endpoint reports UNHEALTHY, then UNHEALTHY is the HealthState of the endpoint. If all health checks report HEALTHY, the HealthState of the endpoint is HEALTHY. . This is only allowed with regional HealthCheckService.
     #[serde(rename="healthStatusAggregationPolicy")]
     
-    pub health_status_aggregation_policy: Option<String>,
+    pub health_status_aggregation_policy: Option<HealthCheckServiceHealthStatusAggregationPolicyEnum>,
     /// [Output Only] The unique identifier for the resource. This identifier is defined by the server.
     
     #[serde_as(as = "Option<::client::serde_with::DisplayFromStr>")]
@@ -5053,7 +5053,7 @@ pub struct HealthStatus {
     /// Health state of the instance.
     #[serde(rename="healthState")]
     
-    pub health_state: Option<String>,
+    pub health_state: Option<HealthStatuHealthStateEnum>,
     /// URL of the instance resource.
     
     pub instance: Option<String>,
@@ -5070,7 +5070,7 @@ pub struct HealthStatus {
     /// no description provided
     #[serde(rename="weightError")]
     
-    pub weight_error: Option<String>,
+    pub weight_error: Option<HealthStatuWeightErrorEnum>,
 }
 
 impl client::Part for HealthStatus {}
@@ -5102,7 +5102,7 @@ pub struct HealthStatusForNetworkEndpoint {
     /// Health state of the network endpoint determined based on the health checks configured.
     #[serde(rename="healthState")]
     
-    pub health_state: Option<String>,
+    pub health_state: Option<HealthStatusForNetworkEndpointHealthStateEnum>,
 }
 
 impl client::Part for HealthStatusForNetworkEndpoint {}
@@ -5473,7 +5473,7 @@ pub struct HttpRedirectAction {
     /// The HTTP Status code to use for this RedirectAction. Supported values are: - MOVED_PERMANENTLY_DEFAULT, which is the default value and corresponds to 301. - FOUND, which corresponds to 302. - SEE_OTHER which corresponds to 303. - TEMPORARY_REDIRECT, which corresponds to 307. In this case, the request method is retained. - PERMANENT_REDIRECT, which corresponds to 308. In this case, the request method is retained. 
     #[serde(rename="redirectResponseCode")]
     
-    pub redirect_response_code: Option<String>,
+    pub redirect_response_code: Option<HttpRedirectActionRedirectResponseCodeEnum>,
     /// If set to true, any accompanying query portion of the original URL is removed before redirecting the request. If set to false, the query portion of the original URL is retained. The default is set to false. 
     #[serde(rename="stripQuery")]
     
@@ -5756,7 +5756,7 @@ impl client::ResponseResult for HttpsHealthCheckList {}
 pub struct Image {
     /// The architecture of the image. Valid values are ARM64 or X86_64.
     
-    pub architecture: Option<String>,
+    pub architecture: Option<ImageArchitectureEnum>,
     /// Size of the image tar.gz archive stored in Google Cloud Storage (in bytes).
     #[serde(rename="archiveSizeBytes")]
     
@@ -5869,10 +5869,10 @@ pub struct Image {
     /// The type of the image used to create this disk. The default and only valid value is RAW.
     #[serde(rename="sourceType")]
     
-    pub source_type: Option<String>,
+    pub source_type: Option<ImageSourceTypeEnum>,
     /// [Output Only] The status of the image. An image can be used to create other resources, such as instances, only after the image has been successfully created and the status is set to READY. Possible values are FAILED, PENDING, or READY.
     
-    pub status: Option<String>,
+    pub status: Option<ImageStatusEnum>,
     /// Cloud Storage bucket storage location of the image (regional or multi-regional).
     #[serde(rename="storageLocations")]
     
@@ -6071,7 +6071,7 @@ pub struct Instance {
     /// KeyRevocationActionType of the instance. Supported options are "STOP" and "NONE". The default value is "NONE" if it is not specified.
     #[serde(rename="keyRevocationActionType")]
     
-    pub key_revocation_action_type: Option<String>,
+    pub key_revocation_action_type: Option<InstanceKeyRevocationActionTypeEnum>,
     /// [Output Only] Type of the resource. Always compute#instance for instances.
     
     pub kind: Option<String>,
@@ -6123,7 +6123,7 @@ pub struct Instance {
     /// The private IPv6 google access type for the VM. If not specified, use INHERIT_FROM_SUBNETWORK as default.
     #[serde(rename="privateIpv6GoogleAccess")]
     
-    pub private_ipv6_google_access: Option<String>,
+    pub private_ipv6_google_access: Option<InstancePrivateIpv6GoogleAccessEnum>,
     /// Specifies the reservations that this instance can consume from.
     #[serde(rename="reservationAffinity")]
     
@@ -6173,7 +6173,7 @@ pub struct Instance {
     pub start_restricted: Option<bool>,
     /// [Output Only] The status of the instance. One of the following values: PROVISIONING, STAGING, RUNNING, STOPPING, SUSPENDING, SUSPENDED, REPAIRING, and TERMINATED. For more information about the status of the instance, see Instance life cycle.
     
-    pub status: Option<String>,
+    pub status: Option<InstanceStatusEnum>,
     /// [Output Only] An optional, human-readable explanation of the status.
     #[serde(rename="statusMessage")]
     
@@ -6501,7 +6501,7 @@ pub struct InstanceGroupManager {
     /// Pagination behavior of the listManagedInstances API method for this managed instance group.
     #[serde(rename="listManagedInstancesResults")]
     
-    pub list_managed_instances_results: Option<String>,
+    pub list_managed_instances_results: Option<InstanceGroupManagerListManagedInstancesResultsEnum>,
     /// The name of the managed instance group. The name must be 1-63 characters long, and comply with RFC1035.
     
     pub name: Option<String>,
@@ -6783,7 +6783,7 @@ pub struct InstanceGroupManagerUpdatePolicy {
     /// The instance redistribution policy for regional managed instance groups. Valid values are: - PROACTIVE (default): The group attempts to maintain an even distribution of VM instances across zones in the region. - NONE: For non-autoscaled groups, proactive redistribution is disabled. 
     #[serde(rename="instanceRedistributionType")]
     
-    pub instance_redistribution_type: Option<String>,
+    pub instance_redistribution_type: Option<InstanceGroupManagerUpdatePolicyInstanceRedistributionTypeEnum>,
     /// The maximum number of instances that can be created above the specified targetSize during the update process. This value can be either a fixed number or, if the group has 10 or more instances, a percentage. If you set a percentage, the number of instances is rounded if necessary. The default value for maxSurge is a fixed value equal to the number of zones in which the managed instance group operates. At least one of either maxSurge or maxUnavailable must be greater than 0. Learn more about maxSurge.
     #[serde(rename="maxSurge")]
     
@@ -6795,19 +6795,19 @@ pub struct InstanceGroupManagerUpdatePolicy {
     /// Minimal action to be taken on an instance. Use this option to minimize disruption as much as possible or to apply a more disruptive action than is necessary. - To limit disruption as much as possible, set the minimal action to REFRESH. If your update requires a more disruptive action, Compute Engine performs the necessary action to execute the update. - To apply a more disruptive action than is strictly necessary, set the minimal action to RESTART or REPLACE. For example, Compute Engine does not need to restart a VM to change its metadata. But if your application reads instance metadata only when a VM is restarted, you can set the minimal action to RESTART in order to pick up metadata changes. 
     #[serde(rename="minimalAction")]
     
-    pub minimal_action: Option<String>,
+    pub minimal_action: Option<InstanceGroupManagerUpdatePolicyMinimalActionEnum>,
     /// Most disruptive action that is allowed to be taken on an instance. You can specify either NONE to forbid any actions, REFRESH to allow actions that do not need instance restart, RESTART to allow actions that can be applied without instance replacing or REPLACE to allow all possible actions. If the Updater determines that the minimal update action needed is more disruptive than most disruptive allowed action you specify it will not perform the update at all.
     #[serde(rename="mostDisruptiveAllowedAction")]
     
-    pub most_disruptive_allowed_action: Option<String>,
+    pub most_disruptive_allowed_action: Option<InstanceGroupManagerUpdatePolicyMostDisruptiveAllowedActionEnum>,
     /// What action should be used to replace instances. See minimal_action.REPLACE
     #[serde(rename="replacementMethod")]
     
-    pub replacement_method: Option<String>,
+    pub replacement_method: Option<InstanceGroupManagerUpdatePolicyReplacementMethodEnum>,
     /// The type of update process. You can specify either PROACTIVE so that the instance group manager proactively executes actions in order to bring instances to their target versions or OPPORTUNISTIC so that no action is proactively executed but the update will be performed as part of other actions (for example, resizes or recreateInstances calls).
     #[serde(rename="type")]
     
-    pub type_: Option<String>,
+    pub type_: Option<InstanceGroupManagerUpdatePolicyTypeEnum>,
 }
 
 impl client::Part for InstanceGroupManagerUpdatePolicy {}
@@ -6876,11 +6876,11 @@ pub struct InstanceGroupManagersApplyUpdatesRequest {
     /// The minimal action that you want to perform on each instance during the update: - REPLACE: At minimum, delete the instance and create it again. - RESTART: Stop the instance and start it again. - REFRESH: Do not stop the instance. - NONE: Do not disrupt the instance at all. By default, the minimum action is NONE. If your update requires a more disruptive action than you set with this flag, the necessary action is performed to execute the update.
     #[serde(rename="minimalAction")]
     
-    pub minimal_action: Option<String>,
+    pub minimal_action: Option<InstanceGroupManagersApplyUpdatesRequestMinimalActionEnum>,
     /// The most disruptive action that you want to perform on each instance during the update: - REPLACE: Delete the instance and create it again. - RESTART: Stop the instance and start it again. - REFRESH: Do not stop the instance. - NONE: Do not disrupt the instance at all. By default, the most disruptive allowed action is REPLACE. If your update requires a more disruptive action than you set with this flag, the update request will fail.
     #[serde(rename="mostDisruptiveAllowedAction")]
     
-    pub most_disruptive_allowed_action: Option<String>,
+    pub most_disruptive_allowed_action: Option<InstanceGroupManagersApplyUpdatesRequestMostDisruptiveAllowedActionEnum>,
 }
 
 impl client::RequestValue for InstanceGroupManagersApplyUpdatesRequest {}
@@ -7211,7 +7211,7 @@ pub struct InstanceGroupsListInstancesRequest {
     /// A filter for the state of the instances in the instance group. Valid options are ALL or RUNNING. If you do not specify this parameter the list includes all instances regardless of their state.
     #[serde(rename="instanceState")]
     
-    pub instance_state: Option<String>,
+    pub instance_state: Option<InstanceGroupsListInstancesRequestInstanceStateEnum>,
 }
 
 impl client::RequestValue for InstanceGroupsListInstancesRequest {}
@@ -7382,7 +7382,7 @@ impl client::Part for InstanceManagedByIgmError {}
 pub struct InstanceManagedByIgmErrorInstanceActionDetails {
     /// [Output Only] Action that managed instance group was executing on the instance when the error occurred. Possible values:
     
-    pub action: Option<String>,
+    pub action: Option<InstanceManagedByIgmErrorInstanceActionDetailActionEnum>,
     /// [Output Only] The URL of the instance. The URL can be set even if the instance has not yet been created.
     
     pub instance: Option<String>,
@@ -7484,7 +7484,7 @@ pub struct InstanceProperties {
     /// KeyRevocationActionType of the instance. Supported options are "STOP" and "NONE". The default value is "NONE" if it is not specified.
     #[serde(rename="keyRevocationActionType")]
     
-    pub key_revocation_action_type: Option<String>,
+    pub key_revocation_action_type: Option<InstancePropertyKeyRevocationActionTypeEnum>,
     /// Labels to apply to instances that are created from these properties.
     
     pub labels: Option<HashMap<String, String>>,
@@ -7510,7 +7510,7 @@ pub struct InstanceProperties {
     /// The private IPv6 google access type for VMs. If not specified, use INHERIT_FROM_SUBNETWORK as default. Note that for MachineImage, this is not supported yet.
     #[serde(rename="privateIpv6GoogleAccess")]
     
-    pub private_ipv6_google_access: Option<String>,
+    pub private_ipv6_google_access: Option<InstancePropertyPrivateIpv6GoogleAccessEnum>,
     /// Specifies the reservations that instances can consume from. Note that for MachineImage, this is not supported yet.
     #[serde(rename="reservationAffinity")]
     
@@ -7669,7 +7669,7 @@ pub struct InstanceWithNamedPorts {
     pub named_ports: Option<Vec<NamedPort>>,
     /// [Output Only] The status of the instance.
     
-    pub status: Option<String>,
+    pub status: Option<InstanceWithNamedPortStatusEnum>,
 }
 
 impl client::Part for InstanceWithNamedPorts {}
@@ -7742,7 +7742,7 @@ pub struct InstancesGetEffectiveFirewallsResponseEffectiveFirewallPolicy {
     /// [Output Only] The type of the firewall policy. Can be one of HIERARCHY, NETWORK, NETWORK_REGIONAL.
     #[serde(rename="type")]
     
-    pub type_: Option<String>,
+    pub type_: Option<InstancesGetEffectiveFirewallsResponseEffectiveFirewallPolicyTypeEnum>,
 }
 
 impl client::Part for InstancesGetEffectiveFirewallsResponseEffectiveFirewallPolicy {}
@@ -7992,14 +7992,14 @@ pub struct Interconnect {
     /// Type of interconnect, which can take one of the following values: - PARTNER: A partner-managed interconnection shared between customers though a partner. - DEDICATED: A dedicated physical interconnection with the customer. Note that a value IT_PRIVATE has been deprecated in favor of DEDICATED.
     #[serde(rename="interconnectType")]
     
-    pub interconnect_type: Option<String>,
+    pub interconnect_type: Option<InterconnectInterconnectTypeEnum>,
     /// [Output Only] Type of the resource. Always compute#interconnect for interconnects.
     
     pub kind: Option<String>,
     /// Type of link requested, which can take one of the following values: - LINK_TYPE_ETHERNET_10G_LR: A 10G Ethernet with LR optics - LINK_TYPE_ETHERNET_100G_LR: A 100G Ethernet with LR optics. Note that this field indicates the speed of each of the links in the bundle, not the speed of the entire bundle.
     #[serde(rename="linkType")]
     
-    pub link_type: Option<String>,
+    pub link_type: Option<InterconnectLinkTypeEnum>,
     /// URL of the InterconnectLocation object that represents where this connection is to be provisioned.
     
     pub location: Option<String>,
@@ -8013,7 +8013,7 @@ pub struct Interconnect {
     /// [Output Only] The current status of this Interconnect's functionality, which can take one of the following values: - OS_ACTIVE: A valid Interconnect, which is turned up and is ready to use. Attachments may be provisioned on this Interconnect. - OS_UNPROVISIONED: An Interconnect that has not completed turnup. No attachments may be provisioned on this Interconnect. - OS_UNDER_MAINTENANCE: An Interconnect that is undergoing internal maintenance. No attachments may be provisioned or updated on this Interconnect. 
     #[serde(rename="operationalStatus")]
     
-    pub operational_status: Option<String>,
+    pub operational_status: Option<InterconnectOperationalStatusEnum>,
     /// [Output Only] IP address configured on the customer side of the Interconnect link. The customer should configure this IP address during turnup when prompted by Google NOC. This can be used only for ping tests.
     #[serde(rename="peerIpAddress")]
     
@@ -8036,7 +8036,7 @@ pub struct Interconnect {
     pub self_link: Option<String>,
     /// [Output Only] The current state of Interconnect functionality, which can take one of the following values: - ACTIVE: The Interconnect is valid, turned up and ready to use. Attachments may be provisioned on this Interconnect. - UNPROVISIONED: The Interconnect has not completed turnup. No attachments may be provisioned on this Interconnect. - UNDER_MAINTENANCE: The Interconnect is undergoing internal maintenance. No attachments may be provisioned or updated on this Interconnect. 
     
-    pub state: Option<String>,
+    pub state: Option<InterconnectStateEnum>,
 }
 
 impl client::RequestValue for Interconnect {}
@@ -8067,7 +8067,7 @@ pub struct InterconnectAttachment {
     pub admin_enabled: Option<bool>,
     /// Provisioned bandwidth capacity for the interconnect attachment. For attachments of type DEDICATED, the user can set the bandwidth. For attachments of type PARTNER, the Google Partner that is operating the interconnect must set the bandwidth. Output only for PARTNER type, mutable for PARTNER_PROVIDER and DEDICATED, and can take one of the following values: - BPS_50M: 50 Mbit/s - BPS_100M: 100 Mbit/s - BPS_200M: 200 Mbit/s - BPS_300M: 300 Mbit/s - BPS_400M: 400 Mbit/s - BPS_500M: 500 Mbit/s - BPS_1G: 1 Gbit/s - BPS_2G: 2 Gbit/s - BPS_5G: 5 Gbit/s - BPS_10G: 10 Gbit/s - BPS_20G: 20 Gbit/s - BPS_50G: 50 Gbit/s 
     
-    pub bandwidth: Option<String>,
+    pub bandwidth: Option<InterconnectAttachmentBandwidthEnum>,
     /// This field is not available.
     #[serde(rename="candidateIpv6Subnets")]
     
@@ -8114,10 +8114,10 @@ pub struct InterconnectAttachment {
     /// Desired availability domain for the attachment. Only available for type PARTNER, at creation time, and can take one of the following values: - AVAILABILITY_DOMAIN_ANY - AVAILABILITY_DOMAIN_1 - AVAILABILITY_DOMAIN_2 For improved reliability, customers should configure a pair of attachments, one per availability domain. The selected availability domain will be provided to the Partner via the pairing key, so that the provisioned circuit will lie in the specified domain. If not specified, the value will default to AVAILABILITY_DOMAIN_ANY.
     #[serde(rename="edgeAvailabilityDomain")]
     
-    pub edge_availability_domain: Option<String>,
+    pub edge_availability_domain: Option<InterconnectAttachmentEdgeAvailabilityDomainEnum>,
     /// Indicates the user-supplied encryption option of this VLAN attachment (interconnectAttachment). Can only be specified at attachment creation for PARTNER or DEDICATED attachments. Possible values are: - NONE - This is the default value, which means that the VLAN attachment carries unencrypted traffic. VMs are able to send traffic to, or receive traffic from, such a VLAN attachment. - IPSEC - The VLAN attachment carries only encrypted traffic that is encrypted by an IPsec device, such as an HA VPN gateway or third-party IPsec VPN. VMs cannot directly send traffic to, or receive traffic from, such a VLAN attachment. To use *HA VPN over Cloud Interconnect*, the VLAN attachment must be created with this option. 
     
-    pub encryption: Option<String>,
+    pub encryption: Option<InterconnectAttachmentEncryptionEnum>,
     /// [Output Only] Google reference ID, to be used when raising support tickets with Google or otherwise to debug backend connectivity issues. [Deprecated] This field is not used.
     #[serde(rename="googleReferenceId")]
     
@@ -8145,7 +8145,7 @@ pub struct InterconnectAttachment {
     /// [Output Only] The current status of whether or not this interconnect attachment is functional, which can take one of the following values: - OS_ACTIVE: The attachment has been turned up and is ready to use. - OS_UNPROVISIONED: The attachment is not ready to use yet, because turnup is not complete. 
     #[serde(rename="operationalStatus")]
     
-    pub operational_status: Option<String>,
+    pub operational_status: Option<InterconnectAttachmentOperationalStatusEnum>,
     /// [Output only for type PARTNER. Input only for PARTNER_PROVIDER. Not present for DEDICATED]. The opaque identifier of an PARTNER attachment used to initiate provisioning with a selected partner. Of the form "XXXXX/region/domain"
     #[serde(rename="pairingKey")]
     
@@ -8180,14 +8180,14 @@ pub struct InterconnectAttachment {
     /// The stack type for this interconnect attachment to identify whether the IPv6 feature is enabled or not. If not specified, IPV4_ONLY will be used. This field can be both set at interconnect attachments creation and update interconnect attachment operations.
     #[serde(rename="stackType")]
     
-    pub stack_type: Option<String>,
+    pub stack_type: Option<InterconnectAttachmentStackTypeEnum>,
     /// [Output Only] The current state of this attachment's functionality. Enum values ACTIVE and UNPROVISIONED are shared by DEDICATED/PRIVATE, PARTNER, and PARTNER_PROVIDER interconnect attachments, while enum values PENDING_PARTNER, PARTNER_REQUEST_RECEIVED, and PENDING_CUSTOMER are used for only PARTNER and PARTNER_PROVIDER interconnect attachments. This state can take one of the following values: - ACTIVE: The attachment has been turned up and is ready to use. - UNPROVISIONED: The attachment is not ready to use yet, because turnup is not complete. - PENDING_PARTNER: A newly-created PARTNER attachment that has not yet been configured on the Partner side. - PARTNER_REQUEST_RECEIVED: A PARTNER attachment is in the process of provisioning after a PARTNER_PROVIDER attachment was created that references it. - PENDING_CUSTOMER: A PARTNER or PARTNER_PROVIDER attachment that is waiting for a customer to activate it. - DEFUNCT: The attachment was deleted externally and is no longer functional. This could be because the associated Interconnect was removed, or because the other side of a Partner attachment was deleted. 
     
-    pub state: Option<String>,
+    pub state: Option<InterconnectAttachmentStateEnum>,
     /// The type of interconnect attachment this is, which can take one of the following values: - DEDICATED: an attachment to a Dedicated Interconnect. - PARTNER: an attachment to a Partner Interconnect, created by the customer. - PARTNER_PROVIDER: an attachment to a Partner Interconnect, created by the partner. 
     #[serde(rename="type")]
     
-    pub type_: Option<String>,
+    pub type_: Option<InterconnectAttachmentTypeEnum>,
     /// The IEEE 802.1Q VLAN tag for this attachment, in the range 2-4094. Only specified at creation time.
     #[serde(rename="vlanTag8021q")]
     
@@ -8370,11 +8370,11 @@ pub struct InterconnectDiagnostics {
     /// The aggregation type of the bundle interface.
     #[serde(rename="bundleAggregationType")]
     
-    pub bundle_aggregation_type: Option<String>,
+    pub bundle_aggregation_type: Option<InterconnectDiagnosticBundleAggregationTypeEnum>,
     /// The operational status of the bundle interface.
     #[serde(rename="bundleOperationalStatus")]
     
-    pub bundle_operational_status: Option<String>,
+    pub bundle_operational_status: Option<InterconnectDiagnosticBundleOperationalStatusEnum>,
     /// A list of InterconnectDiagnostics.LinkStatus objects, describing the status for each link on the Interconnect.
     
     pub links: Option<Vec<InterconnectDiagnosticsLinkStatus>>,
@@ -8424,7 +8424,7 @@ pub struct InterconnectDiagnosticsLinkLACPStatus {
     pub neighbor_system_id: Option<String>,
     /// The state of a LACP link, which can take one of the following values: - ACTIVE: The link is configured and active within the bundle. - DETACHED: The link is not configured within the bundle. This means that the rest of the object should be empty. 
     
-    pub state: Option<String>,
+    pub state: Option<InterconnectDiagnosticsLinkLACPStatuStateEnum>,
 }
 
 impl client::Part for InterconnectDiagnosticsLinkLACPStatus {}
@@ -8439,7 +8439,7 @@ impl client::Part for InterconnectDiagnosticsLinkLACPStatus {}
 pub struct InterconnectDiagnosticsLinkOpticalPower {
     /// The status of the current value when compared to the warning and alarm levels for the receiving or transmitting transceiver. Possible states include: - OK: The value has not crossed a warning threshold. - LOW_WARNING: The value has crossed below the low warning threshold. - HIGH_WARNING: The value has crossed above the high warning threshold. - LOW_ALARM: The value has crossed below the low alarm threshold. - HIGH_ALARM: The value has crossed above the high alarm threshold. 
     
-    pub state: Option<String>,
+    pub state: Option<InterconnectDiagnosticsLinkOpticalPowerStateEnum>,
     /// Value of the current receiving or transmitting optical power, read in dBm. Take a known good optical value, give it a 10% margin and trigger warnings relative to that value. In general, a -7dBm warning and a -11dBm alarm are good optical value estimates for most links.
     
     pub value: Option<f32>,
@@ -8474,7 +8474,7 @@ pub struct InterconnectDiagnosticsLinkStatus {
     /// The operational status of the link.
     #[serde(rename="operationalStatus")]
     
-    pub operational_status: Option<String>,
+    pub operational_status: Option<InterconnectDiagnosticsLinkStatuOperationalStatusEnum>,
     /// An InterconnectDiagnostics.LinkOpticalPower object, describing the current value and status of the received light level.
     #[serde(rename="receivingOpticalPower")]
     
@@ -8548,7 +8548,7 @@ pub struct InterconnectLocation {
     pub city: Option<String>,
     /// [Output Only] Continent for this location, which can take one of the following values: - AFRICA - ASIA_PAC - EUROPE - NORTH_AMERICA - SOUTH_AMERICA 
     
-    pub continent: Option<String>,
+    pub continent: Option<InterconnectLocationContinentEnum>,
     /// [Output Only] Creation timestamp in RFC3339 text format.
     #[serde(rename="creationTimestamp")]
     
@@ -8588,7 +8588,7 @@ pub struct InterconnectLocation {
     pub self_link: Option<String>,
     /// [Output Only] The status of this InterconnectLocation, which can take one of the following values: - CLOSED: The InterconnectLocation is closed and is unavailable for provisioning new Interconnects. - AVAILABLE: The InterconnectLocation is available for provisioning new Interconnects. 
     
-    pub status: Option<String>,
+    pub status: Option<InterconnectLocationStatusEnum>,
     /// [Output Only] Set to true for locations that support physical zone separation. Defaults to false if the field is not present.
     #[serde(rename="supportsPzs")]
     
@@ -8650,7 +8650,7 @@ pub struct InterconnectLocationRegionInfo {
     /// Identifies the network presence of this location.
     #[serde(rename="locationPresence")]
     
-    pub location_presence: Option<String>,
+    pub location_presence: Option<InterconnectLocationRegionInfoLocationPresenceEnum>,
     /// URL for the region of this location.
     
     pub region: Option<String>,
@@ -8681,13 +8681,13 @@ pub struct InterconnectOutageNotification {
     /// Form this outage is expected to take, which can take one of the following values: - OUTAGE: The Interconnect may be completely out of service for some or all of the specified window. - PARTIAL_OUTAGE: Some circuits comprising the Interconnect as a whole should remain up, but with reduced bandwidth. Note that the versions of this enum prefixed with "IT_" have been deprecated in favor of the unprefixed values.
     #[serde(rename="issueType")]
     
-    pub issue_type: Option<String>,
+    pub issue_type: Option<InterconnectOutageNotificationIssueTypeEnum>,
     /// Unique identifier for this outage notification.
     
     pub name: Option<String>,
     /// The party that generated this notification, which can take the following value: - GOOGLE: this notification as generated by Google. Note that the value of NSRC_GOOGLE has been deprecated in favor of GOOGLE.
     
-    pub source: Option<String>,
+    pub source: Option<InterconnectOutageNotificationSourceEnum>,
     /// Scheduled start time for the outage (milliseconds since Unix epoch).
     #[serde(rename="startTime")]
     
@@ -8695,7 +8695,7 @@ pub struct InterconnectOutageNotification {
     pub start_time: Option<i64>,
     /// State of this notification, which can take one of the following values: - ACTIVE: This outage notification is active. The event could be in the past, present, or future. See start_time and end_time for scheduling. - CANCELLED: The outage associated with this notification was cancelled before the outage was due to start. - COMPLETED: The outage associated with this notification is complete. Note that the versions of this enum prefixed with "NS_" have been deprecated in favor of the unprefixed values.
     
-    pub state: Option<String>,
+    pub state: Option<InterconnectOutageNotificationStateEnum>,
 }
 
 impl client::Part for InterconnectOutageNotification {}
@@ -8820,7 +8820,7 @@ pub struct LicenseCode {
     pub self_link: Option<String>,
     /// [Output Only] Current state of this License Code.
     
-    pub state: Option<String>,
+    pub state: Option<LicenseCodeStateEnum>,
     /// [Output Only] If true, the license will remain attached when creating images or snapshots from disks. Otherwise, the license is not transferred.
     
     pub transferable: Option<bool>,
@@ -8980,7 +8980,7 @@ pub struct LocationPolicy {
     /// Strategy for distributing VMs across zones in a region.
     #[serde(rename="targetShape")]
     
-    pub target_shape: Option<String>,
+    pub target_shape: Option<LocationPolicyTargetShapeEnum>,
 }
 
 impl client::Part for LocationPolicy {}
@@ -8998,7 +8998,7 @@ pub struct LocationPolicyLocation {
     pub constraints: Option<LocationPolicyLocationConstraints>,
     /// Preference for a given location. Set to either ALLOW or DENY.
     
-    pub preference: Option<String>,
+    pub preference: Option<LocationPolicyLocationPreferenceEnum>,
 }
 
 impl client::Part for LocationPolicyLocation {}
@@ -9057,7 +9057,7 @@ pub struct LogConfigCloudAuditOptions {
     /// This is deprecated and has no effect. Do not use.
     #[serde(rename="logName")]
     
-    pub log_name: Option<String>,
+    pub log_name: Option<LogConfigCloudAuditOptionLogNameEnum>,
 }
 
 impl client::Part for LogConfigCloudAuditOptions {}
@@ -9113,7 +9113,7 @@ pub struct LogConfigDataAccessOptions {
     /// This is deprecated and has no effect. Do not use.
     #[serde(rename="logMode")]
     
-    pub log_mode: Option<String>,
+    pub log_mode: Option<LogConfigDataAccessOptionLogModeEnum>,
 }
 
 impl client::Part for LogConfigDataAccessOptions {}
@@ -9191,7 +9191,7 @@ pub struct MachineImage {
     pub source_instance_properties: Option<SourceInstanceProperties>,
     /// [Output Only] The status of the machine image. One of the following values: INVALID, CREATING, READY, DELETING, and UPLOADING.
     
-    pub status: Option<String>,
+    pub status: Option<MachineImageStatusEnum>,
     /// The regional or multi-regional Cloud Storage bucket location where the machine image is stored.
     #[serde(rename="storageLocations")]
     
@@ -9426,7 +9426,7 @@ pub struct ManagedInstance {
     /// [Output Only] The current action that the managed instance group has scheduled for the instance. Possible values: - NONE The instance is running, and the managed instance group does not have any scheduled actions for this instance. - CREATING The managed instance group is creating this instance. If the group fails to create this instance, it will try again until it is successful. - CREATING_WITHOUT_RETRIES The managed instance group is attempting to create this instance only once. If the group fails to create this instance, it does not try again and the group's targetSize value is decreased instead. - RECREATING The managed instance group is recreating this instance. - DELETING The managed instance group is permanently deleting this instance. - ABANDONING The managed instance group is abandoning this instance. The instance will be removed from the instance group and from any target pools that are associated with this group. - RESTARTING The managed instance group is restarting the instance. - REFRESHING The managed instance group is applying configuration changes to the instance without stopping it. For example, the group can update the target pool list for an instance without stopping that instance. - VERIFYING The managed instance group has created the instance and it is in the process of being verified. 
     #[serde(rename="currentAction")]
     
-    pub current_action: Option<String>,
+    pub current_action: Option<ManagedInstanceCurrentActionEnum>,
     /// [Output only] The unique identifier for this resource. This field is empty when instance does not exist.
     
     #[serde_as(as = "Option<::client::serde_with::DisplayFromStr>")]
@@ -9441,7 +9441,7 @@ pub struct ManagedInstance {
     /// [Output Only] The status of the instance. This field is empty when the instance does not exist.
     #[serde(rename="instanceStatus")]
     
-    pub instance_status: Option<String>,
+    pub instance_status: Option<ManagedInstanceInstanceStatusEnum>,
     /// [Output Only] Information about the last attempt to create or delete the instance.
     #[serde(rename="lastAttempt")]
     
@@ -9472,7 +9472,7 @@ pub struct ManagedInstanceInstanceHealth {
     /// [Output Only] The current detailed instance health state.
     #[serde(rename="detailedHealthState")]
     
-    pub detailed_health_state: Option<String>,
+    pub detailed_health_state: Option<ManagedInstanceInstanceHealthDetailedHealthStateEnum>,
     /// [Output Only] The URL for the health check that verifies whether the instance is healthy.
     #[serde(rename="healthCheck")]
     
@@ -9557,7 +9557,7 @@ pub struct MetadataFilter {
     /// Specifies how individual filter label matches within the list of filterLabels and contributes toward the overall metadataFilter match. Supported values are: - MATCH_ANY: at least one of the filterLabels must have a matching label in the provided metadata. - MATCH_ALL: all filterLabels must have matching labels in the provided metadata. 
     #[serde(rename="filterMatchCriteria")]
     
-    pub filter_match_criteria: Option<String>,
+    pub filter_match_criteria: Option<MetadataFilterFilterMatchCriteriaEnum>,
 }
 
 impl client::Part for MetadataFilter {}
@@ -9667,7 +9667,7 @@ pub struct Network {
     /// The network firewall policy enforcement order. Can be either AFTER_CLASSIC_FIREWALL or BEFORE_CLASSIC_FIREWALL. Defaults to AFTER_CLASSIC_FIREWALL if the field is not specified.
     #[serde(rename="networkFirewallPolicyEnforcementOrder")]
     
-    pub network_firewall_policy_enforcement_order: Option<String>,
+    pub network_firewall_policy_enforcement_order: Option<NetworkNetworkFirewallPolicyEnforcementOrderEnum>,
     /// [Output Only] A list of network peerings for the resource.
     
     pub peerings: Option<Vec<NetworkPeering>>,
@@ -9718,7 +9718,7 @@ pub struct NetworkAttachment {
     /// no description provided
     #[serde(rename="connectionPreference")]
     
-    pub connection_preference: Option<String>,
+    pub connection_preference: Option<NetworkAttachmentConnectionPreferenceEnum>,
     /// [Output Only] Creation timestamp in RFC3339 text format.
     #[serde(rename="creationTimestamp")]
     
@@ -9829,7 +9829,7 @@ pub struct NetworkAttachmentConnectedEndpoint {
     pub secondary_ip_cidr_ranges: Option<Vec<String>>,
     /// The status of a connected endpoint to this network attachment.
     
-    pub status: Option<String>,
+    pub status: Option<NetworkAttachmentConnectedEndpointStatusEnum>,
     /// The subnetwork used to assign the IP to the producer instance network interface.
     
     pub subnetwork: Option<String>,
@@ -10105,7 +10105,7 @@ pub struct NetworkEndpointGroup {
     /// Type of network endpoints in this network endpoint group. Can be one of GCE_VM_IP, GCE_VM_IP_PORT, NON_GCP_PRIVATE_IP_PORT, INTERNET_FQDN_PORT, INTERNET_IP_PORT, SERVERLESS, PRIVATE_SERVICE_CONNECT.
     #[serde(rename="networkEndpointType")]
     
-    pub network_endpoint_type: Option<String>,
+    pub network_endpoint_type: Option<NetworkEndpointGroupNetworkEndpointTypeEnum>,
     /// no description provided
     #[serde(rename="pscData")]
     
@@ -10296,7 +10296,7 @@ pub struct NetworkEndpointGroupPscData {
     /// [Output Only] The connection status of the PSC Forwarding Rule.
     #[serde(rename="pscConnectionStatus")]
     
-    pub psc_connection_status: Option<String>,
+    pub psc_connection_status: Option<NetworkEndpointGroupPscDataPscConnectionStatusEnum>,
 }
 
 impl client::Part for NetworkEndpointGroupPscData {}
@@ -10356,7 +10356,7 @@ pub struct NetworkEndpointGroupsListEndpointsRequest {
     /// Optional query parameter for showing the health status of each network endpoint. Valid options are SKIP or SHOW. If you don't specify this parameter, the health status of network endpoints will not be provided.
     #[serde(rename="healthStatus")]
     
-    pub health_status: Option<String>,
+    pub health_status: Option<NetworkEndpointGroupsListEndpointsRequestHealthStatusEnum>,
 }
 
 impl client::RequestValue for NetworkEndpointGroupsListEndpointsRequest {}
@@ -10467,7 +10467,7 @@ pub struct NetworkInterface {
     /// [Output Only] One of EXTERNAL, INTERNAL to indicate whether the IP can be accessed from the Internet. This field is always inherited from its subnetwork. Valid only if stackType is IPV4_IPV6.
     #[serde(rename="ipv6AccessType")]
     
-    pub ipv6_access_type: Option<String>,
+    pub ipv6_access_type: Option<NetworkInterfaceIpv6AccessTypeEnum>,
     /// An IPv6 internal network address for this network interface.
     #[serde(rename="ipv6Address")]
     
@@ -10492,7 +10492,7 @@ pub struct NetworkInterface {
     /// The type of vNIC to be used on this interface. This may be gVNIC or VirtioNet.
     #[serde(rename="nicType")]
     
-    pub nic_type: Option<String>,
+    pub nic_type: Option<NetworkInterfaceNicTypeEnum>,
     /// The networking queue count that's specified by users for the network interface. Both Rx and Tx queues will be set to this number. It'll be empty if not specified by the users.
     #[serde(rename="queueCount")]
     
@@ -10500,7 +10500,7 @@ pub struct NetworkInterface {
     /// The stack type for this network interface to identify whether the IPv6 feature is enabled or not. If not specified, IPV4_ONLY will be used. This field can be both set at instance creation and update network interface operations.
     #[serde(rename="stackType")]
     
-    pub stack_type: Option<String>,
+    pub stack_type: Option<NetworkInterfaceStackTypeEnum>,
     /// The URL of the Subnetwork resource for this instance. If the network resource is in legacy mode, do not specify this field. If the network is in auto subnet mode, specifying the subnetwork is optional. If the network is in custom subnet mode, specifying the subnetwork is required. If you specify this field, you can specify the subnetwork as a full or partial URL. For example, the following are all valid URLs: - https://www.googleapis.com/compute/v1/projects/project/regions/region /subnetworks/subnetwork - regions/region/subnetworks/subnetwork 
     
     pub subnetwork: Option<String>,
@@ -10589,10 +10589,10 @@ pub struct NetworkPeering {
     /// Which IP version(s) of traffic and routes are allowed to be imported or exported between peer networks. The default value is IPV4_ONLY.
     #[serde(rename="stackType")]
     
-    pub stack_type: Option<String>,
+    pub stack_type: Option<NetworkPeeringStackTypeEnum>,
     /// [Output Only] State for the peering, either `ACTIVE` or `INACTIVE`. The peering is `ACTIVE` when there's a matching configuration in the peer network.
     
-    pub state: Option<String>,
+    pub state: Option<NetworkPeeringStateEnum>,
     /// [Output Only] Details about the current state of the peering.
     #[serde(rename="stateDetails")]
     
@@ -10612,7 +10612,7 @@ pub struct NetworkPerformanceConfig {
     /// no description provided
     #[serde(rename="totalEgressBandwidthTier")]
     
-    pub total_egress_bandwidth_tier: Option<String>,
+    pub total_egress_bandwidth_tier: Option<NetworkPerformanceConfigTotalEgressBandwidthTierEnum>,
 }
 
 impl client::Part for NetworkPerformanceConfig {}
@@ -10628,7 +10628,7 @@ pub struct NetworkRoutingConfig {
     /// The network-wide routing mode to use. If set to REGIONAL, this network's Cloud Routers will only advertise routes with subnets of this network in the same region as the router. If set to GLOBAL, this network's Cloud Routers will advertise routes with all subnets of this network, across regions.
     #[serde(rename="routingMode")]
     
-    pub routing_mode: Option<String>,
+    pub routing_mode: Option<NetworkRoutingConfigRoutingModeEnum>,
 }
 
 impl client::Part for NetworkRoutingConfig {}
@@ -10712,7 +10712,7 @@ pub struct NetworksGetEffectiveFirewallsResponseEffectiveFirewallPolicy {
     /// [Output Only] The type of the firewall policy.
     #[serde(rename="type")]
     
-    pub type_: Option<String>,
+    pub type_: Option<NetworksGetEffectiveFirewallsResponseEffectiveFirewallPolicyTypeEnum>,
 }
 
 impl client::Part for NetworksGetEffectiveFirewallsResponseEffectiveFirewallPolicy {}
@@ -10809,7 +10809,7 @@ pub struct NodeGroup {
     /// Specifies how to handle instances when a node in the group undergoes maintenance. Set to one of: DEFAULT, RESTART_IN_PLACE, or MIGRATE_WITHIN_NODE_GROUP. The default value is DEFAULT. For more information, see Maintenance policies.
     #[serde(rename="maintenancePolicy")]
     
-    pub maintenance_policy: Option<String>,
+    pub maintenance_policy: Option<NodeGroupMaintenancePolicyEnum>,
     /// no description provided
     #[serde(rename="maintenanceWindow")]
     
@@ -10834,7 +10834,7 @@ pub struct NodeGroup {
     pub size: Option<i32>,
     /// no description provided
     
-    pub status: Option<String>,
+    pub status: Option<NodeGroupStatusEnum>,
     /// [Output Only] The name of the zone where the node group resides, such as us-central1-a.
     
     pub zone: Option<String>,
@@ -10901,7 +10901,7 @@ pub struct NodeGroupAutoscalingPolicy {
     pub min_nodes: Option<i32>,
     /// The autoscaling mode. Set to one of: ON, OFF, or ONLY_SCALE_OUT. For more information, see Autoscaler modes.
     
-    pub mode: Option<String>,
+    pub mode: Option<NodeGroupAutoscalingPolicyModeEnum>,
 }
 
 impl client::Part for NodeGroupAutoscalingPolicy {}
@@ -10980,7 +10980,7 @@ pub struct NodeGroupNode {
     /// CPU overcommit.
     #[serde(rename="cpuOvercommitType")]
     
-    pub cpu_overcommit_type: Option<String>,
+    pub cpu_overcommit_type: Option<NodeGroupNodeCpuOvercommitTypeEnum>,
     /// Local disk configurations.
     
     pub disks: Option<Vec<LocalDisk>>,
@@ -11012,7 +11012,7 @@ pub struct NodeGroupNode {
     pub server_id: Option<String>,
     /// no description provided
     
-    pub status: Option<String>,
+    pub status: Option<NodeGroupNodeStatusEnum>,
     /// Total amount of available resources on the node.
     #[serde(rename="totalResources")]
     
@@ -11160,7 +11160,7 @@ pub struct NodeTemplate {
     /// CPU overcommit.
     #[serde(rename="cpuOvercommitType")]
     
-    pub cpu_overcommit_type: Option<String>,
+    pub cpu_overcommit_type: Option<NodeTemplateCpuOvercommitTypeEnum>,
     /// [Output Only] Creation timestamp in RFC3339 text format.
     #[serde(rename="creationTimestamp")]
     
@@ -11206,7 +11206,7 @@ pub struct NodeTemplate {
     pub server_binding: Option<ServerBinding>,
     /// [Output Only] The status of the node template. One of the following values: CREATING, READY, and DELETING.
     
-    pub status: Option<String>,
+    pub status: Option<NodeTemplateStatusEnum>,
     /// [Output Only] An optional, human-readable explanation of the status.
     #[serde(rename="statusMessage")]
     
@@ -12041,7 +12041,7 @@ pub struct Operation {
     pub start_time: Option<String>,
     /// [Output Only] The status of the operation, which can be one of the following: `PENDING`, `RUNNING`, or `DONE`.
     
-    pub status: Option<String>,
+    pub status: Option<OperationStatusEnum>,
     /// [Output Only] An optional textual description of the current status of the operation.
     #[serde(rename="statusMessage")]
     
@@ -12234,7 +12234,7 @@ pub struct PacketIntervals {
     pub avg_ms: Option<i64>,
     /// From how long ago in the past these intervals were observed.
     
-    pub duration: Option<String>,
+    pub duration: Option<PacketIntervalDurationEnum>,
     /// Maximum observed inter-packet interval in milliseconds.
     #[serde(rename="maxMs")]
     
@@ -12253,7 +12253,7 @@ pub struct PacketIntervals {
     /// The type of packets for which inter-packet intervals were computed.
     #[serde(rename="type")]
     
-    pub type_: Option<String>,
+    pub type_: Option<PacketIntervalTypeEnum>,
 }
 
 impl client::Part for PacketIntervals {}
@@ -12289,7 +12289,7 @@ pub struct PacketMirroring {
     pub description: Option<String>,
     /// Indicates whether or not this packet mirroring takes effect. If set to FALSE, this packet mirroring policy will not be enforced on the network. The default is TRUE.
     
-    pub enable: Option<String>,
+    pub enable: Option<PacketMirroringEnableEnum>,
     /// Filter for mirrored traffic. If unspecified, all traffic is mirrored.
     
     pub filter: Option<PacketMirroringFilter>,
@@ -12383,7 +12383,7 @@ pub struct PacketMirroringFilter {
     pub cidr_ranges: Option<Vec<String>>,
     /// Direction of traffic to mirror, either INGRESS, EGRESS, or BOTH. The default is BOTH.
     
-    pub direction: Option<String>,
+    pub direction: Option<PacketMirroringFilterDirectionEnum>,
 }
 
 impl client::Part for PacketMirroringFilter {}
@@ -12629,7 +12629,7 @@ pub struct PerInstanceConfig {
     pub preserved_state: Option<PreservedState>,
     /// The status of applying this per-instance configuration on the corresponding managed instance.
     
-    pub status: Option<String>,
+    pub status: Option<PerInstanceConfigStatusEnum>,
 }
 
 impl client::Part for PerInstanceConfig {}
@@ -12751,10 +12751,10 @@ pub struct PreservedStatePreservedDisk {
     /// These stateful disks will never be deleted during autohealing, update, instance recreate operations. This flag is used to configure if the disk should be deleted after it is no longer used by the group, e.g. when the given instance or the whole MIG is deleted. Note: disks attached in READ_ONLY mode cannot be auto-deleted.
     #[serde(rename="autoDelete")]
     
-    pub auto_delete: Option<String>,
+    pub auto_delete: Option<PreservedStatePreservedDiskAutoDeleteEnum>,
     /// The mode in which to attach this disk, either READ_WRITE or READ_ONLY. If not specified, the default is to attach the disk in READ_WRITE mode.
     
-    pub mode: Option<String>,
+    pub mode: Option<PreservedStatePreservedDiskModeEnum>,
     /// The URL of the disk resource that is stateful and should be attached to the VM instance.
     
     pub source: Option<String>,
@@ -12797,7 +12797,7 @@ pub struct Project {
     /// This signifies the default network tier used for configuring resources of the project and can only take the following values: PREMIUM, STANDARD. Initially the default network tier is PREMIUM.
     #[serde(rename="defaultNetworkTier")]
     
-    pub default_network_tier: Option<String>,
+    pub default_network_tier: Option<ProjectDefaultNetworkTierEnum>,
     /// [Output Only] Default service account used by VMs running in this project.
     #[serde(rename="defaultServiceAccount")]
     
@@ -12833,11 +12833,11 @@ pub struct Project {
     /// [Output Only] Default internal DNS setting used by VMs running in this project.
     #[serde(rename="vmDnsSetting")]
     
-    pub vm_dns_setting: Option<String>,
+    pub vm_dns_setting: Option<ProjectVmDnsSettingEnum>,
     /// [Output Only] The role this project has in a shared VPC configuration. Currently, only projects with the host role, which is specified by the value HOST, are differentiated.
     #[serde(rename="xpnProjectStatus")]
     
-    pub xpn_project_status: Option<String>,
+    pub xpn_project_status: Option<ProjectXpnProjectStatusEnum>,
 }
 
 impl client::Resource for Project {}
@@ -12943,7 +12943,7 @@ pub struct ProjectsSetDefaultNetworkTierRequest {
     /// Default network tier to be set.
     #[serde(rename="networkTier")]
     
-    pub network_tier: Option<String>,
+    pub network_tier: Option<ProjectsSetDefaultNetworkTierRequestNetworkTierEnum>,
 }
 
 impl client::RequestValue for ProjectsSetDefaultNetworkTierRequest {}
@@ -13005,7 +13005,7 @@ pub struct PublicAdvertisedPrefix {
     pub shared_secret: Option<String>,
     /// The status of the public advertised prefix. Possible values include: - `INITIAL`: RPKI validation is complete. - `PTR_CONFIGURED`: User has configured the PTR. - `VALIDATED`: Reverse DNS lookup is successful. - `REVERSE_DNS_LOOKUP_FAILED`: Reverse DNS lookup failed. - `PREFIX_CONFIGURATION_IN_PROGRESS`: The prefix is being configured. - `PREFIX_CONFIGURATION_COMPLETE`: The prefix is fully configured. - `PREFIX_REMOVAL_IN_PROGRESS`: The prefix is being removed. 
     
-    pub status: Option<String>,
+    pub status: Option<PublicAdvertisedPrefixStatusEnum>,
 }
 
 impl client::RequestValue for PublicAdvertisedPrefix {}
@@ -13138,7 +13138,7 @@ pub struct PublicDelegatedPrefix {
     pub self_link: Option<String>,
     /// [Output Only] The status of the public delegated prefix, which can be one of following values: - `INITIALIZING` The public delegated prefix is being initialized and addresses cannot be created yet. - `READY_TO_ANNOUNCE` The public delegated prefix is a live migration prefix and is active. - `ANNOUNCED` The public delegated prefix is active. - `DELETING` The public delegated prefix is being deprovsioned. 
     
-    pub status: Option<String>,
+    pub status: Option<PublicDelegatedPrefixStatusEnum>,
 }
 
 impl client::RequestValue for PublicDelegatedPrefix {}
@@ -13251,7 +13251,7 @@ pub struct PublicDelegatedPrefixPublicDelegatedSubPrefix {
     pub region: Option<String>,
     /// [Output Only] The status of the sub public delegated prefix.
     
-    pub status: Option<String>,
+    pub status: Option<PublicDelegatedPrefixPublicDelegatedSubPrefixStatusEnum>,
 }
 
 impl client::Part for PublicDelegatedPrefixPublicDelegatedSubPrefix {}
@@ -13288,7 +13288,7 @@ pub struct Quota {
     pub limit: Option<f64>,
     /// [Output Only] Name of the quota metric.
     
-    pub metric: Option<String>,
+    pub metric: Option<QuotaMetricEnum>,
     /// [Output Only] Owning resource. This is the resource on which this quota is applied.
     
     pub owner: Option<String>,
@@ -13392,7 +13392,7 @@ pub struct Region {
     pub self_link: Option<String>,
     /// [Output Only] Status of the region, either UP or DOWN.
     
-    pub status: Option<String>,
+    pub status: Option<RegionStatusEnum>,
     /// [Output Only] Reserved for future use.
     #[serde(rename="supportsPzs")]
     
@@ -13710,11 +13710,11 @@ pub struct RegionInstanceGroupManagersApplyUpdatesRequest {
     /// The minimal action that you want to perform on each instance during the update: - REPLACE: At minimum, delete the instance and create it again. - RESTART: Stop the instance and start it again. - REFRESH: Do not stop the instance. - NONE: Do not disrupt the instance at all. By default, the minimum action is NONE. If your update requires a more disruptive action than you set with this flag, the necessary action is performed to execute the update.
     #[serde(rename="minimalAction")]
     
-    pub minimal_action: Option<String>,
+    pub minimal_action: Option<RegionInstanceGroupManagersApplyUpdatesRequestMinimalActionEnum>,
     /// The most disruptive action that you want to perform on each instance during the update: - REPLACE: Delete the instance and create it again. - RESTART: Stop the instance and start it again. - REFRESH: Do not stop the instance. - NONE: Do not disrupt the instance at all. By default, the most disruptive allowed action is REPLACE. If your update requires a more disruptive action than you set with this flag, the update request will fail.
     #[serde(rename="mostDisruptiveAllowedAction")]
     
-    pub most_disruptive_allowed_action: Option<String>,
+    pub most_disruptive_allowed_action: Option<RegionInstanceGroupManagersApplyUpdatesRequestMostDisruptiveAllowedActionEnum>,
 }
 
 impl client::RequestValue for RegionInstanceGroupManagersApplyUpdatesRequest {}
@@ -13948,7 +13948,7 @@ pub struct RegionInstanceGroupsListInstancesRequest {
     /// Instances in which state should be returned. Valid options are: 'ALL', 'RUNNING'. By default, it lists all instances.
     #[serde(rename="instanceState")]
     
-    pub instance_state: Option<String>,
+    pub instance_state: Option<RegionInstanceGroupsListInstancesRequestInstanceStateEnum>,
     /// Name of port user is interested in. It is optional. If it is set, only information about this ports will be returned. If it is not set, all the named ports will be returned. Always lists all instances.
     #[serde(rename="portName")]
     
@@ -14061,7 +14061,7 @@ pub struct RegionNetworkFirewallPoliciesGetEffectiveFirewallsResponseEffectiveFi
     /// [Output Only] The type of the firewall policy. Can be one of HIERARCHY, NETWORK, NETWORK_REGIONAL.
     #[serde(rename="type")]
     
-    pub type_: Option<String>,
+    pub type_: Option<RegionNetworkFirewallPoliciesGetEffectiveFirewallsResponseEffectiveFirewallPolicyTypeEnum>,
 }
 
 impl client::Part for RegionNetworkFirewallPoliciesGetEffectiveFirewallsResponseEffectiveFirewallPolicy {}
@@ -14251,7 +14251,7 @@ pub struct Reservation {
     pub specific_reservation_required: Option<bool>,
     /// [Output Only] The status of the reservation.
     
-    pub status: Option<String>,
+    pub status: Option<ReservationStatusEnum>,
     /// Zone in which the reservation resides. A zone must be provided if the reservation is created within a commitment.
     
     pub zone: Option<String>,
@@ -14272,7 +14272,7 @@ pub struct ReservationAffinity {
     /// Specifies the type of reservation from which this instance can consume resources: ANY_RESERVATION (default), SPECIFIC_RESERVATION, or NO_RESERVATION. See Consuming reserved instances for examples.
     #[serde(rename="consumeReservationType")]
     
-    pub consume_reservation_type: Option<String>,
+    pub consume_reservation_type: Option<ReservationAffinityConsumeReservationTypeEnum>,
     /// Corresponds to the label key of a reservation resource. To target a SPECIFIC_RESERVATION by name, specify googleapis.com/reservation-name as the key and specify the name of your reservation as its value.
     
     pub key: Option<String>,
@@ -14416,7 +14416,7 @@ pub struct ResourceCommitment {
     /// Type of resource for which this commitment applies. Possible values are VCPU, MEMORY, LOCAL_SSD, and ACCELERATOR.
     #[serde(rename="type")]
     
-    pub type_: Option<String>,
+    pub type_: Option<ResourceCommitmentTypeEnum>,
 }
 
 impl client::Part for ResourceCommitment {}
@@ -14515,7 +14515,7 @@ pub struct ResourcePolicy {
     pub snapshot_schedule_policy: Option<ResourcePolicySnapshotSchedulePolicy>,
     /// [Output Only] The status of resource policy creation.
     
-    pub status: Option<String>,
+    pub status: Option<ResourcePolicyStatusEnum>,
 }
 
 impl client::RequestValue for ResourcePolicy {}
@@ -14600,7 +14600,7 @@ pub struct ResourcePolicyGroupPlacementPolicy {
     pub availability_domain_count: Option<i32>,
     /// Specifies network collocation
     
-    pub collocation: Option<String>,
+    pub collocation: Option<ResourcePolicyGroupPlacementPolicyCollocationEnum>,
     /// Number of VMs in this placement group. Google does not recommend that you use this field unless you use a compact policy and you want your policy to work only if it contains this exact number of VMs.
     #[serde(rename="vmCount")]
     
@@ -14792,7 +14792,7 @@ pub struct ResourcePolicySnapshotSchedulePolicyRetentionPolicy {
     /// Specifies the behavior to apply to scheduled snapshots when the source disk is deleted.
     #[serde(rename="onSourceDiskDelete")]
     
-    pub on_source_disk_delete: Option<String>,
+    pub on_source_disk_delete: Option<ResourcePolicySnapshotSchedulePolicyRetentionPolicyOnSourceDiskDeleteEnum>,
 }
 
 impl client::Part for ResourcePolicySnapshotSchedulePolicyRetentionPolicy {}
@@ -14874,7 +14874,7 @@ impl client::Part for ResourcePolicyWeeklyCycle {}
 pub struct ResourcePolicyWeeklyCycleDayOfWeek {
     /// Defines a schedule that runs on specific days of the week. Specify one or more days. The following options are available: MONDAY, TUESDAY, WEDNESDAY, THURSDAY, FRIDAY, SATURDAY, SUNDAY.
     
-    pub day: Option<String>,
+    pub day: Option<ResourcePolicyWeeklyCycleDayOfWeekDayEnum>,
     /// [Output only] Duration of the time window, automatically chosen to be smallest possible in the given scenario.
     
     pub duration: Option<String>,
@@ -14979,11 +14979,11 @@ pub struct Route {
     /// [Output only] The status of the route.
     #[serde(rename="routeStatus")]
     
-    pub route_status: Option<String>,
+    pub route_status: Option<RouteRouteStatusEnum>,
     /// [Output Only] The type of this route, which can be one of the following values: - 'TRANSIT' for a transit route that this router learned from another Cloud Router and will readvertise to one of its BGP peers - 'SUBNET' for a route from a subnet of the VPC - 'BGP' for a route learned from a BGP peer of this router - 'STATIC' for a static route
     #[serde(rename="routeType")]
     
-    pub route_type: Option<String>,
+    pub route_type: Option<RouteRouteTypeEnum>,
     /// [Output Only] Server-defined fully-qualified URL for this resource.
     #[serde(rename="selfLink")]
     
@@ -15015,7 +15015,7 @@ pub struct RouteAsPath {
     /// [Output Only] The type of the AS Path, which can be one of the following values: - 'AS_SET': unordered set of autonomous systems that the route in has traversed - 'AS_SEQUENCE': ordered set of autonomous systems that the route has traversed - 'AS_CONFED_SEQUENCE': ordered set of Member Autonomous Systems in the local confederation that the route has traversed - 'AS_CONFED_SET': unordered set of Member Autonomous Systems in the local confederation that the route has traversed 
     #[serde(rename="pathSegmentType")]
     
-    pub path_segment_type: Option<String>,
+    pub path_segment_type: Option<RouteAsPathPathSegmentTypeEnum>,
 }
 
 impl client::Part for RouteAsPath {}
@@ -15199,11 +15199,11 @@ pub struct RouterBgp {
     /// User-specified flag to indicate which mode to use for advertisement. The options are DEFAULT or CUSTOM.
     #[serde(rename="advertiseMode")]
     
-    pub advertise_mode: Option<String>,
+    pub advertise_mode: Option<RouterBgpAdvertiseModeEnum>,
     /// User-specified list of prefix groups to advertise in custom mode. This field can only be populated if advertise_mode is CUSTOM and is advertised to all peers of the router. These groups will be advertised in addition to any specified prefixes. Leave this field blank to advertise no custom groups.
     #[serde(rename="advertisedGroups")]
     
-    pub advertised_groups: Option<Vec<String>>,
+    pub advertised_groups: Option<Vec<RouterBgpAdvertisedGroupsEnum>>,
     /// User-specified list of individual IP ranges to advertise in custom mode. This field can only be populated if advertise_mode is CUSTOM and is advertised to all peers of the router. These IP ranges will be advertised in addition to any specified groups. Leave this field blank to advertise no custom IP ranges.
     #[serde(rename="advertisedIpRanges")]
     
@@ -15230,11 +15230,11 @@ pub struct RouterBgpPeer {
     /// User-specified flag to indicate which mode to use for advertisement.
     #[serde(rename="advertiseMode")]
     
-    pub advertise_mode: Option<String>,
+    pub advertise_mode: Option<RouterBgpPeerAdvertiseModeEnum>,
     /// User-specified list of prefix groups to advertise in custom mode, which can take one of the following options: - ALL_SUBNETS: Advertises all available subnets, including peer VPC subnets. - ALL_VPC_SUBNETS: Advertises the router's own VPC subnets. Note that this field can only be populated if advertise_mode is CUSTOM and overrides the list defined for the router (in the "bgp" message). These groups are advertised in addition to any specified prefixes. Leave this field blank to advertise no custom groups.
     #[serde(rename="advertisedGroups")]
     
-    pub advertised_groups: Option<Vec<String>>,
+    pub advertised_groups: Option<Vec<RouterBgpPeerAdvertisedGroupsEnum>>,
     /// User-specified list of individual IP ranges to advertise in custom mode. This field can only be populated if advertise_mode is CUSTOM and overrides the list defined for the router (in the "bgp" message). These IP ranges are advertised in addition to any specified groups. Leave this field blank to advertise no custom IP ranges.
     #[serde(rename="advertisedIpRanges")]
     
@@ -15248,7 +15248,7 @@ pub struct RouterBgpPeer {
     pub bfd: Option<RouterBgpPeerBfd>,
     /// The status of the BGP peer connection. If set to FALSE, any active session with the peer is terminated and all associated routing information is removed. If set to TRUE, the peer connection can be established with routing information. The default is TRUE.
     
-    pub enable: Option<String>,
+    pub enable: Option<RouterBgpPeerEnableEnum>,
     /// Enable IPv6 traffic over BGP Peer. If not specified, it is disabled by default.
     #[serde(rename="enableIpv6")]
     
@@ -15268,7 +15268,7 @@ pub struct RouterBgpPeer {
     /// [Output Only] The resource that configures and manages this BGP peer. - MANAGED_BY_USER is the default value and can be managed by you or other users - MANAGED_BY_ATTACHMENT is a BGP peer that is configured and managed by Cloud Interconnect, specifically by an InterconnectAttachment of type PARTNER. Google automatically creates, updates, and deletes this type of BGP peer when the PARTNER InterconnectAttachment is created, updated, or deleted. 
     #[serde(rename="managementType")]
     
-    pub management_type: Option<String>,
+    pub management_type: Option<RouterBgpPeerManagementTypeEnum>,
     /// Present if MD5 authentication is enabled for the peering. Must be the name of one of the entries in the Router.md5_authentication_keys. The field must comply with RFC1035.
     #[serde(rename="md5AuthenticationKeyName")]
     
@@ -15318,7 +15318,7 @@ pub struct RouterBgpPeerBfd {
     /// The BFD session initialization mode for this BGP peer. If set to ACTIVE, the Cloud Router will initiate the BFD session for this BGP peer. If set to PASSIVE, the Cloud Router will wait for the peer router to initiate the BFD session for this BGP peer. If set to DISABLED, BFD is disabled for this BGP peer. The default is DISABLED.
     #[serde(rename="sessionInitializationMode")]
     
-    pub session_initialization_mode: Option<String>,
+    pub session_initialization_mode: Option<RouterBgpPeerBfdSessionInitializationModeEnum>,
 }
 
 impl client::Part for RouterBgpPeerBfd {}
@@ -15346,7 +15346,7 @@ pub struct RouterInterface {
     /// [Output Only] The resource that configures and manages this interface. - MANAGED_BY_USER is the default value and can be managed directly by users. - MANAGED_BY_ATTACHMENT is an interface that is configured and managed by Cloud Interconnect, specifically, by an InterconnectAttachment of type PARTNER. Google automatically creates, updates, and deletes this type of interface when the PARTNER InterconnectAttachment is created, updated, or deleted. 
     #[serde(rename="managementType")]
     
-    pub management_type: Option<String>,
+    pub management_type: Option<RouterInterfaceManagementTypeEnum>,
     /// Name of this interface entry. The name must be 1-63 characters long, and comply with RFC1035. Specifically, the name must be 1-63 characters long and match the regular expression `[a-z]([-a-z0-9]*[a-z0-9])?` which means the first character must be a lowercase letter, and all following characters must be a dash, lowercase letter, or digit, except the last character, which cannot be a dash.
     
     pub name: Option<String>,
@@ -15442,7 +15442,7 @@ pub struct RouterNat {
     /// List of NAT-ted endpoint types supported by the Nat Gateway. If the list is empty, then it will be equivalent to include ENDPOINT_TYPE_VM
     #[serde(rename="endpointTypes")]
     
-    pub endpoint_types: Option<Vec<String>>,
+    pub endpoint_types: Option<Vec<RouterNatEndpointTypesEnum>>,
     /// Timeout (in seconds) for ICMP connections. Defaults to 30s if not set.
     #[serde(rename="icmpIdleTimeoutSec")]
     
@@ -15465,7 +15465,7 @@ pub struct RouterNat {
     /// Specify the NatIpAllocateOption, which can take one of the following values: - MANUAL_ONLY: Uses only Nat IP addresses provided by customers. When there are not enough specified Nat IPs, the Nat service fails for new VMs. - AUTO_ONLY: Nat IPs are allocated by Google Cloud Platform; customers can't specify any Nat IPs. When choosing AUTO_ONLY, then nat_ip should be empty. 
     #[serde(rename="natIpAllocateOption")]
     
-    pub nat_ip_allocate_option: Option<String>,
+    pub nat_ip_allocate_option: Option<RouterNatNatIpAllocateOptionEnum>,
     /// A list of URLs of the IP resources used for this Nat service. These IP addresses must be valid static external IP addresses assigned to the project.
     #[serde(rename="natIps")]
     
@@ -15476,7 +15476,7 @@ pub struct RouterNat {
     /// Specify the Nat option, which can take one of the following values: - ALL_SUBNETWORKS_ALL_IP_RANGES: All of the IP ranges in every Subnetwork are allowed to Nat. - ALL_SUBNETWORKS_ALL_PRIMARY_IP_RANGES: All of the primary IP ranges in every Subnetwork are allowed to Nat. - LIST_OF_SUBNETWORKS: A list of Subnetworks are allowed to Nat (specified in the field subnetwork below) The default is SUBNETWORK_IP_RANGE_TO_NAT_OPTION_UNSPECIFIED. Note that if this field contains ALL_SUBNETWORKS_ALL_IP_RANGES or ALL_SUBNETWORKS_ALL_PRIMARY_IP_RANGES, then there should not be any other Router.Nat section in any Router for this network in this region.
     #[serde(rename="sourceSubnetworkIpRangesToNat")]
     
-    pub source_subnetwork_ip_ranges_to_nat: Option<String>,
+    pub source_subnetwork_ip_ranges_to_nat: Option<RouterNatSourceSubnetworkIpRangesToNatEnum>,
     /// A list of Subnetwork resources whose traffic should be translated by NAT Gateway. It is used only when LIST_OF_SUBNETWORKS is selected for the SubnetworkIpRangeToNatOption above.
     
     pub subnetworks: Option<Vec<RouterNatSubnetworkToNat>>,
@@ -15513,7 +15513,7 @@ pub struct RouterNatLogConfig {
     pub enable: Option<bool>,
     /// Specify the desired filtering of logs on this NAT. If unspecified, logs are exported for all connections handled by this NAT. This option can take one of the following values: - ERRORS_ONLY: Export logs only for connection failures. - TRANSLATIONS_ONLY: Export logs only for successful connections. - ALL: Export logs for all connections, successful and unsuccessful. 
     
-    pub filter: Option<String>,
+    pub filter: Option<RouterNatLogConfigFilterEnum>,
 }
 
 impl client::Part for RouterNatLogConfig {}
@@ -15582,7 +15582,7 @@ pub struct RouterNatSubnetworkToNat {
     /// Specify the options for NAT ranges in the Subnetwork. All options of a single value are valid except NAT_IP_RANGE_OPTION_UNSPECIFIED. The only valid option with multiple values is: ["PRIMARY_IP_RANGE", "LIST_OF_SECONDARY_IP_RANGES"] Default: [ALL_IP_RANGES]
     #[serde(rename="sourceIpRangesToNat")]
     
-    pub source_ip_ranges_to_nat: Option<Vec<String>>,
+    pub source_ip_ranges_to_nat: Option<Vec<RouterNatSubnetworkToNatSourceIpRangesToNatEnum>>,
 }
 
 impl client::Part for RouterNatSubnetworkToNat {}
@@ -15678,11 +15678,11 @@ pub struct RouterStatusBgpPeerStatus {
     pub state: Option<String>,
     /// Status of the BGP peer: {UP, DOWN}
     
-    pub status: Option<String>,
+    pub status: Option<RouterStatusBgpPeerStatuStatusEnum>,
     /// Indicates why particular status was returned.
     #[serde(rename="statusReason")]
     
-    pub status_reason: Option<String>,
+    pub status_reason: Option<RouterStatusBgpPeerStatuStatusReasonEnum>,
     /// Time this session has been up. Format: 14 years, 51 weeks, 6 days, 23 hours, 59 minutes, 59 seconds
     
     pub uptime: Option<String>,
@@ -15842,7 +15842,7 @@ impl client::Part for RoutersScopedList {}
 pub struct Rule {
     /// This is deprecated and has no effect. Do not use.
     
-    pub action: Option<String>,
+    pub action: Option<RuleActionEnum>,
     /// This is deprecated and has no effect. Do not use.
     
     pub conditions: Option<Vec<Condition>>,
@@ -15885,11 +15885,11 @@ pub struct SSLHealthCheck {
     /// Specifies how a port is selected for health checking. Can be one of the following values: USE_FIXED_PORT: Specifies a port number explicitly using the port field in the health check. Supported by backend services for pass-through load balancers and backend services for proxy load balancers. Not supported by target pools. The health check supports all backends supported by the backend service provided the backend can be health checked. For example, GCE_VM_IP network endpoint groups, GCE_VM_IP_PORT network endpoint groups, and instance group backends. USE_NAMED_PORT: Not supported. USE_SERVING_PORT: Provides an indirect method of specifying the health check port by referring to the backend service. Only supported by backend services for proxy load balancers. Not supported by target pools. Not supported by backend services for pass-through load balancers. Supports all backends that can be health checked; for example, GCE_VM_IP_PORT network endpoint groups and instance group backends. For GCE_VM_IP_PORT network endpoint group backends, the health check uses the port number specified for each endpoint in the network endpoint group. For instance group backends, the health check uses the port number determined by looking up the backend service's named port in the instance group's list of named ports.
     #[serde(rename="portSpecification")]
     
-    pub port_specification: Option<String>,
+    pub port_specification: Option<SSLHealthCheckPortSpecificationEnum>,
     /// Specifies the type of proxy header to append before sending data to the backend, either NONE or PROXY_V1. The default is NONE.
     #[serde(rename="proxyHeader")]
     
-    pub proxy_header: Option<String>,
+    pub proxy_header: Option<SSLHealthCheckProxyHeaderEnum>,
     /// Instructs the health check prober to send this exact ASCII string, up to 1024 bytes in length, after establishing the TCP connection and SSL handshake.
     
     pub request: Option<String>,
@@ -15941,7 +15941,7 @@ pub struct SavedAttachedDisk {
     pub index: Option<i32>,
     /// Specifies the disk interface to use for attaching this disk, which is either SCSI or NVME.
     
-    pub interface: Option<String>,
+    pub interface: Option<SavedAttachedDiskInterfaceEnum>,
     /// [Output Only] Type of the resource. Always compute#attachedDisk for attached disks.
     
     pub kind: Option<String>,
@@ -15950,7 +15950,7 @@ pub struct SavedAttachedDisk {
     pub licenses: Option<Vec<String>>,
     /// The mode in which this disk is attached to the source instance, either READ_WRITE or READ_ONLY.
     
-    pub mode: Option<String>,
+    pub mode: Option<SavedAttachedDiskModeEnum>,
     /// Specifies a URL of the disk attached to the source instance.
     
     pub source: Option<String>,
@@ -15962,11 +15962,11 @@ pub struct SavedAttachedDisk {
     /// [Output Only] An indicator whether storageBytes is in a stable state or it is being adjusted as a result of shared storage reallocation. This status can either be UPDATING, meaning the size of the snapshot is being updated, or UP_TO_DATE, meaning the size of the snapshot is up-to-date.
     #[serde(rename="storageBytesStatus")]
     
-    pub storage_bytes_status: Option<String>,
+    pub storage_bytes_status: Option<SavedAttachedDiskStorageBytesStatusEnum>,
     /// Specifies the type of the attached disk, either SCRATCH or PERSISTENT.
     #[serde(rename="type")]
     
-    pub type_: Option<String>,
+    pub type_: Option<SavedAttachedDiskTypeEnum>,
 }
 
 impl client::Part for SavedAttachedDisk {}
@@ -15981,7 +15981,7 @@ impl client::Part for SavedAttachedDisk {}
 pub struct SavedDisk {
     /// [Output Only] The architecture of the attached disk.
     
-    pub architecture: Option<String>,
+    pub architecture: Option<SavedDiskArchitectureEnum>,
     /// [Output Only] Type of the resource. Always compute#savedDisk for attached disks.
     
     pub kind: Option<String>,
@@ -15997,7 +15997,7 @@ pub struct SavedDisk {
     /// [Output Only] An indicator whether storageBytes is in a stable state or it is being adjusted as a result of shared storage reallocation. This status can either be UPDATING, meaning the size of the snapshot is being updated, or UP_TO_DATE, meaning the size of the snapshot is up-to-date.
     #[serde(rename="storageBytesStatus")]
     
-    pub storage_bytes_status: Option<String>,
+    pub storage_bytes_status: Option<SavedDiskStorageBytesStatusEnum>,
 }
 
 impl client::Part for SavedDisk {}
@@ -16020,7 +16020,7 @@ pub struct ScalingScheduleStatus {
     pub next_start_time: Option<String>,
     /// [Output Only] The current state of a scaling schedule.
     
-    pub state: Option<String>,
+    pub state: Option<ScalingScheduleStatuStateEnum>,
 }
 
 impl client::Part for ScalingScheduleStatus {}
@@ -16044,7 +16044,7 @@ pub struct Scheduling {
     /// Specifies the termination action for the instance.
     #[serde(rename="instanceTerminationAction")]
     
-    pub instance_termination_action: Option<String>,
+    pub instance_termination_action: Option<SchedulingInstanceTerminationActionEnum>,
     /// An opaque location hint used to place the instance close to other resources. This field is for use by internal tools that use the public API.
     #[serde(rename="locationHint")]
     
@@ -16060,14 +16060,14 @@ pub struct Scheduling {
     /// Defines the maintenance behavior for this instance. For standard instances, the default behavior is MIGRATE. For preemptible instances, the default and only possible behavior is TERMINATE. For more information, see Set VM host maintenance policy.
     #[serde(rename="onHostMaintenance")]
     
-    pub on_host_maintenance: Option<String>,
+    pub on_host_maintenance: Option<SchedulingOnHostMaintenanceEnum>,
     /// Defines whether the instance is preemptible. This can only be set during instance creation or while the instance is stopped and therefore, in a `TERMINATED` state. See Instance Life Cycle for more information on the possible instance states.
     
     pub preemptible: Option<bool>,
     /// Specifies the provisioning model of the instance.
     #[serde(rename="provisioningModel")]
     
-    pub provisioning_model: Option<String>,
+    pub provisioning_model: Option<SchedulingProvisioningModelEnum>,
 }
 
 impl client::RequestValue for Scheduling {}
@@ -16085,7 +16085,7 @@ pub struct SchedulingNodeAffinity {
     pub key: Option<String>,
     /// Defines the operation of node selection. Valid operators are IN for affinity and NOT_IN for anti-affinity.
     
-    pub operator: Option<String>,
+    pub operator: Option<SchedulingNodeAffinityOperatorEnum>,
     /// Corresponds to the label values of Node resource.
     
     pub values: Option<Vec<String>>,
@@ -16279,7 +16279,7 @@ pub struct SecurityPolicy {
     /// The type indicates the intended use of the security policy. - CLOUD_ARMOR: Cloud Armor backend security policies can be configured to filter incoming HTTP requests targeting backend services. They filter requests before they hit the origin servers. - CLOUD_ARMOR_EDGE: Cloud Armor edge security policies can be configured to filter incoming HTTP requests targeting backend services (including Cloud CDN-enabled) as well as backend buckets (Cloud Storage). They filter requests before the request is served from Google's cache. - CLOUD_ARMOR_INTERNAL_SERVICE: Cloud Armor internal service policies can be configured to filter HTTP requests targeting services managed by Traffic Director in a service mesh. They filter requests before the request is served from the application. This field can be set only at resource creation time.
     #[serde(rename="type")]
     
-    pub type_: Option<String>,
+    pub type_: Option<SecurityPolicyTypeEnum>,
 }
 
 impl client::RequestValue for SecurityPolicy {}
@@ -16315,7 +16315,7 @@ pub struct SecurityPolicyAdaptiveProtectionConfigLayer7DdosDefenseConfig {
     /// Rule visibility can be one of the following: STANDARD - opaque rules. (default) PREMIUM - transparent rules.
     #[serde(rename="ruleVisibility")]
     
-    pub rule_visibility: Option<String>,
+    pub rule_visibility: Option<SecurityPolicyAdaptiveProtectionConfigLayer7DdosDefenseConfigRuleVisibilityEnum>,
 }
 
 impl client::Part for SecurityPolicyAdaptiveProtectionConfigLayer7DdosDefenseConfig {}
@@ -16335,11 +16335,11 @@ pub struct SecurityPolicyAdvancedOptionsConfig {
     /// no description provided
     #[serde(rename="jsonParsing")]
     
-    pub json_parsing: Option<String>,
+    pub json_parsing: Option<SecurityPolicyAdvancedOptionsConfigJsonParsingEnum>,
     /// no description provided
     #[serde(rename="logLevel")]
     
-    pub log_level: Option<String>,
+    pub log_level: Option<SecurityPolicyAdvancedOptionsConfigLogLevelEnum>,
 }
 
 impl client::Part for SecurityPolicyAdvancedOptionsConfig {}
@@ -16371,7 +16371,7 @@ pub struct SecurityPolicyDdosProtectionConfig {
     /// no description provided
     #[serde(rename="ddosProtection")]
     
-    pub ddos_protection: Option<String>,
+    pub ddos_protection: Option<SecurityPolicyDdosProtectionConfigDdosProtectionEnum>,
 }
 
 impl client::Part for SecurityPolicyDdosProtectionConfig {}
@@ -16550,7 +16550,7 @@ pub struct SecurityPolicyRuleMatcher {
     /// Preconfigured versioned expression. If this field is specified, config must also be specified. Available preconfigured expressions along with their requirements are: SRC_IPS_V1 - must specify the corresponding src_ip_range field in config.
     #[serde(rename="versionedExpr")]
     
-    pub versioned_expr: Option<String>,
+    pub versioned_expr: Option<SecurityPolicyRuleMatcherVersionedExprEnum>,
 }
 
 impl client::Part for SecurityPolicyRuleMatcher {}
@@ -16594,7 +16594,7 @@ pub struct SecurityPolicyRuleRateLimitOptions {
     /// Determines the key to enforce the rate_limit_threshold on. Possible values are: - ALL: A single rate limit threshold is applied to all the requests matching this rule. This is the default value if "enforceOnKey" is not configured. - IP: The source IP address of the request is the key. Each IP has this limit enforced separately. - HTTP_HEADER: The value of the HTTP header whose name is configured under "enforceOnKeyName". The key value is truncated to the first 128 bytes of the header value. If no such header is present in the request, the key type defaults to ALL. - XFF_IP: The first IP address (i.e. the originating client IP address) specified in the list of IPs under X-Forwarded-For HTTP header. If no such header is present or the value is not a valid IP, the key defaults to the source IP address of the request i.e. key type IP. - HTTP_COOKIE: The value of the HTTP cookie whose name is configured under "enforceOnKeyName". The key value is truncated to the first 128 bytes of the cookie value. If no such cookie is present in the request, the key type defaults to ALL. - HTTP_PATH: The URL path of the HTTP request. The key value is truncated to the first 128 bytes. - SNI: Server name indication in the TLS session of the HTTPS request. The key value is truncated to the first 128 bytes. The key type defaults to ALL on a HTTP session. - REGION_CODE: The country/region from which the request originates. 
     #[serde(rename="enforceOnKey")]
     
-    pub enforce_on_key: Option<String>,
+    pub enforce_on_key: Option<SecurityPolicyRuleRateLimitOptionEnforceOnKeyEnum>,
     /// Rate limit key name applicable only for the following key types: HTTP_HEADER -- Name of the HTTP header whose value is taken as the key value. HTTP_COOKIE -- Name of the HTTP cookie whose value is taken as the key value.
     #[serde(rename="enforceOnKeyName")]
     
@@ -16648,7 +16648,7 @@ pub struct SecurityPolicyRuleRedirectOptions {
     /// Type of the redirect action.
     #[serde(rename="type")]
     
-    pub type_: Option<String>,
+    pub type_: Option<SecurityPolicyRuleRedirectOptionTypeEnum>,
 }
 
 impl client::Part for SecurityPolicyRuleRedirectOptions {}
@@ -16718,7 +16718,7 @@ pub struct ServerBinding {
     /// no description provided
     #[serde(rename="type")]
     
-    pub type_: Option<String>,
+    pub type_: Option<ServerBindingTypeEnum>,
 }
 
 impl client::Part for ServerBinding {}
@@ -16768,7 +16768,7 @@ pub struct ServiceAttachment {
     /// The connection preference of service attachment. The value can be set to ACCEPT_AUTOMATIC. An ACCEPT_AUTOMATIC service attachment is one that always accepts the connection from consumer forwarding rules.
     #[serde(rename="connectionPreference")]
     
-    pub connection_preference: Option<String>,
+    pub connection_preference: Option<ServiceAttachmentConnectionPreferenceEnum>,
     /// Projects that are allowed to connect to this service attachment.
     #[serde(rename="consumerAcceptLists")]
     
@@ -16892,7 +16892,7 @@ pub struct ServiceAttachmentConnectedEndpoint {
     pub psc_connection_id: Option<u64>,
     /// The status of a connected endpoint to this service attachment.
     
-    pub status: Option<String>,
+    pub status: Option<ServiceAttachmentConnectedEndpointStatusEnum>,
 }
 
 impl client::Part for ServiceAttachmentConnectedEndpoint {}
@@ -16991,7 +16991,7 @@ pub struct ShareSettings {
     /// Type of sharing for this shared-reservation
     #[serde(rename="shareType")]
     
-    pub share_type: Option<String>,
+    pub share_type: Option<ShareSettingShareTypeEnum>,
 }
 
 impl client::Part for ShareSettings {}
@@ -17155,7 +17155,7 @@ impl client::RequestValue for SignedUrlKey {}
 pub struct Snapshot {
     /// [Output Only] The architecture of the snapshot. Valid values are ARM64 or X86_64.
     
-    pub architecture: Option<String>,
+    pub architecture: Option<SnapshotArchitectureEnum>,
     /// [Output Only] Set to true if snapshots are automatically created by applying resource policy on the target disk.
     #[serde(rename="autoCreated")]
     
@@ -17231,7 +17231,7 @@ pub struct Snapshot {
     /// Indicates the type of the snapshot.
     #[serde(rename="snapshotType")]
     
-    pub snapshot_type: Option<String>,
+    pub snapshot_type: Option<SnapshotSnapshotTypeEnum>,
     /// The source disk used to create this snapshot.
     #[serde(rename="sourceDisk")]
     
@@ -17254,7 +17254,7 @@ pub struct Snapshot {
     pub source_snapshot_schedule_policy_id: Option<String>,
     /// [Output Only] The status of the snapshot. This can be CREATING, DELETING, FAILED, READY, or UPLOADING.
     
-    pub status: Option<String>,
+    pub status: Option<SnapshotStatusEnum>,
     /// [Output Only] A size of the storage used by the snapshot. As snapshots share storage, this number is expected to change with snapshot creation/deletion.
     #[serde(rename="storageBytes")]
     
@@ -17263,7 +17263,7 @@ pub struct Snapshot {
     /// [Output Only] An indicator whether storageBytes is in a stable state or it is being adjusted as a result of shared storage reallocation. This status can either be UPDATING, meaning the size of the snapshot is being updated, or UP_TO_DATE, meaning the size of the snapshot is up-to-date.
     #[serde(rename="storageBytesStatus")]
     
-    pub storage_bytes_status: Option<String>,
+    pub storage_bytes_status: Option<SnapshotStorageBytesStatusEnum>,
     /// Cloud Storage bucket storage location of the snapshot (regional or multi-regional).
     #[serde(rename="storageLocations")]
     
@@ -17375,7 +17375,7 @@ pub struct SourceInstanceProperties {
     /// KeyRevocationActionType of the instance. Supported options are "STOP" and "NONE". The default value is "NONE" if it is not specified.
     #[serde(rename="keyRevocationActionType")]
     
-    pub key_revocation_action_type: Option<String>,
+    pub key_revocation_action_type: Option<SourceInstancePropertyKeyRevocationActionTypeEnum>,
     /// Labels to apply to instances that are created from this machine image.
     
     pub labels: Option<HashMap<String, String>>,
@@ -17475,7 +17475,7 @@ pub struct SslCertificate {
     /// (Optional) Specifies the type of SSL certificate, either "SELF_MANAGED" or "MANAGED". If not specified, the certificate is self-managed and the fields certificate and private_key are used.
     #[serde(rename="type")]
     
-    pub type_: Option<String>,
+    pub type_: Option<SslCertificateTypeEnum>,
 }
 
 impl client::RequestValue for SslCertificate {}
@@ -17569,13 +17569,13 @@ pub struct SslCertificateManagedSslCertificate {
     /// [Output only] Detailed statuses of the domains specified for managed certificate resource.
     #[serde(rename="domainStatus")]
     
-    pub domain_status: Option<HashMap<String, String>>,
+    pub domain_status: Option<HashMap<String, SslCertificateManagedSslCertificateDomainStatusEnum>>,
     /// The domains for which a managed SSL certificate will be generated. Each Google-managed SSL certificate supports up to the [maximum number of domains per Google-managed SSL certificate](https://cloud.google.com/load-balancing/docs/quotas#ssl_certificates).
     
     pub domains: Option<Vec<String>>,
     /// [Output only] Status of the managed certificate resource.
     
-    pub status: Option<String>,
+    pub status: Option<SslCertificateManagedSslCertificateStatusEnum>,
 }
 
 impl client::Part for SslCertificateManagedSslCertificate {}
@@ -17782,13 +17782,13 @@ pub struct SslPolicy {
     /// The minimum version of SSL protocol that can be used by the clients to establish a connection with the load balancer. This can be one of TLS_1_0, TLS_1_1, TLS_1_2.
     #[serde(rename="minTlsVersion")]
     
-    pub min_tls_version: Option<String>,
+    pub min_tls_version: Option<SslPolicyMinTlsVersionEnum>,
     /// Name of the resource. The name must be 1-63 characters long, and comply with RFC1035. Specifically, the name must be 1-63 characters long and match the regular expression `[a-z]([-a-z0-9]*[a-z0-9])?` which means the first character must be a lowercase letter, and all following characters must be a dash, lowercase letter, or digit, except the last character, which cannot be a dash.
     
     pub name: Option<String>,
     /// Profile specifies the set of SSL features that can be used by the load balancer when negotiating SSL with clients. This can be one of COMPATIBLE, MODERN, RESTRICTED, or CUSTOM. If using CUSTOM, the set of SSL features to enable must be specified in the customFeatures field.
     
-    pub profile: Option<String>,
+    pub profile: Option<SslPolicyProfileEnum>,
     /// [Output Only] URL of the region where the regional SSL policy resides. This field is not applicable to global SSL policies.
     
     pub region: Option<String>,
@@ -17867,7 +17867,7 @@ pub struct StatefulPolicyPreservedStateDiskDevice {
     /// These stateful disks will never be deleted during autohealing, update or VM instance recreate operations. This flag is used to configure if the disk should be deleted after it is no longer used by the group, e.g. when the given instance or the whole group is deleted. Note: disks attached in READ_ONLY mode cannot be auto-deleted.
     #[serde(rename="autoDelete")]
     
-    pub auto_delete: Option<String>,
+    pub auto_delete: Option<StatefulPolicyPreservedStateDiskDeviceAutoDeleteEnum>,
 }
 
 impl client::Part for StatefulPolicyPreservedStateDiskDevice {}
@@ -17933,7 +17933,7 @@ pub struct Subnetwork {
     /// The access type of IPv6 address this subnet holds. It's immutable and can only be specified during creation or the first time the subnet is updated into IPV4_IPV6 dual stack.
     #[serde(rename="ipv6AccessType")]
     
-    pub ipv6_access_type: Option<String>,
+    pub ipv6_access_type: Option<SubnetworkIpv6AccessTypeEnum>,
     /// [Output Only] This field is for internal use.
     #[serde(rename="ipv6CidrRange")]
     
@@ -17958,16 +17958,16 @@ pub struct Subnetwork {
     /// This field is for internal use. This field can be both set at resource creation time and updated using patch.
     #[serde(rename="privateIpv6GoogleAccess")]
     
-    pub private_ipv6_google_access: Option<String>,
+    pub private_ipv6_google_access: Option<SubnetworkPrivateIpv6GoogleAccessEnum>,
     /// The purpose of the resource. This field can be either PRIVATE_RFC_1918 or INTERNAL_HTTPS_LOAD_BALANCER. A subnetwork with purpose set to INTERNAL_HTTPS_LOAD_BALANCER is a user-created subnetwork that is reserved for Internal HTTP(S) Load Balancing. If unspecified, the purpose defaults to PRIVATE_RFC_1918. The enableFlowLogs field isn't supported with the purpose field set to INTERNAL_HTTPS_LOAD_BALANCER.
     
-    pub purpose: Option<String>,
+    pub purpose: Option<SubnetworkPurposeEnum>,
     /// URL of the region where the Subnetwork resides. This field can be set only at resource creation time.
     
     pub region: Option<String>,
     /// The role of subnetwork. Currently, this field is only used when purpose = INTERNAL_HTTPS_LOAD_BALANCER. The value can be set to ACTIVE or BACKUP. An ACTIVE subnetwork is one that is currently being used for Internal HTTP(S) Load Balancing. A BACKUP subnetwork is one that is ready to be promoted to ACTIVE or is currently draining. This field can be updated with a patch request.
     
-    pub role: Option<String>,
+    pub role: Option<SubnetworkRoleEnum>,
     /// An array of configurations for secondary IP ranges for VM instances contained in this subnetwork. The primary IP of such VM must belong to the primary ipCidrRange of the subnetwork. The alias IPs may belong to either primary or secondary ranges. This field can be updated with a patch request.
     #[serde(rename="secondaryIpRanges")]
     
@@ -17979,10 +17979,10 @@ pub struct Subnetwork {
     /// The stack type for the subnet. If set to IPV4_ONLY, new VMs in the subnet are assigned IPv4 addresses only. If set to IPV4_IPV6, new VMs in the subnet can be assigned both IPv4 and IPv6 addresses. If not specified, IPV4_ONLY is used. This field can be both set at resource creation time and updated using patch.
     #[serde(rename="stackType")]
     
-    pub stack_type: Option<String>,
+    pub stack_type: Option<SubnetworkStackTypeEnum>,
     /// [Output Only] The state of the subnetwork, which can be one of the following values: READY: Subnetwork is created and ready to use DRAINING: only applicable to subnetworks that have the purpose set to INTERNAL_HTTPS_LOAD_BALANCER and indicates that connections to the load balancer are being drained. A subnetwork that is draining cannot be used or modified until it reaches a status of READY
     
-    pub state: Option<String>,
+    pub state: Option<SubnetworkStateEnum>,
 }
 
 impl client::RequestValue for Subnetwork {}
@@ -18075,7 +18075,7 @@ pub struct SubnetworkLogConfig {
     /// Can only be specified if VPC flow logging for this subnetwork is enabled. Toggles the aggregation interval for collecting flow logs. Increasing the interval time will reduce the amount of generated flow logs for long lasting connections. Default is an interval of 5 seconds per connection.
     #[serde(rename="aggregationInterval")]
     
-    pub aggregation_interval: Option<String>,
+    pub aggregation_interval: Option<SubnetworkLogConfigAggregationIntervalEnum>,
     /// Whether to enable flow logging for this subnetwork. If this field is not explicitly set, it will not appear in get listings. If not set the default behavior is determined by the org policy, if there is no org policy specified, then it will default to disabled.
     
     pub enable: Option<bool>,
@@ -18089,7 +18089,7 @@ pub struct SubnetworkLogConfig {
     pub flow_sampling: Option<f32>,
     /// Can only be specified if VPC flow logs for this subnetwork is enabled. Configures whether all, none or a subset of metadata fields should be added to the reported VPC flow logs. Default is EXCLUDE_ALL_METADATA.
     
-    pub metadata: Option<String>,
+    pub metadata: Option<SubnetworkLogConfigMetadataEnum>,
     /// Can only be specified if VPC flow logs for this subnetwork is enabled and "metadata" was set to CUSTOM_METADATA.
     #[serde(rename="metadataFields")]
     
@@ -18186,7 +18186,7 @@ impl client::RequestValue for SubnetworksSetPrivateIpGoogleAccessRequest {}
 pub struct Subsetting {
     /// no description provided
     
-    pub policy: Option<String>,
+    pub policy: Option<SubsettingPolicyEnum>,
 }
 
 impl client::Part for Subsetting {}
@@ -18209,11 +18209,11 @@ pub struct TCPHealthCheck {
     /// Specifies how a port is selected for health checking. Can be one of the following values: USE_FIXED_PORT: Specifies a port number explicitly using the port field in the health check. Supported by backend services for pass-through load balancers and backend services for proxy load balancers. Not supported by target pools. The health check supports all backends supported by the backend service provided the backend can be health checked. For example, GCE_VM_IP network endpoint groups, GCE_VM_IP_PORT network endpoint groups, and instance group backends. USE_NAMED_PORT: Not supported. USE_SERVING_PORT: Provides an indirect method of specifying the health check port by referring to the backend service. Only supported by backend services for proxy load balancers. Not supported by target pools. Not supported by backend services for pass-through load balancers. Supports all backends that can be health checked; for example, GCE_VM_IP_PORT network endpoint groups and instance group backends. For GCE_VM_IP_PORT network endpoint group backends, the health check uses the port number specified for each endpoint in the network endpoint group. For instance group backends, the health check uses the port number determined by looking up the backend service's named port in the instance group's list of named ports.
     #[serde(rename="portSpecification")]
     
-    pub port_specification: Option<String>,
+    pub port_specification: Option<TCPHealthCheckPortSpecificationEnum>,
     /// Specifies the type of proxy header to append before sending data to the backend, either NONE or PROXY_V1. The default is NONE.
     #[serde(rename="proxyHeader")]
     
-    pub proxy_header: Option<String>,
+    pub proxy_header: Option<TCPHealthCheckProxyHeaderEnum>,
     /// Instructs the health check prober to send this exact ASCII string, up to 1024 bytes in length, after establishing the TCP connection.
     
     pub request: Option<String>,
@@ -18542,7 +18542,7 @@ pub struct TargetHttpsProxiesSetQuicOverrideRequest {
     /// QUIC policy for the TargetHttpsProxy resource.
     #[serde(rename="quicOverride")]
     
-    pub quic_override: Option<String>,
+    pub quic_override: Option<TargetHttpsProxiesSetQuicOverrideRequestQuicOverrideEnum>,
 }
 
 impl client::RequestValue for TargetHttpsProxiesSetQuicOverrideRequest {}
@@ -18620,7 +18620,7 @@ pub struct TargetHttpsProxy {
     /// Specifies the QUIC override policy for this TargetHttpsProxy resource. This setting determines whether the load balancer attempts to negotiate QUIC with clients. You can specify NONE, ENABLE, or DISABLE. - When quic-override is set to NONE, Google manages whether QUIC is used. - When quic-override is set to ENABLE, the load balancer uses QUIC when possible. - When quic-override is set to DISABLE, the load balancer doesn't use QUIC. - If the quic-override flag is not specified, NONE is implied. 
     #[serde(rename="quicOverride")]
     
-    pub quic_override: Option<String>,
+    pub quic_override: Option<TargetHttpsProxyQuicOverrideEnum>,
     /// [Output Only] URL of the region where the regional TargetHttpsProxy resides. This field is not applicable to global TargetHttpsProxies.
     
     pub region: Option<String>,
@@ -18764,7 +18764,7 @@ pub struct TargetInstance {
     /// Must have a value of NO_NAT. Protocol forwarding delivers packets while preserving the destination IP address of the forwarding rule referencing the target instance.
     #[serde(rename="natPolicy")]
     
-    pub nat_policy: Option<String>,
+    pub nat_policy: Option<TargetInstanceNatPolicyEnum>,
     /// The URL of the network this target instance uses to forward traffic. If not specified, the traffic will be forwarded to the network that the default network interface belongs to.
     
     pub network: Option<String>,
@@ -18939,7 +18939,7 @@ pub struct TargetPool {
     /// Session affinity option, must be one of the following values: NONE: Connections from the same client IP may go to any instance in the pool. CLIENT_IP: Connections from the same client IP will go to the same instance in the pool while that instance remains healthy. CLIENT_IP_PROTO: Connections from the same client IP with the same IP protocol will go to the same instance in the pool while that instance remains healthy.
     #[serde(rename="sessionAffinity")]
     
-    pub session_affinity: Option<String>,
+    pub session_affinity: Option<TargetPoolSessionAffinityEnum>,
 }
 
 impl client::RequestValue for TargetPool {}
@@ -19216,7 +19216,7 @@ pub struct TargetSslProxiesSetProxyHeaderRequest {
     /// The new type of proxy header to append before sending data to the backend. NONE or PROXY_V1 are allowed.
     #[serde(rename="proxyHeader")]
     
-    pub proxy_header: Option<String>,
+    pub proxy_header: Option<TargetSslProxiesSetProxyHeaderRequestProxyHeaderEnum>,
 }
 
 impl client::RequestValue for TargetSslProxiesSetProxyHeaderRequest {}
@@ -19278,7 +19278,7 @@ pub struct TargetSslProxy {
     /// Specifies the type of proxy header to append before sending data to the backend, either NONE or PROXY_V1. The default is NONE.
     #[serde(rename="proxyHeader")]
     
-    pub proxy_header: Option<String>,
+    pub proxy_header: Option<TargetSslProxyProxyHeaderEnum>,
     /// [Output Only] Server-defined URL for the resource.
     #[serde(rename="selfLink")]
     
@@ -19388,7 +19388,7 @@ pub struct TargetTcpProxiesSetProxyHeaderRequest {
     /// The new type of proxy header to append before sending data to the backend. NONE or PROXY_V1 are allowed.
     #[serde(rename="proxyHeader")]
     
-    pub proxy_header: Option<String>,
+    pub proxy_header: Option<TargetTcpProxiesSetProxyHeaderRequestProxyHeaderEnum>,
 }
 
 impl client::RequestValue for TargetTcpProxiesSetProxyHeaderRequest {}
@@ -19432,7 +19432,7 @@ pub struct TargetTcpProxy {
     /// Specifies the type of proxy header to append before sending data to the backend, either NONE or PROXY_V1. The default is NONE.
     #[serde(rename="proxyHeader")]
     
-    pub proxy_header: Option<String>,
+    pub proxy_header: Option<TargetTcpProxyProxyHeaderEnum>,
     /// [Output Only] URL of the region where the regional TCP proxy resides. This field is not applicable to global TCP proxy.
     
     pub region: Option<String>,
@@ -19574,7 +19574,7 @@ pub struct TargetVpnGateway {
     pub self_link: Option<String>,
     /// [Output Only] The status of the VPN gateway, which can be one of the following: CREATING, READY, FAILED, or DELETING.
     
-    pub status: Option<String>,
+    pub status: Option<TargetVpnGatewayStatusEnum>,
     /// [Output Only] A list of URLs to VpnTunnel resources. VpnTunnels are created using the compute.vpntunnels.insert method and associated with a VPN gateway.
     
     pub tunnels: Option<Vec<String>>,
@@ -20124,7 +20124,7 @@ pub struct UrlMapsValidateRequest {
     /// Specifies the load balancer type(s) this validation request is for. Use EXTERNAL_MANAGED for HTTP/HTTPS External Global Load Balancer with Advanced Traffic Management. Use EXTERNAL for Classic HTTP/HTTPS External Global Load Balancer. Other load balancer types are not supported. For more information, refer to Choosing a load balancer. If unspecified, the load balancing scheme will be inferred from the backend service resources this URL map references. If that can not be inferred (for example, this URL map only references backend buckets, or this Url map is for rewrites and redirects only and doesn't reference any backends), EXTERNAL will be used as the default type. If specified, the scheme(s) must not conflict with the load balancing scheme of the backend service resources this Url map references.
     #[serde(rename="loadBalancingSchemes")]
     
-    pub load_balancing_schemes: Option<Vec<String>>,
+    pub load_balancing_schemes: Option<Vec<UrlMapsValidateRequestLoadBalancingSchemesEnum>>,
     /// Content of the UrlMap to be validated.
     
     pub resource: Option<UrlMap>,
@@ -20195,16 +20195,16 @@ pub struct UsableSubnetwork {
     /// The access type of IPv6 address this subnet holds. It's immutable and can only be specified during creation or the first time the subnet is updated into IPV4_IPV6 dual stack.
     #[serde(rename="ipv6AccessType")]
     
-    pub ipv6_access_type: Option<String>,
+    pub ipv6_access_type: Option<UsableSubnetworkIpv6AccessTypeEnum>,
     /// Network URL.
     
     pub network: Option<String>,
     /// The purpose of the resource. This field can be either PRIVATE_RFC_1918 or INTERNAL_HTTPS_LOAD_BALANCER. A subnetwork with purpose set to INTERNAL_HTTPS_LOAD_BALANCER is a user-created subnetwork that is reserved for Internal HTTP(S) Load Balancing. If unspecified, the purpose defaults to PRIVATE_RFC_1918. The enableFlowLogs field isn't supported with the purpose field set to INTERNAL_HTTPS_LOAD_BALANCER.
     
-    pub purpose: Option<String>,
+    pub purpose: Option<UsableSubnetworkPurposeEnum>,
     /// The role of subnetwork. Currently, this field is only used when purpose = INTERNAL_HTTPS_LOAD_BALANCER. The value can be set to ACTIVE or BACKUP. An ACTIVE subnetwork is one that is currently being used for Internal HTTP(S) Load Balancing. A BACKUP subnetwork is one that is ready to be promoted to ACTIVE or is currently draining. This field can be updated with a patch request.
     
-    pub role: Option<String>,
+    pub role: Option<UsableSubnetworkRoleEnum>,
     /// Secondary IP ranges.
     #[serde(rename="secondaryIpRanges")]
     
@@ -20212,7 +20212,7 @@ pub struct UsableSubnetwork {
     /// The stack type for the subnet. If set to IPV4_ONLY, new VMs in the subnet are assigned IPv4 addresses only. If set to IPV4_IPV6, new VMs in the subnet can be assigned both IPv4 and IPv6 addresses. If not specified, IPV4_ONLY is used. This field can be both set at resource creation time and updated using patch.
     #[serde(rename="stackType")]
     
-    pub stack_type: Option<String>,
+    pub stack_type: Option<UsableSubnetworkStackTypeEnum>,
     /// Subnetwork URL.
     
     pub subnetwork: Option<String>,
@@ -20485,7 +20485,7 @@ pub struct VpnGateway {
     /// The stack type for this VPN gateway to identify the IP protocols that are enabled. Possible values are: IPV4_ONLY, IPV4_IPV6. If not specified, IPV4_ONLY will be used.
     #[serde(rename="stackType")]
     
-    pub stack_type: Option<String>,
+    pub stack_type: Option<VpnGatewayStackTypeEnum>,
     /// The list of VPN interfaces associated with this VPN gateway.
     #[serde(rename="vpnInterfaces")]
     
@@ -20597,11 +20597,11 @@ impl client::Part for VpnGatewayStatus {}
 pub struct VpnGatewayStatusHighAvailabilityRequirementState {
     /// Indicates the high availability requirement state for the VPN connection. Valid values are CONNECTION_REDUNDANCY_MET, CONNECTION_REDUNDANCY_NOT_MET.
     
-    pub state: Option<String>,
+    pub state: Option<VpnGatewayStatusHighAvailabilityRequirementStateStateEnum>,
     /// Indicates the reason why the VPN connection does not meet the high availability redundancy criteria/requirement. Valid values is INCOMPLETE_TUNNELS_COVERAGE.
     #[serde(rename="unsatisfiedReason")]
     
-    pub unsatisfied_reason: Option<String>,
+    pub unsatisfied_reason: Option<VpnGatewayStatusHighAvailabilityRequirementStateUnsatisfiedReasonEnum>,
 }
 
 impl client::Part for VpnGatewayStatusHighAvailabilityRequirementState {}
@@ -20803,7 +20803,7 @@ pub struct VpnTunnel {
     pub shared_secret_hash: Option<String>,
     /// [Output Only] The status of the VPN tunnel, which can be one of the following: - PROVISIONING: Resource is being allocated for the VPN tunnel. - WAITING_FOR_FULL_CONFIG: Waiting to receive all VPN-related configs from the user. Network, TargetVpnGateway, VpnTunnel, ForwardingRule, and Route resources are needed to setup the VPN tunnel. - FIRST_HANDSHAKE: Successful first handshake with the peer VPN. - ESTABLISHED: Secure session is successfully established with the peer VPN. - NETWORK_ERROR: Deprecated, replaced by NO_INCOMING_PACKETS - AUTHORIZATION_ERROR: Auth error (for example, bad shared secret). - NEGOTIATION_FAILURE: Handshake failed. - DEPROVISIONING: Resources are being deallocated for the VPN tunnel. - FAILED: Tunnel creation has failed and the tunnel is not ready to be used. - NO_INCOMING_PACKETS: No incoming packets from peer. - REJECTED: Tunnel configuration was rejected, can be result of being denied access. - ALLOCATING_RESOURCES: Cloud VPN is in the process of allocating all required resources. - STOPPED: Tunnel is stopped due to its Forwarding Rules being deleted for Classic VPN tunnels or the project is in frozen state. - PEER_IDENTITY_MISMATCH: Peer identity does not match peer IP, probably behind NAT. - TS_NARROWING_NOT_ALLOWED: Traffic selector narrowing not allowed for an HA-VPN tunnel. 
     
-    pub status: Option<String>,
+    pub status: Option<VpnTunnelStatusEnum>,
     /// URL of the Target VPN gateway with which this VPN tunnel is associated. Provided by the client when the VPN tunnel is created.
     #[serde(rename="targetVpnGateway")]
     
@@ -21025,7 +21025,7 @@ pub struct XpnResourceId {
     /// The type of the service resource.
     #[serde(rename="type")]
     
-    pub type_: Option<String>,
+    pub type_: Option<XpnResourceIdTypeEnum>,
 }
 
 impl client::Part for XpnResourceId {}
@@ -21076,7 +21076,7 @@ pub struct Zone {
     pub self_link: Option<String>,
     /// [Output Only] Status of the zone, either UP or DOWN.
     
-    pub status: Option<String>,
+    pub status: Option<ZoneStatusEnum>,
     /// [Output Only] Reserved for future use.
     #[serde(rename="supportsPzs")]
     
@@ -21185,7 +21185,7 @@ impl client::RequestValue for ZoneSetPolicyRequest {}
 pub struct AcceleratorTypeAggregatedListWarning {
     /// [Output Only] A warning code, if applicable. For example, Compute Engine returns NO_RESULTS_ON_PAGE if there are no results in the response.
     
-    pub code: Option<String>,
+    pub code: Option<AcceleratorTypeAggregatedListWarningCodeEnum>,
     /// [Output Only] Metadata about this warning in key: value format. For example: "data": [ { "key": "scope", "value": "zones/us-east1-d" } 
     
     pub data: Option<Vec<AcceleratorTypeAggregatedListWarningData>>,
@@ -21226,7 +21226,7 @@ impl client::Part for AcceleratorTypeAggregatedListWarningData {}
 pub struct AcceleratorTypeListWarning {
     /// [Output Only] A warning code, if applicable. For example, Compute Engine returns NO_RESULTS_ON_PAGE if there are no results in the response.
     
-    pub code: Option<String>,
+    pub code: Option<AcceleratorTypeListWarningCodeEnum>,
     /// [Output Only] Metadata about this warning in key: value format. For example: "data": [ { "key": "scope", "value": "zones/us-east1-d" } 
     
     pub data: Option<Vec<AcceleratorTypeListWarningData>>,
@@ -21267,7 +21267,7 @@ impl client::Part for AcceleratorTypeListWarningData {}
 pub struct AcceleratorTypesScopedListWarning {
     /// [Output Only] A warning code, if applicable. For example, Compute Engine returns NO_RESULTS_ON_PAGE if there are no results in the response.
     
-    pub code: Option<String>,
+    pub code: Option<AcceleratorTypesScopedListWarningCodeEnum>,
     /// [Output Only] Metadata about this warning in key: value format. For example: "data": [ { "key": "scope", "value": "zones/us-east1-d" } 
     
     pub data: Option<Vec<AcceleratorTypesScopedListWarningData>>,
@@ -21308,7 +21308,7 @@ impl client::Part for AcceleratorTypesScopedListWarningData {}
 pub struct AddressAggregatedListWarning {
     /// [Output Only] A warning code, if applicable. For example, Compute Engine returns NO_RESULTS_ON_PAGE if there are no results in the response.
     
-    pub code: Option<String>,
+    pub code: Option<AddressAggregatedListWarningCodeEnum>,
     /// [Output Only] Metadata about this warning in key: value format. For example: "data": [ { "key": "scope", "value": "zones/us-east1-d" } 
     
     pub data: Option<Vec<AddressAggregatedListWarningData>>,
@@ -21349,7 +21349,7 @@ impl client::Part for AddressAggregatedListWarningData {}
 pub struct AddressListWarning {
     /// [Output Only] A warning code, if applicable. For example, Compute Engine returns NO_RESULTS_ON_PAGE if there are no results in the response.
     
-    pub code: Option<String>,
+    pub code: Option<AddressListWarningCodeEnum>,
     /// [Output Only] Metadata about this warning in key: value format. For example: "data": [ { "key": "scope", "value": "zones/us-east1-d" } 
     
     pub data: Option<Vec<AddressListWarningData>>,
@@ -21390,7 +21390,7 @@ impl client::Part for AddressListWarningData {}
 pub struct AddressesScopedListWarning {
     /// [Output Only] A warning code, if applicable. For example, Compute Engine returns NO_RESULTS_ON_PAGE if there are no results in the response.
     
-    pub code: Option<String>,
+    pub code: Option<AddressesScopedListWarningCodeEnum>,
     /// [Output Only] Metadata about this warning in key: value format. For example: "data": [ { "key": "scope", "value": "zones/us-east1-d" } 
     
     pub data: Option<Vec<AddressesScopedListWarningData>>,
@@ -21431,7 +21431,7 @@ impl client::Part for AddressesScopedListWarningData {}
 pub struct AutoscalerAggregatedListWarning {
     /// [Output Only] A warning code, if applicable. For example, Compute Engine returns NO_RESULTS_ON_PAGE if there are no results in the response.
     
-    pub code: Option<String>,
+    pub code: Option<AutoscalerAggregatedListWarningCodeEnum>,
     /// [Output Only] Metadata about this warning in key: value format. For example: "data": [ { "key": "scope", "value": "zones/us-east1-d" } 
     
     pub data: Option<Vec<AutoscalerAggregatedListWarningData>>,
@@ -21472,7 +21472,7 @@ impl client::Part for AutoscalerAggregatedListWarningData {}
 pub struct AutoscalerListWarning {
     /// [Output Only] A warning code, if applicable. For example, Compute Engine returns NO_RESULTS_ON_PAGE if there are no results in the response.
     
-    pub code: Option<String>,
+    pub code: Option<AutoscalerListWarningCodeEnum>,
     /// [Output Only] Metadata about this warning in key: value format. For example: "data": [ { "key": "scope", "value": "zones/us-east1-d" } 
     
     pub data: Option<Vec<AutoscalerListWarningData>>,
@@ -21513,7 +21513,7 @@ impl client::Part for AutoscalerListWarningData {}
 pub struct AutoscalersScopedListWarning {
     /// [Output Only] A warning code, if applicable. For example, Compute Engine returns NO_RESULTS_ON_PAGE if there are no results in the response.
     
-    pub code: Option<String>,
+    pub code: Option<AutoscalersScopedListWarningCodeEnum>,
     /// [Output Only] Metadata about this warning in key: value format. For example: "data": [ { "key": "scope", "value": "zones/us-east1-d" } 
     
     pub data: Option<Vec<AutoscalersScopedListWarningData>>,
@@ -21554,7 +21554,7 @@ impl client::Part for AutoscalersScopedListWarningData {}
 pub struct BackendBucketListWarning {
     /// [Output Only] A warning code, if applicable. For example, Compute Engine returns NO_RESULTS_ON_PAGE if there are no results in the response.
     
-    pub code: Option<String>,
+    pub code: Option<BackendBucketListWarningCodeEnum>,
     /// [Output Only] Metadata about this warning in key: value format. For example: "data": [ { "key": "scope", "value": "zones/us-east1-d" } 
     
     pub data: Option<Vec<BackendBucketListWarningData>>,
@@ -21595,7 +21595,7 @@ impl client::Part for BackendBucketListWarningData {}
 pub struct BackendServiceAggregatedListWarning {
     /// [Output Only] A warning code, if applicable. For example, Compute Engine returns NO_RESULTS_ON_PAGE if there are no results in the response.
     
-    pub code: Option<String>,
+    pub code: Option<BackendServiceAggregatedListWarningCodeEnum>,
     /// [Output Only] Metadata about this warning in key: value format. For example: "data": [ { "key": "scope", "value": "zones/us-east1-d" } 
     
     pub data: Option<Vec<BackendServiceAggregatedListWarningData>>,
@@ -21636,7 +21636,7 @@ impl client::Part for BackendServiceAggregatedListWarningData {}
 pub struct BackendServiceListWarning {
     /// [Output Only] A warning code, if applicable. For example, Compute Engine returns NO_RESULTS_ON_PAGE if there are no results in the response.
     
-    pub code: Option<String>,
+    pub code: Option<BackendServiceListWarningCodeEnum>,
     /// [Output Only] Metadata about this warning in key: value format. For example: "data": [ { "key": "scope", "value": "zones/us-east1-d" } 
     
     pub data: Option<Vec<BackendServiceListWarningData>>,
@@ -21677,7 +21677,7 @@ impl client::Part for BackendServiceListWarningData {}
 pub struct BackendServicesScopedListWarning {
     /// [Output Only] A warning code, if applicable. For example, Compute Engine returns NO_RESULTS_ON_PAGE if there are no results in the response.
     
-    pub code: Option<String>,
+    pub code: Option<BackendServicesScopedListWarningCodeEnum>,
     /// [Output Only] Metadata about this warning in key: value format. For example: "data": [ { "key": "scope", "value": "zones/us-east1-d" } 
     
     pub data: Option<Vec<BackendServicesScopedListWarningData>>,
@@ -21718,7 +21718,7 @@ impl client::Part for BackendServicesScopedListWarningData {}
 pub struct CommitmentAggregatedListWarning {
     /// [Output Only] A warning code, if applicable. For example, Compute Engine returns NO_RESULTS_ON_PAGE if there are no results in the response.
     
-    pub code: Option<String>,
+    pub code: Option<CommitmentAggregatedListWarningCodeEnum>,
     /// [Output Only] Metadata about this warning in key: value format. For example: "data": [ { "key": "scope", "value": "zones/us-east1-d" } 
     
     pub data: Option<Vec<CommitmentAggregatedListWarningData>>,
@@ -21759,7 +21759,7 @@ impl client::Part for CommitmentAggregatedListWarningData {}
 pub struct CommitmentListWarning {
     /// [Output Only] A warning code, if applicable. For example, Compute Engine returns NO_RESULTS_ON_PAGE if there are no results in the response.
     
-    pub code: Option<String>,
+    pub code: Option<CommitmentListWarningCodeEnum>,
     /// [Output Only] Metadata about this warning in key: value format. For example: "data": [ { "key": "scope", "value": "zones/us-east1-d" } 
     
     pub data: Option<Vec<CommitmentListWarningData>>,
@@ -21800,7 +21800,7 @@ impl client::Part for CommitmentListWarningData {}
 pub struct CommitmentsScopedListWarning {
     /// [Output Only] A warning code, if applicable. For example, Compute Engine returns NO_RESULTS_ON_PAGE if there are no results in the response.
     
-    pub code: Option<String>,
+    pub code: Option<CommitmentsScopedListWarningCodeEnum>,
     /// [Output Only] Metadata about this warning in key: value format. For example: "data": [ { "key": "scope", "value": "zones/us-east1-d" } 
     
     pub data: Option<Vec<CommitmentsScopedListWarningData>>,
@@ -21841,7 +21841,7 @@ impl client::Part for CommitmentsScopedListWarningData {}
 pub struct DiskAggregatedListWarning {
     /// [Output Only] A warning code, if applicable. For example, Compute Engine returns NO_RESULTS_ON_PAGE if there are no results in the response.
     
-    pub code: Option<String>,
+    pub code: Option<DiskAggregatedListWarningCodeEnum>,
     /// [Output Only] Metadata about this warning in key: value format. For example: "data": [ { "key": "scope", "value": "zones/us-east1-d" } 
     
     pub data: Option<Vec<DiskAggregatedListWarningData>>,
@@ -21882,7 +21882,7 @@ impl client::Part for DiskAggregatedListWarningData {}
 pub struct DiskListWarning {
     /// [Output Only] A warning code, if applicable. For example, Compute Engine returns NO_RESULTS_ON_PAGE if there are no results in the response.
     
-    pub code: Option<String>,
+    pub code: Option<DiskListWarningCodeEnum>,
     /// [Output Only] Metadata about this warning in key: value format. For example: "data": [ { "key": "scope", "value": "zones/us-east1-d" } 
     
     pub data: Option<Vec<DiskListWarningData>>,
@@ -21923,7 +21923,7 @@ impl client::Part for DiskListWarningData {}
 pub struct DiskTypeAggregatedListWarning {
     /// [Output Only] A warning code, if applicable. For example, Compute Engine returns NO_RESULTS_ON_PAGE if there are no results in the response.
     
-    pub code: Option<String>,
+    pub code: Option<DiskTypeAggregatedListWarningCodeEnum>,
     /// [Output Only] Metadata about this warning in key: value format. For example: "data": [ { "key": "scope", "value": "zones/us-east1-d" } 
     
     pub data: Option<Vec<DiskTypeAggregatedListWarningData>>,
@@ -21964,7 +21964,7 @@ impl client::Part for DiskTypeAggregatedListWarningData {}
 pub struct DiskTypeListWarning {
     /// [Output Only] A warning code, if applicable. For example, Compute Engine returns NO_RESULTS_ON_PAGE if there are no results in the response.
     
-    pub code: Option<String>,
+    pub code: Option<DiskTypeListWarningCodeEnum>,
     /// [Output Only] Metadata about this warning in key: value format. For example: "data": [ { "key": "scope", "value": "zones/us-east1-d" } 
     
     pub data: Option<Vec<DiskTypeListWarningData>>,
@@ -22005,7 +22005,7 @@ impl client::Part for DiskTypeListWarningData {}
 pub struct DiskTypesScopedListWarning {
     /// [Output Only] A warning code, if applicable. For example, Compute Engine returns NO_RESULTS_ON_PAGE if there are no results in the response.
     
-    pub code: Option<String>,
+    pub code: Option<DiskTypesScopedListWarningCodeEnum>,
     /// [Output Only] Metadata about this warning in key: value format. For example: "data": [ { "key": "scope", "value": "zones/us-east1-d" } 
     
     pub data: Option<Vec<DiskTypesScopedListWarningData>>,
@@ -22046,7 +22046,7 @@ impl client::Part for DiskTypesScopedListWarningData {}
 pub struct DisksScopedListWarning {
     /// [Output Only] A warning code, if applicable. For example, Compute Engine returns NO_RESULTS_ON_PAGE if there are no results in the response.
     
-    pub code: Option<String>,
+    pub code: Option<DisksScopedListWarningCodeEnum>,
     /// [Output Only] Metadata about this warning in key: value format. For example: "data": [ { "key": "scope", "value": "zones/us-east1-d" } 
     
     pub data: Option<Vec<DisksScopedListWarningData>>,
@@ -22087,7 +22087,7 @@ impl client::Part for DisksScopedListWarningData {}
 pub struct ExchangedPeeringRoutesListWarning {
     /// [Output Only] A warning code, if applicable. For example, Compute Engine returns NO_RESULTS_ON_PAGE if there are no results in the response.
     
-    pub code: Option<String>,
+    pub code: Option<ExchangedPeeringRoutesListWarningCodeEnum>,
     /// [Output Only] Metadata about this warning in key: value format. For example: "data": [ { "key": "scope", "value": "zones/us-east1-d" } 
     
     pub data: Option<Vec<ExchangedPeeringRoutesListWarningData>>,
@@ -22128,7 +22128,7 @@ impl client::Part for ExchangedPeeringRoutesListWarningData {}
 pub struct ExternalVpnGatewayListWarning {
     /// [Output Only] A warning code, if applicable. For example, Compute Engine returns NO_RESULTS_ON_PAGE if there are no results in the response.
     
-    pub code: Option<String>,
+    pub code: Option<ExternalVpnGatewayListWarningCodeEnum>,
     /// [Output Only] Metadata about this warning in key: value format. For example: "data": [ { "key": "scope", "value": "zones/us-east1-d" } 
     
     pub data: Option<Vec<ExternalVpnGatewayListWarningData>>,
@@ -22209,7 +22209,7 @@ impl client::Part for FirewallDenied {}
 pub struct FirewallListWarning {
     /// [Output Only] A warning code, if applicable. For example, Compute Engine returns NO_RESULTS_ON_PAGE if there are no results in the response.
     
-    pub code: Option<String>,
+    pub code: Option<FirewallListWarningCodeEnum>,
     /// [Output Only] Metadata about this warning in key: value format. For example: "data": [ { "key": "scope", "value": "zones/us-east1-d" } 
     
     pub data: Option<Vec<FirewallListWarningData>>,
@@ -22250,7 +22250,7 @@ impl client::Part for FirewallListWarningData {}
 pub struct FirewallPolicyListWarning {
     /// [Output Only] A warning code, if applicable. For example, Compute Engine returns NO_RESULTS_ON_PAGE if there are no results in the response.
     
-    pub code: Option<String>,
+    pub code: Option<FirewallPolicyListWarningCodeEnum>,
     /// [Output Only] Metadata about this warning in key: value format. For example: "data": [ { "key": "scope", "value": "zones/us-east1-d" } 
     
     pub data: Option<Vec<FirewallPolicyListWarningData>>,
@@ -22291,7 +22291,7 @@ impl client::Part for FirewallPolicyListWarningData {}
 pub struct ForwardingRuleAggregatedListWarning {
     /// [Output Only] A warning code, if applicable. For example, Compute Engine returns NO_RESULTS_ON_PAGE if there are no results in the response.
     
-    pub code: Option<String>,
+    pub code: Option<ForwardingRuleAggregatedListWarningCodeEnum>,
     /// [Output Only] Metadata about this warning in key: value format. For example: "data": [ { "key": "scope", "value": "zones/us-east1-d" } 
     
     pub data: Option<Vec<ForwardingRuleAggregatedListWarningData>>,
@@ -22332,7 +22332,7 @@ impl client::Part for ForwardingRuleAggregatedListWarningData {}
 pub struct ForwardingRuleListWarning {
     /// [Output Only] A warning code, if applicable. For example, Compute Engine returns NO_RESULTS_ON_PAGE if there are no results in the response.
     
-    pub code: Option<String>,
+    pub code: Option<ForwardingRuleListWarningCodeEnum>,
     /// [Output Only] Metadata about this warning in key: value format. For example: "data": [ { "key": "scope", "value": "zones/us-east1-d" } 
     
     pub data: Option<Vec<ForwardingRuleListWarningData>>,
@@ -22373,7 +22373,7 @@ impl client::Part for ForwardingRuleListWarningData {}
 pub struct ForwardingRulesScopedListWarning {
     /// [Output Only] A warning code, if applicable. For example, Compute Engine returns NO_RESULTS_ON_PAGE if there are no results in the response.
     
-    pub code: Option<String>,
+    pub code: Option<ForwardingRulesScopedListWarningCodeEnum>,
     /// [Output Only] Metadata about this warning in key: value format. For example: "data": [ { "key": "scope", "value": "zones/us-east1-d" } 
     
     pub data: Option<Vec<ForwardingRulesScopedListWarningData>>,
@@ -22414,7 +22414,7 @@ impl client::Part for ForwardingRulesScopedListWarningData {}
 pub struct HealthCheckListWarning {
     /// [Output Only] A warning code, if applicable. For example, Compute Engine returns NO_RESULTS_ON_PAGE if there are no results in the response.
     
-    pub code: Option<String>,
+    pub code: Option<HealthCheckListWarningCodeEnum>,
     /// [Output Only] Metadata about this warning in key: value format. For example: "data": [ { "key": "scope", "value": "zones/us-east1-d" } 
     
     pub data: Option<Vec<HealthCheckListWarningData>>,
@@ -22455,7 +22455,7 @@ impl client::Part for HealthCheckListWarningData {}
 pub struct HealthCheckServicesListWarning {
     /// [Output Only] A warning code, if applicable. For example, Compute Engine returns NO_RESULTS_ON_PAGE if there are no results in the response.
     
-    pub code: Option<String>,
+    pub code: Option<HealthCheckServicesListWarningCodeEnum>,
     /// [Output Only] Metadata about this warning in key: value format. For example: "data": [ { "key": "scope", "value": "zones/us-east1-d" } 
     
     pub data: Option<Vec<HealthCheckServicesListWarningData>>,
@@ -22496,7 +22496,7 @@ impl client::Part for HealthCheckServicesListWarningData {}
 pub struct HealthChecksAggregatedListWarning {
     /// [Output Only] A warning code, if applicable. For example, Compute Engine returns NO_RESULTS_ON_PAGE if there are no results in the response.
     
-    pub code: Option<String>,
+    pub code: Option<HealthChecksAggregatedListWarningCodeEnum>,
     /// [Output Only] Metadata about this warning in key: value format. For example: "data": [ { "key": "scope", "value": "zones/us-east1-d" } 
     
     pub data: Option<Vec<HealthChecksAggregatedListWarningData>>,
@@ -22537,7 +22537,7 @@ impl client::Part for HealthChecksAggregatedListWarningData {}
 pub struct HealthChecksScopedListWarning {
     /// [Output Only] A warning code, if applicable. For example, Compute Engine returns NO_RESULTS_ON_PAGE if there are no results in the response.
     
-    pub code: Option<String>,
+    pub code: Option<HealthChecksScopedListWarningCodeEnum>,
     /// [Output Only] Metadata about this warning in key: value format. For example: "data": [ { "key": "scope", "value": "zones/us-east1-d" } 
     
     pub data: Option<Vec<HealthChecksScopedListWarningData>>,
@@ -22578,7 +22578,7 @@ impl client::Part for HealthChecksScopedListWarningData {}
 pub struct HttpHealthCheckListWarning {
     /// [Output Only] A warning code, if applicable. For example, Compute Engine returns NO_RESULTS_ON_PAGE if there are no results in the response.
     
-    pub code: Option<String>,
+    pub code: Option<HttpHealthCheckListWarningCodeEnum>,
     /// [Output Only] Metadata about this warning in key: value format. For example: "data": [ { "key": "scope", "value": "zones/us-east1-d" } 
     
     pub data: Option<Vec<HttpHealthCheckListWarningData>>,
@@ -22619,7 +22619,7 @@ impl client::Part for HttpHealthCheckListWarningData {}
 pub struct HttpsHealthCheckListWarning {
     /// [Output Only] A warning code, if applicable. For example, Compute Engine returns NO_RESULTS_ON_PAGE if there are no results in the response.
     
-    pub code: Option<String>,
+    pub code: Option<HttpsHealthCheckListWarningCodeEnum>,
     /// [Output Only] Metadata about this warning in key: value format. For example: "data": [ { "key": "scope", "value": "zones/us-east1-d" } 
     
     pub data: Option<Vec<HttpsHealthCheckListWarningData>>,
@@ -22661,7 +22661,7 @@ pub struct ImageRawDisk {
     /// The format used to encode and transmit the block device, which should be TAR. This is just a container and transmission format and not a runtime format. Provided by the client when the disk image is created.
     #[serde(rename="containerType")]
     
-    pub container_type: Option<String>,
+    pub container_type: Option<ImageRawDiskContainerTypeEnum>,
     /// [Deprecated] This field is deprecated. An optional SHA1 checksum of the disk image before unpackaging provided by the client when the disk image is created.
     #[serde(rename="sha1Checksum")]
     
@@ -22684,7 +22684,7 @@ impl client::Part for ImageRawDisk {}
 pub struct ImageListWarning {
     /// [Output Only] A warning code, if applicable. For example, Compute Engine returns NO_RESULTS_ON_PAGE if there are no results in the response.
     
-    pub code: Option<String>,
+    pub code: Option<ImageListWarningCodeEnum>,
     /// [Output Only] Metadata about this warning in key: value format. For example: "data": [ { "key": "scope", "value": "zones/us-east1-d" } 
     
     pub data: Option<Vec<ImageListWarningData>>,
@@ -22725,7 +22725,7 @@ impl client::Part for ImageListWarningData {}
 pub struct InstanceAggregatedListWarning {
     /// [Output Only] A warning code, if applicable. For example, Compute Engine returns NO_RESULTS_ON_PAGE if there are no results in the response.
     
-    pub code: Option<String>,
+    pub code: Option<InstanceAggregatedListWarningCodeEnum>,
     /// [Output Only] Metadata about this warning in key: value format. For example: "data": [ { "key": "scope", "value": "zones/us-east1-d" } 
     
     pub data: Option<Vec<InstanceAggregatedListWarningData>>,
@@ -22766,7 +22766,7 @@ impl client::Part for InstanceAggregatedListWarningData {}
 pub struct InstanceGroupAggregatedListWarning {
     /// [Output Only] A warning code, if applicable. For example, Compute Engine returns NO_RESULTS_ON_PAGE if there are no results in the response.
     
-    pub code: Option<String>,
+    pub code: Option<InstanceGroupAggregatedListWarningCodeEnum>,
     /// [Output Only] Metadata about this warning in key: value format. For example: "data": [ { "key": "scope", "value": "zones/us-east1-d" } 
     
     pub data: Option<Vec<InstanceGroupAggregatedListWarningData>>,
@@ -22807,7 +22807,7 @@ impl client::Part for InstanceGroupAggregatedListWarningData {}
 pub struct InstanceGroupListWarning {
     /// [Output Only] A warning code, if applicable. For example, Compute Engine returns NO_RESULTS_ON_PAGE if there are no results in the response.
     
-    pub code: Option<String>,
+    pub code: Option<InstanceGroupListWarningCodeEnum>,
     /// [Output Only] Metadata about this warning in key: value format. For example: "data": [ { "key": "scope", "value": "zones/us-east1-d" } 
     
     pub data: Option<Vec<InstanceGroupListWarningData>>,
@@ -22848,7 +22848,7 @@ impl client::Part for InstanceGroupListWarningData {}
 pub struct InstanceGroupManagerAggregatedListWarning {
     /// [Output Only] A warning code, if applicable. For example, Compute Engine returns NO_RESULTS_ON_PAGE if there are no results in the response.
     
-    pub code: Option<String>,
+    pub code: Option<InstanceGroupManagerAggregatedListWarningCodeEnum>,
     /// [Output Only] Metadata about this warning in key: value format. For example: "data": [ { "key": "scope", "value": "zones/us-east1-d" } 
     
     pub data: Option<Vec<InstanceGroupManagerAggregatedListWarningData>>,
@@ -22889,7 +22889,7 @@ impl client::Part for InstanceGroupManagerAggregatedListWarningData {}
 pub struct InstanceGroupManagerListWarning {
     /// [Output Only] A warning code, if applicable. For example, Compute Engine returns NO_RESULTS_ON_PAGE if there are no results in the response.
     
-    pub code: Option<String>,
+    pub code: Option<InstanceGroupManagerListWarningCodeEnum>,
     /// [Output Only] Metadata about this warning in key: value format. For example: "data": [ { "key": "scope", "value": "zones/us-east1-d" } 
     
     pub data: Option<Vec<InstanceGroupManagerListWarningData>>,
@@ -22930,7 +22930,7 @@ impl client::Part for InstanceGroupManagerListWarningData {}
 pub struct InstanceGroupManagersListPerInstanceConfigsRespWarning {
     /// [Output Only] A warning code, if applicable. For example, Compute Engine returns NO_RESULTS_ON_PAGE if there are no results in the response.
     
-    pub code: Option<String>,
+    pub code: Option<InstanceGroupManagersListPerInstanceConfigsRespWarningCodeEnum>,
     /// [Output Only] Metadata about this warning in key: value format. For example: "data": [ { "key": "scope", "value": "zones/us-east1-d" } 
     
     pub data: Option<Vec<InstanceGroupManagersListPerInstanceConfigsRespWarningData>>,
@@ -22971,7 +22971,7 @@ impl client::Part for InstanceGroupManagersListPerInstanceConfigsRespWarningData
 pub struct InstanceGroupManagersScopedListWarning {
     /// [Output Only] A warning code, if applicable. For example, Compute Engine returns NO_RESULTS_ON_PAGE if there are no results in the response.
     
-    pub code: Option<String>,
+    pub code: Option<InstanceGroupManagersScopedListWarningCodeEnum>,
     /// [Output Only] Metadata about this warning in key: value format. For example: "data": [ { "key": "scope", "value": "zones/us-east1-d" } 
     
     pub data: Option<Vec<InstanceGroupManagersScopedListWarningData>>,
@@ -23012,7 +23012,7 @@ impl client::Part for InstanceGroupManagersScopedListWarningData {}
 pub struct InstanceGroupsListInstancesWarning {
     /// [Output Only] A warning code, if applicable. For example, Compute Engine returns NO_RESULTS_ON_PAGE if there are no results in the response.
     
-    pub code: Option<String>,
+    pub code: Option<InstanceGroupsListInstancesWarningCodeEnum>,
     /// [Output Only] Metadata about this warning in key: value format. For example: "data": [ { "key": "scope", "value": "zones/us-east1-d" } 
     
     pub data: Option<Vec<InstanceGroupsListInstancesWarningData>>,
@@ -23053,7 +23053,7 @@ impl client::Part for InstanceGroupsListInstancesWarningData {}
 pub struct InstanceGroupsScopedListWarning {
     /// [Output Only] A warning code, if applicable. For example, Compute Engine returns NO_RESULTS_ON_PAGE if there are no results in the response.
     
-    pub code: Option<String>,
+    pub code: Option<InstanceGroupsScopedListWarningCodeEnum>,
     /// [Output Only] Metadata about this warning in key: value format. For example: "data": [ { "key": "scope", "value": "zones/us-east1-d" } 
     
     pub data: Option<Vec<InstanceGroupsScopedListWarningData>>,
@@ -23094,7 +23094,7 @@ impl client::Part for InstanceGroupsScopedListWarningData {}
 pub struct InstanceListWarning {
     /// [Output Only] A warning code, if applicable. For example, Compute Engine returns NO_RESULTS_ON_PAGE if there are no results in the response.
     
-    pub code: Option<String>,
+    pub code: Option<InstanceListWarningCodeEnum>,
     /// [Output Only] Metadata about this warning in key: value format. For example: "data": [ { "key": "scope", "value": "zones/us-east1-d" } 
     
     pub data: Option<Vec<InstanceListWarningData>>,
@@ -23135,7 +23135,7 @@ impl client::Part for InstanceListWarningData {}
 pub struct InstanceListReferrersWarning {
     /// [Output Only] A warning code, if applicable. For example, Compute Engine returns NO_RESULTS_ON_PAGE if there are no results in the response.
     
-    pub code: Option<String>,
+    pub code: Option<InstanceListReferrersWarningCodeEnum>,
     /// [Output Only] Metadata about this warning in key: value format. For example: "data": [ { "key": "scope", "value": "zones/us-east1-d" } 
     
     pub data: Option<Vec<InstanceListReferrersWarningData>>,
@@ -23176,7 +23176,7 @@ impl client::Part for InstanceListReferrersWarningData {}
 pub struct InstanceTemplateListWarning {
     /// [Output Only] A warning code, if applicable. For example, Compute Engine returns NO_RESULTS_ON_PAGE if there are no results in the response.
     
-    pub code: Option<String>,
+    pub code: Option<InstanceTemplateListWarningCodeEnum>,
     /// [Output Only] Metadata about this warning in key: value format. For example: "data": [ { "key": "scope", "value": "zones/us-east1-d" } 
     
     pub data: Option<Vec<InstanceTemplateListWarningData>>,
@@ -23217,7 +23217,7 @@ impl client::Part for InstanceTemplateListWarningData {}
 pub struct InstancesScopedListWarning {
     /// [Output Only] A warning code, if applicable. For example, Compute Engine returns NO_RESULTS_ON_PAGE if there are no results in the response.
     
-    pub code: Option<String>,
+    pub code: Option<InstancesScopedListWarningCodeEnum>,
     /// [Output Only] Metadata about this warning in key: value format. For example: "data": [ { "key": "scope", "value": "zones/us-east1-d" } 
     
     pub data: Option<Vec<InstancesScopedListWarningData>>,
@@ -23258,7 +23258,7 @@ impl client::Part for InstancesScopedListWarningData {}
 pub struct InterconnectAttachmentAggregatedListWarning {
     /// [Output Only] A warning code, if applicable. For example, Compute Engine returns NO_RESULTS_ON_PAGE if there are no results in the response.
     
-    pub code: Option<String>,
+    pub code: Option<InterconnectAttachmentAggregatedListWarningCodeEnum>,
     /// [Output Only] Metadata about this warning in key: value format. For example: "data": [ { "key": "scope", "value": "zones/us-east1-d" } 
     
     pub data: Option<Vec<InterconnectAttachmentAggregatedListWarningData>>,
@@ -23299,7 +23299,7 @@ impl client::Part for InterconnectAttachmentAggregatedListWarningData {}
 pub struct InterconnectAttachmentListWarning {
     /// [Output Only] A warning code, if applicable. For example, Compute Engine returns NO_RESULTS_ON_PAGE if there are no results in the response.
     
-    pub code: Option<String>,
+    pub code: Option<InterconnectAttachmentListWarningCodeEnum>,
     /// [Output Only] Metadata about this warning in key: value format. For example: "data": [ { "key": "scope", "value": "zones/us-east1-d" } 
     
     pub data: Option<Vec<InterconnectAttachmentListWarningData>>,
@@ -23340,7 +23340,7 @@ impl client::Part for InterconnectAttachmentListWarningData {}
 pub struct InterconnectAttachmentsScopedListWarning {
     /// [Output Only] A warning code, if applicable. For example, Compute Engine returns NO_RESULTS_ON_PAGE if there are no results in the response.
     
-    pub code: Option<String>,
+    pub code: Option<InterconnectAttachmentsScopedListWarningCodeEnum>,
     /// [Output Only] Metadata about this warning in key: value format. For example: "data": [ { "key": "scope", "value": "zones/us-east1-d" } 
     
     pub data: Option<Vec<InterconnectAttachmentsScopedListWarningData>>,
@@ -23381,7 +23381,7 @@ impl client::Part for InterconnectAttachmentsScopedListWarningData {}
 pub struct InterconnectListWarning {
     /// [Output Only] A warning code, if applicable. For example, Compute Engine returns NO_RESULTS_ON_PAGE if there are no results in the response.
     
-    pub code: Option<String>,
+    pub code: Option<InterconnectListWarningCodeEnum>,
     /// [Output Only] Metadata about this warning in key: value format. For example: "data": [ { "key": "scope", "value": "zones/us-east1-d" } 
     
     pub data: Option<Vec<InterconnectListWarningData>>,
@@ -23422,7 +23422,7 @@ impl client::Part for InterconnectListWarningData {}
 pub struct InterconnectLocationListWarning {
     /// [Output Only] A warning code, if applicable. For example, Compute Engine returns NO_RESULTS_ON_PAGE if there are no results in the response.
     
-    pub code: Option<String>,
+    pub code: Option<InterconnectLocationListWarningCodeEnum>,
     /// [Output Only] Metadata about this warning in key: value format. For example: "data": [ { "key": "scope", "value": "zones/us-east1-d" } 
     
     pub data: Option<Vec<InterconnectLocationListWarningData>>,
@@ -23463,7 +23463,7 @@ impl client::Part for InterconnectLocationListWarningData {}
 pub struct LicensesListResponseWarning {
     /// [Output Only] A warning code, if applicable. For example, Compute Engine returns NO_RESULTS_ON_PAGE if there are no results in the response.
     
-    pub code: Option<String>,
+    pub code: Option<LicensesListResponseWarningCodeEnum>,
     /// [Output Only] Metadata about this warning in key: value format. For example: "data": [ { "key": "scope", "value": "zones/us-east1-d" } 
     
     pub data: Option<Vec<LicensesListResponseWarningData>>,
@@ -23504,7 +23504,7 @@ impl client::Part for LicensesListResponseWarningData {}
 pub struct MachineImageListWarning {
     /// [Output Only] A warning code, if applicable. For example, Compute Engine returns NO_RESULTS_ON_PAGE if there are no results in the response.
     
-    pub code: Option<String>,
+    pub code: Option<MachineImageListWarningCodeEnum>,
     /// [Output Only] Metadata about this warning in key: value format. For example: "data": [ { "key": "scope", "value": "zones/us-east1-d" } 
     
     pub data: Option<Vec<MachineImageListWarningData>>,
@@ -23583,7 +23583,7 @@ impl client::Part for MachineTypeScratchDisks {}
 pub struct MachineTypeAggregatedListWarning {
     /// [Output Only] A warning code, if applicable. For example, Compute Engine returns NO_RESULTS_ON_PAGE if there are no results in the response.
     
-    pub code: Option<String>,
+    pub code: Option<MachineTypeAggregatedListWarningCodeEnum>,
     /// [Output Only] Metadata about this warning in key: value format. For example: "data": [ { "key": "scope", "value": "zones/us-east1-d" } 
     
     pub data: Option<Vec<MachineTypeAggregatedListWarningData>>,
@@ -23624,7 +23624,7 @@ impl client::Part for MachineTypeAggregatedListWarningData {}
 pub struct MachineTypeListWarning {
     /// [Output Only] A warning code, if applicable. For example, Compute Engine returns NO_RESULTS_ON_PAGE if there are no results in the response.
     
-    pub code: Option<String>,
+    pub code: Option<MachineTypeListWarningCodeEnum>,
     /// [Output Only] Metadata about this warning in key: value format. For example: "data": [ { "key": "scope", "value": "zones/us-east1-d" } 
     
     pub data: Option<Vec<MachineTypeListWarningData>>,
@@ -23665,7 +23665,7 @@ impl client::Part for MachineTypeListWarningData {}
 pub struct MachineTypesScopedListWarning {
     /// [Output Only] A warning code, if applicable. For example, Compute Engine returns NO_RESULTS_ON_PAGE if there are no results in the response.
     
-    pub code: Option<String>,
+    pub code: Option<MachineTypesScopedListWarningCodeEnum>,
     /// [Output Only] Metadata about this warning in key: value format. For example: "data": [ { "key": "scope", "value": "zones/us-east1-d" } 
     
     pub data: Option<Vec<MachineTypesScopedListWarningData>>,
@@ -23795,7 +23795,7 @@ impl client::Part for MetadataItems {}
 pub struct NetworkAttachmentAggregatedListWarning {
     /// [Output Only] A warning code, if applicable. For example, Compute Engine returns NO_RESULTS_ON_PAGE if there are no results in the response.
     
-    pub code: Option<String>,
+    pub code: Option<NetworkAttachmentAggregatedListWarningCodeEnum>,
     /// [Output Only] Metadata about this warning in key: value format. For example: "data": [ { "key": "scope", "value": "zones/us-east1-d" } 
     
     pub data: Option<Vec<NetworkAttachmentAggregatedListWarningData>>,
@@ -23836,7 +23836,7 @@ impl client::Part for NetworkAttachmentAggregatedListWarningData {}
 pub struct NetworkAttachmentListWarning {
     /// [Output Only] A warning code, if applicable. For example, Compute Engine returns NO_RESULTS_ON_PAGE if there are no results in the response.
     
-    pub code: Option<String>,
+    pub code: Option<NetworkAttachmentListWarningCodeEnum>,
     /// [Output Only] Metadata about this warning in key: value format. For example: "data": [ { "key": "scope", "value": "zones/us-east1-d" } 
     
     pub data: Option<Vec<NetworkAttachmentListWarningData>>,
@@ -23877,7 +23877,7 @@ impl client::Part for NetworkAttachmentListWarningData {}
 pub struct NetworkAttachmentsScopedListWarning {
     /// [Output Only] A warning code, if applicable. For example, Compute Engine returns NO_RESULTS_ON_PAGE if there are no results in the response.
     
-    pub code: Option<String>,
+    pub code: Option<NetworkAttachmentsScopedListWarningCodeEnum>,
     /// [Output Only] Metadata about this warning in key: value format. For example: "data": [ { "key": "scope", "value": "zones/us-east1-d" } 
     
     pub data: Option<Vec<NetworkAttachmentsScopedListWarningData>>,
@@ -23918,7 +23918,7 @@ impl client::Part for NetworkAttachmentsScopedListWarningData {}
 pub struct NetworkEdgeSecurityServiceAggregatedListWarning {
     /// [Output Only] A warning code, if applicable. For example, Compute Engine returns NO_RESULTS_ON_PAGE if there are no results in the response.
     
-    pub code: Option<String>,
+    pub code: Option<NetworkEdgeSecurityServiceAggregatedListWarningCodeEnum>,
     /// [Output Only] Metadata about this warning in key: value format. For example: "data": [ { "key": "scope", "value": "zones/us-east1-d" } 
     
     pub data: Option<Vec<NetworkEdgeSecurityServiceAggregatedListWarningData>>,
@@ -23959,7 +23959,7 @@ impl client::Part for NetworkEdgeSecurityServiceAggregatedListWarningData {}
 pub struct NetworkEdgeSecurityServicesScopedListWarning {
     /// [Output Only] A warning code, if applicable. For example, Compute Engine returns NO_RESULTS_ON_PAGE if there are no results in the response.
     
-    pub code: Option<String>,
+    pub code: Option<NetworkEdgeSecurityServicesScopedListWarningCodeEnum>,
     /// [Output Only] Metadata about this warning in key: value format. For example: "data": [ { "key": "scope", "value": "zones/us-east1-d" } 
     
     pub data: Option<Vec<NetworkEdgeSecurityServicesScopedListWarningData>>,
@@ -24000,7 +24000,7 @@ impl client::Part for NetworkEdgeSecurityServicesScopedListWarningData {}
 pub struct NetworkEndpointGroupAggregatedListWarning {
     /// [Output Only] A warning code, if applicable. For example, Compute Engine returns NO_RESULTS_ON_PAGE if there are no results in the response.
     
-    pub code: Option<String>,
+    pub code: Option<NetworkEndpointGroupAggregatedListWarningCodeEnum>,
     /// [Output Only] Metadata about this warning in key: value format. For example: "data": [ { "key": "scope", "value": "zones/us-east1-d" } 
     
     pub data: Option<Vec<NetworkEndpointGroupAggregatedListWarningData>>,
@@ -24041,7 +24041,7 @@ impl client::Part for NetworkEndpointGroupAggregatedListWarningData {}
 pub struct NetworkEndpointGroupListWarning {
     /// [Output Only] A warning code, if applicable. For example, Compute Engine returns NO_RESULTS_ON_PAGE if there are no results in the response.
     
-    pub code: Option<String>,
+    pub code: Option<NetworkEndpointGroupListWarningCodeEnum>,
     /// [Output Only] Metadata about this warning in key: value format. For example: "data": [ { "key": "scope", "value": "zones/us-east1-d" } 
     
     pub data: Option<Vec<NetworkEndpointGroupListWarningData>>,
@@ -24082,7 +24082,7 @@ impl client::Part for NetworkEndpointGroupListWarningData {}
 pub struct NetworkEndpointGroupsListNetworkEndpointsWarning {
     /// [Output Only] A warning code, if applicable. For example, Compute Engine returns NO_RESULTS_ON_PAGE if there are no results in the response.
     
-    pub code: Option<String>,
+    pub code: Option<NetworkEndpointGroupsListNetworkEndpointsWarningCodeEnum>,
     /// [Output Only] Metadata about this warning in key: value format. For example: "data": [ { "key": "scope", "value": "zones/us-east1-d" } 
     
     pub data: Option<Vec<NetworkEndpointGroupsListNetworkEndpointsWarningData>>,
@@ -24123,7 +24123,7 @@ impl client::Part for NetworkEndpointGroupsListNetworkEndpointsWarningData {}
 pub struct NetworkEndpointGroupsScopedListWarning {
     /// [Output Only] A warning code, if applicable. For example, Compute Engine returns NO_RESULTS_ON_PAGE if there are no results in the response.
     
-    pub code: Option<String>,
+    pub code: Option<NetworkEndpointGroupsScopedListWarningCodeEnum>,
     /// [Output Only] Metadata about this warning in key: value format. For example: "data": [ { "key": "scope", "value": "zones/us-east1-d" } 
     
     pub data: Option<Vec<NetworkEndpointGroupsScopedListWarningData>>,
@@ -24164,7 +24164,7 @@ impl client::Part for NetworkEndpointGroupsScopedListWarningData {}
 pub struct NetworkListWarning {
     /// [Output Only] A warning code, if applicable. For example, Compute Engine returns NO_RESULTS_ON_PAGE if there are no results in the response.
     
-    pub code: Option<String>,
+    pub code: Option<NetworkListWarningCodeEnum>,
     /// [Output Only] Metadata about this warning in key: value format. For example: "data": [ { "key": "scope", "value": "zones/us-east1-d" } 
     
     pub data: Option<Vec<NetworkListWarningData>>,
@@ -24205,7 +24205,7 @@ impl client::Part for NetworkListWarningData {}
 pub struct NodeGroupAggregatedListWarning {
     /// [Output Only] A warning code, if applicable. For example, Compute Engine returns NO_RESULTS_ON_PAGE if there are no results in the response.
     
-    pub code: Option<String>,
+    pub code: Option<NodeGroupAggregatedListWarningCodeEnum>,
     /// [Output Only] Metadata about this warning in key: value format. For example: "data": [ { "key": "scope", "value": "zones/us-east1-d" } 
     
     pub data: Option<Vec<NodeGroupAggregatedListWarningData>>,
@@ -24246,7 +24246,7 @@ impl client::Part for NodeGroupAggregatedListWarningData {}
 pub struct NodeGroupListWarning {
     /// [Output Only] A warning code, if applicable. For example, Compute Engine returns NO_RESULTS_ON_PAGE if there are no results in the response.
     
-    pub code: Option<String>,
+    pub code: Option<NodeGroupListWarningCodeEnum>,
     /// [Output Only] Metadata about this warning in key: value format. For example: "data": [ { "key": "scope", "value": "zones/us-east1-d" } 
     
     pub data: Option<Vec<NodeGroupListWarningData>>,
@@ -24287,7 +24287,7 @@ impl client::Part for NodeGroupListWarningData {}
 pub struct NodeGroupsListNodesWarning {
     /// [Output Only] A warning code, if applicable. For example, Compute Engine returns NO_RESULTS_ON_PAGE if there are no results in the response.
     
-    pub code: Option<String>,
+    pub code: Option<NodeGroupsListNodesWarningCodeEnum>,
     /// [Output Only] Metadata about this warning in key: value format. For example: "data": [ { "key": "scope", "value": "zones/us-east1-d" } 
     
     pub data: Option<Vec<NodeGroupsListNodesWarningData>>,
@@ -24328,7 +24328,7 @@ impl client::Part for NodeGroupsListNodesWarningData {}
 pub struct NodeGroupsScopedListWarning {
     /// [Output Only] A warning code, if applicable. For example, Compute Engine returns NO_RESULTS_ON_PAGE if there are no results in the response.
     
-    pub code: Option<String>,
+    pub code: Option<NodeGroupsScopedListWarningCodeEnum>,
     /// [Output Only] Metadata about this warning in key: value format. For example: "data": [ { "key": "scope", "value": "zones/us-east1-d" } 
     
     pub data: Option<Vec<NodeGroupsScopedListWarningData>>,
@@ -24369,7 +24369,7 @@ impl client::Part for NodeGroupsScopedListWarningData {}
 pub struct NodeTemplateAggregatedListWarning {
     /// [Output Only] A warning code, if applicable. For example, Compute Engine returns NO_RESULTS_ON_PAGE if there are no results in the response.
     
-    pub code: Option<String>,
+    pub code: Option<NodeTemplateAggregatedListWarningCodeEnum>,
     /// [Output Only] Metadata about this warning in key: value format. For example: "data": [ { "key": "scope", "value": "zones/us-east1-d" } 
     
     pub data: Option<Vec<NodeTemplateAggregatedListWarningData>>,
@@ -24410,7 +24410,7 @@ impl client::Part for NodeTemplateAggregatedListWarningData {}
 pub struct NodeTemplateListWarning {
     /// [Output Only] A warning code, if applicable. For example, Compute Engine returns NO_RESULTS_ON_PAGE if there are no results in the response.
     
-    pub code: Option<String>,
+    pub code: Option<NodeTemplateListWarningCodeEnum>,
     /// [Output Only] Metadata about this warning in key: value format. For example: "data": [ { "key": "scope", "value": "zones/us-east1-d" } 
     
     pub data: Option<Vec<NodeTemplateListWarningData>>,
@@ -24451,7 +24451,7 @@ impl client::Part for NodeTemplateListWarningData {}
 pub struct NodeTemplatesScopedListWarning {
     /// [Output Only] A warning code, if applicable. For example, Compute Engine returns NO_RESULTS_ON_PAGE if there are no results in the response.
     
-    pub code: Option<String>,
+    pub code: Option<NodeTemplatesScopedListWarningCodeEnum>,
     /// [Output Only] Metadata about this warning in key: value format. For example: "data": [ { "key": "scope", "value": "zones/us-east1-d" } 
     
     pub data: Option<Vec<NodeTemplatesScopedListWarningData>>,
@@ -24492,7 +24492,7 @@ impl client::Part for NodeTemplatesScopedListWarningData {}
 pub struct NodeTypeAggregatedListWarning {
     /// [Output Only] A warning code, if applicable. For example, Compute Engine returns NO_RESULTS_ON_PAGE if there are no results in the response.
     
-    pub code: Option<String>,
+    pub code: Option<NodeTypeAggregatedListWarningCodeEnum>,
     /// [Output Only] Metadata about this warning in key: value format. For example: "data": [ { "key": "scope", "value": "zones/us-east1-d" } 
     
     pub data: Option<Vec<NodeTypeAggregatedListWarningData>>,
@@ -24533,7 +24533,7 @@ impl client::Part for NodeTypeAggregatedListWarningData {}
 pub struct NodeTypeListWarning {
     /// [Output Only] A warning code, if applicable. For example, Compute Engine returns NO_RESULTS_ON_PAGE if there are no results in the response.
     
-    pub code: Option<String>,
+    pub code: Option<NodeTypeListWarningCodeEnum>,
     /// [Output Only] Metadata about this warning in key: value format. For example: "data": [ { "key": "scope", "value": "zones/us-east1-d" } 
     
     pub data: Option<Vec<NodeTypeListWarningData>>,
@@ -24574,7 +24574,7 @@ impl client::Part for NodeTypeListWarningData {}
 pub struct NodeTypesScopedListWarning {
     /// [Output Only] A warning code, if applicable. For example, Compute Engine returns NO_RESULTS_ON_PAGE if there are no results in the response.
     
-    pub code: Option<String>,
+    pub code: Option<NodeTypesScopedListWarningCodeEnum>,
     /// [Output Only] Metadata about this warning in key: value format. For example: "data": [ { "key": "scope", "value": "zones/us-east1-d" } 
     
     pub data: Option<Vec<NodeTypesScopedListWarningData>>,
@@ -24615,7 +24615,7 @@ impl client::Part for NodeTypesScopedListWarningData {}
 pub struct NotificationEndpointListWarning {
     /// [Output Only] A warning code, if applicable. For example, Compute Engine returns NO_RESULTS_ON_PAGE if there are no results in the response.
     
-    pub code: Option<String>,
+    pub code: Option<NotificationEndpointListWarningCodeEnum>,
     /// [Output Only] Metadata about this warning in key: value format. For example: "data": [ { "key": "scope", "value": "zones/us-east1-d" } 
     
     pub data: Option<Vec<NotificationEndpointListWarningData>>,
@@ -24726,7 +24726,7 @@ impl client::Part for OperationErrorErrorsErrorDetails {}
 pub struct OperationWarnings {
     /// [Output Only] A warning code, if applicable. For example, Compute Engine returns NO_RESULTS_ON_PAGE if there are no results in the response.
     
-    pub code: Option<String>,
+    pub code: Option<OperationWarningCodeEnum>,
     /// [Output Only] Metadata about this warning in key: value format. For example: "data": [ { "key": "scope", "value": "zones/us-east1-d" } 
     
     pub data: Option<Vec<OperationWarningsData>>,
@@ -24767,7 +24767,7 @@ impl client::Part for OperationWarningsData {}
 pub struct OperationAggregatedListWarning {
     /// [Output Only] A warning code, if applicable. For example, Compute Engine returns NO_RESULTS_ON_PAGE if there are no results in the response.
     
-    pub code: Option<String>,
+    pub code: Option<OperationAggregatedListWarningCodeEnum>,
     /// [Output Only] Metadata about this warning in key: value format. For example: "data": [ { "key": "scope", "value": "zones/us-east1-d" } 
     
     pub data: Option<Vec<OperationAggregatedListWarningData>>,
@@ -24808,7 +24808,7 @@ impl client::Part for OperationAggregatedListWarningData {}
 pub struct OperationListWarning {
     /// [Output Only] A warning code, if applicable. For example, Compute Engine returns NO_RESULTS_ON_PAGE if there are no results in the response.
     
-    pub code: Option<String>,
+    pub code: Option<OperationListWarningCodeEnum>,
     /// [Output Only] Metadata about this warning in key: value format. For example: "data": [ { "key": "scope", "value": "zones/us-east1-d" } 
     
     pub data: Option<Vec<OperationListWarningData>>,
@@ -24849,7 +24849,7 @@ impl client::Part for OperationListWarningData {}
 pub struct OperationsScopedListWarning {
     /// [Output Only] A warning code, if applicable. For example, Compute Engine returns NO_RESULTS_ON_PAGE if there are no results in the response.
     
-    pub code: Option<String>,
+    pub code: Option<OperationsScopedListWarningCodeEnum>,
     /// [Output Only] Metadata about this warning in key: value format. For example: "data": [ { "key": "scope", "value": "zones/us-east1-d" } 
     
     pub data: Option<Vec<OperationsScopedListWarningData>>,
@@ -24890,7 +24890,7 @@ impl client::Part for OperationsScopedListWarningData {}
 pub struct PacketMirroringAggregatedListWarning {
     /// [Output Only] A warning code, if applicable. For example, Compute Engine returns NO_RESULTS_ON_PAGE if there are no results in the response.
     
-    pub code: Option<String>,
+    pub code: Option<PacketMirroringAggregatedListWarningCodeEnum>,
     /// [Output Only] Metadata about this warning in key: value format. For example: "data": [ { "key": "scope", "value": "zones/us-east1-d" } 
     
     pub data: Option<Vec<PacketMirroringAggregatedListWarningData>>,
@@ -24931,7 +24931,7 @@ impl client::Part for PacketMirroringAggregatedListWarningData {}
 pub struct PacketMirroringListWarning {
     /// [Output Only] A warning code, if applicable. For example, Compute Engine returns NO_RESULTS_ON_PAGE if there are no results in the response.
     
-    pub code: Option<String>,
+    pub code: Option<PacketMirroringListWarningCodeEnum>,
     /// [Output Only] Metadata about this warning in key: value format. For example: "data": [ { "key": "scope", "value": "zones/us-east1-d" } 
     
     pub data: Option<Vec<PacketMirroringListWarningData>>,
@@ -24972,7 +24972,7 @@ impl client::Part for PacketMirroringListWarningData {}
 pub struct PacketMirroringsScopedListWarning {
     /// [Output Only] A warning code, if applicable. For example, Compute Engine returns NO_RESULTS_ON_PAGE if there are no results in the response.
     
-    pub code: Option<String>,
+    pub code: Option<PacketMirroringsScopedListWarningCodeEnum>,
     /// [Output Only] Metadata about this warning in key: value format. For example: "data": [ { "key": "scope", "value": "zones/us-east1-d" } 
     
     pub data: Option<Vec<PacketMirroringsScopedListWarningData>>,
@@ -25013,7 +25013,7 @@ impl client::Part for PacketMirroringsScopedListWarningData {}
 pub struct PublicAdvertisedPrefixListWarning {
     /// [Output Only] A warning code, if applicable. For example, Compute Engine returns NO_RESULTS_ON_PAGE if there are no results in the response.
     
-    pub code: Option<String>,
+    pub code: Option<PublicAdvertisedPrefixListWarningCodeEnum>,
     /// [Output Only] Metadata about this warning in key: value format. For example: "data": [ { "key": "scope", "value": "zones/us-east1-d" } 
     
     pub data: Option<Vec<PublicAdvertisedPrefixListWarningData>>,
@@ -25054,7 +25054,7 @@ impl client::Part for PublicAdvertisedPrefixListWarningData {}
 pub struct PublicDelegatedPrefixAggregatedListWarning {
     /// [Output Only] A warning code, if applicable. For example, Compute Engine returns NO_RESULTS_ON_PAGE if there are no results in the response.
     
-    pub code: Option<String>,
+    pub code: Option<PublicDelegatedPrefixAggregatedListWarningCodeEnum>,
     /// [Output Only] Metadata about this warning in key: value format. For example: "data": [ { "key": "scope", "value": "zones/us-east1-d" } 
     
     pub data: Option<Vec<PublicDelegatedPrefixAggregatedListWarningData>>,
@@ -25095,7 +25095,7 @@ impl client::Part for PublicDelegatedPrefixAggregatedListWarningData {}
 pub struct PublicDelegatedPrefixListWarning {
     /// [Output Only] A warning code, if applicable. For example, Compute Engine returns NO_RESULTS_ON_PAGE if there are no results in the response.
     
-    pub code: Option<String>,
+    pub code: Option<PublicDelegatedPrefixListWarningCodeEnum>,
     /// [Output Only] Metadata about this warning in key: value format. For example: "data": [ { "key": "scope", "value": "zones/us-east1-d" } 
     
     pub data: Option<Vec<PublicDelegatedPrefixListWarningData>>,
@@ -25136,7 +25136,7 @@ impl client::Part for PublicDelegatedPrefixListWarningData {}
 pub struct PublicDelegatedPrefixesScopedListWarning {
     /// [Output Only] A warning code, if applicable. For example, Compute Engine returns NO_RESULTS_ON_PAGE if there are no results in the response.
     
-    pub code: Option<String>,
+    pub code: Option<PublicDelegatedPrefixesScopedListWarningCodeEnum>,
     /// [Output Only] Metadata about this warning in key: value format. For example: "data": [ { "key": "scope", "value": "zones/us-east1-d" } 
     
     pub data: Option<Vec<PublicDelegatedPrefixesScopedListWarningData>>,
@@ -25177,7 +25177,7 @@ impl client::Part for PublicDelegatedPrefixesScopedListWarningData {}
 pub struct RegionAutoscalerListWarning {
     /// [Output Only] A warning code, if applicable. For example, Compute Engine returns NO_RESULTS_ON_PAGE if there are no results in the response.
     
-    pub code: Option<String>,
+    pub code: Option<RegionAutoscalerListWarningCodeEnum>,
     /// [Output Only] Metadata about this warning in key: value format. For example: "data": [ { "key": "scope", "value": "zones/us-east1-d" } 
     
     pub data: Option<Vec<RegionAutoscalerListWarningData>>,
@@ -25218,7 +25218,7 @@ impl client::Part for RegionAutoscalerListWarningData {}
 pub struct RegionDiskTypeListWarning {
     /// [Output Only] A warning code, if applicable. For example, Compute Engine returns NO_RESULTS_ON_PAGE if there are no results in the response.
     
-    pub code: Option<String>,
+    pub code: Option<RegionDiskTypeListWarningCodeEnum>,
     /// [Output Only] Metadata about this warning in key: value format. For example: "data": [ { "key": "scope", "value": "zones/us-east1-d" } 
     
     pub data: Option<Vec<RegionDiskTypeListWarningData>>,
@@ -25259,7 +25259,7 @@ impl client::Part for RegionDiskTypeListWarningData {}
 pub struct RegionInstanceGroupListWarning {
     /// [Output Only] A warning code, if applicable. For example, Compute Engine returns NO_RESULTS_ON_PAGE if there are no results in the response.
     
-    pub code: Option<String>,
+    pub code: Option<RegionInstanceGroupListWarningCodeEnum>,
     /// [Output Only] Metadata about this warning in key: value format. For example: "data": [ { "key": "scope", "value": "zones/us-east1-d" } 
     
     pub data: Option<Vec<RegionInstanceGroupListWarningData>>,
@@ -25300,7 +25300,7 @@ impl client::Part for RegionInstanceGroupListWarningData {}
 pub struct RegionInstanceGroupManagerListWarning {
     /// [Output Only] A warning code, if applicable. For example, Compute Engine returns NO_RESULTS_ON_PAGE if there are no results in the response.
     
-    pub code: Option<String>,
+    pub code: Option<RegionInstanceGroupManagerListWarningCodeEnum>,
     /// [Output Only] Metadata about this warning in key: value format. For example: "data": [ { "key": "scope", "value": "zones/us-east1-d" } 
     
     pub data: Option<Vec<RegionInstanceGroupManagerListWarningData>>,
@@ -25341,7 +25341,7 @@ impl client::Part for RegionInstanceGroupManagerListWarningData {}
 pub struct RegionInstanceGroupManagersListInstanceConfigsRespWarning {
     /// [Output Only] A warning code, if applicable. For example, Compute Engine returns NO_RESULTS_ON_PAGE if there are no results in the response.
     
-    pub code: Option<String>,
+    pub code: Option<RegionInstanceGroupManagersListInstanceConfigsRespWarningCodeEnum>,
     /// [Output Only] Metadata about this warning in key: value format. For example: "data": [ { "key": "scope", "value": "zones/us-east1-d" } 
     
     pub data: Option<Vec<RegionInstanceGroupManagersListInstanceConfigsRespWarningData>>,
@@ -25382,7 +25382,7 @@ impl client::Part for RegionInstanceGroupManagersListInstanceConfigsRespWarningD
 pub struct RegionInstanceGroupsListInstancesWarning {
     /// [Output Only] A warning code, if applicable. For example, Compute Engine returns NO_RESULTS_ON_PAGE if there are no results in the response.
     
-    pub code: Option<String>,
+    pub code: Option<RegionInstanceGroupsListInstancesWarningCodeEnum>,
     /// [Output Only] Metadata about this warning in key: value format. For example: "data": [ { "key": "scope", "value": "zones/us-east1-d" } 
     
     pub data: Option<Vec<RegionInstanceGroupsListInstancesWarningData>>,
@@ -25423,7 +25423,7 @@ impl client::Part for RegionInstanceGroupsListInstancesWarningData {}
 pub struct RegionListWarning {
     /// [Output Only] A warning code, if applicable. For example, Compute Engine returns NO_RESULTS_ON_PAGE if there are no results in the response.
     
-    pub code: Option<String>,
+    pub code: Option<RegionListWarningCodeEnum>,
     /// [Output Only] Metadata about this warning in key: value format. For example: "data": [ { "key": "scope", "value": "zones/us-east1-d" } 
     
     pub data: Option<Vec<RegionListWarningData>>,
@@ -25464,7 +25464,7 @@ impl client::Part for RegionListWarningData {}
 pub struct ReservationAggregatedListWarning {
     /// [Output Only] A warning code, if applicable. For example, Compute Engine returns NO_RESULTS_ON_PAGE if there are no results in the response.
     
-    pub code: Option<String>,
+    pub code: Option<ReservationAggregatedListWarningCodeEnum>,
     /// [Output Only] Metadata about this warning in key: value format. For example: "data": [ { "key": "scope", "value": "zones/us-east1-d" } 
     
     pub data: Option<Vec<ReservationAggregatedListWarningData>>,
@@ -25505,7 +25505,7 @@ impl client::Part for ReservationAggregatedListWarningData {}
 pub struct ReservationListWarning {
     /// [Output Only] A warning code, if applicable. For example, Compute Engine returns NO_RESULTS_ON_PAGE if there are no results in the response.
     
-    pub code: Option<String>,
+    pub code: Option<ReservationListWarningCodeEnum>,
     /// [Output Only] Metadata about this warning in key: value format. For example: "data": [ { "key": "scope", "value": "zones/us-east1-d" } 
     
     pub data: Option<Vec<ReservationListWarningData>>,
@@ -25546,7 +25546,7 @@ impl client::Part for ReservationListWarningData {}
 pub struct ReservationsScopedListWarning {
     /// [Output Only] A warning code, if applicable. For example, Compute Engine returns NO_RESULTS_ON_PAGE if there are no results in the response.
     
-    pub code: Option<String>,
+    pub code: Option<ReservationsScopedListWarningCodeEnum>,
     /// [Output Only] Metadata about this warning in key: value format. For example: "data": [ { "key": "scope", "value": "zones/us-east1-d" } 
     
     pub data: Option<Vec<ReservationsScopedListWarningData>>,
@@ -25587,7 +25587,7 @@ impl client::Part for ReservationsScopedListWarningData {}
 pub struct ResourcePoliciesScopedListWarning {
     /// [Output Only] A warning code, if applicable. For example, Compute Engine returns NO_RESULTS_ON_PAGE if there are no results in the response.
     
-    pub code: Option<String>,
+    pub code: Option<ResourcePoliciesScopedListWarningCodeEnum>,
     /// [Output Only] Metadata about this warning in key: value format. For example: "data": [ { "key": "scope", "value": "zones/us-east1-d" } 
     
     pub data: Option<Vec<ResourcePoliciesScopedListWarningData>>,
@@ -25628,7 +25628,7 @@ impl client::Part for ResourcePoliciesScopedListWarningData {}
 pub struct ResourcePolicyAggregatedListWarning {
     /// [Output Only] A warning code, if applicable. For example, Compute Engine returns NO_RESULTS_ON_PAGE if there are no results in the response.
     
-    pub code: Option<String>,
+    pub code: Option<ResourcePolicyAggregatedListWarningCodeEnum>,
     /// [Output Only] Metadata about this warning in key: value format. For example: "data": [ { "key": "scope", "value": "zones/us-east1-d" } 
     
     pub data: Option<Vec<ResourcePolicyAggregatedListWarningData>>,
@@ -25669,7 +25669,7 @@ impl client::Part for ResourcePolicyAggregatedListWarningData {}
 pub struct ResourcePolicyListWarning {
     /// [Output Only] A warning code, if applicable. For example, Compute Engine returns NO_RESULTS_ON_PAGE if there are no results in the response.
     
-    pub code: Option<String>,
+    pub code: Option<ResourcePolicyListWarningCodeEnum>,
     /// [Output Only] Metadata about this warning in key: value format. For example: "data": [ { "key": "scope", "value": "zones/us-east1-d" } 
     
     pub data: Option<Vec<ResourcePolicyListWarningData>>,
@@ -25710,7 +25710,7 @@ impl client::Part for ResourcePolicyListWarningData {}
 pub struct RouteWarnings {
     /// [Output Only] A warning code, if applicable. For example, Compute Engine returns NO_RESULTS_ON_PAGE if there are no results in the response.
     
-    pub code: Option<String>,
+    pub code: Option<RouteWarningCodeEnum>,
     /// [Output Only] Metadata about this warning in key: value format. For example: "data": [ { "key": "scope", "value": "zones/us-east1-d" } 
     
     pub data: Option<Vec<RouteWarningsData>>,
@@ -25751,7 +25751,7 @@ impl client::Part for RouteWarningsData {}
 pub struct RouteListWarning {
     /// [Output Only] A warning code, if applicable. For example, Compute Engine returns NO_RESULTS_ON_PAGE if there are no results in the response.
     
-    pub code: Option<String>,
+    pub code: Option<RouteListWarningCodeEnum>,
     /// [Output Only] Metadata about this warning in key: value format. For example: "data": [ { "key": "scope", "value": "zones/us-east1-d" } 
     
     pub data: Option<Vec<RouteListWarningData>>,
@@ -25792,7 +25792,7 @@ impl client::Part for RouteListWarningData {}
 pub struct RouterAggregatedListWarning {
     /// [Output Only] A warning code, if applicable. For example, Compute Engine returns NO_RESULTS_ON_PAGE if there are no results in the response.
     
-    pub code: Option<String>,
+    pub code: Option<RouterAggregatedListWarningCodeEnum>,
     /// [Output Only] Metadata about this warning in key: value format. For example: "data": [ { "key": "scope", "value": "zones/us-east1-d" } 
     
     pub data: Option<Vec<RouterAggregatedListWarningData>>,
@@ -25833,7 +25833,7 @@ impl client::Part for RouterAggregatedListWarningData {}
 pub struct RouterListWarning {
     /// [Output Only] A warning code, if applicable. For example, Compute Engine returns NO_RESULTS_ON_PAGE if there are no results in the response.
     
-    pub code: Option<String>,
+    pub code: Option<RouterListWarningCodeEnum>,
     /// [Output Only] Metadata about this warning in key: value format. For example: "data": [ { "key": "scope", "value": "zones/us-east1-d" } 
     
     pub data: Option<Vec<RouterListWarningData>>,
@@ -25874,7 +25874,7 @@ impl client::Part for RouterListWarningData {}
 pub struct RoutersScopedListWarning {
     /// [Output Only] A warning code, if applicable. For example, Compute Engine returns NO_RESULTS_ON_PAGE if there are no results in the response.
     
-    pub code: Option<String>,
+    pub code: Option<RoutersScopedListWarningCodeEnum>,
     /// [Output Only] Metadata about this warning in key: value format. For example: "data": [ { "key": "scope", "value": "zones/us-east1-d" } 
     
     pub data: Option<Vec<RoutersScopedListWarningData>>,
@@ -25915,7 +25915,7 @@ impl client::Part for RoutersScopedListWarningData {}
 pub struct SecurityPoliciesAggregatedListWarning {
     /// [Output Only] A warning code, if applicable. For example, Compute Engine returns NO_RESULTS_ON_PAGE if there are no results in the response.
     
-    pub code: Option<String>,
+    pub code: Option<SecurityPoliciesAggregatedListWarningCodeEnum>,
     /// [Output Only] Metadata about this warning in key: value format. For example: "data": [ { "key": "scope", "value": "zones/us-east1-d" } 
     
     pub data: Option<Vec<SecurityPoliciesAggregatedListWarningData>>,
@@ -25956,7 +25956,7 @@ impl client::Part for SecurityPoliciesAggregatedListWarningData {}
 pub struct SecurityPoliciesScopedListWarning {
     /// [Output Only] A warning code, if applicable. For example, Compute Engine returns NO_RESULTS_ON_PAGE if there are no results in the response.
     
-    pub code: Option<String>,
+    pub code: Option<SecurityPoliciesScopedListWarningCodeEnum>,
     /// [Output Only] Metadata about this warning in key: value format. For example: "data": [ { "key": "scope", "value": "zones/us-east1-d" } 
     
     pub data: Option<Vec<SecurityPoliciesScopedListWarningData>>,
@@ -25997,7 +25997,7 @@ impl client::Part for SecurityPoliciesScopedListWarningData {}
 pub struct SecurityPolicyListWarning {
     /// [Output Only] A warning code, if applicable. For example, Compute Engine returns NO_RESULTS_ON_PAGE if there are no results in the response.
     
-    pub code: Option<String>,
+    pub code: Option<SecurityPolicyListWarningCodeEnum>,
     /// [Output Only] Metadata about this warning in key: value format. For example: "data": [ { "key": "scope", "value": "zones/us-east1-d" } 
     
     pub data: Option<Vec<SecurityPolicyListWarningData>>,
@@ -26038,7 +26038,7 @@ impl client::Part for SecurityPolicyListWarningData {}
 pub struct ServiceAttachmentAggregatedListWarning {
     /// [Output Only] A warning code, if applicable. For example, Compute Engine returns NO_RESULTS_ON_PAGE if there are no results in the response.
     
-    pub code: Option<String>,
+    pub code: Option<ServiceAttachmentAggregatedListWarningCodeEnum>,
     /// [Output Only] Metadata about this warning in key: value format. For example: "data": [ { "key": "scope", "value": "zones/us-east1-d" } 
     
     pub data: Option<Vec<ServiceAttachmentAggregatedListWarningData>>,
@@ -26079,7 +26079,7 @@ impl client::Part for ServiceAttachmentAggregatedListWarningData {}
 pub struct ServiceAttachmentListWarning {
     /// [Output Only] A warning code, if applicable. For example, Compute Engine returns NO_RESULTS_ON_PAGE if there are no results in the response.
     
-    pub code: Option<String>,
+    pub code: Option<ServiceAttachmentListWarningCodeEnum>,
     /// [Output Only] Metadata about this warning in key: value format. For example: "data": [ { "key": "scope", "value": "zones/us-east1-d" } 
     
     pub data: Option<Vec<ServiceAttachmentListWarningData>>,
@@ -26120,7 +26120,7 @@ impl client::Part for ServiceAttachmentListWarningData {}
 pub struct ServiceAttachmentsScopedListWarning {
     /// [Output Only] A warning code, if applicable. For example, Compute Engine returns NO_RESULTS_ON_PAGE if there are no results in the response.
     
-    pub code: Option<String>,
+    pub code: Option<ServiceAttachmentsScopedListWarningCodeEnum>,
     /// [Output Only] Metadata about this warning in key: value format. For example: "data": [ { "key": "scope", "value": "zones/us-east1-d" } 
     
     pub data: Option<Vec<ServiceAttachmentsScopedListWarningData>>,
@@ -26161,7 +26161,7 @@ impl client::Part for ServiceAttachmentsScopedListWarningData {}
 pub struct SnapshotListWarning {
     /// [Output Only] A warning code, if applicable. For example, Compute Engine returns NO_RESULTS_ON_PAGE if there are no results in the response.
     
-    pub code: Option<String>,
+    pub code: Option<SnapshotListWarningCodeEnum>,
     /// [Output Only] Metadata about this warning in key: value format. For example: "data": [ { "key": "scope", "value": "zones/us-east1-d" } 
     
     pub data: Option<Vec<SnapshotListWarningData>>,
@@ -26202,7 +26202,7 @@ impl client::Part for SnapshotListWarningData {}
 pub struct SslCertificateAggregatedListWarning {
     /// [Output Only] A warning code, if applicable. For example, Compute Engine returns NO_RESULTS_ON_PAGE if there are no results in the response.
     
-    pub code: Option<String>,
+    pub code: Option<SslCertificateAggregatedListWarningCodeEnum>,
     /// [Output Only] Metadata about this warning in key: value format. For example: "data": [ { "key": "scope", "value": "zones/us-east1-d" } 
     
     pub data: Option<Vec<SslCertificateAggregatedListWarningData>>,
@@ -26243,7 +26243,7 @@ impl client::Part for SslCertificateAggregatedListWarningData {}
 pub struct SslCertificateListWarning {
     /// [Output Only] A warning code, if applicable. For example, Compute Engine returns NO_RESULTS_ON_PAGE if there are no results in the response.
     
-    pub code: Option<String>,
+    pub code: Option<SslCertificateListWarningCodeEnum>,
     /// [Output Only] Metadata about this warning in key: value format. For example: "data": [ { "key": "scope", "value": "zones/us-east1-d" } 
     
     pub data: Option<Vec<SslCertificateListWarningData>>,
@@ -26284,7 +26284,7 @@ impl client::Part for SslCertificateListWarningData {}
 pub struct SslCertificatesScopedListWarning {
     /// [Output Only] A warning code, if applicable. For example, Compute Engine returns NO_RESULTS_ON_PAGE if there are no results in the response.
     
-    pub code: Option<String>,
+    pub code: Option<SslCertificatesScopedListWarningCodeEnum>,
     /// [Output Only] Metadata about this warning in key: value format. For example: "data": [ { "key": "scope", "value": "zones/us-east1-d" } 
     
     pub data: Option<Vec<SslCertificatesScopedListWarningData>>,
@@ -26325,7 +26325,7 @@ impl client::Part for SslCertificatesScopedListWarningData {}
 pub struct SslPoliciesAggregatedListWarning {
     /// [Output Only] A warning code, if applicable. For example, Compute Engine returns NO_RESULTS_ON_PAGE if there are no results in the response.
     
-    pub code: Option<String>,
+    pub code: Option<SslPoliciesAggregatedListWarningCodeEnum>,
     /// [Output Only] Metadata about this warning in key: value format. For example: "data": [ { "key": "scope", "value": "zones/us-east1-d" } 
     
     pub data: Option<Vec<SslPoliciesAggregatedListWarningData>>,
@@ -26366,7 +26366,7 @@ impl client::Part for SslPoliciesAggregatedListWarningData {}
 pub struct SslPoliciesListWarning {
     /// [Output Only] A warning code, if applicable. For example, Compute Engine returns NO_RESULTS_ON_PAGE if there are no results in the response.
     
-    pub code: Option<String>,
+    pub code: Option<SslPoliciesListWarningCodeEnum>,
     /// [Output Only] Metadata about this warning in key: value format. For example: "data": [ { "key": "scope", "value": "zones/us-east1-d" } 
     
     pub data: Option<Vec<SslPoliciesListWarningData>>,
@@ -26407,7 +26407,7 @@ impl client::Part for SslPoliciesListWarningData {}
 pub struct SslPoliciesScopedListWarning {
     /// [Output Only] A warning code, if applicable. For example, Compute Engine returns NO_RESULTS_ON_PAGE if there are no results in the response.
     
-    pub code: Option<String>,
+    pub code: Option<SslPoliciesScopedListWarningCodeEnum>,
     /// [Output Only] Metadata about this warning in key: value format. For example: "data": [ { "key": "scope", "value": "zones/us-east1-d" } 
     
     pub data: Option<Vec<SslPoliciesScopedListWarningData>>,
@@ -26448,7 +26448,7 @@ impl client::Part for SslPoliciesScopedListWarningData {}
 pub struct SslPolicyWarnings {
     /// [Output Only] A warning code, if applicable. For example, Compute Engine returns NO_RESULTS_ON_PAGE if there are no results in the response.
     
-    pub code: Option<String>,
+    pub code: Option<SslPolicyWarningCodeEnum>,
     /// [Output Only] Metadata about this warning in key: value format. For example: "data": [ { "key": "scope", "value": "zones/us-east1-d" } 
     
     pub data: Option<Vec<SslPolicyWarningsData>>,
@@ -26489,7 +26489,7 @@ impl client::Part for SslPolicyWarningsData {}
 pub struct SubnetworkAggregatedListWarning {
     /// [Output Only] A warning code, if applicable. For example, Compute Engine returns NO_RESULTS_ON_PAGE if there are no results in the response.
     
-    pub code: Option<String>,
+    pub code: Option<SubnetworkAggregatedListWarningCodeEnum>,
     /// [Output Only] Metadata about this warning in key: value format. For example: "data": [ { "key": "scope", "value": "zones/us-east1-d" } 
     
     pub data: Option<Vec<SubnetworkAggregatedListWarningData>>,
@@ -26530,7 +26530,7 @@ impl client::Part for SubnetworkAggregatedListWarningData {}
 pub struct SubnetworkListWarning {
     /// [Output Only] A warning code, if applicable. For example, Compute Engine returns NO_RESULTS_ON_PAGE if there are no results in the response.
     
-    pub code: Option<String>,
+    pub code: Option<SubnetworkListWarningCodeEnum>,
     /// [Output Only] Metadata about this warning in key: value format. For example: "data": [ { "key": "scope", "value": "zones/us-east1-d" } 
     
     pub data: Option<Vec<SubnetworkListWarningData>>,
@@ -26571,7 +26571,7 @@ impl client::Part for SubnetworkListWarningData {}
 pub struct SubnetworksScopedListWarning {
     /// [Output Only] A warning code, if applicable. For example, Compute Engine returns NO_RESULTS_ON_PAGE if there are no results in the response.
     
-    pub code: Option<String>,
+    pub code: Option<SubnetworksScopedListWarningCodeEnum>,
     /// [Output Only] Metadata about this warning in key: value format. For example: "data": [ { "key": "scope", "value": "zones/us-east1-d" } 
     
     pub data: Option<Vec<SubnetworksScopedListWarningData>>,
@@ -26612,7 +26612,7 @@ impl client::Part for SubnetworksScopedListWarningData {}
 pub struct TargetGrpcProxyListWarning {
     /// [Output Only] A warning code, if applicable. For example, Compute Engine returns NO_RESULTS_ON_PAGE if there are no results in the response.
     
-    pub code: Option<String>,
+    pub code: Option<TargetGrpcProxyListWarningCodeEnum>,
     /// [Output Only] Metadata about this warning in key: value format. For example: "data": [ { "key": "scope", "value": "zones/us-east1-d" } 
     
     pub data: Option<Vec<TargetGrpcProxyListWarningData>>,
@@ -26653,7 +26653,7 @@ impl client::Part for TargetGrpcProxyListWarningData {}
 pub struct TargetHttpProxiesScopedListWarning {
     /// [Output Only] A warning code, if applicable. For example, Compute Engine returns NO_RESULTS_ON_PAGE if there are no results in the response.
     
-    pub code: Option<String>,
+    pub code: Option<TargetHttpProxiesScopedListWarningCodeEnum>,
     /// [Output Only] Metadata about this warning in key: value format. For example: "data": [ { "key": "scope", "value": "zones/us-east1-d" } 
     
     pub data: Option<Vec<TargetHttpProxiesScopedListWarningData>>,
@@ -26694,7 +26694,7 @@ impl client::Part for TargetHttpProxiesScopedListWarningData {}
 pub struct TargetHttpProxyListWarning {
     /// [Output Only] A warning code, if applicable. For example, Compute Engine returns NO_RESULTS_ON_PAGE if there are no results in the response.
     
-    pub code: Option<String>,
+    pub code: Option<TargetHttpProxyListWarningCodeEnum>,
     /// [Output Only] Metadata about this warning in key: value format. For example: "data": [ { "key": "scope", "value": "zones/us-east1-d" } 
     
     pub data: Option<Vec<TargetHttpProxyListWarningData>>,
@@ -26735,7 +26735,7 @@ impl client::Part for TargetHttpProxyListWarningData {}
 pub struct TargetHttpsProxiesScopedListWarning {
     /// [Output Only] A warning code, if applicable. For example, Compute Engine returns NO_RESULTS_ON_PAGE if there are no results in the response.
     
-    pub code: Option<String>,
+    pub code: Option<TargetHttpsProxiesScopedListWarningCodeEnum>,
     /// [Output Only] Metadata about this warning in key: value format. For example: "data": [ { "key": "scope", "value": "zones/us-east1-d" } 
     
     pub data: Option<Vec<TargetHttpsProxiesScopedListWarningData>>,
@@ -26776,7 +26776,7 @@ impl client::Part for TargetHttpsProxiesScopedListWarningData {}
 pub struct TargetHttpsProxyAggregatedListWarning {
     /// [Output Only] A warning code, if applicable. For example, Compute Engine returns NO_RESULTS_ON_PAGE if there are no results in the response.
     
-    pub code: Option<String>,
+    pub code: Option<TargetHttpsProxyAggregatedListWarningCodeEnum>,
     /// [Output Only] Metadata about this warning in key: value format. For example: "data": [ { "key": "scope", "value": "zones/us-east1-d" } 
     
     pub data: Option<Vec<TargetHttpsProxyAggregatedListWarningData>>,
@@ -26817,7 +26817,7 @@ impl client::Part for TargetHttpsProxyAggregatedListWarningData {}
 pub struct TargetHttpsProxyListWarning {
     /// [Output Only] A warning code, if applicable. For example, Compute Engine returns NO_RESULTS_ON_PAGE if there are no results in the response.
     
-    pub code: Option<String>,
+    pub code: Option<TargetHttpsProxyListWarningCodeEnum>,
     /// [Output Only] Metadata about this warning in key: value format. For example: "data": [ { "key": "scope", "value": "zones/us-east1-d" } 
     
     pub data: Option<Vec<TargetHttpsProxyListWarningData>>,
@@ -26858,7 +26858,7 @@ impl client::Part for TargetHttpsProxyListWarningData {}
 pub struct TargetInstanceAggregatedListWarning {
     /// [Output Only] A warning code, if applicable. For example, Compute Engine returns NO_RESULTS_ON_PAGE if there are no results in the response.
     
-    pub code: Option<String>,
+    pub code: Option<TargetInstanceAggregatedListWarningCodeEnum>,
     /// [Output Only] Metadata about this warning in key: value format. For example: "data": [ { "key": "scope", "value": "zones/us-east1-d" } 
     
     pub data: Option<Vec<TargetInstanceAggregatedListWarningData>>,
@@ -26899,7 +26899,7 @@ impl client::Part for TargetInstanceAggregatedListWarningData {}
 pub struct TargetInstanceListWarning {
     /// [Output Only] A warning code, if applicable. For example, Compute Engine returns NO_RESULTS_ON_PAGE if there are no results in the response.
     
-    pub code: Option<String>,
+    pub code: Option<TargetInstanceListWarningCodeEnum>,
     /// [Output Only] Metadata about this warning in key: value format. For example: "data": [ { "key": "scope", "value": "zones/us-east1-d" } 
     
     pub data: Option<Vec<TargetInstanceListWarningData>>,
@@ -26940,7 +26940,7 @@ impl client::Part for TargetInstanceListWarningData {}
 pub struct TargetInstancesScopedListWarning {
     /// [Output Only] A warning code, if applicable. For example, Compute Engine returns NO_RESULTS_ON_PAGE if there are no results in the response.
     
-    pub code: Option<String>,
+    pub code: Option<TargetInstancesScopedListWarningCodeEnum>,
     /// [Output Only] Metadata about this warning in key: value format. For example: "data": [ { "key": "scope", "value": "zones/us-east1-d" } 
     
     pub data: Option<Vec<TargetInstancesScopedListWarningData>>,
@@ -26981,7 +26981,7 @@ impl client::Part for TargetInstancesScopedListWarningData {}
 pub struct TargetPoolAggregatedListWarning {
     /// [Output Only] A warning code, if applicable. For example, Compute Engine returns NO_RESULTS_ON_PAGE if there are no results in the response.
     
-    pub code: Option<String>,
+    pub code: Option<TargetPoolAggregatedListWarningCodeEnum>,
     /// [Output Only] Metadata about this warning in key: value format. For example: "data": [ { "key": "scope", "value": "zones/us-east1-d" } 
     
     pub data: Option<Vec<TargetPoolAggregatedListWarningData>>,
@@ -27022,7 +27022,7 @@ impl client::Part for TargetPoolAggregatedListWarningData {}
 pub struct TargetPoolListWarning {
     /// [Output Only] A warning code, if applicable. For example, Compute Engine returns NO_RESULTS_ON_PAGE if there are no results in the response.
     
-    pub code: Option<String>,
+    pub code: Option<TargetPoolListWarningCodeEnum>,
     /// [Output Only] Metadata about this warning in key: value format. For example: "data": [ { "key": "scope", "value": "zones/us-east1-d" } 
     
     pub data: Option<Vec<TargetPoolListWarningData>>,
@@ -27063,7 +27063,7 @@ impl client::Part for TargetPoolListWarningData {}
 pub struct TargetPoolsScopedListWarning {
     /// [Output Only] A warning code, if applicable. For example, Compute Engine returns NO_RESULTS_ON_PAGE if there are no results in the response.
     
-    pub code: Option<String>,
+    pub code: Option<TargetPoolsScopedListWarningCodeEnum>,
     /// [Output Only] Metadata about this warning in key: value format. For example: "data": [ { "key": "scope", "value": "zones/us-east1-d" } 
     
     pub data: Option<Vec<TargetPoolsScopedListWarningData>>,
@@ -27104,7 +27104,7 @@ impl client::Part for TargetPoolsScopedListWarningData {}
 pub struct TargetSslProxyListWarning {
     /// [Output Only] A warning code, if applicable. For example, Compute Engine returns NO_RESULTS_ON_PAGE if there are no results in the response.
     
-    pub code: Option<String>,
+    pub code: Option<TargetSslProxyListWarningCodeEnum>,
     /// [Output Only] Metadata about this warning in key: value format. For example: "data": [ { "key": "scope", "value": "zones/us-east1-d" } 
     
     pub data: Option<Vec<TargetSslProxyListWarningData>>,
@@ -27145,7 +27145,7 @@ impl client::Part for TargetSslProxyListWarningData {}
 pub struct TargetTcpProxiesScopedListWarning {
     /// [Output Only] A warning code, if applicable. For example, Compute Engine returns NO_RESULTS_ON_PAGE if there are no results in the response.
     
-    pub code: Option<String>,
+    pub code: Option<TargetTcpProxiesScopedListWarningCodeEnum>,
     /// [Output Only] Metadata about this warning in key: value format. For example: "data": [ { "key": "scope", "value": "zones/us-east1-d" } 
     
     pub data: Option<Vec<TargetTcpProxiesScopedListWarningData>>,
@@ -27186,7 +27186,7 @@ impl client::Part for TargetTcpProxiesScopedListWarningData {}
 pub struct TargetTcpProxyAggregatedListWarning {
     /// [Output Only] A warning code, if applicable. For example, Compute Engine returns NO_RESULTS_ON_PAGE if there are no results in the response.
     
-    pub code: Option<String>,
+    pub code: Option<TargetTcpProxyAggregatedListWarningCodeEnum>,
     /// [Output Only] Metadata about this warning in key: value format. For example: "data": [ { "key": "scope", "value": "zones/us-east1-d" } 
     
     pub data: Option<Vec<TargetTcpProxyAggregatedListWarningData>>,
@@ -27227,7 +27227,7 @@ impl client::Part for TargetTcpProxyAggregatedListWarningData {}
 pub struct TargetTcpProxyListWarning {
     /// [Output Only] A warning code, if applicable. For example, Compute Engine returns NO_RESULTS_ON_PAGE if there are no results in the response.
     
-    pub code: Option<String>,
+    pub code: Option<TargetTcpProxyListWarningCodeEnum>,
     /// [Output Only] Metadata about this warning in key: value format. For example: "data": [ { "key": "scope", "value": "zones/us-east1-d" } 
     
     pub data: Option<Vec<TargetTcpProxyListWarningData>>,
@@ -27268,7 +27268,7 @@ impl client::Part for TargetTcpProxyListWarningData {}
 pub struct TargetVpnGatewayAggregatedListWarning {
     /// [Output Only] A warning code, if applicable. For example, Compute Engine returns NO_RESULTS_ON_PAGE if there are no results in the response.
     
-    pub code: Option<String>,
+    pub code: Option<TargetVpnGatewayAggregatedListWarningCodeEnum>,
     /// [Output Only] Metadata about this warning in key: value format. For example: "data": [ { "key": "scope", "value": "zones/us-east1-d" } 
     
     pub data: Option<Vec<TargetVpnGatewayAggregatedListWarningData>>,
@@ -27309,7 +27309,7 @@ impl client::Part for TargetVpnGatewayAggregatedListWarningData {}
 pub struct TargetVpnGatewayListWarning {
     /// [Output Only] A warning code, if applicable. For example, Compute Engine returns NO_RESULTS_ON_PAGE if there are no results in the response.
     
-    pub code: Option<String>,
+    pub code: Option<TargetVpnGatewayListWarningCodeEnum>,
     /// [Output Only] Metadata about this warning in key: value format. For example: "data": [ { "key": "scope", "value": "zones/us-east1-d" } 
     
     pub data: Option<Vec<TargetVpnGatewayListWarningData>>,
@@ -27350,7 +27350,7 @@ impl client::Part for TargetVpnGatewayListWarningData {}
 pub struct TargetVpnGatewaysScopedListWarning {
     /// [Output Only] A warning code, if applicable. For example, Compute Engine returns NO_RESULTS_ON_PAGE if there are no results in the response.
     
-    pub code: Option<String>,
+    pub code: Option<TargetVpnGatewaysScopedListWarningCodeEnum>,
     /// [Output Only] Metadata about this warning in key: value format. For example: "data": [ { "key": "scope", "value": "zones/us-east1-d" } 
     
     pub data: Option<Vec<TargetVpnGatewaysScopedListWarningData>>,
@@ -27391,7 +27391,7 @@ impl client::Part for TargetVpnGatewaysScopedListWarningData {}
 pub struct UrlMapListWarning {
     /// [Output Only] A warning code, if applicable. For example, Compute Engine returns NO_RESULTS_ON_PAGE if there are no results in the response.
     
-    pub code: Option<String>,
+    pub code: Option<UrlMapListWarningCodeEnum>,
     /// [Output Only] Metadata about this warning in key: value format. For example: "data": [ { "key": "scope", "value": "zones/us-east1-d" } 
     
     pub data: Option<Vec<UrlMapListWarningData>>,
@@ -27432,7 +27432,7 @@ impl client::Part for UrlMapListWarningData {}
 pub struct UrlMapsAggregatedListWarning {
     /// [Output Only] A warning code, if applicable. For example, Compute Engine returns NO_RESULTS_ON_PAGE if there are no results in the response.
     
-    pub code: Option<String>,
+    pub code: Option<UrlMapsAggregatedListWarningCodeEnum>,
     /// [Output Only] Metadata about this warning in key: value format. For example: "data": [ { "key": "scope", "value": "zones/us-east1-d" } 
     
     pub data: Option<Vec<UrlMapsAggregatedListWarningData>>,
@@ -27473,7 +27473,7 @@ impl client::Part for UrlMapsAggregatedListWarningData {}
 pub struct UrlMapsScopedListWarning {
     /// [Output Only] A warning code, if applicable. For example, Compute Engine returns NO_RESULTS_ON_PAGE if there are no results in the response.
     
-    pub code: Option<String>,
+    pub code: Option<UrlMapsScopedListWarningCodeEnum>,
     /// [Output Only] Metadata about this warning in key: value format. For example: "data": [ { "key": "scope", "value": "zones/us-east1-d" } 
     
     pub data: Option<Vec<UrlMapsScopedListWarningData>>,
@@ -27514,7 +27514,7 @@ impl client::Part for UrlMapsScopedListWarningData {}
 pub struct UsableSubnetworksAggregatedListWarning {
     /// [Output Only] A warning code, if applicable. For example, Compute Engine returns NO_RESULTS_ON_PAGE if there are no results in the response.
     
-    pub code: Option<String>,
+    pub code: Option<UsableSubnetworksAggregatedListWarningCodeEnum>,
     /// [Output Only] Metadata about this warning in key: value format. For example: "data": [ { "key": "scope", "value": "zones/us-east1-d" } 
     
     pub data: Option<Vec<UsableSubnetworksAggregatedListWarningData>>,
@@ -27555,7 +27555,7 @@ impl client::Part for UsableSubnetworksAggregatedListWarningData {}
 pub struct VmEndpointNatMappingsListWarning {
     /// [Output Only] A warning code, if applicable. For example, Compute Engine returns NO_RESULTS_ON_PAGE if there are no results in the response.
     
-    pub code: Option<String>,
+    pub code: Option<VmEndpointNatMappingsListWarningCodeEnum>,
     /// [Output Only] Metadata about this warning in key: value format. For example: "data": [ { "key": "scope", "value": "zones/us-east1-d" } 
     
     pub data: Option<Vec<VmEndpointNatMappingsListWarningData>>,
@@ -27596,7 +27596,7 @@ impl client::Part for VmEndpointNatMappingsListWarningData {}
 pub struct VpnGatewayAggregatedListWarning {
     /// [Output Only] A warning code, if applicable. For example, Compute Engine returns NO_RESULTS_ON_PAGE if there are no results in the response.
     
-    pub code: Option<String>,
+    pub code: Option<VpnGatewayAggregatedListWarningCodeEnum>,
     /// [Output Only] Metadata about this warning in key: value format. For example: "data": [ { "key": "scope", "value": "zones/us-east1-d" } 
     
     pub data: Option<Vec<VpnGatewayAggregatedListWarningData>>,
@@ -27637,7 +27637,7 @@ impl client::Part for VpnGatewayAggregatedListWarningData {}
 pub struct VpnGatewayListWarning {
     /// [Output Only] A warning code, if applicable. For example, Compute Engine returns NO_RESULTS_ON_PAGE if there are no results in the response.
     
-    pub code: Option<String>,
+    pub code: Option<VpnGatewayListWarningCodeEnum>,
     /// [Output Only] Metadata about this warning in key: value format. For example: "data": [ { "key": "scope", "value": "zones/us-east1-d" } 
     
     pub data: Option<Vec<VpnGatewayListWarningData>>,
@@ -27678,7 +27678,7 @@ impl client::Part for VpnGatewayListWarningData {}
 pub struct VpnGatewaysScopedListWarning {
     /// [Output Only] A warning code, if applicable. For example, Compute Engine returns NO_RESULTS_ON_PAGE if there are no results in the response.
     
-    pub code: Option<String>,
+    pub code: Option<VpnGatewaysScopedListWarningCodeEnum>,
     /// [Output Only] Metadata about this warning in key: value format. For example: "data": [ { "key": "scope", "value": "zones/us-east1-d" } 
     
     pub data: Option<Vec<VpnGatewaysScopedListWarningData>>,
@@ -27719,7 +27719,7 @@ impl client::Part for VpnGatewaysScopedListWarningData {}
 pub struct VpnTunnelAggregatedListWarning {
     /// [Output Only] A warning code, if applicable. For example, Compute Engine returns NO_RESULTS_ON_PAGE if there are no results in the response.
     
-    pub code: Option<String>,
+    pub code: Option<VpnTunnelAggregatedListWarningCodeEnum>,
     /// [Output Only] Metadata about this warning in key: value format. For example: "data": [ { "key": "scope", "value": "zones/us-east1-d" } 
     
     pub data: Option<Vec<VpnTunnelAggregatedListWarningData>>,
@@ -27760,7 +27760,7 @@ impl client::Part for VpnTunnelAggregatedListWarningData {}
 pub struct VpnTunnelListWarning {
     /// [Output Only] A warning code, if applicable. For example, Compute Engine returns NO_RESULTS_ON_PAGE if there are no results in the response.
     
-    pub code: Option<String>,
+    pub code: Option<VpnTunnelListWarningCodeEnum>,
     /// [Output Only] Metadata about this warning in key: value format. For example: "data": [ { "key": "scope", "value": "zones/us-east1-d" } 
     
     pub data: Option<Vec<VpnTunnelListWarningData>>,
@@ -27801,7 +27801,7 @@ impl client::Part for VpnTunnelListWarningData {}
 pub struct VpnTunnelsScopedListWarning {
     /// [Output Only] A warning code, if applicable. For example, Compute Engine returns NO_RESULTS_ON_PAGE if there are no results in the response.
     
-    pub code: Option<String>,
+    pub code: Option<VpnTunnelsScopedListWarningCodeEnum>,
     /// [Output Only] Metadata about this warning in key: value format. For example: "data": [ { "key": "scope", "value": "zones/us-east1-d" } 
     
     pub data: Option<Vec<VpnTunnelsScopedListWarningData>>,
@@ -27842,7 +27842,7 @@ impl client::Part for VpnTunnelsScopedListWarningData {}
 pub struct XpnHostListWarning {
     /// [Output Only] A warning code, if applicable. For example, Compute Engine returns NO_RESULTS_ON_PAGE if there are no results in the response.
     
-    pub code: Option<String>,
+    pub code: Option<XpnHostListWarningCodeEnum>,
     /// [Output Only] Metadata about this warning in key: value format. For example: "data": [ { "key": "scope", "value": "zones/us-east1-d" } 
     
     pub data: Option<Vec<XpnHostListWarningData>>,
@@ -27883,7 +27883,7 @@ impl client::Part for XpnHostListWarningData {}
 pub struct ZoneListWarning {
     /// [Output Only] A warning code, if applicable. For example, Compute Engine returns NO_RESULTS_ON_PAGE if there are no results in the response.
     
-    pub code: Option<String>,
+    pub code: Option<ZoneListWarningCodeEnum>,
     /// [Output Only] Metadata about this warning in key: value format. For example: "data": [ { "key": "scope", "value": "zones/us-east1-d" } 
     
     pub data: Option<Vec<ZoneListWarningData>>,

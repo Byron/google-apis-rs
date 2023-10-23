@@ -70,7 +70,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("groupUniqueId", self._group_unique_id);
+        params.push("groupUniqueId", &self._group_unique_id);
 
         params.extend(self._additional_params.iter());
 
@@ -335,7 +335,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("groupUniqueId", self._group_unique_id);
+        params.push("groupUniqueId", &self._group_unique_id);
 
         params.extend(self._additional_params.iter());
 
@@ -623,7 +623,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("groupUniqueId", self._group_unique_id);
+        params.push("groupUniqueId", &self._group_unique_id);
 
         params.extend(self._additional_params.iter());
 

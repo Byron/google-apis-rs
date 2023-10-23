@@ -42,12 +42,12 @@ use super::*;
 ///              .enable_detailed_highway_types(false)
 ///              .client_tile_version_id("duo")
 ///              .client_info_user_id("vero")
-///              .client_info_platform("vero")
-///              .client_info_operating_system("invidunt")
-///              .client_info_device_model("Stet")
-///              .client_info_application_version("vero")
-///              .client_info_application_id("elitr")
-///              .client_info_api_client("Lorem")
+///              .client_info_platform(&Default::default())
+///              .client_info_operating_system("vero")
+///              .client_info_device_model("invidunt")
+///              .client_info_application_version("Stet")
+///              .client_info_application_id("vero")
+///              .client_info_api_client("elitr")
 ///              .always_include_building_footprints(true)
 ///              .doit().await;
 /// 

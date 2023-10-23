@@ -13,7 +13,7 @@ pub struct AchievementDefinition {
     /// The type of the achievement.
     #[serde(rename="achievementType")]
     
-    pub achievement_type: Option<String>,
+    pub achievement_type: Option<AchievementDefinitionAchievementTypeEnum>,
     /// The description of the achievement.
     
     pub description: Option<String>,
@@ -32,7 +32,7 @@ pub struct AchievementDefinition {
     /// The initial state of the achievement.
     #[serde(rename="initialState")]
     
-    pub initial_state: Option<String>,
+    pub initial_state: Option<AchievementDefinitionInitialStateEnum>,
     /// Indicates whether the revealed icon image being returned is a default image, or is provided by the game.
     #[serde(rename="isRevealedIconUrlDefault")]
     
@@ -131,7 +131,7 @@ pub struct AchievementRevealResponse {
     /// The current state of the achievement for which a reveal was attempted. This might be `UNLOCKED` if the achievement was already unlocked.
     #[serde(rename="currentState")]
     
-    pub current_state: Option<String>,
+    pub current_state: Option<AchievementRevealResponseCurrentStateEnum>,
     /// Uniquely identifies the type of this resource. Value is always the fixed string `games#achievementRevealResponse`.
     
     pub kind: Option<String>,
@@ -260,7 +260,7 @@ pub struct AchievementUpdateRequest {
     /// The type of update being applied.
     #[serde(rename="updateType")]
     
-    pub update_type: Option<String>,
+    pub update_type: Option<AchievementUpdateRequestUpdateTypeEnum>,
 }
 
 impl client::Part for AchievementUpdateRequest {}
@@ -280,7 +280,7 @@ pub struct AchievementUpdateResponse {
     /// The current state of the achievement.
     #[serde(rename="currentState")]
     
-    pub current_state: Option<String>,
+    pub current_state: Option<AchievementUpdateResponseCurrentStateEnum>,
     /// The current steps recorded for this achievement if it is incremental.
     #[serde(rename="currentSteps")]
     
@@ -333,7 +333,7 @@ pub struct Application {
     /// A list of features that have been enabled for the application.
     #[serde(rename="enabledFeatures")]
     
-    pub enabled_features: Option<Vec<String>>,
+    pub enabled_features: Option<Vec<ApplicationEnabledFeaturesEnum>>,
     /// The ID of the application.
     
     pub id: Option<String>,
@@ -488,7 +488,7 @@ pub struct EventBatchRecordFailure {
     /// The cause for the update failure.
     #[serde(rename="failureCause")]
     
-    pub failure_cause: Option<String>,
+    pub failure_cause: Option<EventBatchRecordFailureFailureCauseEnum>,
     /// Uniquely identifies the type of this resource. Value is always the fixed string `games#eventBatchRecordFailure`.
     
     pub kind: Option<String>,
@@ -553,7 +553,7 @@ pub struct EventDefinition {
     pub kind: Option<String>,
     /// The visibility of event being tracked in this definition.
     
-    pub visibility: Option<String>,
+    pub visibility: Option<EventDefinitionVisibilityEnum>,
 }
 
 impl client::Part for EventDefinition {}
@@ -646,7 +646,7 @@ pub struct EventRecordFailure {
     /// The cause for the update failure.
     #[serde(rename="failureCause")]
     
-    pub failure_cause: Option<String>,
+    pub failure_cause: Option<EventRecordFailureFailureCauseEnum>,
     /// Uniquely identifies the type of this resource. Value is always the fixed string `games#eventRecordFailure`.
     
     pub kind: Option<String>,
@@ -839,7 +839,7 @@ pub struct Instance {
     /// The platform type.
     #[serde(rename="platformType")]
     
-    pub platform_type: Option<String>,
+    pub platform_type: Option<InstancePlatformTypeEnum>,
     /// Flag to show if this game instance supports realtime play.
     #[serde(rename="realtimePlay")]
     
@@ -975,7 +975,7 @@ pub struct Leaderboard {
     pub name: Option<String>,
     /// How scores are ordered.
     
-    pub order: Option<String>,
+    pub order: Option<LeaderboardOrderEnum>,
 }
 
 impl client::Resource for Leaderboard {}
@@ -1020,7 +1020,7 @@ pub struct LeaderboardEntry {
     /// The time span of this high score.
     #[serde(rename="timeSpan")]
     
-    pub time_span: Option<String>,
+    pub time_span: Option<LeaderboardEntryTimeSpanEnum>,
     /// The timestamp at which this score was recorded, in milliseconds since the epoch in UTC.
     #[serde(rename="writeTimestampMillis")]
     
@@ -1192,7 +1192,7 @@ pub struct Player {
     /// The friend status of the given player, relative to the requester. This is unset if the player is not sharing their friends list with the game.
     #[serde(rename="friendStatus")]
     
-    pub friend_status: Option<String>,
+    pub friend_status: Option<PlayerFriendStatusEnum>,
     /// Per-application unique player identifier.
     #[serde(rename="gamePlayerId")]
     
@@ -1234,7 +1234,7 @@ pub struct PlayerAchievement {
     /// The state of the achievement.
     #[serde(rename="achievementState")]
     
-    pub achievement_state: Option<String>,
+    pub achievement_state: Option<PlayerAchievementAchievementStateEnum>,
     /// The current steps for an incremental achievement.
     #[serde(rename="currentSteps")]
     
@@ -1422,7 +1422,7 @@ pub struct PlayerLeaderboardScore {
     /// The time span of this score.
     #[serde(rename="timeSpan")]
     
-    pub time_span: Option<String>,
+    pub time_span: Option<PlayerLeaderboardScoreTimeSpanEnum>,
     /// The timestamp at which this score was recorded, in milliseconds since the epoch in UTC.
     #[serde(rename="writeTimestamp")]
     
@@ -1541,7 +1541,7 @@ pub struct PlayerScore {
     /// The time span for this player score.
     #[serde(rename="timeSpan")]
     
-    pub time_span: Option<String>,
+    pub time_span: Option<PlayerScoreTimeSpanEnum>,
 }
 
 impl client::Part for PlayerScore {}
@@ -1584,7 +1584,7 @@ pub struct PlayerScoreResponse {
     /// The time spans where the submitted score is better than the existing score for that time span.
     #[serde(rename="beatenScoreTimeSpans")]
     
-    pub beaten_score_time_spans: Option<Vec<String>>,
+    pub beaten_score_time_spans: Option<Vec<PlayerScoreResponseBeatenScoreTimeSpansEnum>>,
     /// The formatted value of the submitted score.
     #[serde(rename="formattedScore")]
     
@@ -1641,7 +1641,7 @@ pub struct ProfileSettings {
     /// no description provided
     #[serde(rename="friendsListVisibility")]
     
-    pub friends_list_visibility: Option<String>,
+    pub friends_list_visibility: Option<ProfileSettingFriendsListVisibilityEnum>,
     /// Uniquely identifies the type of this resource. Value is always the fixed string `games#profileSettings`.
     
     pub kind: Option<String>,
@@ -1675,7 +1675,7 @@ pub struct RevisionCheckResponse {
     /// The result of the revision check.
     #[serde(rename="revisionStatus")]
     
-    pub revision_status: Option<String>,
+    pub revision_status: Option<RevisionCheckResponseRevisionStatusEnum>,
 }
 
 impl client::ResponseResult for RevisionCheckResponse {}
@@ -1785,7 +1785,7 @@ pub struct Snapshot {
     /// The type of this snapshot.
     #[serde(rename="type")]
     
-    pub type_: Option<String>,
+    pub type_: Option<SnapshotTypeEnum>,
     /// The unique name provided when the snapshot was created.
     #[serde(rename="uniqueName")]
     

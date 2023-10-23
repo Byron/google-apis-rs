@@ -9,10 +9,10 @@ pub struct Accelerator {
     /// The type of an accelator for a CDF instance.
     #[serde(rename="acceleratorType")]
     
-    pub accelerator_type: Option<String>,
+    pub accelerator_type: Option<AcceleratorAcceleratorTypeEnum>,
     /// The state of the accelerator.
     
-    pub state: Option<String>,
+    pub state: Option<AcceleratorStateEnum>,
 }
 
 impl client::Part for Accelerator {}
@@ -51,7 +51,7 @@ pub struct AuditLogConfig {
     /// The log type that this config enables.
     #[serde(rename="logType")]
     
-    pub log_type: Option<String>,
+    pub log_type: Option<AuditLogConfigLogTypeEnum>,
 }
 
 impl client::Part for AuditLogConfig {}
@@ -262,7 +262,7 @@ pub struct Instance {
     /// Output only. If the instance state is DISABLED, the reason for disabling the instance.
     #[serde(rename="disabledReason")]
     
-    pub disabled_reason: Option<Vec<String>>,
+    pub disabled_reason: Option<Vec<InstanceDisabledReasonEnum>>,
     /// Display name for an instance.
     #[serde(rename="displayName")]
     
@@ -322,7 +322,7 @@ pub struct Instance {
     pub service_endpoint: Option<String>,
     /// Output only. The current state of this Data Fusion instance.
     
-    pub state: Option<String>,
+    pub state: Option<InstanceStateEnum>,
     /// Output only. Additional information about the current state of this Data Fusion instance if available.
     #[serde(rename="stateMessage")]
     
@@ -334,7 +334,7 @@ pub struct Instance {
     /// Required. Instance type.
     #[serde(rename="type")]
     
-    pub type_: Option<String>,
+    pub type_: Option<InstanceTypeEnum>,
     /// Output only. The time the instance was last updated.
     #[serde(rename="updateTime")]
     
@@ -797,7 +797,7 @@ pub struct Version {
     /// Type represents the release availability of the version
     #[serde(rename="type")]
     
-    pub type_: Option<String>,
+    pub type_: Option<VersionTypeEnum>,
     /// The version number of the Data Fusion instance, such as '6.0.1.0'.
     #[serde(rename="versionNumber")]
     

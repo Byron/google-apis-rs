@@ -38,8 +38,8 @@ use super::*;
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.users().import_ssh_public_key(req, "parent")
-///              .view("sed")
-///              .project_id("amet.")
+///              .view(&Default::default())
+///              .project_id("At")
 ///              .doit().await;
 /// 
 /// match result {

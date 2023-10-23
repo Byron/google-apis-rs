@@ -95,7 +95,7 @@ let mut hub = Pagespeedonline::new(hyper::Client::builder().build(hyper_rustls::
 // execute the final call using `doit()`.
 // Values shown here are possibly random and not representative !
 let result = hub.pagespeedapi().runpagespeed("url")
-             .strategy("magna")
+             .strategy(&Default::default())
              .screenshot(true)
              .add_rule("voluptua.")
              .locale("At")

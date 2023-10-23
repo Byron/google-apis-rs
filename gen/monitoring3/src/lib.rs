@@ -113,10 +113,10 @@
 //! // execute the final call using `doit()`.
 //! // Values shown here are possibly random and not representative !
 //! let result = hub.services().service_level_objectives_list("parent")
-//!              .view("sanctus")
-//!              .page_token("sed")
-//!              .page_size(-2)
-//!              .filter("takimata")
+//!              .view(&Default::default())
+//!              .page_token("At")
+//!              .page_size(-8)
+//!              .filter("sed")
 //!              .doit().await;
 //! 
 //! match result {

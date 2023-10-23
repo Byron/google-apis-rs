@@ -45,10 +45,10 @@ impl<'a, S> AdvertiserMethods<'a, S> {
     ///
     /// * `role` - The role of the requester. Valid values: 'advertisers' or 'publishers'.
     /// * `roleId` - The ID of the requesting advertiser or publisher.
-    pub fn get(&self, role: &str, role_id: &str) -> AdvertiserGetCall<'a, S> {
+    pub fn get(&self, role: &AdvertiserRoleEnum, role_id: &str) -> AdvertiserGetCall<'a, S> {
         AdvertiserGetCall {
             hub: self.hub,
-            _role: role.to_string(),
+            _role: role.clone(),
             _role_id: role_id.to_string(),
             _advertiser_id: Default::default(),
             _delegate: Default::default(),
@@ -64,10 +64,10 @@ impl<'a, S> AdvertiserMethods<'a, S> {
     ///
     /// * `role` - The role of the requester. Valid values: 'advertisers' or 'publishers'.
     /// * `roleId` - The ID of the requesting advertiser or publisher.
-    pub fn list(&self, role: &str, role_id: &str) -> AdvertiserListCall<'a, S> {
+    pub fn list(&self, role: &AdvertiserRoleEnum, role_id: &str) -> AdvertiserListCall<'a, S> {
         AdvertiserListCall {
             hub: self.hub,
-            _role: role.to_string(),
+            _role: role.clone(),
             _role_id: role_id.to_string(),
             _relationship_status: Default::default(),
             _page_token: Default::default(),
@@ -189,10 +189,10 @@ impl<'a, S> EventMethods<'a, S> {
     ///
     /// * `role` - The role of the requester. Valid values: 'advertisers' or 'publishers'.
     /// * `roleId` - The ID of the requesting advertiser or publisher.
-    pub fn list(&self, role: &str, role_id: &str) -> EventListCall<'a, S> {
+    pub fn list(&self, role: &EventRoleEnum, role_id: &str) -> EventListCall<'a, S> {
         EventListCall {
             hub: self.hub,
-            _role: role.to_string(),
+            _role: role.clone(),
             _role_id: role_id.to_string(),
             _type_: Default::default(),
             _status: Default::default(),
@@ -265,10 +265,10 @@ impl<'a, S> LinkMethods<'a, S> {
     /// * `role` - The role of the requester. Valid values: 'advertisers' or 'publishers'.
     /// * `roleId` - The ID of the requesting advertiser or publisher.
     /// * `linkId` - The ID of the link to look up.
-    pub fn get(&self, role: &str, role_id: &str, link_id: i64) -> LinkGetCall<'a, S> {
+    pub fn get(&self, role: &LinkRoleEnum, role_id: &str, link_id: i64) -> LinkGetCall<'a, S> {
         LinkGetCall {
             hub: self.hub,
-            _role: role.to_string(),
+            _role: role.clone(),
             _role_id: role_id.to_string(),
             _link_id: link_id,
             _delegate: Default::default(),
@@ -285,11 +285,11 @@ impl<'a, S> LinkMethods<'a, S> {
     /// * `request` - No description provided.
     /// * `role` - The role of the requester. Valid values: 'advertisers' or 'publishers'.
     /// * `roleId` - The ID of the requesting advertiser or publisher.
-    pub fn insert(&self, request: Link, role: &str, role_id: &str) -> LinkInsertCall<'a, S> {
+    pub fn insert(&self, request: Link, role: &LinkRoleEnum, role_id: &str) -> LinkInsertCall<'a, S> {
         LinkInsertCall {
             hub: self.hub,
             _request: request,
-            _role: role.to_string(),
+            _role: role.clone(),
             _role_id: role_id.to_string(),
             _delegate: Default::default(),
             _additional_params: Default::default(),
@@ -304,10 +304,10 @@ impl<'a, S> LinkMethods<'a, S> {
     ///
     /// * `role` - The role of the requester. Valid values: 'advertisers' or 'publishers'.
     /// * `roleId` - The ID of the requesting advertiser or publisher.
-    pub fn list(&self, role: &str, role_id: &str) -> LinkListCall<'a, S> {
+    pub fn list(&self, role: &LinkRoleEnum, role_id: &str) -> LinkListCall<'a, S> {
         LinkListCall {
             hub: self.hub,
-            _role: role.to_string(),
+            _role: role.clone(),
             _role_id: role_id.to_string(),
             _start_date_min: Default::default(),
             _start_date_max: Default::default(),
@@ -376,10 +376,10 @@ impl<'a, S> PublisherMethods<'a, S> {
     ///
     /// * `role` - The role of the requester. Valid values: 'advertisers' or 'publishers'.
     /// * `roleId` - The ID of the requesting advertiser or publisher.
-    pub fn get(&self, role: &str, role_id: &str) -> PublisherGetCall<'a, S> {
+    pub fn get(&self, role: &PublisherRoleEnum, role_id: &str) -> PublisherGetCall<'a, S> {
         PublisherGetCall {
             hub: self.hub,
-            _role: role.to_string(),
+            _role: role.clone(),
             _role_id: role_id.to_string(),
             _publisher_id: Default::default(),
             _delegate: Default::default(),
@@ -395,10 +395,10 @@ impl<'a, S> PublisherMethods<'a, S> {
     ///
     /// * `role` - The role of the requester. Valid values: 'advertisers' or 'publishers'.
     /// * `roleId` - The ID of the requesting advertiser or publisher.
-    pub fn list(&self, role: &str, role_id: &str) -> PublisherListCall<'a, S> {
+    pub fn list(&self, role: &PublisherRoleEnum, role_id: &str) -> PublisherListCall<'a, S> {
         PublisherListCall {
             hub: self.hub,
-            _role: role.to_string(),
+            _role: role.clone(),
             _role_id: role_id.to_string(),
             _relationship_status: Default::default(),
             _publisher_category: Default::default(),
@@ -462,12 +462,12 @@ impl<'a, S> ReportMethods<'a, S> {
     /// * `role` - The role of the requester. Valid values: 'advertisers' or 'publishers'.
     /// * `roleId` - The ID of the requesting advertiser or publisher.
     /// * `reportType` - The type of report being requested. Valid values: 'order_delta'. Required.
-    pub fn get(&self, role: &str, role_id: &str, report_type: &str) -> ReportGetCall<'a, S> {
+    pub fn get(&self, role: &ReportRoleEnum, role_id: &str, report_type: &ReportReportTypeEnum) -> ReportGetCall<'a, S> {
         ReportGetCall {
             hub: self.hub,
-            _role: role.to_string(),
+            _role: role.clone(),
             _role_id: role_id.to_string(),
-            _report_type: report_type.to_string(),
+            _report_type: report_type.clone(),
             _status: Default::default(),
             _start_index: Default::default(),
             _start_date: Default::default(),

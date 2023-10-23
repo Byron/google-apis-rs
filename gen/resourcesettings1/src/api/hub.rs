@@ -32,7 +32,7 @@ use super::*;
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.folders().settings_get("name")
-///              .view("At")
+///              .view(&Default::default())
 ///              .doit().await;
 /// 
 /// match result {

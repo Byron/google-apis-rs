@@ -242,7 +242,7 @@ pub struct CountArtifactsRequest {
     pub query: Option<Query>,
     /// Sets the granularity of the count results.
     
-    pub view: Option<String>,
+    pub view: Option<CountArtifactsRequestViewEnum>,
 }
 
 impl client::RequestValue for CountArtifactsRequest {}
@@ -274,7 +274,7 @@ pub struct DriveOptions {
     /// Set whether the results include only content encrypted with [Google Workspace Client-side encryption](https://support.google.com/a?p=cse_ov) content, only unencrypted content, or both. Defaults to both. Currently supported for Drive.
     #[serde(rename="clientSideEncryptedOption")]
     
-    pub client_side_encrypted_option: Option<String>,
+    pub client_side_encrypted_option: Option<DriveOptionClientSideEncryptedOptionEnum>,
     /// Set to **true** to include shared drives.
     #[serde(rename="includeSharedDrives")]
     
@@ -358,7 +358,7 @@ pub struct Export {
     pub stats: Option<ExportStats>,
     /// Output only. The status of the export.
     
-    pub status: Option<String>,
+    pub status: Option<ExportStatusEnum>,
 }
 
 impl client::RequestValue for Export {}
@@ -390,7 +390,7 @@ pub struct ExportOptions {
     pub mail_options: Option<MailExportOptions>,
     /// The requested data region for the export.
     
-    pub region: Option<String>,
+    pub region: Option<ExportOptionRegionEnum>,
     /// Options for Voice exports.
     #[serde(rename="voiceOptions")]
     
@@ -437,7 +437,7 @@ pub struct GroupsExportOptions {
     /// The file format for exported messages.
     #[serde(rename="exportFormat")]
     
-    pub export_format: Option<String>,
+    pub export_format: Option<GroupsExportOptionExportFormatEnum>,
 }
 
 impl client::Part for GroupsExportOptions {}
@@ -453,7 +453,7 @@ pub struct HangoutsChatExportOptions {
     /// The file format for exported messages.
     #[serde(rename="exportFormat")]
     
-    pub export_format: Option<String>,
+    pub export_format: Option<HangoutsChatExportOptionExportFormatEnum>,
 }
 
 impl client::Part for HangoutsChatExportOptions {}
@@ -639,7 +639,7 @@ pub struct HeldVoiceQuery {
     /// A list of data types covered by the hold. Should be non-empty. Order does not matter and duplicates are ignored.
     #[serde(rename="coveredData")]
     
-    pub covered_data: Option<Vec<String>>,
+    pub covered_data: Option<Vec<HeldVoiceQueryCoveredDataEnum>>,
 }
 
 impl client::Part for HeldVoiceQuery {}
@@ -663,7 +663,7 @@ pub struct Hold {
     pub accounts: Option<Vec<HeldAccount>>,
     /// The service to be searched.
     
-    pub corpus: Option<String>,
+    pub corpus: Option<HoldCorpusEnum>,
     /// The unique immutable ID of the hold. Assigned during creation.
     #[serde(rename="holdId")]
     
@@ -833,7 +833,7 @@ pub struct MailExportOptions {
     /// The file format for exported messages.
     #[serde(rename="exportFormat")]
     
-    pub export_format: Option<String>,
+    pub export_format: Option<MailExportOptionExportFormatEnum>,
     /// To export confidential mode content, set to **true**.
     #[serde(rename="showConfidentialModeContent")]
     
@@ -918,7 +918,7 @@ pub struct Matter {
     pub name: Option<String>,
     /// The state of the matter.
     
-    pub state: Option<String>,
+    pub state: Option<MatterStateEnum>,
 }
 
 impl client::RequestValue for Matter {}
@@ -943,7 +943,7 @@ pub struct MatterPermission {
     pub account_id: Option<String>,
     /// The user's role for the matter.
     
-    pub role: Option<String>,
+    pub role: Option<MatterPermissionRoleEnum>,
 }
 
 impl client::ResponseResult for MatterPermission {}
@@ -1014,11 +1014,11 @@ pub struct Query {
     pub account_info: Option<AccountInfo>,
     /// The Google Workspace service to search.
     
-    pub corpus: Option<String>,
+    pub corpus: Option<QueryCorpusEnum>,
     /// The data source to search.
     #[serde(rename="dataScope")]
     
-    pub data_scope: Option<String>,
+    pub data_scope: Option<QueryDataScopeEnum>,
     /// Set Drive search-specific options.
     #[serde(rename="driveOptions")]
     
@@ -1041,7 +1041,7 @@ pub struct Query {
     pub mail_options: Option<MailOptions>,
     /// The entity to search. This field replaces **searchMethod** to support shared drives. When **searchMethod** is **TEAM_DRIVE**, the response of this field is **SHARED_DRIVE**.
     
-    pub method: Option<String>,
+    pub method: Option<QueryMethodEnum>,
     /// Required when **SearchMethod** is **ORG_UNIT**.
     #[serde(rename="orgUnitInfo")]
     
@@ -1049,7 +1049,7 @@ pub struct Query {
     /// The search method to use.
     #[serde(rename="searchMethod")]
     
-    pub search_method: Option<String>,
+    pub search_method: Option<QuerySearchMethodEnum>,
     /// Required when **SearchMethod** is **SHARED_DRIVE**.
     #[serde(rename="sharedDriveInfo")]
     
@@ -1324,7 +1324,7 @@ pub struct VoiceExportOptions {
     /// The file format for exported text messages.
     #[serde(rename="exportFormat")]
     
-    pub export_format: Option<String>,
+    pub export_format: Option<VoiceExportOptionExportFormatEnum>,
 }
 
 impl client::Part for VoiceExportOptions {}
@@ -1340,7 +1340,7 @@ pub struct VoiceOptions {
     /// Datatypes to search
     #[serde(rename="coveredData")]
     
-    pub covered_data: Option<Vec<String>>,
+    pub covered_data: Option<Vec<VoiceOptionCoveredDataEnum>>,
 }
 
 impl client::Part for VoiceOptions {}

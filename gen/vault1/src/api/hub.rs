@@ -32,9 +32,9 @@ use super::*;
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.matters().holds_list("matterId")
-///              .view("takimata")
-///              .page_token("amet.")
-///              .page_size(-20)
+///              .view(&Default::default())
+///              .page_token("sed")
+///              .page_size(-2)
 ///              .doit().await;
 /// 
 /// match result {

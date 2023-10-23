@@ -58,7 +58,7 @@ pub struct AddTargetedAppsRequest {
     /// Required. The targeting mode that should be applied to the list of app IDs. If there are existing targeted app IDs, must be equal to the existing PretargetingConfig.appTargeting.mobileAppTargeting.targetingMode or a 400 bad request error will be returned.
     #[serde(rename="targetingMode")]
     
-    pub targeting_mode: Option<String>,
+    pub targeting_mode: Option<AddTargetedAppsRequestTargetingModeEnum>,
 }
 
 impl client::RequestValue for AddTargetedAppsRequest {}
@@ -82,7 +82,7 @@ pub struct AddTargetedPublishersRequest {
     /// Required. The targeting mode that should be applied to the list of publisher IDs. If are existing publisher IDs, must be equal to the existing PretargetingConfig.publisherTargeting.targetingMode or a 400 bad request error will be returned.
     #[serde(rename="targetingMode")]
     
-    pub targeting_mode: Option<String>,
+    pub targeting_mode: Option<AddTargetedPublishersRequestTargetingModeEnum>,
 }
 
 impl client::RequestValue for AddTargetedPublishersRequest {}
@@ -105,7 +105,7 @@ pub struct AddTargetedSitesRequest {
     /// Required. The targeting mode that should be applied to the list of site URLs. If there are existing targeted sites, must be equal to the existing PretargetingConfig.webTargeting.targetingMode or a 400 bad request error will be returned.
     #[serde(rename="targetingMode")]
     
-    pub targeting_mode: Option<String>,
+    pub targeting_mode: Option<AddTargetedSitesRequestTargetingModeEnum>,
 }
 
 impl client::RequestValue for AddTargetedSitesRequest {}
@@ -405,7 +405,7 @@ pub struct Creative {
     /// Output only. The format of this creative. Can be used to filter the response of the creatives.list method.
     #[serde(rename="creativeFormat")]
     
-    pub creative_format: Option<String>,
+    pub creative_format: Option<CreativeCreativeFormatEnum>,
     /// Buyer-specific creative ID that references this creative in bid responses. This field is Ignored in update operations. Can be used to filter the response of the creatives.list method. The maximum length of the creative ID is 128 bytes.
     #[serde(rename="creativeId")]
     
@@ -421,7 +421,7 @@ pub struct Creative {
     /// All declared attributes for the ads that may be shown from this creative. Can be used to filter the response of the creatives.list method. If the `excluded_attribute` field of a [bid request](https://developers.google.com/authorized-buyers/rtb/downloads/realtime-bidding-proto") contains one of the attributes that were declared or detected for a given creative, and a bid is submitted with that creative, the bid will be filtered before the auction.
     #[serde(rename="declaredAttributes")]
     
-    pub declared_attributes: Option<Vec<String>>,
+    pub declared_attributes: Option<Vec<CreativeDeclaredAttributesEnum>>,
     /// The set of declared destination URLs for the creative. Can be used to filter the response of the creatives.list method.
     #[serde(rename="declaredClickThroughUrls")]
     
@@ -429,7 +429,7 @@ pub struct Creative {
     /// All declared restricted categories for the ads that may be shown from this creative. Can be used to filter the response of the creatives.list method.
     #[serde(rename="declaredRestrictedCategories")]
     
-    pub declared_restricted_categories: Option<Vec<String>>,
+    pub declared_restricted_categories: Option<Vec<CreativeDeclaredRestrictedCategoriesEnum>>,
     /// IDs for the declared ad technology vendors that may be used by this creative. See https://storage.googleapis.com/adx-rtb-dictionaries/vendors.txt for possible values. Can be used to filter the response of the creatives.list method.
     #[serde(rename="declaredVendorIds")]
     
@@ -454,7 +454,7 @@ pub struct Creative {
     /// All restricted categories for the ads that may be shown from this creative.
     #[serde(rename="restrictedCategories")]
     
-    pub restricted_categories: Option<Vec<String>>,
+    pub restricted_categories: Option<Vec<CreativeRestrictedCategoriesEnum>>,
     /// Output only. The version of the creative. Version for a new creative is 1 and it increments during subsequent creative updates.
     
     pub version: Option<i32>,
@@ -513,7 +513,7 @@ pub struct CreativeServingDecision {
     /// Publisher-excludable attributes that were detected for this creative. Can be used to filter the response of the creatives.list method. If the `excluded_attribute` field of a [bid request](https://developers.google.com/authorized-buyers/rtb/downloads/realtime-bidding-proto) contains one of the attributes that were declared or detected for a given creative, and a bid is submitted with that creative, the bid will be filtered before the auction.
     #[serde(rename="detectedAttributes")]
     
-    pub detected_attributes: Option<Vec<String>>,
+    pub detected_attributes: Option<Vec<CreativeServingDecisionDetectedAttributesEnum>>,
     /// The set of detected destination URLs for the creative. Can be used to filter the response of the creatives.list method.
     #[serde(rename="detectedClickThroughUrls")]
     
@@ -597,7 +597,7 @@ pub struct DestinationNotCrawlableEvidence {
     pub crawled_url: Option<String>,
     /// Reason of destination not crawlable.
     
-    pub reason: Option<String>,
+    pub reason: Option<DestinationNotCrawlableEvidenceReasonEnum>,
 }
 
 impl client::Part for DestinationNotCrawlableEvidence {}
@@ -613,7 +613,7 @@ pub struct DestinationNotWorkingEvidence {
     /// DNS lookup errors.
     #[serde(rename="dnsError")]
     
-    pub dns_error: Option<String>,
+    pub dns_error: Option<DestinationNotWorkingEvidenceDnsErrorEnum>,
     /// The full non-working URL.
     #[serde(rename="expandedUrl")]
     
@@ -625,22 +625,22 @@ pub struct DestinationNotWorkingEvidence {
     /// Page was crawled successfully, but was detected as either a page with no content or an error page.
     #[serde(rename="invalidPage")]
     
-    pub invalid_page: Option<String>,
+    pub invalid_page: Option<DestinationNotWorkingEvidenceInvalidPageEnum>,
     /// Approximate time when the ad destination was last checked.
     #[serde(rename="lastCheckTime")]
     
     pub last_check_time: Option<client::chrono::DateTime<client::chrono::offset::Utc>>,
     /// Platform of the non-working URL.
     
-    pub platform: Option<String>,
+    pub platform: Option<DestinationNotWorkingEvidencePlatformEnum>,
     /// HTTP redirect chain error.
     #[serde(rename="redirectionError")]
     
-    pub redirection_error: Option<String>,
+    pub redirection_error: Option<DestinationNotWorkingEvidenceRedirectionErrorEnum>,
     /// Rejected because of malformed URLs or invalid requests.
     #[serde(rename="urlRejected")]
     
-    pub url_rejected: Option<String>,
+    pub url_rejected: Option<DestinationNotWorkingEvidenceUrlRejectedEnum>,
 }
 
 impl client::Part for DestinationNotWorkingEvidence {}
@@ -751,7 +751,7 @@ pub struct Endpoint {
     /// The protocol that the bidder endpoint is using.
     #[serde(rename="bidProtocol")]
     
-    pub bid_protocol: Option<String>,
+    pub bid_protocol: Option<EndpointBidProtocolEnum>,
     /// The maximum number of queries per second allowed to be sent to this server.
     #[serde(rename="maximumQps")]
     
@@ -763,7 +763,7 @@ pub struct Endpoint {
     /// The trading location that bid requests should be sent from. See https://developers.google.com/authorized-buyers/rtb/peer-guide#trading-locations for further information.
     #[serde(rename="tradingLocation")]
     
-    pub trading_location: Option<String>,
+    pub trading_location: Option<EndpointTradingLocationEnum>,
     /// Output only. The URL that bid requests should be sent to.
     
     pub url: Option<String>,
@@ -1049,7 +1049,7 @@ pub struct MediaFile {
     /// The MIME type of this media file. Can be used to filter the response of the creatives.list method.
     #[serde(rename="mimeType")]
     
-    pub mime_type: Option<String>,
+    pub mime_type: Option<MediaFileMimeTypeEnum>,
 }
 
 impl client::Part for MediaFile {}
@@ -1161,7 +1161,7 @@ impl client::RequestValue for OpenUserListRequest {}
 pub struct PolicyCompliance {
     /// Serving status for the given transaction type (for example, open auction, deals) or region (for example, China, Russia). Can be used to filter the response of the creatives.list method.
     
-    pub status: Option<String>,
+    pub status: Option<PolicyComplianceStatusEnum>,
     /// Topics related to the policy compliance for this transaction type (for example, open auction, deals) or region (for example, China, Russia). Topics may be present only if status is DISAPPROVED.
     
     pub topics: Option<Vec<PolicyTopicEntry>>,
@@ -1257,7 +1257,7 @@ pub struct PretargetingConfig {
     /// Targeting modes included by this configuration. A bid request must allow all the specified targeting modes. An unset value allows all bid requests to be sent, regardless of which targeting modes they allow.
     #[serde(rename="allowedUserTargetingModes")]
     
-    pub allowed_user_targeting_modes: Option<Vec<String>>,
+    pub allowed_user_targeting_modes: Option<Vec<PretargetingConfigAllowedUserTargetingModesEnum>>,
     /// Targeting on a subset of app inventory. If APP is listed in targeted_environments, the specified targeting is applied. A maximum of 30,000 app IDs can be targeted. An unset value for targeting allows all app-based bid requests to be sent. Apps can either be targeting positively (bid requests will be sent only if the destination app is listed in the targeting dimension) or negatively (bid requests will be sent only if the destination app is not listed in the targeting dimension).
     #[serde(rename="appTargeting")]
     
@@ -1287,11 +1287,11 @@ pub struct PretargetingConfig {
     /// Environments that are being included. Bid requests will not be sent for a given environment if it is not included. Further restrictions can be applied to included environments to target only a subset of its inventory. An unset value includes all environments.
     #[serde(rename="includedEnvironments")]
     
-    pub included_environments: Option<Vec<String>>,
+    pub included_environments: Option<Vec<PretargetingConfigIncludedEnvironmentsEnum>>,
     /// Creative formats included by this configuration. Only bid requests eligible for at least one of the specified creative formats will be sent. An unset value will allow all bid requests to be sent, regardless of format.
     #[serde(rename="includedFormats")]
     
-    pub included_formats: Option<Vec<String>>,
+    pub included_formats: Option<Vec<PretargetingConfigIncludedFormatsEnum>>,
     /// The languages included in this configuration, represented by their language code. See https://developers.google.com/adwords/api/docs/appendix/languagecodes.
     #[serde(rename="includedLanguages")]
     
@@ -1304,15 +1304,15 @@ pub struct PretargetingConfig {
     /// The platforms included by this configration. Bid requests for devices with the specified platform types will be sent. An unset value allows all bid requests to be sent, regardless of platform.
     #[serde(rename="includedPlatforms")]
     
-    pub included_platforms: Option<Vec<String>>,
+    pub included_platforms: Option<Vec<PretargetingConfigIncludedPlatformsEnum>>,
     /// User identifier types included in this configuration. At least one of the user identifier types specified in this list must be available for the bid request to be sent.
     #[serde(rename="includedUserIdTypes")]
     
-    pub included_user_id_types: Option<Vec<String>>,
+    pub included_user_id_types: Option<Vec<PretargetingConfigIncludedUserIdTypesEnum>>,
     /// The interstitial targeting specified for this configuration. The unset value will allow bid requests to be sent regardless of whether they are for interstitials or not.
     #[serde(rename="interstitialTargeting")]
     
-    pub interstitial_targeting: Option<String>,
+    pub interstitial_targeting: Option<PretargetingConfigInterstitialTargetingEnum>,
     /// Output only. Existing included or excluded geos that are invalid. Previously targeted geos may become invalid due to privacy restrictions.
     #[serde(rename="invalidGeoIds")]
     
@@ -1336,7 +1336,7 @@ pub struct PretargetingConfig {
     pub publisher_targeting: Option<StringTargetingDimension>,
     /// Output only. The state of this pretargeting configuration.
     
-    pub state: Option<String>,
+    pub state: Option<PretargetingConfigStateEnum>,
     /// The remarketing lists included or excluded in this configuration as defined in UserList.
     #[serde(rename="userListTargeting")]
     
@@ -1369,7 +1369,7 @@ pub struct PublisherConnection {
     /// Whether the publisher has been approved by the bidder.
     #[serde(rename="biddingState")]
     
-    pub bidding_state: Option<String>,
+    pub bidding_state: Option<PublisherConnectionBiddingStateEnum>,
     /// Output only. The time at which the publisher initiated a connection with the bidder (irrespective of if or when the bidder approves it). This is subsequently updated if the publisher revokes and re-initiates the connection.
     #[serde(rename="createTime")]
     
@@ -1384,7 +1384,7 @@ pub struct PublisherConnection {
     /// Output only. Whether the publisher is an Ad Manager or AdMob publisher.
     #[serde(rename="publisherPlatform")]
     
-    pub publisher_platform: Option<String>,
+    pub publisher_platform: Option<PublisherConnectionPublisherPlatformEnum>,
 }
 
 impl client::ResponseResult for PublisherConnection {}
@@ -1459,7 +1459,7 @@ pub struct StringTargetingDimension {
     /// How the items in this list should be targeted.
     #[serde(rename="targetingMode")]
     
-    pub targeting_mode: Option<String>,
+    pub targeting_mode: Option<StringTargetingDimensionTargetingModeEnum>,
     /// The values specified.
     
     pub values: Option<Vec<String>>,
@@ -1517,7 +1517,7 @@ pub struct UrlRestriction {
     /// The restriction type for the specified URL.
     #[serde(rename="restrictionType")]
     
-    pub restriction_type: Option<String>,
+    pub restriction_type: Option<UrlRestrictionRestrictionTypeEnum>,
     /// Start date (if specified) of the URL restriction.
     #[serde(rename="startDate")]
     
@@ -1562,7 +1562,7 @@ pub struct UserList {
     pub name: Option<String>,
     /// Output only. The status of the user list. A new user list starts out as open.
     
-    pub status: Option<String>,
+    pub status: Option<UserListStatusEnum>,
     /// Required. The URL restriction for the user list.
     #[serde(rename="urlRestriction")]
     
@@ -1628,7 +1628,7 @@ pub struct VideoMetadata {
     /// The maximum VAST version across all wrapped VAST documents. Can be used to filter the response of the creatives.list method.
     #[serde(rename="vastVersion")]
     
-    pub vast_version: Option<String>,
+    pub vast_version: Option<VideoMetadataVastVersionEnum>,
 }
 
 impl client::Part for VideoMetadata {}

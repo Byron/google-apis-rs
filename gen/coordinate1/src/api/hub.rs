@@ -37,17 +37,17 @@ use super::*;
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.jobs().patch(req, "teamId", 85)
-///              .title("est")
-///              .progress("ipsum")
-///              .note("ipsum")
-///              .lng(0.8016125465746553)
-///              .lat(0.8000651323113592)
-///              .customer_phone_number("ea")
-///              .customer_name("dolor")
-///              .add_custom_field("Lorem")
-///              .assignee("eos")
-///              .address("labore")
+/// let result = hub.jobs().patch(req, "teamId", 64)
+///              .title("gubergren")
+///              .progress(&Default::default())
+///              .note("rebum.")
+///              .lng(0.34810194289930996)
+///              .lat(0.4035875305784462)
+///              .customer_phone_number("est")
+///              .customer_name("gubergren")
+///              .add_custom_field("ea")
+///              .assignee("dolor")
+///              .address("Lorem")
 ///              .doit().await;
 /// 
 /// match result {

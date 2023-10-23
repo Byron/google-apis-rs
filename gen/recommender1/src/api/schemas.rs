@@ -27,7 +27,7 @@ impl client::Part for GoogleCloudRecommenderV1CostProjection {}
 pub struct GoogleCloudRecommenderV1Impact {
     /// Category that is being targeted.
     
-    pub category: Option<String>,
+    pub category: Option<GoogleCloudRecommenderV1ImpactCategoryEnum>,
     /// Use with CategoryType.COST
     #[serde(rename="costProjection")]
     
@@ -73,7 +73,7 @@ pub struct GoogleCloudRecommenderV1Insight {
     pub associated_recommendations: Option<Vec<GoogleCloudRecommenderV1InsightRecommendationReference>>,
     /// Category being targeted by the insight.
     
-    pub category: Option<String>,
+    pub category: Option<GoogleCloudRecommenderV1InsightCategoryEnum>,
     /// A struct of custom fields to explain the insight. Example: "grantedPermissionsCount": "1000"
     
     pub content: Option<HashMap<String, json::Value>>,
@@ -101,7 +101,7 @@ pub struct GoogleCloudRecommenderV1Insight {
     pub observation_period: Option<client::chrono::Duration>,
     /// Insight's severity.
     
-    pub severity: Option<String>,
+    pub severity: Option<GoogleCloudRecommenderV1InsightSeverityEnum>,
     /// Information state and metadata.
     #[serde(rename="stateInfo")]
     
@@ -139,7 +139,7 @@ impl client::Part for GoogleCloudRecommenderV1InsightRecommendationReference {}
 pub struct GoogleCloudRecommenderV1InsightStateInfo {
     /// Insight state.
     
-    pub state: Option<String>,
+    pub state: Option<GoogleCloudRecommenderV1InsightStateInfoStateEnum>,
     /// A map of metadata for the state, provided by user or automations systems.
     #[serde(rename="stateMetadata")]
     
@@ -512,7 +512,7 @@ pub struct GoogleCloudRecommenderV1Recommendation {
     pub primary_impact: Option<GoogleCloudRecommenderV1Impact>,
     /// Recommendation's priority.
     
-    pub priority: Option<String>,
+    pub priority: Option<GoogleCloudRecommenderV1RecommendationPriorityEnum>,
     /// Contains an identifier for a subtype of recommendations produced for the same recommender. Subtype is a function of content and impact, meaning a new subtype might be added when significant changes to `content` or `primary_impact.category` are introduced. See the Recommenders section to see a list of subtypes for a given Recommender. Examples: For recommender = "google.iam.policy.Recommender", recommender_subtype can be one of "REMOVE_ROLE"/"REPLACE_ROLE"
     #[serde(rename="recommenderSubtype")]
     
@@ -573,7 +573,7 @@ impl client::Part for GoogleCloudRecommenderV1RecommendationInsightReference {}
 pub struct GoogleCloudRecommenderV1RecommendationStateInfo {
     /// The state of the recommendation, Eg ACTIVE, SUCCEEDED, FAILED.
     
-    pub state: Option<String>,
+    pub state: Option<GoogleCloudRecommenderV1RecommendationStateInfoStateEnum>,
     /// A map of metadata for the state, provided by user or automations systems.
     #[serde(rename="stateMetadata")]
     
@@ -657,7 +657,7 @@ pub struct GoogleCloudRecommenderV1ReliabilityProjection {
     pub details: Option<HashMap<String, json::Value>>,
     /// Reliability risks mitigated by this recommendation.
     
-    pub risks: Option<Vec<String>>,
+    pub risks: Option<Vec<GoogleCloudRecommenderV1ReliabilityProjectionRisksEnum>>,
 }
 
 impl client::Part for GoogleCloudRecommenderV1ReliabilityProjection {}

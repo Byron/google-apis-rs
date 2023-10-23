@@ -212,11 +212,11 @@
 //! // You can configure optional parameters by calling the respective setters at will, and
 //! // execute the final call using `doit()`.
 //! // Values shown here are possibly random and not representative !
-//! let result = hub.advertisers().campaigns_targeting_types_assigned_targeting_options_list(-80, -2, "targetingType")
+//! let result = hub.advertisers().campaigns_targeting_types_assigned_targeting_options_list(-8, -80, &Default::default())
 //!              .page_token("amet.")
-//!              .page_size(-20)
-//!              .order_by("ipsum")
-//!              .filter("gubergren")
+//!              .page_size(-59)
+//!              .order_by("amet.")
+//!              .filter("duo")
 //!              .doit().await;
 //! 
 //! match result {

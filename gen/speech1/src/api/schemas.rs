@@ -367,7 +367,7 @@ pub struct RecognitionConfig {
     pub enable_word_time_offsets: Option<bool>,
     /// Encoding of audio data sent in all `RecognitionAudio` messages. This field is optional for `FLAC` and `WAV` audio files and required for all other audio formats. For details, see AudioEncoding.
     
-    pub encoding: Option<String>,
+    pub encoding: Option<RecognitionConfigEncodingEnum>,
     /// Required. The language of the supplied audio as a [BCP-47](https://www.rfc-editor.org/rfc/bcp/bcp47.txt) language tag. Example: "en-US". See [Language Support](https://cloud.google.com/speech-to-text/docs/languages) for a list of the currently supported language codes.
     #[serde(rename="languageCode")]
     
@@ -421,15 +421,15 @@ pub struct RecognitionMetadata {
     /// The use case most closely describing the audio content to be recognized.
     #[serde(rename="interactionType")]
     
-    pub interaction_type: Option<String>,
+    pub interaction_type: Option<RecognitionMetadataInteractionTypeEnum>,
     /// The audio type that most closely describes the audio being recognized.
     #[serde(rename="microphoneDistance")]
     
-    pub microphone_distance: Option<String>,
+    pub microphone_distance: Option<RecognitionMetadataMicrophoneDistanceEnum>,
     /// The original media the speech was recorded on.
     #[serde(rename="originalMediaType")]
     
-    pub original_media_type: Option<String>,
+    pub original_media_type: Option<RecognitionMetadataOriginalMediaTypeEnum>,
     /// Mime type of the original audio file. For example `audio/m4a`, `audio/x-alaw-basic`, `audio/mp3`, `audio/3gpp`. A list of possible audio mime types is maintained at http://www.iana.org/assignments/media-types/media-types.xhtml#audio
     #[serde(rename="originalMimeType")]
     
@@ -441,7 +441,7 @@ pub struct RecognitionMetadata {
     /// The type of device the speech was recorded with.
     #[serde(rename="recordingDeviceType")]
     
-    pub recording_device_type: Option<String>,
+    pub recording_device_type: Option<RecognitionMetadataRecordingDeviceTypeEnum>,
 }
 
 impl client::Part for RecognitionMetadata {}

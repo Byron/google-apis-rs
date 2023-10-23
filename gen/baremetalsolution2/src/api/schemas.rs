@@ -21,7 +21,7 @@ pub struct AllowedClient {
     /// Mount permissions.
     #[serde(rename="mountPermissions")]
     
-    pub mount_permissions: Option<String>,
+    pub mount_permissions: Option<AllowedClientMountPermissionsEnum>,
     /// The network the access point sits on.
     
     pub network: Option<String>,
@@ -169,7 +169,7 @@ pub struct GoogleCloudBaremetalsolutionV2ServerNetworkTemplateLogicalInterface {
     /// Interface type.
     #[serde(rename="type")]
     
-    pub type_: Option<String>,
+    pub type_: Option<GoogleCloudBaremetalsolutionV2ServerNetworkTemplateLogicalInterfaceTypeEnum>,
 }
 
 impl client::Part for GoogleCloudBaremetalsolutionV2ServerNetworkTemplateLogicalInterface {}
@@ -240,7 +240,7 @@ pub struct Instance {
     pub pod: Option<String>,
     /// Output only. The state of the server.
     
-    pub state: Option<String>,
+    pub state: Option<InstanceStateEnum>,
     /// Output only. Update a time stamp.
     #[serde(rename="updateTime")]
     
@@ -251,7 +251,7 @@ pub struct Instance {
     /// The workload profile for the instance.
     #[serde(rename="workloadProfile")]
     
-    pub workload_profile: Option<String>,
+    pub workload_profile: Option<InstanceWorkloadProfileEnum>,
 }
 
 impl client::RequestValue for Instance {}
@@ -293,7 +293,7 @@ pub struct InstanceConfig {
     /// The type of network configuration on the instance.
     #[serde(rename="networkConfig")]
     
-    pub network_config: Option<String>,
+    pub network_config: Option<InstanceConfigNetworkConfigEnum>,
     /// Server network template name. Filled if InstanceConfig.multivlan_config is true.
     #[serde(rename="networkTemplate")]
     
@@ -669,7 +669,7 @@ pub struct LogicalNetworkInterface {
     /// Type of network.
     #[serde(rename="networkType")]
     
-    pub network_type: Option<String>,
+    pub network_type: Option<LogicalNetworkInterfaceNetworkTypeEnum>,
 }
 
 impl client::Part for LogicalNetworkInterface {}
@@ -696,7 +696,7 @@ pub struct Lun {
     /// The LUN multiprotocol type ensures the characteristics of the LUN are optimized for each operating system.
     #[serde(rename="multiprotocolType")]
     
-    pub multiprotocol_type: Option<String>,
+    pub multiprotocol_type: Option<LunMultiprotocolTypeEnum>,
     /// Output only. The name of the LUN.
     
     pub name: Option<String>,
@@ -710,11 +710,11 @@ pub struct Lun {
     pub size_gb: Option<i64>,
     /// The state of this storage volume.
     
-    pub state: Option<String>,
+    pub state: Option<LunStateEnum>,
     /// The storage type for this LUN.
     #[serde(rename="storageType")]
     
-    pub storage_type: Option<String>,
+    pub storage_type: Option<LunStorageTypeEnum>,
     /// Display the storage volume for this LUN.
     #[serde(rename="storageVolume")]
     
@@ -802,11 +802,11 @@ pub struct Network {
     pub services_cidr: Option<String>,
     /// The Network state.
     
-    pub state: Option<String>,
+    pub state: Option<NetworkStateEnum>,
     /// The type of this network.
     #[serde(rename="type")]
     
-    pub type_: Option<String>,
+    pub type_: Option<NetworkTypeEnum>,
     /// The vlan id of the Network.
     #[serde(rename="vlanId")]
     
@@ -875,7 +875,7 @@ impl client::Part for NetworkAddressReservation {}
 pub struct NetworkConfig {
     /// Interconnect bandwidth. Set only when type is CLIENT.
     
-    pub bandwidth: Option<String>,
+    pub bandwidth: Option<NetworkConfigBandwidthEnum>,
     /// CIDR range of the network.
     
     pub cidr: Option<String>,
@@ -896,11 +896,11 @@ pub struct NetworkConfig {
     /// Service CIDR, if any.
     #[serde(rename="serviceCidr")]
     
-    pub service_cidr: Option<String>,
+    pub service_cidr: Option<NetworkConfigServiceCidrEnum>,
     /// The type of this network, either Client or Private.
     #[serde(rename="type")]
     
-    pub type_: Option<String>,
+    pub type_: Option<NetworkConfigTypeEnum>,
     /// User note field, it can be used by customers to add additional information for the BMS Ops team .
     #[serde(rename="userNote")]
     
@@ -996,7 +996,7 @@ pub struct NfsExport {
     pub no_root_squash: Option<bool>,
     /// Export permissions.
     
-    pub permissions: Option<String>,
+    pub permissions: Option<NfsExportPermissionsEnum>,
 }
 
 impl client::Part for NfsExport {}
@@ -1039,11 +1039,11 @@ pub struct NfsShare {
     pub requested_size_gib: Option<i64>,
     /// Output only. The state of the NFS share.
     
-    pub state: Option<String>,
+    pub state: Option<NfsShareStateEnum>,
     /// Immutable. The storage type of the underlying volume.
     #[serde(rename="storageType")]
     
-    pub storage_type: Option<String>,
+    pub storage_type: Option<NfsShareStorageTypeEnum>,
     /// Output only. The underlying volume of the share. Created automatically during provisioning.
     
     pub volume: Option<String>,
@@ -1170,7 +1170,7 @@ pub struct ProvisioningConfig {
     pub networks: Option<Vec<NetworkConfig>>,
     /// Output only. State of ProvisioningConfig.
     
-    pub state: Option<String>,
+    pub state: Option<ProvisioningConfigStateEnum>,
     /// Optional status messages associated with the FAILED state.
     #[serde(rename="statusMessage")]
     
@@ -1206,7 +1206,7 @@ pub struct ProvisioningQuota {
     /// The asset type of this provisioning quota.
     #[serde(rename="assetType")]
     
-    pub asset_type: Option<String>,
+    pub asset_type: Option<ProvisioningQuotaAssetTypeEnum>,
     /// The available count of the provisioning quota.
     #[serde(rename="availableCount")]
     
@@ -1499,7 +1499,7 @@ pub struct VRF {
     pub qos_policy: Option<QosPolicy>,
     /// The possible state of VRF.
     
-    pub state: Option<String>,
+    pub state: Option<VRFStateEnum>,
     /// The list of VLAN attachments for the VRF.
     #[serde(rename="vlanAttachments")]
     
@@ -1601,13 +1601,13 @@ pub struct Volume {
     /// Immutable. Performance tier of the Volume. Default is SHARED.
     #[serde(rename="performanceTier")]
     
-    pub performance_tier: Option<String>,
+    pub performance_tier: Option<VolumePerformanceTierEnum>,
     /// Immutable. Pod name.
     
     pub pod: Option<String>,
     /// Output only. Storage protocol for the Volume.
     
-    pub protocol: Option<String>,
+    pub protocol: Option<VolumeProtocolEnum>,
     /// The space remaining in the storage volume for new LUNs, in GiB, excluding space reserved for snapshots.
     #[serde(rename="remainingSpaceGib")]
     
@@ -1621,7 +1621,7 @@ pub struct Volume {
     /// The behavior to use when snapshot reserved space is full.
     #[serde(rename="snapshotAutoDeleteBehavior")]
     
-    pub snapshot_auto_delete_behavior: Option<String>,
+    pub snapshot_auto_delete_behavior: Option<VolumeSnapshotAutoDeleteBehaviorEnum>,
     /// Whether snapshots are enabled.
     #[serde(rename="snapshotEnabled")]
     
@@ -1636,7 +1636,7 @@ pub struct Volume {
     pub snapshot_schedule_policy: Option<String>,
     /// The state of this storage volume.
     
-    pub state: Option<String>,
+    pub state: Option<VolumeStateEnum>,
     /// Input only. Name of the storage aggregate pool to allocate the volume in. Can be used only for VOLUME_PERFORMANCE_TIER_ASSIGNED volumes.
     #[serde(rename="storageAggregatePool")]
     
@@ -1644,11 +1644,11 @@ pub struct Volume {
     /// The storage type for this volume.
     #[serde(rename="storageType")]
     
-    pub storage_type: Option<String>,
+    pub storage_type: Option<VolumeStorageTypeEnum>,
     /// The workload profile for the volume.
     #[serde(rename="workloadProfile")]
     
-    pub workload_profile: Option<String>,
+    pub workload_profile: Option<VolumeWorkloadProfileEnum>,
 }
 
 impl client::RequestValue for Volume {}
@@ -1687,10 +1687,10 @@ pub struct VolumeConfig {
     /// Performance tier of the Volume. Default is SHARED.
     #[serde(rename="performanceTier")]
     
-    pub performance_tier: Option<String>,
+    pub performance_tier: Option<VolumeConfigPerformanceTierEnum>,
     /// Volume protocol.
     
-    pub protocol: Option<String>,
+    pub protocol: Option<VolumeConfigProtocolEnum>,
     /// The requested size of this volume, in GB.
     #[serde(rename="sizeGb")]
     
@@ -1706,7 +1706,7 @@ pub struct VolumeConfig {
     /// The type of this Volume.
     #[serde(rename="type")]
     
-    pub type_: Option<String>,
+    pub type_: Option<VolumeConfigTypeEnum>,
     /// User note field, it can be used by customers to add additional information for the BMS Ops team .
     #[serde(rename="userNote")]
     
@@ -1748,7 +1748,7 @@ pub struct VolumeSnapshot {
     /// Output only. The type of the snapshot which indicates whether it was scheduled or manual/ad-hoc.
     #[serde(rename="type")]
     
-    pub type_: Option<String>,
+    pub type_: Option<VolumeSnapshotTypeEnum>,
 }
 
 impl client::RequestValue for VolumeSnapshot {}

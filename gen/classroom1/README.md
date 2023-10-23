@@ -147,10 +147,10 @@ let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsC
 // Values shown here are possibly random and not representative !
 let result = hub.courses().course_work_student_submissions_list("courseId", "courseWorkId")
              .user_id("no")
-             .add_states("ipsum")
-             .page_token("voluptua.")
-             .page_size(-27)
-             .late("sanctus")
+             .add_states(&Default::default())
+             .page_token("ipsum")
+             .page_size(-28)
+             .late(&Default::default())
              .doit().await;
 
 match result {

@@ -77,7 +77,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
 
         params.extend(self._additional_params.iter());
 
@@ -369,7 +369,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
 
         params.extend(self._additional_params.iter());
 
@@ -654,7 +654,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -916,7 +916,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -1184,7 +1184,7 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
         if let Some(value) = self._require_open_jobs.as_ref() {
             params.push("requireOpenJobs", value.to_string());
         }
@@ -1483,7 +1483,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -1775,7 +1775,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
 
         params.extend(self._additional_params.iter());
 
@@ -2067,7 +2067,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
 
         params.extend(self._additional_params.iter());
 
@@ -2352,7 +2352,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -2614,7 +2614,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -2834,8 +2834,8 @@ where
 /// let result = hub.projects().jobs_list("parent")
 ///              .page_token("ea")
 ///              .page_size(-55)
-///              .job_view("invidunt")
-///              .filter("amet")
+///              .job_view(&Default::default())
+///              .filter("invidunt")
 ///              .doit().await;
 /// # }
 /// ```
@@ -2846,7 +2846,7 @@ pub struct ProjectJobListCall<'a, S>
    pub(super) _parent: String,
    pub(super) _page_token: Option<String>,
    pub(super) _page_size: Option<i32>,
-   pub(super) _job_view: Option<String>,
+   pub(super) _job_view: Option<ProjectJobViewEnum>,
    pub(super) _filter: Option<String>,
    pub(super) _delegate: Option<&'a mut dyn client::Delegate>,
    pub(super) _additional_params: HashMap<String, String>,
@@ -2884,7 +2884,7 @@ where
         }
 
         let mut params = Params::with_capacity(7 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -3028,8 +3028,8 @@ where
     /// Optional. The desired job attributes returned for jobs in the search response. Defaults to JobView.JOB_VIEW_FULL if no value is specified.
     ///
     /// Sets the *job view* query property to the given value.
-    pub fn job_view(mut self, new_value: &str) -> ProjectJobListCall<'a, S> {
-        self._job_view = Some(new_value.to_string());
+    pub fn job_view(mut self, new_value: &ProjectJobViewEnum) -> ProjectJobListCall<'a, S> {
+        self._job_view = Some(new_value.clone());
         self
     }
     /// Required. The filter string specifies the jobs to be enumerated. Supported operator: =, AND The fields eligible for filtering are: * `companyName` * `requisitionId` * `status` Available values: OPEN, EXPIRED, ALL. Defaults to OPEN if no value is specified. At least one of `companyName` and `requisitionId` must present or an INVALID_ARGUMENT error is thrown. Sample Query: * companyName = "projects/api-test-project/companies/123" * companyName = "projects/api-test-project/companies/123" AND requisitionId = "req-1" * companyName = "projects/api-test-project/companies/123" AND status = "EXPIRED" * requisitionId = "req-1" * requisitionId = "req-1" AND status = "EXPIRED"
@@ -3193,7 +3193,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -3485,7 +3485,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
 
         params.extend(self._additional_params.iter());
 
@@ -3777,7 +3777,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
 
         params.extend(self._additional_params.iter());
 
@@ -4018,13 +4018,13 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().complete("name")
-///              .type_("gubergren")
-///              .scope("rebum.")
-///              .query("est")
-///              .page_size(-50)
-///              .add_language_codes("ipsum")
+///              .type_(&Default::default())
+///              .scope(&Default::default())
+///              .query("ut")
+///              .page_size(-12)
+///              .add_language_codes("rebum.")
 ///              .language_code("est")
-///              .company_name("gubergren")
+///              .company_name("ipsum")
 ///              .doit().await;
 /// # }
 /// ```
@@ -4033,8 +4033,8 @@ pub struct ProjectCompleteCall<'a, S>
 
    pub(super) hub: &'a CloudTalentSolution<S>,
    pub(super) _name: String,
-   pub(super) _type_: Option<String>,
-   pub(super) _scope: Option<String>,
+   pub(super) _type_: Option<ProjectTypeEnum>,
+   pub(super) _scope: Option<ProjectScopeEnum>,
    pub(super) _query: Option<String>,
    pub(super) _page_size: Option<i32>,
    pub(super) _language_codes: Vec<String>,
@@ -4076,7 +4076,7 @@ where
         }
 
         let mut params = Params::with_capacity(10 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
         if let Some(value) = self._type_.as_ref() {
             params.push("type", value);
         }
@@ -4217,15 +4217,15 @@ where
     /// Optional. The completion topic. The default is CompletionType.COMBINED.
     ///
     /// Sets the *type* query property to the given value.
-    pub fn type_(mut self, new_value: &str) -> ProjectCompleteCall<'a, S> {
-        self._type_ = Some(new_value.to_string());
+    pub fn type_(mut self, new_value: &ProjectTypeEnum) -> ProjectCompleteCall<'a, S> {
+        self._type_ = Some(new_value.clone());
         self
     }
     /// Optional. The scope of the completion. The defaults is CompletionScope.PUBLIC.
     ///
     /// Sets the *scope* query property to the given value.
-    pub fn scope(mut self, new_value: &str) -> ProjectCompleteCall<'a, S> {
-        self._scope = Some(new_value.to_string());
+    pub fn scope(mut self, new_value: &ProjectScopeEnum) -> ProjectCompleteCall<'a, S> {
+        self._scope = Some(new_value.clone());
         self
     }
     /// Required. The query used to generate suggestions. The maximum number of allowed characters is 255.

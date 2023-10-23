@@ -337,7 +337,7 @@ pub struct Block {
     /// Detected block type (text, image etc) for this block.
     #[serde(rename="blockType")]
     
-    pub block_type: Option<String>,
+    pub block_type: Option<BlockBlockTypeEnum>,
     /// The bounding box for the block. The vertices are in the order of top-left, top-right, bottom-right, bottom-left. When a rotation of the bounding box is detected the rotation is represented as around the top-left corner as defined when the text is read in the 'natural' orientation. For example: * when the text is horizontal it might look like: 0----1 | | 3----2 * when it's rotated 180 degrees around the top-left corner it becomes: 2----3 | | 1----0 and the vertex order will still be (0, 1, 2, 3).
     #[serde(rename="boundingBox")]
     
@@ -505,7 +505,7 @@ pub struct DetectedBreak {
     /// Detected break type.
     #[serde(rename="type")]
     
-    pub type_: Option<String>,
+    pub type_: Option<DetectedBreakTypeEnum>,
 }
 
 impl client::Part for DetectedBreak {}
@@ -616,11 +616,11 @@ pub struct FaceAnnotation {
     /// Anger likelihood.
     #[serde(rename="angerLikelihood")]
     
-    pub anger_likelihood: Option<String>,
+    pub anger_likelihood: Option<FaceAnnotationAngerLikelihoodEnum>,
     /// Blurred likelihood.
     #[serde(rename="blurredLikelihood")]
     
-    pub blurred_likelihood: Option<String>,
+    pub blurred_likelihood: Option<FaceAnnotationBlurredLikelihoodEnum>,
     /// The bounding polygon around the face. The coordinates of the bounding box are in the original image's scale. The bounding box is computed to "frame" the face in accordance with human expectations. It is based on the landmarker results. Note that one or more x and/or y coordinates may not be generated in the `BoundingPoly` (the polygon will be unbounded) if only a partial face appears in the image to be annotated.
     #[serde(rename="boundingPoly")]
     
@@ -636,11 +636,11 @@ pub struct FaceAnnotation {
     /// Headwear likelihood.
     #[serde(rename="headwearLikelihood")]
     
-    pub headwear_likelihood: Option<String>,
+    pub headwear_likelihood: Option<FaceAnnotationHeadwearLikelihoodEnum>,
     /// Joy likelihood.
     #[serde(rename="joyLikelihood")]
     
-    pub joy_likelihood: Option<String>,
+    pub joy_likelihood: Option<FaceAnnotationJoyLikelihoodEnum>,
     /// Face landmarking confidence. Range [0, 1].
     #[serde(rename="landmarkingConfidence")]
     
@@ -659,11 +659,11 @@ pub struct FaceAnnotation {
     /// Sorrow likelihood.
     #[serde(rename="sorrowLikelihood")]
     
-    pub sorrow_likelihood: Option<String>,
+    pub sorrow_likelihood: Option<FaceAnnotationSorrowLikelihoodEnum>,
     /// Surprise likelihood.
     #[serde(rename="surpriseLikelihood")]
     
-    pub surprise_likelihood: Option<String>,
+    pub surprise_likelihood: Option<FaceAnnotationSurpriseLikelihoodEnum>,
     /// Pitch angle, which indicates the upwards/downwards angle that the face is pointing relative to the image's horizontal plane. Range [-180,180].
     #[serde(rename="tiltAngle")]
     
@@ -671,7 +671,7 @@ pub struct FaceAnnotation {
     /// Under-exposed likelihood.
     #[serde(rename="underExposedLikelihood")]
     
-    pub under_exposed_likelihood: Option<String>,
+    pub under_exposed_likelihood: Option<FaceAnnotationUnderExposedLikelihoodEnum>,
 }
 
 impl client::Part for FaceAnnotation {}
@@ -694,7 +694,7 @@ pub struct Feature {
     /// The feature type.
     #[serde(rename="type")]
     
-    pub type_: Option<String>,
+    pub type_: Option<FeatureTypeEnum>,
 }
 
 impl client::Part for Feature {}
@@ -975,7 +975,7 @@ pub struct Landmark {
     /// Face landmark type.
     #[serde(rename="type")]
     
-    pub type_: Option<String>,
+    pub type_: Option<LandmarkTypeEnum>,
 }
 
 impl client::Part for Landmark {}
@@ -1631,19 +1631,19 @@ impl client::Part for Result {}
 pub struct SafeSearchAnnotation {
     /// Represents the adult content likelihood for the image. Adult content may contain elements such as nudity, pornographic images or cartoons, or sexual activities.
     
-    pub adult: Option<String>,
+    pub adult: Option<SafeSearchAnnotationAdultEnum>,
     /// Likelihood that this is a medical image.
     
-    pub medical: Option<String>,
+    pub medical: Option<SafeSearchAnnotationMedicalEnum>,
     /// Likelihood that the request image contains racy content. Racy content may include (but is not limited to) skimpy or sheer clothing, strategically covered nudity, lewd or provocative poses, or close-ups of sensitive body areas.
     
-    pub racy: Option<String>,
+    pub racy: Option<SafeSearchAnnotationRacyEnum>,
     /// Spoof likelihood. The likelihood that an modification was made to the image's canonical version to make it appear funny or offensive.
     
-    pub spoof: Option<String>,
+    pub spoof: Option<SafeSearchAnnotationSpoofEnum>,
     /// Likelihood that this image contains violent content.
     
-    pub violence: Option<String>,
+    pub violence: Option<SafeSearchAnnotationViolenceEnum>,
 }
 
 impl client::Part for SafeSearchAnnotation {}

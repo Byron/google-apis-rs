@@ -86,7 +86,7 @@ pub struct GoogleSecuritySafebrowsingV4FetchThreatListUpdatesRequestListUpdateRe
     /// The type of platform at risk by entries present in the list.
     #[serde(rename="platformType")]
     
-    pub platform_type: Option<String>,
+    pub platform_type: Option<GoogleSecuritySafebrowsingV4FetchThreatListUpdatesRequestListUpdateRequestPlatformTypeEnum>,
     /// The current state of the client for the requested list (the encrypted client state that was received from the last successful list update).
     
     #[serde_as(as = "Option<::client::serde::urlsafe_base64::Wrapper>")]
@@ -94,11 +94,11 @@ pub struct GoogleSecuritySafebrowsingV4FetchThreatListUpdatesRequestListUpdateRe
     /// The types of entries present in the list.
     #[serde(rename="threatEntryType")]
     
-    pub threat_entry_type: Option<String>,
+    pub threat_entry_type: Option<GoogleSecuritySafebrowsingV4FetchThreatListUpdatesRequestListUpdateRequestThreatEntryTypeEnum>,
     /// The type of threat posed by entries present in the list.
     #[serde(rename="threatType")]
     
-    pub threat_type: Option<String>,
+    pub threat_type: Option<GoogleSecuritySafebrowsingV4FetchThreatListUpdatesRequestListUpdateRequestThreatTypeEnum>,
 }
 
 impl client::Part for GoogleSecuritySafebrowsingV4FetchThreatListUpdatesRequestListUpdateRequest {}
@@ -132,7 +132,7 @@ pub struct GoogleSecuritySafebrowsingV4FetchThreatListUpdatesRequestListUpdateRe
     /// The compression types supported by the client.
     #[serde(rename="supportedCompressions")]
     
-    pub supported_compressions: Option<Vec<String>>,
+    pub supported_compressions: Option<Vec<GoogleSecuritySafebrowsingV4FetchThreatListUpdatesRequestListUpdateRequestConstraintSupportedCompressionsEnum>>,
 }
 
 impl client::Part for GoogleSecuritySafebrowsingV4FetchThreatListUpdatesRequestListUpdateRequestConstraints {}
@@ -185,22 +185,22 @@ pub struct GoogleSecuritySafebrowsingV4FetchThreatListUpdatesResponseListUpdateR
     /// The platform type for which data is returned.
     #[serde(rename="platformType")]
     
-    pub platform_type: Option<String>,
+    pub platform_type: Option<GoogleSecuritySafebrowsingV4FetchThreatListUpdatesResponseListUpdateResponsePlatformTypeEnum>,
     /// A set of entries to remove from a local threat type's list. In practice, this field is empty or contains exactly one ThreatEntrySet.
     
     pub removals: Option<Vec<GoogleSecuritySafebrowsingV4ThreatEntrySet>>,
     /// The type of response. This may indicate that an action is required by the client when the response is received.
     #[serde(rename="responseType")]
     
-    pub response_type: Option<String>,
+    pub response_type: Option<GoogleSecuritySafebrowsingV4FetchThreatListUpdatesResponseListUpdateResponseResponseTypeEnum>,
     /// The format of the threats.
     #[serde(rename="threatEntryType")]
     
-    pub threat_entry_type: Option<String>,
+    pub threat_entry_type: Option<GoogleSecuritySafebrowsingV4FetchThreatListUpdatesResponseListUpdateResponseThreatEntryTypeEnum>,
     /// The threat type for which data is returned.
     #[serde(rename="threatType")]
     
-    pub threat_type: Option<String>,
+    pub threat_type: Option<GoogleSecuritySafebrowsingV4FetchThreatListUpdatesResponseListUpdateResponseThreatTypeEnum>,
 }
 
 impl client::Part for GoogleSecuritySafebrowsingV4FetchThreatListUpdatesResponseListUpdateResponse {}
@@ -464,7 +464,7 @@ pub struct GoogleSecuritySafebrowsingV4ThreatEntrySet {
     /// The compression type for the entries in this set.
     #[serde(rename="compressionType")]
     
-    pub compression_type: Option<String>,
+    pub compression_type: Option<GoogleSecuritySafebrowsingV4ThreatEntrySetCompressionTypeEnum>,
     /// The raw SHA256-formatted entries.
     #[serde(rename="rawHashes")]
     
@@ -507,14 +507,14 @@ pub struct GoogleSecuritySafebrowsingV4ThreatHit {
     /// The platform type reported.
     #[serde(rename="platformType")]
     
-    pub platform_type: Option<String>,
+    pub platform_type: Option<GoogleSecuritySafebrowsingV4ThreatHitPlatformTypeEnum>,
     /// The resources related to the threat hit.
     
     pub resources: Option<Vec<GoogleSecuritySafebrowsingV4ThreatHitThreatSource>>,
     /// The threat type reported.
     #[serde(rename="threatType")]
     
-    pub threat_type: Option<String>,
+    pub threat_type: Option<GoogleSecuritySafebrowsingV4ThreatHitThreatTypeEnum>,
     /// Details about the user that encountered the threat.
     #[serde(rename="userInfo")]
     
@@ -541,7 +541,7 @@ pub struct GoogleSecuritySafebrowsingV4ThreatHitThreatSource {
     /// The type of source reported.
     #[serde(rename="type")]
     
-    pub type_: Option<String>,
+    pub type_: Option<GoogleSecuritySafebrowsingV4ThreatHitThreatSourceTypeEnum>,
     /// The URL of the resource.
     
     pub url: Option<String>,
@@ -581,7 +581,7 @@ pub struct GoogleSecuritySafebrowsingV4ThreatInfo {
     /// The platform types to be checked.
     #[serde(rename="platformTypes")]
     
-    pub platform_types: Option<Vec<String>>,
+    pub platform_types: Option<Vec<GoogleSecuritySafebrowsingV4ThreatInfoPlatformTypesEnum>>,
     /// The threat entries to be checked.
     #[serde(rename="threatEntries")]
     
@@ -589,11 +589,11 @@ pub struct GoogleSecuritySafebrowsingV4ThreatInfo {
     /// The entry types to be checked.
     #[serde(rename="threatEntryTypes")]
     
-    pub threat_entry_types: Option<Vec<String>>,
+    pub threat_entry_types: Option<Vec<GoogleSecuritySafebrowsingV4ThreatInfoThreatEntryTypesEnum>>,
     /// The threat types to be checked.
     #[serde(rename="threatTypes")]
     
-    pub threat_types: Option<Vec<String>>,
+    pub threat_types: Option<Vec<GoogleSecuritySafebrowsingV4ThreatInfoThreatTypesEnum>>,
 }
 
 impl client::Part for GoogleSecuritySafebrowsingV4ThreatInfo {}
@@ -609,15 +609,15 @@ pub struct GoogleSecuritySafebrowsingV4ThreatListDescriptor {
     /// The platform type targeted by the list's entries.
     #[serde(rename="platformType")]
     
-    pub platform_type: Option<String>,
+    pub platform_type: Option<GoogleSecuritySafebrowsingV4ThreatListDescriptorPlatformTypeEnum>,
     /// The entry types contained in the list.
     #[serde(rename="threatEntryType")]
     
-    pub threat_entry_type: Option<String>,
+    pub threat_entry_type: Option<GoogleSecuritySafebrowsingV4ThreatListDescriptorThreatEntryTypeEnum>,
     /// The threat type posed by the list's entries.
     #[serde(rename="threatType")]
     
-    pub threat_type: Option<String>,
+    pub threat_type: Option<GoogleSecuritySafebrowsingV4ThreatListDescriptorThreatTypeEnum>,
 }
 
 impl client::Part for GoogleSecuritySafebrowsingV4ThreatListDescriptor {}
@@ -638,7 +638,7 @@ pub struct GoogleSecuritySafebrowsingV4ThreatMatch {
     /// The platform type matching this threat.
     #[serde(rename="platformType")]
     
-    pub platform_type: Option<String>,
+    pub platform_type: Option<GoogleSecuritySafebrowsingV4ThreatMatchPlatformTypeEnum>,
     /// The threat matching this threat.
     
     pub threat: Option<GoogleSecuritySafebrowsingV4ThreatEntry>,
@@ -649,11 +649,11 @@ pub struct GoogleSecuritySafebrowsingV4ThreatMatch {
     /// The threat entry type matching this threat.
     #[serde(rename="threatEntryType")]
     
-    pub threat_entry_type: Option<String>,
+    pub threat_entry_type: Option<GoogleSecuritySafebrowsingV4ThreatMatchThreatEntryTypeEnum>,
     /// The threat type matching this threat.
     #[serde(rename="threatType")]
     
-    pub threat_type: Option<String>,
+    pub threat_type: Option<GoogleSecuritySafebrowsingV4ThreatMatchThreatTypeEnum>,
 }
 
 impl client::Part for GoogleSecuritySafebrowsingV4ThreatMatch {}

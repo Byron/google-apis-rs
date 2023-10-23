@@ -16,7 +16,7 @@ pub struct AnalyzeEntitiesRequest {
     /// The encoding type used by the API to calculate offsets.
     #[serde(rename="encodingType")]
     
-    pub encoding_type: Option<String>,
+    pub encoding_type: Option<AnalyzeEntitiesRequestEncodingTypeEnum>,
 }
 
 impl client::RequestValue for AnalyzeEntitiesRequest {}
@@ -61,7 +61,7 @@ pub struct AnalyzeSentimentRequest {
     /// The encoding type used by the API to calculate sentence offsets for the sentence sentiment.
     #[serde(rename="encodingType")]
     
-    pub encoding_type: Option<String>,
+    pub encoding_type: Option<AnalyzeSentimentRequestEncodingTypeEnum>,
 }
 
 impl client::RequestValue for AnalyzeSentimentRequest {}
@@ -110,7 +110,7 @@ pub struct AnalyzeSyntaxRequest {
     /// The encoding type used by the API to calculate offsets.
     #[serde(rename="encodingType")]
     
-    pub encoding_type: Option<String>,
+    pub encoding_type: Option<AnalyzeSyntaxRequestEncodingTypeEnum>,
 }
 
 impl client::RequestValue for AnalyzeSyntaxRequest {}
@@ -158,7 +158,7 @@ pub struct AnnotateTextRequest {
     /// The encoding type used by the API to calculate offsets.
     #[serde(rename="encodingType")]
     
-    pub encoding_type: Option<String>,
+    pub encoding_type: Option<AnnotateTextRequestEncodingTypeEnum>,
     /// The enabled features.
     
     pub features: Option<Features>,
@@ -212,7 +212,7 @@ pub struct DependencyEdge {
     pub head_token_index: Option<i32>,
     /// The parse label for the token.
     
-    pub label: Option<String>,
+    pub label: Option<DependencyEdgeLabelEnum>,
 }
 
 impl client::Part for DependencyEdge {}
@@ -245,7 +245,7 @@ pub struct Document {
     /// Required. If the type is not set or is `TYPE_UNSPECIFIED`, returns an `INVALID_ARGUMENT` error.
     #[serde(rename="type")]
     
-    pub type_: Option<String>,
+    pub type_: Option<DocumentTypeEnum>,
 }
 
 impl client::Resource for Document {}
@@ -273,7 +273,7 @@ pub struct Entity {
     /// The entity type.
     #[serde(rename="type")]
     
-    pub type_: Option<String>,
+    pub type_: Option<EntityTypeEnum>,
 }
 
 impl client::Part for Entity {}
@@ -292,7 +292,7 @@ pub struct EntityMention {
     /// The type of the entity mention.
     #[serde(rename="type")]
     
-    pub type_: Option<String>,
+    pub type_: Option<EntityMentionTypeEnum>,
 }
 
 impl client::Part for EntityMention {}
@@ -331,40 +331,40 @@ impl client::Part for Features {}
 pub struct PartOfSpeech {
     /// The grammatical aspect.
     
-    pub aspect: Option<String>,
+    pub aspect: Option<PartOfSpeechAspectEnum>,
     /// The grammatical case.
     
-    pub case: Option<String>,
+    pub case: Option<PartOfSpeechCaseEnum>,
     /// The grammatical form.
     
-    pub form: Option<String>,
+    pub form: Option<PartOfSpeechFormEnum>,
     /// The grammatical gender.
     
-    pub gender: Option<String>,
+    pub gender: Option<PartOfSpeechGenderEnum>,
     /// The grammatical mood.
     
-    pub mood: Option<String>,
+    pub mood: Option<PartOfSpeechMoodEnum>,
     /// The grammatical number.
     
-    pub number: Option<String>,
+    pub number: Option<PartOfSpeechNumberEnum>,
     /// The grammatical person.
     
-    pub person: Option<String>,
+    pub person: Option<PartOfSpeechPersonEnum>,
     /// The grammatical properness.
     
-    pub proper: Option<String>,
+    pub proper: Option<PartOfSpeechProperEnum>,
     /// The grammatical reciprocity.
     
-    pub reciprocity: Option<String>,
+    pub reciprocity: Option<PartOfSpeechReciprocityEnum>,
     /// The part of speech tag.
     
-    pub tag: Option<String>,
+    pub tag: Option<PartOfSpeechTagEnum>,
     /// The grammatical tense.
     
-    pub tense: Option<String>,
+    pub tense: Option<PartOfSpeechTenseEnum>,
     /// The grammatical voice.
     
-    pub voice: Option<String>,
+    pub voice: Option<PartOfSpeechVoiceEnum>,
 }
 
 impl client::Part for PartOfSpeech {}

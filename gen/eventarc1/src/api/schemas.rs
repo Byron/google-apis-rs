@@ -32,7 +32,7 @@ pub struct AuditLogConfig {
     /// The log type that this config enables.
     #[serde(rename="logType")]
     
-    pub log_type: Option<String>,
+    pub log_type: Option<AuditLogConfigLogTypeEnum>,
 }
 
 impl client::Part for AuditLogConfig {}
@@ -96,7 +96,7 @@ pub struct Channel {
     pub pubsub_topic: Option<String>,
     /// Output only. The state of a Channel.
     
-    pub state: Option<String>,
+    pub state: Option<ChannelStateEnum>,
     /// Output only. Server assigned unique identifier for the channel. The value is a UUID4 string and guaranteed to remain unchanged until the resource is deleted.
     
     pub uid: Option<String>,
@@ -738,7 +738,7 @@ impl client::RequestValue for SetIamPolicyRequest {}
 pub struct StateCondition {
     /// The canonical code of the condition.
     
-    pub code: Option<String>,
+    pub code: Option<StateConditionCodeEnum>,
     /// Human-readable message.
     
     pub message: Option<String>,

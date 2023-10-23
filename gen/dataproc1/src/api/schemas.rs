@@ -234,7 +234,7 @@ pub struct Batch {
     pub spark_sql_batch: Option<SparkSqlBatch>,
     /// Output only. The state of the batch.
     
-    pub state: Option<String>,
+    pub state: Option<BatchStateEnum>,
     /// Output only. Historical state information for the batch.
     #[serde(rename="stateHistory")]
     
@@ -476,14 +476,14 @@ pub struct ClusterStatus {
     pub detail: Option<String>,
     /// Output only. The cluster's state.
     
-    pub state: Option<String>,
+    pub state: Option<ClusterStatuStateEnum>,
     /// Output only. Time when this state was entered (see JSON representation of Timestamp (https://developers.google.com/protocol-buffers/docs/proto3#json)).
     #[serde(rename="stateStartTime")]
     
     pub state_start_time: Option<client::chrono::DateTime<client::chrono::offset::Utc>>,
     /// Output only. Additional state information that includes status reported by the agent.
     
-    pub substate: Option<String>,
+    pub substate: Option<ClusterStatuSubstateEnum>,
 }
 
 impl client::Part for ClusterStatus {}
@@ -752,7 +752,7 @@ pub struct GceClusterConfig {
     /// Optional. The type of IPv6 access for a cluster.
     #[serde(rename="privateIpv6GoogleAccess")]
     
-    pub private_ipv6_google_access: Option<String>,
+    pub private_ipv6_google_access: Option<GceClusterConfigPrivateIpv6GoogleAccessEnum>,
     /// Optional. Reservation Affinity for consuming Zonal reservation.
     #[serde(rename="reservationAffinity")]
     
@@ -970,7 +970,7 @@ pub struct GkeNodePoolTarget {
     pub node_pool_config: Option<GkeNodePoolConfig>,
     /// Required. The roles associated with the GKE node pool.
     
-    pub roles: Option<Vec<String>>,
+    pub roles: Option<Vec<GkeNodePoolTargetRolesEnum>>,
 }
 
 impl client::Part for GkeNodePoolTarget {}
@@ -1164,7 +1164,7 @@ pub struct InstanceGroupConfig {
     pub num_instances: Option<i32>,
     /// Optional. Specifies the preemptibility of the instance group.The default value for master and worker groups is NON_PREEMPTIBLE. This default cannot be changed.The default value for secondary instances is PREEMPTIBLE.
     
-    pub preemptibility: Option<String>,
+    pub preemptibility: Option<InstanceGroupConfigPreemptibilityEnum>,
 }
 
 impl client::Part for InstanceGroupConfig {}
@@ -1399,14 +1399,14 @@ pub struct JobStatus {
     pub details: Option<String>,
     /// Output only. A state message specifying the overall job state.
     
-    pub state: Option<String>,
+    pub state: Option<JobStatuStateEnum>,
     /// Output only. The time when this state was entered.
     #[serde(rename="stateStartTime")]
     
     pub state_start_time: Option<client::chrono::DateTime<client::chrono::offset::Utc>>,
     /// Output only. Additional state information, which includes status reported by the agent.
     
-    pub substate: Option<String>,
+    pub substate: Option<JobStatuSubstateEnum>,
 }
 
 impl client::Part for JobStatus {}
@@ -1707,7 +1707,7 @@ pub struct LoggingConfig {
     /// The per-package log levels for the driver. This may include "root" package name to configure rootLogger. Examples: 'com.google = FATAL', 'root = INFO', 'org.apache = DEBUG'
     #[serde(rename="driverLogLevels")]
     
-    pub driver_log_levels: Option<HashMap<String, String>>,
+    pub driver_log_levels: Option<HashMap<String, LoggingConfigDriverLogLevelsEnum>>,
 }
 
 impl client::Part for LoggingConfig {}
@@ -1785,7 +1785,7 @@ pub struct Metric {
     /// Required. Default metrics are collected unless metricOverrides are specified for the metric source (see Available OSS metrics (https://cloud.google.com/dataproc/docs/guides/monitoring#available_oss_metrics) for more information).
     #[serde(rename="metricSource")]
     
-    pub metric_source: Option<String>,
+    pub metric_source: Option<MetricMetricSourceEnum>,
 }
 
 impl client::Part for Metric {}
@@ -1835,7 +1835,7 @@ pub struct NodeGroup {
     pub node_group_config: Option<InstanceGroupConfig>,
     /// Required. Node group roles.
     
-    pub roles: Option<Vec<String>>,
+    pub roles: Option<Vec<NodeGroupRolesEnum>>,
 }
 
 impl client::RequestValue for NodeGroup {}
@@ -1896,7 +1896,7 @@ pub struct NodePool {
     /// Required. Repair action to take on specified resources of the node pool.
     #[serde(rename="repairAction")]
     
-    pub repair_action: Option<String>,
+    pub repair_action: Option<NodePoolRepairActionEnum>,
 }
 
 impl client::Part for NodePool {}
@@ -2321,7 +2321,7 @@ pub struct ReservationAffinity {
     /// Optional. Type of reservation to consume
     #[serde(rename="consumeReservationType")]
     
-    pub consume_reservation_type: Option<String>,
+    pub consume_reservation_type: Option<ReservationAffinityConsumeReservationTypeEnum>,
     /// Optional. Corresponds to the label key of reservation resource.
     
     pub key: Option<String>,
@@ -2497,7 +2497,7 @@ pub struct SoftwareConfig {
     /// Optional. The set of components to activate on the cluster.
     #[serde(rename="optionalComponents")]
     
-    pub optional_components: Option<Vec<String>>,
+    pub optional_components: Option<Vec<SoftwareConfigOptionalComponentsEnum>>,
     /// Optional. The properties to set on daemon config files.Property keys are specified in prefix:property format, for example core:hadoop.tmp.dir. The following are supported prefixes and their mappings: capacity-scheduler: capacity-scheduler.xml core: core-site.xml distcp: distcp-default.xml hdfs: hdfs-site.xml hive: hive-site.xml mapred: mapred-site.xml pig: pig.properties spark: spark-defaults.conf yarn: yarn-site.xmlFor more information, see Cluster properties (https://cloud.google.com/dataproc/docs/concepts/cluster-properties).
     
     pub properties: Option<HashMap<String, String>>,
@@ -2785,7 +2785,7 @@ impl client::RequestValue for StartClusterRequest {}
 pub struct StateHistory {
     /// Output only. The state of the batch at this point in history.
     
-    pub state: Option<String>,
+    pub state: Option<StateHistoryStateEnum>,
     /// Output only. Details about the state at this point in history.
     #[serde(rename="stateMessage")]
     
@@ -3161,7 +3161,7 @@ pub struct YarnApplication {
     pub progress: Option<f32>,
     /// Required. The application state.
     
-    pub state: Option<String>,
+    pub state: Option<YarnApplicationStateEnum>,
     /// Optional. The HTTP URL of the ApplicationMaster, HistoryServer, or TimelineServer that provides application-specific information. The URL uses the internal hostname, and requires a proxy server for resolution and, possibly, access.
     #[serde(rename="trackingUrl")]
     

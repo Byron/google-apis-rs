@@ -39,8 +39,8 @@ use super::*;
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.deployments().patch(req, "project", "deployment")
 ///              .preview(true)
-///              .delete_policy("gubergren")
-///              .create_policy("eos")
+///              .delete_policy(&Default::default())
+///              .create_policy(&Default::default())
 ///              .doit().await;
 /// 
 /// match result {

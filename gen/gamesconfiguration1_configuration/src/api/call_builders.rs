@@ -820,7 +820,7 @@ where
         }
 
         let mut params = Params::with_capacity(2 + self._additional_params.len());
-        params.push("achievementId", self._achievement_id);
+        params.push("achievementId", &self._achievement_id);
 
         params.extend(self._additional_params.iter());
 
@@ -1071,7 +1071,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("achievementId", self._achievement_id);
+        params.push("achievementId", &self._achievement_id);
 
         params.extend(self._additional_params.iter());
 
@@ -1340,7 +1340,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("applicationId", self._application_id);
+        params.push("applicationId", &self._application_id);
 
         params.extend(self._additional_params.iter());
 
@@ -1629,7 +1629,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("applicationId", self._application_id);
+        params.push("applicationId", &self._application_id);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -1918,7 +1918,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("achievementId", self._achievement_id);
+        params.push("achievementId", &self._achievement_id);
 
         params.extend(self._additional_params.iter());
 
@@ -2203,7 +2203,7 @@ where
         }
 
         let mut params = Params::with_capacity(2 + self._additional_params.len());
-        params.push("leaderboardId", self._leaderboard_id);
+        params.push("leaderboardId", &self._leaderboard_id);
 
         params.extend(self._additional_params.iter());
 
@@ -2454,7 +2454,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("leaderboardId", self._leaderboard_id);
+        params.push("leaderboardId", &self._leaderboard_id);
 
         params.extend(self._additional_params.iter());
 
@@ -2723,7 +2723,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("applicationId", self._application_id);
+        params.push("applicationId", &self._application_id);
 
         params.extend(self._additional_params.iter());
 
@@ -3012,7 +3012,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("applicationId", self._application_id);
+        params.push("applicationId", &self._application_id);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -3301,7 +3301,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("leaderboardId", self._leaderboard_id);
+        params.push("leaderboardId", &self._leaderboard_id);
 
         params.extend(self._additional_params.iter());
 

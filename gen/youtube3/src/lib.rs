@@ -176,19 +176,19 @@
 //! // You can configure optional parameters by calling the respective setters at will, and
 //! // execute the final call using `doit()`.
 //! // Values shown here are possibly random and not representative !
-//! let result = hub.videos().list(&vec!["gubergren".into()])
-//!              .video_category_id("Lorem")
+//! let result = hub.videos().list(&vec!["duo".into()])
+//!              .video_category_id("ipsum")
 //!              .region_code("gubergren")
-//!              .page_token("eos")
-//!              .on_behalf_of_content_owner("dolor")
-//!              .my_rating("ea")
-//!              .max_width(-55)
-//!              .max_results(13)
-//!              .max_height(-47)
-//!              .locale("duo")
-//!              .add_id("ipsum")
-//!              .hl("sed")
-//!              .chart("ut")
+//!              .page_token("Lorem")
+//!              .on_behalf_of_content_owner("gubergren")
+//!              .my_rating(&Default::default())
+//!              .max_width(-75)
+//!              .max_results(97)
+//!              .max_height(-17)
+//!              .locale("ipsum")
+//!              .add_id("invidunt")
+//!              .hl("amet")
+//!              .chart(&Default::default())
 //!              .doit().await;
 //! 
 //! match result {

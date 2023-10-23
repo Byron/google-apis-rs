@@ -117,7 +117,7 @@ impl client::RequestValue for CreateLeadRequest {}
 pub struct EventData {
     /// Data type.
     
-    pub key: Option<String>,
+    pub key: Option<EventDataKeyEnum>,
     /// Data values.
     
     pub values: Option<Vec<String>>,
@@ -146,7 +146,7 @@ pub struct ExamStatus {
     /// The type of the exam.
     #[serde(rename="examType")]
     
-    pub exam_type: Option<String>,
+    pub exam_type: Option<ExamStatuExamTypeEnum>,
     /// Whether this exam has been passed and not expired.
     
     pub passed: Option<bool>,
@@ -176,7 +176,7 @@ pub struct ListOffersResponse {
     /// Reason why no Offers are available.
     #[serde(rename="noOfferReason")]
     
-    pub no_offer_reason: Option<String>,
+    pub no_offer_reason: Option<ListOffersResponseNoOfferReasonEnum>,
     /// Available Offers to be distributed.
     #[serde(rename="availableOffers")]
     
@@ -204,7 +204,7 @@ pub struct CountryOfferInfo {
     /// Type of offer country is eligible for.
     #[serde(rename="offerType")]
     
-    pub offer_type: Option<String>,
+    pub offer_type: Option<CountryOfferInfoOfferTypeEnum>,
     /// (localized) Get Y amount for that country's offer.
     #[serde(rename="getYAmount")]
     
@@ -260,7 +260,7 @@ pub struct OfferCustomer {
     /// Type of the offer
     #[serde(rename="offerType")]
     
-    pub offer_type: Option<String>,
+    pub offer_type: Option<OfferCustomerOfferTypeEnum>,
     /// External CID for the customer.
     #[serde(rename="externalCid")]
     
@@ -304,7 +304,7 @@ pub struct CertificationStatus {
     /// The type of the certification.
     #[serde(rename="type")]
     
-    pub type_: Option<String>,
+    pub type_: Option<CertificationStatuTypeEnum>,
     /// Number of people who are certified,
     #[serde(rename="userCount")]
     
@@ -442,11 +442,11 @@ pub struct SpecializationStatus {
     /// The specialization this status is for.
     #[serde(rename="badgeSpecialization")]
     
-    pub badge_specialization: Option<String>,
+    pub badge_specialization: Option<SpecializationStatuBadgeSpecializationEnum>,
     /// State of agency specialization.
     #[serde(rename="badgeSpecializationState")]
     
-    pub badge_specialization_state: Option<String>,
+    pub badge_specialization_state: Option<SpecializationStatuBadgeSpecializationStateEnum>,
 }
 
 impl client::Part for SpecializationStatus {}
@@ -475,7 +475,7 @@ pub struct Certification {
     /// The type of certification, the area of expertise.
     #[serde(rename="certificationType")]
     
-    pub certification_type: Option<String>,
+    pub certification_type: Option<CertificationCertificationTypeEnum>,
 }
 
 impl client::Part for Certification {}
@@ -649,7 +649,7 @@ pub struct Company {
     /// The public viewability status of the company's profile.
     #[serde(rename="profileStatus")]
     
-    pub profile_status: Option<String>,
+    pub profile_status: Option<CompanyProfileStatusEnum>,
     /// The primary language code of the company, as defined by
     /// <a href="https://tools.ietf.org/html/bcp47">BCP 47</a>
     /// (IETF BCP 47, "Tags for Identifying Languages").
@@ -669,7 +669,7 @@ pub struct Company {
     pub converted_min_monthly_budget: Option<Money>,
     /// Industries the company can help with.
     
-    pub industries: Option<Vec<String>>,
+    pub industries: Option<Vec<CompanyIndustriesEnum>>,
     /// URL of the company's website.
     #[serde(rename="websiteUrl")]
     
@@ -714,7 +714,7 @@ pub struct Company {
     pub original_min_monthly_budget: Option<Money>,
     /// Services the company can help with.
     
-    pub services: Option<Vec<String>>,
+    pub services: Option<Vec<CompanyServicesEnum>>,
     /// The primary location of the company.
     #[serde(rename="primaryLocation")]
     
@@ -730,7 +730,7 @@ pub struct Company {
     /// Partner badge tier
     #[serde(rename="badgeTier")]
     
-    pub badge_tier: Option<String>,
+    pub badge_tier: Option<CompanyBadgeTierEnum>,
     /// Email domains that allow users with a matching email address to get
     /// auto-approved for associating with this company.
     #[serde(rename="autoApprovalEmailDomains")]
@@ -739,7 +739,7 @@ pub struct Company {
     /// Company type labels listed on the company's profile.
     #[serde(rename="companyTypes")]
     
-    pub company_types: Option<Vec<String>>,
+    pub company_types: Option<Vec<CompanyCompanyTypesEnum>>,
 }
 
 impl client::RequestValue for Company {}
@@ -765,7 +765,7 @@ pub struct CreateLeadResponse {
     /// validation.
     #[serde(rename="recaptchaStatus")]
     
-    pub recaptcha_status: Option<String>,
+    pub recaptcha_status: Option<CreateLeadResponseRecaptchaStatusEnum>,
     /// Current response metadata.
     #[serde(rename="responseMetadata")]
     
@@ -866,7 +866,7 @@ pub struct CertificationExamStatus {
     /// The type of certification exam.
     #[serde(rename="type")]
     
-    pub type_: Option<String>,
+    pub type_: Option<CertificationExamStatuTypeEnum>,
 }
 
 impl client::Part for CertificationExamStatus {}
@@ -919,7 +919,7 @@ pub struct Rank {
     /// The type of rank.
     #[serde(rename="type")]
     
-    pub type_: Option<String>,
+    pub type_: Option<RankTypeEnum>,
 }
 
 impl client::Part for Rank {}
@@ -1034,7 +1034,7 @@ pub struct HistoricalOffer {
     pub creation_time: Option<client::chrono::DateTime<client::chrono::offset::Utc>>,
     /// Status of the offer.
     
-    pub status: Option<String>,
+    pub status: Option<HistoricalOfferStatusEnum>,
     /// Email address for client.
     #[serde(rename="clientEmail")]
     
@@ -1059,7 +1059,7 @@ pub struct HistoricalOffer {
     /// Type of offer.
     #[serde(rename="offerType")]
     
-    pub offer_type: Option<String>,
+    pub offer_type: Option<HistoricalOfferOfferTypeEnum>,
     /// Name (First + Last) of the partners user to whom the incentive is allocated.
     #[serde(rename="senderName")]
     
@@ -1107,18 +1107,18 @@ pub struct LogUserEventRequest {
     /// The scope of the event.
     #[serde(rename="eventScope")]
     
-    pub event_scope: Option<String>,
+    pub event_scope: Option<LogUserEventRequestEventScopeEnum>,
     /// The category the action belongs to.
     #[serde(rename="eventCategory")]
     
-    pub event_category: Option<String>,
+    pub event_category: Option<LogUserEventRequestEventCategoryEnum>,
     /// Advertiser lead information.
     
     pub lead: Option<Lead>,
     /// The action that occurred.
     #[serde(rename="eventAction")]
     
-    pub event_action: Option<String>,
+    pub event_action: Option<LogUserEventRequestEventActionEnum>,
 }
 
 impl client::RequestValue for LogUserEventRequest {}
@@ -1291,7 +1291,7 @@ pub struct AvailableOffer {
     /// Level of this offer.
     #[serde(rename="offerLevel")]
     
-    pub offer_level: Option<String>,
+    pub offer_level: Option<AvailableOfferOfferLevelEnum>,
     /// Name of the offer.
     
     pub name: Option<String>,
@@ -1310,7 +1310,7 @@ pub struct AvailableOffer {
     /// Type of offer.
     #[serde(rename="offerType")]
     
-    pub offer_type: Option<String>,
+    pub offer_type: Option<AvailableOfferOfferTypeEnum>,
     /// The maximum age of an account [in days] to be eligible.
     #[serde(rename="maxAccountAge")]
     
@@ -1436,7 +1436,7 @@ pub struct LogMessageRequest {
     pub request_metadata: Option<RequestMetadata>,
     /// Message level of client message.
     
-    pub level: Option<String>,
+    pub level: Option<LogMessageRequestLevelEnum>,
     /// Details about the client message.
     
     pub details: Option<String>,
@@ -1478,11 +1478,11 @@ pub struct Lead {
     pub website_url: Option<String>,
     /// The lead's state in relation to the company.
     
-    pub state: Option<String>,
+    pub state: Option<LeadStateEnum>,
     /// List of reasons for using Google Partner Search and creating a lead.
     #[serde(rename="gpsMotivations")]
     
-    pub gps_motivations: Option<Vec<String>>,
+    pub gps_motivations: Option<Vec<LeadGpsMotivationsEnum>>,
     /// Email address of lead source.
     
     pub email: Option<String>,
@@ -1516,7 +1516,7 @@ pub struct Lead {
     /// Type of lead.
     #[serde(rename="type")]
     
-    pub type_: Option<String>,
+    pub type_: Option<LeadTypeEnum>,
 }
 
 impl client::RequestValue for Lead {}
@@ -1567,7 +1567,7 @@ pub struct ListUserStatesResponse {
     /// User's states.
     #[serde(rename="userStates")]
     
-    pub user_states: Option<Vec<String>>,
+    pub user_states: Option<Vec<ListUserStatesResponseUserStatesEnum>>,
 }
 
 impl client::ResponseResult for ListUserStatesResponse {}
@@ -1607,7 +1607,7 @@ pub struct CompanyRelation {
     pub primary_address: Option<Location>,
     /// The state of relationship, in terms of approvals.
     
-    pub state: Option<String>,
+    pub state: Option<CompanyRelationStateEnum>,
     /// The name (in the company's primary language) for the company.
     
     pub name: Option<String>,
@@ -1618,7 +1618,7 @@ pub struct CompanyRelation {
     pub manager_account: Option<i64>,
     /// The segment the company is classified as.
     
-    pub segment: Option<Vec<String>>,
+    pub segment: Option<Vec<CompanyRelationSegmentEnum>>,
     /// The internal company ID.
     /// Only available for a whitelisted set of api clients.
     #[serde(rename="internalCompanyId")]
@@ -1627,7 +1627,7 @@ pub struct CompanyRelation {
     /// Whether the company is a Partner.
     #[serde(rename="badgeTier")]
     
-    pub badge_tier: Option<String>,
+    pub badge_tier: Option<CompanyRelationBadgeTierEnum>,
     /// The list of Google Partners specialization statuses for the company.
     #[serde(rename="specializationStatus")]
     

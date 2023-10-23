@@ -16,7 +16,7 @@ pub struct GoogleCloudDialogflowV2beta1Agent {
     /// Optional. API version displayed in Dialogflow console. If not specified, V2 API is assumed. Clients are free to query different service endpoints for different API versions. However, bots connectors and webhook calls will follow the specified API version.
     #[serde(rename="apiVersion")]
     
-    pub api_version: Option<String>,
+    pub api_version: Option<GoogleCloudDialogflowV2beta1AgentApiVersionEnum>,
     /// Optional. The URI of the agent's avatar. Avatars are used throughout the Dialogflow console and in the self-hosted [Web Demo](https://cloud.google.com/dialogflow/docs/integrations/web-demo) integration.
     #[serde(rename="avatarUri")]
     
@@ -43,7 +43,7 @@ pub struct GoogleCloudDialogflowV2beta1Agent {
     /// Optional. Determines how intents are detected from user queries.
     #[serde(rename="matchMode")]
     
-    pub match_mode: Option<String>,
+    pub match_mode: Option<GoogleCloudDialogflowV2beta1AgentMatchModeEnum>,
     /// Required. The project of this agent. Format: `projects/` or `projects//locations/`
     
     pub parent: Option<String>,
@@ -53,7 +53,7 @@ pub struct GoogleCloudDialogflowV2beta1Agent {
     pub supported_language_codes: Option<Vec<String>>,
     /// Optional. The agent tier. If not specified, TIER_STANDARD is assumed.
     
-    pub tier: Option<String>,
+    pub tier: Option<GoogleCloudDialogflowV2beta1AgentTierEnum>,
     /// Required. The time zone of this agent from the [time zone database](https://www.iana.org/time-zones), e.g., America/New_York, Europe/Paris.
     #[serde(rename="timeZone")]
     
@@ -74,15 +74,15 @@ pub struct GoogleCloudDialogflowV2beta1AgentAssistantFeedback {
     /// Optional. Whether or not the suggested answer is relevant. For example: * Query: "Can I change my mailing address?" * Suggested document says: "Items must be returned/exchanged within 60 days of the purchase date." * answer_relevance: AnswerRelevance.IRRELEVANT
     #[serde(rename="answerRelevance")]
     
-    pub answer_relevance: Option<String>,
+    pub answer_relevance: Option<GoogleCloudDialogflowV2beta1AgentAssistantFeedbackAnswerRelevanceEnum>,
     /// Optional. Whether or not the information in the document is correct. For example: * Query: "Can I return the package in 2 days once received?" * Suggested document says: "Items must be returned/exchanged within 60 days of the purchase date." * Ground truth: "No return or exchange is allowed." * [document_correctness]: INCORRECT
     #[serde(rename="documentCorrectness")]
     
-    pub document_correctness: Option<String>,
+    pub document_correctness: Option<GoogleCloudDialogflowV2beta1AgentAssistantFeedbackDocumentCorrectnessEnum>,
     /// Optional. Whether or not the suggested document is efficient. For example, if the document is poorly written, hard to understand, hard to use or too long to find useful information, document_efficiency is DocumentEfficiency.INEFFICIENT.
     #[serde(rename="documentEfficiency")]
     
-    pub document_efficiency: Option<String>,
+    pub document_efficiency: Option<GoogleCloudDialogflowV2beta1AgentAssistantFeedbackDocumentEfficiencyEnum>,
     /// Feedback for conversation summarization.
     #[serde(rename="summarizationFeedback")]
     
@@ -281,7 +281,7 @@ pub struct GoogleCloudDialogflowV2beta1AnswerFeedback {
     /// The correctness level of the specific answer.
     #[serde(rename="correctnessLevel")]
     
-    pub correctness_level: Option<String>,
+    pub correctness_level: Option<GoogleCloudDialogflowV2beta1AnswerFeedbackCorrectnessLevelEnum>,
     /// Time when the answer/item was displayed.
     #[serde(rename="displayTime")]
     
@@ -417,7 +417,7 @@ pub struct GoogleCloudDialogflowV2beta1AutomatedAgentReply {
     /// AutomatedAgentReply type.
     #[serde(rename="automatedAgentReplyType")]
     
-    pub automated_agent_reply_type: Option<String>,
+    pub automated_agent_reply_type: Option<GoogleCloudDialogflowV2beta1AutomatedAgentReplyAutomatedAgentReplyTypeEnum>,
     /// The unique identifier of the current Dialogflow CX conversation page. Format: `projects//locations//agents//flows//pages/`.
     #[serde(rename="cxCurrentPage")]
     
@@ -666,7 +666,7 @@ pub struct GoogleCloudDialogflowV2beta1BatchUpdateIntentsRequest {
     /// Optional. The resource view to apply to the returned intent.
     #[serde(rename="intentView")]
     
-    pub intent_view: Option<String>,
+    pub intent_view: Option<GoogleCloudDialogflowV2beta1BatchUpdateIntentsRequestIntentViewEnum>,
     /// Optional. The language used to access language-specific data. If not specified, the agent's default language is used. For more information, see [Multilingual intent and entity data](https://cloud.google.com/dialogflow/docs/agents-multilingual#intent-entity).
     #[serde(rename="languageCode")]
     
@@ -695,11 +695,11 @@ pub struct GoogleCloudDialogflowV2beta1ClearSuggestionFeatureConfigRequest {
     /// Required. The participant role to remove the suggestion feature config. Only HUMAN_AGENT or END_USER can be used.
     #[serde(rename="participantRole")]
     
-    pub participant_role: Option<String>,
+    pub participant_role: Option<GoogleCloudDialogflowV2beta1ClearSuggestionFeatureConfigRequestParticipantRoleEnum>,
     /// Required. The type of the suggestion feature to remove.
     #[serde(rename="suggestionFeatureType")]
     
-    pub suggestion_feature_type: Option<String>,
+    pub suggestion_feature_type: Option<GoogleCloudDialogflowV2beta1ClearSuggestionFeatureConfigRequestSuggestionFeatureTypeEnum>,
 }
 
 impl client::RequestValue for GoogleCloudDialogflowV2beta1ClearSuggestionFeatureConfigRequest {}
@@ -833,7 +833,7 @@ pub struct GoogleCloudDialogflowV2beta1Conversation {
     /// The stage of a conversation. It indicates whether the virtual agent or a human agent is handling the conversation. If the conversation is created with the conversation profile that has Dialogflow config set, defaults to ConversationStage.VIRTUAL_AGENT_STAGE; Otherwise, defaults to ConversationStage.HUMAN_ASSIST_STAGE. If the conversation is created with the conversation profile that has Dialogflow config set but explicitly sets conversation_stage to ConversationStage.HUMAN_ASSIST_STAGE, it skips ConversationStage.VIRTUAL_AGENT_STAGE stage and directly goes to ConversationStage.HUMAN_ASSIST_STAGE.
     #[serde(rename="conversationStage")]
     
-    pub conversation_stage: Option<String>,
+    pub conversation_stage: Option<GoogleCloudDialogflowV2beta1ConversationConversationStageEnum>,
     /// Output only. The time the conversation was finished.
     #[serde(rename="endTime")]
     
@@ -841,7 +841,7 @@ pub struct GoogleCloudDialogflowV2beta1Conversation {
     /// Output only. The current state of the Conversation.
     #[serde(rename="lifecycleState")]
     
-    pub lifecycle_state: Option<String>,
+    pub lifecycle_state: Option<GoogleCloudDialogflowV2beta1ConversationLifecycleStateEnum>,
     /// Output only. The unique identifier of this conversation. Format: `projects//locations//conversations/`.
     
     pub name: Option<String>,
@@ -1091,7 +1091,7 @@ pub struct GoogleCloudDialogflowV2beta1Document {
     /// Required. The knowledge type of document content.
     #[serde(rename="knowledgeTypes")]
     
-    pub knowledge_types: Option<Vec<String>>,
+    pub knowledge_types: Option<Vec<GoogleCloudDialogflowV2beta1DocumentKnowledgeTypesEnum>>,
     /// Output only. The time and status of the latest reload. This reload may have been triggered automatically or manually and may not have succeeded.
     #[serde(rename="latestReloadStatus")]
     
@@ -1113,7 +1113,7 @@ pub struct GoogleCloudDialogflowV2beta1Document {
     pub raw_content: Option<Vec<u8>>,
     /// Output only. The current state of the document.
     
-    pub state: Option<String>,
+    pub state: Option<GoogleCloudDialogflowV2beta1DocumentStateEnum>,
 }
 
 impl client::RequestValue for GoogleCloudDialogflowV2beta1Document {}
@@ -1173,7 +1173,7 @@ pub struct GoogleCloudDialogflowV2beta1EntityType {
     /// Optional. Indicates whether the entity type can be automatically expanded.
     #[serde(rename="autoExpansionMode")]
     
-    pub auto_expansion_mode: Option<String>,
+    pub auto_expansion_mode: Option<GoogleCloudDialogflowV2beta1EntityTypeAutoExpansionModeEnum>,
     /// Required. The name of the entity type.
     #[serde(rename="displayName")]
     
@@ -1187,7 +1187,7 @@ pub struct GoogleCloudDialogflowV2beta1EntityType {
     pub entities: Option<Vec<GoogleCloudDialogflowV2beta1EntityTypeEntity>>,
     /// Required. Indicates the kind of entity type.
     
-    pub kind: Option<String>,
+    pub kind: Option<GoogleCloudDialogflowV2beta1EntityTypeKindEnum>,
     /// The unique identifier of the entity type. Required for EntityTypes.UpdateEntityType and EntityTypes.BatchUpdateEntityTypes methods. Supported formats: - `projects//agent/entityTypes/` - `projects//locations//agent/entityTypes/`
     
     pub name: Option<String>,
@@ -1262,7 +1262,7 @@ pub struct GoogleCloudDialogflowV2beta1Environment {
     pub name: Option<String>,
     /// Output only. The state of this environment. This field is read-only, i.e., it cannot be set by create and update methods.
     
-    pub state: Option<String>,
+    pub state: Option<GoogleCloudDialogflowV2beta1EnvironmentStateEnum>,
     /// Optional. Text to speech settings for this environment.
     #[serde(rename="textToSpeechSettings")]
     
@@ -1448,7 +1448,7 @@ pub struct GoogleCloudDialogflowV2beta1FulfillmentFeature {
     /// The type of the feature that enabled for fulfillment.
     #[serde(rename="type")]
     
-    pub type_: Option<String>,
+    pub type_: Option<GoogleCloudDialogflowV2beta1FulfillmentFeatureTypeEnum>,
 }
 
 impl client::Part for GoogleCloudDialogflowV2beta1FulfillmentFeature {}
@@ -1874,7 +1874,7 @@ pub struct GoogleCloudDialogflowV2beta1ImportDocumentTemplate {
     /// Required. The knowledge type of document content.
     #[serde(rename="knowledgeTypes")]
     
-    pub knowledge_types: Option<Vec<String>>,
+    pub knowledge_types: Option<Vec<GoogleCloudDialogflowV2beta1ImportDocumentTemplateKnowledgeTypesEnum>>,
     /// Metadata for the document. The metadata supports arbitrary key-value pairs. Suggested use cases include storing a document's title, an external URL distinct from the document's content_uri, etc. The max size of a `key` or a `value` of the metadata is 1024 bytes.
     
     pub metadata: Option<HashMap<String, String>>,
@@ -1926,7 +1926,7 @@ pub struct GoogleCloudDialogflowV2beta1InputAudioConfig {
     /// Required. Audio encoding of the audio content to process.
     #[serde(rename="audioEncoding")]
     
-    pub audio_encoding: Option<String>,
+    pub audio_encoding: Option<GoogleCloudDialogflowV2beta1InputAudioConfigAudioEncodingEnum>,
     /// Only used in Participants.AnalyzeContent and Participants.StreamingAnalyzeContent. If `false` and recognition doesn't return any result, trigger `NO_SPEECH_RECOGNIZED` event to Dialogflow agent.
     #[serde(rename="disableNoSpeechRecognizedEvent")]
     
@@ -1945,7 +1945,7 @@ pub struct GoogleCloudDialogflowV2beta1InputAudioConfig {
     /// Which variant of the Speech model to use.
     #[serde(rename="modelVariant")]
     
-    pub model_variant: Option<String>,
+    pub model_variant: Option<GoogleCloudDialogflowV2beta1InputAudioConfigModelVariantEnum>,
     /// A list of strings containing words and phrases that the speech recognizer should recognize with higher likelihood. See [the Cloud Speech documentation](https://cloud.google.com/speech-to-text/docs/basics#phrase-hints) for more details. This field is deprecated. Please use [speech_contexts]() instead. If you specify both [phrase_hints]() and [speech_contexts](), Dialogflow will treat the [phrase_hints]() as a single additional [SpeechContext]().
     #[serde(rename="phraseHints")]
     
@@ -1989,7 +1989,7 @@ pub struct GoogleCloudDialogflowV2beta1Intent {
     /// Optional. The list of platforms for which the first responses will be copied from the messages in PLATFORM_UNSPECIFIED (i.e. default platform).
     #[serde(rename="defaultResponsePlatforms")]
     
-    pub default_response_platforms: Option<Vec<String>>,
+    pub default_response_platforms: Option<Vec<GoogleCloudDialogflowV2beta1IntentDefaultResponsePlatformsEnum>>,
     /// Required. The name of this intent.
     #[serde(rename="displayName")]
     
@@ -2060,7 +2060,7 @@ pub struct GoogleCloudDialogflowV2beta1Intent {
     /// Optional. Indicates whether webhooks are enabled for the intent.
     #[serde(rename="webhookState")]
     
-    pub webhook_state: Option<String>,
+    pub webhook_state: Option<GoogleCloudDialogflowV2beta1IntentWebhookStateEnum>,
 }
 
 impl client::RequestValue for GoogleCloudDialogflowV2beta1Intent {}
@@ -2144,7 +2144,7 @@ pub struct GoogleCloudDialogflowV2beta1IntentMessage {
     pub payload: Option<HashMap<String, json::Value>>,
     /// Optional. The platform that this message is intended for.
     
-    pub platform: Option<String>,
+    pub platform: Option<GoogleCloudDialogflowV2beta1IntentMessagePlatformEnum>,
     /// Displays quick replies.
     #[serde(rename="quickReplies")]
     
@@ -2264,7 +2264,7 @@ pub struct GoogleCloudDialogflowV2beta1IntentMessageBrowseCarouselCard {
     /// Optional. Settings for displaying the image. Applies to every image in items.
     #[serde(rename="imageDisplayOptions")]
     
-    pub image_display_options: Option<String>,
+    pub image_display_options: Option<GoogleCloudDialogflowV2beta1IntentMessageBrowseCarouselCardImageDisplayOptionsEnum>,
     /// Required. List of items in the Browse Carousel Card. Minimum of two items, maximum of ten.
     
     pub items: Option<Vec<GoogleCloudDialogflowV2beta1IntentMessageBrowseCarouselCardBrowseCarouselCardItem>>,
@@ -2314,7 +2314,7 @@ pub struct GoogleCloudDialogflowV2beta1IntentMessageBrowseCarouselCardBrowseCaro
     /// Optional. Specifies the type of viewer that is used when opening the URL. Defaults to opening via web browser.
     #[serde(rename="urlTypeHint")]
     
-    pub url_type_hint: Option<String>,
+    pub url_type_hint: Option<GoogleCloudDialogflowV2beta1IntentMessageBrowseCarouselCardBrowseCarouselCardItemOpenUrlActionUrlTypeHintEnum>,
 }
 
 impl client::Part for GoogleCloudDialogflowV2beta1IntentMessageBrowseCarouselCardBrowseCarouselCardItemOpenUrlAction {}
@@ -2415,7 +2415,7 @@ pub struct GoogleCloudDialogflowV2beta1IntentMessageColumnProperties {
     /// Optional. Defines text alignment for all cells in this column.
     #[serde(rename="horizontalAlignment")]
     
-    pub horizontal_alignment: Option<String>,
+    pub horizontal_alignment: Option<GoogleCloudDialogflowV2beta1IntentMessageColumnPropertyHorizontalAlignmentEnum>,
 }
 
 impl client::Part for GoogleCloudDialogflowV2beta1IntentMessageColumnProperties {}
@@ -2519,7 +2519,7 @@ pub struct GoogleCloudDialogflowV2beta1IntentMessageMediaContent {
     /// Optional. What type of media is the content (ie "audio").
     #[serde(rename="mediaType")]
     
-    pub media_type: Option<String>,
+    pub media_type: Option<GoogleCloudDialogflowV2beta1IntentMessageMediaContentMediaTypeEnum>,
 }
 
 impl client::Part for GoogleCloudDialogflowV2beta1IntentMessageMediaContent {}
@@ -2610,7 +2610,7 @@ pub struct GoogleCloudDialogflowV2beta1IntentMessageRbmCardContentRbmMedia {
     pub file_uri: Option<String>,
     /// Required for cards with vertical orientation. The height of the media within a rich card with a vertical layout. For a standalone card with horizontal layout, height is not customizable, and this field is ignored.
     
-    pub height: Option<String>,
+    pub height: Option<GoogleCloudDialogflowV2beta1IntentMessageRbmCardContentRbmMediaHeightEnum>,
     /// Optional. Publicly reachable URI of the thumbnail.If you don't provide a thumbnail URI, the RBM platform displays a blank placeholder thumbnail until the user's device downloads the file. Depending on the user's setting, the file may not download automatically and may require the user to tap a download button.
     #[serde(rename="thumbnailUri")]
     
@@ -2634,7 +2634,7 @@ pub struct GoogleCloudDialogflowV2beta1IntentMessageRbmCarouselCard {
     /// Required. The width of the cards in the carousel.
     #[serde(rename="cardWidth")]
     
-    pub card_width: Option<String>,
+    pub card_width: Option<GoogleCloudDialogflowV2beta1IntentMessageRbmCarouselCardCardWidthEnum>,
 }
 
 impl client::Part for GoogleCloudDialogflowV2beta1IntentMessageRbmCarouselCard {}
@@ -2654,11 +2654,11 @@ pub struct GoogleCloudDialogflowV2beta1IntentMessageRbmStandaloneCard {
     /// Required. Orientation of the card.
     #[serde(rename="cardOrientation")]
     
-    pub card_orientation: Option<String>,
+    pub card_orientation: Option<GoogleCloudDialogflowV2beta1IntentMessageRbmStandaloneCardCardOrientationEnum>,
     /// Required if orientation is horizontal. Image preview alignment for standalone cards with horizontal layout.
     #[serde(rename="thumbnailImageAlignment")]
     
-    pub thumbnail_image_alignment: Option<String>,
+    pub thumbnail_image_alignment: Option<GoogleCloudDialogflowV2beta1IntentMessageRbmStandaloneCardThumbnailImageAlignmentEnum>,
 }
 
 impl client::Part for GoogleCloudDialogflowV2beta1IntentMessageRbmStandaloneCard {}
@@ -3069,7 +3069,7 @@ pub struct GoogleCloudDialogflowV2beta1IntentTrainingPhrase {
     /// Required. The type of the training phrase.
     #[serde(rename="type")]
     
-    pub type_: Option<String>,
+    pub type_: Option<GoogleCloudDialogflowV2beta1IntentTrainingPhraseTypeEnum>,
 }
 
 impl client::Part for GoogleCloudDialogflowV2beta1IntentTrainingPhrase {}
@@ -3137,7 +3137,7 @@ pub struct GoogleCloudDialogflowV2beta1KnowledgeAnswersAnswer {
     /// The system's confidence level that this knowledge answer is a good match for this conversational query. NOTE: The confidence level for a given `` pair may change without notice, as it depends on models that are constantly being improved. However, it will change less frequently than the confidence score below, and should be preferred for referencing the quality of an answer.
     #[serde(rename="matchConfidenceLevel")]
     
-    pub match_confidence_level: Option<String>,
+    pub match_confidence_level: Option<GoogleCloudDialogflowV2beta1KnowledgeAnswersAnswerMatchConfidenceLevelEnum>,
     /// Indicates which Knowledge Document this answer was extracted from. Format: `projects//knowledgeBases//documents/`.
     
     pub source: Option<String>,
@@ -3577,7 +3577,7 @@ pub struct GoogleCloudDialogflowV2beta1Message {
     /// Output only. The role of the participant.
     #[serde(rename="participantRole")]
     
-    pub participant_role: Option<String>,
+    pub participant_role: Option<GoogleCloudDialogflowV2beta1MessageParticipantRoleEnum>,
     /// Optional. The time when the message was sent.
     #[serde(rename="sendTime")]
     
@@ -3620,7 +3620,7 @@ pub struct GoogleCloudDialogflowV2beta1NotificationConfig {
     /// Format of message.
     #[serde(rename="messageFormat")]
     
-    pub message_format: Option<String>,
+    pub message_format: Option<GoogleCloudDialogflowV2beta1NotificationConfigMessageFormatEnum>,
     /// Name of the Pub/Sub topic to publish conversation events like CONVERSATION_STARTED as serialized ConversationEvent protos. For telephony integration to receive notification, make sure either this topic is in the same project as the conversation or you grant `service-@gcp-sa-dialogflow.iam.gserviceaccount.com` the `Dialogflow Service Agent` role in the topic project. For chat integration to receive notification, make sure API caller has been granted the `Dialogflow Service Agent` role for the topic. Format: `projects//locations//topics/`.
     
     pub topic: Option<String>,
@@ -3658,7 +3658,7 @@ pub struct GoogleCloudDialogflowV2beta1OutputAudioConfig {
     /// Required. Audio encoding of the synthesized audio content.
     #[serde(rename="audioEncoding")]
     
-    pub audio_encoding: Option<String>,
+    pub audio_encoding: Option<GoogleCloudDialogflowV2beta1OutputAudioConfigAudioEncodingEnum>,
     /// The synthesis sample rate (in hertz) for this audio. If not provided, then the synthesizer will use the default sample rate based on the audio encoding. If this is different from the voice's natural sample rate, then the synthesizer will honor this request by converting to the desired sample rate (which might result in worse audio quality).
     #[serde(rename="sampleRateHertz")]
     
@@ -3701,7 +3701,7 @@ pub struct GoogleCloudDialogflowV2beta1Participant {
     pub obfuscated_external_user_id: Option<String>,
     /// Immutable. The role this participant plays in the conversation. This field must be set during participant creation and is then immutable.
     
-    pub role: Option<String>,
+    pub role: Option<GoogleCloudDialogflowV2beta1ParticipantRoleEnum>,
 }
 
 impl client::RequestValue for GoogleCloudDialogflowV2beta1Participant {}
@@ -4147,7 +4147,7 @@ pub struct GoogleCloudDialogflowV2beta1SessionEntityType {
     /// Required. Indicates whether the additional data should override or supplement the custom entity type definition.
     #[serde(rename="entityOverrideMode")]
     
-    pub entity_override_mode: Option<String>,
+    pub entity_override_mode: Option<GoogleCloudDialogflowV2beta1SessionEntityTypeEntityOverrideModeEnum>,
     /// Required. The unique identifier of this session entity type. Supported formats: - `projects//agent/sessions//entityTypes/` - `projects//locations//agent/sessions//entityTypes/` - `projects//agent/environments//users//sessions//entityTypes/` - `projects//locations//agent/environments/ /users//sessions//entityTypes/` If `Location ID` is not specified we assume default 'us' location. If `Environment ID` is not specified, we assume default 'draft' environment. If `User ID` is not specified, we assume default '-' user. `` must be the display name of an existing entity type in the same agent that will be overridden or supplemented.
     
     pub name: Option<String>,
@@ -4172,7 +4172,7 @@ pub struct GoogleCloudDialogflowV2beta1SetSuggestionFeatureConfigRequest {
     /// Required. The participant role to add or update the suggestion feature config. Only HUMAN_AGENT or END_USER can be used.
     #[serde(rename="participantRole")]
     
-    pub participant_role: Option<String>,
+    pub participant_role: Option<GoogleCloudDialogflowV2beta1SetSuggestionFeatureConfigRequestParticipantRoleEnum>,
     /// Required. The suggestion feature config to add or update.
     #[serde(rename="suggestionFeatureConfig")]
     
@@ -4235,7 +4235,7 @@ pub struct GoogleCloudDialogflowV2beta1SpeechToTextConfig {
     /// The speech model used in speech to text. `SPEECH_MODEL_VARIANT_UNSPECIFIED`, `USE_BEST_AVAILABLE` will be treated as `USE_ENHANCED`. It can be overridden in AnalyzeContentRequest and StreamingAnalyzeContentRequest request. If enhanced model variant is specified and an enhanced version of the specified model for the language does not exist, then it would emit an error.
     #[serde(rename="speechModelVariant")]
     
-    pub speech_model_variant: Option<String>,
+    pub speech_model_variant: Option<GoogleCloudDialogflowV2beta1SpeechToTextConfigSpeechModelVariantEnum>,
 }
 
 impl client::Part for GoogleCloudDialogflowV2beta1SpeechToTextConfig {}
@@ -4608,7 +4608,7 @@ pub struct GoogleCloudDialogflowV2beta1SuggestionFeature {
     /// Type of Human Agent Assistant API feature to request.
     #[serde(rename="type")]
     
-    pub type_: Option<String>,
+    pub type_: Option<GoogleCloudDialogflowV2beta1SuggestionFeatureTypeEnum>,
 }
 
 impl client::Part for GoogleCloudDialogflowV2beta1SuggestionFeature {}
@@ -4681,7 +4681,7 @@ pub struct GoogleCloudDialogflowV2beta1TelephonyDtmfEvents {
     /// A sequence of TelephonyDtmf digits.
     #[serde(rename="dtmfEvents")]
     
-    pub dtmf_events: Option<Vec<String>>,
+    pub dtmf_events: Option<Vec<GoogleCloudDialogflowV2beta1TelephonyDtmfEventDtmfEventsEnum>>,
 }
 
 impl client::Part for GoogleCloudDialogflowV2beta1TelephonyDtmfEvents {}
@@ -4720,7 +4720,7 @@ pub struct GoogleCloudDialogflowV2beta1TextToSpeechSettings {
     /// Required. Audio encoding of the synthesized audio content.
     #[serde(rename="outputAudioEncoding")]
     
-    pub output_audio_encoding: Option<String>,
+    pub output_audio_encoding: Option<GoogleCloudDialogflowV2beta1TextToSpeechSettingOutputAudioEncodingEnum>,
     /// Optional. The synthesis sample rate (in hertz) for this audio. If not provided, then the synthesizer will use the default sample rate based on the audio encoding. If this is different from the voice's natural sample rate, then the synthesizer will honor this request by converting to the desired sample rate (which might result in worse audio quality).
     #[serde(rename="sampleRateHertz")]
     
@@ -4766,7 +4766,7 @@ pub struct GoogleCloudDialogflowV2beta1ValidationError {
     pub error_message: Option<String>,
     /// The severity of the error.
     
-    pub severity: Option<String>,
+    pub severity: Option<GoogleCloudDialogflowV2beta1ValidationErrorSeverityEnum>,
 }
 
 impl client::Part for GoogleCloudDialogflowV2beta1ValidationError {}
@@ -4821,7 +4821,7 @@ pub struct GoogleCloudDialogflowV2beta1Version {
     pub name: Option<String>,
     /// Output only. The status of this version. This field is read-only and cannot be set by create and update methods.
     
-    pub status: Option<String>,
+    pub status: Option<GoogleCloudDialogflowV2beta1VersionStatusEnum>,
     /// Output only. The sequential number of this version. This field is read-only which means it cannot be set by create and update methods.
     #[serde(rename="versionNumber")]
     
@@ -4845,7 +4845,7 @@ pub struct GoogleCloudDialogflowV2beta1VoiceSelectionParams {
     /// Optional. The preferred gender of the voice. If not set, the service will choose a voice based on the other parameters such as language_code and name. Note that this is only a preference, not requirement. If a voice of the appropriate gender is not available, the synthesizer should substitute a voice with a different gender rather than failing the request.
     #[serde(rename="ssmlGender")]
     
-    pub ssml_gender: Option<String>,
+    pub ssml_gender: Option<GoogleCloudDialogflowV2beta1VoiceSelectionParamSsmlGenderEnum>,
 }
 
 impl client::Part for GoogleCloudDialogflowV2beta1VoiceSelectionParams {}

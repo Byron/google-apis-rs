@@ -225,7 +225,7 @@ pub struct GooglePrivacyDlpV2beta1CharsToIgnore {
     /// no description provided
     #[serde(rename="commonCharactersToIgnore")]
     
-    pub common_characters_to_ignore: Option<String>,
+    pub common_characters_to_ignore: Option<GooglePrivacyDlpV2beta1CharsToIgnoreCommonCharactersToIgnoreEnum>,
 }
 
 impl client::Part for GooglePrivacyDlpV2beta1CharsToIgnore {}
@@ -388,7 +388,7 @@ pub struct GooglePrivacyDlpV2beta1Finding {
     pub location: Option<GooglePrivacyDlpV2beta1Location>,
     /// Estimate of how likely it is that the info_type is correct.
     
-    pub likelihood: Option<String>,
+    pub likelihood: Option<GooglePrivacyDlpV2beta1FindingLikelihoodEnum>,
     /// The specific type of info the string might be.
     #[serde(rename="infoType")]
     
@@ -538,7 +538,7 @@ pub struct GooglePrivacyDlpV2beta1Expressions {
     /// only supported value is `AND`.
     #[serde(rename="logicalOperator")]
     
-    pub logical_operator: Option<String>,
+    pub logical_operator: Option<GooglePrivacyDlpV2beta1ExpressionLogicalOperatorEnum>,
     /// no description provided
     
     pub conditions: Option<GooglePrivacyDlpV2beta1Conditions>,
@@ -854,7 +854,7 @@ pub struct GooglePrivacyDlpV2beta1TimePartConfig {
     /// no description provided
     #[serde(rename="partToExtract")]
     
-    pub part_to_extract: Option<String>,
+    pub part_to_extract: Option<GooglePrivacyDlpV2beta1TimePartConfigPartToExtractEnum>,
 }
 
 impl client::Part for GooglePrivacyDlpV2beta1TimePartConfig {}
@@ -1020,7 +1020,7 @@ pub struct GooglePrivacyDlpV2beta1InspectConfig {
     /// Only returns findings equal or above this threshold.
     #[serde(rename="minLikelihood")]
     
-    pub min_likelihood: Option<String>,
+    pub min_likelihood: Option<GooglePrivacyDlpV2beta1InspectConfigMinLikelihoodEnum>,
 }
 
 impl client::Part for GooglePrivacyDlpV2beta1InspectConfig {}
@@ -1492,7 +1492,7 @@ pub struct GooglePrivacyDlpV2beta1SummaryResult {
     pub count: Option<i64>,
     /// no description provided
     
-    pub code: Option<String>,
+    pub code: Option<GooglePrivacyDlpV2beta1SummaryResultCodeEnum>,
 }
 
 impl client::Part for GooglePrivacyDlpV2beta1SummaryResult {}
@@ -1970,7 +1970,7 @@ pub struct GooglePrivacyDlpV2beta1CryptoReplaceFfxFpeConfig {
     /// no description provided
     #[serde(rename="commonAlphabet")]
     
-    pub common_alphabet: Option<String>,
+    pub common_alphabet: Option<GooglePrivacyDlpV2beta1CryptoReplaceFfxFpeConfigCommonAlphabetEnum>,
     /// The native way to select the alphabet. Must be in the range [2, 62].
     
     pub radix: Option<i32>,
@@ -2164,7 +2164,7 @@ pub struct GooglePrivacyDlpV2beta1Condition {
     pub field: Option<GooglePrivacyDlpV2beta1FieldId>,
     /// Operator used to compare the field or info type to the value. [required]
     
-    pub operator: Option<String>,
+    pub operator: Option<GooglePrivacyDlpV2beta1ConditionOperatorEnum>,
     /// Value to compare against. [Required, except for `EXISTS` tests.]
     
     pub value: Option<GooglePrivacyDlpV2beta1Value>,

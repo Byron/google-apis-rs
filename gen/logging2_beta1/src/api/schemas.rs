@@ -170,7 +170,7 @@ pub struct LabelDescriptor {
     /// The type of data that can be assigned to the label.
     #[serde(rename="valueType")]
     
-    pub value_type: Option<String>,
+    pub value_type: Option<LabelDescriptorValueTypeEnum>,
 }
 
 impl client::Part for LabelDescriptor {}
@@ -385,7 +385,7 @@ pub struct LogEntry {
     pub resource: Option<MonitoredResource>,
     /// Optional. The severity of the log entry. The default value is LogSeverity.DEFAULT.
     
-    pub severity: Option<String>,
+    pub severity: Option<LogEntrySeverityEnum>,
     /// Optional. Source code location information associated with the log entry, if any.
     #[serde(rename="sourceLocation")]
     
@@ -509,7 +509,7 @@ pub struct LogMetric {
     pub value_extractor: Option<String>,
     /// Deprecated. The API version that created or updated this metric. The v2 format is used by default and cannot be changed.
     
-    pub version: Option<String>,
+    pub version: Option<LogMetricVersionEnum>,
 }
 
 impl client::RequestValue for LogMetric {}
@@ -558,7 +558,7 @@ pub struct LogSink {
     /// Deprecated. The log entry format to use for this sink's exported log entries. The v2 format is used by default and cannot be changed.
     #[serde(rename="outputVersionFormat")]
     
-    pub output_version_format: Option<String>,
+    pub output_version_format: Option<LogSinkOutputVersionFormatEnum>,
     /// Output only. The last update timestamp of the sink.This field may not be present for older sinks.
     #[serde(rename="updateTime")]
     
@@ -596,7 +596,7 @@ pub struct MetricDescriptor {
     /// Whether the metric records instantaneous values, changes to a value, etc. Some combinations of metric_kind and value_type might not be supported.
     #[serde(rename="metricKind")]
     
-    pub metric_kind: Option<String>,
+    pub metric_kind: Option<MetricDescriptorMetricKindEnum>,
     /// The resource name of the metric descriptor.
     
     pub name: Option<String>,
@@ -655,7 +655,7 @@ pub struct MetricDescriptor {
     /// Whether the measurement is an integer, a floating-point number, etc. Some combinations of metric_kind and value_type might not be supported.
     #[serde(rename="valueType")]
     
-    pub value_type: Option<String>,
+    pub value_type: Option<MetricDescriptorValueTypeEnum>,
 }
 
 impl client::Part for MetricDescriptor {}
@@ -676,7 +676,7 @@ pub struct MetricDescriptorMetadata {
     /// The launch stage of the metric definition.
     #[serde(rename="launchStage")]
     
-    pub launch_stage: Option<String>,
+    pub launch_stage: Option<MetricDescriptorMetadataLaunchStageEnum>,
     /// The sampling period of metric data points. For metrics which are written periodically, consecutive data points are stored at this time interval, excluding data loss due to errors. Metrics with a higher granularity have a smaller sampling period.
     #[serde(rename="samplePeriod")]
     

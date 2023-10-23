@@ -104,7 +104,7 @@ let mut req = Breakpoint::default();
 // Values shown here are possibly random and not representative !
 let result = hub.debugger().debuggees_breakpoints_set(req, "debuggeeId")
              .client_version("magna")
-             .canary_option("no")
+             .canary_option(&Default::default())
              .doit().await;
 
 match result {

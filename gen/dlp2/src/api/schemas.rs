@@ -217,7 +217,7 @@ pub struct GooglePrivacyDlpV2BigQueryOptions {
     /// no description provided
     #[serde(rename="sampleMethod")]
     
-    pub sample_method: Option<String>,
+    pub sample_method: Option<GooglePrivacyDlpV2BigQueryOptionSampleMethodEnum>,
     /// Complete BigQuery table reference.
     #[serde(rename="tableReference")]
     
@@ -326,7 +326,7 @@ pub struct GooglePrivacyDlpV2ByteContentItem {
     /// The type of data stored in the bytes string. Default will be TEXT_UTF8.
     #[serde(rename="type")]
     
-    pub type_: Option<String>,
+    pub type_: Option<GooglePrivacyDlpV2ByteContentItemTypeEnum>,
 }
 
 impl client::Part for GooglePrivacyDlpV2ByteContentItem {}
@@ -457,7 +457,7 @@ pub struct GooglePrivacyDlpV2CharsToIgnore {
     /// Common characters to not transform when masking. Useful to avoid removing punctuation.
     #[serde(rename="commonCharactersToIgnore")]
     
-    pub common_characters_to_ignore: Option<String>,
+    pub common_characters_to_ignore: Option<GooglePrivacyDlpV2CharsToIgnoreCommonCharactersToIgnoreEnum>,
 }
 
 impl client::Part for GooglePrivacyDlpV2CharsToIgnore {}
@@ -501,7 +501,7 @@ pub struct GooglePrivacyDlpV2CloudStorageOptions {
     /// List of file type groups to include in the scan. If empty, all files are scanned and available data format processors are applied. In addition, the binary content of the selected files is always scanned as well. Images are scanned only as binary if the specified region does not support image inspection and no file_types were specified. Image inspection is restricted to 'global', 'us', 'asia', and 'europe'.
     #[serde(rename="fileTypes")]
     
-    pub file_types: Option<Vec<String>>,
+    pub file_types: Option<Vec<GooglePrivacyDlpV2CloudStorageOptionFileTypesEnum>>,
     /// Limits the number of files to scan to this percentage of the input FileSet. Number of files scanned is rounded down. Must be between 0 and 100, inclusively. Both 0 and 100 means no limit. Defaults to 0.
     #[serde(rename="filesLimitPercent")]
     
@@ -509,7 +509,7 @@ pub struct GooglePrivacyDlpV2CloudStorageOptions {
     /// no description provided
     #[serde(rename="sampleMethod")]
     
-    pub sample_method: Option<String>,
+    pub sample_method: Option<GooglePrivacyDlpV2CloudStorageOptionSampleMethodEnum>,
 }
 
 impl client::Part for GooglePrivacyDlpV2CloudStorageOptions {}
@@ -587,7 +587,7 @@ pub struct GooglePrivacyDlpV2Condition {
     pub field: Option<GooglePrivacyDlpV2FieldId>,
     /// Required. Operator used to compare the field or infoType to the value.
     
-    pub operator: Option<String>,
+    pub operator: Option<GooglePrivacyDlpV2ConditionOperatorEnum>,
     /// Value to compare against. [Mandatory, except for `EXISTS` tests.]
     
     pub value: Option<GooglePrivacyDlpV2Value>,
@@ -938,7 +938,7 @@ pub struct GooglePrivacyDlpV2CryptoReplaceFfxFpeConfig {
     /// Common alphabets.
     #[serde(rename="commonAlphabet")]
     
-    pub common_alphabet: Option<String>,
+    pub common_alphabet: Option<GooglePrivacyDlpV2CryptoReplaceFfxFpeConfigCommonAlphabetEnum>,
     /// The 'tweak', a context may be used for higher security since the same identifier in two different contexts won't be given the same surrogate. If the context is not set, a default tweak will be used. If the context is set but: 1. there is no record present when transforming a given value or 1. the field is not present when transforming a given value, a default tweak will be used. Note that case (1) is expected when an `InfoTypeTransformation` is applied to both structured and unstructured `ContentItem`s. Currently, the referenced field may be of value type integer or string. The tweak is constructed as a sequence of bytes in big endian byte order such that: - a 64 bit integer is encoded followed by a single byte of value 1 - a string is encoded in UTF-8 format followed by a single byte of value 2
     
     pub context: Option<GooglePrivacyDlpV2FieldId>,
@@ -979,14 +979,14 @@ pub struct GooglePrivacyDlpV2CustomInfoType {
     /// If set to EXCLUSION_TYPE_EXCLUDE this infoType will not cause a finding to be returned. It still can be used for rules matching.
     #[serde(rename="exclusionType")]
     
-    pub exclusion_type: Option<String>,
+    pub exclusion_type: Option<GooglePrivacyDlpV2CustomInfoTypeExclusionTypeEnum>,
     /// CustomInfoType can either be a new infoType, or an extension of built-in infoType, when the name matches one of existing infoTypes and that infoType is specified in `InspectContent.info_types` field. Specifying the latter adds findings to the one detected by the system. If built-in info type is not specified in `InspectContent.info_types` list then the name is treated as a custom info type.
     #[serde(rename="infoType")]
     
     pub info_type: Option<GooglePrivacyDlpV2InfoType>,
     /// Likelihood to return for this CustomInfoType. This base value can be altered by a detection rule if the finding meets the criteria specified by the rule. Defaults to `VERY_LIKELY` if not specified.
     
-    pub likelihood: Option<String>,
+    pub likelihood: Option<GooglePrivacyDlpV2CustomInfoTypeLikelihoodEnum>,
     /// Regular expression based CustomInfoType.
     
     pub regex: Option<GooglePrivacyDlpV2Regex>,
@@ -1078,7 +1078,7 @@ pub struct GooglePrivacyDlpV2DateTime {
     /// Day of week
     #[serde(rename="dayOfWeek")]
     
-    pub day_of_week: Option<String>,
+    pub day_of_week: Option<GooglePrivacyDlpV2DateTimeDayOfWeekEnum>,
     /// Time of day
     
     pub time: Option<GoogleTypeTimeOfDay>,
@@ -1105,7 +1105,7 @@ pub struct GooglePrivacyDlpV2Deidentify {
     /// List of user-specified file type groups to transform. If specified, only the files with these filetypes will be transformed. If empty, all supported files will be transformed. Supported types may be automatically added over time. If a file type is set in this field that isn't supported by the Deidentify action then the job will fail and will not be successfully created/started. Currently the only filetypes supported are: IMAGES, TEXT_FILES, CSV, TSV.
     #[serde(rename="fileTypesToTransform")]
     
-    pub file_types_to_transform: Option<Vec<String>>,
+    pub file_types_to_transform: Option<Vec<GooglePrivacyDlpV2DeidentifyFileTypesToTransformEnum>>,
     /// User specified deidentify templates and configs for structured, unstructured, and image files.
     #[serde(rename="transformationConfig")]
     
@@ -1437,11 +1437,11 @@ pub struct GooglePrivacyDlpV2DlpJob {
     pub start_time: Option<client::chrono::DateTime<client::chrono::offset::Utc>>,
     /// State of a job.
     
-    pub state: Option<String>,
+    pub state: Option<GooglePrivacyDlpV2DlpJobStateEnum>,
     /// The type of job.
     #[serde(rename="type")]
     
-    pub type_: Option<String>,
+    pub type_: Option<GooglePrivacyDlpV2DlpJobTypeEnum>,
 }
 
 impl client::ResponseResult for GooglePrivacyDlpV2DlpJob {}
@@ -1553,7 +1553,7 @@ pub struct GooglePrivacyDlpV2ExclusionRule {
     /// How the rule is applied, see MatchingType documentation for details.
     #[serde(rename="matchingType")]
     
-    pub matching_type: Option<String>,
+    pub matching_type: Option<GooglePrivacyDlpV2ExclusionRuleMatchingTypeEnum>,
     /// Regular expression which defines the rule.
     
     pub regex: Option<GooglePrivacyDlpV2Regex>,
@@ -1575,7 +1575,7 @@ pub struct GooglePrivacyDlpV2Expressions {
     /// The operator to apply to the result of conditions. Default and currently only supported value is `AND`.
     #[serde(rename="logicalOperator")]
     
-    pub logical_operator: Option<String>,
+    pub logical_operator: Option<GooglePrivacyDlpV2ExpressionLogicalOperatorEnum>,
 }
 
 impl client::Part for GooglePrivacyDlpV2Expressions {}
@@ -1673,7 +1673,7 @@ pub struct GooglePrivacyDlpV2Finding {
     pub labels: Option<HashMap<String, String>>,
     /// Confidence of how likely it is that the `info_type` is correct.
     
-    pub likelihood: Option<String>,
+    pub likelihood: Option<GooglePrivacyDlpV2FindingLikelihoodEnum>,
     /// Where the content was found.
     
     pub location: Option<GooglePrivacyDlpV2Location>,
@@ -2058,15 +2058,15 @@ pub struct GooglePrivacyDlpV2InfoTypeCategory {
     /// The group of relevant businesses where this infoType is commonly used
     #[serde(rename="industryCategory")]
     
-    pub industry_category: Option<String>,
+    pub industry_category: Option<GooglePrivacyDlpV2InfoTypeCategoryIndustryCategoryEnum>,
     /// The region or country that issued the ID or document represented by the infoType.
     #[serde(rename="locationCategory")]
     
-    pub location_category: Option<String>,
+    pub location_category: Option<GooglePrivacyDlpV2InfoTypeCategoryLocationCategoryEnum>,
     /// The class of identifiers where this infoType belongs
     #[serde(rename="typeCategory")]
     
-    pub type_category: Option<String>,
+    pub type_category: Option<GooglePrivacyDlpV2InfoTypeCategoryTypeCategoryEnum>,
 }
 
 impl client::Part for GooglePrivacyDlpV2InfoTypeCategory {}
@@ -2099,7 +2099,7 @@ pub struct GooglePrivacyDlpV2InfoTypeDescription {
     /// Which parts of the API supports this InfoType.
     #[serde(rename="supportedBy")]
     
-    pub supported_by: Option<Vec<String>>,
+    pub supported_by: Option<Vec<GooglePrivacyDlpV2InfoTypeDescriptionSupportedByEnum>>,
     /// A list of available versions for the infotype.
     
     pub versions: Option<Vec<GooglePrivacyDlpV2VersionDescription>>,
@@ -2193,7 +2193,7 @@ pub struct GooglePrivacyDlpV2InspectConfig {
     /// Deprecated and unused.
     #[serde(rename="contentOptions")]
     
-    pub content_options: Option<Vec<String>>,
+    pub content_options: Option<Vec<GooglePrivacyDlpV2InspectConfigContentOptionsEnum>>,
     /// CustomInfoTypes provided by the user. See https://cloud.google.com/dlp/docs/creating-custom-infotypes to learn more.
     #[serde(rename="customInfoTypes")]
     
@@ -2216,7 +2216,7 @@ pub struct GooglePrivacyDlpV2InspectConfig {
     /// Only returns findings equal or above this threshold. The default is POSSIBLE. See https://cloud.google.com/dlp/docs/likelihood to learn more.
     #[serde(rename="minLikelihood")]
     
-    pub min_likelihood: Option<String>,
+    pub min_likelihood: Option<GooglePrivacyDlpV2InspectConfigMinLikelihoodEnum>,
     /// Set of rules to apply to the findings for this InspectConfig. Exclusion rules, contained in the set are executed in the end, other rules are executed in the order they are specified for each info type.
     #[serde(rename="ruleSet")]
     
@@ -2488,7 +2488,7 @@ pub struct GooglePrivacyDlpV2JobTrigger {
     pub name: Option<String>,
     /// Required. A status for this trigger.
     
-    pub status: Option<String>,
+    pub status: Option<GooglePrivacyDlpV2JobTriggerStatusEnum>,
     /// A list of triggers which will be OR'ed together. Only one in the list needs to trigger for a job to be started. The list may contain only a single Schedule trigger and must have at least one object.
     
     pub triggers: Option<Vec<GooglePrivacyDlpV2Trigger>>,
@@ -2910,7 +2910,7 @@ pub struct GooglePrivacyDlpV2LikelihoodAdjustment {
     /// Set the likelihood of a finding to a fixed value.
     #[serde(rename="fixedLikelihood")]
     
-    pub fixed_likelihood: Option<String>,
+    pub fixed_likelihood: Option<GooglePrivacyDlpV2LikelihoodAdjustmentFixedLikelihoodEnum>,
     /// Increase or decrease the likelihood by the specified number of levels. For example, if a finding would be `POSSIBLE` without the detection rule and `relative_likelihood` is 1, then it is upgraded to `LIKELY`, while a value of -1 would downgrade it to `UNLIKELY`. Likelihood may never drop below `VERY_UNLIKELY` or exceed `VERY_LIKELY`, so applying an adjustment of 1 followed by an adjustment of -1 when base likelihood is `VERY_LIKELY` will result in a final likelihood of `LIKELY`.
     #[serde(rename="relativeLikelihood")]
     
@@ -3125,7 +3125,7 @@ pub struct GooglePrivacyDlpV2MetadataLocation {
     /// Type of metadata containing the finding.
     #[serde(rename="type")]
     
-    pub type_: Option<String>,
+    pub type_: Option<GooglePrivacyDlpV2MetadataLocationTypeEnum>,
 }
 
 impl client::Part for GooglePrivacyDlpV2MetadataLocation {}
@@ -3180,7 +3180,7 @@ pub struct GooglePrivacyDlpV2OutputStorageConfig {
     /// Schema used for writing the findings for Inspect jobs. This field is only used for Inspect and must be unspecified for Risk jobs. Columns are derived from the `Finding` object. If appending to an existing table, any columns from the predefined schema that are missing will be added. No columns in the existing table will be deleted. If unspecified, then all available columns will be used for a new table or an (existing) table with no schema, and no changes will be made to an existing table that has a schema. Only for use with external storage.
     #[serde(rename="outputSchema")]
     
-    pub output_schema: Option<String>,
+    pub output_schema: Option<GooglePrivacyDlpV2OutputStorageConfigOutputSchemaEnum>,
     /// Store findings in an existing table or a new table in an existing dataset. If table_id is not set a new one will be generated for you with the following format: dlp_googleapis_yyyy_mm_dd_[dlp_job_id]. Pacific time zone will be used for generating the date details. For Inspect, each column in an existing output table must have the same name, type, and mode of a field in the `Finding` object. For Risk, an existing output table should be the output of a previous Risk analysis job run on the same source table, with the same privacy metric and quasi-identifiers. Risk jobs that analyze the same table but compute a different privacy metric, or use different sets of quasi-identifiers, cannot store their results in the same table.
     
     pub table: Option<GooglePrivacyDlpV2BigQueryTable>,
@@ -3958,7 +3958,7 @@ impl client::Part for GooglePrivacyDlpV2SelectedInfoTypes {}
 pub struct GooglePrivacyDlpV2SensitivityScore {
     /// The score applied to the resource.
     
-    pub score: Option<String>,
+    pub score: Option<GooglePrivacyDlpV2SensitivityScoreScoreEnum>,
 }
 
 impl client::Part for GooglePrivacyDlpV2SensitivityScore {}
@@ -4136,7 +4136,7 @@ pub struct GooglePrivacyDlpV2StoredInfoTypeVersion {
     pub errors: Option<Vec<GooglePrivacyDlpV2Error>>,
     /// Stored info type version state. Read-only, updated by the system during dictionary creation.
     
-    pub state: Option<String>,
+    pub state: Option<GooglePrivacyDlpV2StoredInfoTypeVersionStateEnum>,
     /// Statistics about this storedInfoType version.
     
     pub stats: Option<GooglePrivacyDlpV2StoredInfoTypeStats>,
@@ -4173,7 +4173,7 @@ impl client::Part for GooglePrivacyDlpV2StoredType {}
 pub struct GooglePrivacyDlpV2SummaryResult {
     /// Outcome of the transformation.
     
-    pub code: Option<String>,
+    pub code: Option<GooglePrivacyDlpV2SummaryResultCodeEnum>,
     /// Number of transformations counted by this result.
     
     #[serde_as(as = "Option<::client::serde_with::DisplayFromStr>")]
@@ -4295,7 +4295,7 @@ pub struct GooglePrivacyDlpV2TimePartConfig {
     /// The part of the time to keep.
     #[serde(rename="partToExtract")]
     
-    pub part_to_extract: Option<String>,
+    pub part_to_extract: Option<GooglePrivacyDlpV2TimePartConfigPartToExtractEnum>,
 }
 
 impl client::Part for GooglePrivacyDlpV2TimePartConfig {}
@@ -4636,7 +4636,7 @@ pub struct GooglePrivacyDlpV2Value {
     /// day of week
     #[serde(rename="dayOfWeekValue")]
     
-    pub day_of_week_value: Option<String>,
+    pub day_of_week_value: Option<GooglePrivacyDlpV2ValueDayOfWeekValueEnum>,
     /// float
     #[serde(rename="floatValue")]
     

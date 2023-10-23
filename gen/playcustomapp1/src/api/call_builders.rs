@@ -367,7 +367,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("account", self._account.to_string());
+        params.push("account", &self._account.to_string());
 
         params.extend(self._additional_params.iter());
 

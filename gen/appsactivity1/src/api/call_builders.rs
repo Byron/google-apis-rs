@@ -26,13 +26,13 @@ use super::*;
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.activities().list()
-///              .user_id("amet")
-///              .source("duo")
-///              .page_token("ipsum")
-///              .page_size(-93)
-///              .grouping_strategy("ut")
-///              .drive_file_id("gubergren")
-///              .drive_ancestor_id("rebum.")
+///              .user_id("ea")
+///              .source("ipsum")
+///              .page_token("invidunt")
+///              .page_size(-47)
+///              .grouping_strategy(&Default::default())
+///              .drive_file_id("duo")
+///              .drive_ancestor_id("ipsum")
 ///              .doit().await;
 /// # }
 /// ```
@@ -44,7 +44,7 @@ pub struct ActivityListCall<'a, S>
    pub(super) _source: Option<String>,
    pub(super) _page_token: Option<String>,
    pub(super) _page_size: Option<i32>,
-   pub(super) _grouping_strategy: Option<String>,
+   pub(super) _grouping_strategy: Option<ActivityGroupingStrategyEnum>,
    pub(super) _drive_file_id: Option<String>,
    pub(super) _drive_ancestor_id: Option<String>,
    pub(super) _delegate: Option<&'a mut dyn client::Delegate>,
@@ -233,8 +233,8 @@ where
     /// Indicates the strategy to use when grouping singleEvents items in the associated combinedEvent object.
     ///
     /// Sets the *grouping strategy* query property to the given value.
-    pub fn grouping_strategy(mut self, new_value: &str) -> ActivityListCall<'a, S> {
-        self._grouping_strategy = Some(new_value.to_string());
+    pub fn grouping_strategy(mut self, new_value: &ActivityGroupingStrategyEnum) -> ActivityListCall<'a, S> {
+        self._grouping_strategy = Some(new_value.clone());
         self
     }
     /// Identifies the Drive item to return activities for.

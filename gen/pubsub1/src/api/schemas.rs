@@ -32,7 +32,7 @@ pub struct BigQueryConfig {
     pub drop_unknown_fields: Option<bool>,
     /// Output only. An output-only field that indicates whether or not the subscription can receive messages.
     
-    pub state: Option<String>,
+    pub state: Option<BigQueryConfigStateEnum>,
     /// The name of the table to which to write data, of the form {projectId}.{datasetId}.{tableId}
     
     pub table: Option<String>,
@@ -714,7 +714,7 @@ pub struct Schema {
     /// The type of the schema definition.
     #[serde(rename="type")]
     
-    pub type_: Option<String>,
+    pub type_: Option<SchemaTypeEnum>,
 }
 
 impl client::RequestValue for Schema {}
@@ -730,7 +730,7 @@ impl client::ResponseResult for Schema {}
 pub struct SchemaSettings {
     /// The encoding of messages validated against `schema`.
     
-    pub encoding: Option<String>,
+    pub encoding: Option<SchemaSettingEncodingEnum>,
     /// The minimum (inclusive) revision allowed for validating messages. If empty or not present, allow any revision to be validated against last_revision or any revision created before.
     #[serde(rename="firstRevisionId")]
     
@@ -905,7 +905,7 @@ pub struct Subscription {
     pub retry_policy: Option<RetryPolicy>,
     /// Output only. An output-only field indicating whether or not the subscription can receive messages.
     
-    pub state: Option<String>,
+    pub state: Option<SubscriptionStateEnum>,
     /// Required. The name of the topic from which this subscription is receiving messages. Format is `projects/{project}/topics/{topic}`. The value of this field will be `_deleted-topic_` if the topic has been deleted.
     
     pub topic: Option<String>,
@@ -1092,7 +1092,7 @@ impl client::RequestValue for UpdateTopicRequest {}
 pub struct ValidateMessageRequest {
     /// The encoding expected for messages
     
-    pub encoding: Option<String>,
+    pub encoding: Option<ValidateMessageRequestEncodingEnum>,
     /// Message to validate against the provided `schema_spec`.
     
     #[serde_as(as = "Option<::client::serde::urlsafe_base64::Wrapper>")]

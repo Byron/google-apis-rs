@@ -171,12 +171,12 @@ let result = hub.files().patch(req, "fileId")
              .ocr_language("dolor")
              .ocr(true)
              .new_revision(false)
-             .modified_date_behavior("amet")
-             .include_permissions_for_view("duo")
-             .include_labels("ipsum")
-             .enforce_single_parent(false)
-             .convert(true)
-             .add_parents("ipsum")
+             .modified_date_behavior(&Default::default())
+             .include_permissions_for_view("amet")
+             .include_labels("duo")
+             .enforce_single_parent(true)
+             .convert(false)
+             .add_parents("ut")
              .doit().await;
 
 match result {

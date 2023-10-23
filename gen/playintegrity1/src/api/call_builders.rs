@@ -77,7 +77,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("packageName", self._package_name);
+        params.push("packageName", &self._package_name);
 
         params.extend(self._additional_params.iter());
 

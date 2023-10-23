@@ -101,7 +101,7 @@ pub struct DynamicGroupQuery {
     /// Resource type for the Dynamic Group Query
     #[serde(rename="resourceType")]
     
-    pub resource_type: Option<String>,
+    pub resource_type: Option<DynamicGroupQueryResourceTypeEnum>,
 }
 
 impl client::Part for DynamicGroupQuery {}
@@ -116,7 +116,7 @@ impl client::Part for DynamicGroupQuery {}
 pub struct DynamicGroupStatus {
     /// Status of the dynamic group.
     
-    pub status: Option<String>,
+    pub status: Option<DynamicGroupStatuStatusEnum>,
     /// The latest time at which the dynamic group is guaranteed to be in the given status. If status is `UP_TO_DATE`, the latest time at which the dynamic group was confirmed to be up-to-date. If status is `UPDATING_MEMBERSHIPS`, the time at which dynamic group was created.
     #[serde(rename="statusTime")]
     
@@ -178,7 +178,7 @@ pub struct GoogleAppsCloudidentityDevicesV1AndroidAttributes {
     /// Ownership privileges on device.
     #[serde(rename="ownershipPrivilege")]
     
-    pub ownership_privilege: Option<String>,
+    pub ownership_privilege: Option<GoogleAppsCloudidentityDevicesV1AndroidAttributeOwnershipPrivilegeEnum>,
     /// Whether device supports Android work profiles. If false, this service will not block access to corp data even if an administrator turns on the "Enforce Work Profile" policy.
     #[serde(rename="supportsWorkProfile")]
     
@@ -283,7 +283,7 @@ pub struct GoogleAppsCloudidentityDevicesV1ClientState {
     /// The compliance state of the resource as specified by the API client.
     #[serde(rename="complianceState")]
     
-    pub compliance_state: Option<String>,
+    pub compliance_state: Option<GoogleAppsCloudidentityDevicesV1ClientStateComplianceStateEnum>,
     /// Output only. The time the client state data was created.
     #[serde(rename="createTime")]
     
@@ -298,7 +298,7 @@ pub struct GoogleAppsCloudidentityDevicesV1ClientState {
     /// The Health score of the resource. The Health score is the callers specification of the condition of the device from a usability point of view. For example, a third-party device management provider may specify a health score based on its compliance with organizational policies.
     #[serde(rename="healthScore")]
     
-    pub health_score: Option<String>,
+    pub health_score: Option<GoogleAppsCloudidentityDevicesV1ClientStateHealthScoreEnum>,
     /// The map of key-value attributes stored by callers specific to a device. The total serialized length of this map may not exceed 10KB. No limit is placed on the number of attributes in a map.
     #[serde(rename="keyValuePairs")]
     
@@ -309,14 +309,14 @@ pub struct GoogleAppsCloudidentityDevicesV1ClientState {
     pub last_update_time: Option<client::chrono::DateTime<client::chrono::offset::Utc>>,
     /// The management state of the resource as specified by the API client.
     
-    pub managed: Option<String>,
+    pub managed: Option<GoogleAppsCloudidentityDevicesV1ClientStateManagedEnum>,
     /// Output only. [Resource name](https://cloud.google.com/apis/design/resource_names) of the ClientState in format: `devices/{device}/deviceUsers/{device_user}/clientState/{partner}`, where partner corresponds to the partner storing the data. For partners belonging to the "BeyondCorp Alliance", this is the partner ID specified to you by Google. For all other callers, this is a string of the form: `{customer}-suffix`, where `customer` is your customer ID. The *suffix* is any string the caller specifies. This string will be displayed verbatim in the administration console. This suffix is used in setting up Custom Access Levels in Context-Aware Access. Your organization's customer ID can be obtained from the URL: `GET https://www.googleapis.com/admin/directory/v1/customers/my_customer` The `id` field in the response contains the customer ID starting with the letter 'C'. The customer ID to be used in this API is the string after the letter 'C' (not including 'C')
     
     pub name: Option<String>,
     /// Output only. The owner of the ClientState
     #[serde(rename="ownerType")]
     
-    pub owner_type: Option<String>,
+    pub owner_type: Option<GoogleAppsCloudidentityDevicesV1ClientStateOwnerTypeEnum>,
     /// A descriptive cause of the health score.
     #[serde(rename="scoreReason")]
     
@@ -389,7 +389,7 @@ pub struct GoogleAppsCloudidentityDevicesV1Device {
     /// Output only. Represents whether the Device is compromised.
     #[serde(rename="compromisedState")]
     
-    pub compromised_state: Option<String>,
+    pub compromised_state: Option<GoogleAppsCloudidentityDevicesV1DeviceCompromisedStateEnum>,
     /// Output only. When the Company-Owned device was imported. This field is empty for BYOD devices.
     #[serde(rename="createTime")]
     
@@ -401,7 +401,7 @@ pub struct GoogleAppsCloudidentityDevicesV1Device {
     /// Output only. Type of device.
     #[serde(rename="deviceType")]
     
-    pub device_type: Option<String>,
+    pub device_type: Option<GoogleAppsCloudidentityDevicesV1DeviceDeviceTypeEnum>,
     /// Output only. Whether developer options is enabled on device.
     #[serde(rename="enabledDeveloperOptions")]
     
@@ -413,7 +413,7 @@ pub struct GoogleAppsCloudidentityDevicesV1Device {
     /// Output only. Device encryption state.
     #[serde(rename="encryptionState")]
     
-    pub encryption_state: Option<String>,
+    pub encryption_state: Option<GoogleAppsCloudidentityDevicesV1DeviceEncryptionStateEnum>,
     /// Output only. IMEI number of device if GSM device; empty otherwise.
     
     pub imei: Option<String>,
@@ -428,7 +428,7 @@ pub struct GoogleAppsCloudidentityDevicesV1Device {
     /// Output only. Management state of the device
     #[serde(rename="managementState")]
     
-    pub management_state: Option<String>,
+    pub management_state: Option<GoogleAppsCloudidentityDevicesV1DeviceManagementStateEnum>,
     /// Output only. Device manufacturer. Example: Motorola.
     
     pub manufacturer: Option<String>,
@@ -456,7 +456,7 @@ pub struct GoogleAppsCloudidentityDevicesV1Device {
     /// Output only. Whether the device is owned by the company or an individual
     #[serde(rename="ownerType")]
     
-    pub owner_type: Option<String>,
+    pub owner_type: Option<GoogleAppsCloudidentityDevicesV1DeviceOwnerTypeEnum>,
     /// Output only. OS release version. Example: 6.0.
     #[serde(rename="releaseVersion")]
     
@@ -493,7 +493,7 @@ pub struct GoogleAppsCloudidentityDevicesV1DeviceUser {
     /// Compromised State of the DeviceUser object
     #[serde(rename="compromisedState")]
     
-    pub compromised_state: Option<String>,
+    pub compromised_state: Option<GoogleAppsCloudidentityDevicesV1DeviceUserCompromisedStateEnum>,
     /// When the user first signed in to the device
     #[serde(rename="createTime")]
     
@@ -513,14 +513,14 @@ pub struct GoogleAppsCloudidentityDevicesV1DeviceUser {
     /// Output only. Management state of the user on the device.
     #[serde(rename="managementState")]
     
-    pub management_state: Option<String>,
+    pub management_state: Option<GoogleAppsCloudidentityDevicesV1DeviceUserManagementStateEnum>,
     /// Output only. [Resource name](https://cloud.google.com/apis/design/resource_names) of the DeviceUser in format: `devices/{device}/deviceUsers/{device_user}`, where `device_user` uniquely identifies a user's use of a device.
     
     pub name: Option<String>,
     /// Password state of the DeviceUser object
     #[serde(rename="passwordState")]
     
-    pub password_state: Option<String>,
+    pub password_state: Option<GoogleAppsCloudidentityDevicesV1DeviceUserPasswordStateEnum>,
     /// Output only. User agent on the device for this specific user
     #[serde(rename="userAgent")]
     
@@ -765,7 +765,7 @@ pub struct GroupRelation {
     /// The relation between the member and the transitive group.
     #[serde(rename="relationType")]
     
-    pub relation_type: Option<String>,
+    pub relation_type: Option<GroupRelationRelationTypeEnum>,
     /// Membership roles of the member for the group.
     
     pub roles: Option<Vec<TransitiveMembershipRole>>,
@@ -884,7 +884,7 @@ pub struct InboundSsoAssignment {
     /// Inbound SSO behavior.
     #[serde(rename="ssoMode")]
     
-    pub sso_mode: Option<String>,
+    pub sso_mode: Option<InboundSsoAssignmentSsoModeEnum>,
     /// Immutable. Must be of the form `groups/{group}`.
     #[serde(rename="targetGroup")]
     
@@ -1117,7 +1117,7 @@ pub struct MemberRelation {
     /// The relation between the group and the transitive member.
     #[serde(rename="relationType")]
     
-    pub relation_type: Option<String>,
+    pub relation_type: Option<MemberRelationRelationTypeEnum>,
     /// The membership role details (i.e name of role and expiry time).
     
     pub roles: Option<Vec<TransitiveMembershipRole>>,
@@ -1173,7 +1173,7 @@ pub struct Membership {
     /// Output only. The type of the membership.
     #[serde(rename="type")]
     
-    pub type_: Option<String>,
+    pub type_: Option<MembershipTypeEnum>,
     /// Output only. The time when the `Membership` was last updated.
     #[serde(rename="updateTime")]
     
@@ -1216,7 +1216,7 @@ impl client::Part for MembershipRole {}
 pub struct MembershipRoleRestrictionEvaluation {
     /// Output only. The current state of the restriction
     
-    pub state: Option<String>,
+    pub state: Option<MembershipRoleRestrictionEvaluationStateEnum>,
 }
 
 impl client::Part for MembershipRoleRestrictionEvaluation {}
@@ -1335,7 +1335,7 @@ impl client::ResponseResult for Operation {}
 pub struct RestrictionEvaluation {
     /// Output only. The current state of the restriction
     
-    pub state: Option<String>,
+    pub state: Option<RestrictionEvaluationStateEnum>,
 }
 
 impl client::Part for RestrictionEvaluation {}
@@ -1556,7 +1556,7 @@ pub struct SignInBehavior {
     /// When to redirect sign-ins to the IdP.
     #[serde(rename="redirectCondition")]
     
-    pub redirect_condition: Option<String>,
+    pub redirect_condition: Option<SignInBehaviorRedirectConditionEnum>,
 }
 
 impl client::Part for SignInBehavior {}
@@ -1639,7 +1639,7 @@ pub struct UserInvitation {
     pub name: Option<String>,
     /// State of the `UserInvitation`.
     
-    pub state: Option<String>,
+    pub state: Option<UserInvitationStateEnum>,
     /// Time when the `UserInvitation` was last updated.
     #[serde(rename="updateTime")]
     

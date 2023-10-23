@@ -32,11 +32,11 @@ use super::*;
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.tables().rows_list("parent")
-///              .view("gubergren")
-///              .page_token("Lorem")
-///              .page_size(-12)
-///              .order_by("eos")
-///              .filter("dolor")
+///              .view(&Default::default())
+///              .page_token("duo")
+///              .page_size(-55)
+///              .order_by("gubergren")
+///              .filter("Lorem")
 ///              .doit().await;
 /// 
 /// match result {

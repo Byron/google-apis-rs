@@ -201,10 +201,10 @@ impl<'a, S> TestEnvironmentCatalogMethods<'a, S> {
     /// # Arguments
     ///
     /// * `environmentType` - Required. The type of environment that should be listed.
-    pub fn get(&self, environment_type: &str) -> TestEnvironmentCatalogGetCall<'a, S> {
+    pub fn get(&self, environment_type: &TestEnvironmentCatalogEnvironmentTypeEnum) -> TestEnvironmentCatalogGetCall<'a, S> {
         TestEnvironmentCatalogGetCall {
             hub: self.hub,
-            _environment_type: environment_type.to_string(),
+            _environment_type: environment_type.clone(),
             _project_id: Default::default(),
             _delegate: Default::default(),
             _additional_params: Default::default(),

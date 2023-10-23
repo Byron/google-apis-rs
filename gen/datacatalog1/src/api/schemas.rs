@@ -121,7 +121,7 @@ pub struct GoogleCloudDatacatalogV1BigQueryConnectionSpec {
     /// The type of the BigQuery connection.
     #[serde(rename="connectionType")]
     
-    pub connection_type: Option<String>,
+    pub connection_type: Option<GoogleCloudDatacatalogV1BigQueryConnectionSpecConnectionTypeEnum>,
     /// True if there are credentials attached to the BigQuery connection; false otherwise.
     #[serde(rename="hasCredential")]
     
@@ -185,7 +185,7 @@ pub struct GoogleCloudDatacatalogV1BigQueryTableSpec {
     /// Output only. The table source type.
     #[serde(rename="tableSourceType")]
     
-    pub table_source_type: Option<String>,
+    pub table_source_type: Option<GoogleCloudDatacatalogV1BigQueryTableSpecTableSourceTypeEnum>,
     /// Specification of a BigQuery table. Populated only if the `table_source_type` is `BIGQUERY_TABLE`.
     #[serde(rename="tableSpec")]
     
@@ -235,7 +235,7 @@ pub struct GoogleCloudDatacatalogV1CloudSqlBigQueryConnectionSpec {
     /// Type of the Cloud SQL database.
     #[serde(rename="type")]
     
-    pub type_: Option<String>,
+    pub type_: Option<GoogleCloudDatacatalogV1CloudSqlBigQueryConnectionSpecTypeEnum>,
 }
 
 impl client::Part for GoogleCloudDatacatalogV1CloudSqlBigQueryConnectionSpec {}
@@ -265,7 +265,7 @@ pub struct GoogleCloudDatacatalogV1ColumnSchema {
     /// Optional. Most important inclusion of this column.
     #[serde(rename="highestIndexingType")]
     
-    pub highest_indexing_type: Option<String>,
+    pub highest_indexing_type: Option<GoogleCloudDatacatalogV1ColumnSchemaHighestIndexingTypeEnum>,
     /// Looker specific column info of this column.
     #[serde(rename="lookerColumnSpec")]
     
@@ -299,7 +299,7 @@ pub struct GoogleCloudDatacatalogV1ColumnSchemaLookerColumnSpec {
     /// Looker specific column type of this column.
     #[serde(rename="type")]
     
-    pub type_: Option<String>,
+    pub type_: Option<GoogleCloudDatacatalogV1ColumnSchemaLookerColumnSpecTypeEnum>,
 }
 
 impl client::Part for GoogleCloudDatacatalogV1ColumnSchemaLookerColumnSpec {}
@@ -386,7 +386,7 @@ pub struct GoogleCloudDatacatalogV1DataSource {
     pub resource: Option<String>,
     /// Service that physically stores the data.
     
-    pub service: Option<String>,
+    pub service: Option<GoogleCloudDatacatalogV1DataSourceServiceEnum>,
     /// Output only. Data Catalog entry name, if applicable.
     #[serde(rename="sourceEntry")]
     
@@ -434,7 +434,7 @@ pub struct GoogleCloudDatacatalogV1DatabaseTableSpec {
     /// Type of this table.
     #[serde(rename="type")]
     
-    pub type_: Option<String>,
+    pub type_: Option<GoogleCloudDatacatalogV1DatabaseTableSpecTypeEnum>,
 }
 
 impl client::Part for GoogleCloudDatacatalogV1DatabaseTableSpec {}
@@ -458,7 +458,7 @@ pub struct GoogleCloudDatacatalogV1DatabaseTableSpecDatabaseViewSpec {
     /// Type of this view.
     #[serde(rename="viewType")]
     
-    pub view_type: Option<String>,
+    pub view_type: Option<GoogleCloudDatacatalogV1DatabaseTableSpecDatabaseViewSpecViewTypeEnum>,
 }
 
 impl client::Part for GoogleCloudDatacatalogV1DatabaseTableSpecDatabaseViewSpec {}
@@ -485,7 +485,7 @@ pub struct GoogleCloudDatacatalogV1DataplexExternalTable {
     pub google_cloud_resource: Option<String>,
     /// Service in which the external table is registered.
     
-    pub system: Option<String>,
+    pub system: Option<GoogleCloudDatacatalogV1DataplexExternalTableSystemEnum>,
 }
 
 impl client::Part for GoogleCloudDatacatalogV1DataplexExternalTable {}
@@ -618,7 +618,7 @@ pub struct GoogleCloudDatacatalogV1Entry {
     /// Output only. Indicates the entry's source system that Data Catalog integrates with, such as BigQuery, Pub/Sub, or Dataproc Metastore.
     #[serde(rename="integratedSystem")]
     
-    pub integrated_system: Option<String>,
+    pub integrated_system: Option<GoogleCloudDatacatalogV1EntryIntegratedSystemEnum>,
     /// Cloud labels attached to the entry. In Data Catalog, you can create and modify labels attached only to custom entries. Synced entries have unmodifiable labels that come from the source system.
     
     pub labels: Option<HashMap<String, String>>,
@@ -655,7 +655,7 @@ pub struct GoogleCloudDatacatalogV1Entry {
     /// The type of the entry. Only used for entries with types listed in the `EntryType` enum. Currently, only `FILESET` enum value is allowed. All other entries created in Data Catalog must use the `user_specified_type`.
     #[serde(rename="type")]
     
-    pub type_: Option<String>,
+    pub type_: Option<GoogleCloudDatacatalogV1EntryTypeEnum>,
     /// Resource usage statistics.
     #[serde(rename="usageSignal")]
     
@@ -759,7 +759,7 @@ pub struct GoogleCloudDatacatalogV1FieldType {
     /// Primitive types, such as string, boolean, etc.
     #[serde(rename="primitiveType")]
     
-    pub primitive_type: Option<String>,
+    pub primitive_type: Option<GoogleCloudDatacatalogV1FieldTypePrimitiveTypeEnum>,
 }
 
 impl client::Part for GoogleCloudDatacatalogV1FieldType {}
@@ -1382,7 +1382,7 @@ pub struct GoogleCloudDatacatalogV1RoutineSpec {
     /// The type of the routine.
     #[serde(rename="routineType")]
     
-    pub routine_type: Option<String>,
+    pub routine_type: Option<GoogleCloudDatacatalogV1RoutineSpecRoutineTypeEnum>,
 }
 
 impl client::Part for GoogleCloudDatacatalogV1RoutineSpec {}
@@ -1397,7 +1397,7 @@ impl client::Part for GoogleCloudDatacatalogV1RoutineSpec {}
 pub struct GoogleCloudDatacatalogV1RoutineSpecArgument {
     /// Specifies whether the argument is input or output.
     
-    pub mode: Option<String>,
+    pub mode: Option<GoogleCloudDatacatalogV1RoutineSpecArgumentModeEnum>,
     /// The name of the argument. A return argument of a function might not have a name.
     
     pub name: Option<String>,
@@ -1542,7 +1542,7 @@ pub struct GoogleCloudDatacatalogV1SearchCatalogResult {
     /// Output only. The source system that Data Catalog automatically integrates with, such as BigQuery, Cloud Pub/Sub, or Dataproc Metastore.
     #[serde(rename="integratedSystem")]
     
-    pub integrated_system: Option<String>,
+    pub integrated_system: Option<GoogleCloudDatacatalogV1SearchCatalogResultIntegratedSystemEnum>,
     /// The full name of the Google Cloud resource the entry belongs to. For more information, see \[Full Resource Name\] (/apis/design/resource_names#full_resource_name). Example: `//bigquery.googleapis.com/projects/PROJECT_ID/datasets/DATASET_ID/tables/TABLE_ID`
     #[serde(rename="linkedResource")]
     
@@ -1562,7 +1562,7 @@ pub struct GoogleCloudDatacatalogV1SearchCatalogResult {
     /// Type of the search result. You can use this field to determine which get method to call to fetch the full resource.
     #[serde(rename="searchResultType")]
     
-    pub search_result_type: Option<String>,
+    pub search_result_type: Option<GoogleCloudDatacatalogV1SearchCatalogResultSearchResultTypeEnum>,
     /// Custom source system that you can manually integrate Data Catalog with.
     #[serde(rename="userSpecifiedSystem")]
     
@@ -1609,7 +1609,7 @@ pub struct GoogleCloudDatacatalogV1SerializedTaxonomy {
     /// A list of policy types that are activated per taxonomy.
     #[serde(rename="activatedPolicyTypes")]
     
-    pub activated_policy_types: Option<Vec<String>>,
+    pub activated_policy_types: Option<Vec<GoogleCloudDatacatalogV1SerializedTaxonomyActivatedPolicyTypesEnum>>,
     /// Description of the serialized taxonomy. At most 2000 bytes when encoded in UTF-8. If not set, defaults to an empty description.
     
     pub description: Option<String>,
@@ -1926,7 +1926,7 @@ pub struct GoogleCloudDatacatalogV1Taxonomy {
     /// Optional. A list of policy types that are activated for this taxonomy. If not set, defaults to an empty list.
     #[serde(rename="activatedPolicyTypes")]
     
-    pub activated_policy_types: Option<Vec<String>>,
+    pub activated_policy_types: Option<Vec<GoogleCloudDatacatalogV1TaxonomyActivatedPolicyTypesEnum>>,
     /// Optional. Description of this taxonomy. If not set, defaults to empty. The description must contain only Unicode characters, tabs, newlines, carriage returns, and page breaks, and be at most 2000 bytes long when encoded in UTF-8.
     
     pub description: Option<String>,
@@ -1966,7 +1966,7 @@ pub struct GoogleCloudDatacatalogV1TaxonomyService {
     pub identity: Option<String>,
     /// The GCP service name.
     
-    pub name: Option<String>,
+    pub name: Option<GoogleCloudDatacatalogV1TaxonomyServiceNameEnum>,
 }
 
 impl client::Part for GoogleCloudDatacatalogV1TaxonomyService {}

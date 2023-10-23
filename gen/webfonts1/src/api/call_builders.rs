@@ -26,7 +26,7 @@ use super::*;
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.webfonts().list()
-///              .sort("ipsum")
+///              .sort(&Default::default())
 ///              .doit().await;
 /// # }
 /// ```
@@ -34,7 +34,7 @@ pub struct WebfontListCall<'a, S>
     where S: 'a {
 
    pub(super) hub: &'a Webfonts<S>,
-   pub(super) _sort: Option<String>,
+   pub(super) _sort: Option<WebfontSortEnum>,
    pub(super) _delegate: Option<&'a mut dyn client::Delegate>,
    pub(super) _additional_params: HashMap<String, String>,
 }
@@ -163,8 +163,8 @@ where
     /// Enables sorting of the list.
     ///
     /// Sets the *sort* query property to the given value.
-    pub fn sort(mut self, new_value: &str) -> WebfontListCall<'a, S> {
-        self._sort = Some(new_value.to_string());
+    pub fn sort(mut self, new_value: &WebfontSortEnum) -> WebfontListCall<'a, S> {
+        self._sort = Some(new_value.clone());
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong

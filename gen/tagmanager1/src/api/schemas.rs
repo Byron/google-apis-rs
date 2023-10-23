@@ -88,7 +88,7 @@ impl client::ResponseResult for Account {}
 pub struct AccountAccess {
     /// List of Account permissions. Valid account permissions are read and manage. @mutable tagmanager.accounts.permissions.create @mutable tagmanager.accounts.permissions.update
     
-    pub permission: Option<Vec<String>>,
+    pub permission: Option<Vec<AccountAccesPermissionEnum>>,
 }
 
 impl client::Part for AccountAccess {}
@@ -107,7 +107,7 @@ pub struct Condition {
     /// The type of operator for this condition. @mutable tagmanager.accounts.containers.triggers.create @mutable tagmanager.accounts.containers.triggers.update
     #[serde(rename="type")]
     
-    pub type_: Option<String>,
+    pub type_: Option<ConditionTypeEnum>,
 }
 
 impl client::Part for Condition {}
@@ -141,7 +141,7 @@ pub struct Container {
     /// List of enabled built-in variables. Valid values include: pageUrl, pageHostname, pagePath, referrer, event, clickElement, clickClasses, clickId, clickTarget, clickUrl, clickText, formElement, formClasses, formId, formTarget, formUrl, formText, errorMessage, errorUrl, errorLine, newHistoryFragment, oldHistoryFragment, newHistoryState, oldHistoryState, historySource, containerVersion, debugMode, randomNumber, containerId. @mutable tagmanager.accounts.containers.create @mutable tagmanager.accounts.containers.update
     #[serde(rename="enabledBuiltInVariable")]
     
-    pub enabled_built_in_variable: Option<Vec<String>>,
+    pub enabled_built_in_variable: Option<Vec<ContainerEnabledBuiltInVariableEnum>>,
     /// The fingerprint of the GTM Container as computed at storage time. This value is recomputed whenever the account is modified.
     
     pub fingerprint: Option<String>,
@@ -166,7 +166,7 @@ pub struct Container {
     /// List of Usage Contexts for the Container. Valid values include: web, android, ios. @mutable tagmanager.accounts.containers.create @mutable tagmanager.accounts.containers.update
     #[serde(rename="usageContext")]
     
-    pub usage_context: Option<Vec<String>>,
+    pub usage_context: Option<Vec<ContainerUsageContextEnum>>,
 }
 
 impl client::RequestValue for Container {}
@@ -186,7 +186,7 @@ pub struct ContainerAccess {
     pub container_id: Option<String>,
     /// List of Container permissions. Valid container permissions are: read, edit, delete, publish. @mutable tagmanager.accounts.permissions.create @mutable tagmanager.accounts.permissions.update
     
-    pub permission: Option<Vec<String>>,
+    pub permission: Option<Vec<ContainerAccesPermissionEnum>>,
 }
 
 impl client::Part for ContainerAccess {}
@@ -413,7 +413,7 @@ pub struct Environment {
     /// The type of this environment.
     #[serde(rename="type")]
     
-    pub type_: Option<String>,
+    pub type_: Option<EnvironmentTypeEnum>,
     /// Default preview page url for the environment. @mutable tagmanager.accounts.containers.environments.create @mutable tagmanager.accounts.containers.environments.update
     
     pub url: Option<String>,
@@ -744,7 +744,7 @@ pub struct Parameter {
     /// The parameter type. Valid values are: - boolean: The value represents a boolean, represented as 'true' or 'false' - integer: The value represents a 64-bit signed integer value, in base 10 - list: A list of parameters should be specified - map: A map of parameters should be specified - template: The value represents any text; this can include variable references (even variable references that might return non-string types) - trigger_reference: The value represents a trigger, represented as the trigger id - tag_reference: The value represents a tag, represented as the tag name @mutable tagmanager.accounts.containers.variables.create @mutable tagmanager.accounts.containers.variables.update @mutable tagmanager.accounts.containers.triggers.create @mutable tagmanager.accounts.containers.triggers.update @mutable tagmanager.accounts.containers.tags.create @mutable tagmanager.accounts.containers.tags.update
     #[serde(rename="type")]
     
-    pub type_: Option<String>,
+    pub type_: Option<ParameterTypeEnum>,
     /// A parameter's value (may contain variable references such as "{{myVariable}}") as appropriate to the specified type. @mutable tagmanager.accounts.containers.variables.create @mutable tagmanager.accounts.containers.variables.update @mutable tagmanager.accounts.containers.triggers.create @mutable tagmanager.accounts.containers.triggers.update @mutable tagmanager.accounts.containers.tags.create @mutable tagmanager.accounts.containers.tags.update
     
     pub value: Option<String>,
@@ -913,7 +913,7 @@ pub struct Tag {
     /// Option to fire this tag.
     #[serde(rename="tagFiringOption")]
     
-    pub tag_firing_option: Option<String>,
+    pub tag_firing_option: Option<TagTagFiringOptionEnum>,
     /// The Tag ID uniquely identifies the GTM Tag.
     #[serde(rename="tagId")]
     
@@ -1041,7 +1041,7 @@ pub struct Trigger {
     /// Defines the data layer event that causes this trigger. @mutable tagmanager.accounts.containers.triggers.create @mutable tagmanager.accounts.containers.triggers.update
     #[serde(rename="type")]
     
-    pub type_: Option<String>,
+    pub type_: Option<TriggerTypeEnum>,
     /// Globally unique id of the trigger that auto-generates this (a Form Submit, Link Click or Timer listener) if any. Used to make incompatible auto-events work together with trigger filtering based on trigger ids. This value is populated during output generation since the tags implied by triggers don't exist until then. Only valid for Form Submit, Link Click and Timer triggers. @mutable tagmanager.accounts.containers.triggers.create @mutable tagmanager.accounts.containers.triggers.update
     #[serde(rename="uniqueTriggerId")]
     

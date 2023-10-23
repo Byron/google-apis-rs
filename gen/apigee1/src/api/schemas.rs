@@ -229,7 +229,7 @@ pub struct GoogleCloudApigeeV1Alias {
     /// Type of alias.
     #[serde(rename="type")]
     
-    pub type_: Option<String>,
+    pub type_: Option<GoogleCloudApigeeV1AliaTypeEnum>,
 }
 
 impl client::ResponseResult for GoogleCloudApigeeV1Alias {}
@@ -251,7 +251,7 @@ pub struct GoogleCloudApigeeV1AliasRevisionConfig {
     /// no description provided
     #[serde(rename="type")]
     
-    pub type_: Option<String>,
+    pub type_: Option<GoogleCloudApigeeV1AliasRevisionConfigTypeEnum>,
 }
 
 impl client::Part for GoogleCloudApigeeV1AliasRevisionConfig {}
@@ -389,7 +389,7 @@ pub struct GoogleCloudApigeeV1ApiProduct {
     /// Scope of the quota decides how the quota counter gets applied and evaluate for quota violation. If the Scope is set as PROXY, then all the operations defined for the APIproduct that are associated with the same proxy will share the same quota counter set at the APIproduct level, making it a global counter at a proxy level. If the Scope is set as OPERATION, then each operations get the counter set at the API product dedicated, making it a local counter. Note that, the QuotaCounterScope applies only when an operation does not have dedicated quota set for itself.
     #[serde(rename="quotaCounterScope")]
     
-    pub quota_counter_scope: Option<String>,
+    pub quota_counter_scope: Option<GoogleCloudApigeeV1ApiProductQuotaCounterScopeEnum>,
     /// Time interval over which the number of request messages is calculated.
     #[serde(rename="quotaInterval")]
     
@@ -441,7 +441,7 @@ pub struct GoogleCloudApigeeV1ApiProxy {
     /// Output only. The type of the API proxy.
     #[serde(rename="apiProxyType")]
     
-    pub api_proxy_type: Option<String>,
+    pub api_proxy_type: Option<GoogleCloudApigeeV1ApiProxyApiProxyTypeEnum>,
     /// User labels applied to this API Proxy.
     
     pub labels: Option<HashMap<String, String>>,
@@ -974,13 +974,13 @@ pub struct GoogleCloudApigeeV1CanaryEvaluation {
     pub start_time: Option<client::chrono::DateTime<client::chrono::offset::Utc>>,
     /// Output only. The current state of the canary evaluation.
     
-    pub state: Option<String>,
+    pub state: Option<GoogleCloudApigeeV1CanaryEvaluationStateEnum>,
     /// Required. The newer version that is serving requests.
     
     pub treatment: Option<String>,
     /// Output only. The resulting verdict of the canary evaluations: NONE, PASS, or FAIL.
     
-    pub verdict: Option<String>,
+    pub verdict: Option<GoogleCloudApigeeV1CanaryEvaluationVerdictEnum>,
 }
 
 impl client::RequestValue for GoogleCloudApigeeV1CanaryEvaluation {}
@@ -1423,7 +1423,7 @@ pub struct GoogleCloudApigeeV1DataCollector {
     /// Immutable. The type of data this data collector will collect.
     #[serde(rename="type")]
     
-    pub type_: Option<String>,
+    pub type_: Option<GoogleCloudApigeeV1DataCollectorTypeEnum>,
 }
 
 impl client::RequestValue for GoogleCloudApigeeV1DataCollector {}
@@ -1443,7 +1443,7 @@ pub struct GoogleCloudApigeeV1DataCollectorConfig {
     /// Data type accepted by the data collector.
     #[serde(rename="type")]
     
-    pub type_: Option<String>,
+    pub type_: Option<GoogleCloudApigeeV1DataCollectorConfigTypeEnum>,
 }
 
 impl client::Part for GoogleCloudApigeeV1DataCollectorConfig {}
@@ -1728,7 +1728,7 @@ pub struct GoogleCloudApigeeV1Deployment {
     pub service_account: Option<String>,
     /// Current state of the deployment. **Note**: This field is displayed only when viewing deployment status.
     
-    pub state: Option<String>,
+    pub state: Option<GoogleCloudApigeeV1DeploymentStateEnum>,
 }
 
 impl client::ResponseResult for GoogleCloudApigeeV1Deployment {}
@@ -2167,7 +2167,7 @@ pub struct GoogleCloudApigeeV1DeveloperMonetizationConfig {
     /// Billing type.
     #[serde(rename="billingType")]
     
-    pub billing_type: Option<String>,
+    pub billing_type: Option<GoogleCloudApigeeV1DeveloperMonetizationConfigBillingTypeEnum>,
 }
 
 impl client::RequestValue for GoogleCloudApigeeV1DeveloperMonetizationConfig {}
@@ -2252,7 +2252,7 @@ pub struct GoogleCloudApigeeV1EndpointAttachment {
     /// Output only. State of the endpoint attachment connection to the service attachment.
     #[serde(rename="connectionState")]
     
-    pub connection_state: Option<String>,
+    pub connection_state: Option<GoogleCloudApigeeV1EndpointAttachmentConnectionStateEnum>,
     /// Output only. Host that can be used in either the HTTP target endpoint directly or as the host in target server.
     
     pub host: Option<String>,
@@ -2268,7 +2268,7 @@ pub struct GoogleCloudApigeeV1EndpointAttachment {
     pub service_attachment: Option<String>,
     /// Output only. State of the endpoint attachment. Values other than `ACTIVE` mean the resource is not ready to use.
     
-    pub state: Option<String>,
+    pub state: Option<GoogleCloudApigeeV1EndpointAttachmentStateEnum>,
 }
 
 impl client::RequestValue for GoogleCloudApigeeV1EndpointAttachment {}
@@ -2339,7 +2339,7 @@ pub struct GoogleCloudApigeeV1Environment {
     /// Optional. API Proxy type supported by the environment. The type can be set when creating the Environment and cannot be changed.
     #[serde(rename="apiProxyType")]
     
-    pub api_proxy_type: Option<String>,
+    pub api_proxy_type: Option<GoogleCloudApigeeV1EnvironmentApiProxyTypeEnum>,
     /// Output only. Creation time of this environment as milliseconds since epoch.
     #[serde(rename="createdAt")]
     
@@ -2348,7 +2348,7 @@ pub struct GoogleCloudApigeeV1Environment {
     /// Optional. Deployment type supported by the environment. The deployment type can be set when creating the environment and cannot be changed. When you enable archive deployment, you will be **prevented from performing** a [subset of actions](https://cloud.google.com/apigee/docs/api-platform/local-development/overview#prevented-actions) within the environment, including: * Managing the deployment of API proxy or shared flow revisions * Creating, updating, or deleting resource files * Creating, updating, or deleting target servers
     #[serde(rename="deploymentType")]
     
-    pub deployment_type: Option<String>,
+    pub deployment_type: Option<GoogleCloudApigeeV1EnvironmentDeploymentTypeEnum>,
     /// Optional. Description of the environment.
     
     pub description: Option<String>,
@@ -2377,7 +2377,7 @@ pub struct GoogleCloudApigeeV1Environment {
     pub properties: Option<GoogleCloudApigeeV1Properties>,
     /// Output only. State of the environment. Values other than ACTIVE means the resource is not ready to use.
     
-    pub state: Option<String>,
+    pub state: Option<GoogleCloudApigeeV1EnvironmentStateEnum>,
 }
 
 impl client::RequestValue for GoogleCloudApigeeV1Environment {}
@@ -2514,7 +2514,7 @@ pub struct GoogleCloudApigeeV1EnvironmentGroup {
     pub name: Option<String>,
     /// Output only. State of the environment group. Values other than ACTIVE means the resource is not ready to use.
     
-    pub state: Option<String>,
+    pub state: Option<GoogleCloudApigeeV1EnvironmentGroupStateEnum>,
 }
 
 impl client::RequestValue for GoogleCloudApigeeV1EnvironmentGroup {}
@@ -3032,7 +3032,7 @@ pub struct GoogleCloudApigeeV1Instance {
     /// Optional. Size of the CIDR block range that will be reserved by the instance. PAID organizations support `SLASH_16` to `SLASH_20` and defaults to `SLASH_16`. Evaluation organizations support only `SLASH_23`.
     #[serde(rename="peeringCidrRange")]
     
-    pub peering_cidr_range: Option<String>,
+    pub peering_cidr_range: Option<GoogleCloudApigeeV1InstancePeeringCidrRangeEnum>,
     /// Output only. Port number of the exposed Apigee endpoint.
     
     pub port: Option<String>,
@@ -3046,7 +3046,7 @@ pub struct GoogleCloudApigeeV1Instance {
     pub service_attachment: Option<String>,
     /// Output only. State of the instance. Values other than `ACTIVE` means the resource is not ready to use.
     
-    pub state: Option<String>,
+    pub state: Option<GoogleCloudApigeeV1InstanceStateEnum>,
 }
 
 impl client::RequestValue for GoogleCloudApigeeV1Instance {}
@@ -4023,13 +4023,13 @@ impl client::Part for GoogleCloudApigeeV1Metric {}
 pub struct GoogleCloudApigeeV1MetricAggregation {
     /// Aggregation function associated with the metric.
     
-    pub aggregation: Option<String>,
+    pub aggregation: Option<GoogleCloudApigeeV1MetricAggregationAggregationEnum>,
     /// Name of the metric
     
     pub name: Option<String>,
     /// Ordering for this aggregation in the result. For time series this is ignored since the ordering of points depends only on the timestamp, not the values.
     
-    pub order: Option<String>,
+    pub order: Option<GoogleCloudApigeeV1MetricAggregationOrderEnum>,
 }
 
 impl client::Part for GoogleCloudApigeeV1MetricAggregation {}
@@ -4071,7 +4071,7 @@ pub struct GoogleCloudApigeeV1NatAddress {
     pub name: Option<String>,
     /// Output only. State of the nat address.
     
-    pub state: Option<String>,
+    pub state: Option<GoogleCloudApigeeV1NatAddresStateEnum>,
 }
 
 impl client::RequestValue for GoogleCloudApigeeV1NatAddress {}
@@ -4267,7 +4267,7 @@ pub struct GoogleCloudApigeeV1Organization {
     /// Billing type of the Apigee organization. See [Apigee pricing](https://cloud.google.com/apigee/pricing).
     #[serde(rename="billingType")]
     
-    pub billing_type: Option<String>,
+    pub billing_type: Option<GoogleCloudApigeeV1OrganizationBillingTypeEnum>,
     /// Output only. Base64-encoded public certificate for the root CA of the Apigee organization. Valid only when [RuntimeType](#RuntimeType) is `CLOUD`.
     #[serde(rename="caCertificate")]
     
@@ -4323,18 +4323,18 @@ pub struct GoogleCloudApigeeV1Organization {
     /// Required. Runtime type of the Apigee organization based on the Apigee subscription purchased.
     #[serde(rename="runtimeType")]
     
-    pub runtime_type: Option<String>,
+    pub runtime_type: Option<GoogleCloudApigeeV1OrganizationRuntimeTypeEnum>,
     /// Output only. State of the organization. Values other than ACTIVE means the resource is not ready to use.
     
-    pub state: Option<String>,
+    pub state: Option<GoogleCloudApigeeV1OrganizationStateEnum>,
     /// Output only. DEPRECATED: This will eventually be replaced by BillingType. Subscription type of the Apigee organization. Valid values include trial (free, limited, and for evaluation purposes only) or paid (full subscription has been purchased). See [Apigee pricing](https://cloud.google.com/apigee/pricing/).
     #[serde(rename="subscriptionType")]
     
-    pub subscription_type: Option<String>,
+    pub subscription_type: Option<GoogleCloudApigeeV1OrganizationSubscriptionTypeEnum>,
     /// Not used by Apigee.
     #[serde(rename="type")]
     
-    pub type_: Option<String>,
+    pub type_: Option<GoogleCloudApigeeV1OrganizationTypeEnum>,
 }
 
 impl client::RequestValue for GoogleCloudApigeeV1Organization {}
@@ -4716,11 +4716,11 @@ pub struct GoogleCloudApigeeV1QueryTimeSeriesStatsRequest {
     /// Order the sequences in increasing or decreasing order of timestamps. Default is descending order of timestamps (latest first).
     #[serde(rename="timestampOrder")]
     
-    pub timestamp_order: Option<String>,
+    pub timestamp_order: Option<GoogleCloudApigeeV1QueryTimeSeriesStatsRequestTimestampOrderEnum>,
     /// Time buckets to group the stats by.
     #[serde(rename="windowSize")]
     
-    pub window_size: Option<String>,
+    pub window_size: Option<GoogleCloudApigeeV1QueryTimeSeriesStatsRequestWindowSizeEnum>,
 }
 
 impl client::RequestValue for GoogleCloudApigeeV1QueryTimeSeriesStatsRequest {}
@@ -4812,7 +4812,7 @@ pub struct GoogleCloudApigeeV1RatePlan {
     /// Frequency at which the customer will be billed.
     #[serde(rename="billingPeriod")]
     
-    pub billing_period: Option<String>,
+    pub billing_period: Option<GoogleCloudApigeeV1RatePlanBillingPeriodEnum>,
     /// API call volume ranges and the fees charged when the total number of API calls is within a given range. The method used to calculate the final fee depends on the selected pricing model. For example, if the pricing model is `STAIRSTEP` and the ranges are defined as follows: ``` { "start": 1, "end": 100, "fee": 75 }, { "start": 101, "end": 200, "fee": 100 }, } ``` Then the following fees would be charged based on the total number of API calls (assuming the currency selected is `USD`): * 1 call costs $75 * 50 calls cost $75 * 150 calls cost $100 The number of API calls cannot exceed 200.
     #[serde(rename="consumptionPricingRates")]
     
@@ -4820,7 +4820,7 @@ pub struct GoogleCloudApigeeV1RatePlan {
     /// Pricing model used for consumption-based charges.
     #[serde(rename="consumptionPricingType")]
     
-    pub consumption_pricing_type: Option<String>,
+    pub consumption_pricing_type: Option<GoogleCloudApigeeV1RatePlanConsumptionPricingTypeEnum>,
     /// Output only. Time that the rate plan was created in milliseconds since epoch.
     #[serde(rename="createdAt")]
     
@@ -4861,7 +4861,7 @@ pub struct GoogleCloudApigeeV1RatePlan {
     /// DEPRECATED: This field is no longer supported and will eventually be removed when Apigee Hybrid 1.5/1.6 is no longer supported. Instead, use the `billingType` field inside `DeveloperMonetizationConfig` resource. Flag that specifies the billing account type, prepaid or postpaid.
     #[serde(rename="paymentFundingModel")]
     
-    pub payment_funding_model: Option<String>,
+    pub payment_funding_model: Option<GoogleCloudApigeeV1RatePlanPaymentFundingModelEnum>,
     /// Details of the revenue sharing model.
     #[serde(rename="revenueShareRates")]
     
@@ -4869,7 +4869,7 @@ pub struct GoogleCloudApigeeV1RatePlan {
     /// Method used to calculate the revenue that is shared with developers.
     #[serde(rename="revenueShareType")]
     
-    pub revenue_share_type: Option<String>,
+    pub revenue_share_type: Option<GoogleCloudApigeeV1RatePlanRevenueShareTypeEnum>,
     /// Initial, one-time fee paid when purchasing the API product.
     #[serde(rename="setupFee")]
     
@@ -4881,7 +4881,7 @@ pub struct GoogleCloudApigeeV1RatePlan {
     pub start_time: Option<i64>,
     /// Current state of the rate plan (draft or published).
     
-    pub state: Option<String>,
+    pub state: Option<GoogleCloudApigeeV1RatePlanStateEnum>,
 }
 
 impl client::RequestValue for GoogleCloudApigeeV1RatePlan {}
@@ -5285,7 +5285,7 @@ pub struct GoogleCloudApigeeV1RuntimeTraceConfig {
     pub endpoint: Option<String>,
     /// Exporter that is used to view the distributed trace captured using OpenCensus. An exporter sends traces to any backend that is capable of consuming them. Recorded spans can be exported by registered exporters.
     
-    pub exporter: Option<String>,
+    pub exporter: Option<GoogleCloudApigeeV1RuntimeTraceConfigExporterEnum>,
     /// Name of the trace config in the following format: `organizations/{org}/environment/{env}/traceConfig`
     
     pub name: Option<String>,
@@ -5352,7 +5352,7 @@ impl client::Part for GoogleCloudApigeeV1RuntimeTraceConfigOverride {}
 pub struct GoogleCloudApigeeV1RuntimeTraceSamplingConfig {
     /// Sampler of distributed tracing. OFF is the default value.
     
-    pub sampler: Option<String>,
+    pub sampler: Option<GoogleCloudApigeeV1RuntimeTraceSamplingConfigSamplerEnum>,
     /// Field sampling rate. This value is only applicable when using the PROBABILITY sampler. The supported values are > 0 and <= 0.5.
     #[serde(rename="samplingRate")]
     
@@ -6213,7 +6213,7 @@ pub struct GoogleCloudApigeeV1TargetServer {
     pub port: Option<i32>,
     /// Immutable. The protocol used by this TargetServer.
     
-    pub protocol: Option<String>,
+    pub protocol: Option<GoogleCloudApigeeV1TargetServerProtocolEnum>,
     /// Optional. Specifies TLS configuration info for this TargetServer. The JSON name is `sSLInfo` for legacy/backwards compatibility reasons -- Edge originally supported SSL, and the name is still used for TLS configuration.
     #[serde(rename="sSLInfo")]
     
@@ -6245,7 +6245,7 @@ pub struct GoogleCloudApigeeV1TargetServerConfig {
     pub port: Option<i32>,
     /// The protocol used by this target server.
     
-    pub protocol: Option<String>,
+    pub protocol: Option<GoogleCloudApigeeV1TargetServerConfigProtocolEnum>,
     /// TLS settings for the target server.
     #[serde(rename="tlsInfo")]
     
@@ -6403,7 +6403,7 @@ pub struct GoogleCloudApigeeV1TraceConfig {
     pub endpoint: Option<String>,
     /// Required. Exporter that is used to view the distributed trace captured using OpenCensus. An exporter sends traces to any backend that is capable of consuming them. Recorded spans can be exported by registered exporters.
     
-    pub exporter: Option<String>,
+    pub exporter: Option<GoogleCloudApigeeV1TraceConfigExporterEnum>,
     /// Distributed trace configuration for all API proxies in an environment. You can also override the configuration for a specific API proxy using the distributed trace configuration overrides API.
     #[serde(rename="samplingConfig")]
     
@@ -6453,7 +6453,7 @@ impl client::ResponseResult for GoogleCloudApigeeV1TraceConfigOverride {}
 pub struct GoogleCloudApigeeV1TraceSamplingConfig {
     /// Sampler of distributed tracing. OFF is the default value.
     
-    pub sampler: Option<String>,
+    pub sampler: Option<GoogleCloudApigeeV1TraceSamplingConfigSamplerEnum>,
     /// Field sampling rate. This value is only applicable when using the PROBABILITY sampler. The supported values are > 0 and <= 0.5.
     #[serde(rename="samplingRate")]
     
@@ -6472,7 +6472,7 @@ impl client::Part for GoogleCloudApigeeV1TraceSamplingConfig {}
 pub struct GoogleCloudApigeeV1UpdateError {
     /// Status code.
     
-    pub code: Option<String>,
+    pub code: Option<GoogleCloudApigeeV1UpdateErrorCodeEnum>,
     /// User-friendly error message.
     
     pub message: Option<String>,
@@ -6521,7 +6521,7 @@ pub struct GoogleIamV1AuditLogConfig {
     /// The log type that this config enables.
     #[serde(rename="logType")]
     
-    pub log_type: Option<String>,
+    pub log_type: Option<GoogleIamV1AuditLogConfigLogTypeEnum>,
 }
 
 impl client::Part for GoogleIamV1AuditLogConfig {}

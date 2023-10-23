@@ -49,7 +49,7 @@ pub struct BusinessCallsInsights {
     /// The metric for which the value applies.
     #[serde(rename="metricType")]
     
-    pub metric_type: Option<String>,
+    pub metric_type: Option<BusinessCallsInsightMetricTypeEnum>,
     /// Required. The resource name of the calls insights. Format: locations/{location}/businesscallsinsights
     
     pub name: Option<String>,
@@ -73,7 +73,7 @@ pub struct BusinessCallsSettings {
     /// Required. The state of this location's enrollment in Business calls.
     #[serde(rename="callsState")]
     
-    pub calls_state: Option<String>,
+    pub calls_state: Option<BusinessCallsSettingCallsStateEnum>,
     /// Input only. Time when the end user provided consent to the API user to enable business calls.
     #[serde(rename="consentTime")]
     
@@ -160,7 +160,7 @@ impl client::ResponseResult for ListBusinessCallsInsightsResponse {}
 pub struct WeekDayMetrics {
     /// Day of the week. Allowed values are Sunday - Saturday.
     
-    pub day: Option<String>,
+    pub day: Option<WeekDayMetricDayEnum>,
     /// Total count of missed calls for this hour.
     #[serde(rename="missedCallsCount")]
     

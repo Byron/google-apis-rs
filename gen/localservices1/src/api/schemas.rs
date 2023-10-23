@@ -162,7 +162,7 @@ pub struct GoogleAdsHomeservicesLocalservicesV1DetailedLeadReport {
     /// Whether the lead has been charged.
     #[serde(rename="chargeStatus")]
     
-    pub charge_status: Option<String>,
+    pub charge_status: Option<GoogleAdsHomeservicesLocalservicesV1DetailedLeadReportChargeStatusEnum>,
     /// Currency code.
     #[serde(rename="currencyCode")]
     
@@ -194,7 +194,7 @@ pub struct GoogleAdsHomeservicesLocalservicesV1DetailedLeadReport {
     /// Lead type.
     #[serde(rename="leadType")]
     
-    pub lead_type: Option<String>,
+    pub lead_type: Option<GoogleAdsHomeservicesLocalservicesV1DetailedLeadReportLeadTypeEnum>,
     /// More information associated to only message leads.
     #[serde(rename="messageLead")]
     

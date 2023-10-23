@@ -66,12 +66,12 @@ impl<'a, S> AdvertiserMethods<'a, S> {
     /// * `campaignId` - Required. The ID of the campaign the assigned targeting option belongs to.
     /// * `targetingType` - Required. Identifies the type of this assigned targeting option. Supported targeting types: * `TARGETING_TYPE_AGE_RANGE` * `TARGETING_TYPE_AUTHORIZED_SELLER_STATUS` * `TARGETING_TYPE_CONTENT_INSTREAM_POSITION` * `TARGETING_TYPE_CONTENT_OUTSTREAM_POSITION` * `TARGETING_TYPE_DIGITAL_CONTENT_LABEL_EXCLUSION` * `TARGETING_TYPE_ENVIRONMENT` * `TARGETING_TYPE_EXCHANGE` * `TARGETING_TYPE_GENDER` * `TARGETING_TYPE_GEO_REGION` * `TARGETING_TYPE_HOUSEHOLD_INCOME` * `TARGETING_TYPE_INVENTORY_SOURCE` * `TARGETING_TYPE_INVENTORY_SOURCE_GROUP` * `TARGETING_TYPE_LANGUAGE` * `TARGETING_TYPE_ON_SCREEN_POSITION` * `TARGETING_TYPE_PARENTAL_STATUS` * `TARGETING_TYPE_SENSITIVE_CATEGORY_EXCLUSION` * `TARGETING_TYPE_SUB_EXCHANGE` * `TARGETING_TYPE_THIRD_PARTY_VERIFIER` * `TARGETING_TYPE_VIEWABILITY`
     /// * `assignedTargetingOptionId` - Required. An identifier unique to the targeting type in this campaign that identifies the assigned targeting option being requested.
-    pub fn campaigns_targeting_types_assigned_targeting_options_get(&self, advertiser_id: i64, campaign_id: i64, targeting_type: &str, assigned_targeting_option_id: &str) -> AdvertiserCampaignTargetingTypeAssignedTargetingOptionGetCall<'a, S> {
+    pub fn campaigns_targeting_types_assigned_targeting_options_get(&self, advertiser_id: i64, campaign_id: i64, targeting_type: &AdvertiserTargetingTypeEnum, assigned_targeting_option_id: &str) -> AdvertiserCampaignTargetingTypeAssignedTargetingOptionGetCall<'a, S> {
         AdvertiserCampaignTargetingTypeAssignedTargetingOptionGetCall {
             hub: self.hub,
             _advertiser_id: advertiser_id,
             _campaign_id: campaign_id,
-            _targeting_type: targeting_type.to_string(),
+            _targeting_type: targeting_type.clone(),
             _assigned_targeting_option_id: assigned_targeting_option_id.to_string(),
             _delegate: Default::default(),
             _additional_params: Default::default(),
@@ -88,12 +88,12 @@ impl<'a, S> AdvertiserMethods<'a, S> {
     /// * `advertiserId` - Required. The ID of the advertiser the campaign belongs to.
     /// * `campaignId` - Required. The ID of the campaign to list assigned targeting options for.
     /// * `targetingType` - Required. Identifies the type of assigned targeting options to list. Supported targeting types: * `TARGETING_TYPE_AGE_RANGE` * `TARGETING_TYPE_AUTHORIZED_SELLER_STATUS` * `TARGETING_TYPE_CONTENT_INSTREAM_POSITION` * `TARGETING_TYPE_CONTENT_OUTSTREAM_POSITION` * `TARGETING_TYPE_DIGITAL_CONTENT_LABEL_EXCLUSION` * `TARGETING_TYPE_ENVIRONMENT` * `TARGETING_TYPE_EXCHANGE` * `TARGETING_TYPE_GENDER` * `TARGETING_TYPE_GEO_REGION` * `TARGETING_TYPE_HOUSEHOLD_INCOME` * `TARGETING_TYPE_INVENTORY_SOURCE` * `TARGETING_TYPE_INVENTORY_SOURCE_GROUP` * `TARGETING_TYPE_LANGUAGE` * `TARGETING_TYPE_ON_SCREEN_POSITION` * `TARGETING_TYPE_PARENTAL_STATUS` * `TARGETING_TYPE_SENSITIVE_CATEGORY_EXCLUSION` * `TARGETING_TYPE_SUB_EXCHANGE` * `TARGETING_TYPE_THIRD_PARTY_VERIFIER` * `TARGETING_TYPE_VIEWABILITY`
-    pub fn campaigns_targeting_types_assigned_targeting_options_list(&self, advertiser_id: i64, campaign_id: i64, targeting_type: &str) -> AdvertiserCampaignTargetingTypeAssignedTargetingOptionListCall<'a, S> {
+    pub fn campaigns_targeting_types_assigned_targeting_options_list(&self, advertiser_id: i64, campaign_id: i64, targeting_type: &AdvertiserTargetingTypeEnum) -> AdvertiserCampaignTargetingTypeAssignedTargetingOptionListCall<'a, S> {
         AdvertiserCampaignTargetingTypeAssignedTargetingOptionListCall {
             hub: self.hub,
             _advertiser_id: advertiser_id,
             _campaign_id: campaign_id,
-            _targeting_type: targeting_type.to_string(),
+            _targeting_type: targeting_type.clone(),
             _page_token: Default::default(),
             _page_size: Default::default(),
             _order_by: Default::default(),
@@ -532,12 +532,12 @@ impl<'a, S> AdvertiserMethods<'a, S> {
     /// * `insertionOrderId` - Required. The ID of the insertion order the assigned targeting option belongs to.
     /// * `targetingType` - Required. Identifies the type of this assigned targeting option.
     /// * `assignedTargetingOptionId` - Required. An identifier unique to the targeting type in this insertion order that identifies the assigned targeting option being requested.
-    pub fn insertion_orders_targeting_types_assigned_targeting_options_get(&self, advertiser_id: i64, insertion_order_id: i64, targeting_type: &str, assigned_targeting_option_id: &str) -> AdvertiserInsertionOrderTargetingTypeAssignedTargetingOptionGetCall<'a, S> {
+    pub fn insertion_orders_targeting_types_assigned_targeting_options_get(&self, advertiser_id: i64, insertion_order_id: i64, targeting_type: &AdvertiserTargetingTypeEnum, assigned_targeting_option_id: &str) -> AdvertiserInsertionOrderTargetingTypeAssignedTargetingOptionGetCall<'a, S> {
         AdvertiserInsertionOrderTargetingTypeAssignedTargetingOptionGetCall {
             hub: self.hub,
             _advertiser_id: advertiser_id,
             _insertion_order_id: insertion_order_id,
-            _targeting_type: targeting_type.to_string(),
+            _targeting_type: targeting_type.clone(),
             _assigned_targeting_option_id: assigned_targeting_option_id.to_string(),
             _delegate: Default::default(),
             _additional_params: Default::default(),
@@ -554,12 +554,12 @@ impl<'a, S> AdvertiserMethods<'a, S> {
     /// * `advertiserId` - Required. The ID of the advertiser the insertion order belongs to.
     /// * `insertionOrderId` - Required. The ID of the insertion order to list assigned targeting options for.
     /// * `targetingType` - Required. Identifies the type of assigned targeting options to list.
-    pub fn insertion_orders_targeting_types_assigned_targeting_options_list(&self, advertiser_id: i64, insertion_order_id: i64, targeting_type: &str) -> AdvertiserInsertionOrderTargetingTypeAssignedTargetingOptionListCall<'a, S> {
+    pub fn insertion_orders_targeting_types_assigned_targeting_options_list(&self, advertiser_id: i64, insertion_order_id: i64, targeting_type: &AdvertiserTargetingTypeEnum) -> AdvertiserInsertionOrderTargetingTypeAssignedTargetingOptionListCall<'a, S> {
         AdvertiserInsertionOrderTargetingTypeAssignedTargetingOptionListCall {
             hub: self.hub,
             _advertiser_id: advertiser_id,
             _insertion_order_id: insertion_order_id,
-            _targeting_type: targeting_type.to_string(),
+            _targeting_type: targeting_type.clone(),
             _page_token: Default::default(),
             _page_size: Default::default(),
             _order_by: Default::default(),
@@ -742,13 +742,13 @@ impl<'a, S> AdvertiserMethods<'a, S> {
     /// * `advertiserId` - Required. The ID of the advertiser the line item belongs to.
     /// * `lineItemId` - Required. The ID of the line item the assigned targeting option will belong to.
     /// * `targetingType` - Required. Identifies the type of this assigned targeting option.
-    pub fn line_items_targeting_types_assigned_targeting_options_create(&self, request: AssignedTargetingOption, advertiser_id: i64, line_item_id: i64, targeting_type: &str) -> AdvertiserLineItemTargetingTypeAssignedTargetingOptionCreateCall<'a, S> {
+    pub fn line_items_targeting_types_assigned_targeting_options_create(&self, request: AssignedTargetingOption, advertiser_id: i64, line_item_id: i64, targeting_type: &AdvertiserTargetingTypeEnum) -> AdvertiserLineItemTargetingTypeAssignedTargetingOptionCreateCall<'a, S> {
         AdvertiserLineItemTargetingTypeAssignedTargetingOptionCreateCall {
             hub: self.hub,
             _request: request,
             _advertiser_id: advertiser_id,
             _line_item_id: line_item_id,
-            _targeting_type: targeting_type.to_string(),
+            _targeting_type: targeting_type.clone(),
             _delegate: Default::default(),
             _additional_params: Default::default(),
             _scopes: Default::default(),
@@ -765,12 +765,12 @@ impl<'a, S> AdvertiserMethods<'a, S> {
     /// * `lineItemId` - Required. The ID of the line item the assigned targeting option belongs to.
     /// * `targetingType` - Required. Identifies the type of this assigned targeting option.
     /// * `assignedTargetingOptionId` - Required. The ID of the assigned targeting option to delete.
-    pub fn line_items_targeting_types_assigned_targeting_options_delete(&self, advertiser_id: i64, line_item_id: i64, targeting_type: &str, assigned_targeting_option_id: &str) -> AdvertiserLineItemTargetingTypeAssignedTargetingOptionDeleteCall<'a, S> {
+    pub fn line_items_targeting_types_assigned_targeting_options_delete(&self, advertiser_id: i64, line_item_id: i64, targeting_type: &AdvertiserTargetingTypeEnum, assigned_targeting_option_id: &str) -> AdvertiserLineItemTargetingTypeAssignedTargetingOptionDeleteCall<'a, S> {
         AdvertiserLineItemTargetingTypeAssignedTargetingOptionDeleteCall {
             hub: self.hub,
             _advertiser_id: advertiser_id,
             _line_item_id: line_item_id,
-            _targeting_type: targeting_type.to_string(),
+            _targeting_type: targeting_type.clone(),
             _assigned_targeting_option_id: assigned_targeting_option_id.to_string(),
             _delegate: Default::default(),
             _additional_params: Default::default(),
@@ -788,12 +788,12 @@ impl<'a, S> AdvertiserMethods<'a, S> {
     /// * `lineItemId` - Required. The ID of the line item the assigned targeting option belongs to.
     /// * `targetingType` - Required. Identifies the type of this assigned targeting option.
     /// * `assignedTargetingOptionId` - Required. An identifier unique to the targeting type in this line item that identifies the assigned targeting option being requested.
-    pub fn line_items_targeting_types_assigned_targeting_options_get(&self, advertiser_id: i64, line_item_id: i64, targeting_type: &str, assigned_targeting_option_id: &str) -> AdvertiserLineItemTargetingTypeAssignedTargetingOptionGetCall<'a, S> {
+    pub fn line_items_targeting_types_assigned_targeting_options_get(&self, advertiser_id: i64, line_item_id: i64, targeting_type: &AdvertiserTargetingTypeEnum, assigned_targeting_option_id: &str) -> AdvertiserLineItemTargetingTypeAssignedTargetingOptionGetCall<'a, S> {
         AdvertiserLineItemTargetingTypeAssignedTargetingOptionGetCall {
             hub: self.hub,
             _advertiser_id: advertiser_id,
             _line_item_id: line_item_id,
-            _targeting_type: targeting_type.to_string(),
+            _targeting_type: targeting_type.clone(),
             _assigned_targeting_option_id: assigned_targeting_option_id.to_string(),
             _delegate: Default::default(),
             _additional_params: Default::default(),
@@ -810,12 +810,12 @@ impl<'a, S> AdvertiserMethods<'a, S> {
     /// * `advertiserId` - Required. The ID of the advertiser the line item belongs to.
     /// * `lineItemId` - Required. The ID of the line item to list assigned targeting options for.
     /// * `targetingType` - Required. Identifies the type of assigned targeting options to list.
-    pub fn line_items_targeting_types_assigned_targeting_options_list(&self, advertiser_id: i64, line_item_id: i64, targeting_type: &str) -> AdvertiserLineItemTargetingTypeAssignedTargetingOptionListCall<'a, S> {
+    pub fn line_items_targeting_types_assigned_targeting_options_list(&self, advertiser_id: i64, line_item_id: i64, targeting_type: &AdvertiserTargetingTypeEnum) -> AdvertiserLineItemTargetingTypeAssignedTargetingOptionListCall<'a, S> {
         AdvertiserLineItemTargetingTypeAssignedTargetingOptionListCall {
             hub: self.hub,
             _advertiser_id: advertiser_id,
             _line_item_id: line_item_id,
-            _targeting_type: targeting_type.to_string(),
+            _targeting_type: targeting_type.clone(),
             _page_token: Default::default(),
             _page_size: Default::default(),
             _order_by: Default::default(),
@@ -1493,12 +1493,12 @@ impl<'a, S> AdvertiserMethods<'a, S> {
     /// * `request` - No description provided.
     /// * `advertiserId` - Required. The ID of the advertiser.
     /// * `targetingType` - Required. Identifies the type of this assigned targeting option. Supported targeting types: * `TARGETING_TYPE_CHANNEL` * `TARGETING_TYPE_DIGITAL_CONTENT_LABEL_EXCLUSION` * `TARGETING_TYPE_OMID` * `TARGETING_TYPE_SENSITIVE_CATEGORY_EXCLUSION`
-    pub fn targeting_types_assigned_targeting_options_create(&self, request: AssignedTargetingOption, advertiser_id: i64, targeting_type: &str) -> AdvertiserTargetingTypeAssignedTargetingOptionCreateCall<'a, S> {
+    pub fn targeting_types_assigned_targeting_options_create(&self, request: AssignedTargetingOption, advertiser_id: i64, targeting_type: &AdvertiserTargetingTypeEnum) -> AdvertiserTargetingTypeAssignedTargetingOptionCreateCall<'a, S> {
         AdvertiserTargetingTypeAssignedTargetingOptionCreateCall {
             hub: self.hub,
             _request: request,
             _advertiser_id: advertiser_id,
-            _targeting_type: targeting_type.to_string(),
+            _targeting_type: targeting_type.clone(),
             _delegate: Default::default(),
             _additional_params: Default::default(),
             _scopes: Default::default(),
@@ -1514,11 +1514,11 @@ impl<'a, S> AdvertiserMethods<'a, S> {
     /// * `advertiserId` - Required. The ID of the advertiser.
     /// * `targetingType` - Required. Identifies the type of this assigned targeting option. Supported targeting types: * `TARGETING_TYPE_CHANNEL` * `TARGETING_TYPE_DIGITAL_CONTENT_LABEL_EXCLUSION` * `TARGETING_TYPE_OMID` * `TARGETING_TYPE_SENSITIVE_CATEGORY_EXCLUSION`
     /// * `assignedTargetingOptionId` - Required. The ID of the assigned targeting option to delete.
-    pub fn targeting_types_assigned_targeting_options_delete(&self, advertiser_id: i64, targeting_type: &str, assigned_targeting_option_id: &str) -> AdvertiserTargetingTypeAssignedTargetingOptionDeleteCall<'a, S> {
+    pub fn targeting_types_assigned_targeting_options_delete(&self, advertiser_id: i64, targeting_type: &AdvertiserTargetingTypeEnum, assigned_targeting_option_id: &str) -> AdvertiserTargetingTypeAssignedTargetingOptionDeleteCall<'a, S> {
         AdvertiserTargetingTypeAssignedTargetingOptionDeleteCall {
             hub: self.hub,
             _advertiser_id: advertiser_id,
-            _targeting_type: targeting_type.to_string(),
+            _targeting_type: targeting_type.clone(),
             _assigned_targeting_option_id: assigned_targeting_option_id.to_string(),
             _delegate: Default::default(),
             _additional_params: Default::default(),
@@ -1535,11 +1535,11 @@ impl<'a, S> AdvertiserMethods<'a, S> {
     /// * `advertiserId` - Required. The ID of the advertiser.
     /// * `targetingType` - Required. Identifies the type of this assigned targeting option. Supported targeting types: * `TARGETING_TYPE_CHANNEL` * `TARGETING_TYPE_DIGITAL_CONTENT_LABEL_EXCLUSION` * `TARGETING_TYPE_OMID` * `TARGETING_TYPE_SENSITIVE_CATEGORY_EXCLUSION`
     /// * `assignedTargetingOptionId` - Required. An identifier unique to the targeting type in this advertiser that identifies the assigned targeting option being requested.
-    pub fn targeting_types_assigned_targeting_options_get(&self, advertiser_id: i64, targeting_type: &str, assigned_targeting_option_id: &str) -> AdvertiserTargetingTypeAssignedTargetingOptionGetCall<'a, S> {
+    pub fn targeting_types_assigned_targeting_options_get(&self, advertiser_id: i64, targeting_type: &AdvertiserTargetingTypeEnum, assigned_targeting_option_id: &str) -> AdvertiserTargetingTypeAssignedTargetingOptionGetCall<'a, S> {
         AdvertiserTargetingTypeAssignedTargetingOptionGetCall {
             hub: self.hub,
             _advertiser_id: advertiser_id,
-            _targeting_type: targeting_type.to_string(),
+            _targeting_type: targeting_type.clone(),
             _assigned_targeting_option_id: assigned_targeting_option_id.to_string(),
             _delegate: Default::default(),
             _additional_params: Default::default(),
@@ -1555,11 +1555,11 @@ impl<'a, S> AdvertiserMethods<'a, S> {
     ///
     /// * `advertiserId` - Required. The ID of the advertiser.
     /// * `targetingType` - Required. Identifies the type of assigned targeting options to list. Supported targeting types: * `TARGETING_TYPE_CHANNEL` * `TARGETING_TYPE_DIGITAL_CONTENT_LABEL_EXCLUSION` * `TARGETING_TYPE_OMID` * `TARGETING_TYPE_SENSITIVE_CATEGORY_EXCLUSION`
-    pub fn targeting_types_assigned_targeting_options_list(&self, advertiser_id: i64, targeting_type: &str) -> AdvertiserTargetingTypeAssignedTargetingOptionListCall<'a, S> {
+    pub fn targeting_types_assigned_targeting_options_list(&self, advertiser_id: i64, targeting_type: &AdvertiserTargetingTypeEnum) -> AdvertiserTargetingTypeAssignedTargetingOptionListCall<'a, S> {
         AdvertiserTargetingTypeAssignedTargetingOptionListCall {
             hub: self.hub,
             _advertiser_id: advertiser_id,
-            _targeting_type: targeting_type.to_string(),
+            _targeting_type: targeting_type.clone(),
             _page_token: Default::default(),
             _page_size: Default::default(),
             _order_by: Default::default(),
@@ -3181,12 +3181,12 @@ impl<'a, S> PartnerMethods<'a, S> {
     /// * `request` - No description provided.
     /// * `partnerId` - Required. The ID of the partner.
     /// * `targetingType` - Required. Identifies the type of this assigned targeting option. Supported targeting types: * `TARGETING_TYPE_CHANNEL`
-    pub fn targeting_types_assigned_targeting_options_create(&self, request: AssignedTargetingOption, partner_id: i64, targeting_type: &str) -> PartnerTargetingTypeAssignedTargetingOptionCreateCall<'a, S> {
+    pub fn targeting_types_assigned_targeting_options_create(&self, request: AssignedTargetingOption, partner_id: i64, targeting_type: &PartnerTargetingTypeEnum) -> PartnerTargetingTypeAssignedTargetingOptionCreateCall<'a, S> {
         PartnerTargetingTypeAssignedTargetingOptionCreateCall {
             hub: self.hub,
             _request: request,
             _partner_id: partner_id,
-            _targeting_type: targeting_type.to_string(),
+            _targeting_type: targeting_type.clone(),
             _delegate: Default::default(),
             _additional_params: Default::default(),
             _scopes: Default::default(),
@@ -3202,11 +3202,11 @@ impl<'a, S> PartnerMethods<'a, S> {
     /// * `partnerId` - Required. The ID of the partner.
     /// * `targetingType` - Required. Identifies the type of this assigned targeting option. Supported targeting types: * `TARGETING_TYPE_CHANNEL`
     /// * `assignedTargetingOptionId` - Required. The ID of the assigned targeting option to delete.
-    pub fn targeting_types_assigned_targeting_options_delete(&self, partner_id: i64, targeting_type: &str, assigned_targeting_option_id: &str) -> PartnerTargetingTypeAssignedTargetingOptionDeleteCall<'a, S> {
+    pub fn targeting_types_assigned_targeting_options_delete(&self, partner_id: i64, targeting_type: &PartnerTargetingTypeEnum, assigned_targeting_option_id: &str) -> PartnerTargetingTypeAssignedTargetingOptionDeleteCall<'a, S> {
         PartnerTargetingTypeAssignedTargetingOptionDeleteCall {
             hub: self.hub,
             _partner_id: partner_id,
-            _targeting_type: targeting_type.to_string(),
+            _targeting_type: targeting_type.clone(),
             _assigned_targeting_option_id: assigned_targeting_option_id.to_string(),
             _delegate: Default::default(),
             _additional_params: Default::default(),
@@ -3223,11 +3223,11 @@ impl<'a, S> PartnerMethods<'a, S> {
     /// * `partnerId` - Required. The ID of the partner.
     /// * `targetingType` - Required. Identifies the type of this assigned targeting option. Supported targeting types: * `TARGETING_TYPE_CHANNEL`
     /// * `assignedTargetingOptionId` - Required. An identifier unique to the targeting type in this partner that identifies the assigned targeting option being requested.
-    pub fn targeting_types_assigned_targeting_options_get(&self, partner_id: i64, targeting_type: &str, assigned_targeting_option_id: &str) -> PartnerTargetingTypeAssignedTargetingOptionGetCall<'a, S> {
+    pub fn targeting_types_assigned_targeting_options_get(&self, partner_id: i64, targeting_type: &PartnerTargetingTypeEnum, assigned_targeting_option_id: &str) -> PartnerTargetingTypeAssignedTargetingOptionGetCall<'a, S> {
         PartnerTargetingTypeAssignedTargetingOptionGetCall {
             hub: self.hub,
             _partner_id: partner_id,
-            _targeting_type: targeting_type.to_string(),
+            _targeting_type: targeting_type.clone(),
             _assigned_targeting_option_id: assigned_targeting_option_id.to_string(),
             _delegate: Default::default(),
             _additional_params: Default::default(),
@@ -3243,11 +3243,11 @@ impl<'a, S> PartnerMethods<'a, S> {
     ///
     /// * `partnerId` - Required. The ID of the partner.
     /// * `targetingType` - Required. Identifies the type of assigned targeting options to list. Supported targeting types: * `TARGETING_TYPE_CHANNEL`
-    pub fn targeting_types_assigned_targeting_options_list(&self, partner_id: i64, targeting_type: &str) -> PartnerTargetingTypeAssignedTargetingOptionListCall<'a, S> {
+    pub fn targeting_types_assigned_targeting_options_list(&self, partner_id: i64, targeting_type: &PartnerTargetingTypeEnum) -> PartnerTargetingTypeAssignedTargetingOptionListCall<'a, S> {
         PartnerTargetingTypeAssignedTargetingOptionListCall {
             hub: self.hub,
             _partner_id: partner_id,
-            _targeting_type: targeting_type.to_string(),
+            _targeting_type: targeting_type.clone(),
             _page_token: Default::default(),
             _page_size: Default::default(),
             _order_by: Default::default(),
@@ -3434,10 +3434,10 @@ impl<'a, S> TargetingTypeMethods<'a, S> {
     ///
     /// * `targetingType` - Required. The type of targeting option to retrieve. Accepted values are: * `TARGETING_TYPE_APP_CATEGORY` * `TARGETING_TYPE_AGE_RANGE` * `TARGETING_TYPE_GENDER` * `TARGETING_TYPE_VIDEO_PLAYER_SIZE` * `TARGETING_TYPE_USER_REWARDED_CONTENT` * `TARGETING_TYPE_PARENTAL_STATUS` * `TARGETING_TYPE_CONTENT_INSTREAM_POSITION` * `TARGETING_TYPE_CONTENT_OUTSTREAM_POSITION` * `TARGETING_TYPE_DEVICE_TYPE` * `TARGETING_TYPE_BROWSER` * `TARGETING_TYPE_HOUSEHOLD_INCOME` * `TARGETING_TYPE_ON_SCREEN_POSITION` * `TARGETING_TYPE_CARRIER_AND_ISP` * `TARGETING_TYPE_OPERATING_SYSTEM` * `TARGETING_TYPE_DEVICE_MAKE_MODEL` * `TARGETING_TYPE_ENVIRONMENT` * `TARGETING_TYPE_CATEGORY` * `TARGETING_TYPE_VIEWABILITY` * `TARGETING_TYPE_AUTHORIZED_SELLER_STATUS` * `TARGETING_TYPE_LANGUAGE` * `TARGETING_TYPE_GEO_REGION` * `TARGETING_TYPE_DIGITAL_CONTENT_LABEL_EXCLUSION` * `TARGETING_TYPE_SENSITIVE_CATEGORY_EXCLUSION` * `TARGETING_TYPE_EXCHANGE` * `TARGETING_TYPE_SUB_EXCHANGE` * `TARGETING_TYPE_NATIVE_CONTENT_POSITION` * `TARGETING_TYPE_OMID`
     /// * `targetingOptionId` - Required. The ID of the of targeting option to retrieve.
-    pub fn targeting_options_get(&self, targeting_type: &str, targeting_option_id: &str) -> TargetingTypeTargetingOptionGetCall<'a, S> {
+    pub fn targeting_options_get(&self, targeting_type: &TargetingTypeTargetingTypeEnum, targeting_option_id: &str) -> TargetingTypeTargetingOptionGetCall<'a, S> {
         TargetingTypeTargetingOptionGetCall {
             hub: self.hub,
-            _targeting_type: targeting_type.to_string(),
+            _targeting_type: targeting_type.clone(),
             _targeting_option_id: targeting_option_id.to_string(),
             _advertiser_id: Default::default(),
             _delegate: Default::default(),
@@ -3453,10 +3453,10 @@ impl<'a, S> TargetingTypeMethods<'a, S> {
     /// # Arguments
     ///
     /// * `targetingType` - Required. The type of targeting option to be listed. Accepted values are: * `TARGETING_TYPE_APP_CATEGORY` * `TARGETING_TYPE_AGE_RANGE` * `TARGETING_TYPE_GENDER` * `TARGETING_TYPE_VIDEO_PLAYER_SIZE` * `TARGETING_TYPE_USER_REWARDED_CONTENT` * `TARGETING_TYPE_PARENTAL_STATUS` * `TARGETING_TYPE_CONTENT_INSTREAM_POSITION` * `TARGETING_TYPE_CONTENT_OUTSTREAM_POSITION` * `TARGETING_TYPE_DEVICE_TYPE` * `TARGETING_TYPE_BROWSER` * `TARGETING_TYPE_HOUSEHOLD_INCOME` * `TARGETING_TYPE_ON_SCREEN_POSITION` * `TARGETING_TYPE_CARRIER_AND_ISP` * `TARGETING_TYPE_OPERATING_SYSTEM` * `TARGETING_TYPE_DEVICE_MAKE_MODEL` * `TARGETING_TYPE_ENVIRONMENT` * `TARGETING_TYPE_CATEGORY` * `TARGETING_TYPE_VIEWABILITY` * `TARGETING_TYPE_AUTHORIZED_SELLER_STATUS` * `TARGETING_TYPE_LANGUAGE` * `TARGETING_TYPE_GEO_REGION` * `TARGETING_TYPE_DIGITAL_CONTENT_LABEL_EXCLUSION` * `TARGETING_TYPE_SENSITIVE_CATEGORY_EXCLUSION` * `TARGETING_TYPE_EXCHANGE` * `TARGETING_TYPE_SUB_EXCHANGE` * `TARGETING_TYPE_NATIVE_CONTENT_POSITION` * `TARGETING_TYPE_OMID`
-    pub fn targeting_options_list(&self, targeting_type: &str) -> TargetingTypeTargetingOptionListCall<'a, S> {
+    pub fn targeting_options_list(&self, targeting_type: &TargetingTypeTargetingTypeEnum) -> TargetingTypeTargetingOptionListCall<'a, S> {
         TargetingTypeTargetingOptionListCall {
             hub: self.hub,
-            _targeting_type: targeting_type.to_string(),
+            _targeting_type: targeting_type.clone(),
             _page_token: Default::default(),
             _page_size: Default::default(),
             _order_by: Default::default(),
@@ -3476,11 +3476,11 @@ impl<'a, S> TargetingTypeMethods<'a, S> {
     ///
     /// * `request` - No description provided.
     /// * `targetingType` - Required. The type of targeting options to retrieve. Accepted values are: * `TARGETING_TYPE_GEO_REGION` * `TARGETING_TYPE_POI` * `TARGETING_TYPE_BUSINESS_CHAIN`
-    pub fn targeting_options_search(&self, request: SearchTargetingOptionsRequest, targeting_type: &str) -> TargetingTypeTargetingOptionSearchCall<'a, S> {
+    pub fn targeting_options_search(&self, request: SearchTargetingOptionsRequest, targeting_type: &TargetingTypeTargetingTypeEnum) -> TargetingTypeTargetingOptionSearchCall<'a, S> {
         TargetingTypeTargetingOptionSearchCall {
             hub: self.hub,
             _request: request,
-            _targeting_type: targeting_type.to_string(),
+            _targeting_type: targeting_type.clone(),
             _delegate: Default::default(),
             _additional_params: Default::default(),
             _scopes: Default::default(),

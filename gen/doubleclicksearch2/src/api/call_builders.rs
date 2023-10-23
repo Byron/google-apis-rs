@@ -1308,13 +1308,13 @@ where
         }
 
         let mut params = Params::with_capacity(14 + self._additional_params.len());
-        params.push("agencyId", self._agency_id.to_string());
-        params.push("advertiserId", self._advertiser_id.to_string());
-        params.push("engineAccountId", self._engine_account_id.to_string());
-        params.push("endDate", self._end_date.to_string());
-        params.push("rowCount", self._row_count.to_string());
-        params.push("startDate", self._start_date.to_string());
-        params.push("startRow", self._start_row.to_string());
+        params.push("agencyId", &self._agency_id.to_string());
+        params.push("advertiserId", &self._advertiser_id.to_string());
+        params.push("engineAccountId", &self._engine_account_id.to_string());
+        params.push("endDate", &self._end_date.to_string());
+        params.push("rowCount", &self._row_count.to_string());
+        params.push("startDate", &self._start_date.to_string());
+        params.push("startRow", &self._start_row.to_string());
         if let Some(value) = self._customer_id.as_ref() {
             params.push("customerId", value);
         }
@@ -1704,11 +1704,11 @@ where
         }
 
         let mut params = Params::with_capacity(14 + self._additional_params.len());
-        params.push("customerId", self._customer_id);
-        params.push("endDate", self._end_date.to_string());
-        params.push("rowCount", self._row_count.to_string());
-        params.push("startDate", self._start_date.to_string());
-        params.push("startRow", self._start_row.to_string());
+        params.push("customerId", &self._customer_id);
+        params.push("endDate", &self._end_date.to_string());
+        params.push("rowCount", &self._row_count.to_string());
+        params.push("startDate", &self._start_date.to_string());
+        params.push("startRow", &self._start_row.to_string());
         if let Some(value) = self._engine_account_id.as_ref() {
             params.push("engineAccountId", value.to_string());
         }
@@ -3172,7 +3172,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("reportId", self._report_id);
+        params.push("reportId", &self._report_id);
 
         params.extend(self._additional_params.iter());
 
@@ -3438,8 +3438,8 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("reportId", self._report_id);
-        params.push("reportFragment", self._report_fragment.to_string());
+        params.push("reportId", &self._report_id);
+        params.push("reportFragment", &self._report_fragment.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -3706,8 +3706,8 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("agencyId", self._agency_id.to_string());
-        params.push("advertiserId", self._advertiser_id.to_string());
+        params.push("agencyId", &self._agency_id.to_string());
+        params.push("advertiserId", &self._advertiser_id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -4262,8 +4262,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("agencyId", self._agency_id.to_string());
-        params.push("advertiserId", self._advertiser_id.to_string());
+        params.push("agencyId", &self._agency_id.to_string());
+        params.push("advertiserId", &self._advertiser_id.to_string());
 
         params.extend(self._additional_params.iter());
 

@@ -8,7 +8,7 @@ use super::*;
 pub struct GoogleCloudRecaptchaenterpriseV1AccountDefenderAssessment {
     /// Labels for this request.
     
-    pub labels: Option<Vec<String>>,
+    pub labels: Option<Vec<GoogleCloudRecaptchaenterpriseV1AccountDefenderAssessmentLabelsEnum>>,
 }
 
 impl client::Part for GoogleCloudRecaptchaenterpriseV1AccountDefenderAssessment {}
@@ -31,7 +31,7 @@ pub struct GoogleCloudRecaptchaenterpriseV1AccountVerificationInfo {
     /// Output only. Result of the latest account verification challenge.
     #[serde(rename="latestVerificationResult")]
     
-    pub latest_verification_result: Option<String>,
+    pub latest_verification_result: Option<GoogleCloudRecaptchaenterpriseV1AccountVerificationInfoLatestVerificationResultEnum>,
     /// Username of the account that is being verified. Deprecated. Customers should now provide the hashed account ID field in Event.
     
     pub username: Option<String>,
@@ -73,7 +73,7 @@ impl client::Part for GoogleCloudRecaptchaenterpriseV1AndroidKeySettings {}
 pub struct GoogleCloudRecaptchaenterpriseV1AnnotateAssessmentRequest {
     /// Optional. The annotation that will be assigned to the Event. This field can be left empty to provide reasons that apply to an event without concluding whether the event is legitimate or fraudulent.
     
-    pub annotation: Option<String>,
+    pub annotation: Option<GoogleCloudRecaptchaenterpriseV1AnnotateAssessmentRequestAnnotationEnum>,
     /// Optional. Unique stable hashed user identifier to apply to the assessment. This is an alternative to setting the hashed_account_id in CreateAssessment, for example when the account identifier is not yet known in the initial request. It is recommended that the identifier is hashed using hmac-sha256 with stable secret.
     #[serde(rename="hashedAccountId")]
     
@@ -81,7 +81,7 @@ pub struct GoogleCloudRecaptchaenterpriseV1AnnotateAssessmentRequest {
     pub hashed_account_id: Option<Vec<u8>>,
     /// Optional. Optional reasons for the annotation that will be assigned to the Event.
     
-    pub reasons: Option<Vec<String>>,
+    pub reasons: Option<Vec<GoogleCloudRecaptchaenterpriseV1AnnotateAssessmentRequestReasonsEnum>>,
 }
 
 impl client::RequestValue for GoogleCloudRecaptchaenterpriseV1AnnotateAssessmentRequest {}
@@ -533,7 +533,7 @@ impl client::ResponseResult for GoogleCloudRecaptchaenterpriseV1RetrieveLegacySe
 pub struct GoogleCloudRecaptchaenterpriseV1RiskAnalysis {
     /// Reasons contributing to the risk analysis verdict.
     
-    pub reasons: Option<Vec<String>>,
+    pub reasons: Option<Vec<GoogleCloudRecaptchaenterpriseV1RiskAnalysiReasonsEnum>>,
     /// Legitimate event score from 0.0 to 1.0. (1.0 means very likely legitimate traffic while 0.0 means very likely non-legitimate traffic).
     
     pub score: Option<f32>,
@@ -642,7 +642,7 @@ pub struct GoogleCloudRecaptchaenterpriseV1TestingOptions {
     /// For challenge-based keys only (CHECKBOX, INVISIBLE), all challenge requests for this site will return nocaptcha if NOCAPTCHA, or an unsolvable challenge if CHALLENGE.
     #[serde(rename="testingChallenge")]
     
-    pub testing_challenge: Option<String>,
+    pub testing_challenge: Option<GoogleCloudRecaptchaenterpriseV1TestingOptionTestingChallengeEnum>,
     /// All assessments for this Key will return this score. Must be between 0 (likely not legitimate) and 1 (likely legitimate) inclusive.
     #[serde(rename="testingScore")]
     
@@ -676,7 +676,7 @@ pub struct GoogleCloudRecaptchaenterpriseV1TokenProperties {
     /// Reason associated with the response when valid = false.
     #[serde(rename="invalidReason")]
     
-    pub invalid_reason: Option<String>,
+    pub invalid_reason: Option<GoogleCloudRecaptchaenterpriseV1TokenPropertyInvalidReasonEnum>,
     /// The ID of the iOS bundle with which the token was generated (iOS keys only).
     #[serde(rename="iosBundleId")]
     
@@ -699,11 +699,11 @@ pub struct GoogleCloudRecaptchaenterpriseV1WafSettings {
     /// Required. The WAF feature for which this key is enabled.
     #[serde(rename="wafFeature")]
     
-    pub waf_feature: Option<String>,
+    pub waf_feature: Option<GoogleCloudRecaptchaenterpriseV1WafSettingWafFeatureEnum>,
     /// Required. The WAF service that uses this key.
     #[serde(rename="wafService")]
     
-    pub waf_service: Option<String>,
+    pub waf_service: Option<GoogleCloudRecaptchaenterpriseV1WafSettingWafServiceEnum>,
 }
 
 impl client::Part for GoogleCloudRecaptchaenterpriseV1WafSettings {}
@@ -731,11 +731,11 @@ pub struct GoogleCloudRecaptchaenterpriseV1WebKeySettings {
     /// Settings for the frequency and difficulty at which this key triggers captcha challenges. This should only be specified for IntegrationTypes CHECKBOX and INVISIBLE.
     #[serde(rename="challengeSecurityPreference")]
     
-    pub challenge_security_preference: Option<String>,
+    pub challenge_security_preference: Option<GoogleCloudRecaptchaenterpriseV1WebKeySettingChallengeSecurityPreferenceEnum>,
     /// Required. Describes how this key is integrated with the website.
     #[serde(rename="integrationType")]
     
-    pub integration_type: Option<String>,
+    pub integration_type: Option<GoogleCloudRecaptchaenterpriseV1WebKeySettingIntegrationTypeEnum>,
 }
 
 impl client::Part for GoogleCloudRecaptchaenterpriseV1WebKeySettings {}

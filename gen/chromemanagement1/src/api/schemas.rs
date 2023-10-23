@@ -116,7 +116,7 @@ pub struct GoogleChromeManagementV1AppDetails {
     /// Output only. App type.
     #[serde(rename="type")]
     
-    pub type_: Option<String>,
+    pub type_: Option<GoogleChromeManagementV1AppDetailTypeEnum>,
 }
 
 impl client::ResponseResult for GoogleChromeManagementV1AppDetails {}
@@ -250,7 +250,7 @@ pub struct GoogleChromeManagementV1BatteryStatusReport {
     /// Output only. Battery health.
     #[serde(rename="batteryHealth")]
     
-    pub battery_health: Option<String>,
+    pub battery_health: Option<GoogleChromeManagementV1BatteryStatusReportBatteryHealthEnum>,
     /// Output only. Cycle count.
     #[serde(rename="cycleCount")]
     
@@ -304,7 +304,7 @@ pub struct GoogleChromeManagementV1BootPerformanceReport {
     /// The shutdown reason.
     #[serde(rename="shutdownReason")]
     
-    pub shutdown_reason: Option<String>,
+    pub shutdown_reason: Option<GoogleChromeManagementV1BootPerformanceReportShutdownReasonEnum>,
     /// The timestamp when shutdown.
     #[serde(rename="shutdownTime")]
     
@@ -323,7 +323,7 @@ impl client::Part for GoogleChromeManagementV1BootPerformanceReport {}
 pub struct GoogleChromeManagementV1BrowserVersion {
     /// Output only. The release channel of the installed browser.
     
-    pub channel: Option<String>,
+    pub channel: Option<GoogleChromeManagementV1BrowserVersionChannelEnum>,
     /// Output only. Count grouped by device_system and major version
     
     #[serde_as(as = "Option<::client::serde_with::DisplayFromStr>")]
@@ -334,7 +334,7 @@ pub struct GoogleChromeManagementV1BrowserVersion {
     pub device_os_version: Option<String>,
     /// Output only. The device operating system.
     
-    pub system: Option<String>,
+    pub system: Option<GoogleChromeManagementV1BrowserVersionSystemEnum>,
     /// Output only. The full version of the installed browser.
     
     pub version: Option<String>,
@@ -392,7 +392,7 @@ pub struct GoogleChromeManagementV1ChromeAppInfo {
     /// Output only. Types of an item in the Chrome Web Store
     #[serde(rename="type")]
     
-    pub type_: Option<String>,
+    pub type_: Option<GoogleChromeManagementV1ChromeAppInfoTypeEnum>,
 }
 
 impl client::Part for GoogleChromeManagementV1ChromeAppInfo {}
@@ -665,7 +665,7 @@ impl client::ResponseResult for GoogleChromeManagementV1CountInstalledAppsRespon
 pub struct GoogleChromeManagementV1CpuInfo {
     /// Output only. Architecture type for the CPU. * This field provides device information, which is static and will not change over time. * Data for this field is controlled via policy: [ReportDeviceCpuInfo](https://chromeenterprise.google/policies/#ReportDeviceCpuInfo) * Data Collection Frequency: Only at Upload * Default Data Reporting Frequency: 3 hours - Policy Controlled: Yes * Cache: If the device is offline, the collected data is stored locally, and will be reported when the device is next online: No * Reported for affiliated users only: N/A
     
-    pub architecture: Option<String>,
+    pub architecture: Option<GoogleChromeManagementV1CpuInfoArchitectureEnum>,
     /// Output only. Whether keylocker is configured.`TRUE` = Enabled; `FALSE` = disabled. Only reported if keylockerSupported = `TRUE`.
     #[serde(rename="keylockerConfigured")]
     
@@ -763,7 +763,7 @@ pub struct GoogleChromeManagementV1DeviceAueCountReport {
     /// Enum value of month corresponding to the auto update expiration date in UTC time zone. If the device is already expired, this field is empty.
     #[serde(rename="aueMonth")]
     
-    pub aue_month: Option<String>,
+    pub aue_month: Option<GoogleChromeManagementV1DeviceAueCountReportAueMonthEnum>,
     /// Int value of year corresponding to the Auto Update Expiration date in UTC time zone. If the device is already expired, this field is empty.
     #[serde(rename="aueYear")]
     
@@ -1003,7 +1003,7 @@ pub struct GoogleChromeManagementV1HttpsLatencyRoutineData {
     pub latency: Option<client::chrono::Duration>,
     /// Output only. HTTPS latency routine problem if a problem occurred.
     
-    pub problem: Option<String>,
+    pub problem: Option<GoogleChromeManagementV1HttpsLatencyRoutineDataProblemEnum>,
 }
 
 impl client::Part for GoogleChromeManagementV1HttpsLatencyRoutineData {}
@@ -1023,15 +1023,15 @@ pub struct GoogleChromeManagementV1InstalledApp {
     /// Output only. How the app was installed.
     #[serde(rename="appInstallType")]
     
-    pub app_install_type: Option<String>,
+    pub app_install_type: Option<GoogleChromeManagementV1InstalledAppAppInstallTypeEnum>,
     /// Output only. Source of the installed app.
     #[serde(rename="appSource")]
     
-    pub app_source: Option<String>,
+    pub app_source: Option<GoogleChromeManagementV1InstalledAppAppSourceEnum>,
     /// Output only. Type of the app.
     #[serde(rename="appType")]
     
-    pub app_type: Option<String>,
+    pub app_type: Option<GoogleChromeManagementV1InstalledAppAppTypeEnum>,
     /// Output only. Count of browser devices with this app installed.
     #[serde(rename="browserDeviceCount")]
     
@@ -1193,7 +1193,7 @@ pub struct GoogleChromeManagementV1NetworkDevice {
     /// Output only. Network device type.
     #[serde(rename="type")]
     
-    pub type_: Option<String>,
+    pub type_: Option<GoogleChromeManagementV1NetworkDeviceTypeEnum>,
 }
 
 impl client::Part for GoogleChromeManagementV1NetworkDevice {}
@@ -1245,11 +1245,11 @@ pub struct GoogleChromeManagementV1NetworkStatusReport {
     /// Output only. Current connection state of the network.
     #[serde(rename="connectionState")]
     
-    pub connection_state: Option<String>,
+    pub connection_state: Option<GoogleChromeManagementV1NetworkStatusReportConnectionStateEnum>,
     /// Output only. Network connection type.
     #[serde(rename="connectionType")]
     
-    pub connection_type: Option<String>,
+    pub connection_type: Option<GoogleChromeManagementV1NetworkStatusReportConnectionTypeEnum>,
     /// Output only. Whether the wifi encryption key is turned off.
     #[serde(rename="encryptionOn")]
     
@@ -1336,7 +1336,7 @@ pub struct GoogleChromeManagementV1OsUpdateStatus {
     /// Output only. Current state of the os update.
     #[serde(rename="updateState")]
     
-    pub update_state: Option<String>,
+    pub update_state: Option<GoogleChromeManagementV1OsUpdateStatuUpdateStateEnum>,
 }
 
 impl client::Part for GoogleChromeManagementV1OsUpdateStatus {}
@@ -1562,7 +1562,7 @@ pub struct GoogleChromeManagementV1TelemetryEvent {
     /// The event type of the current event.
     #[serde(rename="eventType")]
     
-    pub event_type: Option<String>,
+    pub event_type: Option<GoogleChromeManagementV1TelemetryEventEventTypeEnum>,
     /// Output only. Payload for HTTPS latency change event. Present only when `event_type` is `NETWORK_HTTPS_LATENCY_CHANGE`.
     #[serde(rename="httpsLatencyChangeEvent")]
     
@@ -1600,7 +1600,7 @@ pub struct GoogleChromeManagementV1TelemetryHttpsLatencyChangeEvent {
     /// Current HTTPS latency state.
     #[serde(rename="httpsLatencyState")]
     
-    pub https_latency_state: Option<String>,
+    pub https_latency_state: Option<GoogleChromeManagementV1TelemetryHttpsLatencyChangeEventHttpsLatencyStateEnum>,
 }
 
 impl client::Part for GoogleChromeManagementV1TelemetryHttpsLatencyChangeEvent {}
@@ -1651,7 +1651,7 @@ pub struct GoogleChromeManagementV1ThunderboltInfo {
     /// Security level of the Thunderbolt bus.
     #[serde(rename="securityLevel")]
     
-    pub security_level: Option<String>,
+    pub security_level: Option<GoogleChromeManagementV1ThunderboltInfoSecurityLevelEnum>,
 }
 
 impl client::Part for GoogleChromeManagementV1ThunderboltInfo {}
@@ -1667,11 +1667,11 @@ pub struct GoogleChromeManagementV1TotalMemoryEncryptionInfo {
     /// Memory encryption algorithm.
     #[serde(rename="encryptionAlgorithm")]
     
-    pub encryption_algorithm: Option<String>,
+    pub encryption_algorithm: Option<GoogleChromeManagementV1TotalMemoryEncryptionInfoEncryptionAlgorithmEnum>,
     /// The state of memory encryption on the device.
     #[serde(rename="encryptionState")]
     
-    pub encryption_state: Option<String>,
+    pub encryption_state: Option<GoogleChromeManagementV1TotalMemoryEncryptionInfoEncryptionStateEnum>,
     /// The length of the encryption keys.
     #[serde(rename="keyLength")]
     

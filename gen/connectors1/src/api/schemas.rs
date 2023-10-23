@@ -32,7 +32,7 @@ pub struct AuditLogConfig {
     /// The log type that this config enables.
     #[serde(rename="logType")]
     
-    pub log_type: Option<String>,
+    pub log_type: Option<AuditLogConfigLogTypeEnum>,
 }
 
 impl client::Part for AuditLogConfig {}
@@ -52,7 +52,7 @@ pub struct AuthConfig {
     /// The type of authentication configured.
     #[serde(rename="authType")]
     
-    pub auth_type: Option<String>,
+    pub auth_type: Option<AuthConfigAuthTypeEnum>,
     /// Oauth2ClientCredentials.
     #[serde(rename="oauth2ClientCredentials")]
     
@@ -84,7 +84,7 @@ pub struct AuthConfigTemplate {
     /// The type of authentication configured.
     #[serde(rename="authType")]
     
-    pub auth_type: Option<String>,
+    pub auth_type: Option<AuthConfigTemplateAuthTypeEnum>,
     /// Config variables to describe an `AuthConfig` for a `Connection`.
     #[serde(rename="configVariableTemplates")]
     
@@ -222,7 +222,7 @@ pub struct ConfigVariableTemplate {
     pub role_grant: Option<RoleGrant>,
     /// State of the config variable.
     
-    pub state: Option<String>,
+    pub state: Option<ConfigVariableTemplateStateEnum>,
     /// Regular expression in RE2 syntax used for validating the `value` of a `ConfigVariable`.
     #[serde(rename="validationRegex")]
     
@@ -230,7 +230,7 @@ pub struct ConfigVariableTemplate {
     /// Type of the parameter: string, int, bool etc. consider custom type for the benefit for the validation.
     #[serde(rename="valueType")]
     
-    pub value_type: Option<String>,
+    pub value_type: Option<ConfigVariableTemplateValueTypeEnum>,
 }
 
 impl client::Part for ConfigVariableTemplate {}
@@ -344,7 +344,7 @@ pub struct ConnectionSchemaMetadata {
     pub refresh_time: Option<client::chrono::DateTime<client::chrono::offset::Utc>>,
     /// Output only. The current state of runtime schema.
     
-    pub state: Option<String>,
+    pub state: Option<ConnectionSchemaMetadataStateEnum>,
     /// Output only. Timestamp when the connection runtime schema was updated.
     #[serde(rename="updateTime")]
     
@@ -366,7 +366,7 @@ pub struct ConnectionStatus {
     pub description: Option<String>,
     /// State.
     
-    pub state: Option<String>,
+    pub state: Option<ConnectionStatuStateEnum>,
     /// Status provides detailed information for the state.
     
     pub status: Option<String>,
@@ -411,7 +411,7 @@ pub struct Connector {
     /// Output only. Flag to mark the version indicating the launch stage.
     #[serde(rename="launchStage")]
     
-    pub launch_stage: Option<String>,
+    pub launch_stage: Option<ConnectorLaunchStageEnum>,
     /// Output only. Resource name of the Connector. Format: projects/{project}/locations/{location}/providers/{provider}/connectors/{connector} Only global location is supported for Connector resource.
     
     pub name: Option<String>,
@@ -465,7 +465,7 @@ pub struct ConnectorVersion {
     /// Output only. Flag to mark the version indicating the launch stage.
     #[serde(rename="launchStage")]
     
-    pub launch_stage: Option<String>,
+    pub launch_stage: Option<ConnectorVersionLaunchStageEnum>,
     /// Output only. Resource name of the Version. Format: projects/{project}/locations/{location}/providers/{provider}/connectors/{connector}/versions/{version} Only global location is supported for Connector resource.
     
     pub name: Option<String>,
@@ -661,7 +661,7 @@ pub struct Field {
     /// The data type of the Field.
     #[serde(rename="dataType")]
     
-    pub data_type: Option<String>,
+    pub data_type: Option<FieldDataTypeEnum>,
     /// The following field specifies the default value of the Field provided by the external system if a value is not provided.
     #[serde(rename="defaultValue")]
     
@@ -696,7 +696,7 @@ pub struct InputParameter {
     /// The data type of the Parameter.
     #[serde(rename="dataType")]
     
-    pub data_type: Option<String>,
+    pub data_type: Option<InputParameterDataTypeEnum>,
     /// The following field specifies the default value of the Parameter provided by the external system if a value is not provided.
     #[serde(rename="defaultValue")]
     
@@ -1150,7 +1150,7 @@ pub struct Provider {
     /// Output only. Flag to mark the version indicating the launch stage.
     #[serde(rename="launchStage")]
     
-    pub launch_stage: Option<String>,
+    pub launch_stage: Option<ProviderLaunchStageEnum>,
     /// Output only. Resource name of the Provider. Format: projects/{project}/locations/{location}/providers/{provider} Only global location is supported for Provider resource.
     
     pub name: Option<String>,
@@ -1196,7 +1196,7 @@ pub struct Resource {
     /// Different types of resource supported.
     #[serde(rename="type")]
     
-    pub type_: Option<String>,
+    pub type_: Option<ResourceTypeEnum>,
 }
 
 impl client::Part for Resource {}
@@ -1212,7 +1212,7 @@ pub struct ResultMetadata {
     /// The data type of the field.
     #[serde(rename="dataType")]
     
-    pub data_type: Option<String>,
+    pub data_type: Option<ResultMetadataDataTypeEnum>,
     /// A brief description of the field.
     
     pub description: Option<String>,
@@ -1237,7 +1237,7 @@ pub struct RoleGrant {
     pub helper_text_template: Option<String>,
     /// Prinicipal/Identity for whom the role need to assigned.
     
-    pub principal: Option<String>,
+    pub principal: Option<RoleGrantPrincipalEnum>,
     /// Resource on which the roles needs to be granted for the principal.
     
     pub resource: Option<Resource>,
@@ -1320,7 +1320,7 @@ pub struct RuntimeConfig {
     pub service_directory: Option<String>,
     /// Output only. The state of the location.
     
-    pub state: Option<String>,
+    pub state: Option<RuntimeConfigStateEnum>,
 }
 
 impl client::ResponseResult for RuntimeConfig {}
@@ -1398,7 +1398,7 @@ pub struct Source {
     /// Type of the source.
     #[serde(rename="sourceType")]
     
-    pub source_type: Option<String>,
+    pub source_type: Option<SourceSourceTypeEnum>,
 }
 
 impl client::Part for Source {}

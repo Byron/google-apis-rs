@@ -2925,13 +2925,13 @@ impl<'a, S> DynamicTargetingKeyMethods<'a, S> {
     /// * `objectId` - ID of the object of this dynamic targeting key. This is a required field.
     /// * `name` - Name of this dynamic targeting key. This is a required field. Must be less than 256 characters long and cannot contain commas. All characters are converted to lowercase.
     /// * `objectType` - Type of the object of this dynamic targeting key. This is a required field.
-    pub fn delete(&self, profile_id: i64, object_id: i64, name: &str, object_type: &str) -> DynamicTargetingKeyDeleteCall<'a, S> {
+    pub fn delete(&self, profile_id: i64, object_id: i64, name: &str, object_type: &DynamicTargetingKeyObjectTypeEnum) -> DynamicTargetingKeyDeleteCall<'a, S> {
         DynamicTargetingKeyDeleteCall {
             hub: self.hub,
             _profile_id: profile_id,
             _object_id: object_id,
             _name: name.to_string(),
-            _object_type: object_type.to_string(),
+            _object_type: object_type.clone(),
             _delegate: Default::default(),
             _additional_params: Default::default(),
             _scopes: Default::default(),

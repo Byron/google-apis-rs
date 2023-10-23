@@ -280,7 +280,7 @@ pub struct ActivityContentDetailsPromotedItem {
     /// The type of call-to-action, a message to the user indicating action that can be taken.
     #[serde(rename="ctaType")]
     
-    pub cta_type: Option<String>,
+    pub cta_type: Option<ActivityContentDetailsPromotedItemCtaTypeEnum>,
     /// The custom call-to-action button text. If specified, it will override the default button text for the cta_type.
     #[serde(rename="customCtaButtonText")]
     
@@ -319,7 +319,7 @@ impl client::Part for ActivityContentDetailsPromotedItem {}
 pub struct ActivityContentDetailsRecommendation {
     /// The reason that the resource is recommended to the user.
     
-    pub reason: Option<String>,
+    pub reason: Option<ActivityContentDetailsRecommendationReasonEnum>,
     /// The resourceId object contains information that identifies the recommended resource.
     #[serde(rename="resourceId")]
     
@@ -358,7 +358,7 @@ pub struct ActivityContentDetailsSocial {
     /// The name of the social network.
     #[serde(rename="type")]
     
-    pub type_: Option<String>,
+    pub type_: Option<ActivityContentDetailsSocialTypeEnum>,
 }
 
 impl client::Part for ActivityContentDetailsSocial {}
@@ -499,7 +499,7 @@ pub struct ActivitySnippet {
     /// The type of activity that the resource describes.
     #[serde(rename="type")]
     
-    pub type_: Option<String>,
+    pub type_: Option<ActivitySnippetTypeEnum>,
 }
 
 impl client::Part for ActivitySnippet {}
@@ -611,11 +611,11 @@ pub struct CaptionSnippet {
     /// The type of audio track associated with the caption track.
     #[serde(rename="audioTrackType")]
     
-    pub audio_track_type: Option<String>,
+    pub audio_track_type: Option<CaptionSnippetAudioTrackTypeEnum>,
     /// The reason that YouTube failed to process the caption track. This property is only present if the state property's value is failed.
     #[serde(rename="failureReason")]
     
-    pub failure_reason: Option<String>,
+    pub failure_reason: Option<CaptionSnippetFailureReasonEnum>,
     /// Indicates whether YouTube synchronized the caption track to the audio track in the video. The value will be true if a sync was explicitly requested when the caption track was uploaded. For example, when calling the captions.insert or captions.update methods, you can set the sync parameter to true to instruct YouTube to sync the uploaded track to the video. If the value is false, YouTube uses the time codes in the uploaded caption track to determine when to display captions.
     #[serde(rename="isAutoSynced")]
     
@@ -648,11 +648,11 @@ pub struct CaptionSnippet {
     pub name: Option<String>,
     /// The caption track's status.
     
-    pub status: Option<String>,
+    pub status: Option<CaptionSnippetStatusEnum>,
     /// The caption track's type.
     #[serde(rename="trackKind")]
     
-    pub track_kind: Option<String>,
+    pub track_kind: Option<CaptionSnippetTrackKindEnum>,
     /// The ID that YouTube uses to uniquely identify the video associated with the caption track. @mutable youtube.captions.insert
     #[serde(rename="videoId")]
     
@@ -675,7 +675,7 @@ pub struct CdnSettings {
     /// The frame rate of the inbound video data.
     #[serde(rename="frameRate")]
     
-    pub frame_rate: Option<String>,
+    pub frame_rate: Option<CdnSettingFrameRateEnum>,
     /// The ingestionInfo object contains information that YouTube provides that you need to transmit your RTMP or HTTP stream to YouTube.
     #[serde(rename="ingestionInfo")]
     
@@ -683,10 +683,10 @@ pub struct CdnSettings {
     ///  The method or protocol used to transmit the video stream.
     #[serde(rename="ingestionType")]
     
-    pub ingestion_type: Option<String>,
+    pub ingestion_type: Option<CdnSettingIngestionTypeEnum>,
     /// The resolution of the inbound video data.
     
-    pub resolution: Option<String>,
+    pub resolution: Option<CdnSettingResolutionEnum>,
 }
 
 impl client::Part for CdnSettings {}
@@ -898,7 +898,7 @@ impl client::Part for ChannelContentOwnerDetails {}
 pub struct ChannelConversionPing {
     /// Defines the context of the ping.
     
-    pub context: Option<String>,
+    pub context: Option<ChannelConversionPingContextEnum>,
     /// The url (without the schema) that the player shall send the ping to. It's at caller's descretion to decide which schema to use (http vs https) Example of a returned url: //googleads.g.doubleclick.net/pagead/ viewthroughconversion/962985656/?data=path%3DtHe_path%3Btype%3D cview%3Butuid%3DGISQtTNGYqaYl4sKxoVvKA&labe=default The caller must append biscotti authentication (ms param in case of mobile, for example) to this ping.
     #[serde(rename="conversionUrl")]
     
@@ -1201,14 +1201,14 @@ pub struct ChannelSectionSnippet {
     pub position: Option<u32>,
     /// The style of the channel section.
     
-    pub style: Option<String>,
+    pub style: Option<ChannelSectionSnippetStyleEnum>,
     /// The channel section's title for multiple_playlists and multiple_channels.
     
     pub title: Option<String>,
     /// The type of the channel section.
     #[serde(rename="type")]
     
-    pub type_: Option<String>,
+    pub type_: Option<ChannelSectionSnippetTypeEnum>,
 }
 
 impl client::Part for ChannelSectionSnippet {}
@@ -1388,7 +1388,7 @@ pub struct ChannelStatus {
     /// The long uploads status of this channel. See https://support.google.com/youtube/answer/71673 for more information.
     #[serde(rename="longUploadsStatus")]
     
-    pub long_uploads_status: Option<String>,
+    pub long_uploads_status: Option<ChannelStatuLongUploadsStatusEnum>,
     /// no description provided
     #[serde(rename="madeForKids")]
     
@@ -1396,7 +1396,7 @@ pub struct ChannelStatus {
     /// Privacy status of the channel.
     #[serde(rename="privacyStatus")]
     
-    pub privacy_status: Option<String>,
+    pub privacy_status: Option<ChannelStatuPrivacyStatusEnum>,
     /// no description provided
     #[serde(rename="selfDeclaredMadeForKids")]
     
@@ -1601,7 +1601,7 @@ pub struct CommentSnippet {
     /// The comment's moderation status. Will not be set if the comments were requested through the id filter.
     #[serde(rename="moderationStatus")]
     
-    pub moderation_status: Option<String>,
+    pub moderation_status: Option<CommentSnippetModerationStatusEnum>,
     /// The unique id of the parent comment, only set for replies.
     #[serde(rename="parentId")]
     
@@ -1629,7 +1629,7 @@ pub struct CommentSnippet {
     /// The rating the viewer has given to this comment. For the time being this will never return RATE_TYPE_DISLIKE and instead return RATE_TYPE_NONE. This may change in the future.
     #[serde(rename="viewerRating")]
     
-    pub viewer_rating: Option<String>,
+    pub viewer_rating: Option<CommentSnippetViewerRatingEnum>,
 }
 
 impl client::Part for CommentSnippet {}
@@ -1824,287 +1824,287 @@ pub struct ContentRating {
     /// The video's Australian Classification Board (ACB) or Australian Communications and Media Authority (ACMA) rating. ACMA ratings are used to classify children's television programming.
     #[serde(rename="acbRating")]
     
-    pub acb_rating: Option<String>,
+    pub acb_rating: Option<ContentRatingAcbRatingEnum>,
     /// The video's rating from Italy's Autorità per le Garanzie nelle Comunicazioni (AGCOM).
     #[serde(rename="agcomRating")]
     
-    pub agcom_rating: Option<String>,
+    pub agcom_rating: Option<ContentRatingAgcomRatingEnum>,
     /// The video's Anatel (Asociación Nacional de Televisión) rating for Chilean television.
     #[serde(rename="anatelRating")]
     
-    pub anatel_rating: Option<String>,
+    pub anatel_rating: Option<ContentRatingAnatelRatingEnum>,
     /// The video's British Board of Film Classification (BBFC) rating.
     #[serde(rename="bbfcRating")]
     
-    pub bbfc_rating: Option<String>,
+    pub bbfc_rating: Option<ContentRatingBbfcRatingEnum>,
     /// The video's rating from Thailand's Board of Film and Video Censors.
     #[serde(rename="bfvcRating")]
     
-    pub bfvc_rating: Option<String>,
+    pub bfvc_rating: Option<ContentRatingBfvcRatingEnum>,
     /// The video's rating from the Austrian Board of Media Classification (Bundesministerium für Unterricht, Kunst und Kultur).
     #[serde(rename="bmukkRating")]
     
-    pub bmukk_rating: Option<String>,
+    pub bmukk_rating: Option<ContentRatingBmukkRatingEnum>,
     /// Rating system for Canadian TV - Canadian TV Classification System The video's rating from the Canadian Radio-Television and Telecommunications Commission (CRTC) for Canadian English-language broadcasts. For more information, see the Canadian Broadcast Standards Council website.
     #[serde(rename="catvRating")]
     
-    pub catv_rating: Option<String>,
+    pub catv_rating: Option<ContentRatingCatvRatingEnum>,
     /// The video's rating from the Canadian Radio-Television and Telecommunications Commission (CRTC) for Canadian French-language broadcasts. For more information, see the Canadian Broadcast Standards Council website.
     #[serde(rename="catvfrRating")]
     
-    pub catvfr_rating: Option<String>,
+    pub catvfr_rating: Option<ContentRatingCatvfrRatingEnum>,
     /// The video's Central Board of Film Certification (CBFC - India) rating.
     #[serde(rename="cbfcRating")]
     
-    pub cbfc_rating: Option<String>,
+    pub cbfc_rating: Option<ContentRatingCbfcRatingEnum>,
     /// The video's Consejo de Calificación Cinematográfica (Chile) rating.
     #[serde(rename="cccRating")]
     
-    pub ccc_rating: Option<String>,
+    pub ccc_rating: Option<ContentRatingCccRatingEnum>,
     /// The video's rating from Portugal's Comissão de Classificação de Espect´culos.
     #[serde(rename="cceRating")]
     
-    pub cce_rating: Option<String>,
+    pub cce_rating: Option<ContentRatingCceRatingEnum>,
     /// The video's rating in Switzerland.
     #[serde(rename="chfilmRating")]
     
-    pub chfilm_rating: Option<String>,
+    pub chfilm_rating: Option<ContentRatingChfilmRatingEnum>,
     /// The video's Canadian Home Video Rating System (CHVRS) rating.
     #[serde(rename="chvrsRating")]
     
-    pub chvrs_rating: Option<String>,
+    pub chvrs_rating: Option<ContentRatingChvrsRatingEnum>,
     /// The video's rating from the Commission de Contrôle des Films (Belgium).
     #[serde(rename="cicfRating")]
     
-    pub cicf_rating: Option<String>,
+    pub cicf_rating: Option<ContentRatingCicfRatingEnum>,
     /// The video's rating from Romania's CONSILIUL NATIONAL AL AUDIOVIZUALULUI (CNA).
     #[serde(rename="cnaRating")]
     
-    pub cna_rating: Option<String>,
+    pub cna_rating: Option<ContentRatingCnaRatingEnum>,
     /// Rating system in France - Commission de classification cinematographique
     #[serde(rename="cncRating")]
     
-    pub cnc_rating: Option<String>,
+    pub cnc_rating: Option<ContentRatingCncRatingEnum>,
     /// The video's rating from France's Conseil supérieur de l’audiovisuel, which rates broadcast content.
     #[serde(rename="csaRating")]
     
-    pub csa_rating: Option<String>,
+    pub csa_rating: Option<ContentRatingCsaRatingEnum>,
     /// The video's rating from Luxembourg's Commission de surveillance de la classification des films (CSCF).
     #[serde(rename="cscfRating")]
     
-    pub cscf_rating: Option<String>,
+    pub cscf_rating: Option<ContentRatingCscfRatingEnum>,
     /// The video's rating in the Czech Republic.
     #[serde(rename="czfilmRating")]
     
-    pub czfilm_rating: Option<String>,
+    pub czfilm_rating: Option<ContentRatingCzfilmRatingEnum>,
     /// The video's Departamento de Justiça, Classificação, Qualificação e Títulos (DJCQT - Brazil) rating.
     #[serde(rename="djctqRating")]
     
-    pub djctq_rating: Option<String>,
+    pub djctq_rating: Option<ContentRatingDjctqRatingEnum>,
     /// Reasons that explain why the video received its DJCQT (Brazil) rating.
     #[serde(rename="djctqRatingReasons")]
     
-    pub djctq_rating_reasons: Option<Vec<String>>,
+    pub djctq_rating_reasons: Option<Vec<ContentRatingDjctqRatingReasonsEnum>>,
     /// Rating system in Turkey - Evaluation and Classification Board of the Ministry of Culture and Tourism
     #[serde(rename="ecbmctRating")]
     
-    pub ecbmct_rating: Option<String>,
+    pub ecbmct_rating: Option<ContentRatingEcbmctRatingEnum>,
     /// The video's rating in Estonia.
     #[serde(rename="eefilmRating")]
     
-    pub eefilm_rating: Option<String>,
+    pub eefilm_rating: Option<ContentRatingEefilmRatingEnum>,
     /// The video's rating in Egypt.
     #[serde(rename="egfilmRating")]
     
-    pub egfilm_rating: Option<String>,
+    pub egfilm_rating: Option<ContentRatingEgfilmRatingEnum>,
     /// The video's Eirin (映倫) rating. Eirin is the Japanese rating system.
     #[serde(rename="eirinRating")]
     
-    pub eirin_rating: Option<String>,
+    pub eirin_rating: Option<ContentRatingEirinRatingEnum>,
     /// The video's rating from Malaysia's Film Censorship Board.
     #[serde(rename="fcbmRating")]
     
-    pub fcbm_rating: Option<String>,
+    pub fcbm_rating: Option<ContentRatingFcbmRatingEnum>,
     /// The video's rating from Hong Kong's Office for Film, Newspaper and Article Administration.
     #[serde(rename="fcoRating")]
     
-    pub fco_rating: Option<String>,
+    pub fco_rating: Option<ContentRatingFcoRatingEnum>,
     /// This property has been deprecated. Use the contentDetails.contentRating.cncRating instead.
     #[serde(rename="fmocRating")]
     
-    pub fmoc_rating: Option<String>,
+    pub fmoc_rating: Option<ContentRatingFmocRatingEnum>,
     /// The video's rating from South Africa's Film and Publication Board.
     #[serde(rename="fpbRating")]
     
-    pub fpb_rating: Option<String>,
+    pub fpb_rating: Option<ContentRatingFpbRatingEnum>,
     /// Reasons that explain why the video received its FPB (South Africa) rating.
     #[serde(rename="fpbRatingReasons")]
     
-    pub fpb_rating_reasons: Option<Vec<String>>,
+    pub fpb_rating_reasons: Option<Vec<ContentRatingFpbRatingReasonsEnum>>,
     /// The video's Freiwillige Selbstkontrolle der Filmwirtschaft (FSK - Germany) rating.
     #[serde(rename="fskRating")]
     
-    pub fsk_rating: Option<String>,
+    pub fsk_rating: Option<ContentRatingFskRatingEnum>,
     /// The video's rating in Greece.
     #[serde(rename="grfilmRating")]
     
-    pub grfilm_rating: Option<String>,
+    pub grfilm_rating: Option<ContentRatingGrfilmRatingEnum>,
     /// The video's Instituto de la Cinematografía y de las Artes Audiovisuales (ICAA - Spain) rating.
     #[serde(rename="icaaRating")]
     
-    pub icaa_rating: Option<String>,
+    pub icaa_rating: Option<ContentRatingIcaaRatingEnum>,
     /// The video's Irish Film Classification Office (IFCO - Ireland) rating. See the IFCO website for more information.
     #[serde(rename="ifcoRating")]
     
-    pub ifco_rating: Option<String>,
+    pub ifco_rating: Option<ContentRatingIfcoRatingEnum>,
     /// The video's rating in Israel.
     #[serde(rename="ilfilmRating")]
     
-    pub ilfilm_rating: Option<String>,
+    pub ilfilm_rating: Option<ContentRatingIlfilmRatingEnum>,
     /// The video's INCAA (Instituto Nacional de Cine y Artes Audiovisuales - Argentina) rating.
     #[serde(rename="incaaRating")]
     
-    pub incaa_rating: Option<String>,
+    pub incaa_rating: Option<ContentRatingIncaaRatingEnum>,
     /// The video's rating from the Kenya Film Classification Board.
     #[serde(rename="kfcbRating")]
     
-    pub kfcb_rating: Option<String>,
+    pub kfcb_rating: Option<ContentRatingKfcbRatingEnum>,
     /// The video's NICAM/Kijkwijzer rating from the Nederlands Instituut voor de Classificatie van Audiovisuele Media (Netherlands).
     #[serde(rename="kijkwijzerRating")]
     
-    pub kijkwijzer_rating: Option<String>,
+    pub kijkwijzer_rating: Option<ContentRatingKijkwijzerRatingEnum>,
     /// The video's Korea Media Rating Board (영상물등급위원회) rating. The KMRB rates videos in South Korea.
     #[serde(rename="kmrbRating")]
     
-    pub kmrb_rating: Option<String>,
+    pub kmrb_rating: Option<ContentRatingKmrbRatingEnum>,
     /// The video's rating from Indonesia's Lembaga Sensor Film.
     #[serde(rename="lsfRating")]
     
-    pub lsf_rating: Option<String>,
+    pub lsf_rating: Option<ContentRatingLsfRatingEnum>,
     /// The video's rating from Malta's Film Age-Classification Board.
     #[serde(rename="mccaaRating")]
     
-    pub mccaa_rating: Option<String>,
+    pub mccaa_rating: Option<ContentRatingMccaaRatingEnum>,
     /// The video's rating from the Danish Film Institute's (Det Danske Filminstitut) Media Council for Children and Young People.
     #[serde(rename="mccypRating")]
     
-    pub mccyp_rating: Option<String>,
+    pub mccyp_rating: Option<ContentRatingMccypRatingEnum>,
     /// The video's rating system for Vietnam - MCST
     #[serde(rename="mcstRating")]
     
-    pub mcst_rating: Option<String>,
+    pub mcst_rating: Option<ContentRatingMcstRatingEnum>,
     /// The video's rating from Singapore's Media Development Authority (MDA) and, specifically, it's Board of Film Censors (BFC).
     #[serde(rename="mdaRating")]
     
-    pub mda_rating: Option<String>,
+    pub mda_rating: Option<ContentRatingMdaRatingEnum>,
     /// The video's rating from Medietilsynet, the Norwegian Media Authority.
     #[serde(rename="medietilsynetRating")]
     
-    pub medietilsynet_rating: Option<String>,
+    pub medietilsynet_rating: Option<ContentRatingMedietilsynetRatingEnum>,
     /// The video's rating from Finland's Kansallinen Audiovisuaalinen Instituutti (National Audiovisual Institute).
     #[serde(rename="mekuRating")]
     
-    pub meku_rating: Option<String>,
+    pub meku_rating: Option<ContentRatingMekuRatingEnum>,
     /// The rating system for MENA countries, a clone of MPAA. It is needed to prevent titles go live w/o additional QC check, since some of them can be inappropriate for the countries at all. See b/33408548 for more details.
     #[serde(rename="menaMpaaRating")]
     
-    pub mena_mpaa_rating: Option<String>,
+    pub mena_mpaa_rating: Option<ContentRatingMenaMpaaRatingEnum>,
     /// The video's rating from the Ministero dei Beni e delle Attività Culturali e del Turismo (Italy).
     #[serde(rename="mibacRating")]
     
-    pub mibac_rating: Option<String>,
+    pub mibac_rating: Option<ContentRatingMibacRatingEnum>,
     /// The video's Ministerio de Cultura (Colombia) rating.
     #[serde(rename="mocRating")]
     
-    pub moc_rating: Option<String>,
+    pub moc_rating: Option<ContentRatingMocRatingEnum>,
     /// The video's rating from Taiwan's Ministry of Culture (文化部).
     #[serde(rename="moctwRating")]
     
-    pub moctw_rating: Option<String>,
+    pub moctw_rating: Option<ContentRatingMoctwRatingEnum>,
     /// The video's Motion Picture Association of America (MPAA) rating.
     #[serde(rename="mpaaRating")]
     
-    pub mpaa_rating: Option<String>,
+    pub mpaa_rating: Option<ContentRatingMpaaRatingEnum>,
     /// The rating system for trailer, DVD, and Ad in the US. See http://movielabs.com/md/ratings/v2.3/html/US_MPAAT_Ratings.html.
     #[serde(rename="mpaatRating")]
     
-    pub mpaat_rating: Option<String>,
+    pub mpaat_rating: Option<ContentRatingMpaatRatingEnum>,
     /// The video's rating from the Movie and Television Review and Classification Board (Philippines).
     #[serde(rename="mtrcbRating")]
     
-    pub mtrcb_rating: Option<String>,
+    pub mtrcb_rating: Option<ContentRatingMtrcbRatingEnum>,
     /// The video's rating from the Maldives National Bureau of Classification.
     #[serde(rename="nbcRating")]
     
-    pub nbc_rating: Option<String>,
+    pub nbc_rating: Option<ContentRatingNbcRatingEnum>,
     /// The video's rating in Poland.
     #[serde(rename="nbcplRating")]
     
-    pub nbcpl_rating: Option<String>,
+    pub nbcpl_rating: Option<ContentRatingNbcplRatingEnum>,
     /// The video's rating from the Bulgarian National Film Center.
     #[serde(rename="nfrcRating")]
     
-    pub nfrc_rating: Option<String>,
+    pub nfrc_rating: Option<ContentRatingNfrcRatingEnum>,
     /// The video's rating from Nigeria's National Film and Video Censors Board.
     #[serde(rename="nfvcbRating")]
     
-    pub nfvcb_rating: Option<String>,
+    pub nfvcb_rating: Option<ContentRatingNfvcbRatingEnum>,
     /// The video's rating from the Nacionãlais Kino centrs (National Film Centre of Latvia).
     #[serde(rename="nkclvRating")]
     
-    pub nkclv_rating: Option<String>,
+    pub nkclv_rating: Option<ContentRatingNkclvRatingEnum>,
     /// The National Media Council ratings system for United Arab Emirates.
     #[serde(rename="nmcRating")]
     
-    pub nmc_rating: Option<String>,
+    pub nmc_rating: Option<ContentRatingNmcRatingEnum>,
     /// The video's Office of Film and Literature Classification (OFLC - New Zealand) rating.
     #[serde(rename="oflcRating")]
     
-    pub oflc_rating: Option<String>,
+    pub oflc_rating: Option<ContentRatingOflcRatingEnum>,
     /// The video's rating in Peru.
     #[serde(rename="pefilmRating")]
     
-    pub pefilm_rating: Option<String>,
+    pub pefilm_rating: Option<ContentRatingPefilmRatingEnum>,
     /// The video's rating from the Hungarian Nemzeti Filmiroda, the Rating Committee of the National Office of Film.
     #[serde(rename="rcnofRating")]
     
-    pub rcnof_rating: Option<String>,
+    pub rcnof_rating: Option<ContentRatingRcnofRatingEnum>,
     /// The video's rating in Venezuela.
     #[serde(rename="resorteviolenciaRating")]
     
-    pub resorteviolencia_rating: Option<String>,
+    pub resorteviolencia_rating: Option<ContentRatingResorteviolenciaRatingEnum>,
     /// The video's General Directorate of Radio, Television and Cinematography (Mexico) rating.
     #[serde(rename="rtcRating")]
     
-    pub rtc_rating: Option<String>,
+    pub rtc_rating: Option<ContentRatingRtcRatingEnum>,
     /// The video's rating from Ireland's Raidió Teilifís Éireann.
     #[serde(rename="rteRating")]
     
-    pub rte_rating: Option<String>,
+    pub rte_rating: Option<ContentRatingRteRatingEnum>,
     /// The video's National Film Registry of the Russian Federation (MKRF - Russia) rating.
     #[serde(rename="russiaRating")]
     
-    pub russia_rating: Option<String>,
+    pub russia_rating: Option<ContentRatingRussiaRatingEnum>,
     /// The video's rating in Slovakia.
     #[serde(rename="skfilmRating")]
     
-    pub skfilm_rating: Option<String>,
+    pub skfilm_rating: Option<ContentRatingSkfilmRatingEnum>,
     /// The video's rating in Iceland.
     #[serde(rename="smaisRating")]
     
-    pub smais_rating: Option<String>,
+    pub smais_rating: Option<ContentRatingSmaisRatingEnum>,
     /// The video's rating from Statens medieråd (Sweden's National Media Council).
     #[serde(rename="smsaRating")]
     
-    pub smsa_rating: Option<String>,
+    pub smsa_rating: Option<ContentRatingSmsaRatingEnum>,
     /// The video's TV Parental Guidelines (TVPG) rating.
     #[serde(rename="tvpgRating")]
     
-    pub tvpg_rating: Option<String>,
+    pub tvpg_rating: Option<ContentRatingTvpgRatingEnum>,
     /// A rating that YouTube uses to identify age-restricted content.
     #[serde(rename="ytRating")]
     
-    pub yt_rating: Option<String>,
+    pub yt_rating: Option<ContentRatingYtRatingEnum>,
 }
 
 impl client::Part for ContentRating {}
@@ -2124,7 +2124,7 @@ pub struct Cuepoint {
     /// no description provided
     #[serde(rename="cueType")]
     
-    pub cue_type: Option<String>,
+    pub cue_type: Option<CuepointCueTypeEnum>,
     /// The duration of this cuepoint.
     #[serde(rename="durationSecs")]
     
@@ -2603,11 +2603,11 @@ pub struct InvideoPosition {
     /// Describes in which corner of the video the visual widget will appear.
     #[serde(rename="cornerPosition")]
     
-    pub corner_position: Option<String>,
+    pub corner_position: Option<InvideoPositionCornerPositionEnum>,
     /// Defines the position type.
     #[serde(rename="type")]
     
-    pub type_: Option<String>,
+    pub type_: Option<InvideoPositionTypeEnum>,
 }
 
 impl client::Part for InvideoPosition {}
@@ -2633,7 +2633,7 @@ pub struct InvideoTiming {
     /// Describes a timing type. If the value is offsetFromStart, then the offsetMs field represents an offset from the start of the video. If the value is offsetFromEnd, then the offsetMs field represents an offset from the end of the video.
     #[serde(rename="type")]
     
-    pub type_: Option<String>,
+    pub type_: Option<InvideoTimingTypeEnum>,
 }
 
 impl client::Part for InvideoTiming {}
@@ -2751,7 +2751,7 @@ pub struct LiveBroadcastContentDetails {
     /// no description provided
     #[serde(rename="closedCaptionsType")]
     
-    pub closed_captions_type: Option<String>,
+    pub closed_captions_type: Option<LiveBroadcastContentDetailClosedCaptionsTypeEnum>,
     /// This setting indicates whether auto start is enabled for this broadcast. The default value for this property is false. This setting can only be used by Events.
     #[serde(rename="enableAutoStart")]
     
@@ -2783,7 +2783,7 @@ pub struct LiveBroadcastContentDetails {
     /// If both this and enable_low_latency are set, they must match. LATENCY_NORMAL should match enable_low_latency=false LATENCY_LOW should match enable_low_latency=true LATENCY_ULTRA_LOW should have enable_low_latency omitted.
     #[serde(rename="latencyPreference")]
     
-    pub latency_preference: Option<String>,
+    pub latency_preference: Option<LiveBroadcastContentDetailLatencyPreferenceEnum>,
     /// The mesh for projecting the video if projection is mesh. The mesh value must be a UTF-8 string containing the base-64 encoding of 3D mesh data that follows the Spherical Video V2 RFC specification for an mshp box, excluding the box size and type but including the following four reserved zero bytes for the version and flags.
     
     #[serde_as(as = "Option<::client::serde::urlsafe_base64::Wrapper>")]
@@ -2794,7 +2794,7 @@ pub struct LiveBroadcastContentDetails {
     pub monitor_stream: Option<MonitorStreamInfo>,
     /// The projection format of this broadcast. This defaults to rectangular.
     
-    pub projection: Option<String>,
+    pub projection: Option<LiveBroadcastContentDetailProjectionEnum>,
     /// Automatically start recording after the event goes live. The default value for this property is true. *Important:* You must also set the enableDvr property's value to true if you want the playback to be available immediately after the broadcast ends. If you set this property's value to true but do not also set the enableDvr property to true, there may be a delay of around one day before the archived video will be available for playback.
     #[serde(rename="recordFromStart")]
     
@@ -2806,7 +2806,7 @@ pub struct LiveBroadcastContentDetails {
     /// The 3D stereo layout of this broadcast. This defaults to mono.
     #[serde(rename="stereoLayout")]
     
-    pub stereo_layout: Option<String>,
+    pub stereo_layout: Option<LiveBroadcastContentDetailStereoLayoutEnum>,
 }
 
 impl client::Part for LiveBroadcastContentDetails {}
@@ -2965,11 +2965,11 @@ pub struct LiveBroadcastStatus {
     /// The broadcast's status. The status can be updated using the API's liveBroadcasts.transition method.
     #[serde(rename="lifeCycleStatus")]
     
-    pub life_cycle_status: Option<String>,
+    pub life_cycle_status: Option<LiveBroadcastStatuLifeCycleStatusEnum>,
     /// Priority of the live broadcast event (internal state).
     #[serde(rename="liveBroadcastPriority")]
     
-    pub live_broadcast_priority: Option<String>,
+    pub live_broadcast_priority: Option<LiveBroadcastStatuLiveBroadcastPriorityEnum>,
     /// Whether the broadcast is made for kids or not, decided by YouTube instead of the creator. This field is read only.
     #[serde(rename="madeForKids")]
     
@@ -2977,11 +2977,11 @@ pub struct LiveBroadcastStatus {
     /// The broadcast's privacy status. Note that the broadcast represents exactly one YouTube video, so the privacy settings are identical to those supported for videos. In addition, you can set this field by modifying the broadcast resource or by setting the privacyStatus field of the corresponding video resource.
     #[serde(rename="privacyStatus")]
     
-    pub privacy_status: Option<String>,
+    pub privacy_status: Option<LiveBroadcastStatuPrivacyStatusEnum>,
     /// The broadcast's recording status.
     #[serde(rename="recordingStatus")]
     
-    pub recording_status: Option<String>,
+    pub recording_status: Option<LiveBroadcastStatuRecordingStatusEnum>,
     /// This field will be set to True if the creator declares the broadcast to be kids only: go/live-cw-work.
     #[serde(rename="selfDeclaredMadeForKids")]
     
@@ -3059,7 +3059,7 @@ pub struct LiveChatBanSnippet {
     /// The type of ban.
     #[serde(rename="type")]
     
-    pub type_: Option<String>,
+    pub type_: Option<LiveChatBanSnippetTypeEnum>,
 }
 
 impl client::Part for LiveChatBanSnippet {}
@@ -3431,7 +3431,7 @@ pub struct LiveChatMessageSnippet {
     /// The type of message, this will always be present, it determines the contents of the message as well as which fields will be present.
     #[serde(rename="type")]
     
-    pub type_: Option<String>,
+    pub type_: Option<LiveChatMessageSnippetTypeEnum>,
     /// no description provided
     #[serde(rename="userBannedDetails")]
     
@@ -3688,7 +3688,7 @@ pub struct LiveChatUserBannedMessageDetails {
     /// The type of ban.
     #[serde(rename="banType")]
     
-    pub ban_type: Option<String>,
+    pub ban_type: Option<LiveChatUserBannedMessageDetailBanTypeEnum>,
     /// The details of the user that was banned.
     #[serde(rename="bannedUserDetails")]
     
@@ -3773,11 +3773,11 @@ pub struct LiveStreamConfigurationIssue {
     pub reason: Option<String>,
     /// How severe this issue is to the stream.
     
-    pub severity: Option<String>,
+    pub severity: Option<LiveStreamConfigurationIssueSeverityEnum>,
     /// The kind of error happening.
     #[serde(rename="type")]
     
-    pub type_: Option<String>,
+    pub type_: Option<LiveStreamConfigurationIssueTypeEnum>,
 }
 
 impl client::Part for LiveStreamConfigurationIssue {}
@@ -3821,7 +3821,7 @@ pub struct LiveStreamHealthStatus {
     pub last_update_time_seconds: Option<u64>,
     /// The status code of this stream
     
-    pub status: Option<String>,
+    pub status: Option<LiveStreamHealthStatuStatusEnum>,
 }
 
 impl client::Part for LiveStreamHealthStatus {}
@@ -3939,7 +3939,7 @@ pub struct LiveStreamStatus {
     /// no description provided
     #[serde(rename="streamStatus")]
     
-    pub stream_status: Option<String>,
+    pub stream_status: Option<LiveStreamStatuStreamStatusEnum>,
 }
 
 impl client::Part for LiveStreamStatus {}
@@ -4636,7 +4636,7 @@ pub struct PlaylistItemStatus {
     /// This resource's privacy status.
     #[serde(rename="privacyStatus")]
     
-    pub privacy_status: Option<String>,
+    pub privacy_status: Option<PlaylistItemStatuPrivacyStatusEnum>,
 }
 
 impl client::Part for PlaylistItemStatus {}
@@ -4801,7 +4801,7 @@ pub struct PlaylistStatus {
     /// The playlist's privacy status.
     #[serde(rename="privacyStatus")]
     
-    pub privacy_status: Option<String>,
+    pub privacy_status: Option<PlaylistStatuPrivacyStatusEnum>,
 }
 
 impl client::Part for PlaylistStatus {}
@@ -4985,7 +4985,7 @@ pub struct SearchResultSnippet {
     /// It indicates if the resource (video or channel) has upcoming/active live broadcast content. Or it's "none" if there is not any upcoming/active live broadcasts.
     #[serde(rename="liveBroadcastContent")]
     
-    pub live_broadcast_content: Option<String>,
+    pub live_broadcast_content: Option<SearchResultSnippetLiveBroadcastContentEnum>,
     /// The creation date and time of the resource that the search result identifies.
     #[serde(rename="publishedAt")]
     
@@ -5067,7 +5067,7 @@ pub struct SubscriptionContentDetails {
     /// The type of activity this subscription is for (only uploads, everything).
     #[serde(rename="activityType")]
     
-    pub activity_type: Option<String>,
+    pub activity_type: Option<SubscriptionContentDetailActivityTypeEnum>,
     /// The number of new items in the subscription since its content was last read.
     #[serde(rename="newItemCount")]
     
@@ -5552,7 +5552,7 @@ pub struct ThirdPartyLinkSnippet {
     /// Type of the link named after the entities that are being linked.
     #[serde(rename="type")]
     
-    pub type_: Option<String>,
+    pub type_: Option<ThirdPartyLinkSnippetTypeEnum>,
 }
 
 impl client::Part for ThirdPartyLinkSnippet {}
@@ -5568,7 +5568,7 @@ pub struct ThirdPartyLinkStatus {
     /// no description provided
     #[serde(rename="linkStatus")]
     
-    pub link_status: Option<String>,
+    pub link_status: Option<ThirdPartyLinkStatuLinkStatusEnum>,
 }
 
 impl client::Part for ThirdPartyLinkStatus {}
@@ -5963,7 +5963,7 @@ pub struct VideoAgeGating {
     /// Video game rating, if any.
     #[serde(rename="videoGameRating")]
     
-    pub video_game_rating: Option<String>,
+    pub video_game_rating: Option<VideoAgeGatingVideoGameRatingEnum>,
 }
 
 impl client::Part for VideoAgeGating {}
@@ -6092,7 +6092,7 @@ impl client::Part for VideoCategorySnippet {}
 pub struct VideoContentDetails {
     /// The value of captions indicates whether the video has captions or not.
     
-    pub caption: Option<String>,
+    pub caption: Option<VideoContentDetailCaptionEnum>,
     /// Specifies the ratings that the video received under various rating schemes.
     #[serde(rename="contentRating")]
     
@@ -6103,7 +6103,7 @@ pub struct VideoContentDetails {
     pub country_restriction: Option<AccessPolicy>,
     /// The value of definition indicates whether the video is available in high definition or only in standard definition.
     
-    pub definition: Option<String>,
+    pub definition: Option<VideoContentDetailDefinitionEnum>,
     /// The value of dimension indicates whether the video is available in 3D or in 2D.
     
     pub dimension: Option<String>,
@@ -6120,7 +6120,7 @@ pub struct VideoContentDetails {
     pub licensed_content: Option<bool>,
     /// Specifies the projection format of the video.
     
-    pub projection: Option<String>,
+    pub projection: Option<VideoContentDetailProjectionEnum>,
     /// The regionRestriction object contains information about the countries where a video is (or is not) viewable. The object will contain either the contentDetails.regionRestriction.allowed property or the contentDetails.regionRestriction.blocked property.
     #[serde(rename="regionRestriction")]
     
@@ -6188,7 +6188,7 @@ pub struct VideoFileDetails {
     /// The uploaded file's type as detected by YouTube's video processing engine. Currently, YouTube only processes video files, but this field is present whether a video file or another type of file was uploaded.
     #[serde(rename="fileType")]
     
-    pub file_type: Option<String>,
+    pub file_type: Option<VideoFileDetailFileTypeEnum>,
     /// A list of video streams contained in the uploaded video file. Each item in the list contains detailed metadata about a video stream.
     #[serde(rename="videoStreams")]
     
@@ -6254,7 +6254,7 @@ pub struct VideoFileDetailsVideoStream {
     pub height_pixels: Option<u32>,
     /// The amount that YouTube needs to rotate the original source content to properly display the video.
     
-    pub rotation: Option<String>,
+    pub rotation: Option<VideoFileDetailsVideoStreamRotationEnum>,
     /// A value that uniquely identifies a video vendor. Typically, the value is a four-letter vendor code.
     
     pub vendor: Option<String>,
@@ -6482,7 +6482,7 @@ pub struct VideoProcessingDetails {
     /// The reason that YouTube failed to process the video. This property will only have a value if the processingStatus property's value is failed.
     #[serde(rename="processingFailureReason")]
     
-    pub processing_failure_reason: Option<String>,
+    pub processing_failure_reason: Option<VideoProcessingDetailProcessingFailureReasonEnum>,
     /// This value indicates whether the video processing engine has generated suggestions that might improve YouTube's ability to process the the video, warnings that explain video processing problems, or errors that cause video processing problems. You can retrieve these suggestions by requesting the suggestions part in your videos.list() request.
     #[serde(rename="processingIssuesAvailability")]
     
@@ -6494,7 +6494,7 @@ pub struct VideoProcessingDetails {
     /// The video's processing status. This value indicates whether YouTube was able to process the video or if the video is still being processed.
     #[serde(rename="processingStatus")]
     
-    pub processing_status: Option<String>,
+    pub processing_status: Option<VideoProcessingDetailProcessingStatusEnum>,
     /// This value indicates whether keyword (tag) suggestions are available for the video. Tags can be added to a video's metadata to make it easier for other users to find the video. You can retrieve these suggestions by requesting the suggestions part in your videos.list() request.
     #[serde(rename="tagSuggestionsAvailability")]
     
@@ -6555,7 +6555,7 @@ impl client::Part for VideoProjectDetails {}
 pub struct VideoRating {
     /// Rating of a video.
     
-    pub rating: Option<String>,
+    pub rating: Option<VideoRatingRatingEnum>,
     /// The ID that YouTube uses to uniquely identify the video.
     #[serde(rename="videoId")]
     
@@ -6621,7 +6621,7 @@ pub struct VideoSnippet {
     /// Indicates if the video is an upcoming/active live broadcast. Or it's "none" if the video is not an upcoming/active live broadcast.
     #[serde(rename="liveBroadcastContent")]
     
-    pub live_broadcast_content: Option<String>,
+    pub live_broadcast_content: Option<VideoSnippetLiveBroadcastContentEnum>,
     /// Localized snippet selected with the hl parameter. If no such localization exists, this field is populated with the default snippet. (Read-only)
     
     pub localized: Option<VideoLocalization>,
@@ -6693,10 +6693,10 @@ pub struct VideoStatus {
     /// This value explains why a video failed to upload. This property is only present if the uploadStatus property indicates that the upload failed.
     #[serde(rename="failureReason")]
     
-    pub failure_reason: Option<String>,
+    pub failure_reason: Option<VideoStatuFailureReasonEnum>,
     /// The video's license. @mutable youtube.videos.insert youtube.videos.update
     
-    pub license: Option<String>,
+    pub license: Option<VideoStatuLicenseEnum>,
     /// no description provided
     #[serde(rename="madeForKids")]
     
@@ -6704,7 +6704,7 @@ pub struct VideoStatus {
     /// The video's privacy status.
     #[serde(rename="privacyStatus")]
     
-    pub privacy_status: Option<String>,
+    pub privacy_status: Option<VideoStatuPrivacyStatusEnum>,
     /// This value indicates if the extended video statistics on the watch page can be viewed by everyone. Note that the view count, likes, etc will still be visible if this is disabled. @mutable youtube.videos.insert youtube.videos.update
     #[serde(rename="publicStatsViewable")]
     
@@ -6716,7 +6716,7 @@ pub struct VideoStatus {
     /// This value explains why YouTube rejected an uploaded video. This property is only present if the uploadStatus property indicates that the upload was rejected.
     #[serde(rename="rejectionReason")]
     
-    pub rejection_reason: Option<String>,
+    pub rejection_reason: Option<VideoStatuRejectionReasonEnum>,
     /// no description provided
     #[serde(rename="selfDeclaredMadeForKids")]
     
@@ -6724,7 +6724,7 @@ pub struct VideoStatus {
     /// The status of the uploaded video.
     #[serde(rename="uploadStatus")]
     
-    pub upload_status: Option<String>,
+    pub upload_status: Option<VideoStatuUploadStatusEnum>,
 }
 
 impl client::Part for VideoStatus {}
@@ -6740,19 +6740,19 @@ pub struct VideoSuggestions {
     /// A list of video editing operations that might improve the video quality or playback experience of the uploaded video.
     #[serde(rename="editorSuggestions")]
     
-    pub editor_suggestions: Option<Vec<String>>,
+    pub editor_suggestions: Option<Vec<VideoSuggestionEditorSuggestionsEnum>>,
     /// A list of errors that will prevent YouTube from successfully processing the uploaded video video. These errors indicate that, regardless of the video's current processing status, eventually, that status will almost certainly be failed.
     #[serde(rename="processingErrors")]
     
-    pub processing_errors: Option<Vec<String>>,
+    pub processing_errors: Option<Vec<VideoSuggestionProcessingErrorsEnum>>,
     /// A list of suggestions that may improve YouTube's ability to process the video.
     #[serde(rename="processingHints")]
     
-    pub processing_hints: Option<Vec<String>>,
+    pub processing_hints: Option<Vec<VideoSuggestionProcessingHintsEnum>>,
     /// A list of reasons why YouTube may have difficulty transcoding the uploaded video or that might result in an erroneous transcoding. These warnings are generated before YouTube actually processes the uploaded video file. In addition, they identify issues that are unlikely to cause the video processing to fail but that might cause problems such as sync issues, video artifacts, or a missing audio track.
     #[serde(rename="processingWarnings")]
     
-    pub processing_warnings: Option<Vec<String>>,
+    pub processing_warnings: Option<Vec<VideoSuggestionProcessingWarningsEnum>>,
     /// A list of keyword tags that could be added to the video's metadata to increase the likelihood that users will locate your video when searching or browsing on YouTube.
     #[serde(rename="tagSuggestions")]
     

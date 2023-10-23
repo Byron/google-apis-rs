@@ -106,7 +106,7 @@ pub struct AccessReason {
     /// Type of access justification.
     #[serde(rename="type")]
     
-    pub type_: Option<String>,
+    pub type_: Option<AccessReasonTypeEnum>,
 }
 
 impl client::Part for AccessReason {}
@@ -293,7 +293,7 @@ pub struct EnrolledService {
     /// The enrollment level of the service.
     #[serde(rename="enrollmentLevel")]
     
-    pub enrollment_level: Option<String>,
+    pub enrollment_level: Option<EnrolledServiceEnrollmentLevelEnum>,
 }
 
 impl client::Part for EnrolledService {}

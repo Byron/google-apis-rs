@@ -90,7 +90,7 @@ pub struct BulkCheckResponse {
     /// Error code for the entire request. Present only if the entire request failed. Individual check errors will not trigger the presence of this field.
     #[serde(rename="bulkErrorCode")]
     
-    pub bulk_error_code: Option<String>,
+    pub bulk_error_code: Option<BulkCheckResponseBulkErrorCodeEnum>,
     /// List of results for each check request. Results are returned in the same order in which they were sent in the request.
     #[serde(rename="checkResults")]
     
@@ -134,7 +134,7 @@ pub struct CheckResponse {
     /// Error codes that describe the result of the Check operation.
     #[serde(rename="errorCode")]
     
-    pub error_code: Option<Vec<String>>,
+    pub error_code: Option<Vec<CheckResponseErrorCodeEnum>>,
     /// Set to true if the assets specified in the request are linked by the relation specified in the request.
     
     pub linked: Option<bool>,
@@ -166,7 +166,7 @@ pub struct ListResponse {
     /// Error codes that describe the result of the List operation.
     #[serde(rename="errorCode")]
     
-    pub error_code: Option<Vec<String>>,
+    pub error_code: Option<Vec<ListResponseErrorCodeEnum>>,
     /// From serving time, how much longer the response should be considered valid barring further updates. REQUIRED
     #[serde(rename="maxAge")]
     

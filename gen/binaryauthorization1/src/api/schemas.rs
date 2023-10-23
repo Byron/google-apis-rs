@@ -9,11 +9,11 @@ pub struct AdmissionRule {
     /// Required. The action when a pod creation is denied by the admission rule.
     #[serde(rename="enforcementMode")]
     
-    pub enforcement_mode: Option<String>,
+    pub enforcement_mode: Option<AdmissionRuleEnforcementModeEnum>,
     /// Required. How this admission rule will be evaluated.
     #[serde(rename="evaluationMode")]
     
-    pub evaluation_mode: Option<String>,
+    pub evaluation_mode: Option<AdmissionRuleEvaluationModeEnum>,
     /// Optional. The resource names of the attestors that must attest to a container image, in the format `projects/*/attestors/*`. Each attestor must exist before a policy can reference it. To add an attestor to a policy the principal issuing the policy change request must be able to read the attestor resource. Note: this field must be non-empty when the evaluation_mode field specifies REQUIRE_ATTESTATION, otherwise it must be empty.
     #[serde(rename="requireAttestationsBy")]
     
@@ -266,7 +266,7 @@ pub struct PkixPublicKey {
     /// The signature algorithm used to verify a message against a signature using this key. These signature algorithm must match the structure and any object identifiers encoded in `public_key_pem` (i.e. this algorithm must match that of the public key).
     #[serde(rename="signatureAlgorithm")]
     
-    pub signature_algorithm: Option<String>,
+    pub signature_algorithm: Option<PkixPublicKeySignatureAlgorithmEnum>,
 }
 
 impl client::Part for PkixPublicKey {}
@@ -306,7 +306,7 @@ pub struct Policy {
     /// Optional. Controls the evaluation of a Google-maintained global admission policy for common system-level images. Images not covered by the global policy will be subject to the project admission policy. This setting has no effect when specified inside a global admission policy.
     #[serde(rename="globalPolicyEvaluationMode")]
     
-    pub global_policy_evaluation_mode: Option<String>,
+    pub global_policy_evaluation_mode: Option<PolicyGlobalPolicyEvaluationModeEnum>,
     /// Optional. Per-istio-service-identity admission rules. Istio service identity spec format: `spiffe:///ns//sa/` or `/ns//sa/` e.g. `spiffe://example.com/ns/test-ns/sa/default`
     #[serde(rename="istioServiceIdentityAdmissionRules")]
     
@@ -480,7 +480,7 @@ pub struct ValidateAttestationOccurrenceResponse {
     pub denial_reason: Option<String>,
     /// The result of the Attestation validation.
     
-    pub result: Option<String>,
+    pub result: Option<ValidateAttestationOccurrenceResponseResultEnum>,
 }
 
 impl client::ResponseResult for ValidateAttestationOccurrenceResponse {}

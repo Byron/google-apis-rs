@@ -154,7 +154,7 @@ pub struct AttributeParameters {
     /// What type of scores to return. If unset, defaults to probability scores.
     #[serde(rename="scoreType")]
     
-    pub score_type: Option<String>,
+    pub score_type: Option<AttributeParameterScoreTypeEnum>,
 }
 
 impl client::Part for AttributeParameters {}
@@ -216,7 +216,7 @@ pub struct Score {
     /// The type of the above value.
     #[serde(rename="type")]
     
-    pub type_: Option<String>,
+    pub type_: Option<ScoreTypeEnum>,
     /// Score value. Semantics described by type below.
     
     pub value: Option<f32>,
@@ -357,7 +357,7 @@ pub struct TextEntry {
     /// Type of the text field.
     #[serde(rename="type")]
     
-    pub type_: Option<String>,
+    pub type_: Option<TextEntryTypeEnum>,
 }
 
 impl client::Part for TextEntry {}

@@ -126,9 +126,9 @@
 //! // execute the final call using `doit()`.
 //! // Values shown here are possibly random and not representative !
 //! let result = hub.matters().holds_list("matterId")
-//!              .view("At")
-//!              .page_token("sanctus")
-//!              .page_size(-80)
+//!              .view(&Default::default())
+//!              .page_token("voluptua.")
+//!              .page_size(-27)
 //!              .doit().await;
 //! 
 //! match result {

@@ -6277,7 +6277,7 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -6576,7 +6576,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -6868,7 +6868,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
 
         params.extend(self._additional_params.iter());
 
@@ -7161,7 +7161,7 @@ where
         }
 
         let mut params = Params::with_capacity(7 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
         if let Some(value) = self._zone.as_ref() {
             params.push("zone", value);
         }
@@ -7471,7 +7471,7 @@ where
         }
 
         let mut params = Params::with_capacity(7 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
         if let Some(value) = self._zone.as_ref() {
             params.push("zone", value);
         }
@@ -7779,7 +7779,7 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
         if let Some(value) = self._zone.as_ref() {
             params.push("zone", value);
         }
@@ -8078,7 +8078,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -8370,7 +8370,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -8662,7 +8662,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -8954,7 +8954,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -9246,7 +9246,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -9530,7 +9530,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
 
         params.extend(self._additional_params.iter());
 
@@ -10017,7 +10017,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -10309,7 +10309,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
 
         params.extend(self._additional_params.iter());
 
@@ -10600,7 +10600,7 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
         if let Some(value) = self._zone.as_ref() {
             params.push("zone", value);
         }
@@ -10898,7 +10898,7 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
         if let Some(value) = self._zone.as_ref() {
             params.push("zone", value);
         }
@@ -11189,7 +11189,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
 
         params.extend(self._additional_params.iter());
 
@@ -11411,7 +11411,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
         if let Some(value) = self._zone.as_ref() {
             params.push("zone", value);
         }
@@ -11700,7 +11700,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -11992,7 +11992,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -12284,7 +12284,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -12576,7 +12576,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -12868,7 +12868,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -13160,7 +13160,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -13452,7 +13452,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -13744,7 +13744,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -14036,7 +14036,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -14328,7 +14328,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -14620,7 +14620,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -14912,7 +14912,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -15204,7 +15204,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -15495,7 +15495,7 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
         if let Some(value) = self._zone.as_ref() {
             params.push("zone", value);
         }
@@ -15791,7 +15791,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
         if let Some(value) = self._zone.as_ref() {
             params.push("zone", value);
         }
@@ -16077,7 +16077,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
         if let Some(value) = self._zone.as_ref() {
             params.push("zone", value);
         }
@@ -16369,10 +16369,10 @@ where
         }
 
         let mut params = Params::with_capacity(7 + self._additional_params.len());
-        params.push("projectId", self._project_id);
-        params.push("zone", self._zone);
-        params.push("clusterId", self._cluster_id);
-        params.push("nodePoolId", self._node_pool_id);
+        params.push("projectId", &self._project_id);
+        params.push("zone", &self._zone);
+        params.push("clusterId", &self._cluster_id);
+        params.push("nodePoolId", &self._node_pool_id);
 
         params.extend(self._additional_params.iter());
 
@@ -16696,9 +16696,9 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("projectId", self._project_id);
-        params.push("zone", self._zone);
-        params.push("clusterId", self._cluster_id);
+        params.push("projectId", &self._project_id);
+        params.push("zone", &self._zone);
+        params.push("clusterId", &self._cluster_id);
 
         params.extend(self._additional_params.iter());
 
@@ -17008,10 +17008,10 @@ where
         }
 
         let mut params = Params::with_capacity(7 + self._additional_params.len());
-        params.push("projectId", self._project_id);
-        params.push("zone", self._zone);
-        params.push("clusterId", self._cluster_id);
-        params.push("nodePoolId", self._node_pool_id);
+        params.push("projectId", &self._project_id);
+        params.push("zone", &self._zone);
+        params.push("clusterId", &self._cluster_id);
+        params.push("nodePoolId", &self._node_pool_id);
         if let Some(value) = self._name.as_ref() {
             params.push("name", value);
         }
@@ -17318,10 +17318,10 @@ where
         }
 
         let mut params = Params::with_capacity(7 + self._additional_params.len());
-        params.push("projectId", self._project_id);
-        params.push("zone", self._zone);
-        params.push("clusterId", self._cluster_id);
-        params.push("nodePoolId", self._node_pool_id);
+        params.push("projectId", &self._project_id);
+        params.push("zone", &self._zone);
+        params.push("clusterId", &self._cluster_id);
+        params.push("nodePoolId", &self._node_pool_id);
         if let Some(value) = self._name.as_ref() {
             params.push("name", value);
         }
@@ -17627,9 +17627,9 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("projectId", self._project_id);
-        params.push("zone", self._zone);
-        params.push("clusterId", self._cluster_id);
+        params.push("projectId", &self._project_id);
+        params.push("zone", &self._zone);
+        params.push("clusterId", &self._cluster_id);
         if let Some(value) = self._parent.as_ref() {
             params.push("parent", value);
         }
@@ -17931,10 +17931,10 @@ where
         }
 
         let mut params = Params::with_capacity(7 + self._additional_params.len());
-        params.push("projectId", self._project_id);
-        params.push("zone", self._zone);
-        params.push("clusterId", self._cluster_id);
-        params.push("nodePoolId", self._node_pool_id);
+        params.push("projectId", &self._project_id);
+        params.push("zone", &self._zone);
+        params.push("clusterId", &self._cluster_id);
+        params.push("nodePoolId", &self._node_pool_id);
 
         params.extend(self._additional_params.iter());
 
@@ -18259,10 +18259,10 @@ where
         }
 
         let mut params = Params::with_capacity(7 + self._additional_params.len());
-        params.push("projectId", self._project_id);
-        params.push("zone", self._zone);
-        params.push("clusterId", self._cluster_id);
-        params.push("nodePoolId", self._node_pool_id);
+        params.push("projectId", &self._project_id);
+        params.push("zone", &self._zone);
+        params.push("clusterId", &self._cluster_id);
+        params.push("nodePoolId", &self._node_pool_id);
 
         params.extend(self._additional_params.iter());
 
@@ -18587,10 +18587,10 @@ where
         }
 
         let mut params = Params::with_capacity(7 + self._additional_params.len());
-        params.push("projectId", self._project_id);
-        params.push("zone", self._zone);
-        params.push("clusterId", self._cluster_id);
-        params.push("nodePoolId", self._node_pool_id);
+        params.push("projectId", &self._project_id);
+        params.push("zone", &self._zone);
+        params.push("clusterId", &self._cluster_id);
+        params.push("nodePoolId", &self._node_pool_id);
 
         params.extend(self._additional_params.iter());
 
@@ -18915,10 +18915,10 @@ where
         }
 
         let mut params = Params::with_capacity(7 + self._additional_params.len());
-        params.push("projectId", self._project_id);
-        params.push("zone", self._zone);
-        params.push("clusterId", self._cluster_id);
-        params.push("nodePoolId", self._node_pool_id);
+        params.push("projectId", &self._project_id);
+        params.push("zone", &self._zone);
+        params.push("clusterId", &self._cluster_id);
+        params.push("nodePoolId", &self._node_pool_id);
 
         params.extend(self._additional_params.iter());
 
@@ -19242,9 +19242,9 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("projectId", self._project_id);
-        params.push("zone", self._zone);
-        params.push("clusterId", self._cluster_id);
+        params.push("projectId", &self._project_id);
+        params.push("zone", &self._zone);
+        params.push("clusterId", &self._cluster_id);
 
         params.extend(self._additional_params.iter());
 
@@ -19558,9 +19558,9 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("projectId", self._project_id);
-        params.push("zone", self._zone);
-        params.push("clusterId", self._cluster_id);
+        params.push("projectId", &self._project_id);
+        params.push("zone", &self._zone);
+        params.push("clusterId", &self._cluster_id);
 
         params.extend(self._additional_params.iter());
 
@@ -19873,8 +19873,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("projectId", self._project_id);
-        params.push("zone", self._zone);
+        params.push("projectId", &self._project_id);
+        params.push("zone", &self._zone);
 
         params.extend(self._additional_params.iter());
 
@@ -20173,9 +20173,9 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("projectId", self._project_id);
-        params.push("zone", self._zone);
-        params.push("clusterId", self._cluster_id);
+        params.push("projectId", &self._project_id);
+        params.push("zone", &self._zone);
+        params.push("clusterId", &self._cluster_id);
         if let Some(value) = self._name.as_ref() {
             params.push("name", value);
         }
@@ -20471,9 +20471,9 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("projectId", self._project_id);
-        params.push("zone", self._zone);
-        params.push("clusterId", self._cluster_id);
+        params.push("projectId", &self._project_id);
+        params.push("zone", &self._zone);
+        params.push("clusterId", &self._cluster_id);
         if let Some(value) = self._name.as_ref() {
             params.push("name", value);
         }
@@ -20774,9 +20774,9 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("projectId", self._project_id);
-        params.push("zone", self._zone);
-        params.push("clusterId", self._cluster_id);
+        params.push("projectId", &self._project_id);
+        params.push("zone", &self._zone);
+        params.push("clusterId", &self._cluster_id);
 
         params.extend(self._additional_params.iter());
 
@@ -21084,8 +21084,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("projectId", self._project_id);
-        params.push("zone", self._zone);
+        params.push("projectId", &self._project_id);
+        params.push("zone", &self._zone);
         if let Some(value) = self._parent.as_ref() {
             params.push("parent", value);
         }
@@ -21376,9 +21376,9 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("projectId", self._project_id);
-        params.push("zone", self._zone);
-        params.push("clusterId", self._cluster_id);
+        params.push("projectId", &self._project_id);
+        params.push("zone", &self._zone);
+        params.push("clusterId", &self._cluster_id);
 
         params.extend(self._additional_params.iter());
 
@@ -21692,9 +21692,9 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("projectId", self._project_id);
-        params.push("zone", self._zone);
-        params.push("clusterId", self._cluster_id);
+        params.push("projectId", &self._project_id);
+        params.push("zone", &self._zone);
+        params.push("clusterId", &self._cluster_id);
 
         params.extend(self._additional_params.iter());
 
@@ -22008,9 +22008,9 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("projectId", self._project_id);
-        params.push("zone", self._zone);
-        params.push("clusterId", self._cluster_id);
+        params.push("projectId", &self._project_id);
+        params.push("zone", &self._zone);
+        params.push("clusterId", &self._cluster_id);
 
         params.extend(self._additional_params.iter());
 
@@ -22324,9 +22324,9 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("projectId", self._project_id);
-        params.push("zone", self._zone);
-        params.push("clusterId", self._cluster_id);
+        params.push("projectId", &self._project_id);
+        params.push("zone", &self._zone);
+        params.push("clusterId", &self._cluster_id);
 
         params.extend(self._additional_params.iter());
 
@@ -22640,9 +22640,9 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("projectId", self._project_id);
-        params.push("zone", self._zone);
-        params.push("clusterId", self._cluster_id);
+        params.push("projectId", &self._project_id);
+        params.push("zone", &self._zone);
+        params.push("clusterId", &self._cluster_id);
 
         params.extend(self._additional_params.iter());
 
@@ -22956,9 +22956,9 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("projectId", self._project_id);
-        params.push("zone", self._zone);
-        params.push("clusterId", self._cluster_id);
+        params.push("projectId", &self._project_id);
+        params.push("zone", &self._zone);
+        params.push("clusterId", &self._cluster_id);
 
         params.extend(self._additional_params.iter());
 
@@ -23272,9 +23272,9 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("projectId", self._project_id);
-        params.push("zone", self._zone);
-        params.push("clusterId", self._cluster_id);
+        params.push("projectId", &self._project_id);
+        params.push("zone", &self._zone);
+        params.push("clusterId", &self._cluster_id);
 
         params.extend(self._additional_params.iter());
 
@@ -23588,9 +23588,9 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("projectId", self._project_id);
-        params.push("zone", self._zone);
-        params.push("clusterId", self._cluster_id);
+        params.push("projectId", &self._project_id);
+        params.push("zone", &self._zone);
+        params.push("clusterId", &self._cluster_id);
 
         params.extend(self._additional_params.iter());
 
@@ -23904,9 +23904,9 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("projectId", self._project_id);
-        params.push("zone", self._zone);
-        params.push("clusterId", self._cluster_id);
+        params.push("projectId", &self._project_id);
+        params.push("zone", &self._zone);
+        params.push("clusterId", &self._cluster_id);
 
         params.extend(self._additional_params.iter());
 
@@ -24220,9 +24220,9 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("projectId", self._project_id);
-        params.push("zone", self._zone);
-        params.push("clusterId", self._cluster_id);
+        params.push("projectId", &self._project_id);
+        params.push("zone", &self._zone);
+        params.push("clusterId", &self._cluster_id);
 
         params.extend(self._additional_params.iter());
 
@@ -24536,9 +24536,9 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("projectId", self._project_id);
-        params.push("zone", self._zone);
-        params.push("operationId", self._operation_id);
+        params.push("projectId", &self._project_id);
+        params.push("zone", &self._zone);
+        params.push("operationId", &self._operation_id);
 
         params.extend(self._additional_params.iter());
 
@@ -24847,9 +24847,9 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("projectId", self._project_id);
-        params.push("zone", self._zone);
-        params.push("operationId", self._operation_id);
+        params.push("projectId", &self._project_id);
+        params.push("zone", &self._zone);
+        params.push("operationId", &self._operation_id);
         if let Some(value) = self._name.as_ref() {
             params.push("name", value);
         }
@@ -25144,8 +25144,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("projectId", self._project_id);
-        params.push("zone", self._zone);
+        params.push("projectId", &self._project_id);
+        params.push("zone", &self._zone);
         if let Some(value) = self._parent.as_ref() {
             params.push("parent", value);
         }
@@ -25430,8 +25430,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("projectId", self._project_id);
-        params.push("zone", self._zone);
+        params.push("projectId", &self._project_id);
+        params.push("zone", &self._zone);
         if let Some(value) = self._name.as_ref() {
             params.push("name", value);
         }

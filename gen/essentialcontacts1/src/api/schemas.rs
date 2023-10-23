@@ -56,7 +56,7 @@ pub struct GoogleCloudEssentialcontactsV1Contact {
     /// Required. The categories of notifications that the contact will receive communications for.
     #[serde(rename="notificationCategorySubscriptions")]
     
-    pub notification_category_subscriptions: Option<Vec<String>>,
+    pub notification_category_subscriptions: Option<Vec<GoogleCloudEssentialcontactsV1ContactNotificationCategorySubscriptionsEnum>>,
     /// The last time the validation_state was updated, either manually or automatically. A contact is considered stale if its validation state was updated more than 1 year ago.
     #[serde(rename="validateTime")]
     
@@ -64,7 +64,7 @@ pub struct GoogleCloudEssentialcontactsV1Contact {
     /// The validity of the contact. A contact is considered valid if it is the correct recipient for notifications for a particular resource.
     #[serde(rename="validationState")]
     
-    pub validation_state: Option<String>,
+    pub validation_state: Option<GoogleCloudEssentialcontactsV1ContactValidationStateEnum>,
 }
 
 impl client::RequestValue for GoogleCloudEssentialcontactsV1Contact {}
@@ -115,7 +115,7 @@ pub struct GoogleCloudEssentialcontactsV1SendTestMessageRequest {
     /// Required. The notification category to send the test message for. All contacts must be subscribed to this category.
     #[serde(rename="notificationCategory")]
     
-    pub notification_category: Option<String>,
+    pub notification_category: Option<GoogleCloudEssentialcontactsV1SendTestMessageRequestNotificationCategoryEnum>,
 }
 
 impl client::RequestValue for GoogleCloudEssentialcontactsV1SendTestMessageRequest {}

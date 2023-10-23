@@ -1398,7 +1398,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("siteUrl", self._site_url);
+        params.push("siteUrl", &self._site_url);
 
         params.extend(self._additional_params.iter());
 
@@ -1684,8 +1684,8 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("siteUrl", self._site_url);
-        params.push("feedpath", self._feedpath);
+        params.push("siteUrl", &self._site_url);
+        params.push("feedpath", &self._feedpath);
 
         params.extend(self._additional_params.iter());
 
@@ -1947,8 +1947,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("siteUrl", self._site_url);
-        params.push("feedpath", self._feedpath);
+        params.push("siteUrl", &self._site_url);
+        params.push("feedpath", &self._feedpath);
 
         params.extend(self._additional_params.iter());
 
@@ -2222,7 +2222,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("siteUrl", self._site_url);
+        params.push("siteUrl", &self._site_url);
         if let Some(value) = self._sitemap_index.as_ref() {
             params.push("sitemapIndex", value);
         }
@@ -2495,8 +2495,8 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("siteUrl", self._site_url);
-        params.push("feedpath", self._feedpath);
+        params.push("siteUrl", &self._site_url);
+        params.push("feedpath", &self._feedpath);
 
         params.extend(self._additional_params.iter());
 
@@ -2757,7 +2757,7 @@ where
         }
 
         let mut params = Params::with_capacity(2 + self._additional_params.len());
-        params.push("siteUrl", self._site_url);
+        params.push("siteUrl", &self._site_url);
 
         params.extend(self._additional_params.iter());
 
@@ -3008,7 +3008,7 @@ where
         }
 
         let mut params = Params::with_capacity(2 + self._additional_params.len());
-        params.push("siteUrl", self._site_url);
+        params.push("siteUrl", &self._site_url);
 
         params.extend(self._additional_params.iter());
 
@@ -3259,7 +3259,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("siteUrl", self._site_url);
+        params.push("siteUrl", &self._site_url);
 
         params.extend(self._additional_params.iter());
 

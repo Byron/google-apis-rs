@@ -17,7 +17,7 @@ pub struct NotificationSetting {
     /// The types of notifications that will be sent to the Pub/Sub topic. To stop receiving notifications entirely, use NotificationSettings.UpdateNotificationSetting with an empty notification_types or set the pubsub_topic to an empty string.
     #[serde(rename="notificationTypes")]
     
-    pub notification_types: Option<Vec<String>>,
+    pub notification_types: Option<Vec<NotificationSettingNotificationTypesEnum>>,
     /// Optional. The Google Pub/Sub topic that will receive notifications when locations managed by this account are updated. If unset, no notifications will be posted. The account mybusiness-api-pubsub@system.gserviceaccount.com must have at least Publish permissions on the Pub/Sub topic.
     #[serde(rename="pubsubTopic")]
     

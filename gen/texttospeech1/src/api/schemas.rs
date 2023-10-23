@@ -9,7 +9,7 @@ pub struct AudioConfig {
     /// Required. The format of the audio byte stream.
     #[serde(rename="audioEncoding")]
     
-    pub audio_encoding: Option<String>,
+    pub audio_encoding: Option<AudioConfigAudioEncodingEnum>,
     /// Optional. Input only. An identifier which selects 'audio effects' profiles that are applied on (post synthesized) text to speech. Effects are applied on top of each other in the order they are given. See [audio profiles](https://cloud.google.com/text-to-speech/docs/audio-profiles) for current supported profile ids.
     #[serde(rename="effectsProfileId")]
     
@@ -62,7 +62,7 @@ pub struct CustomVoiceParams {
     /// Optional. The usage of the synthesized audio to be reported.
     #[serde(rename="reportedUsage")]
     
-    pub reported_usage: Option<String>,
+    pub reported_usage: Option<CustomVoiceParamReportedUsageEnum>,
 }
 
 impl client::Part for CustomVoiceParams {}
@@ -302,7 +302,7 @@ pub struct Voice {
     /// The gender of this voice.
     #[serde(rename="ssmlGender")]
     
-    pub ssml_gender: Option<String>,
+    pub ssml_gender: Option<VoiceSsmlGenderEnum>,
 }
 
 impl client::Resource for Voice {}
@@ -329,7 +329,7 @@ pub struct VoiceSelectionParams {
     /// The preferred gender of the voice. If not set, the service will choose a voice based on the other parameters such as language_code and name. Note that this is only a preference, not requirement; if a voice of the appropriate gender is not available, the synthesizer should substitute a voice with a different gender rather than failing the request.
     #[serde(rename="ssmlGender")]
     
-    pub ssml_gender: Option<String>,
+    pub ssml_gender: Option<VoiceSelectionParamSsmlGenderEnum>,
 }
 
 impl client::Part for VoiceSelectionParams {}

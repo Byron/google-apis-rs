@@ -112,10 +112,10 @@ let mut hub = Monitoring::new(hyper::Client::builder().build(hyper_rustls::Https
 // execute the final call using `doit()`.
 // Values shown here are possibly random and not representative !
 let result = hub.services().service_level_objectives_list("parent")
-             .view("magna")
-             .page_token("no")
-             .page_size(-55)
-             .filter("voluptua.")
+             .view(&Default::default())
+             .page_token("magna")
+             .page_size(-11)
+             .filter("ipsum")
              .doit().await;
 
 match result {

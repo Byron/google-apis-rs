@@ -32,9 +32,9 @@ use super::*;
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.sites().versions_files_list("parent")
-///              .status("takimata")
-///              .page_token("amet.")
-///              .page_size(-20)
+///              .status(&Default::default())
+///              .page_token("sed")
+///              .page_size(-2)
 ///              .doit().await;
 /// 
 /// match result {

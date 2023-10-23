@@ -32,7 +32,7 @@ pub struct AuditLogConfig {
     /// The log type that this config enables.
     #[serde(rename="logType")]
     
-    pub log_type: Option<String>,
+    pub log_type: Option<AuditLogConfigLogTypeEnum>,
 }
 
 impl client::Part for AuditLogConfig {}
@@ -116,7 +116,7 @@ pub struct EndpointMatcherMetadataLabelMatcher {
     /// Specifies how matching should be done. Supported values are: MATCH_ANY: At least one of the Labels specified in the matcher should match the metadata presented by xDS client. MATCH_ALL: The metadata presented by the xDS client should contain all of the labels specified here. The selection is determined based on the best match. For example, suppose there are three EndpointPolicy resources P1, P2 and P3 and if P1 has a the matcher as MATCH_ANY , P2 has MATCH_ALL , and P3 has MATCH_ALL . If a client with label connects, the config from P1 will be selected. If a client with label connects, the config from P2 will be selected. If a client with label connects, the config from P3 will be selected. If there is more than one best match, (for example, if a config P4 with selector exists and if a client with label connects), an error will be thrown.
     #[serde(rename="metadataLabelMatchCriteria")]
     
-    pub metadata_label_match_criteria: Option<String>,
+    pub metadata_label_match_criteria: Option<EndpointMatcherMetadataLabelMatcherMetadataLabelMatchCriteriaEnum>,
     /// The list of label value pairs that must match labels in the provided metadata based on filterMatchCriteria This list can have at most 64 entries. The list can be empty if the match criteria is MATCH_ANY, to specify a wildcard match (i.e this matches any client).
     #[serde(rename="metadataLabels")]
     
@@ -195,7 +195,7 @@ pub struct EndpointPolicy {
     /// Required. The type of endpoint policy. This is primarily used to validate the configuration.
     #[serde(rename="type")]
     
-    pub type_: Option<String>,
+    pub type_: Option<EndpointPolicyTypeEnum>,
     /// Output only. The timestamp when the resource was updated.
     #[serde(rename="updateTime")]
     
@@ -273,7 +273,7 @@ pub struct Gateway {
     /// Immutable. The type of the customer managed gateway. This field is required. If unspecified, an error is returned.
     #[serde(rename="type")]
     
-    pub type_: Option<String>,
+    pub type_: Option<GatewayTypeEnum>,
     /// Output only. The timestamp when the resource was updated.
     #[serde(rename="updateTime")]
     
@@ -425,7 +425,7 @@ pub struct GrpcRouteHeaderMatch {
     /// Optional. Specifies how to match against the value of the header. If not specified, a default value of EXACT is used.
     #[serde(rename="type")]
     
-    pub type_: Option<String>,
+    pub type_: Option<GrpcRouteHeaderMatchTypeEnum>,
     /// Required. The value of the header.
     
     pub value: Option<String>,
@@ -456,7 +456,7 @@ pub struct GrpcRouteMethodMatch {
     /// Optional. Specifies how to match against the name. If not specified, a default value of "EXACT" is used.
     #[serde(rename="type")]
     
-    pub type_: Option<String>,
+    pub type_: Option<GrpcRouteMethodMatchTypeEnum>,
 }
 
 impl client::Part for GrpcRouteMethodMatch {}
@@ -856,7 +856,7 @@ pub struct HttpRouteRedirect {
     /// The HTTP Status code to use for the redirect.
     #[serde(rename="responseCode")]
     
-    pub response_code: Option<String>,
+    pub response_code: Option<HttpRouteRedirectResponseCodeEnum>,
     /// if set to true, any accompanying query portion of the original URL is removed prior to redirecting the request. If set to false, the query portion of the original URL is retained. The default is set to false.
     #[serde(rename="stripQuery")]
     

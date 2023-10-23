@@ -38,7 +38,7 @@ pub struct GoogleCloudPaymentsResellerSubscriptionV1CancelSubscriptionRequest {
     /// Specifies the reason for the cancellation.
     #[serde(rename="cancellationReason")]
     
-    pub cancellation_reason: Option<String>,
+    pub cancellation_reason: Option<GoogleCloudPaymentsResellerSubscriptionV1CancelSubscriptionRequestCancellationReasonEnum>,
 }
 
 impl client::RequestValue for GoogleCloudPaymentsResellerSubscriptionV1CancelSubscriptionRequest {}
@@ -75,7 +75,7 @@ pub struct GoogleCloudPaymentsResellerSubscriptionV1Duration {
     pub count: Option<i32>,
     /// The unit used for the duration
     
-    pub unit: Option<String>,
+    pub unit: Option<GoogleCloudPaymentsResellerSubscriptionV1DurationUnitEnum>,
 }
 
 impl client::Part for GoogleCloudPaymentsResellerSubscriptionV1Duration {}
@@ -247,11 +247,11 @@ pub struct GoogleCloudPaymentsResellerSubscriptionV1GoogleOnePayload {
     pub campaigns: Option<Vec<String>>,
     /// The type of offering the subscription was sold by the partner. e.g. VAS.
     
-    pub offering: Option<String>,
+    pub offering: Option<GoogleCloudPaymentsResellerSubscriptionV1GoogleOnePayloadOfferingEnum>,
     /// The type of sales channel through which the subscription was sold.
     #[serde(rename="salesChannel")]
     
-    pub sales_channel: Option<String>,
+    pub sales_channel: Option<GoogleCloudPaymentsResellerSubscriptionV1GoogleOnePayloadSalesChannelEnum>,
     /// The identifier for the partner store where the subscription was sold.
     #[serde(rename="storeId")]
     
@@ -425,7 +425,7 @@ pub struct GoogleCloudPaymentsResellerSubscriptionV1Promotion {
     /// Output only. Output Only. Specifies the type of the promotion.
     #[serde(rename="promotionType")]
     
-    pub promotion_type: Option<String>,
+    pub promotion_type: Option<GoogleCloudPaymentsResellerSubscriptionV1PromotionPromotionTypeEnum>,
     /// Output only. 2-letter ISO region code where the promotion is available in. Ex. "US" Please refers to: https://en.wikipedia.org/wiki/ISO_3166-1
     #[serde(rename="regionCodes")]
     
@@ -554,7 +554,7 @@ pub struct GoogleCloudPaymentsResellerSubscriptionV1Subscription {
     /// Output only. Describes the processing state of the subscription. See more details at [the lifecycle of a subscription](https://developers.google.com/payments/reseller/subscription/reference/index/Receive.Notifications#payments-subscription-lifecycle).
     #[serde(rename="processingState")]
     
-    pub processing_state: Option<String>,
+    pub processing_state: Option<GoogleCloudPaymentsResellerSubscriptionV1SubscriptionProcessingStateEnum>,
     /// Required. Deprecated: consider using `line_items` as the input. Required. Resource name that identifies the purchased products. The format will be 'partners/{partner_id}/products/{product_id}'.
     
     pub products: Option<Vec<String>>,
@@ -579,7 +579,7 @@ pub struct GoogleCloudPaymentsResellerSubscriptionV1Subscription {
     pub service_location: Option<GoogleCloudPaymentsResellerSubscriptionV1Location>,
     /// Output only. Describes the state of the subscription. See more details at [the lifecycle of a subscription](https://developers.google.com/payments/reseller/subscription/reference/index/Receive.Notifications#payments-subscription-lifecycle).
     
-    pub state: Option<String>,
+    pub state: Option<GoogleCloudPaymentsResellerSubscriptionV1SubscriptionStateEnum>,
     /// Output only. System generated timestamp when the subscription is most recently updated. UTC timezone.
     #[serde(rename="updateTime")]
     
@@ -603,7 +603,7 @@ impl client::ResponseResult for GoogleCloudPaymentsResellerSubscriptionV1Subscri
 pub struct GoogleCloudPaymentsResellerSubscriptionV1SubscriptionCancellationDetails {
     /// The reason of the cancellation.
     
-    pub reason: Option<String>,
+    pub reason: Option<GoogleCloudPaymentsResellerSubscriptionV1SubscriptionCancellationDetailReasonEnum>,
 }
 
 impl client::Part for GoogleCloudPaymentsResellerSubscriptionV1SubscriptionCancellationDetails {}
@@ -641,10 +641,10 @@ pub struct GoogleCloudPaymentsResellerSubscriptionV1SubscriptionLineItem {
     /// Output only. The recurrence type of the line item.
     #[serde(rename="recurrenceType")]
     
-    pub recurrence_type: Option<String>,
+    pub recurrence_type: Option<GoogleCloudPaymentsResellerSubscriptionV1SubscriptionLineItemRecurrenceTypeEnum>,
     /// Output only. The state of the line item.
     
-    pub state: Option<String>,
+    pub state: Option<GoogleCloudPaymentsResellerSubscriptionV1SubscriptionLineItemStateEnum>,
 }
 
 impl client::Part for GoogleCloudPaymentsResellerSubscriptionV1SubscriptionLineItem {}
@@ -687,7 +687,7 @@ pub struct GoogleCloudPaymentsResellerSubscriptionV1SubscriptionPromotionSpec {
     /// Output only. The type of the promotion for the spec.
     #[serde(rename="type")]
     
-    pub type_: Option<String>,
+    pub type_: Option<GoogleCloudPaymentsResellerSubscriptionV1SubscriptionPromotionSpecTypeEnum>,
 }
 
 impl client::Part for GoogleCloudPaymentsResellerSubscriptionV1SubscriptionPromotionSpec {}
@@ -703,7 +703,7 @@ pub struct GoogleCloudPaymentsResellerSubscriptionV1SubscriptionUpgradeDowngrade
     /// Required. Specifies the billing cycle spec for the new upgraded/downgraded subscription.
     #[serde(rename="billingCycleSpec")]
     
-    pub billing_cycle_spec: Option<String>,
+    pub billing_cycle_spec: Option<GoogleCloudPaymentsResellerSubscriptionV1SubscriptionUpgradeDowngradeDetailBillingCycleSpecEnum>,
     /// Required. The previous subscription id to be replaced. This is not the full resource name, use the subscription_id segment only.
     #[serde(rename="previousSubscriptionId")]
     

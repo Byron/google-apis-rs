@@ -328,7 +328,7 @@ pub struct Operation {
     pub start_time: Option<String>,
     /// [Output Only] The status of the operation, which can be one of the following: PENDING, RUNNING, or DONE.
     
-    pub status: Option<String>,
+    pub status: Option<OperationStatusEnum>,
     /// [Output Only] An optional textual description of the current status of the operation.
     #[serde(rename="statusMessage")]
     
@@ -556,7 +556,7 @@ impl client::Part for OperationErrorErrors {}
 pub struct OperationWarnings {
     /// [Output Only] A warning code, if applicable. For example, Compute Engine returns NO_RESULTS_ON_PAGE if there are no results in the response.
     
-    pub code: Option<String>,
+    pub code: Option<OperationWarningCodeEnum>,
     /// [Output Only] Metadata about this warning in key: value format. For example:
     /// "data": [ { "key": "scope", "value": "zones/us-east1-d" }
     

@@ -93,7 +93,7 @@ pub struct PosixAccount {
     /// The operating system type where this account applies.
     #[serde(rename="operatingSystemType")]
     
-    pub operating_system_type: Option<String>,
+    pub operating_system_type: Option<PosixAccountOperatingSystemTypeEnum>,
     /// Only one POSIX account can be marked as primary.
     
     pub primary: Option<bool>,

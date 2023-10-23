@@ -89,7 +89,7 @@ pub struct ErrorGroup {
     /// Error group's resolution status. An unspecified resolution status will be interpreted as OPEN
     #[serde(rename="resolutionStatus")]
     
-    pub resolution_status: Option<String>,
+    pub resolution_status: Option<ErrorGroupResolutionStatusEnum>,
     /// Associated tracking issues.
     #[serde(rename="trackingIssues")]
     

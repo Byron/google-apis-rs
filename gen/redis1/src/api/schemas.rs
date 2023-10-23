@@ -49,7 +49,7 @@ pub struct FailoverInstanceRequest {
     /// Optional. Available data protection modes that the user can choose. If it's unspecified, data protection mode will be LIMITED_DATA_LOSS by default.
     #[serde(rename="dataProtectionMode")]
     
-    pub data_protection_mode: Option<String>,
+    pub data_protection_mode: Option<FailoverInstanceRequestDataProtectionModeEnum>,
 }
 
 impl client::RequestValue for FailoverInstanceRequest {}
@@ -149,7 +149,7 @@ pub struct Instance {
     /// Optional. The network connect mode of the Redis instance. If not provided, the connect mode defaults to DIRECT_PEERING.
     #[serde(rename="connectMode")]
     
-    pub connect_mode: Option<String>,
+    pub connect_mode: Option<InstanceConnectModeEnum>,
     /// Output only. The time the instance was created.
     #[serde(rename="createTime")]
     
@@ -216,7 +216,7 @@ pub struct Instance {
     /// Optional. Read replicas mode for the instance. Defaults to READ_REPLICAS_DISABLED.
     #[serde(rename="readReplicasMode")]
     
-    pub read_replicas_mode: Option<String>,
+    pub read_replicas_mode: Option<InstanceReadReplicasModeEnum>,
     /// Optional. Redis configuration parameters, according to http://redis.io/topics/config. Currently, the only supported parameters are: Redis version 3.2 and newer: * maxmemory-policy * notify-keyspace-events Redis version 4.0 and newer: * activedefrag * lfu-decay-time * lfu-log-factor * maxmemory-gb Redis version 5.0 and newer: * stream-node-max-bytes * stream-node-max-entries
     #[serde(rename="redisConfigs")]
     
@@ -243,7 +243,7 @@ pub struct Instance {
     pub server_ca_certs: Option<Vec<TlsCertificate>>,
     /// Output only. The current state of this instance.
     
-    pub state: Option<String>,
+    pub state: Option<InstanceStateEnum>,
     /// Output only. Additional information about the current status of this instance, if available.
     #[serde(rename="statusMessage")]
     
@@ -251,14 +251,14 @@ pub struct Instance {
     /// Optional. reasons that causes instance in "SUSPENDED" state.
     #[serde(rename="suspensionReasons")]
     
-    pub suspension_reasons: Option<Vec<String>>,
+    pub suspension_reasons: Option<Vec<InstanceSuspensionReasonsEnum>>,
     /// Required. The service tier of the instance.
     
-    pub tier: Option<String>,
+    pub tier: Option<InstanceTierEnum>,
     /// Optional. The TLS mode of the Redis instance. If not provided, TLS is disabled for the instance.
     #[serde(rename="transitEncryptionMode")]
     
-    pub transit_encryption_mode: Option<String>,
+    pub transit_encryption_mode: Option<InstanceTransitEncryptionModeEnum>,
 }
 
 impl client::RequestValue for Instance {}
@@ -528,7 +528,7 @@ pub struct PersistenceConfig {
     /// Optional. Controls whether Persistence features are enabled. If not provided, the existing value will be used.
     #[serde(rename="persistenceMode")]
     
-    pub persistence_mode: Option<String>,
+    pub persistence_mode: Option<PersistenceConfigPersistenceModeEnum>,
     /// Output only. The next time that a snapshot attempt is scheduled to occur.
     #[serde(rename="rdbNextSnapshotTime")]
     
@@ -536,7 +536,7 @@ pub struct PersistenceConfig {
     /// Optional. Period between RDB snapshots. Snapshots will be attempted every period starting from the provided snapshot start time. For example, a start time of 01/01/2033 06:45 and SIX_HOURS snapshot period will do nothing until 01/01/2033, and then trigger snapshots every day at 06:45, 12:45, 18:45, and 00:45 the next day, and so on. If not provided, TWENTY_FOUR_HOURS will be used as default.
     #[serde(rename="rdbSnapshotPeriod")]
     
-    pub rdb_snapshot_period: Option<String>,
+    pub rdb_snapshot_period: Option<PersistenceConfigRdbSnapshotPeriodEnum>,
     /// Optional. Date and time that the first snapshot was/will be attempted, and to which future snapshots will be aligned. If not provided, the current time will be used.
     #[serde(rename="rdbSnapshotStartTime")]
     
@@ -560,7 +560,7 @@ pub struct RescheduleMaintenanceRequest {
     /// Required. If reschedule type is SPECIFIC_TIME, must set up schedule_time as well.
     #[serde(rename="rescheduleType")]
     
-    pub reschedule_type: Option<String>,
+    pub reschedule_type: Option<RescheduleMaintenanceRequestRescheduleTypeEnum>,
     /// Optional. Timestamp when the maintenance shall be rescheduled to if reschedule_type=SPECIFIC_TIME, in RFC 3339 format, for example `2012-11-15T16:19:00.094Z`.
     #[serde(rename="scheduleTime")]
     
@@ -675,7 +675,7 @@ impl client::RequestValue for UpgradeInstanceRequest {}
 pub struct WeeklyMaintenanceWindow {
     /// Required. The day of week that maintenance updates occur.
     
-    pub day: Option<String>,
+    pub day: Option<WeeklyMaintenanceWindowDayEnum>,
     /// Output only. Duration of the maintenance window. The current window is fixed at 1 hour.
     
     #[serde_as(as = "Option<::client::serde::duration::Wrapper>")]

@@ -1070,9 +1070,9 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("project", self._project);
-        params.push("zone", self._zone);
-        params.push("instanceGroupManager", self._instance_group_manager);
+        params.push("project", &self._project);
+        params.push("zone", &self._zone);
+        params.push("instanceGroupManager", &self._instance_group_manager);
 
         params.extend(self._additional_params.iter());
 
@@ -1375,9 +1375,9 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("project", self._project);
-        params.push("zone", self._zone);
-        params.push("instanceGroupManager", self._instance_group_manager);
+        params.push("project", &self._project);
+        params.push("zone", &self._zone);
+        params.push("instanceGroupManager", &self._instance_group_manager);
 
         params.extend(self._additional_params.iter());
 
@@ -1664,9 +1664,9 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("project", self._project);
-        params.push("zone", self._zone);
-        params.push("instanceGroupManager", self._instance_group_manager);
+        params.push("project", &self._project);
+        params.push("zone", &self._zone);
+        params.push("instanceGroupManager", &self._instance_group_manager);
 
         params.extend(self._additional_params.iter());
 
@@ -1969,9 +1969,9 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("project", self._project);
-        params.push("zone", self._zone);
-        params.push("instanceGroupManager", self._instance_group_manager);
+        params.push("project", &self._project);
+        params.push("zone", &self._zone);
+        params.push("instanceGroupManager", &self._instance_group_manager);
 
         params.extend(self._additional_params.iter());
 
@@ -2258,9 +2258,9 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("project", self._project);
-        params.push("zone", self._zone);
-        params.push("size", self._size.to_string());
+        params.push("project", &self._project);
+        params.push("zone", &self._zone);
+        params.push("size", &self._size.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -2568,8 +2568,8 @@ where
         }
 
         let mut params = Params::with_capacity(7 + self._additional_params.len());
-        params.push("project", self._project);
-        params.push("zone", self._zone);
+        params.push("project", &self._project);
+        params.push("zone", &self._zone);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -2876,9 +2876,9 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("project", self._project);
-        params.push("zone", self._zone);
-        params.push("instanceGroupManager", self._instance_group_manager);
+        params.push("project", &self._project);
+        params.push("zone", &self._zone);
+        params.push("instanceGroupManager", &self._instance_group_manager);
 
         params.extend(self._additional_params.iter());
 
@@ -3182,10 +3182,10 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("project", self._project);
-        params.push("zone", self._zone);
-        params.push("instanceGroupManager", self._instance_group_manager);
-        params.push("size", self._size.to_string());
+        params.push("project", &self._project);
+        params.push("zone", &self._zone);
+        params.push("instanceGroupManager", &self._instance_group_manager);
+        params.push("size", &self._size.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -3482,9 +3482,9 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("project", self._project);
-        params.push("zone", self._zone);
-        params.push("instanceGroupManager", self._instance_group_manager);
+        params.push("project", &self._project);
+        params.push("zone", &self._zone);
+        params.push("instanceGroupManager", &self._instance_group_manager);
 
         params.extend(self._additional_params.iter());
 
@@ -3794,9 +3794,9 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("project", self._project);
-        params.push("zone", self._zone);
-        params.push("instanceGroupManager", self._instance_group_manager);
+        params.push("project", &self._project);
+        params.push("zone", &self._zone);
+        params.push("instanceGroupManager", &self._instance_group_manager);
 
         params.extend(self._additional_params.iter());
 
@@ -4099,9 +4099,9 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("project", self._project);
-        params.push("zone", self._zone);
-        params.push("operation", self._operation);
+        params.push("project", &self._project);
+        params.push("zone", &self._zone);
+        params.push("operation", &self._operation);
 
         params.extend(self._additional_params.iter());
 
@@ -4386,8 +4386,8 @@ where
         }
 
         let mut params = Params::with_capacity(7 + self._additional_params.len());
-        params.push("project", self._project);
-        params.push("zone", self._zone);
+        params.push("project", &self._project);
+        params.push("zone", &self._zone);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }

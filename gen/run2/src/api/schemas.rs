@@ -44,7 +44,7 @@ pub struct GoogleCloudRunV2Condition {
     /// A reason for the execution condition.
     #[serde(rename="executionReason")]
     
-    pub execution_reason: Option<String>,
+    pub execution_reason: Option<GoogleCloudRunV2ConditionExecutionReasonEnum>,
     /// Last time the condition transitioned from one status to another.
     #[serde(rename="lastTransitionTime")]
     
@@ -54,17 +54,17 @@ pub struct GoogleCloudRunV2Condition {
     pub message: Option<String>,
     /// A common (service-level) reason for this condition.
     
-    pub reason: Option<String>,
+    pub reason: Option<GoogleCloudRunV2ConditionReasonEnum>,
     /// A reason for the revision condition.
     #[serde(rename="revisionReason")]
     
-    pub revision_reason: Option<String>,
+    pub revision_reason: Option<GoogleCloudRunV2ConditionRevisionReasonEnum>,
     /// How to interpret failures of this condition, one of Error, Warning, Info
     
-    pub severity: Option<String>,
+    pub severity: Option<GoogleCloudRunV2ConditionSeverityEnum>,
     /// State of the condition.
     
-    pub state: Option<String>,
+    pub state: Option<GoogleCloudRunV2ConditionStateEnum>,
     /// type is used to communicate the status of the reconciliation process. See also: https://github.com/knative/serving/blob/main/docs/spec/errors.md#error-conditions-and-reporting Types common to all resources include: * "Ready": True when the Resource is ready.
     #[serde(rename="type")]
     
@@ -237,7 +237,7 @@ pub struct GoogleCloudRunV2Execution {
     /// Set the launch stage to a preview stage on write to allow use of preview features in that stage. On read, describes whether the resource uses preview features. Launch Stages are defined at [Google Cloud Platform Launch Stages](https://cloud.google.com/terms/launch-stages).
     #[serde(rename="launchStage")]
     
-    pub launch_stage: Option<String>,
+    pub launch_stage: Option<GoogleCloudRunV2ExecutionLaunchStageEnum>,
     /// Output only. URI where logs for this execution can be found in Cloud Console.
     #[serde(rename="logUri")]
     
@@ -467,7 +467,7 @@ pub struct GoogleCloudRunV2Job {
     /// The launch stage as defined by [Google Cloud Platform Launch Stages](https://cloud.google.com/terms/launch-stages). Cloud Run supports `ALPHA`, `BETA`, and `GA`. If no value is specified, GA is assumed.
     #[serde(rename="launchStage")]
     
-    pub launch_stage: Option<String>,
+    pub launch_stage: Option<GoogleCloudRunV2JobLaunchStageEnum>,
     /// The fully qualified name of this Job. Format: projects/{project}/locations/{location}/jobs/{job}
     
     pub name: Option<String>,
@@ -707,7 +707,7 @@ pub struct GoogleCloudRunV2Revision {
     /// The action to take if the encryption key is revoked.
     #[serde(rename="encryptionKeyRevocationAction")]
     
-    pub encryption_key_revocation_action: Option<String>,
+    pub encryption_key_revocation_action: Option<GoogleCloudRunV2RevisionEncryptionKeyRevocationActionEnum>,
     /// If encryption_key_revocation_action is SHUTDOWN, the duration before shutting down all instances. The minimum increment is 1 hour.
     #[serde(rename="encryptionKeyShutdownDuration")]
     
@@ -719,7 +719,7 @@ pub struct GoogleCloudRunV2Revision {
     /// The execution environment being used to host this Revision.
     #[serde(rename="executionEnvironment")]
     
-    pub execution_environment: Option<String>,
+    pub execution_environment: Option<GoogleCloudRunV2RevisionExecutionEnvironmentEnum>,
     /// Output only. For a deleted resource, the time after which it will be permamently deleted. It is only populated as a response to a Delete request.
     #[serde(rename="expireTime")]
     
@@ -734,7 +734,7 @@ pub struct GoogleCloudRunV2Revision {
     /// Set the launch stage to a preview stage on write to allow use of preview features in that stage. On read, describes whether the resource uses preview features. Launch Stages are defined at [Google Cloud Platform Launch Stages](https://cloud.google.com/terms/launch-stages).
     #[serde(rename="launchStage")]
     
-    pub launch_stage: Option<String>,
+    pub launch_stage: Option<GoogleCloudRunV2RevisionLaunchStageEnum>,
     /// Output only. The Google Console URI to obtain logs for the Revision.
     #[serde(rename="logUri")]
     
@@ -827,7 +827,7 @@ pub struct GoogleCloudRunV2RevisionTemplate {
     /// The sandbox environment to host this Revision.
     #[serde(rename="executionEnvironment")]
     
-    pub execution_environment: Option<String>,
+    pub execution_environment: Option<GoogleCloudRunV2RevisionTemplateExecutionEnvironmentEnum>,
     /// KRM-style labels for the resource. Cloud Run API v2 does not support labels with `run.googleapis.com`, `cloud.googleapis.com`, `serving.knative.dev`, or `autoscaling.knative.dev` namespaces, and they will be rejected. All system labels in v1 now have a corresponding field in v2 RevisionTemplate.
     
     pub labels: Option<HashMap<String, String>>,
@@ -981,7 +981,7 @@ pub struct GoogleCloudRunV2Service {
     pub generation: Option<i64>,
     /// Provides the ingress settings for this Service. On output, returns the currently observed ingress settings, or INGRESS_TRAFFIC_UNSPECIFIED if no revision is active.
     
-    pub ingress: Option<String>,
+    pub ingress: Option<GoogleCloudRunV2ServiceIngressEnum>,
     /// Map of string keys and values that can be used to organize and categorize objects. User-provided labels are shared with Google's billing system, so they can be used to filter, or break down billing charges by team, component, environment, state, etc. For more information, visit https://cloud.google.com/resource-manager/docs/creating-managing-labels or https://cloud.google.com/run/docs/configuring/labels Cloud Run API v2 does not support labels with `run.googleapis.com`, `cloud.googleapis.com`, `serving.knative.dev`, or `autoscaling.knative.dev` namespaces, and they will be rejected. All system labels in v1 now have a corresponding field in v2 Service.
     
     pub labels: Option<HashMap<String, String>>,
@@ -1000,7 +1000,7 @@ pub struct GoogleCloudRunV2Service {
     /// The launch stage as defined by [Google Cloud Platform Launch Stages](https://cloud.google.com/terms/launch-stages). Cloud Run supports `ALPHA`, `BETA`, and `GA`. If no value is specified, GA is assumed.
     #[serde(rename="launchStage")]
     
-    pub launch_stage: Option<String>,
+    pub launch_stage: Option<GoogleCloudRunV2ServiceLaunchStageEnum>,
     /// The fully qualified name of this Service. In CreateServiceRequest, this field is ignored, and instead composed from CreateServiceRequest.parent and CreateServiceRequest.service_id. Format: projects/{project}/locations/{location}/services/{service_id}
     
     pub name: Option<String>,
@@ -1102,7 +1102,7 @@ pub struct GoogleCloudRunV2Task {
     /// The execution environment being used to host this Task.
     #[serde(rename="executionEnvironment")]
     
-    pub execution_environment: Option<String>,
+    pub execution_environment: Option<GoogleCloudRunV2TaskExecutionEnvironmentEnum>,
     /// Output only. For a deleted resource, the time after which it will be permamently deleted. It is only populated as a response to a Delete request.
     #[serde(rename="expireTime")]
     
@@ -1213,7 +1213,7 @@ pub struct GoogleCloudRunV2TaskTemplate {
     /// The execution environment being used to host this Task.
     #[serde(rename="executionEnvironment")]
     
-    pub execution_environment: Option<String>,
+    pub execution_environment: Option<GoogleCloudRunV2TaskTemplateExecutionEnvironmentEnum>,
     /// Number of retries allowed per Task, before marking this Task failed.
     #[serde(rename="maxRetries")]
     
@@ -1257,7 +1257,7 @@ pub struct GoogleCloudRunV2TrafficTarget {
     /// The allocation type for this traffic target.
     #[serde(rename="type")]
     
-    pub type_: Option<String>,
+    pub type_: Option<GoogleCloudRunV2TrafficTargetTypeEnum>,
 }
 
 impl client::Part for GoogleCloudRunV2TrafficTarget {}
@@ -1282,7 +1282,7 @@ pub struct GoogleCloudRunV2TrafficTargetStatus {
     /// The allocation type for this traffic target.
     #[serde(rename="type")]
     
-    pub type_: Option<String>,
+    pub type_: Option<GoogleCloudRunV2TrafficTargetStatuTypeEnum>,
     /// Displays the target URI.
     
     pub uri: Option<String>,
@@ -1365,7 +1365,7 @@ pub struct GoogleCloudRunV2VpcAccess {
     pub connector: Option<String>,
     /// Traffic VPC egress settings.
     
-    pub egress: Option<String>,
+    pub egress: Option<GoogleCloudRunV2VpcAccesEgressEnum>,
 }
 
 impl client::Part for GoogleCloudRunV2VpcAccess {}
@@ -1404,7 +1404,7 @@ pub struct GoogleIamV1AuditLogConfig {
     /// The log type that this config enables.
     #[serde(rename="logType")]
     
-    pub log_type: Option<String>,
+    pub log_type: Option<GoogleIamV1AuditLogConfigLogTypeEnum>,
 }
 
 impl client::Part for GoogleIamV1AuditLogConfig {}

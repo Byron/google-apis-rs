@@ -230,7 +230,7 @@ pub struct BinaryAuthorization {
     /// Mode of operation for binauthz policy evaluation. If unspecified, defaults to DISABLED.
     #[serde(rename="evaluationMode")]
     
-    pub evaluation_mode: Option<String>,
+    pub evaluation_mode: Option<BinaryAuthorizationEvaluationModeEnum>,
 }
 
 impl client::Part for BinaryAuthorization {}
@@ -261,7 +261,7 @@ pub struct BlueGreenInfo {
     pub green_pool_version: Option<String>,
     /// Current blue-green upgrade phase.
     
-    pub phase: Option<String>,
+    pub phase: Option<BlueGreenInfoPhaseEnum>,
 }
 
 impl client::Part for BlueGreenInfo {}
@@ -368,7 +368,7 @@ pub struct CloudRunConfig {
     /// Which load balancer type is installed for Cloud Run.
     #[serde(rename="loadBalancerType")]
     
-    pub load_balancer_type: Option<String>,
+    pub load_balancer_type: Option<CloudRunConfigLoadBalancerTypeEnum>,
 }
 
 impl client::Part for CloudRunConfig {}
@@ -601,7 +601,7 @@ pub struct Cluster {
     pub shielded_nodes: Option<ShieldedNodes>,
     /// [Output only] The current status of this cluster.
     
-    pub status: Option<String>,
+    pub status: Option<ClusterStatusEnum>,
     /// [Output only] Deprecated. Use conditions instead. Additional information about the current status of this cluster, if available.
     #[serde(rename="statusMessage")]
     
@@ -647,7 +647,7 @@ pub struct ClusterAutoscaling {
     /// Defines autoscaling behaviour.
     #[serde(rename="autoscalingProfile")]
     
-    pub autoscaling_profile: Option<String>,
+    pub autoscaling_profile: Option<ClusterAutoscalingAutoscalingProfileEnum>,
     /// Enables automatic node pool creation and deletion.
     #[serde(rename="enableNodeAutoprovisioning")]
     
@@ -695,7 +695,7 @@ pub struct ClusterUpdate {
     /// The desired datapath provider for the cluster.
     #[serde(rename="desiredDatapathProvider")]
     
-    pub desired_datapath_provider: Option<String>,
+    pub desired_datapath_provider: Option<ClusterUpdateDesiredDatapathProviderEnum>,
     /// The desired status of whether to disable default sNAT for this cluster.
     #[serde(rename="desiredDefaultSnatStatus")]
     
@@ -795,7 +795,7 @@ pub struct ClusterUpdate {
     /// The desired state of IPv6 connectivity to Google Services.
     #[serde(rename="desiredPrivateIpv6GoogleAccess")]
     
-    pub desired_private_ipv6_google_access: Option<String>,
+    pub desired_private_ipv6_google_access: Option<ClusterUpdateDesiredPrivateIpv6GoogleAccessEnum>,
     /// The desired release channel configuration.
     #[serde(rename="desiredReleaseChannel")]
     
@@ -815,7 +815,7 @@ pub struct ClusterUpdate {
     /// The desired stack type of the cluster. If a stack type is provided and does not match the current stack type of the cluster, update will attempt to change the stack type to the new type.
     #[serde(rename="desiredStackType")]
     
-    pub desired_stack_type: Option<String>,
+    pub desired_stack_type: Option<ClusterUpdateDesiredStackTypeEnum>,
     /// Cluster-level Vertical Pod Autoscaling configuration.
     #[serde(rename="desiredVerticalPodAutoscaling")]
     
@@ -1013,7 +1013,7 @@ pub struct DNSConfig {
     /// cluster_dns indicates which in-cluster DNS provider should be used.
     #[serde(rename="clusterDns")]
     
-    pub cluster_dns: Option<String>,
+    pub cluster_dns: Option<DNSConfigClusterDnsEnum>,
     /// cluster_dns_domain is the suffix used for all cluster service records.
     #[serde(rename="clusterDnsDomain")]
     
@@ -1021,7 +1021,7 @@ pub struct DNSConfig {
     /// cluster_dns_scope indicates the scope of access to cluster DNS records.
     #[serde(rename="clusterDnsScope")]
     
-    pub cluster_dns_scope: Option<String>,
+    pub cluster_dns_scope: Option<DNSConfigClusterDnsScopeEnum>,
 }
 
 impl client::Part for DNSConfig {}
@@ -1059,7 +1059,7 @@ pub struct DatabaseEncryption {
     pub key_name: Option<String>,
     /// Denotes the state of etcd encryption.
     
-    pub state: Option<String>,
+    pub state: Option<DatabaseEncryptionStateEnum>,
 }
 
 impl client::Part for DatabaseEncryption {}
@@ -1153,7 +1153,7 @@ pub struct Filter {
     /// Event types to allowlist.
     #[serde(rename="eventType")]
     
-    pub event_type: Option<Vec<String>>,
+    pub event_type: Option<Vec<FilterEventTypeEnum>>,
 }
 
 impl client::Part for Filter {}
@@ -1169,7 +1169,7 @@ pub struct GPUSharingConfig {
     /// The type of GPU sharing strategy to enable on the GPU node.
     #[serde(rename="gpuSharingStrategy")]
     
-    pub gpu_sharing_strategy: Option<String>,
+    pub gpu_sharing_strategy: Option<GPUSharingConfigGpuSharingStrategyEnum>,
     /// The max number of containers that can share a physical GPU.
     #[serde(rename="maxSharedClientsPerGpu")]
     
@@ -1189,7 +1189,7 @@ impl client::Part for GPUSharingConfig {}
 pub struct GatewayAPIConfig {
     /// The Gateway API release channel to use for Gateway API.
     
-    pub channel: Option<String>,
+    pub channel: Option<GatewayAPIConfigChannelEnum>,
 }
 
 impl client::Part for GatewayAPIConfig {}
@@ -1412,7 +1412,7 @@ pub struct IPAllocationPolicy {
     /// The ipv6 access type (internal or external) when create_subnetwork is true
     #[serde(rename="ipv6AccessType")]
     
-    pub ipv6_access_type: Option<String>,
+    pub ipv6_access_type: Option<IPAllocationPolicyIpv6AccessTypeEnum>,
     /// This field is deprecated, use node_ipv4_cidr_block.
     #[serde(rename="nodeIpv4Cidr")]
     
@@ -1436,7 +1436,7 @@ pub struct IPAllocationPolicy {
     /// The IP stack type of the cluster
     #[serde(rename="stackType")]
     
-    pub stack_type: Option<String>,
+    pub stack_type: Option<IPAllocationPolicyStackTypeEnum>,
     /// A custom subnetwork name to be used if `create_subnetwork` is true. If this field is empty, then an automatic name will be chosen for the new subnetwork.
     #[serde(rename="subnetworkName")]
     
@@ -1568,7 +1568,7 @@ pub struct LinuxNodeConfig {
     /// cgroup_mode specifies the cgroup mode to be used on the node.
     #[serde(rename="cgroupMode")]
     
-    pub cgroup_mode: Option<String>,
+    pub cgroup_mode: Option<LinuxNodeConfigCgroupModeEnum>,
     /// The Linux kernel parameters to be applied to the nodes and all pods running on the nodes. The following parameters are supported. net.core.busy_poll net.core.busy_read net.core.netdev_max_backlog net.core.rmem_max net.core.wmem_default net.core.wmem_max net.core.optmem_max net.core.somaxconn net.ipv4.tcp_rmem net.ipv4.tcp_wmem net.ipv4.tcp_tw_reuse
     
     pub sysctls: Option<HashMap<String, String>>,
@@ -1695,7 +1695,7 @@ pub struct LoggingComponentConfig {
     /// Select components to collect logs. An empty set would disable all logging.
     #[serde(rename="enableComponents")]
     
-    pub enable_components: Option<Vec<String>>,
+    pub enable_components: Option<Vec<LoggingComponentConfigEnableComponentsEnum>>,
 }
 
 impl client::Part for LoggingComponentConfig {}
@@ -1726,7 +1726,7 @@ impl client::Part for LoggingConfig {}
 pub struct LoggingVariantConfig {
     /// Logging variant deployed on nodes.
     
-    pub variant: Option<String>,
+    pub variant: Option<LoggingVariantConfigVariantEnum>,
 }
 
 impl client::Part for LoggingVariantConfig {}
@@ -1741,7 +1741,7 @@ impl client::Part for LoggingVariantConfig {}
 pub struct MaintenanceExclusionOptions {
     /// Scope specifies the upgrade scope which upgrades are blocked by the exclusion.
     
-    pub scope: Option<String>,
+    pub scope: Option<MaintenanceExclusionOptionScopeEnum>,
 }
 
 impl client::Part for MaintenanceExclusionOptions {}
@@ -1933,7 +1933,7 @@ pub struct MonitoringComponentConfig {
     /// Select components to collect metrics. An empty set would disable all monitoring.
     #[serde(rename="enableComponents")]
     
-    pub enable_components: Option<Vec<String>>,
+    pub enable_components: Option<Vec<MonitoringComponentConfigEnableComponentsEnum>>,
 }
 
 impl client::Part for MonitoringComponentConfig {}
@@ -1969,7 +1969,7 @@ pub struct NetworkConfig {
     /// The desired datapath provider for this cluster. By default, uses the IPTables-based kube-proxy implementation.
     #[serde(rename="datapathProvider")]
     
-    pub datapath_provider: Option<String>,
+    pub datapath_provider: Option<NetworkConfigDatapathProviderEnum>,
     /// Whether the cluster disables default in-node sNAT rules. In-node sNAT rules will be disabled when default_snat_status is disabled. When disabled is set to false, default IP masquerade rules will be applied to the nodes to prevent sNAT on cluster internal traffic.
     #[serde(rename="defaultSnatStatus")]
     
@@ -1996,7 +1996,7 @@ pub struct NetworkConfig {
     /// The desired state of IPv6 connectivity to Google Services. By default, no private IPv6 access to or from Google Services (all access will be via IPv4)
     #[serde(rename="privateIpv6GoogleAccess")]
     
-    pub private_ipv6_google_access: Option<String>,
+    pub private_ipv6_google_access: Option<NetworkConfigPrivateIpv6GoogleAccessEnum>,
     /// ServiceExternalIPsConfig specifies if services with externalIPs field are blocked or not.
     #[serde(rename="serviceExternalIpsConfig")]
     
@@ -2019,7 +2019,7 @@ pub struct NetworkPerformanceConfig {
     /// Specifies the total network bandwidth tier for the NodePool.
     #[serde(rename="totalEgressBandwidthTier")]
     
-    pub total_egress_bandwidth_tier: Option<String>,
+    pub total_egress_bandwidth_tier: Option<NetworkPerformanceConfigTotalEgressBandwidthTierEnum>,
 }
 
 impl client::Part for NetworkPerformanceConfig {}
@@ -2037,7 +2037,7 @@ pub struct NetworkPolicy {
     pub enabled: Option<bool>,
     /// The selected network policy provider.
     
-    pub provider: Option<String>,
+    pub provider: Option<NetworkPolicyProviderEnum>,
 }
 
 impl client::Part for NetworkPolicy {}
@@ -2392,7 +2392,7 @@ pub struct NodePool {
     pub self_link: Option<String>,
     /// [Output only] The status of the nodes in this pool instance.
     
-    pub status: Option<String>,
+    pub status: Option<NodePoolStatusEnum>,
     /// [Output only] Deprecated. Use conditions instead. Additional information about the current status of this node pool instance, if available.
     #[serde(rename="statusMessage")]
     
@@ -2445,7 +2445,7 @@ pub struct NodePoolAutoscaling {
     /// Location policy used when scaling up a nodepool.
     #[serde(rename="locationPolicy")]
     
-    pub location_policy: Option<String>,
+    pub location_policy: Option<NodePoolAutoscalingLocationPolicyEnum>,
     /// Maximum number of nodes for one location in the NodePool. Must be >= min_node_count. There has to be enough quota to scale up the cluster.
     #[serde(rename="maxNodeCount")]
     
@@ -2508,7 +2508,7 @@ impl client::Part for NodePoolLoggingConfig {}
 pub struct NodeTaint {
     /// Effect for taint.
     
-    pub effect: Option<String>,
+    pub effect: Option<NodeTaintEffectEnum>,
     /// Key for taint.
     
     pub key: Option<String>,
@@ -2633,7 +2633,7 @@ pub struct Operation {
     /// The operation type.
     #[serde(rename="operationType")]
     
-    pub operation_type: Option<String>,
+    pub operation_type: Option<OperationOperationTypeEnum>,
     /// Output only. [Output only] Progress information for an operation.
     
     pub progress: Option<OperationProgress>,
@@ -2647,7 +2647,7 @@ pub struct Operation {
     pub start_time: Option<String>,
     /// The current status of the operation.
     
-    pub status: Option<String>,
+    pub status: Option<OperationStatusEnum>,
     /// Output only. If an error has occurred, a textual description of the error. Deprecated. Use the field error instead.
     #[serde(rename="statusMessage")]
     
@@ -2682,7 +2682,7 @@ pub struct OperationProgress {
     pub stages: Option<Vec<OperationProgress>>,
     /// Status of an operation stage. Unset for single-stage operations.
     
-    pub status: Option<String>,
+    pub status: Option<OperationProgresStatusEnum>,
 }
 
 impl client::Part for OperationProgress {}
@@ -2698,7 +2698,7 @@ pub struct PlacementPolicy {
     /// The type of placement.
     #[serde(rename="type")]
     
-    pub type_: Option<String>,
+    pub type_: Option<PlacementPolicyTypeEnum>,
 }
 
 impl client::Part for PlacementPolicy {}
@@ -2811,7 +2811,7 @@ impl client::Part for RecurringTimeWindow {}
 pub struct ReleaseChannel {
     /// channel specifies which release channel the cluster is subscribed to.
     
-    pub channel: Option<String>,
+    pub channel: Option<ReleaseChannelChannelEnum>,
 }
 
 impl client::Part for ReleaseChannel {}
@@ -2826,7 +2826,7 @@ impl client::Part for ReleaseChannel {}
 pub struct ReleaseChannelConfig {
     /// The release channel this configuration applies to.
     
-    pub channel: Option<String>,
+    pub channel: Option<ReleaseChannelConfigChannelEnum>,
     /// The default version for newly created clusters on the channel.
     #[serde(rename="defaultVersion")]
     
@@ -2850,7 +2850,7 @@ pub struct ReservationAffinity {
     /// Corresponds to the type of reservation consumption.
     #[serde(rename="consumeReservationType")]
     
-    pub consume_reservation_type: Option<String>,
+    pub consume_reservation_type: Option<ReservationAffinityConsumeReservationTypeEnum>,
     /// Corresponds to the label key of a reservation resource. To target a SPECIFIC_RESERVATION by name, specify "compute.googleapis.com/reservation-name" as the key and specify the name of your reservation as its value.
     
     pub key: Option<String>,
@@ -2974,7 +2974,7 @@ pub struct SandboxConfig {
     /// Type of the sandbox to use for the node.
     #[serde(rename="type")]
     
-    pub type_: Option<String>,
+    pub type_: Option<SandboxConfigTypeEnum>,
 }
 
 impl client::Part for SandboxConfig {}
@@ -3261,7 +3261,7 @@ impl client::RequestValue for SetMaintenancePolicyRequest {}
 pub struct SetMasterAuthRequest {
     /// Required. The exact form of action to be taken on the master auth.
     
-    pub action: Option<String>,
+    pub action: Option<SetMasterAuthRequestActionEnum>,
     /// Deprecated. The name of the cluster to upgrade. This field has been deprecated and replaced by the name field.
     #[serde(rename="clusterId")]
     
@@ -3595,10 +3595,10 @@ pub struct StatusCondition {
     /// Canonical code of the condition.
     #[serde(rename="canonicalCode")]
     
-    pub canonical_code: Option<String>,
+    pub canonical_code: Option<StatusConditionCanonicalCodeEnum>,
     /// Machine-friendly representation of the condition Deprecated. Use canonical_code instead.
     
-    pub code: Option<String>,
+    pub code: Option<StatusConditionCodeEnum>,
     /// Human-friendly representation of the condition
     
     pub message: Option<String>,
@@ -3842,7 +3842,7 @@ pub struct UpgradeSettings {
     pub max_unavailable: Option<i32>,
     /// Update strategy of the node pool.
     
-    pub strategy: Option<String>,
+    pub strategy: Option<UpgradeSettingStrategyEnum>,
 }
 
 impl client::Part for UpgradeSettings {}
@@ -3895,7 +3895,7 @@ pub struct UsableSubnetworkSecondaryRange {
     pub range_name: Option<String>,
     /// This field is to determine the status of the secondary range programmably.
     
-    pub status: Option<String>,
+    pub status: Option<UsableSubnetworkSecondaryRangeStatusEnum>,
 }
 
 impl client::Part for UsableSubnetworkSecondaryRange {}
@@ -3941,7 +3941,7 @@ pub struct WindowsNodeConfig {
     /// OSVersion specifies the Windows node config to be used on the node
     #[serde(rename="osVersion")]
     
-    pub os_version: Option<String>,
+    pub os_version: Option<WindowsNodeConfigOsVersionEnum>,
 }
 
 impl client::Part for WindowsNodeConfig {}
@@ -3972,7 +3972,7 @@ impl client::Part for WorkloadIdentityConfig {}
 pub struct WorkloadMetadataConfig {
     /// Mode is the configuration for how to expose metadata to workloads running on the node pool.
     
-    pub mode: Option<String>,
+    pub mode: Option<WorkloadMetadataConfigModeEnum>,
 }
 
 impl client::Part for WorkloadMetadataConfig {}

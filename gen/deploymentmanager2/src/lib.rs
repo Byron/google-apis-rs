@@ -120,9 +120,9 @@
 //! // execute the final call using `doit()`.
 //! // Values shown here are possibly random and not representative !
 //! let result = hub.deployments().patch(req, "project", "deployment")
-//!              .preview(true)
-//!              .delete_policy("amet.")
-//!              .create_policy("duo")
+//!              .preview(false)
+//!              .delete_policy(&Default::default())
+//!              .create_policy(&Default::default())
 //!              .doit().await;
 //! 
 //! match result {

@@ -22,7 +22,7 @@ pub struct GoogleMapsPlayablelocationsV3Impression {
     /// Required. The type of impression event.
     #[serde(rename="impressionType")]
     
-    pub impression_type: Option<String>,
+    pub impression_type: Option<GoogleMapsPlayablelocationsV3ImpressionImpressionTypeEnum>,
     /// Required. The name of the playable location.
     #[serde(rename="locationName")]
     
@@ -163,7 +163,7 @@ pub struct GoogleMapsPlayablelocationsV3PlayerReport {
     pub reason_details: Option<String>,
     /// Required. One or more reasons why this playable location is considered bad.
     
-    pub reasons: Option<Vec<String>>,
+    pub reasons: Option<Vec<GoogleMapsPlayablelocationsV3PlayerReportReasonsEnum>>,
 }
 
 impl client::Part for GoogleMapsPlayablelocationsV3PlayerReport {}
@@ -471,7 +471,7 @@ pub struct GoogleMapsPlayablelocationsV3SampleSpacingOptions {
     /// Set this to the point type used in your game.
     #[serde(rename="pointType")]
     
-    pub point_type: Option<String>,
+    pub point_type: Option<GoogleMapsPlayablelocationsV3SampleSpacingOptionPointTypeEnum>,
 }
 
 impl client::Part for GoogleMapsPlayablelocationsV3SampleSpacingOptions {}
@@ -523,7 +523,7 @@ pub struct GoogleMapsUnityClientInfo {
     pub operating_system_build: Option<String>,
     /// Platform where the application is running.
     
-    pub platform: Option<String>,
+    pub platform: Option<GoogleMapsUnityClientInfoPlatformEnum>,
 }
 
 impl client::Part for GoogleMapsUnityClientInfo {}

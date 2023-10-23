@@ -1268,7 +1268,7 @@ where
         }
 
         let mut params = Params::with_capacity(2 + self._additional_params.len());
-        params.push("queryId", self._query_id.to_string());
+        params.push("queryId", &self._query_id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -1519,7 +1519,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("queryId", self._query_id.to_string());
+        params.push("queryId", &self._query_id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -2057,7 +2057,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("queryId", self._query_id.to_string());
+        params.push("queryId", &self._query_id.to_string());
         if let Some(value) = self._asynchronous.as_ref() {
             params.push("asynchronous", value.to_string());
         }
@@ -2345,7 +2345,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("queryId", self._query_id.to_string());
+        params.push("queryId", &self._query_id.to_string());
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }

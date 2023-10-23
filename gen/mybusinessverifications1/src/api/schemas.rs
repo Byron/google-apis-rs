@@ -69,7 +69,7 @@ pub struct ComplyWithGuidelines {
     /// The reason why the location is being recommended to comply with guidelines.
     #[serde(rename="recommendationReason")]
     
-    pub recommendation_reason: Option<String>,
+    pub recommendation_reason: Option<ComplyWithGuidelineRecommendationReasonEnum>,
 }
 
 impl client::Part for ComplyWithGuidelines {}
@@ -328,13 +328,13 @@ pub struct Verification {
     pub create_time: Option<client::chrono::DateTime<client::chrono::offset::Utc>>,
     /// The method of the verification.
     
-    pub method: Option<String>,
+    pub method: Option<VerificationMethodEnum>,
     /// Resource name of the verification.
     
     pub name: Option<String>,
     /// The state of the verification.
     
-    pub state: Option<String>,
+    pub state: Option<VerificationStateEnum>,
 }
 
 impl client::Part for Verification {}
@@ -362,7 +362,7 @@ pub struct VerificationOption {
     /// Method to verify the location.
     #[serde(rename="verificationMethod")]
     
-    pub verification_method: Option<String>,
+    pub verification_method: Option<VerificationOptionVerificationMethodEnum>,
 }
 
 impl client::Part for VerificationOption {}
@@ -432,7 +432,7 @@ pub struct VerifyLocationRequest {
     pub mailer_contact: Option<String>,
     /// Required. Verification method.
     
-    pub method: Option<String>,
+    pub method: Option<VerifyLocationRequestMethodEnum>,
     /// Optional. The input for PHONE_CALL/SMS method The phone number that should be called or be sent SMS to. It must be one of the phone numbers in the eligible options.
     #[serde(rename="phoneNumber")]
     

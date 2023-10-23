@@ -73,8 +73,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("projectId", self._project_id);
-        params.push("datasetId", self._dataset_id);
+        params.push("projectId", &self._project_id);
+        params.push("datasetId", &self._dataset_id);
         if let Some(value) = self._delete_contents.as_ref() {
             params.push("deleteContents", value.to_string());
         }
@@ -342,8 +342,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("projectId", self._project_id);
-        params.push("datasetId", self._dataset_id);
+        params.push("projectId", &self._project_id);
+        params.push("datasetId", &self._dataset_id);
 
         params.extend(self._additional_params.iter());
 
@@ -618,7 +618,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("projectId", self._project_id);
+        params.push("projectId", &self._project_id);
 
         params.extend(self._additional_params.iter());
 
@@ -855,9 +855,9 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.datasets().list("projectId")
-///              .page_token("sed")
-///              .max_results(64)
-///              .filter("gubergren")
+///              .page_token("ipsum")
+///              .max_results(13)
+///              .filter("amet")
 ///              .all(true)
 ///              .doit().await;
 /// # }
@@ -907,7 +907,7 @@ where
         }
 
         let mut params = Params::with_capacity(7 + self._additional_params.len());
-        params.push("projectId", self._project_id);
+        params.push("projectId", &self._project_id);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -1213,8 +1213,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("projectId", self._project_id);
-        params.push("datasetId", self._dataset_id);
+        params.push("projectId", &self._project_id);
+        params.push("datasetId", &self._dataset_id);
 
         params.extend(self._additional_params.iter());
 
@@ -1513,8 +1513,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("projectId", self._project_id);
-        params.push("datasetId", self._dataset_id);
+        params.push("projectId", &self._project_id);
+        params.push("datasetId", &self._dataset_id);
 
         params.extend(self._additional_params.iter());
 
@@ -1761,7 +1761,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.jobs().cancel("projectId", "jobId")
-///              .location("Lorem")
+///              .location("ipsum")
 ///              .doit().await;
 /// # }
 /// ```
@@ -1808,8 +1808,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("projectId", self._project_id);
-        params.push("jobId", self._job_id);
+        params.push("projectId", &self._project_id);
+        params.push("jobId", &self._job_id);
         if let Some(value) = self._location.as_ref() {
             params.push("location", value);
         }
@@ -2043,7 +2043,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.jobs().delete("projectId", "jobId")
-///              .location("sed")
+///              .location("ea")
 ///              .doit().await;
 /// # }
 /// ```
@@ -2090,8 +2090,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("projectId", self._project_id);
-        params.push("jobId", self._job_id);
+        params.push("projectId", &self._project_id);
+        params.push("jobId", &self._job_id);
         if let Some(value) = self._location.as_ref() {
             params.push("location", value);
         }
@@ -2314,7 +2314,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.jobs().get("projectId", "jobId")
-///              .location("no")
+///              .location("eos")
 ///              .doit().await;
 /// # }
 /// ```
@@ -2361,8 +2361,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("projectId", self._project_id);
-        params.push("jobId", self._job_id);
+        params.push("projectId", &self._project_id);
+        params.push("jobId", &self._job_id);
         if let Some(value) = self._location.as_ref() {
             params.push("location", value);
         }
@@ -2596,11 +2596,11 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.jobs().get_query_results("projectId", "jobId")
-///              .timeout_ms(77)
-///              .start_index(58)
-///              .page_token("et")
-///              .max_results(33)
-///              .location("vero")
+///              .timeout_ms(31)
+///              .start_index(21)
+///              .page_token("no")
+///              .max_results(86)
+///              .location("kasd")
 ///              .doit().await;
 /// # }
 /// ```
@@ -2651,8 +2651,8 @@ where
         }
 
         let mut params = Params::with_capacity(9 + self._additional_params.len());
-        params.push("projectId", self._project_id);
-        params.push("jobId", self._job_id);
+        params.push("projectId", &self._project_id);
+        params.push("jobId", &self._job_id);
         if let Some(value) = self._timeout_ms.as_ref() {
             params.push("timeoutMs", value.to_string());
         }
@@ -2977,7 +2977,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("projectId", self._project_id);
+        params.push("projectId", &self._project_id);
 
         params.extend(self._additional_params.iter());
 
@@ -3118,7 +3118,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("projectId", self._project_id);
+        params.push("projectId", &self._project_id);
 
         params.extend(self._additional_params.iter());
 
@@ -3463,14 +3463,14 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.jobs().list("projectId")
-///              .add_state_filter("duo")
-///              .projection("dolore")
+///              .add_state_filter(&Default::default())
+///              .projection(&Default::default())
 ///              .parent_job_id("et")
-///              .page_token("voluptua.")
-///              .min_creation_time(99)
-///              .max_results(5)
-///              .max_creation_time(9)
-///              .all_users(true)
+///              .page_token("et")
+///              .min_creation_time(25)
+///              .max_results(70)
+///              .max_creation_time(8)
+///              .all_users(false)
 ///              .doit().await;
 /// # }
 /// ```
@@ -3479,8 +3479,8 @@ pub struct JobListCall<'a, S>
 
    pub(super) hub: &'a Bigquery<S>,
    pub(super) _project_id: String,
-   pub(super) _state_filter: Vec<String>,
-   pub(super) _projection: Option<String>,
+   pub(super) _state_filter: Option<JobStateFilterEnum>,
+   pub(super) _projection: Option<JobProjectionEnum>,
    pub(super) _parent_job_id: Option<String>,
    pub(super) _page_token: Option<String>,
    pub(super) _min_creation_time: Option<u64>,
@@ -3523,7 +3523,7 @@ where
         }
 
         let mut params = Params::with_capacity(11 + self._additional_params.len());
-        params.push("projectId", self._project_id);
+        params.push("projectId", &self._project_id);
         if self._state_filter.len() > 0 {
             for f in self._state_filter.iter() {
                 params.push("stateFilter", f);
@@ -3668,15 +3668,15 @@ where
     ///
     /// Append the given value to the *state filter* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_state_filter(mut self, new_value: &str) -> JobListCall<'a, S> {
-        self._state_filter.push(new_value.to_string());
+    pub fn add_state_filter(mut self, new_value: &JobStateFilterEnum) -> JobListCall<'a, S> {
+        self._state_filter.push(new_value.clone());
         self
     }
     /// Restrict information returned to a set of selected fields
     ///
     /// Sets the *projection* query property to the given value.
-    pub fn projection(mut self, new_value: &str) -> JobListCall<'a, S> {
-        self._projection = Some(new_value.to_string());
+    pub fn projection(mut self, new_value: &JobProjectionEnum) -> JobListCall<'a, S> {
+        self._projection = Some(new_value.clone());
         self
     }
     /// If set, retrieves only jobs whose parent is this job. Otherwise, retrieves only jobs which have no parent
@@ -3871,7 +3871,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("projectId", self._project_id);
+        params.push("projectId", &self._project_id);
 
         params.extend(self._additional_params.iter());
 
@@ -4154,9 +4154,9 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("projectId", self._project_id);
-        params.push("datasetId", self._dataset_id);
-        params.push("modelId", self._model_id);
+        params.push("projectId", &self._project_id);
+        params.push("datasetId", &self._dataset_id);
+        params.push("modelId", &self._model_id);
 
         params.extend(self._additional_params.iter());
 
@@ -4425,9 +4425,9 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("projectId", self._project_id);
-        params.push("datasetId", self._dataset_id);
-        params.push("modelId", self._model_id);
+        params.push("projectId", &self._project_id);
+        params.push("datasetId", &self._dataset_id);
+        params.push("modelId", &self._model_id);
 
         params.extend(self._additional_params.iter());
 
@@ -4661,8 +4661,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.models().list("projectId", "datasetId")
-///              .page_token("Stet")
-///              .max_results(25)
+///              .page_token("vero")
+///              .max_results(13)
 ///              .doit().await;
 /// # }
 /// ```
@@ -4710,8 +4710,8 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("projectId", self._project_id);
-        params.push("datasetId", self._dataset_id);
+        params.push("projectId", &self._project_id);
+        params.push("datasetId", &self._dataset_id);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -5008,9 +5008,9 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("projectId", self._project_id);
-        params.push("datasetId", self._dataset_id);
-        params.push("modelId", self._model_id);
+        params.push("projectId", &self._project_id);
+        params.push("datasetId", &self._dataset_id);
+        params.push("modelId", &self._model_id);
 
         params.extend(self._additional_params.iter());
 
@@ -5311,7 +5311,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("projectId", self._project_id);
+        params.push("projectId", &self._project_id);
 
         params.extend(self._additional_params.iter());
 
@@ -5525,8 +5525,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().list()
-///              .page_token("ipsum")
-///              .max_results(78)
+///              .page_token("diam")
+///              .max_results(40)
 ///              .doit().await;
 /// # }
 /// ```
@@ -5834,9 +5834,9 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("projectId", self._project_id);
-        params.push("datasetId", self._dataset_id);
-        params.push("routineId", self._routine_id);
+        params.push("projectId", &self._project_id);
+        params.push("datasetId", &self._dataset_id);
+        params.push("routineId", &self._routine_id);
 
         params.extend(self._additional_params.iter());
 
@@ -6107,9 +6107,9 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("projectId", self._project_id);
-        params.push("datasetId", self._dataset_id);
-        params.push("routineId", self._routine_id);
+        params.push("projectId", &self._project_id);
+        params.push("datasetId", &self._dataset_id);
+        params.push("routineId", &self._routine_id);
         if let Some(value) = self._read_mask.as_ref() {
             params.push("readMask", value.to_string());
         }
@@ -6405,8 +6405,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("projectId", self._project_id);
-        params.push("datasetId", self._dataset_id);
+        params.push("projectId", &self._project_id);
+        params.push("datasetId", &self._dataset_id);
 
         params.extend(self._additional_params.iter());
 
@@ -6654,9 +6654,9 @@ where
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.routines().list("projectId", "datasetId")
 ///              .read_mask(&Default::default())
-///              .page_token("gubergren")
-///              .max_results(27)
-///              .filter("accusam")
+///              .page_token("takimata")
+///              .max_results(82)
+///              .filter("gubergren")
 ///              .doit().await;
 /// # }
 /// ```
@@ -6706,8 +6706,8 @@ where
         }
 
         let mut params = Params::with_capacity(8 + self._additional_params.len());
-        params.push("projectId", self._project_id);
-        params.push("datasetId", self._dataset_id);
+        params.push("projectId", &self._project_id);
+        params.push("datasetId", &self._dataset_id);
         if let Some(value) = self._read_mask.as_ref() {
             params.push("readMask", value.to_string());
         }
@@ -7024,9 +7024,9 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("projectId", self._project_id);
-        params.push("datasetId", self._dataset_id);
-        params.push("routineId", self._routine_id);
+        params.push("projectId", &self._project_id);
+        params.push("datasetId", &self._dataset_id);
+        params.push("routineId", &self._routine_id);
 
         params.extend(self._additional_params.iter());
 
@@ -7334,7 +7334,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("resource", self._resource);
+        params.push("resource", &self._resource);
 
         params.extend(self._additional_params.iter());
 
@@ -7571,8 +7571,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.row_access_policies().list("projectId", "datasetId", "tableId")
-///              .page_token("sadipscing")
-///              .page_size(-6)
+///              .page_token("amet.")
+///              .page_size(-17)
 ///              .doit().await;
 /// # }
 /// ```
@@ -7621,9 +7621,9 @@ where
         }
 
         let mut params = Params::with_capacity(7 + self._additional_params.len());
-        params.push("projectId", self._project_id);
-        params.push("datasetId", self._dataset_id);
-        params.push("tableId", self._table_id);
+        params.push("projectId", &self._project_id);
+        params.push("datasetId", &self._dataset_id);
+        params.push("tableId", &self._table_id);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -7928,7 +7928,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("resource", self._resource);
+        params.push("resource", &self._resource);
 
         params.extend(self._additional_params.iter());
 
@@ -8216,7 +8216,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("resource", self._resource);
+        params.push("resource", &self._resource);
 
         params.extend(self._additional_params.iter());
 
@@ -8506,9 +8506,9 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("projectId", self._project_id);
-        params.push("datasetId", self._dataset_id);
-        params.push("tableId", self._table_id);
+        params.push("projectId", &self._project_id);
+        params.push("datasetId", &self._dataset_id);
+        params.push("tableId", &self._table_id);
 
         params.extend(self._additional_params.iter());
 
@@ -8765,10 +8765,10 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.tabledata().list("projectId", "datasetId", "tableId")
-///              .start_index(69)
-///              .selected_fields("ipsum")
-///              .page_token("et")
-///              .max_results(93)
+///              .start_index(66)
+///              .selected_fields("tempor")
+///              .page_token("aliquyam")
+///              .max_results(96)
 ///              .doit().await;
 /// # }
 /// ```
@@ -8819,9 +8819,9 @@ where
         }
 
         let mut params = Params::with_capacity(9 + self._additional_params.len());
-        params.push("projectId", self._project_id);
-        params.push("datasetId", self._dataset_id);
-        params.push("tableId", self._table_id);
+        params.push("projectId", &self._project_id);
+        params.push("datasetId", &self._dataset_id);
+        params.push("tableId", &self._table_id);
         if let Some(value) = self._start_index.as_ref() {
             params.push("startIndex", value.to_string());
         }
@@ -9141,9 +9141,9 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("projectId", self._project_id);
-        params.push("datasetId", self._dataset_id);
-        params.push("tableId", self._table_id);
+        params.push("projectId", &self._project_id);
+        params.push("datasetId", &self._dataset_id);
+        params.push("tableId", &self._table_id);
 
         params.extend(self._additional_params.iter());
 
@@ -9366,8 +9366,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.tables().get("projectId", "datasetId", "tableId")
-///              .view("et")
-///              .selected_fields("sed")
+///              .view(&Default::default())
+///              .selected_fields("dolores")
 ///              .doit().await;
 /// # }
 /// ```
@@ -9378,7 +9378,7 @@ pub struct TableGetCall<'a, S>
    pub(super) _project_id: String,
    pub(super) _dataset_id: String,
    pub(super) _table_id: String,
-   pub(super) _view: Option<String>,
+   pub(super) _view: Option<TableViewEnum>,
    pub(super) _selected_fields: Option<String>,
    pub(super) _delegate: Option<&'a mut dyn client::Delegate>,
    pub(super) _additional_params: HashMap<String, String>,
@@ -9416,9 +9416,9 @@ where
         }
 
         let mut params = Params::with_capacity(7 + self._additional_params.len());
-        params.push("projectId", self._project_id);
-        params.push("datasetId", self._dataset_id);
-        params.push("tableId", self._table_id);
+        params.push("projectId", &self._project_id);
+        params.push("datasetId", &self._dataset_id);
+        params.push("tableId", &self._table_id);
         if let Some(value) = self._view.as_ref() {
             params.push("view", value);
         }
@@ -9562,8 +9562,8 @@ where
     /// Specifies the view that determines which table information is returned. By default, basic table information and storage statistics (STORAGE_STATS) are returned.
     ///
     /// Sets the *view* query property to the given value.
-    pub fn view(mut self, new_value: &str) -> TableGetCall<'a, S> {
-        self._view = Some(new_value.to_string());
+    pub fn view(mut self, new_value: &TableViewEnum) -> TableGetCall<'a, S> {
+        self._view = Some(new_value.clone());
         self
     }
     /// List of fields to return (comma-separated). If unspecified, all fields are returned
@@ -9723,7 +9723,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("resource", self._resource);
+        params.push("resource", &self._resource);
 
         params.extend(self._additional_params.iter());
 
@@ -10012,8 +10012,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("projectId", self._project_id);
-        params.push("datasetId", self._dataset_id);
+        params.push("projectId", &self._project_id);
+        params.push("datasetId", &self._dataset_id);
 
         params.extend(self._additional_params.iter());
 
@@ -10260,8 +10260,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.tables().list("projectId", "datasetId")
-///              .page_token("nonumy")
-///              .max_results(24)
+///              .page_token("elitr")
+///              .max_results(21)
 ///              .doit().await;
 /// # }
 /// ```
@@ -10309,8 +10309,8 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("projectId", self._project_id);
-        params.push("datasetId", self._dataset_id);
+        params.push("projectId", &self._project_id);
+        params.push("datasetId", &self._dataset_id);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -10560,7 +10560,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.tables().patch(req, "projectId", "datasetId", "tableId")
-///              .autodetect_schema(false)
+///              .autodetect_schema(true)
 ///              .doit().await;
 /// # }
 /// ```
@@ -10609,9 +10609,9 @@ where
         }
 
         let mut params = Params::with_capacity(7 + self._additional_params.len());
-        params.push("projectId", self._project_id);
-        params.push("datasetId", self._dataset_id);
-        params.push("tableId", self._table_id);
+        params.push("projectId", &self._project_id);
+        params.push("datasetId", &self._dataset_id);
+        params.push("tableId", &self._table_id);
         if let Some(value) = self._autodetect_schema.as_ref() {
             params.push("autodetect_schema", value.to_string());
         }
@@ -10929,7 +10929,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("resource", self._resource);
+        params.push("resource", &self._resource);
 
         params.extend(self._additional_params.iter());
 
@@ -11217,7 +11217,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("resource", self._resource);
+        params.push("resource", &self._resource);
 
         params.extend(self._additional_params.iter());
 
@@ -11460,7 +11460,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.tables().update(req, "projectId", "datasetId", "tableId")
-///              .autodetect_schema(false)
+///              .autodetect_schema(true)
 ///              .doit().await;
 /// # }
 /// ```
@@ -11509,9 +11509,9 @@ where
         }
 
         let mut params = Params::with_capacity(7 + self._additional_params.len());
-        params.push("projectId", self._project_id);
-        params.push("datasetId", self._dataset_id);
-        params.push("tableId", self._table_id);
+        params.push("projectId", &self._project_id);
+        params.push("datasetId", &self._dataset_id);
+        params.push("tableId", &self._table_id);
         if let Some(value) = self._autodetect_schema.as_ref() {
             params.push("autodetect_schema", value.to_string());
         }

@@ -182,11 +182,11 @@ pub struct GoogleCloudRecommendationengineV1beta1CatalogItemLevelConfig {
     /// Optional. Level of the catalog at which events are uploaded. See https://cloud.google.com/recommendations-ai/docs/catalog#catalog-levels for more details.
     #[serde(rename="eventItemLevel")]
     
-    pub event_item_level: Option<String>,
+    pub event_item_level: Option<GoogleCloudRecommendationengineV1beta1CatalogItemLevelConfigEventItemLevelEnum>,
     /// Optional. Level of the catalog at which predictions are made. See https://cloud.google.com/recommendations-ai/docs/catalog#catalog-levels for more details.
     #[serde(rename="predictItemLevel")]
     
-    pub predict_item_level: Option<String>,
+    pub predict_item_level: Option<GoogleCloudRecommendationengineV1beta1CatalogItemLevelConfigPredictItemLevelEnum>,
 }
 
 impl client::Part for GoogleCloudRecommendationengineV1beta1CatalogItemLevelConfig {}
@@ -692,7 +692,7 @@ pub struct GoogleCloudRecommendationengineV1beta1ProductCatalogItem {
     /// Optional. Online stock state of the catalog item. Default is `IN_STOCK`.
     #[serde(rename="stockState")]
     
-    pub stock_state: Option<String>,
+    pub stock_state: Option<GoogleCloudRecommendationengineV1beta1ProductCatalogItemStockStateEnum>,
 }
 
 impl client::Part for GoogleCloudRecommendationengineV1beta1ProductCatalogItem {}
@@ -772,7 +772,7 @@ pub struct GoogleCloudRecommendationengineV1beta1ProductDetail {
     /// Optional. Item stock state. If provided, this overrides the stock state in Catalog for items in this event.
     #[serde(rename="stockState")]
     
-    pub stock_state: Option<String>,
+    pub stock_state: Option<GoogleCloudRecommendationengineV1beta1ProductDetailStockStateEnum>,
 }
 
 impl client::Part for GoogleCloudRecommendationengineV1beta1ProductDetail {}
@@ -878,7 +878,7 @@ pub struct GoogleCloudRecommendationengineV1beta1RejoinUserEventsRequest {
     /// Required. The type of the catalog rejoin to define the scope and range of the user events to be rejoined with catalog items.
     #[serde(rename="userEventRejoinScope")]
     
-    pub user_event_rejoin_scope: Option<String>,
+    pub user_event_rejoin_scope: Option<GoogleCloudRecommendationengineV1beta1RejoinUserEventsRequestUserEventRejoinScopeEnum>,
 }
 
 impl client::RequestValue for GoogleCloudRecommendationengineV1beta1RejoinUserEventsRequest {}
@@ -902,7 +902,7 @@ pub struct GoogleCloudRecommendationengineV1beta1UserEvent {
     /// Optional. This field should *not* be set when using JavaScript pixel or the Recommendations AI Tag. Defaults to `EVENT_SOURCE_UNSPECIFIED`.
     #[serde(rename="eventSource")]
     
-    pub event_source: Option<String>,
+    pub event_source: Option<GoogleCloudRecommendationengineV1beta1UserEventEventSourceEnum>,
     /// Optional. Only required for ImportUserEvents method. Timestamp of user event created.
     #[serde(rename="eventTime")]
     

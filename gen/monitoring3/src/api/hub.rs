@@ -32,10 +32,10 @@ use super::*;
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.services().service_level_objectives_list("parent")
-///              .view("duo")
-///              .page_token("ipsum")
-///              .page_size(-62)
-///              .filter("Lorem")
+///              .view(&Default::default())
+///              .page_token("takimata")
+///              .page_size(-52)
+///              .filter("duo")
 ///              .doit().await;
 /// 
 /// match result {

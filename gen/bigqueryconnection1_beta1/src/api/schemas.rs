@@ -32,7 +32,7 @@ pub struct AuditLogConfig {
     /// The log type that this config enables.
     #[serde(rename="logType")]
     
-    pub log_type: Option<String>,
+    pub log_type: Option<AuditLogConfigLogTypeEnum>,
 }
 
 impl client::Part for AuditLogConfig {}
@@ -101,7 +101,7 @@ pub struct CloudSqlProperties {
     /// Type of the Cloud SQL database.
     #[serde(rename="type")]
     
-    pub type_: Option<String>,
+    pub type_: Option<CloudSqlPropertyTypeEnum>,
 }
 
 impl client::Part for CloudSqlProperties {}

@@ -232,7 +232,7 @@ pub struct BuildBazelRemoteExecutionV2CacheCapabilities {
     /// All the digest functions supported by the remote cache. Remote cache may support multiple digest functions simultaneously.
     #[serde(rename="digestFunction")]
     
-    pub digest_function: Option<Vec<String>>,
+    pub digest_function: Option<Vec<BuildBazelRemoteExecutionV2CacheCapabilityDigestFunctionEnum>>,
     /// Maximum total size of blobs to be uploaded/downloaded using batch methods. A value of 0 means no limit is set, although in practice there will always be a message size limitation of the protocol in use, e.g. GRPC.
     #[serde(rename="maxBatchTotalSizeBytes")]
     
@@ -241,11 +241,11 @@ pub struct BuildBazelRemoteExecutionV2CacheCapabilities {
     /// Compressors supported by the "compressed-blobs" bytestream resources. Servers MUST support identity/no-compression, even if it is not listed here. Note that this does not imply which if any compressors are supported by the server at the gRPC level.
     #[serde(rename="supportedCompressor")]
     
-    pub supported_compressor: Option<Vec<String>>,
+    pub supported_compressor: Option<Vec<BuildBazelRemoteExecutionV2CacheCapabilitySupportedCompressorEnum>>,
     /// Whether absolute symlink targets are supported.
     #[serde(rename="symlinkAbsolutePathStrategy")]
     
-    pub symlink_absolute_path_strategy: Option<String>,
+    pub symlink_absolute_path_strategy: Option<BuildBazelRemoteExecutionV2CacheCapabilitySymlinkAbsolutePathStrategyEnum>,
 }
 
 impl client::Part for BuildBazelRemoteExecutionV2CacheCapabilities {}
@@ -411,7 +411,7 @@ pub struct BuildBazelRemoteExecutionV2ExecutionCapabilities {
     /// Remote execution may only support a single digest function.
     #[serde(rename="digestFunction")]
     
-    pub digest_function: Option<String>,
+    pub digest_function: Option<BuildBazelRemoteExecutionV2ExecutionCapabilityDigestFunctionEnum>,
     /// Whether remote execution is enabled for the particular server/instance.
     #[serde(rename="execEnabled")]
     

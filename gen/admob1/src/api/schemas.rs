@@ -44,7 +44,7 @@ pub struct App {
     /// Output only. The approval state for the app.
     #[serde(rename="appApprovalState")]
     
-    pub app_approval_state: Option<String>,
+    pub app_approval_state: Option<AppAppApprovalStateEnum>,
     /// The externally visible ID of the app which can be used to integrate with the AdMob SDK. This is a read only property. Example: ca-app-pub-9876543210987654~0123456789
     #[serde(rename="appId")]
     
@@ -342,7 +342,7 @@ pub struct MediationReportSpec {
     pub dimension_filters: Option<Vec<MediationReportSpecDimensionFilter>>,
     /// List of dimensions of the report. The value combination of these dimensions determines the row of the report. If no dimensions are specified, the report returns a single row of requested metrics for the entire account.
     
-    pub dimensions: Option<Vec<String>>,
+    pub dimensions: Option<Vec<MediationReportSpecDimensionsEnum>>,
     /// Localization settings of the report.
     #[serde(rename="localizationSettings")]
     
@@ -353,7 +353,7 @@ pub struct MediationReportSpec {
     pub max_report_rows: Option<i32>,
     /// List of metrics of the report. A report must specify at least one metric.
     
-    pub metrics: Option<Vec<String>>,
+    pub metrics: Option<Vec<MediationReportSpecMetricsEnum>>,
     /// Describes the sorting of report rows. The order of the condition in the list defines its precedence; the earlier the condition, the higher its precedence. If no sort conditions are specified, the row ordering is undefined.
     #[serde(rename="sortConditions")]
     
@@ -376,7 +376,7 @@ impl client::Part for MediationReportSpec {}
 pub struct MediationReportSpecDimensionFilter {
     /// Applies the filter criterion to the specified dimension.
     
-    pub dimension: Option<String>,
+    pub dimension: Option<MediationReportSpecDimensionFilterDimensionEnum>,
     /// Matches a row if its value for the specified dimension is in one of the values specified in this condition.
     #[serde(rename="matchesAny")]
     
@@ -395,13 +395,13 @@ impl client::Part for MediationReportSpecDimensionFilter {}
 pub struct MediationReportSpecSortCondition {
     /// Sort by the specified dimension.
     
-    pub dimension: Option<String>,
+    pub dimension: Option<MediationReportSpecSortConditionDimensionEnum>,
     /// Sort by the specified metric.
     
-    pub metric: Option<String>,
+    pub metric: Option<MediationReportSpecSortConditionMetricEnum>,
     /// Sorting order of the dimension or metric.
     
-    pub order: Option<String>,
+    pub order: Option<MediationReportSpecSortConditionOrderEnum>,
 }
 
 impl client::Part for MediationReportSpecSortCondition {}
@@ -424,7 +424,7 @@ pub struct NetworkReportSpec {
     pub dimension_filters: Option<Vec<NetworkReportSpecDimensionFilter>>,
     /// List of dimensions of the report. The value combination of these dimensions determines the row of the report. If no dimensions are specified, the report returns a single row of requested metrics for the entire account.
     
-    pub dimensions: Option<Vec<String>>,
+    pub dimensions: Option<Vec<NetworkReportSpecDimensionsEnum>>,
     /// Localization settings of the report.
     #[serde(rename="localizationSettings")]
     
@@ -435,7 +435,7 @@ pub struct NetworkReportSpec {
     pub max_report_rows: Option<i32>,
     /// List of metrics of the report. A report must specify at least one metric.
     
-    pub metrics: Option<Vec<String>>,
+    pub metrics: Option<Vec<NetworkReportSpecMetricsEnum>>,
     /// Describes the sorting of report rows. The order of the condition in the list defines its precedence; the earlier the condition, the higher its precedence. If no sort conditions are specified, the row ordering is undefined.
     #[serde(rename="sortConditions")]
     
@@ -458,7 +458,7 @@ impl client::Part for NetworkReportSpec {}
 pub struct NetworkReportSpecDimensionFilter {
     /// Applies the filter criterion to the specified dimension.
     
-    pub dimension: Option<String>,
+    pub dimension: Option<NetworkReportSpecDimensionFilterDimensionEnum>,
     /// Matches a row if its value for the specified dimension is in one of the values specified in this condition.
     #[serde(rename="matchesAny")]
     
@@ -477,13 +477,13 @@ impl client::Part for NetworkReportSpecDimensionFilter {}
 pub struct NetworkReportSpecSortCondition {
     /// Sort by the specified dimension.
     
-    pub dimension: Option<String>,
+    pub dimension: Option<NetworkReportSpecSortConditionDimensionEnum>,
     /// Sort by the specified metric.
     
-    pub metric: Option<String>,
+    pub metric: Option<NetworkReportSpecSortConditionMetricEnum>,
     /// Sorting order of the dimension or metric.
     
-    pub order: Option<String>,
+    pub order: Option<NetworkReportSpecSortConditionOrderEnum>,
 }
 
 impl client::Part for NetworkReportSpecSortCondition {}
@@ -642,7 +642,7 @@ pub struct ReportWarning {
     /// Type of the warning.
     #[serde(rename="type")]
     
-    pub type_: Option<String>,
+    pub type_: Option<ReportWarningTypeEnum>,
 }
 
 impl client::Part for ReportWarning {}

@@ -51,7 +51,7 @@ pub struct DataSource {
     /// Indicates the type of authorization.
     #[serde(rename="authorizationType")]
     
-    pub authorization_type: Option<String>,
+    pub authorization_type: Option<DataSourceAuthorizationTypeEnum>,
     /// Data source client id which should be used to receive refresh token.
     #[serde(rename="clientId")]
     
@@ -59,7 +59,7 @@ pub struct DataSource {
     /// Specifies whether the data source supports automatic data refresh for the past few days, and how it's supported. For some data sources, data might not be complete until a few days later, so it's useful to refresh data automatically.
     #[serde(rename="dataRefreshType")]
     
-    pub data_refresh_type: Option<String>,
+    pub data_refresh_type: Option<DataSourceDataRefreshTypeEnum>,
     /// Data source id.
     #[serde(rename="dataSourceId")]
     
@@ -112,7 +112,7 @@ pub struct DataSource {
     /// Deprecated. This field has no effect.
     #[serde(rename="transferType")]
     
-    pub transfer_type: Option<String>,
+    pub transfer_type: Option<DataSourceTransferTypeEnum>,
     /// The number of seconds to wait for an update from the data source before the Data Transfer Service marks the transfer as FAILED.
     #[serde(rename="updateDeadlineSeconds")]
     
@@ -173,7 +173,7 @@ pub struct DataSourceParameter {
     /// Parameter type.
     #[serde(rename="type")]
     
-    pub type_: Option<String>,
+    pub type_: Option<DataSourceParameterTypeEnum>,
     /// Description of the requirements for this field, in case the user input does not fulfill the regex pattern or min/max values.
     #[serde(rename="validationDescription")]
     
@@ -629,7 +629,7 @@ pub struct TransferConfig {
     pub schedule_options: Option<ScheduleOptions>,
     /// Output only. State of the most recently updated transfer run.
     
-    pub state: Option<String>,
+    pub state: Option<TransferConfigStateEnum>,
     /// Output only. Data transfer modification time. Ignored by server on input.
     #[serde(rename="updateTime")]
     
@@ -662,7 +662,7 @@ pub struct TransferMessage {
     pub message_time: Option<client::chrono::DateTime<client::chrono::offset::Utc>>,
     /// Message severity.
     
-    pub severity: Option<String>,
+    pub severity: Option<TransferMessageSeverityEnum>,
 }
 
 impl client::Part for TransferMessage {}
@@ -727,7 +727,7 @@ pub struct TransferRun {
     pub start_time: Option<client::chrono::DateTime<client::chrono::offset::Utc>>,
     /// Data transfer run state. Ignored for input requests.
     
-    pub state: Option<String>,
+    pub state: Option<TransferRunStateEnum>,
     /// Output only. Last time the data transfer run state was updated.
     #[serde(rename="updateTime")]
     

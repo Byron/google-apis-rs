@@ -35,7 +35,7 @@ impl client::Part for AclEntry {}
 pub struct ApiWarning {
     /// Code to uniquely identify the warning type.
     
-    pub code: Option<String>,
+    pub code: Option<ApiWarningCodeEnum>,
     /// The warning message.
     
     pub message: Option<String>,
@@ -152,11 +152,11 @@ pub struct BackupRun {
     pub start_time: Option<client::chrono::DateTime<client::chrono::offset::Utc>>,
     /// The status of this run.
     
-    pub status: Option<String>,
+    pub status: Option<BackupRunStatusEnum>,
     /// The type of this run; can be either "AUTOMATED" or "ON_DEMAND".
     #[serde(rename="type")]
     
-    pub type_: Option<String>,
+    pub type_: Option<BackupRunTypeEnum>,
     /// The start time of the backup window during which this the backup was
     /// attempted in <a href="https://tools.ietf.org/html/rfc3339">RFC 3339</a>
     /// format, for example <code>2012-11-15T16:19:00.094Z</code>.
@@ -356,7 +356,7 @@ pub struct DatabaseInstance {
     /// the database type and Second or First Generation.
     #[serde(rename="backendType")]
     
-    pub backend_type: Option<String>,
+    pub backend_type: Option<DatabaseInstanceBackendTypeEnum>,
     /// Connection name of the Cloud SQL instance used in connection strings.
     #[serde(rename="connectionName")]
     
@@ -379,7 +379,7 @@ pub struct DatabaseInstance {
     /// instances: <code>MYSQL_5_6</code> (default) or <code>MYSQL_5_5</code>
     #[serde(rename="databaseVersion")]
     
-    pub database_version: Option<String>,
+    pub database_version: Option<DatabaseInstanceDatabaseVersionEnum>,
     /// Disk encryption configuration specific to an instance.
     /// Applies only to Second Generation instances.
     #[serde(rename="diskEncryptionConfiguration")]
@@ -413,7 +413,7 @@ pub struct DatabaseInstance {
     /// instance configured as a read-replica.
     #[serde(rename="instanceType")]
     
-    pub instance_type: Option<String>,
+    pub instance_type: Option<DatabaseInstanceInstanceTypeEnum>,
     /// The assigned IP addresses for the instance.
     #[serde(rename="ipAddresses")]
     
@@ -496,11 +496,11 @@ pub struct DatabaseInstance {
     /// <br><code>FAILED</code>: The instance creation failed.
     /// <br><code>UNKNOWN_STATE</code>: The state of the instance is unknown.
     
-    pub state: Option<String>,
+    pub state: Option<DatabaseInstanceStateEnum>,
     /// If the instance state is SUSPENDED, the reason for the suspension.
     #[serde(rename="suspensionReason")]
     
-    pub suspension_reason: Option<Vec<String>>,
+    pub suspension_reason: Option<Vec<DatabaseInstanceSuspensionReasonEnum>>,
 }
 
 impl client::RequestValue for DatabaseInstance {}
@@ -688,7 +688,7 @@ pub struct ExportContext {
     /// contains SQL statements. <br><code>CSV</code>: The file contains CSV data.
     #[serde(rename="fileType")]
     
-    pub file_type: Option<String>,
+    pub file_type: Option<ExportContextFileTypeEnum>,
     /// This is always <code>sql#exportContext</code>.
     
     pub kind: Option<String>,
@@ -757,7 +757,7 @@ pub struct Flag {
     /// is applicable only to Second Generation instances.
     #[serde(rename="appliesTo")]
     
-    pub applies_to: Option<Vec<String>>,
+    pub applies_to: Option<Vec<FlagAppliesToEnum>>,
     /// Whether or not the flag is considered in beta.
     #[serde(rename="inBeta")]
     
@@ -790,7 +790,7 @@ pub struct Flag {
     /// <code>skip_grant_tables</code>.
     #[serde(rename="type")]
     
-    pub type_: Option<String>,
+    pub type_: Option<FlagTypeEnum>,
 }
 
 impl client::Resource for Flag {}
@@ -844,7 +844,7 @@ pub struct ImportContext {
     /// contains SQL statements. <br><code>CSV</code>: The file contains CSV data.
     #[serde(rename="fileType")]
     
-    pub file_type: Option<String>,
+    pub file_type: Option<ImportContextFileTypeEnum>,
     /// The PostgreSQL user for this import operation. PostgreSQL instances only.
     #[serde(rename="importUser")]
     
@@ -1140,7 +1140,7 @@ pub struct IpMapping {
     /// originating from the instance, if supported.
     #[serde(rename="type")]
     
-    pub type_: Option<String>,
+    pub type_: Option<IpMappingTypeEnum>,
 }
 
 impl client::Part for IpMapping {}
@@ -1197,7 +1197,7 @@ pub struct MaintenanceWindow {
     /// Learn more</a>.
     #[serde(rename="updateTrack")]
     
-    pub update_track: Option<String>,
+    pub update_track: Option<MaintenanceWindowUpdateTrackEnum>,
 }
 
 impl client::Part for MaintenanceWindow {}
@@ -1390,7 +1390,7 @@ pub struct Operation {
     /// <code>DELETE_DATABASE</code> .
     #[serde(rename="operationType")]
     
-    pub operation_type: Option<String>,
+    pub operation_type: Option<OperationOperationTypeEnum>,
     /// The URI of this resource.
     #[serde(rename="selfLink")]
     
@@ -1405,7 +1405,7 @@ pub struct Operation {
     /// <code>RUNNING</code>, <code>DONE</code>,
     /// <code>SQL_OPERATION_STATUS_UNSPECIFIED</code>.
     
-    pub status: Option<String>,
+    pub status: Option<OperationStatusEnum>,
     /// Name of the database instance related to this operation.
     #[serde(rename="targetId")]
     
@@ -1536,7 +1536,7 @@ pub struct Reschedule {
     /// Required. The type of the reschedule.
     #[serde(rename="rescheduleType")]
     
-    pub reschedule_type: Option<String>,
+    pub reschedule_type: Option<RescheduleRescheduleTypeEnum>,
     /// Optional. Timestamp when the maintenance shall be rescheduled to if
     /// reschedule_type=SPECIFIC_TIME, in <a
     /// href="https://tools.ietf.org/html/rfc3339">RFC 3339</a> format, for
@@ -1616,7 +1616,7 @@ pub struct Settings {
     /// 12 hours of inactivity.
     #[serde(rename="activationPolicy")]
     
-    pub activation_policy: Option<String>,
+    pub activation_policy: Option<SettingActivationPolicyEnum>,
     /// The App Engine app IDs that can access this instance. First Generation
     /// instances only.
     #[serde(rename="authorizedGaeApplications")]
@@ -1631,7 +1631,7 @@ pub struct Settings {
     /// of the High Availability Configuration</a>.
     #[serde(rename="availabilityType")]
     
-    pub availability_type: Option<String>,
+    pub availability_type: Option<SettingAvailabilityTypeEnum>,
     /// The daily backup configuration for the instance.
     #[serde(rename="backupConfiguration")]
     
@@ -1652,7 +1652,7 @@ pub struct Settings {
     /// <code>PD_HDD</code>. Not used for First Generation instances.
     #[serde(rename="dataDiskType")]
     
-    pub data_disk_type: Option<String>,
+    pub data_disk_type: Option<SettingDataDiskTypeEnum>,
     /// The database flags passed to the instance at startup.
     #[serde(rename="databaseFlags")]
     
@@ -1689,13 +1689,13 @@ pub struct Settings {
     /// Generation instances.
     #[serde(rename="pricingPlan")]
     
-    pub pricing_plan: Option<String>,
+    pub pricing_plan: Option<SettingPricingPlanEnum>,
     /// The type of replication this instance uses. This can be either
     /// <code>ASYNCHRONOUS</code> or <code>SYNCHRONOUS</code>. This property is
     /// only applicable to First Generation instances.
     #[serde(rename="replicationType")]
     
-    pub replication_type: Option<String>,
+    pub replication_type: Option<SettingReplicationTypeEnum>,
     /// The version of instance settings. This is a required field for update
     /// method to make sure concurrent updates are handled properly. During update,
     /// use the most recent settingsVersion value for this instance and do not try
@@ -1750,7 +1750,7 @@ pub struct SqlExternalSyncSettingError {
     /// Identifies the specific error that occurred.
     #[serde(rename="type")]
     
-    pub type_: Option<String>,
+    pub type_: Option<SqlExternalSyncSettingErrorTypeEnum>,
 }
 
 impl client::Part for SqlExternalSyncSettingError {}

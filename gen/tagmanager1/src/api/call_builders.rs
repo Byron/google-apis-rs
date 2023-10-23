@@ -2519,8 +2519,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("accountId", self._account_id);
-        params.push("containerId", self._container_id);
+        params.push("accountId", &self._account_id);
+        params.push("containerId", &self._container_id);
 
         params.extend(self._additional_params.iter());
 
@@ -2817,9 +2817,9 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("accountId", self._account_id);
-        params.push("containerId", self._container_id);
-        params.push("environmentId", self._environment_id);
+        params.push("accountId", &self._account_id);
+        params.push("containerId", &self._container_id);
+        params.push("environmentId", &self._environment_id);
 
         params.extend(self._additional_params.iter());
 
@@ -3092,9 +3092,9 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("accountId", self._account_id);
-        params.push("containerId", self._container_id);
-        params.push("environmentId", self._environment_id);
+        params.push("accountId", &self._account_id);
+        params.push("containerId", &self._container_id);
+        params.push("environmentId", &self._environment_id);
 
         params.extend(self._additional_params.iter());
 
@@ -3377,8 +3377,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("accountId", self._account_id);
-        params.push("containerId", self._container_id);
+        params.push("accountId", &self._account_id);
+        params.push("containerId", &self._container_id);
 
         params.extend(self._additional_params.iter());
 
@@ -3661,9 +3661,9 @@ where
         }
 
         let mut params = Params::with_capacity(7 + self._additional_params.len());
-        params.push("accountId", self._account_id);
-        params.push("containerId", self._container_id);
-        params.push("environmentId", self._environment_id);
+        params.push("accountId", &self._account_id);
+        params.push("containerId", &self._container_id);
+        params.push("environmentId", &self._environment_id);
         if let Some(value) = self._fingerprint.as_ref() {
             params.push("fingerprint", value);
         }
@@ -3980,9 +3980,9 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("accountId", self._account_id);
-        params.push("containerId", self._container_id);
-        params.push("folderId", self._folder_id);
+        params.push("accountId", &self._account_id);
+        params.push("containerId", &self._container_id);
+        params.push("folderId", &self._folder_id);
 
         params.extend(self._additional_params.iter());
 
@@ -4272,8 +4272,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("accountId", self._account_id);
-        params.push("containerId", self._container_id);
+        params.push("accountId", &self._account_id);
+        params.push("containerId", &self._container_id);
 
         params.extend(self._additional_params.iter());
 
@@ -4570,9 +4570,9 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("accountId", self._account_id);
-        params.push("containerId", self._container_id);
-        params.push("folderId", self._folder_id);
+        params.push("accountId", &self._account_id);
+        params.push("containerId", &self._container_id);
+        params.push("folderId", &self._folder_id);
 
         params.extend(self._additional_params.iter());
 
@@ -4845,9 +4845,9 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("accountId", self._account_id);
-        params.push("containerId", self._container_id);
-        params.push("folderId", self._folder_id);
+        params.push("accountId", &self._account_id);
+        params.push("containerId", &self._container_id);
+        params.push("folderId", &self._folder_id);
 
         params.extend(self._additional_params.iter());
 
@@ -5130,8 +5130,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("accountId", self._account_id);
-        params.push("containerId", self._container_id);
+        params.push("accountId", &self._account_id);
+        params.push("containerId", &self._container_id);
 
         params.extend(self._additional_params.iter());
 
@@ -5414,9 +5414,9 @@ where
         }
 
         let mut params = Params::with_capacity(7 + self._additional_params.len());
-        params.push("accountId", self._account_id);
-        params.push("containerId", self._container_id);
-        params.push("folderId", self._folder_id);
+        params.push("accountId", &self._account_id);
+        params.push("containerId", &self._container_id);
+        params.push("folderId", &self._folder_id);
         if let Some(value) = self._fingerprint.as_ref() {
             params.push("fingerprint", value);
         }
@@ -5746,9 +5746,9 @@ where
         }
 
         let mut params = Params::with_capacity(8 + self._additional_params.len());
-        params.push("accountId", self._account_id);
-        params.push("containerId", self._container_id);
-        params.push("folderId", self._folder_id);
+        params.push("accountId", &self._account_id);
+        params.push("containerId", &self._container_id);
+        params.push("folderId", &self._folder_id);
         if self._variable_id.len() > 0 {
             for f in self._variable_id.iter() {
                 params.push("variableId", f);
@@ -6090,9 +6090,9 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("accountId", self._account_id);
-        params.push("containerId", self._container_id);
-        params.push("environmentId", self._environment_id);
+        params.push("accountId", &self._account_id);
+        params.push("containerId", &self._container_id);
+        params.push("environmentId", &self._environment_id);
 
         params.extend(self._additional_params.iter());
 
@@ -6405,8 +6405,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("accountId", self._account_id);
-        params.push("containerId", self._container_id);
+        params.push("accountId", &self._account_id);
+        params.push("containerId", &self._container_id);
 
         params.extend(self._additional_params.iter());
 
@@ -6703,9 +6703,9 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("accountId", self._account_id);
-        params.push("containerId", self._container_id);
-        params.push("tagId", self._tag_id);
+        params.push("accountId", &self._account_id);
+        params.push("containerId", &self._container_id);
+        params.push("tagId", &self._tag_id);
 
         params.extend(self._additional_params.iter());
 
@@ -6978,9 +6978,9 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("accountId", self._account_id);
-        params.push("containerId", self._container_id);
-        params.push("tagId", self._tag_id);
+        params.push("accountId", &self._account_id);
+        params.push("containerId", &self._container_id);
+        params.push("tagId", &self._tag_id);
 
         params.extend(self._additional_params.iter());
 
@@ -7263,8 +7263,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("accountId", self._account_id);
-        params.push("containerId", self._container_id);
+        params.push("accountId", &self._account_id);
+        params.push("containerId", &self._container_id);
 
         params.extend(self._additional_params.iter());
 
@@ -7547,9 +7547,9 @@ where
         }
 
         let mut params = Params::with_capacity(7 + self._additional_params.len());
-        params.push("accountId", self._account_id);
-        params.push("containerId", self._container_id);
-        params.push("tagId", self._tag_id);
+        params.push("accountId", &self._account_id);
+        params.push("containerId", &self._container_id);
+        params.push("tagId", &self._tag_id);
         if let Some(value) = self._fingerprint.as_ref() {
             params.push("fingerprint", value);
         }
@@ -7872,8 +7872,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("accountId", self._account_id);
-        params.push("containerId", self._container_id);
+        params.push("accountId", &self._account_id);
+        params.push("containerId", &self._container_id);
 
         params.extend(self._additional_params.iter());
 
@@ -8170,9 +8170,9 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("accountId", self._account_id);
-        params.push("containerId", self._container_id);
-        params.push("triggerId", self._trigger_id);
+        params.push("accountId", &self._account_id);
+        params.push("containerId", &self._container_id);
+        params.push("triggerId", &self._trigger_id);
 
         params.extend(self._additional_params.iter());
 
@@ -8445,9 +8445,9 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("accountId", self._account_id);
-        params.push("containerId", self._container_id);
-        params.push("triggerId", self._trigger_id);
+        params.push("accountId", &self._account_id);
+        params.push("containerId", &self._container_id);
+        params.push("triggerId", &self._trigger_id);
 
         params.extend(self._additional_params.iter());
 
@@ -8730,8 +8730,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("accountId", self._account_id);
-        params.push("containerId", self._container_id);
+        params.push("accountId", &self._account_id);
+        params.push("containerId", &self._container_id);
 
         params.extend(self._additional_params.iter());
 
@@ -9014,9 +9014,9 @@ where
         }
 
         let mut params = Params::with_capacity(7 + self._additional_params.len());
-        params.push("accountId", self._account_id);
-        params.push("containerId", self._container_id);
-        params.push("triggerId", self._trigger_id);
+        params.push("accountId", &self._account_id);
+        params.push("containerId", &self._container_id);
+        params.push("triggerId", &self._trigger_id);
         if let Some(value) = self._fingerprint.as_ref() {
             params.push("fingerprint", value);
         }
@@ -9339,8 +9339,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("accountId", self._account_id);
-        params.push("containerId", self._container_id);
+        params.push("accountId", &self._account_id);
+        params.push("containerId", &self._container_id);
 
         params.extend(self._additional_params.iter());
 
@@ -9637,9 +9637,9 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("accountId", self._account_id);
-        params.push("containerId", self._container_id);
-        params.push("variableId", self._variable_id);
+        params.push("accountId", &self._account_id);
+        params.push("containerId", &self._container_id);
+        params.push("variableId", &self._variable_id);
 
         params.extend(self._additional_params.iter());
 
@@ -9912,9 +9912,9 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("accountId", self._account_id);
-        params.push("containerId", self._container_id);
-        params.push("variableId", self._variable_id);
+        params.push("accountId", &self._account_id);
+        params.push("containerId", &self._container_id);
+        params.push("variableId", &self._variable_id);
 
         params.extend(self._additional_params.iter());
 
@@ -10197,8 +10197,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("accountId", self._account_id);
-        params.push("containerId", self._container_id);
+        params.push("accountId", &self._account_id);
+        params.push("containerId", &self._container_id);
 
         params.extend(self._additional_params.iter());
 
@@ -10481,9 +10481,9 @@ where
         }
 
         let mut params = Params::with_capacity(7 + self._additional_params.len());
-        params.push("accountId", self._account_id);
-        params.push("containerId", self._container_id);
-        params.push("variableId", self._variable_id);
+        params.push("accountId", &self._account_id);
+        params.push("containerId", &self._container_id);
+        params.push("variableId", &self._variable_id);
         if let Some(value) = self._fingerprint.as_ref() {
             params.push("fingerprint", value);
         }
@@ -10806,8 +10806,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("accountId", self._account_id);
-        params.push("containerId", self._container_id);
+        params.push("accountId", &self._account_id);
+        params.push("containerId", &self._container_id);
 
         params.extend(self._additional_params.iter());
 
@@ -11104,9 +11104,9 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("accountId", self._account_id);
-        params.push("containerId", self._container_id);
-        params.push("containerVersionId", self._container_version_id);
+        params.push("accountId", &self._account_id);
+        params.push("containerId", &self._container_id);
+        params.push("containerVersionId", &self._container_version_id);
 
         params.extend(self._additional_params.iter());
 
@@ -11379,9 +11379,9 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("accountId", self._account_id);
-        params.push("containerId", self._container_id);
-        params.push("containerVersionId", self._container_version_id);
+        params.push("accountId", &self._account_id);
+        params.push("containerId", &self._container_id);
+        params.push("containerVersionId", &self._container_version_id);
 
         params.extend(self._additional_params.iter());
 
@@ -11668,8 +11668,8 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("accountId", self._account_id);
-        params.push("containerId", self._container_id);
+        params.push("accountId", &self._account_id);
+        params.push("containerId", &self._container_id);
         if let Some(value) = self._include_deleted.as_ref() {
             params.push("includeDeleted", value.to_string());
         }
@@ -11965,9 +11965,9 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("accountId", self._account_id);
-        params.push("containerId", self._container_id);
-        params.push("containerVersionId", self._container_version_id);
+        params.push("accountId", &self._account_id);
+        params.push("containerId", &self._container_id);
+        params.push("containerVersionId", &self._container_version_id);
         if let Some(value) = self._fingerprint.as_ref() {
             params.push("fingerprint", value);
         }
@@ -12261,9 +12261,9 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("accountId", self._account_id);
-        params.push("containerId", self._container_id);
-        params.push("containerVersionId", self._container_version_id);
+        params.push("accountId", &self._account_id);
+        params.push("containerId", &self._container_id);
+        params.push("containerVersionId", &self._container_version_id);
 
         params.extend(self._additional_params.iter());
 
@@ -12547,9 +12547,9 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("accountId", self._account_id);
-        params.push("containerId", self._container_id);
-        params.push("containerVersionId", self._container_version_id);
+        params.push("accountId", &self._account_id);
+        params.push("containerId", &self._container_id);
+        params.push("containerVersionId", &self._container_version_id);
 
         params.extend(self._additional_params.iter());
 
@@ -12842,9 +12842,9 @@ where
         }
 
         let mut params = Params::with_capacity(7 + self._additional_params.len());
-        params.push("accountId", self._account_id);
-        params.push("containerId", self._container_id);
-        params.push("containerVersionId", self._container_version_id);
+        params.push("accountId", &self._account_id);
+        params.push("containerId", &self._container_id);
+        params.push("containerVersionId", &self._container_version_id);
         if let Some(value) = self._fingerprint.as_ref() {
             params.push("fingerprint", value);
         }
@@ -13166,7 +13166,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("accountId", self._account_id);
+        params.push("accountId", &self._account_id);
 
         params.extend(self._additional_params.iter());
 
@@ -13452,8 +13452,8 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("accountId", self._account_id);
-        params.push("containerId", self._container_id);
+        params.push("accountId", &self._account_id);
+        params.push("containerId", &self._container_id);
 
         params.extend(self._additional_params.iter());
 
@@ -13715,8 +13715,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("accountId", self._account_id);
-        params.push("containerId", self._container_id);
+        params.push("accountId", &self._account_id);
+        params.push("containerId", &self._container_id);
 
         params.extend(self._additional_params.iter());
 
@@ -13988,7 +13988,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("accountId", self._account_id);
+        params.push("accountId", &self._account_id);
 
         params.extend(self._additional_params.iter());
 
@@ -14260,8 +14260,8 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("accountId", self._account_id);
-        params.push("containerId", self._container_id);
+        params.push("accountId", &self._account_id);
+        params.push("containerId", &self._container_id);
         if let Some(value) = self._fingerprint.as_ref() {
             params.push("fingerprint", value);
         }
@@ -14573,7 +14573,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("accountId", self._account_id);
+        params.push("accountId", &self._account_id);
 
         params.extend(self._additional_params.iter());
 
@@ -14859,8 +14859,8 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("accountId", self._account_id);
-        params.push("permissionId", self._permission_id);
+        params.push("accountId", &self._account_id);
+        params.push("permissionId", &self._permission_id);
 
         params.extend(self._additional_params.iter());
 
@@ -15122,8 +15122,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("accountId", self._account_id);
-        params.push("permissionId", self._permission_id);
+        params.push("accountId", &self._account_id);
+        params.push("permissionId", &self._permission_id);
 
         params.extend(self._additional_params.iter());
 
@@ -15395,7 +15395,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("accountId", self._account_id);
+        params.push("accountId", &self._account_id);
 
         params.extend(self._additional_params.iter());
 
@@ -15665,8 +15665,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("accountId", self._account_id);
-        params.push("permissionId", self._permission_id);
+        params.push("accountId", &self._account_id);
+        params.push("permissionId", &self._permission_id);
 
         params.extend(self._additional_params.iter());
 
@@ -15961,7 +15961,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("accountId", self._account_id);
+        params.push("accountId", &self._account_id);
 
         params.extend(self._additional_params.iter());
 
@@ -16475,7 +16475,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("accountId", self._account_id);
+        params.push("accountId", &self._account_id);
         if let Some(value) = self._fingerprint.as_ref() {
             params.push("fingerprint", value);
         }

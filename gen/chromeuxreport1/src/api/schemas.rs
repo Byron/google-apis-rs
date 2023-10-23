@@ -75,7 +75,7 @@ pub struct Key {
     /// The form factor is the device class that all users used to access the site for this record. If the form factor is unspecified, then aggregated data over all form factors will be returned.
     #[serde(rename="formFactor")]
     
-    pub form_factor: Option<String>,
+    pub form_factor: Option<KeyFormFactorEnum>,
     /// Origin specifies the origin that this record is for. Note: When specifying an origin, data for loads under this origin over all pages are aggregated into origin level user experience data.
     
     pub origin: Option<String>,
@@ -138,7 +138,7 @@ pub struct QueryRequest {
     /// The form factor is a query dimension that specifies the device class that the record's data should belong to. Note: If no form factor is specified, then a special record with aggregated data over all form factors will be returned.
     #[serde(rename="formFactor")]
     
-    pub form_factor: Option<String>,
+    pub form_factor: Option<QueryRequestFormFactorEnum>,
     /// The metrics that should be included in the response. If none are specified then any metrics found will be returned. Allowed values: ["first_contentful_paint", "first_input_delay", "largest_contentful_paint", "cumulative_layout_shift", "experimental_time_to_first_byte", "experimental_interaction_to_next_paint"]
     
     pub metrics: Option<Vec<String>>,

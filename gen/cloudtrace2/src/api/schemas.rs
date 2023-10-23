@@ -117,7 +117,7 @@ pub struct Link {
     /// The relationship of the current span relative to the linked span.
     #[serde(rename="type")]
     
-    pub type_: Option<String>,
+    pub type_: Option<LinkTypeEnum>,
 }
 
 impl client::Part for Link {}
@@ -161,7 +161,7 @@ pub struct MessageEvent {
     /// Type of MessageEvent. Indicates whether the message was sent or received.
     #[serde(rename="type")]
     
-    pub type_: Option<String>,
+    pub type_: Option<MessageEventTypeEnum>,
     /// The number of uncompressed bytes sent or received.
     #[serde(rename="uncompressedSizeBytes")]
     
@@ -238,7 +238,7 @@ pub struct Span {
     /// Optional. Distinguishes between spans generated in a particular context. For example, two spans with the same name may be distinguished using `CLIENT` (caller) and `SERVER` (callee) to identify an RPC call.
     #[serde(rename="spanKind")]
     
-    pub span_kind: Option<String>,
+    pub span_kind: Option<SpanSpanKindEnum>,
     /// Stack trace captured at the start of the span.
     #[serde(rename="stackTrace")]
     

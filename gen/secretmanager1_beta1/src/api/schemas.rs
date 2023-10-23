@@ -73,7 +73,7 @@ pub struct AuditLogConfig {
     /// The log type that this config enables.
     #[serde(rename="logType")]
     
-    pub log_type: Option<String>,
+    pub log_type: Option<AuditLogConfigLogTypeEnum>,
 }
 
 impl client::Part for AuditLogConfig {}
@@ -446,7 +446,7 @@ pub struct SecretVersion {
     pub name: Option<String>,
     /// Output only. The current state of the SecretVersion.
     
-    pub state: Option<String>,
+    pub state: Option<SecretVersionStateEnum>,
 }
 
 impl client::ResponseResult for SecretVersion {}

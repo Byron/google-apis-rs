@@ -28,19 +28,19 @@ pub struct ActiveViewVideoViewabilityMetricConfig {
     /// The minimum visible video duration required (in seconds) in order for an impression to be recorded. You must specify minimum_duration, minimum_quartile or both. If both are specified, an impression meets the metric criteria if either requirement is met (whichever happens first).
     #[serde(rename="minimumDuration")]
     
-    pub minimum_duration: Option<String>,
+    pub minimum_duration: Option<ActiveViewVideoViewabilityMetricConfigMinimumDurationEnum>,
     /// The minimum visible video duration required, based on the video quartiles, in order for an impression to be recorded. You must specify minimum_duration, minimum_quartile or both. If both are specified, an impression meets the metric criteria if either requirement is met (whichever happens first).
     #[serde(rename="minimumQuartile")]
     
-    pub minimum_quartile: Option<String>,
+    pub minimum_quartile: Option<ActiveViewVideoViewabilityMetricConfigMinimumQuartileEnum>,
     /// Required. The minimum percentage of the video ad's pixels visible on the screen in order for an impression to be recorded.
     #[serde(rename="minimumViewability")]
     
-    pub minimum_viewability: Option<String>,
+    pub minimum_viewability: Option<ActiveViewVideoViewabilityMetricConfigMinimumViewabilityEnum>,
     /// Required. The minimum percentage of the video ad's volume required in order for an impression to be recorded.
     #[serde(rename="minimumVolume")]
     
-    pub minimum_volume: Option<String>,
+    pub minimum_volume: Option<ActiveViewVideoViewabilityMetricConfigMinimumVolumeEnum>,
 }
 
 impl client::Part for ActiveViewVideoViewabilityMetricConfig {}
@@ -56,7 +56,7 @@ pub struct Adloox {
     /// Adloox's brand safety settings.
     #[serde(rename="excludedAdlooxCategories")]
     
-    pub excluded_adloox_categories: Option<Vec<String>>,
+    pub excluded_adloox_categories: Option<Vec<AdlooxExcludedAdlooxCategoriesEnum>>,
 }
 
 impl client::Part for Adloox {}
@@ -177,7 +177,7 @@ pub struct Advertiser {
     /// Required. Controls whether or not insertion orders and line items of the advertiser can spend their budgets and bid on inventory. * Accepted values are `ENTITY_STATUS_ACTIVE`, `ENTITY_STATUS_PAUSED` and `ENTITY_STATUS_SCHEDULED_FOR_DELETION`. * If set to `ENTITY_STATUS_SCHEDULED_FOR_DELETION`, the advertiser will be deleted 30 days from when it was first scheduled for deletion.
     #[serde(rename="entityStatus")]
     
-    pub entity_status: Option<String>,
+    pub entity_status: Option<AdvertiserEntityStatusEnum>,
     /// Required. General settings of the advertiser.
     #[serde(rename="generalConfig")]
     
@@ -348,7 +348,7 @@ pub struct AgeRangeAssignedTargetingOptionDetails {
     /// The age range of an audience. We only support targeting a continuous age range of an audience. Thus, the age range represented in this field can be 1) targeted solely, or, 2) part of a larger continuous age range. The reach of a continuous age range targeting can be expanded by also targeting an audience of an unknown age. Output only in v1. Required in v2.
     #[serde(rename="ageRange")]
     
-    pub age_range: Option<String>,
+    pub age_range: Option<AgeRangeAssignedTargetingOptionDetailAgeRangeEnum>,
     /// Required. The targeting_option_id of a TargetingOption of type `TARGETING_TYPE_AGE_RANGE`.
     #[serde(rename="targetingOptionId")]
     
@@ -368,7 +368,7 @@ pub struct AgeRangeTargetingOptionDetails {
     /// Output only. The age range of an audience.
     #[serde(rename="ageRange")]
     
-    pub age_range: Option<String>,
+    pub age_range: Option<AgeRangeTargetingOptionDetailAgeRangeEnum>,
 }
 
 impl client::Part for AgeRangeTargetingOptionDetails {}
@@ -388,7 +388,7 @@ pub struct AppAssignedTargetingOptionDetails {
     /// Indicates the platform of the targeted app. If this field is not specified, the app platform will be assumed to be mobile (i.e., Android or iOS), and we will derive the appropriate mobile platform from the app ID.
     #[serde(rename="appPlatform")]
     
-    pub app_platform: Option<String>,
+    pub app_platform: Option<AppAssignedTargetingOptionDetailAppPlatformEnum>,
     /// Output only. The display name of the app.
     #[serde(rename="displayName")]
     
@@ -472,7 +472,7 @@ pub struct AssetAssociation {
     pub asset: Option<Asset>,
     /// The role of this asset for the creative.
     
-    pub role: Option<String>,
+    pub role: Option<AssetAssociationRoleEnum>,
 }
 
 impl client::Part for AssetAssociation {}
@@ -660,7 +660,7 @@ pub struct AssignedTargetingOption {
     pub household_income_details: Option<HouseholdIncomeAssignedTargetingOptionDetails>,
     /// Output only. The inheritance status of the assigned targeting option.
     
-    pub inheritance: Option<String>,
+    pub inheritance: Option<AssignedTargetingOptionInheritanceEnum>,
     /// Inventory source details. This field will be populated when the targeting_type is `TARGETING_TYPE_INVENTORY_SOURCE`.
     #[serde(rename="inventorySourceDetails")]
     
@@ -727,7 +727,7 @@ pub struct AssignedTargetingOption {
     /// Output only. Identifies the type of this assigned targeting option.
     #[serde(rename="targetingType")]
     
-    pub targeting_type: Option<String>,
+    pub targeting_type: Option<AssignedTargetingOptionTargetingTypeEnum>,
     /// Third party verification details. This field will be populated when the targeting_type is `TARGETING_TYPE_THIRD_PARTY_VERIFIER`.
     #[serde(rename="thirdPartyVerifierDetails")]
     
@@ -778,7 +778,7 @@ pub struct AssignedUserRole {
     /// Required. The user role to assign to a user for the entity.
     #[serde(rename="userRole")]
     
-    pub user_role: Option<String>,
+    pub user_role: Option<AssignedUserRoleUserRoleEnum>,
 }
 
 impl client::Part for AssignedUserRole {}
@@ -830,7 +830,7 @@ pub struct AudioContentTypeAssignedTargetingOptionDetails {
     /// The audio content type. Output only in v1. Required in v2.
     #[serde(rename="audioContentType")]
     
-    pub audio_content_type: Option<String>,
+    pub audio_content_type: Option<AudioContentTypeAssignedTargetingOptionDetailAudioContentTypeEnum>,
     /// Required. The targeting_option_id field when targeting_type is `TARGETING_TYPE_AUDIO_CONTENT_TYPE`.
     #[serde(rename="targetingOptionId")]
     
@@ -850,7 +850,7 @@ pub struct AudioContentTypeTargetingOptionDetails {
     /// Output only. The audio content type.
     #[serde(rename="audioContentType")]
     
-    pub audio_content_type: Option<String>,
+    pub audio_content_type: Option<AudioContentTypeTargetingOptionDetailAudioContentTypeEnum>,
 }
 
 impl client::Part for AudioContentTypeTargetingOptionDetails {}
@@ -942,7 +942,7 @@ pub struct AuthorizedSellerStatusAssignedTargetingOptionDetails {
     /// Output only. The authorized seller status to target.
     #[serde(rename="authorizedSellerStatus")]
     
-    pub authorized_seller_status: Option<String>,
+    pub authorized_seller_status: Option<AuthorizedSellerStatusAssignedTargetingOptionDetailAuthorizedSellerStatusEnum>,
     /// Required. The targeting_option_id of a TargetingOption of type `TARGETING_TYPE_AUTHORIZED_SELLER_STATUS`.
     #[serde(rename="targetingOptionId")]
     
@@ -962,7 +962,7 @@ pub struct AuthorizedSellerStatusTargetingOptionDetails {
     /// Output only. The authorized seller status.
     #[serde(rename="authorizedSellerStatus")]
     
-    pub authorized_seller_status: Option<String>,
+    pub authorized_seller_status: Option<AuthorizedSellerStatusTargetingOptionDetailAuthorizedSellerStatusEnum>,
 }
 
 impl client::Part for AuthorizedSellerStatusTargetingOptionDetails {}
@@ -1555,7 +1555,7 @@ pub struct BusinessChainAssignedTargetingOptionDetails {
     /// Required. The unit of distance by which the targeting radius is measured.
     #[serde(rename="proximityRadiusUnit")]
     
-    pub proximity_radius_unit: Option<String>,
+    pub proximity_radius_unit: Option<BusinessChainAssignedTargetingOptionDetailProximityRadiusUnitEnum>,
     /// Required. The targeting_option_id of a TargetingOption of type `TARGETING_TYPE_BUSINESS_CHAIN`. Accepted business chain targeting option IDs can be retrieved using SearchTargetingOptions.
     #[serde(rename="targetingOptionId")]
     
@@ -1603,7 +1603,7 @@ pub struct BusinessChainTargetingOptionDetails {
     /// Output only. The type of the geographic region.
     #[serde(rename="geoRegionType")]
     
-    pub geo_region_type: Option<String>,
+    pub geo_region_type: Option<BusinessChainTargetingOptionDetailGeoRegionTypeEnum>,
 }
 
 impl client::Part for BusinessChainTargetingOptionDetails {}
@@ -1651,7 +1651,7 @@ pub struct Campaign {
     /// Required. Controls whether or not the insertion orders under this campaign can spend their budgets and bid on inventory. * Accepted values are `ENTITY_STATUS_ACTIVE`, `ENTITY_STATUS_ARCHIVED`, and `ENTITY_STATUS_PAUSED`. * For CreateCampaign method, `ENTITY_STATUS_ARCHIVED` is not allowed.
     #[serde(rename="entityStatus")]
     
-    pub entity_status: Option<String>,
+    pub entity_status: Option<CampaignEntityStatusEnum>,
     /// Required. The frequency cap setting of the campaign.
     #[serde(rename="frequencyCap")]
     
@@ -1689,7 +1689,7 @@ pub struct CampaignBudget {
     /// Required. Immutable. Specifies whether the budget is measured in currency or impressions.
     #[serde(rename="budgetUnit")]
     
-    pub budget_unit: Option<String>,
+    pub budget_unit: Option<CampaignBudgetBudgetUnitEnum>,
     /// Required. The date range for the campaign budget. Linked budget segments may have a different date range. They are resolved relative to the parent advertiser's time zone. Both `start_date` and `end_date` must be before the year 2037.
     #[serde(rename="dateRange")]
     
@@ -1705,7 +1705,7 @@ pub struct CampaignBudget {
     /// Required. The external source of the budget.
     #[serde(rename="externalBudgetSource")]
     
-    pub external_budget_source: Option<String>,
+    pub external_budget_source: Option<CampaignBudgetExternalBudgetSourceEnum>,
     /// Immutable. The ID used to group budgets to be included the same invoice. If this field is set and the invoice level of the corresponding billing profile is set to "Budget invoice grouping ID", all external_budget_id sharing the same invoice_grouping_id will be grouped in the same invoice.
     #[serde(rename="invoiceGroupingId")]
     
@@ -1750,7 +1750,7 @@ pub struct CampaignGoal {
     /// Required. The type of the campaign goal.
     #[serde(rename="campaignGoalType")]
     
-    pub campaign_goal_type: Option<String>,
+    pub campaign_goal_type: Option<CampaignGoalCampaignGoalTypeEnum>,
     /// Required. The performance goal of the campaign. Acceptable values for performance_goal_type are: * `PERFORMANCE_GOAL_TYPE_CPM` * `PERFORMANCE_GOAL_TYPE_CPC` * `PERFORMANCE_GOAL_TYPE_CPA` * `PERFORMANCE_GOAL_TYPE_CPIAVC` * `PERFORMANCE_GOAL_TYPE_CTR` * `PERFORMANCE_GOAL_TYPE_VIEWABILITY` * `PERFORMANCE_GOAL_TYPE_OTHER`
     #[serde(rename="performanceGoal")]
     
@@ -1797,7 +1797,7 @@ pub struct CarrierAndIspTargetingOptionDetails {
     /// Output only. The type indicating if it's carrier or ISP.
     #[serde(rename="type")]
     
-    pub type_: Option<String>,
+    pub type_: Option<CarrierAndIspTargetingOptionDetailTypeEnum>,
 }
 
 impl client::Part for CarrierAndIspTargetingOptionDetails {}
@@ -2106,7 +2106,7 @@ pub struct ContentDurationAssignedTargetingOptionDetails {
     /// Output only. The content duration.
     #[serde(rename="contentDuration")]
     
-    pub content_duration: Option<String>,
+    pub content_duration: Option<ContentDurationAssignedTargetingOptionDetailContentDurationEnum>,
     /// Required. The targeting_option_id field when targeting_type is `TARGETING_TYPE_CONTENT_DURATION`.
     #[serde(rename="targetingOptionId")]
     
@@ -2126,7 +2126,7 @@ pub struct ContentDurationTargetingOptionDetails {
     /// Output only. The content duration.
     #[serde(rename="contentDuration")]
     
-    pub content_duration: Option<String>,
+    pub content_duration: Option<ContentDurationTargetingOptionDetailContentDurationEnum>,
 }
 
 impl client::Part for ContentDurationTargetingOptionDetails {}
@@ -2181,11 +2181,11 @@ pub struct ContentInstreamPositionAssignedTargetingOptionDetails {
     /// Output only. The ad type to target. Only applicable to insertion order targeting and new line items supporting the specified ad type will inherit this targeting option by default. Possible values are: * `AD_TYPE_VIDEO`, the setting will be inherited by new line item when line_item_type is `LINE_ITEM_TYPE_VIDEO_DEFAULT`. * `AD_TYPE_AUDIO`, the setting will be inherited by new line item when line_item_type is `LINE_ITEM_TYPE_AUDIO_DEFAULT`.
     #[serde(rename="adType")]
     
-    pub ad_type: Option<String>,
+    pub ad_type: Option<ContentInstreamPositionAssignedTargetingOptionDetailAdTypeEnum>,
     /// The content instream position for video or audio ads. Output only in v1. Required in v2.
     #[serde(rename="contentInstreamPosition")]
     
-    pub content_instream_position: Option<String>,
+    pub content_instream_position: Option<ContentInstreamPositionAssignedTargetingOptionDetailContentInstreamPositionEnum>,
     /// Required. The targeting_option_id field when targeting_type is `TARGETING_TYPE_CONTENT_INSTREAM_POSITION`.
     #[serde(rename="targetingOptionId")]
     
@@ -2205,7 +2205,7 @@ pub struct ContentInstreamPositionTargetingOptionDetails {
     /// Output only. The content instream position.
     #[serde(rename="contentInstreamPosition")]
     
-    pub content_instream_position: Option<String>,
+    pub content_instream_position: Option<ContentInstreamPositionTargetingOptionDetailContentInstreamPositionEnum>,
 }
 
 impl client::Part for ContentInstreamPositionTargetingOptionDetails {}
@@ -2221,11 +2221,11 @@ pub struct ContentOutstreamPositionAssignedTargetingOptionDetails {
     /// Output only. The ad type to target. Only applicable to insertion order targeting and new line items supporting the specified ad type will inherit this targeting option by default. Possible values are: * `AD_TYPE_DISPLAY`, the setting will be inherited by new line item when line_item_type is `LINE_ITEM_TYPE_DISPLAY_DEFAULT`. * `AD_TYPE_VIDEO`, the setting will be inherited by new line item when line_item_type is `LINE_ITEM_TYPE_VIDEO_DEFAULT`.
     #[serde(rename="adType")]
     
-    pub ad_type: Option<String>,
+    pub ad_type: Option<ContentOutstreamPositionAssignedTargetingOptionDetailAdTypeEnum>,
     /// The content outstream position. Output only in v1. Required in v2.
     #[serde(rename="contentOutstreamPosition")]
     
-    pub content_outstream_position: Option<String>,
+    pub content_outstream_position: Option<ContentOutstreamPositionAssignedTargetingOptionDetailContentOutstreamPositionEnum>,
     /// Required. The targeting_option_id field when targeting_type is `TARGETING_TYPE_CONTENT_OUTSTREAM_POSITION`.
     #[serde(rename="targetingOptionId")]
     
@@ -2245,7 +2245,7 @@ pub struct ContentOutstreamPositionTargetingOptionDetails {
     /// Output only. The content outstream position.
     #[serde(rename="contentOutstreamPosition")]
     
-    pub content_outstream_position: Option<String>,
+    pub content_outstream_position: Option<ContentOutstreamPositionTargetingOptionDetailContentOutstreamPositionEnum>,
 }
 
 impl client::Part for ContentOutstreamPositionTargetingOptionDetails {}
@@ -2261,7 +2261,7 @@ pub struct ContentStreamTypeAssignedTargetingOptionDetails {
     /// Output only. The content stream type.
     #[serde(rename="contentStreamType")]
     
-    pub content_stream_type: Option<String>,
+    pub content_stream_type: Option<ContentStreamTypeAssignedTargetingOptionDetailContentStreamTypeEnum>,
     /// Required. The targeting_option_id field when targeting_type is `TARGETING_TYPE_CONTENT_STREAM_TYPE`.
     #[serde(rename="targetingOptionId")]
     
@@ -2281,7 +2281,7 @@ pub struct ContentStreamTypeTargetingOptionDetails {
     /// Output only. The content stream type.
     #[serde(rename="contentStreamType")]
     
-    pub content_stream_type: Option<String>,
+    pub content_stream_type: Option<ContentStreamTypeTargetingOptionDetailContentStreamTypeEnum>,
 }
 
 impl client::Part for ContentStreamTypeTargetingOptionDetails {}
@@ -2379,7 +2379,7 @@ pub struct CreateAssignedTargetingOptionsRequest {
     /// Required. Identifies the type of this assigned targeting option.
     #[serde(rename="targetingType")]
     
-    pub targeting_type: Option<String>,
+    pub targeting_type: Option<CreateAssignedTargetingOptionsRequestTargetingTypeEnum>,
 }
 
 impl client::Part for CreateAssignedTargetingOptionsRequest {}
@@ -2420,7 +2420,7 @@ pub struct CreateSdfDownloadTaskRequest {
     pub partner_id: Option<i64>,
     /// Required. The SDF version of the downloaded file. If set to `SDF_VERSION_UNSPECIFIED`, this will default to the version specified by the advertiser or partner identified by `root_id`. An advertiser inherits its SDF version from its partner unless configured otherwise.
     
-    pub version: Option<String>,
+    pub version: Option<CreateSdfDownloadTaskRequestVersionEnum>,
 }
 
 impl client::RequestValue for CreateSdfDownloadTaskRequest {}
@@ -2480,7 +2480,7 @@ pub struct Creative {
     /// Output only. A list of attributes of the creative that is generated by the system.
     #[serde(rename="creativeAttributes")]
     
-    pub creative_attributes: Option<Vec<String>>,
+    pub creative_attributes: Option<Vec<CreativeCreativeAttributesEnum>>,
     /// Output only. The unique ID of the creative. Assigned by the system.
     #[serde(rename="creativeId")]
     
@@ -2489,7 +2489,7 @@ pub struct Creative {
     /// Required. Immutable. The type of the creative.
     #[serde(rename="creativeType")]
     
-    pub creative_type: Option<String>,
+    pub creative_type: Option<CreativeCreativeTypeEnum>,
     /// Required. Primary dimensions of the creative. Applicable to all creative types. The value of width_pixels and height_pixels defaults to `0` when creative_type is one of: * `CREATIVE_TYPE_VIDEO` * `CREATIVE_TYPE_TEMPLATED_APP_INSTALL_INTERSTITIAL` * `CREATIVE_TYPE_AUDIO` * `CREATIVE_TYPE_NATIVE_VIDEO` * `CREATIVE_TYPE_TEMPLATED_APP_INSTALL_VIDEO`
     
     pub dimensions: Option<Dimensions>,
@@ -2503,7 +2503,7 @@ pub struct Creative {
     /// Required. Controls whether or not the creative can serve. Accepted values are: * `ENTITY_STATUS_ACTIVE` * `ENTITY_STATUS_ARCHIVED` * `ENTITY_STATUS_PAUSED`
     #[serde(rename="entityStatus")]
     
-    pub entity_status: Option<String>,
+    pub entity_status: Option<CreativeEntityStatusEnum>,
     /// Required. Exit events for this creative. An exit (also known as a click tag) is any area in your creative that someone can click or tap to open an advertiser's landing page. Every creative must include at least one exit. You can add an exit to your creative in any of the following ways: * Use Google Web Designer's tap area. * Define a JavaScript variable called "clickTag". * Use the Enabler (Enabler.exit()) to track exits in rich media formats.
     #[serde(rename="exitEvents")]
     
@@ -2515,11 +2515,11 @@ pub struct Creative {
     /// Optional. Specifies the expanding direction of the creative. Required and only valid for third-party expandable creatives. Third-party expandable creatives are creatives with following hosting source: * `HOSTING_SOURCE_THIRD_PARTY` combined with following creative_type: * `CREATIVE_TYPE_EXPANDABLE`
     #[serde(rename="expandingDirection")]
     
-    pub expanding_direction: Option<String>,
+    pub expanding_direction: Option<CreativeExpandingDirectionEnum>,
     /// Required. Indicates where the creative is hosted.
     #[serde(rename="hostingSource")]
     
-    pub hosting_source: Option<String>,
+    pub hosting_source: Option<CreativeHostingSourceEnum>,
     /// Output only. Indicates the third-party VAST tag creative requires HTML5 Video support. Output only and only valid for third-party VAST tag creatives. Third-party VAST tag creatives are creatives with following hosting_source: * `HOSTING_SOURCE_THIRD_PARTY` combined with following creative_type: * `CREATIVE_TYPE_VIDEO`
     #[serde(rename="html5Video")]
     
@@ -2641,7 +2641,7 @@ pub struct CreativeConfig {
     /// The type of creative that can be assigned to the inventory source. Only the following types are supported: * `CREATIVE_TYPE_STANDARD` * `CREATIVE_TYPE_VIDEO`
     #[serde(rename="creativeType")]
     
-    pub creative_type: Option<String>,
+    pub creative_type: Option<CreativeConfigCreativeTypeEnum>,
     /// The configuration for display creatives. Applicable when creative_type is `CREATIVE_TYPE_STANDARD`.
     #[serde(rename="displayCreativeConfig")]
     
@@ -2686,11 +2686,11 @@ pub struct CustomBiddingAlgorithm {
     /// Output only. The status of custom bidding algorithm.
     #[serde(rename="customBiddingAlgorithmState")]
     
-    pub custom_bidding_algorithm_state: Option<String>,
+    pub custom_bidding_algorithm_state: Option<CustomBiddingAlgorithmCustomBiddingAlgorithmStateEnum>,
     /// Required. Immutable. The type of custom bidding algorithm.
     #[serde(rename="customBiddingAlgorithmType")]
     
-    pub custom_bidding_algorithm_type: Option<String>,
+    pub custom_bidding_algorithm_type: Option<CustomBiddingAlgorithmCustomBiddingAlgorithmTypeEnum>,
     /// Required. The display name of the custom bidding algorithm. Must be UTF-8 encoded with a maximum size of 240 bytes.
     #[serde(rename="displayName")]
     
@@ -2698,7 +2698,7 @@ pub struct CustomBiddingAlgorithm {
     /// Controls whether or not the custom bidding algorithm can be used as a bidding strategy. Accepted values are: * `ENTITY_STATUS_ACTIVE` * `ENTITY_STATUS_ARCHIVED`
     #[serde(rename="entityStatus")]
     
-    pub entity_status: Option<String>,
+    pub entity_status: Option<CustomBiddingAlgorithmEntityStatusEnum>,
     /// Output only. The state of custom bidding model readiness for each advertiser who has access. This field may only include the state of the queried advertiser if the algorithm [`owner`](https://developers.google.com/display-video/api/reference/rest/v1/customBiddingAlgorithms#CustomBiddingAlgorithm.FIELDS.oneof_owner) is a partner and is being retrieved using an advertiser [`accessor`](https://developers.google.com/display-video/api/reference/rest/v1/customBiddingAlgorithms/list#body.QUERY_PARAMETERS.oneof_accessor).
     #[serde(rename="modelReadiness")]
     
@@ -2738,7 +2738,7 @@ pub struct CustomBiddingModelReadinessState {
     /// The readiness state of custom bidding model.
     #[serde(rename="readinessState")]
     
-    pub readiness_state: Option<String>,
+    pub readiness_state: Option<CustomBiddingModelReadinessStateReadinessStateEnum>,
 }
 
 impl client::Part for CustomBiddingModelReadinessState {}
@@ -2784,7 +2784,7 @@ pub struct CustomBiddingScript {
     pub script: Option<CustomBiddingScriptRef>,
     /// Output only. The state of the custom bidding script.
     
-    pub state: Option<String>,
+    pub state: Option<CustomBiddingScriptStateEnum>,
 }
 
 impl client::RequestValue for CustomBiddingScript {}
@@ -2924,7 +2924,7 @@ pub struct DayAndTimeAssignedTargetingOptionDetails {
     /// Required. The day of the week for this day and time targeting setting.
     #[serde(rename="dayOfWeek")]
     
-    pub day_of_week: Option<String>,
+    pub day_of_week: Option<DayAndTimeAssignedTargetingOptionDetailDayOfWeekEnum>,
     /// Required. The end hour for day and time targeting. Must be between 1 (1 hour after start of day) and 24 (end of day).
     #[serde(rename="endHour")]
     
@@ -2936,7 +2936,7 @@ pub struct DayAndTimeAssignedTargetingOptionDetails {
     /// Required. The mechanism used to determine which timezone to use for this day and time targeting setting.
     #[serde(rename="timeZoneResolution")]
     
-    pub time_zone_resolution: Option<String>,
+    pub time_zone_resolution: Option<DayAndTimeAssignedTargetingOptionDetailTimeZoneResolutionEnum>,
 }
 
 impl client::Part for DayAndTimeAssignedTargetingOptionDetails {}
@@ -2971,7 +2971,7 @@ pub struct DeleteAssignedTargetingOptionsRequest {
     /// Required. Identifies the type of this assigned targeting option.
     #[serde(rename="targetingType")]
     
-    pub targeting_type: Option<String>,
+    pub targeting_type: Option<DeleteAssignedTargetingOptionsRequestTargetingTypeEnum>,
 }
 
 impl client::Part for DeleteAssignedTargetingOptionsRequest {}
@@ -3026,7 +3026,7 @@ pub struct DeviceTypeAssignedTargetingOptionDetails {
     /// The display name of the device type. Output only in v1. Required in v2.
     #[serde(rename="deviceType")]
     
-    pub device_type: Option<String>,
+    pub device_type: Option<DeviceTypeAssignedTargetingOptionDetailDeviceTypeEnum>,
     /// Required. ID of the device type.
     #[serde(rename="targetingOptionId")]
     
@@ -3046,7 +3046,7 @@ pub struct DeviceTypeTargetingOptionDetails {
     /// Output only. The device type that is used to be targeted.
     #[serde(rename="deviceType")]
     
-    pub device_type: Option<String>,
+    pub device_type: Option<DeviceTypeTargetingOptionDetailDeviceTypeEnum>,
 }
 
 impl client::Part for DeviceTypeTargetingOptionDetails {}
@@ -3062,7 +3062,7 @@ pub struct DigitalContentLabelAssignedTargetingOptionDetails {
     /// Output only. The display name of the digital content label rating tier.
     #[serde(rename="contentRatingTier")]
     
-    pub content_rating_tier: Option<String>,
+    pub content_rating_tier: Option<DigitalContentLabelAssignedTargetingOptionDetailContentRatingTierEnum>,
     /// Required. ID of the digital content label to be EXCLUDED.
     #[serde(rename="excludedTargetingOptionId")]
     
@@ -3082,7 +3082,7 @@ pub struct DigitalContentLabelTargetingOptionDetails {
     /// Output only. An enum for the content label brand safety tiers.
     #[serde(rename="contentRatingTier")]
     
-    pub content_rating_tier: Option<String>,
+    pub content_rating_tier: Option<DigitalContentLabelTargetingOptionDetailContentRatingTierEnum>,
 }
 
 impl client::Part for DigitalContentLabelTargetingOptionDetails {}
@@ -3122,7 +3122,7 @@ pub struct DoubleVerify {
     /// Avoid bidding on apps with the age rating.
     #[serde(rename="avoidedAgeRatings")]
     
-    pub avoided_age_ratings: Option<Vec<String>>,
+    pub avoided_age_ratings: Option<Vec<DoubleVerifyAvoidedAgeRatingsEnum>>,
     /// DV Brand Safety Controls.
     #[serde(rename="brandSafetyCategories")]
     
@@ -3163,7 +3163,7 @@ pub struct DoubleVerifyAppStarRating {
     /// Avoid bidding on apps with the star ratings.
     #[serde(rename="avoidedStarRating")]
     
-    pub avoided_star_rating: Option<String>,
+    pub avoided_star_rating: Option<DoubleVerifyAppStarRatingAvoidedStarRatingEnum>,
 }
 
 impl client::Part for DoubleVerifyAppStarRating {}
@@ -3183,11 +3183,11 @@ pub struct DoubleVerifyBrandSafetyCategories {
     /// Brand safety high severity avoidance categories.
     #[serde(rename="avoidedHighSeverityCategories")]
     
-    pub avoided_high_severity_categories: Option<Vec<String>>,
+    pub avoided_high_severity_categories: Option<Vec<DoubleVerifyBrandSafetyCategoryAvoidedHighSeverityCategoriesEnum>>,
     /// Brand safety medium severity avoidance categories.
     #[serde(rename="avoidedMediumSeverityCategories")]
     
-    pub avoided_medium_severity_categories: Option<Vec<String>>,
+    pub avoided_medium_severity_categories: Option<Vec<DoubleVerifyBrandSafetyCategoryAvoidedMediumSeverityCategoriesEnum>>,
 }
 
 impl client::Part for DoubleVerifyBrandSafetyCategories {}
@@ -3202,11 +3202,11 @@ impl client::Part for DoubleVerifyBrandSafetyCategories {}
 pub struct DoubleVerifyDisplayViewability {
     /// Target web and app inventory to maximize IAB viewable rate.
     
-    pub iab: Option<String>,
+    pub iab: Option<DoubleVerifyDisplayViewabilityIabEnum>,
     /// Target web and app inventory to maximize 100% viewable duration.
     #[serde(rename="viewableDuring")]
     
-    pub viewable_during: Option<String>,
+    pub viewable_during: Option<DoubleVerifyDisplayViewabilityViewableDuringEnum>,
 }
 
 impl client::Part for DoubleVerifyDisplayViewability {}
@@ -3226,7 +3226,7 @@ pub struct DoubleVerifyFraudInvalidTraffic {
     /// Avoid Sites and Apps with historical Fraud & IVT.
     #[serde(rename="avoidedFraudOption")]
     
-    pub avoided_fraud_option: Option<String>,
+    pub avoided_fraud_option: Option<DoubleVerifyFraudInvalidTrafficAvoidedFraudOptionEnum>,
 }
 
 impl client::Part for DoubleVerifyFraudInvalidTraffic {}
@@ -3242,15 +3242,15 @@ pub struct DoubleVerifyVideoViewability {
     /// Target inventory to maximize impressions with 400x300 or greater player size.
     #[serde(rename="playerImpressionRate")]
     
-    pub player_impression_rate: Option<String>,
+    pub player_impression_rate: Option<DoubleVerifyVideoViewabilityPlayerImpressionRateEnum>,
     /// Target web inventory to maximize IAB viewable rate.
     #[serde(rename="videoIab")]
     
-    pub video_iab: Option<String>,
+    pub video_iab: Option<DoubleVerifyVideoViewabilityVideoIabEnum>,
     /// Target web inventory to maximize fully viewable rate.
     #[serde(rename="videoViewableRate")]
     
-    pub video_viewable_rate: Option<String>,
+    pub video_viewable_rate: Option<DoubleVerifyVideoViewabilityVideoViewableRateEnum>,
 }
 
 impl client::Part for DoubleVerifyVideoViewability {}
@@ -3456,7 +3456,7 @@ impl client::ResponseResult for Empty {}
 pub struct EnvironmentAssignedTargetingOptionDetails {
     /// The serving environment. Output only in v1. Required in v2.
     
-    pub environment: Option<String>,
+    pub environment: Option<EnvironmentAssignedTargetingOptionDetailEnvironmentEnum>,
     /// Required. The targeting_option_id of a TargetingOption of type `TARGETING_TYPE_ENVIRONMENT` (e.g., "508010" for targeting the `ENVIRONMENT_WEB_OPTIMIZED` option).
     #[serde(rename="targetingOptionId")]
     
@@ -3475,7 +3475,7 @@ impl client::Part for EnvironmentAssignedTargetingOptionDetails {}
 pub struct EnvironmentTargetingOptionDetails {
     /// Output only. The serving environment.
     
-    pub environment: Option<String>,
+    pub environment: Option<EnvironmentTargetingOptionDetailEnvironmentEnum>,
 }
 
 impl client::Part for EnvironmentTargetingOptionDetails {}
@@ -3522,7 +3522,7 @@ impl client::Part for ExchangeConfig {}
 pub struct ExchangeConfigEnabledExchange {
     /// The enabled exchange.
     
-    pub exchange: Option<String>,
+    pub exchange: Option<ExchangeConfigEnabledExchangeExchangeEnum>,
     /// Output only. Agency ID of Google Ad Manager. The field is only relevant when Google Ad Manager is the enabled exchange.
     #[serde(rename="googleAdManagerAgencyId")]
     
@@ -3549,10 +3549,10 @@ impl client::Part for ExchangeConfigEnabledExchange {}
 pub struct ExchangeReviewStatus {
     /// The exchange reviewing the creative.
     
-    pub exchange: Option<String>,
+    pub exchange: Option<ExchangeReviewStatuExchangeEnum>,
     /// Status of the exchange review.
     
-    pub status: Option<String>,
+    pub status: Option<ExchangeReviewStatuStatusEnum>,
 }
 
 impl client::Part for ExchangeReviewStatus {}
@@ -3567,7 +3567,7 @@ impl client::Part for ExchangeReviewStatus {}
 pub struct ExchangeTargetingOptionDetails {
     /// Output only. The type of exchange.
     
-    pub exchange: Option<String>,
+    pub exchange: Option<ExchangeTargetingOptionDetailExchangeEnum>,
 }
 
 impl client::Part for ExchangeTargetingOptionDetails {}
@@ -3590,7 +3590,7 @@ pub struct ExitEvent {
     /// Required. The type of the exit event.
     #[serde(rename="type")]
     
-    pub type_: Option<String>,
+    pub type_: Option<ExitEventTypeEnum>,
     /// Required. The click through URL of the exit event. This is required when type is: * `EXIT_EVENT_TYPE_DEFAULT` * `EXIT_EVENT_TYPE_BACKUP`
     
     pub url: Option<String>,
@@ -3626,11 +3626,11 @@ pub struct FirstAndThirdPartyAudience {
     /// Output only. The source of the audience.
     #[serde(rename="audienceSource")]
     
-    pub audience_source: Option<String>,
+    pub audience_source: Option<FirstAndThirdPartyAudienceAudienceSourceEnum>,
     /// The type of the audience.
     #[serde(rename="audienceType")]
     
-    pub audience_type: Option<String>,
+    pub audience_type: Option<FirstAndThirdPartyAudienceAudienceTypeEnum>,
     /// Input only. A list of contact information to define the initial audience members. Only applicable to audience_type `CUSTOMER_MATCH_CONTACT_INFO`
     #[serde(rename="contactInfoList")]
     
@@ -3670,7 +3670,7 @@ pub struct FirstAndThirdPartyAudience {
     /// Whether the audience is a first or third party audience.
     #[serde(rename="firstAndThirdPartyAudienceType")]
     
-    pub first_and_third_party_audience_type: Option<String>,
+    pub first_and_third_party_audience_type: Option<FirstAndThirdPartyAudienceFirstAndThirdPartyAudienceTypeEnum>,
     /// Output only. The estimated audience size for Gmail network. If the size is less than 1000, the number will be hidden and 0 will be returned due to privacy reasons. Otherwise, the number will be rounded off to two significant digits. Only applicable to first party audiences. Only returned in GET request.
     #[serde(rename="gmailAudienceSize")]
     
@@ -3729,7 +3729,7 @@ pub struct FirstAndThirdPartyAudienceTargetingSetting {
     pub first_and_third_party_audience_id: Option<i64>,
     /// The recency of the first and third party audience targeting setting. Only applicable to first party audiences, otherwise will be ignored. For more info, refer to https://support.google.com/displayvideo/answer/2949947#recency When unspecified, no recency limit will be used.
     
-    pub recency: Option<String>,
+    pub recency: Option<FirstAndThirdPartyAudienceTargetingSettingRecencyEnum>,
 }
 
 impl client::Part for FirstAndThirdPartyAudienceTargetingSetting {}
@@ -3791,7 +3791,7 @@ pub struct FloodlightGroup {
     /// Required. The web tag type enabled for the Floodlight group.
     #[serde(rename="webTagType")]
     
-    pub web_tag_type: Option<String>,
+    pub web_tag_type: Option<FloodlightGroupWebTagTypeEnum>,
 }
 
 impl client::RequestValue for FloodlightGroup {}
@@ -3813,7 +3813,7 @@ pub struct FrequencyCap {
     /// The time unit in which the frequency cap will be applied. Required when unlimited is `false`.
     #[serde(rename="timeUnit")]
     
-    pub time_unit: Option<String>,
+    pub time_unit: Option<FrequencyCapTimeUnitEnum>,
     /// The number of time_unit the frequency cap will last. Required when unlimited is `false`. The following restrictions apply based on the value of time_unit: * `TIME_UNIT_LIFETIME` - this field is output only and will default to 1 * `TIME_UNIT_MONTHS` - must be between 1 and 2 * `TIME_UNIT_WEEKS` - must be between 1 and 4 * `TIME_UNIT_DAYS` - must be between 1 and 6 * `TIME_UNIT_HOURS` - must be between 1 and 23 * `TIME_UNIT_MINUTES` - must be between 1 and 59
     #[serde(rename="timeUnitCount")]
     
@@ -3835,7 +3835,7 @@ impl client::Part for FrequencyCap {}
 pub struct GenderAssignedTargetingOptionDetails {
     /// The gender of the audience. Output only in v1. Required in v2.
     
-    pub gender: Option<String>,
+    pub gender: Option<GenderAssignedTargetingOptionDetailGenderEnum>,
     /// Required. The targeting_option_id of a TargetingOption of type `TARGETING_TYPE_GENDER`.
     #[serde(rename="targetingOptionId")]
     
@@ -3854,7 +3854,7 @@ impl client::Part for GenderAssignedTargetingOptionDetails {}
 pub struct GenderTargetingOptionDetails {
     /// Output only. The gender of an audience.
     
-    pub gender: Option<String>,
+    pub gender: Option<GenderTargetingOptionDetailGenderEnum>,
 }
 
 impl client::Part for GenderTargetingOptionDetails {}
@@ -3883,7 +3883,7 @@ pub struct GenerateDefaultLineItemRequest {
     /// Required. The type of the line item.
     #[serde(rename="lineItemType")]
     
-    pub line_item_type: Option<String>,
+    pub line_item_type: Option<GenerateDefaultLineItemRequestLineItemTypeEnum>,
     /// The mobile app promoted by the line item. This is applicable only when line_item_type is either `LINE_ITEM_TYPE_DISPLAY_MOBILE_APP_INSTALL` or `LINE_ITEM_TYPE_VIDEO_MOBILE_APP_INSTALL`.
     #[serde(rename="mobileApp")]
     
@@ -3907,7 +3907,7 @@ pub struct GeoRegionAssignedTargetingOptionDetails {
     /// Output only. The type of geographic region targeting.
     #[serde(rename="geoRegionType")]
     
-    pub geo_region_type: Option<String>,
+    pub geo_region_type: Option<GeoRegionAssignedTargetingOptionDetailGeoRegionTypeEnum>,
     /// Indicates if this option is being negatively targeted.
     
     pub negative: Option<bool>,
@@ -3950,7 +3950,7 @@ pub struct GeoRegionTargetingOptionDetails {
     /// Output only. The type of geographic region targeting.
     #[serde(rename="geoRegionType")]
     
-    pub geo_region_type: Option<String>,
+    pub geo_region_type: Option<GeoRegionTargetingOptionDetailGeoRegionTypeEnum>,
 }
 
 impl client::Part for GeoRegionTargetingOptionDetails {}
@@ -3980,7 +3980,7 @@ pub struct GoogleAudience {
     /// Output only. The type of Google audience. .
     #[serde(rename="googleAudienceType")]
     
-    pub google_audience_type: Option<String>,
+    pub google_audience_type: Option<GoogleAudienceGoogleAudienceTypeEnum>,
     /// Output only. The resource name of the google audience.
     
     pub name: Option<String>,
@@ -4075,7 +4075,7 @@ pub struct GuaranteedOrder {
     pub display_name: Option<String>,
     /// Required. Immutable. The exchange where the guaranteed order originated.
     
-    pub exchange: Option<String>,
+    pub exchange: Option<GuaranteedOrderExchangeEnum>,
     /// Output only. The unique identifier of the guaranteed order. The guaranteed order IDs have the format `{exchange}-{legacy_guaranteed_order_id}`.
     #[serde(rename="guaranteedOrderId")]
     
@@ -4134,7 +4134,7 @@ pub struct GuaranteedOrderStatus {
     /// Output only. The configuration status of the guaranteed order. Acceptable values are `PENDING` and `COMPLETED`. A guaranteed order must be configured (fill in the required fields, choose creatives, and select a default campaign) before it can serve. Currently the configuration action can only be performed via UI.
     #[serde(rename="configStatus")]
     
-    pub config_status: Option<String>,
+    pub config_status: Option<GuaranteedOrderStatuConfigStatusEnum>,
     /// The user-provided reason for pausing this guaranteed order. Must be UTF-8 encoded with a maximum length of 100 bytes. Only applicable when entity_status is set to `ENTITY_STATUS_PAUSED`.
     #[serde(rename="entityPauseReason")]
     
@@ -4142,7 +4142,7 @@ pub struct GuaranteedOrderStatus {
     /// Whether or not the guaranteed order is servable. Acceptable values are `ENTITY_STATUS_ACTIVE`, `ENTITY_STATUS_ARCHIVED`, and `ENTITY_STATUS_PAUSED`. Default value is `ENTITY_STATUS_ACTIVE`.
     #[serde(rename="entityStatus")]
     
-    pub entity_status: Option<String>,
+    pub entity_status: Option<GuaranteedOrderStatuEntityStatusEnum>,
 }
 
 impl client::Part for GuaranteedOrderStatus {}
@@ -4158,7 +4158,7 @@ pub struct HouseholdIncomeAssignedTargetingOptionDetails {
     /// The household income of the audience. Output only in v1. Required in v2.
     #[serde(rename="householdIncome")]
     
-    pub household_income: Option<String>,
+    pub household_income: Option<HouseholdIncomeAssignedTargetingOptionDetailHouseholdIncomeEnum>,
     /// Required. The targeting_option_id of a TargetingOption of type `TARGETING_TYPE_HOUSEHOLD_INCOME`.
     #[serde(rename="targetingOptionId")]
     
@@ -4178,7 +4178,7 @@ pub struct HouseholdIncomeTargetingOptionDetails {
     /// Output only. The household income of an audience.
     #[serde(rename="householdIncome")]
     
-    pub household_income: Option<String>,
+    pub household_income: Option<HouseholdIncomeTargetingOptionDetailHouseholdIncomeEnum>,
 }
 
 impl client::Part for HouseholdIncomeTargetingOptionDetails {}
@@ -4251,7 +4251,7 @@ pub struct InsertionOrder {
     /// Immutable. The billable outcome of the insertion order.
     #[serde(rename="billableOutcome")]
     
-    pub billable_outcome: Option<String>,
+    pub billable_outcome: Option<InsertionOrderBillableOutcomeEnum>,
     /// Required. The budget allocation settings of the insertion order.
     
     pub budget: Option<InsertionOrderBudget>,
@@ -4267,7 +4267,7 @@ pub struct InsertionOrder {
     /// Required. Controls whether or not the insertion order can spend its budget and bid on inventory. * For CreateInsertionOrder method, only `ENTITY_STATUS_DRAFT` is allowed. To activate an insertion order, use UpdateInsertionOrder method and update the status to `ENTITY_STATUS_ACTIVE` after creation. * An insertion order cannot be changed back to `ENTITY_STATUS_DRAFT` status from any other status. * An insertion order cannot be set to `ENTITY_STATUS_ACTIVE` if its parent campaign is not active.
     #[serde(rename="entityStatus")]
     
-    pub entity_status: Option<String>,
+    pub entity_status: Option<InsertionOrderEntityStatusEnum>,
     /// Required. The frequency capping setting of the insertion order.
     #[serde(rename="frequencyCap")]
     
@@ -4280,7 +4280,7 @@ pub struct InsertionOrder {
     /// The type of insertion order. If this field is unspecified in creation, the value defaults to `RTB`.
     #[serde(rename="insertionOrderType")]
     
-    pub insertion_order_type: Option<String>,
+    pub insertion_order_type: Option<InsertionOrderInsertionOrderTypeEnum>,
     /// Additional integration details of the insertion order.
     #[serde(rename="integrationDetails")]
     
@@ -4302,7 +4302,7 @@ pub struct InsertionOrder {
     /// Output only. The reservation type of the insertion order.
     #[serde(rename="reservationType")]
     
-    pub reservation_type: Option<String>,
+    pub reservation_type: Option<InsertionOrderReservationTypeEnum>,
     /// Output only. The timestamp when the insertion order was last updated. Assigned by the system.
     #[serde(rename="updateTime")]
     
@@ -4323,7 +4323,7 @@ pub struct InsertionOrderBudget {
     /// The type of automation used to manage bid and budget for the insertion order. If this field is unspecified in creation, the value defaults to `INSERTION_ORDER_AUTOMATION_TYPE_NONE`.
     #[serde(rename="automationType")]
     
-    pub automation_type: Option<String>,
+    pub automation_type: Option<InsertionOrderBudgetAutomationTypeEnum>,
     /// Required. The list of budget segments. Use a budget segment to specify a specific budget for a given period of time an insertion order is running.
     #[serde(rename="budgetSegments")]
     
@@ -4331,7 +4331,7 @@ pub struct InsertionOrderBudget {
     /// Required. Immutable. The budget unit specifies whether the budget is currency based or impression based.
     #[serde(rename="budgetUnit")]
     
-    pub budget_unit: Option<String>,
+    pub budget_unit: Option<InsertionOrderBudgetBudgetUnitEnum>,
 }
 
 impl client::Part for InsertionOrderBudget {}
@@ -4381,7 +4381,7 @@ pub struct IntegralAdScience {
     /// Display Viewability section (applicable to display line items only).
     #[serde(rename="displayViewability")]
     
-    pub display_viewability: Option<String>,
+    pub display_viewability: Option<IntegralAdScienceDisplayViewabilityEnum>,
     /// Brand Safety - **Unrateable**.
     #[serde(rename="excludeUnrateable")]
     
@@ -4389,47 +4389,47 @@ pub struct IntegralAdScience {
     /// Ad Fraud settings.
     #[serde(rename="excludedAdFraudRisk")]
     
-    pub excluded_ad_fraud_risk: Option<String>,
+    pub excluded_ad_fraud_risk: Option<IntegralAdScienceExcludedAdFraudRiskEnum>,
     /// Brand Safety - **Adult content**.
     #[serde(rename="excludedAdultRisk")]
     
-    pub excluded_adult_risk: Option<String>,
+    pub excluded_adult_risk: Option<IntegralAdScienceExcludedAdultRiskEnum>,
     /// Brand Safety - **Alcohol**.
     #[serde(rename="excludedAlcoholRisk")]
     
-    pub excluded_alcohol_risk: Option<String>,
+    pub excluded_alcohol_risk: Option<IntegralAdScienceExcludedAlcoholRiskEnum>,
     /// Brand Safety - **Drugs**.
     #[serde(rename="excludedDrugsRisk")]
     
-    pub excluded_drugs_risk: Option<String>,
+    pub excluded_drugs_risk: Option<IntegralAdScienceExcludedDrugsRiskEnum>,
     /// Brand Safety - **Gambling**.
     #[serde(rename="excludedGamblingRisk")]
     
-    pub excluded_gambling_risk: Option<String>,
+    pub excluded_gambling_risk: Option<IntegralAdScienceExcludedGamblingRiskEnum>,
     /// Brand Safety - **Hate speech**.
     #[serde(rename="excludedHateSpeechRisk")]
     
-    pub excluded_hate_speech_risk: Option<String>,
+    pub excluded_hate_speech_risk: Option<IntegralAdScienceExcludedHateSpeechRiskEnum>,
     /// Brand Safety - **Illegal downloads**.
     #[serde(rename="excludedIllegalDownloadsRisk")]
     
-    pub excluded_illegal_downloads_risk: Option<String>,
+    pub excluded_illegal_downloads_risk: Option<IntegralAdScienceExcludedIllegalDownloadsRiskEnum>,
     /// Brand Safety - **Offensive language**.
     #[serde(rename="excludedOffensiveLanguageRisk")]
     
-    pub excluded_offensive_language_risk: Option<String>,
+    pub excluded_offensive_language_risk: Option<IntegralAdScienceExcludedOffensiveLanguageRiskEnum>,
     /// Brand Safety - **Violence**.
     #[serde(rename="excludedViolenceRisk")]
     
-    pub excluded_violence_risk: Option<String>,
+    pub excluded_violence_risk: Option<IntegralAdScienceExcludedViolenceRiskEnum>,
     /// True advertising quality (applicable to Display line items only).
     #[serde(rename="traqScoreOption")]
     
-    pub traq_score_option: Option<String>,
+    pub traq_score_option: Option<IntegralAdScienceTraqScoreOptionEnum>,
     /// Video Viewability Section (applicable to video line items only).
     #[serde(rename="videoViewability")]
     
-    pub video_viewability: Option<String>,
+    pub video_viewability: Option<IntegralAdScienceVideoViewabilityEnum>,
 }
 
 impl client::Part for IntegralAdScience {}
@@ -4471,7 +4471,7 @@ impl client::Part for IntegrationDetails {}
 pub struct InventorySource {
     /// Whether the inventory source has a guaranteed or non-guaranteed delivery.
     
-    pub commitment: Option<String>,
+    pub commitment: Option<InventorySourceCommitmentEnum>,
     /// The creative requirements of the inventory source. Not applicable for auction packages.
     #[serde(rename="creativeConfigs")]
     
@@ -4483,14 +4483,14 @@ pub struct InventorySource {
     /// The delivery method of the inventory source. * For non-guaranteed inventory sources, the only acceptable value is `INVENTORY_SOURCE_DELIVERY_METHOD_PROGRAMMATIC`. * For guaranteed inventory sources, acceptable values are `INVENTORY_SOURCE_DELIVERY_METHOD_TAG` and `INVENTORY_SOURCE_DELIVERY_METHOD_PROGRAMMATIC`.
     #[serde(rename="deliveryMethod")]
     
-    pub delivery_method: Option<String>,
+    pub delivery_method: Option<InventorySourceDeliveryMethodEnum>,
     /// The display name of the inventory source. Must be UTF-8 encoded with a maximum size of 240 bytes.
     #[serde(rename="displayName")]
     
     pub display_name: Option<String>,
     /// The exchange to which the inventory source belongs.
     
-    pub exchange: Option<String>,
+    pub exchange: Option<InventorySourceExchangeEnum>,
     /// Immutable. The ID of the guaranteed order that this inventory source belongs to. Only applicable when commitment is `INVENTORY_SOURCE_COMMITMENT_GUARANTEED`.
     #[serde(rename="guaranteedOrderId")]
     
@@ -4503,11 +4503,11 @@ pub struct InventorySource {
     /// Output only. The product type of the inventory source, denoting the way through which it sells inventory.
     #[serde(rename="inventorySourceProductType")]
     
-    pub inventory_source_product_type: Option<String>,
+    pub inventory_source_product_type: Option<InventorySourceInventorySourceProductTypeEnum>,
     /// Denotes the type of the inventory source.
     #[serde(rename="inventorySourceType")]
     
-    pub inventory_source_type: Option<String>,
+    pub inventory_source_type: Option<InventorySourceInventorySourceTypeEnum>,
     /// Output only. The resource name of the inventory source.
     
     pub name: Option<String>,
@@ -4727,7 +4727,7 @@ pub struct InventorySourceStatus {
     /// Output only. The configuration status of the inventory source. Only applicable for guaranteed inventory sources. Acceptable values are `INVENTORY_SOURCE_CONFIG_STATUS_PENDING` and `INVENTORY_SOURCE_CONFIG_STATUS_COMPLETED`. An inventory source must be configured (fill in the required fields, choose creatives, and select a default campaign) before it can serve.
     #[serde(rename="configStatus")]
     
-    pub config_status: Option<String>,
+    pub config_status: Option<InventorySourceStatuConfigStatusEnum>,
     /// The user-provided reason for pausing this inventory source. Must not exceed 100 characters. Only applicable when entity_status is set to `ENTITY_STATUS_PAUSED`.
     #[serde(rename="entityPauseReason")]
     
@@ -4735,7 +4735,7 @@ pub struct InventorySourceStatus {
     /// Whether or not the inventory source is servable. Acceptable values are `ENTITY_STATUS_ACTIVE`, `ENTITY_STATUS_ARCHIVED`, and `ENTITY_STATUS_PAUSED`. Default value is `ENTITY_STATUS_ACTIVE`.
     #[serde(rename="entityStatus")]
     
-    pub entity_status: Option<String>,
+    pub entity_status: Option<InventorySourceStatuEntityStatusEnum>,
     /// Output only. The seller-provided reason for pausing this inventory source. Only applicable for inventory sources synced directly from the publishers and when seller_status is set to `ENTITY_STATUS_PAUSED`.
     #[serde(rename="sellerPauseReason")]
     
@@ -4743,7 +4743,7 @@ pub struct InventorySourceStatus {
     /// Output only. The status set by the seller for the inventory source. Only applicable for inventory sources synced directly from the publishers. Acceptable values are `ENTITY_STATUS_ACTIVE` and `ENTITY_STATUS_PAUSED`.
     #[serde(rename="sellerStatus")]
     
-    pub seller_status: Option<String>,
+    pub seller_status: Option<InventorySourceStatuSellerStatusEnum>,
 }
 
 impl client::Part for InventorySourceStatus {}
@@ -4803,7 +4803,7 @@ pub struct Invoice {
     /// The type of invoice document.
     #[serde(rename="invoiceType")]
     
-    pub invoice_type: Option<String>,
+    pub invoice_type: Option<InvoiceInvoiceTypeEnum>,
     /// The date when the invoice was issued.
     #[serde(rename="issueDate")]
     
@@ -4964,7 +4964,7 @@ pub struct LineItem {
     /// Required. Controls whether or not the line item can spend its budget and bid on inventory. * For CreateLineItem method, only `ENTITY_STATUS_DRAFT` is allowed. To activate a line item, use UpdateLineItem method and update the status to `ENTITY_STATUS_ACTIVE` after creation. * A line item cannot be changed back to `ENTITY_STATUS_DRAFT` status from any other status. * If the line item's parent insertion order is not active, the line item can't spend its budget even if its own status is `ENTITY_STATUS_ACTIVE`.
     #[serde(rename="entityStatus")]
     
-    pub entity_status: Option<String>,
+    pub entity_status: Option<LineItemEntityStatusEnum>,
     /// Whether to exclude new exchanges from automatically being targeted by the line item. This field is false by default.
     #[serde(rename="excludeNewExchanges")]
     
@@ -4998,7 +4998,7 @@ pub struct LineItem {
     /// Required. Immutable. The type of the line item.
     #[serde(rename="lineItemType")]
     
-    pub line_item_type: Option<String>,
+    pub line_item_type: Option<LineItemLineItemTypeEnum>,
     /// The mobile app promoted by the line item. This is applicable only when line_item_type is either `LINE_ITEM_TYPE_DISPLAY_MOBILE_APP_INSTALL` or `LINE_ITEM_TYPE_VIDEO_MOBILE_APP_INSTALL`.
     #[serde(rename="mobileApp")]
     
@@ -5020,7 +5020,7 @@ pub struct LineItem {
     /// Output only. The reservation type of the line item.
     #[serde(rename="reservationType")]
     
-    pub reservation_type: Option<String>,
+    pub reservation_type: Option<LineItemReservationTypeEnum>,
     /// The [targeting expansion](https://developers.google.com//support.google.com/displayvideo/answer/10191558) settings of the line item. This config is only applicable when eligible audience list targeting is assigned to the line item. Beginning November 7, 2022, these settings may represent the [optimized targeting feature](https://developers.google.com//support.google.com/displayvideo/answer/12060859) in place of targeting expansion. This feature will be rolled out to all partners by November 9, 2022.
     #[serde(rename="targetingExpansion")]
     
@@ -5032,7 +5032,7 @@ pub struct LineItem {
     /// Output only. The warning messages generated by the line item. These warnings do not block saving the line item, but some may block the line item from running.
     #[serde(rename="warningMessages")]
     
-    pub warning_messages: Option<Vec<String>>,
+    pub warning_messages: Option<Vec<LineItemWarningMessagesEnum>>,
 }
 
 impl client::RequestValue for LineItem {}
@@ -5049,11 +5049,11 @@ pub struct LineItemBudget {
     /// Required. The type of the budget allocation. `LINE_ITEM_BUDGET_ALLOCATION_TYPE_AUTOMATIC` is only applicable when automatic budget allocation is enabled for the parent insertion order.
     #[serde(rename="budgetAllocationType")]
     
-    pub budget_allocation_type: Option<String>,
+    pub budget_allocation_type: Option<LineItemBudgetBudgetAllocationTypeEnum>,
     /// Output only. The budget unit specifies whether the budget is currency based or impression based. This value is inherited from the parent insertion order.
     #[serde(rename="budgetUnit")]
     
-    pub budget_unit: Option<String>,
+    pub budget_unit: Option<LineItemBudgetBudgetUnitEnum>,
     /// The maximum budget amount the line item will spend. Must be greater than 0. When budget_allocation_type is: * `LINE_ITEM_BUDGET_ALLOCATION_TYPE_AUTOMATIC`, this field is immutable and is set by the system. * `LINE_ITEM_BUDGET_ALLOCATION_TYPE_FIXED`, if budget_unit is: - `BUDGET_UNIT_CURRENCY`, this field represents maximum budget amount to spend, in micros of the advertiser's currency. For example, 1500000 represents 1.5 standard units of the currency. - `BUDGET_UNIT_IMPRESSIONS`, this field represents the maximum number of impressions to serve. * `LINE_ITEM_BUDGET_ALLOCATION_TYPE_UNLIMITED`, this field is not applicable and will be ignored by the system.
     #[serde(rename="maxAmount")]
     
@@ -5078,7 +5078,7 @@ pub struct LineItemFlight {
     /// Required. The type of the line item's flight dates.
     #[serde(rename="flightDateType")]
     
-    pub flight_date_type: Option<String>,
+    pub flight_date_type: Option<LineItemFlightFlightDateTypeEnum>,
     /// The ID of the manual trigger associated with the line item. * Required when flight_date_type is `LINE_ITEM_FLIGHT_DATE_TYPE_TRIGGER`. Must not be set otherwise. * When set, the line item's flight dates are inherited from its parent insertion order. * Active line items will spend when the selected trigger is activated within the parent insertion order's flight dates.
     #[serde(rename="triggerId")]
     
@@ -5857,7 +5857,7 @@ pub struct LocationList {
     /// Required. Immutable. The type of location. All locations in the list will share this type.
     #[serde(rename="locationType")]
     
-    pub location_type: Option<String>,
+    pub location_type: Option<LocationListLocationTypeEnum>,
     /// Output only. The resource name of the location list.
     
     pub name: Option<String>,
@@ -5945,7 +5945,7 @@ pub struct ManualTrigger {
     pub name: Option<String>,
     /// Output only. The state of the manual trigger. Will be set to the `INACTIVE` state upon creation.
     
-    pub state: Option<String>,
+    pub state: Option<ManualTriggerStateEnum>,
     /// Output only. The unique ID of the manual trigger.
     #[serde(rename="triggerId")]
     
@@ -5977,7 +5977,7 @@ pub struct MaximizeSpendBidStrategy {
     /// Required. The type of the performance goal that the bidding strategy tries to minimize while spending the full budget. `BIDDING_STRATEGY_PERFORMANCE_GOAL_TYPE_VIEWABLE_CPM` is not supported for this strategy.
     #[serde(rename="performanceGoalType")]
     
-    pub performance_goal_type: Option<String>,
+    pub performance_goal_type: Option<MaximizeSpendBidStrategyPerformanceGoalTypeEnum>,
     /// Whether the strategy takes deal floor prices into account.
     #[serde(rename="raiseBidForDeals")]
     
@@ -6024,7 +6024,7 @@ pub struct MobileApp {
     pub display_name: Option<String>,
     /// Output only. The app platform.
     
-    pub platform: Option<String>,
+    pub platform: Option<MobileAppPlatformEnum>,
     /// Output only. The app publisher.
     
     pub publisher: Option<String>,
@@ -6082,7 +6082,7 @@ pub struct NativeContentPositionAssignedTargetingOptionDetails {
     /// The content position. Output only in v1. Required in v2.
     #[serde(rename="contentPosition")]
     
-    pub content_position: Option<String>,
+    pub content_position: Option<NativeContentPositionAssignedTargetingOptionDetailContentPositionEnum>,
     /// Required. The targeting_option_id field when targeting_type is `TARGETING_TYPE_NATIVE_CONTENT_POSITION`.
     #[serde(rename="targetingOptionId")]
     
@@ -6102,7 +6102,7 @@ pub struct NativeContentPositionTargetingOptionDetails {
     /// Output only. The content position.
     #[serde(rename="contentPosition")]
     
-    pub content_position: Option<String>,
+    pub content_position: Option<NativeContentPositionTargetingOptionDetailContentPositionEnum>,
 }
 
 impl client::Part for NativeContentPositionTargetingOptionDetails {}
@@ -6210,7 +6210,7 @@ pub struct ObaIcon {
     pub landing_page_url: Option<String>,
     /// The position of the OBA icon on the creative.
     
-    pub position: Option<String>,
+    pub position: Option<ObaIconPositionEnum>,
     /// The program of the OBA icon. For example: “AdChoices”.
     
     pub program: Option<String>,
@@ -6240,7 +6240,7 @@ impl client::Part for ObaIcon {}
 pub struct OmidAssignedTargetingOptionDetails {
     /// The type of Open Measurement enabled inventory. Output only in v1. Required in v2.
     
-    pub omid: Option<String>,
+    pub omid: Option<OmidAssignedTargetingOptionDetailOmidEnum>,
     /// Required. The targeting_option_id of a TargetingOption of type `TARGETING_TYPE_OMID`.
     #[serde(rename="targetingOptionId")]
     
@@ -6259,7 +6259,7 @@ impl client::Part for OmidAssignedTargetingOptionDetails {}
 pub struct OmidTargetingOptionDetails {
     /// Output only. The type of Open Measurement enabled inventory.
     
-    pub omid: Option<String>,
+    pub omid: Option<OmidTargetingOptionDetailOmidEnum>,
 }
 
 impl client::Part for OmidTargetingOptionDetails {}
@@ -6275,11 +6275,11 @@ pub struct OnScreenPositionAssignedTargetingOptionDetails {
     /// Output only. The ad type to target. Only applicable to insertion order targeting and new line items supporting the specified ad type will inherit this targeting option by default. Possible values are: * `AD_TYPE_DISPLAY`, the setting will be inherited by new line item when line_item_type is `LINE_ITEM_TYPE_DISPLAY_DEFAULT`. * `AD_TYPE_VIDEO`, the setting will be inherited by new line item when line_item_type is `LINE_ITEM_TYPE_VIDEO_DEFAULT`.
     #[serde(rename="adType")]
     
-    pub ad_type: Option<String>,
+    pub ad_type: Option<OnScreenPositionAssignedTargetingOptionDetailAdTypeEnum>,
     /// Output only. The on screen position.
     #[serde(rename="onScreenPosition")]
     
-    pub on_screen_position: Option<String>,
+    pub on_screen_position: Option<OnScreenPositionAssignedTargetingOptionDetailOnScreenPositionEnum>,
     /// Required. The targeting_option_id field when targeting_type is `TARGETING_TYPE_ON_SCREEN_POSITION`.
     #[serde(rename="targetingOptionId")]
     
@@ -6299,7 +6299,7 @@ pub struct OnScreenPositionTargetingOptionDetails {
     /// Output only. The on screen position.
     #[serde(rename="onScreenPosition")]
     
-    pub on_screen_position: Option<String>,
+    pub on_screen_position: Option<OnScreenPositionTargetingOptionDetailOnScreenPositionEnum>,
 }
 
 impl client::Part for OnScreenPositionTargetingOptionDetails {}
@@ -6396,11 +6396,11 @@ pub struct Pacing {
     /// Required. The time period in which the pacing budget will be spent. When automatic budget allocation is enabled at the insertion order via auto_budget_allocation, this field is output only and defaults to `PACING_PERIOD_FLIGHT`.
     #[serde(rename="pacingPeriod")]
     
-    pub pacing_period: Option<String>,
+    pub pacing_period: Option<PacingPacingPeriodEnum>,
     /// Required. The type of pacing that defines how the budget amount will be spent across the pacing_period.
     #[serde(rename="pacingType")]
     
-    pub pacing_type: Option<String>,
+    pub pacing_type: Option<PacingPacingTypeEnum>,
 }
 
 impl client::Part for Pacing {}
@@ -6416,7 +6416,7 @@ pub struct ParentEntityFilter {
     /// Required. File types that will be returned.
     #[serde(rename="fileType")]
     
-    pub file_type: Option<Vec<String>>,
+    pub file_type: Option<Vec<ParentEntityFilterFileTypeEnum>>,
     /// The IDs of the specified filter type. This is used to filter entities to fetch. If filter type is not `FILTER_TYPE_NONE`, at least one ID must be specified.
     #[serde(rename="filterIds")]
     
@@ -6425,7 +6425,7 @@ pub struct ParentEntityFilter {
     /// Required. Filter type used to filter fetched entities.
     #[serde(rename="filterType")]
     
-    pub filter_type: Option<String>,
+    pub filter_type: Option<ParentEntityFilterFilterTypeEnum>,
 }
 
 impl client::Part for ParentEntityFilter {}
@@ -6441,7 +6441,7 @@ pub struct ParentalStatusAssignedTargetingOptionDetails {
     /// The parental status of the audience. Output only in v1. Required in v2.
     #[serde(rename="parentalStatus")]
     
-    pub parental_status: Option<String>,
+    pub parental_status: Option<ParentalStatusAssignedTargetingOptionDetailParentalStatusEnum>,
     /// Required. The targeting_option_id of a TargetingOption of type `TARGETING_TYPE_PARENTAL_STATUS`.
     #[serde(rename="targetingOptionId")]
     
@@ -6461,7 +6461,7 @@ pub struct ParentalStatusTargetingOptionDetails {
     /// Output only. The parental status of an audience.
     #[serde(rename="parentalStatus")]
     
-    pub parental_status: Option<String>,
+    pub parental_status: Option<ParentalStatusTargetingOptionDetailParentalStatusEnum>,
 }
 
 impl client::Part for ParentalStatusTargetingOptionDetails {}
@@ -6508,7 +6508,7 @@ pub struct Partner {
     /// Output only. The status of the partner.
     #[serde(rename="entityStatus")]
     
-    pub entity_status: Option<String>,
+    pub entity_status: Option<PartnerEntityStatusEnum>,
     /// Settings that control which exchanges are enabled for the partner.
     #[serde(rename="exchangeConfig")]
     
@@ -6561,7 +6561,7 @@ pub struct PartnerCost {
     /// Required. The type of the partner cost.
     #[serde(rename="costType")]
     
-    pub cost_type: Option<String>,
+    pub cost_type: Option<PartnerCostCostTypeEnum>,
     /// The CPM fee amount in micros of advertiser's currency. Applicable when the fee_type is `PARTNER_FEE_TYPE_CPM_FEE`. Must be greater than or equal to 0. For example, for 1.5 standard unit of the advertiser's currency, set this field to 1500000.
     #[serde(rename="feeAmount")]
     
@@ -6575,11 +6575,11 @@ pub struct PartnerCost {
     /// Required. The fee type for this partner cost.
     #[serde(rename="feeType")]
     
-    pub fee_type: Option<String>,
+    pub fee_type: Option<PartnerCostFeeTypeEnum>,
     /// The invoice type for this partner cost. * Required when cost_type is one of: - `PARTNER_COST_TYPE_ADLOOX` - `PARTNER_COST_TYPE_DOUBLE_VERIFY` - `PARTNER_COST_TYPE_INTEGRAL_AD_SCIENCE`. * Output only for other types.
     #[serde(rename="invoiceType")]
     
-    pub invoice_type: Option<String>,
+    pub invoice_type: Option<PartnerCostInvoiceTypeEnum>,
 }
 
 impl client::Part for PartnerCost {}
@@ -6636,7 +6636,7 @@ pub struct PartnerRevenueModel {
     /// Required. The markup type of the partner revenue model.
     #[serde(rename="markupType")]
     
-    pub markup_type: Option<String>,
+    pub markup_type: Option<PartnerRevenueModelMarkupTypeEnum>,
 }
 
 impl client::Part for PartnerRevenueModel {}
@@ -6666,7 +6666,7 @@ pub struct PerformanceGoal {
     /// Required. The type of the performance goal.
     #[serde(rename="performanceGoalType")]
     
-    pub performance_goal_type: Option<String>,
+    pub performance_goal_type: Option<PerformanceGoalPerformanceGoalTypeEnum>,
 }
 
 impl client::Part for PerformanceGoal {}
@@ -6697,7 +6697,7 @@ pub struct PerformanceGoalBidStrategy {
     /// Required. The type of the performance goal that the bidding strategy will try to meet or beat. For line item level usage, the value must be one of: * `BIDDING_STRATEGY_PERFORMANCE_GOAL_TYPE_CPA` * `BIDDING_STRATEGY_PERFORMANCE_GOAL_TYPE_CPC` * `BIDDING_STRATEGY_PERFORMANCE_GOAL_TYPE_VIEWABLE_CPM` * `BIDDING_STRATEGY_PERFORMANCE_GOAL_TYPE_CUSTOM_ALGO`.
     #[serde(rename="performanceGoalType")]
     
-    pub performance_goal_type: Option<String>,
+    pub performance_goal_type: Option<PerformanceGoalBidStrategyPerformanceGoalTypeEnum>,
 }
 
 impl client::Part for PerformanceGoalBidStrategy {}
@@ -6727,7 +6727,7 @@ pub struct PoiAssignedTargetingOptionDetails {
     /// Required. The unit of distance by which the targeting radius is measured.
     #[serde(rename="proximityRadiusUnit")]
     
-    pub proximity_radius_unit: Option<String>,
+    pub proximity_radius_unit: Option<PoiAssignedTargetingOptionDetailProximityRadiusUnitEnum>,
     /// Required. The targeting_option_id of a TargetingOption of type `TARGETING_TYPE_POI`. Accepted POI targeting option IDs can be retrieved using SearchTargetingOptions. If targeting a specific latitude/longitude coordinate removed from an address or POI name, you can generate the necessary targeting option ID by rounding the desired coordinate values to the 6th decimal place, removing the decimals, and concatenating the string values separated by a semicolon. For example, you can target the latitude/longitude pair of 40.7414691, -74.003387 using the targeting option ID "40741469;-74003387".
     #[serde(rename="targetingOptionId")]
     
@@ -6789,7 +6789,7 @@ pub struct PrismaConfig {
     /// Required. The Prisma type.
     #[serde(rename="prismaType")]
     
-    pub prisma_type: Option<String>,
+    pub prisma_type: Option<PrismaConfigPrismaTypeEnum>,
     /// Required. The entity allocated this budget (DSP, site, etc.).
     
     pub supplier: Option<String>,
@@ -6837,7 +6837,7 @@ pub struct ProximityLocationListAssignedTargetingOptionDetails {
     /// Required. Radius range for proximity location list. This represents the size of the area around a chosen location that will be targeted. `All` proximity location targeting under a single resource must have the same radius range value. Set this value to match any existing targeting. If updated, this field will change the radius range for all proximity targeting under the resource.
     #[serde(rename="proximityRadiusRange")]
     
-    pub proximity_radius_range: Option<String>,
+    pub proximity_radius_range: Option<ProximityLocationListAssignedTargetingOptionDetailProximityRadiusRangeEnum>,
 }
 
 impl client::Part for ProximityLocationListAssignedTargetingOptionDetails {}
@@ -6856,7 +6856,7 @@ pub struct PublisherReviewStatus {
     pub publisher_name: Option<String>,
     /// Status of the publisher review.
     
-    pub status: Option<String>,
+    pub status: Option<PublisherReviewStatuStatusEnum>,
 }
 
 impl client::Part for PublisherReviewStatus {}
@@ -6872,7 +6872,7 @@ pub struct RateDetails {
     /// The rate type. Acceptable values are `INVENTORY_SOURCE_RATE_TYPE_CPM_FIXED`, `INVENTORY_SOURCE_RATE_TYPE_CPM_FLOOR`, and `INVENTORY_SOURCE_RATE_TYPE_CPD`.
     #[serde(rename="inventorySourceRateType")]
     
-    pub inventory_source_rate_type: Option<String>,
+    pub inventory_source_rate_type: Option<RateDetailInventorySourceRateTypeEnum>,
     /// Output only. The amount that the buyer has committed to spending on the inventory source up front. Only applicable for guaranteed inventory sources.
     #[serde(rename="minimumSpend")]
     
@@ -7011,15 +7011,15 @@ pub struct ReviewStatusInfo {
     /// Represents the basic approval needed for a creative to begin serving. Summary of creative_and_landing_page_review_status and content_and_policy_review_status.
     #[serde(rename="approvalStatus")]
     
-    pub approval_status: Option<String>,
+    pub approval_status: Option<ReviewStatusInfoApprovalStatusEnum>,
     /// Content and policy review status for the creative.
     #[serde(rename="contentAndPolicyReviewStatus")]
     
-    pub content_and_policy_review_status: Option<String>,
+    pub content_and_policy_review_status: Option<ReviewStatusInfoContentAndPolicyReviewStatusEnum>,
     /// Creative and landing page review status for the creative.
     #[serde(rename="creativeAndLandingPageReviewStatus")]
     
-    pub creative_and_landing_page_review_status: Option<String>,
+    pub creative_and_landing_page_review_status: Option<ReviewStatusInfoCreativeAndLandingPageReviewStatusEnum>,
     /// Exchange review statuses for the creative.
     #[serde(rename="exchangeReviewStatuses")]
     
@@ -7047,7 +7047,7 @@ pub struct ScriptError {
     /// The type of error.
     #[serde(rename="errorCode")]
     
-    pub error_code: Option<String>,
+    pub error_code: Option<ScriptErrorErrorCodeEnum>,
     /// The detailed error message.
     #[serde(rename="errorMessage")]
     
@@ -7074,7 +7074,7 @@ pub struct SdfConfig {
     pub admin_email: Option<String>,
     /// Required. The version of SDF being used.
     
-    pub version: Option<String>,
+    pub version: Option<SdfConfigVersionEnum>,
 }
 
 impl client::Part for SdfConfig {}
@@ -7159,7 +7159,7 @@ pub struct SensitiveCategoryAssignedTargetingOptionDetails {
     /// Output only. An enum for the DV360 Sensitive category content classifier.
     #[serde(rename="sensitiveCategory")]
     
-    pub sensitive_category: Option<String>,
+    pub sensitive_category: Option<SensitiveCategoryAssignedTargetingOptionDetailSensitiveCategoryEnum>,
 }
 
 impl client::Part for SensitiveCategoryAssignedTargetingOptionDetails {}
@@ -7175,7 +7175,7 @@ pub struct SensitiveCategoryTargetingOptionDetails {
     /// Output only. An enum for the DV360 Sensitive category content classifier.
     #[serde(rename="sensitiveCategory")]
     
-    pub sensitive_category: Option<String>,
+    pub sensitive_category: Option<SensitiveCategoryTargetingOptionDetailSensitiveCategoryEnum>,
 }
 
 impl client::Part for SensitiveCategoryTargetingOptionDetails {}
@@ -7272,7 +7272,7 @@ pub struct TargetingExpansionConfig {
     /// Required. Magnitude of expansion for applicable targeting under this line item. Beginning November 7, 2022, the behavior of this field will change in the following ways with the replacement of targeting expansion with [optimized targeting](https://developers.google.com//support.google.com/displayvideo/answer/12060859): * This field will represent the optimized targeting checkbox, with a `NO_EXPANSION` value representing optimized targeting turned off and a `LEAST_EXPANSION` value representing optimized targeting turned on. * `NO_EXPANSION` will be the default value for the field and will be automatically assigned if you do not set the field. * If you set the field to any value other than `NO_EXPANSION`, it will automatically be set to `LEAST_EXPANSION`.
     #[serde(rename="targetingExpansionLevel")]
     
-    pub targeting_expansion_level: Option<String>,
+    pub targeting_expansion_level: Option<TargetingExpansionConfigTargetingExpansionLevelEnum>,
 }
 
 impl client::Part for TargetingExpansionConfig {}
@@ -7419,7 +7419,7 @@ pub struct TargetingOption {
     /// Output only. The type of this targeting option.
     #[serde(rename="targetingType")]
     
-    pub targeting_type: Option<String>,
+    pub targeting_type: Option<TargetingOptionTargetingTypeEnum>,
     /// User rewarded content details.
     #[serde(rename="userRewardedContentDetails")]
     
@@ -7463,7 +7463,7 @@ pub struct ThirdPartyUrl {
     /// The type of interaction needs to be tracked by the tracking URL
     #[serde(rename="type")]
     
-    pub type_: Option<String>,
+    pub type_: Option<ThirdPartyUrlTypeEnum>,
     /// Tracking URL used to track the interaction. Provide a URL with optional path or query string, beginning with `https:`. For example, https://www.example.com/path
     
     pub url: Option<String>,
@@ -7620,7 +7620,7 @@ pub struct UniversalAdId {
     pub id: Option<String>,
     /// The registry provides unique creative identifiers.
     
-    pub registry: Option<String>,
+    pub registry: Option<UniversalAdIdRegistryEnum>,
 }
 
 impl client::Part for UniversalAdId {}
@@ -7700,7 +7700,7 @@ pub struct UserRewardedContentAssignedTargetingOptionDetails {
     /// Output only. User rewarded content status for video ads.
     #[serde(rename="userRewardedContent")]
     
-    pub user_rewarded_content: Option<String>,
+    pub user_rewarded_content: Option<UserRewardedContentAssignedTargetingOptionDetailUserRewardedContentEnum>,
 }
 
 impl client::Part for UserRewardedContentAssignedTargetingOptionDetails {}
@@ -7716,7 +7716,7 @@ pub struct UserRewardedContentTargetingOptionDetails {
     /// Output only. User rewarded content status for video ads.
     #[serde(rename="userRewardedContent")]
     
-    pub user_rewarded_content: Option<String>,
+    pub user_rewarded_content: Option<UserRewardedContentTargetingOptionDetailUserRewardedContentEnum>,
 }
 
 impl client::Part for UserRewardedContentTargetingOptionDetails {}
@@ -7736,7 +7736,7 @@ pub struct VideoPlayerSizeAssignedTargetingOptionDetails {
     /// The video player size. Output only in v1. Required in v2.
     #[serde(rename="videoPlayerSize")]
     
-    pub video_player_size: Option<String>,
+    pub video_player_size: Option<VideoPlayerSizeAssignedTargetingOptionDetailVideoPlayerSizeEnum>,
 }
 
 impl client::Part for VideoPlayerSizeAssignedTargetingOptionDetails {}
@@ -7752,7 +7752,7 @@ pub struct VideoPlayerSizeTargetingOptionDetails {
     /// Output only. The video player size.
     #[serde(rename="videoPlayerSize")]
     
-    pub video_player_size: Option<String>,
+    pub video_player_size: Option<VideoPlayerSizeTargetingOptionDetailVideoPlayerSizeEnum>,
 }
 
 impl client::Part for VideoPlayerSizeTargetingOptionDetails {}
@@ -7771,7 +7771,7 @@ pub struct ViewabilityAssignedTargetingOptionDetails {
     pub targeting_option_id: Option<String>,
     /// The predicted viewability percentage. Output only in v1. Required in v2.
     
-    pub viewability: Option<String>,
+    pub viewability: Option<ViewabilityAssignedTargetingOptionDetailViewabilityEnum>,
 }
 
 impl client::Part for ViewabilityAssignedTargetingOptionDetails {}
@@ -7786,7 +7786,7 @@ impl client::Part for ViewabilityAssignedTargetingOptionDetails {}
 pub struct ViewabilityTargetingOptionDetails {
     /// Output only. The predicted viewability percentage.
     
-    pub viewability: Option<String>,
+    pub viewability: Option<ViewabilityTargetingOptionDetailViewabilityEnum>,
 }
 
 impl client::Part for ViewabilityTargetingOptionDetails {}

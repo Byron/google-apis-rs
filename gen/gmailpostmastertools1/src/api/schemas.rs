@@ -9,7 +9,7 @@ pub struct DeliveryError {
     /// The class of delivery error.
     #[serde(rename="errorClass")]
     
-    pub error_class: Option<String>,
+    pub error_class: Option<DeliveryErrorErrorClassEnum>,
     /// The ratio of messages where the error occurred vs all authenticated traffic.
     #[serde(rename="errorRatio")]
     
@@ -17,7 +17,7 @@ pub struct DeliveryError {
     /// The type of delivery error.
     #[serde(rename="errorType")]
     
-    pub error_type: Option<String>,
+    pub error_type: Option<DeliveryErrorErrorTypeEnum>,
 }
 
 impl client::Part for DeliveryError {}
@@ -46,7 +46,7 @@ pub struct Domain {
     pub name: Option<String>,
     /// User’s permission for this domain. Assigned by the server.
     
-    pub permission: Option<String>,
+    pub permission: Option<DomainPermissionEnum>,
 }
 
 impl client::Resource for Domain {}
@@ -86,7 +86,7 @@ pub struct IpReputation {
     pub ip_count: Option<i64>,
     /// The reputation category this IP reputation represents.
     
-    pub reputation: Option<String>,
+    pub reputation: Option<IpReputationReputationEnum>,
     /// A sample of IPs in this reputation category.
     #[serde(rename="sampleIps")]
     
@@ -169,7 +169,7 @@ pub struct TrafficStats {
     /// Reputation of the domain.
     #[serde(rename="domainReputation")]
     
-    pub domain_reputation: Option<String>,
+    pub domain_reputation: Option<TrafficStatDomainReputationEnum>,
     /// The ratio of incoming mail (to Gmail), that passed secure transport (TLS) vs all mail received from that domain. This metric only pertains to traffic that passed [SPF](http://www.openspf.org/) or [DKIM](http://www.dkim.org/).
     #[serde(rename="inboundEncryptionRatio")]
     

@@ -231,10 +231,10 @@ let mut hub = Dfareporting::new(hyper::Client::builder().build(hyper_rustls::Htt
 // execute the final call using `doit()`.
 // Values shown here are possibly random and not representative !
 let result = hub.reports().files_list(-22, -33)
-             .sort_order("no")
-             .sort_field("ipsum")
-             .page_token("voluptua.")
-             .max_results(-27)
+             .sort_order(&Default::default())
+             .sort_field(&Default::default())
+             .page_token("no")
+             .max_results(-55)
              .doit().await;
 
 match result {

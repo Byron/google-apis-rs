@@ -36,12 +36,12 @@ use super::*;
 ///              .enable_detailed_highway_types(false)
 ///              .client_tile_version_id("dolore")
 ///              .client_info_user_id("dolore")
-///              .client_info_platform("dolore")
-///              .client_info_operating_system("voluptua.")
-///              .client_info_device_model("amet.")
-///              .client_info_application_version("ea")
-///              .client_info_application_id("sadipscing")
-///              .client_info_api_client("Lorem")
+///              .client_info_platform(&Default::default())
+///              .client_info_operating_system("dolore")
+///              .client_info_device_model("voluptua.")
+///              .client_info_application_version("amet.")
+///              .client_info_application_id("ea")
+///              .client_info_api_client("sadipscing")
 ///              .always_include_building_footprints(true)
 ///              .doit().await;
 /// # }
@@ -61,7 +61,7 @@ pub struct FeaturetileGetCall<'a, S>
    pub(super) _enable_detailed_highway_types: Option<bool>,
    pub(super) _client_tile_version_id: Option<String>,
    pub(super) _client_info_user_id: Option<String>,
-   pub(super) _client_info_platform: Option<String>,
+   pub(super) _client_info_platform: Option<FeaturetileClientInfoPlatformEnum>,
    pub(super) _client_info_operating_system: Option<String>,
    pub(super) _client_info_device_model: Option<String>,
    pub(super) _client_info_application_version: Option<String>,
@@ -103,7 +103,7 @@ where
         }
 
         let mut params = Params::with_capacity(20 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
         if let Some(value) = self._region_code.as_ref() {
             params.push("regionCode", value);
         }
@@ -332,8 +332,8 @@ where
     /// Platform where the application is running.
     ///
     /// Sets the *client info.platform* query property to the given value.
-    pub fn client_info_platform(mut self, new_value: &str) -> FeaturetileGetCall<'a, S> {
-        self._client_info_platform = Some(new_value.to_string());
+    pub fn client_info_platform(mut self, new_value: &FeaturetileClientInfoPlatformEnum) -> FeaturetileGetCall<'a, S> {
+        self._client_info_platform = Some(new_value.clone());
         self
     }
     /// Operating system name and version as reported by the OS. For example, "Mac OS X 10.10.4". The exact format is platform-dependent.
@@ -447,17 +447,17 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.terraintiles().get("name")
-///              .add_terrain_formats("est")
-///              .min_elevation_resolution_cells(-27)
-///              .max_elevation_resolution_cells(-43)
-///              .client_info_user_id("sit")
-///              .client_info_platform("et")
-///              .client_info_operating_system("tempor")
-///              .client_info_device_model("aliquyam")
-///              .client_info_application_version("ipsum")
-///              .client_info_application_id("et")
-///              .client_info_api_client("sanctus")
-///              .altitude_precision_centimeters(-56)
+///              .add_terrain_formats(&Default::default())
+///              .min_elevation_resolution_cells(-7)
+///              .max_elevation_resolution_cells(-27)
+///              .client_info_user_id("sed")
+///              .client_info_platform(&Default::default())
+///              .client_info_operating_system("sit")
+///              .client_info_device_model("et")
+///              .client_info_application_version("tempor")
+///              .client_info_application_id("aliquyam")
+///              .client_info_api_client("ipsum")
+///              .altitude_precision_centimeters(-18)
 ///              .doit().await;
 /// # }
 /// ```
@@ -466,11 +466,11 @@ pub struct TerraintileGetCall<'a, S>
 
    pub(super) hub: &'a SemanticTile<S>,
    pub(super) _name: String,
-   pub(super) _terrain_formats: Vec<String>,
+   pub(super) _terrain_formats: Option<TerraintileTerrainFormatsEnum>,
    pub(super) _min_elevation_resolution_cells: Option<i32>,
    pub(super) _max_elevation_resolution_cells: Option<i32>,
    pub(super) _client_info_user_id: Option<String>,
-   pub(super) _client_info_platform: Option<String>,
+   pub(super) _client_info_platform: Option<TerraintileClientInfoPlatformEnum>,
    pub(super) _client_info_operating_system: Option<String>,
    pub(super) _client_info_device_model: Option<String>,
    pub(super) _client_info_application_version: Option<String>,
@@ -512,7 +512,7 @@ where
         }
 
         let mut params = Params::with_capacity(14 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
         if self._terrain_formats.len() > 0 {
             for f in self._terrain_formats.iter() {
                 params.push("terrainFormats", f);
@@ -656,8 +656,8 @@ where
     ///
     /// Append the given value to the *terrain formats* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_terrain_formats(mut self, new_value: &str) -> TerraintileGetCall<'a, S> {
-        self._terrain_formats.push(new_value.to_string());
+    pub fn add_terrain_formats(mut self, new_value: &TerraintileTerrainFormatsEnum) -> TerraintileGetCall<'a, S> {
+        self._terrain_formats.push(new_value.clone());
         self
     }
     /// The minimum allowed resolution for the returned elevation heightmap. Possible values: between 0 and 1024 (and not more than max_elevation_resolution_cells). Zero is supported for backward compatibility. Under-sized heightmaps will be non-uniformly up-sampled such that each edge is no shorter than this value. Non-uniformity is chosen to maximise the amount of preserved data. For example: Original resolution: 30px (width) * 10px (height) min_elevation_resolution: 30 New resolution: 30px (width) * 30px (height)
@@ -684,8 +684,8 @@ where
     /// Platform where the application is running.
     ///
     /// Sets the *client info.platform* query property to the given value.
-    pub fn client_info_platform(mut self, new_value: &str) -> TerraintileGetCall<'a, S> {
-        self._client_info_platform = Some(new_value.to_string());
+    pub fn client_info_platform(mut self, new_value: &TerraintileClientInfoPlatformEnum) -> TerraintileGetCall<'a, S> {
+        self._client_info_platform = Some(new_value.clone());
         self
     }
     /// Operating system name and version as reported by the OS. For example, "Mac OS X 10.10.4". The exact format is platform-dependent.

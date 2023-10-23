@@ -32,11 +32,11 @@ use super::*;
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.courses().course_work_student_submissions_list("courseId", "courseWorkId")
-///              .user_id("eos")
-///              .add_states("dolor")
-///              .page_token("ea")
-///              .page_size(-55)
-///              .late("invidunt")
+///              .user_id("ipsum")
+///              .add_states(&Default::default())
+///              .page_token("gubergren")
+///              .page_size(-51)
+///              .late(&Default::default())
 ///              .doit().await;
 /// 
 /// match result {

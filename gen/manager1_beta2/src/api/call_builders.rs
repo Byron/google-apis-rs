@@ -1418,9 +1418,9 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("projectId", self._project_id);
-        params.push("region", self._region);
-        params.push("deploymentName", self._deployment_name);
+        params.push("projectId", &self._project_id);
+        params.push("region", &self._region);
+        params.push("deploymentName", &self._deployment_name);
 
         params.extend(self._additional_params.iter());
 
@@ -1686,9 +1686,9 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("projectId", self._project_id);
-        params.push("region", self._region);
-        params.push("deploymentName", self._deployment_name);
+        params.push("projectId", &self._project_id);
+        params.push("region", &self._region);
+        params.push("deploymentName", &self._deployment_name);
 
         params.extend(self._additional_params.iter());
 
@@ -1971,8 +1971,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("projectId", self._project_id);
-        params.push("region", self._region);
+        params.push("projectId", &self._project_id);
+        params.push("region", &self._region);
 
         params.extend(self._additional_params.iter());
 
@@ -2266,8 +2266,8 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("projectId", self._project_id);
-        params.push("region", self._region);
+        params.push("projectId", &self._project_id);
+        params.push("region", &self._region);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -2554,8 +2554,8 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("projectId", self._project_id);
-        params.push("templateName", self._template_name);
+        params.push("projectId", &self._project_id);
+        params.push("templateName", &self._template_name);
 
         params.extend(self._additional_params.iter());
 
@@ -2811,8 +2811,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("projectId", self._project_id);
-        params.push("templateName", self._template_name);
+        params.push("projectId", &self._project_id);
+        params.push("templateName", &self._template_name);
 
         params.extend(self._additional_params.iter());
 
@@ -3085,7 +3085,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("projectId", self._project_id);
+        params.push("projectId", &self._project_id);
 
         params.extend(self._additional_params.iter());
 
@@ -3369,7 +3369,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("projectId", self._project_id);
+        params.push("projectId", &self._project_id);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }

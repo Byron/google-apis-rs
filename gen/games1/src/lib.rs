@@ -121,8 +121,8 @@
 //! // execute the final call using `doit()`.
 //! // Values shown here are possibly random and not representative !
 //! let result = hub.applications().get("applicationId")
-//!              .platform_type("voluptua.")
-//!              .language("At")
+//!              .platform_type(&Default::default())
+//!              .language("ipsum")
 //!              .doit().await;
 //! 
 //! match result {

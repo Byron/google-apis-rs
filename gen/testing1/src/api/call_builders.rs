@@ -344,8 +344,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("projectId", self._project_id);
-        params.push("testMatrixId", self._test_matrix_id);
+        params.push("projectId", &self._project_id);
+        params.push("testMatrixId", &self._test_matrix_id);
 
         params.extend(self._additional_params.iter());
 
@@ -626,7 +626,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("projectId", self._project_id);
+        params.push("projectId", &self._project_id);
         if let Some(value) = self._request_id.as_ref() {
             params.push("requestId", value);
         }
@@ -922,8 +922,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("projectId", self._project_id);
-        params.push("testMatrixId", self._test_matrix_id);
+        params.push("projectId", &self._project_id);
+        params.push("testMatrixId", &self._test_matrix_id);
 
         params.extend(self._additional_params.iter());
 
@@ -1150,8 +1150,8 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.test_environment_catalog().get("environmentType")
-///              .project_id("gubergren")
+/// let result = hub.test_environment_catalog().get(&Default::default())
+///              .project_id("ipsum")
 ///              .doit().await;
 /// # }
 /// ```
@@ -1159,7 +1159,7 @@ pub struct TestEnvironmentCatalogGetCall<'a, S>
     where S: 'a {
 
    pub(super) hub: &'a Testing<S>,
-   pub(super) _environment_type: String,
+   pub(super) _environment_type: TestEnvironmentCatalogEnvironmentTypeEnum,
    pub(super) _project_id: Option<String>,
    pub(super) _delegate: Option<&'a mut dyn client::Delegate>,
    pub(super) _additional_params: HashMap<String, String>,
@@ -1197,7 +1197,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("environmentType", self._environment_type);
+        params.push("environmentType", &self._environment_type);
         if let Some(value) = self._project_id.as_ref() {
             params.push("projectId", value);
         }
@@ -1311,8 +1311,8 @@ where
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn environment_type(mut self, new_value: &str) -> TestEnvironmentCatalogGetCall<'a, S> {
-        self._environment_type = new_value.to_string();
+    pub fn environment_type(mut self, new_value: &TestEnvironmentCatalogEnvironmentTypeEnum) -> TestEnvironmentCatalogGetCall<'a, S> {
+        self._environment_type = new_value.clone();
         self
     }
     /// For authorization, the cloud project requesting the TestEnvironmentCatalog.

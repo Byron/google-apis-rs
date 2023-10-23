@@ -178,7 +178,7 @@ pub struct RecognitionConfig {
     pub speech_context: Option<SpeechContext>,
     /// *Required* Encoding of audio data sent in all `RecognitionAudio` messages.
     
-    pub encoding: Option<String>,
+    pub encoding: Option<RecognitionConfigEncodingEnum>,
 }
 
 impl client::Part for RecognitionConfig {}

@@ -195,7 +195,7 @@ impl client::Part for GoogleCloudPolicytroubleshooterV1AccessTuple {}
 pub struct GoogleCloudPolicytroubleshooterV1BindingExplanation {
     /// Required. Indicates whether _this binding_ provides the specified permission to the specified principal for the specified resource. This field does _not_ indicate whether the principal actually has the permission for the resource. There might be another binding that overrides this binding. To determine whether the principal actually has the permission, use the `access` field in the TroubleshootIamPolicyResponse.
     
-    pub access: Option<String>,
+    pub access: Option<GoogleCloudPolicytroubleshooterV1BindingExplanationAccessEnum>,
     /// A condition expression that prevents this binding from granting access unless the expression evaluates to `true`. To learn about IAM Conditions, see https://cloud.google.com/iam/help/conditions/overview.
     
     pub condition: Option<GoogleTypeExpr>,
@@ -204,18 +204,18 @@ pub struct GoogleCloudPolicytroubleshooterV1BindingExplanation {
     pub memberships: Option<HashMap<String, GoogleCloudPolicytroubleshooterV1BindingExplanationAnnotatedMembership>>,
     /// The relevance of this binding to the overall determination for the entire policy.
     
-    pub relevance: Option<String>,
+    pub relevance: Option<GoogleCloudPolicytroubleshooterV1BindingExplanationRelevanceEnum>,
     /// The role that this binding grants. For example, `roles/compute.serviceAgent`. For a complete list of predefined IAM roles, as well as the permissions in each role, see https://cloud.google.com/iam/help/roles/reference.
     
     pub role: Option<String>,
     /// Indicates whether the role granted by this binding contains the specified permission.
     #[serde(rename="rolePermission")]
     
-    pub role_permission: Option<String>,
+    pub role_permission: Option<GoogleCloudPolicytroubleshooterV1BindingExplanationRolePermissionEnum>,
     /// The relevance of the permission's existence, or nonexistence, in the role to the overall determination for the entire policy.
     #[serde(rename="rolePermissionRelevance")]
     
-    pub role_permission_relevance: Option<String>,
+    pub role_permission_relevance: Option<GoogleCloudPolicytroubleshooterV1BindingExplanationRolePermissionRelevanceEnum>,
 }
 
 impl client::Part for GoogleCloudPolicytroubleshooterV1BindingExplanation {}
@@ -230,10 +230,10 @@ impl client::Part for GoogleCloudPolicytroubleshooterV1BindingExplanation {}
 pub struct GoogleCloudPolicytroubleshooterV1BindingExplanationAnnotatedMembership {
     /// Indicates whether the binding includes the principal.
     
-    pub membership: Option<String>,
+    pub membership: Option<GoogleCloudPolicytroubleshooterV1BindingExplanationAnnotatedMembershipMembershipEnum>,
     /// The relevance of the principal's status to the overall determination for the binding.
     
-    pub relevance: Option<String>,
+    pub relevance: Option<GoogleCloudPolicytroubleshooterV1BindingExplanationAnnotatedMembershipRelevanceEnum>,
 }
 
 impl client::Part for GoogleCloudPolicytroubleshooterV1BindingExplanationAnnotatedMembership {}
@@ -248,7 +248,7 @@ impl client::Part for GoogleCloudPolicytroubleshooterV1BindingExplanationAnnotat
 pub struct GoogleCloudPolicytroubleshooterV1ExplainedPolicy {
     /// Indicates whether _this policy_ provides the specified permission to the specified principal for the specified resource. This field does _not_ indicate whether the principal actually has the permission for the resource. There might be another policy that overrides this policy. To determine whether the principal actually has the permission, use the `access` field in the TroubleshootIamPolicyResponse.
     
-    pub access: Option<String>,
+    pub access: Option<GoogleCloudPolicytroubleshooterV1ExplainedPolicyAccessEnum>,
     /// Details about how each binding in the policy affects the principal's ability, or inability, to use the permission for the resource. If the sender of the request does not have access to the policy, this field is omitted.
     #[serde(rename="bindingExplanations")]
     
@@ -262,7 +262,7 @@ pub struct GoogleCloudPolicytroubleshooterV1ExplainedPolicy {
     pub policy: Option<GoogleIamV1Policy>,
     /// The relevance of this policy to the overall determination in the TroubleshootIamPolicyResponse. If the sender of the request does not have access to the policy, this field is omitted.
     
-    pub relevance: Option<String>,
+    pub relevance: Option<GoogleCloudPolicytroubleshooterV1ExplainedPolicyRelevanceEnum>,
 }
 
 impl client::Part for GoogleCloudPolicytroubleshooterV1ExplainedPolicy {}
@@ -301,7 +301,7 @@ impl client::RequestValue for GoogleCloudPolicytroubleshooterV1TroubleshootIamPo
 pub struct GoogleCloudPolicytroubleshooterV1TroubleshootIamPolicyResponse {
     /// Indicates whether the principal has the specified permission for the specified resource, based on evaluating all of the applicable IAM policies.
     
-    pub access: Option<String>,
+    pub access: Option<GoogleCloudPolicytroubleshooterV1TroubleshootIamPolicyResponseAccessEnum>,
     /// The general errors contained in the troubleshooting response.
     
     pub errors: Option<Vec<GoogleRpcStatus>>,
@@ -347,7 +347,7 @@ pub struct GoogleIamV1AuditLogConfig {
     /// The log type that this config enables.
     #[serde(rename="logType")]
     
-    pub log_type: Option<String>,
+    pub log_type: Option<GoogleIamV1AuditLogConfigLogTypeEnum>,
 }
 
 impl client::Part for GoogleIamV1AuditLogConfig {}

@@ -123,11 +123,11 @@ let mut hub = AdExchangeBuyer::new(hyper::Client::builder().build(hyper_rustls::
 // Values shown here are possibly random and not representative !
 let result = hub.creatives().list()
              .page_token("et")
-             .open_auction_status_filter("magna")
-             .max_results(90)
-             .deals_status_filter("ipsum")
-             .add_buyer_creative_id("voluptua.")
-             .add_account_id(-27)
+             .open_auction_status_filter(&Default::default())
+             .max_results(68)
+             .deals_status_filter(&Default::default())
+             .add_buyer_creative_id("no")
+             .add_account_id(-55)
              .doit().await;
 
 match result {

@@ -63,7 +63,7 @@ pub struct FilterPair {
     /// Filter type.
     #[serde(rename="type")]
     
-    pub type_: Option<String>,
+    pub type_: Option<FilterPairTypeEnum>,
     /// Filter value.
     
     pub value: Option<String>,
@@ -157,21 +157,21 @@ pub struct Parameters {
     /// Data is grouped by the filters listed in this field.
     #[serde(rename="groupBys")]
     
-    pub group_bys: Option<Vec<String>>,
+    pub group_bys: Option<Vec<ParameterGroupBysEnum>>,
     /// Deprecated. This field is no longer in use.
     #[serde(rename="includeInviteData")]
     
     pub include_invite_data: Option<bool>,
     /// Metrics to include as columns in your report.
     
-    pub metrics: Option<Vec<String>>,
+    pub metrics: Option<Vec<ParameterMetricsEnum>>,
     /// Additional query options.
     
     pub options: Option<Options>,
     /// Report type.
     #[serde(rename="type")]
     
-    pub type_: Option<String>,
+    pub type_: Option<ParameterTypeEnum>,
 }
 
 impl client::Part for Parameters {}
@@ -191,7 +191,7 @@ pub struct PathFilter {
     /// Indicates the position of the path the filter should match to (first, last, or any event in path).
     #[serde(rename="pathMatchPosition")]
     
-    pub path_match_position: Option<String>,
+    pub path_match_position: Option<PathFilterPathMatchPositionEnum>,
 }
 
 impl client::Part for PathFilter {}
@@ -226,11 +226,11 @@ impl client::Part for PathQueryOptions {}
 pub struct PathQueryOptionsFilter {
     /// Dimension the filter is applied to.
     
-    pub filter: Option<String>,
+    pub filter: Option<PathQueryOptionsFilterFilterEnum>,
     /// Indicates how the filter should be matched to the value.
     #[serde(rename="match")]
     
-    pub match_: Option<String>,
+    pub match_: Option<PathQueryOptionsFilterMatchEnum>,
     /// Value to filter on.
     
     pub values: Option<Vec<String>>,
@@ -298,10 +298,10 @@ pub struct QueryMetadata {
     /// Range of report data.
     #[serde(rename="dataRange")]
     
-    pub data_range: Option<String>,
+    pub data_range: Option<QueryMetadataDataRangeEnum>,
     /// Format of the generated report.
     
-    pub format: Option<String>,
+    pub format: Option<QueryMetadataFormatEnum>,
     /// The path to the location in Google Cloud Storage where the latest report is stored.
     #[serde(rename="googleCloudStoragePathForLatestReport")]
     
@@ -355,7 +355,7 @@ pub struct QuerySchedule {
     pub end_time_ms: Option<i64>,
     /// How often the query is run.
     
-    pub frequency: Option<String>,
+    pub frequency: Option<QueryScheduleFrequencyEnum>,
     /// Time of day at which a new report will be generated, represented as minutes past midnight. Range is 0 to 1439. Only applies to scheduled reports.
     #[serde(rename="nextRunMinuteOfDay")]
     
@@ -409,7 +409,7 @@ pub struct ReportFailure {
     /// Error code that shows why the report was not created.
     #[serde(rename="errorCode")]
     
-    pub error_code: Option<String>,
+    pub error_code: Option<ReportFailureErrorCodeEnum>,
 }
 
 impl client::Part for ReportFailure {}
@@ -483,10 +483,10 @@ pub struct ReportStatus {
     pub finish_time_ms: Option<i64>,
     /// The file type of the report.
     
-    pub format: Option<String>,
+    pub format: Option<ReportStatuFormatEnum>,
     /// The state of the report.
     
-    pub state: Option<String>,
+    pub state: Option<ReportStatuStateEnum>,
 }
 
 impl client::Part for ReportStatus {}
@@ -525,7 +525,7 @@ pub struct RunQueryRequest {
     /// Report data range used to generate the report.
     #[serde(rename="dataRange")]
     
-    pub data_range: Option<String>,
+    pub data_range: Option<RunQueryRequestDataRangeEnum>,
     /// The ending time for the data that is shown in the report. Note, reportDataEndTimeMs is required if dataRange is CUSTOM_DATES and ignored otherwise.
     #[serde(rename="reportDataEndTimeMs")]
     

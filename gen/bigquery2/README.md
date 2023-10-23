@@ -121,8 +121,8 @@ let mut hub = Bigquery::new(hyper::Client::builder().build(hyper_rustls::HttpsCo
 // execute the final call using `doit()`.
 // Values shown here are possibly random and not representative !
 let result = hub.tables().get("projectId", "datasetId", "tableId")
-             .view("ipsum")
-             .selected_fields("voluptua.")
+             .view(&Default::default())
+             .selected_fields("ipsum")
              .doit().await;
 
 match result {

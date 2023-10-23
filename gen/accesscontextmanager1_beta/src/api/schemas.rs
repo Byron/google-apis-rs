@@ -71,7 +71,7 @@ pub struct BasicLevel {
     /// How the `conditions` list should be combined to determine if a request is granted this `AccessLevel`. If AND is used, each `Condition` in `conditions` must be satisfied for the `AccessLevel` to be applied. If OR is used, at least one `Condition` in `conditions` must be satisfied for the `AccessLevel` to be applied. Default behavior is AND.
     #[serde(rename="combiningFunction")]
     
-    pub combining_function: Option<String>,
+    pub combining_function: Option<BasicLevelCombiningFunctionEnum>,
     /// Required. A list of requirements for the `AccessLevel` to be granted.
     
     pub conditions: Option<Vec<Condition>>,
@@ -138,11 +138,11 @@ pub struct DevicePolicy {
     /// Allowed device management levels, an empty list allows all management levels.
     #[serde(rename="allowedDeviceManagementLevels")]
     
-    pub allowed_device_management_levels: Option<Vec<String>>,
+    pub allowed_device_management_levels: Option<Vec<DevicePolicyAllowedDeviceManagementLevelsEnum>>,
     /// Allowed encryptions statuses, an empty list allows all statuses.
     #[serde(rename="allowedEncryptionStatuses")]
     
-    pub allowed_encryption_statuses: Option<Vec<String>>,
+    pub allowed_encryption_statuses: Option<Vec<DevicePolicyAllowedEncryptionStatusesEnum>>,
     /// Allowed OS versions, an empty list allows all types and all versions.
     #[serde(rename="osConstraints")]
     
@@ -315,7 +315,7 @@ pub struct OsConstraint {
     /// Required. The allowed OS type.
     #[serde(rename="osType")]
     
-    pub os_type: Option<String>,
+    pub os_type: Option<OsConstraintOsTypeEnum>,
     /// Only allows requests from devices with a verified Chrome OS. Verifications includes requirements that the device is enterprise-managed, conformant to domain policies, and the caller has permission to call the API targeted by the request.
     #[serde(rename="requireVerifiedChromeOs")]
     
@@ -347,7 +347,7 @@ pub struct ServicePerimeter {
     /// Perimeter type indicator. A single project is allowed to be a member of single regular perimeter, but multiple service perimeter bridges. A project cannot be a included in a perimeter bridge without being included in regular perimeter. For perimeter bridges, restricted/unrestricted service lists as well as access lists must be empty.
     #[serde(rename="perimeterType")]
     
-    pub perimeter_type: Option<String>,
+    pub perimeter_type: Option<ServicePerimeterPerimeterTypeEnum>,
     /// Current ServicePerimeter configuration. Specifies sets of resources, restricted/unrestricted services and access levels that determine perimeter content and boundaries.
     
     pub status: Option<ServicePerimeterConfig>,

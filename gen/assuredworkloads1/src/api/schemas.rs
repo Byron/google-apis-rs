@@ -124,7 +124,7 @@ pub struct GoogleCloudAssuredworkloadsV1RestrictAllowedResourcesRequest {
     /// Required. The type of restriction for using gcp products in the Workload environment.
     #[serde(rename="restrictionType")]
     
-    pub restriction_type: Option<String>,
+    pub restriction_type: Option<GoogleCloudAssuredworkloadsV1RestrictAllowedResourcesRequestRestrictionTypeEnum>,
 }
 
 impl client::RequestValue for GoogleCloudAssuredworkloadsV1RestrictAllowedResourcesRequest {}
@@ -201,7 +201,7 @@ pub struct GoogleCloudAssuredworkloadsV1Violation {
     pub resolve_time: Option<client::chrono::DateTime<client::chrono::offset::Utc>>,
     /// Output only. State of the violation
     
-    pub state: Option<String>,
+    pub state: Option<GoogleCloudAssuredworkloadsV1ViolationStateEnum>,
     /// Output only. The last time when the Violation record was updated.
     #[serde(rename="updateTime")]
     
@@ -228,7 +228,7 @@ pub struct GoogleCloudAssuredworkloadsV1ViolationRemediation {
     /// Output only. Reemediation type based on the type of org policy values violated
     #[serde(rename="remediationType")]
     
-    pub remediation_type: Option<String>,
+    pub remediation_type: Option<GoogleCloudAssuredworkloadsV1ViolationRemediationRemediationTypeEnum>,
 }
 
 impl client::Part for GoogleCloudAssuredworkloadsV1ViolationRemediation {}
@@ -321,7 +321,7 @@ pub struct GoogleCloudAssuredworkloadsV1Workload {
     /// Required. Immutable. Compliance Regime associated with this workload.
     #[serde(rename="complianceRegime")]
     
-    pub compliance_regime: Option<String>,
+    pub compliance_regime: Option<GoogleCloudAssuredworkloadsV1WorkloadComplianceRegimeEnum>,
     /// Output only. Count of active Violations in the Workload.
     #[serde(rename="complianceStatus")]
     
@@ -348,7 +348,7 @@ pub struct GoogleCloudAssuredworkloadsV1Workload {
     /// Output only. Represents the KAJ enrollment state of the given workload.
     #[serde(rename="kajEnrollmentState")]
     
-    pub kaj_enrollment_state: Option<String>,
+    pub kaj_enrollment_state: Option<GoogleCloudAssuredworkloadsV1WorkloadKajEnrollmentStateEnum>,
     /// Input only. Settings used to create a CMEK crypto key. When set, a project with a KMS CMEK key is provisioned. This field is deprecated as of Feb 28, 2022. In order to create a Keyring, callers should specify, ENCRYPTION_KEYS_PROJECT or KEYRING in ResourceSettings.resource_type field.
     #[serde(rename="kmsSettings")]
     
@@ -361,7 +361,7 @@ pub struct GoogleCloudAssuredworkloadsV1Workload {
     pub name: Option<String>,
     /// Optional. Partner regime associated with this workload.
     
-    pub partner: Option<String>,
+    pub partner: Option<GoogleCloudAssuredworkloadsV1WorkloadPartnerEnum>,
     /// Input only. The parent resource for the resources managed by this Assured Workload. May be either empty or a folder resource which is a child of the Workload parent. If not specified all resources are created under the parent organization. Format: folders/{folder_id}
     #[serde(rename="provisionedResourcesParent")]
     
@@ -463,7 +463,7 @@ pub struct GoogleCloudAssuredworkloadsV1WorkloadResourceInfo {
     /// Indicates the type of resource.
     #[serde(rename="resourceType")]
     
-    pub resource_type: Option<String>,
+    pub resource_type: Option<GoogleCloudAssuredworkloadsV1WorkloadResourceInfoResourceTypeEnum>,
 }
 
 impl client::Part for GoogleCloudAssuredworkloadsV1WorkloadResourceInfo {}
@@ -487,7 +487,7 @@ pub struct GoogleCloudAssuredworkloadsV1WorkloadResourceSettings {
     /// Indicates the type of resource. This field should be specified to correspond the id to the right resource type (CONSUMER_FOLDER or ENCRYPTION_KEYS_PROJECT)
     #[serde(rename="resourceType")]
     
-    pub resource_type: Option<String>,
+    pub resource_type: Option<GoogleCloudAssuredworkloadsV1WorkloadResourceSettingResourceTypeEnum>,
 }
 
 impl client::Part for GoogleCloudAssuredworkloadsV1WorkloadResourceSettings {}
@@ -503,11 +503,11 @@ pub struct GoogleCloudAssuredworkloadsV1WorkloadSaaEnrollmentResponse {
     /// Indicates SAA enrollment setup error if any.
     #[serde(rename="setupErrors")]
     
-    pub setup_errors: Option<Vec<String>>,
+    pub setup_errors: Option<Vec<GoogleCloudAssuredworkloadsV1WorkloadSaaEnrollmentResponseSetupErrorsEnum>>,
     /// Indicates SAA enrollment status of a given workload.
     #[serde(rename="setupStatus")]
     
-    pub setup_status: Option<String>,
+    pub setup_status: Option<GoogleCloudAssuredworkloadsV1WorkloadSaaEnrollmentResponseSetupStatusEnum>,
 }
 
 impl client::Part for GoogleCloudAssuredworkloadsV1WorkloadSaaEnrollmentResponse {}

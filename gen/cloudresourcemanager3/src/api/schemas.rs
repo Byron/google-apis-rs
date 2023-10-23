@@ -32,7 +32,7 @@ pub struct AuditLogConfig {
     /// The log type that this config enables.
     #[serde(rename="logType")]
     
-    pub log_type: Option<String>,
+    pub log_type: Option<AuditLogConfigLogTypeEnum>,
 }
 
 impl client::Part for AuditLogConfig {}
@@ -177,7 +177,7 @@ pub struct Folder {
     pub parent: Option<String>,
     /// Output only. The lifecycle state of the folder. Updates to the state must be performed using DeleteFolder and UndeleteFolder.
     
-    pub state: Option<String>,
+    pub state: Option<FolderStateEnum>,
     /// Output only. Timestamp when the folder was last modified.
     #[serde(rename="updateTime")]
     
@@ -588,7 +588,7 @@ pub struct Organization {
     pub name: Option<String>,
     /// Output only. The organization's current lifecycle state.
     
-    pub state: Option<String>,
+    pub state: Option<OrganizationStateEnum>,
     /// Output only. Timestamp when the Organization was last modified.
     #[serde(rename="updateTime")]
     
@@ -689,7 +689,7 @@ pub struct Project {
     pub project_id: Option<String>,
     /// Output only. The project lifecycle state.
     
-    pub state: Option<String>,
+    pub state: Option<ProjectStateEnum>,
     /// Output only. The most recent time this resource was modified.
     #[serde(rename="updateTime")]
     
@@ -920,7 +920,7 @@ pub struct TagKey {
     pub parent: Option<String>,
     /// Optional. A purpose denotes that this Tag is intended for use in policies of a specific policy engine, and will involve that policy engine in management operations involving this Tag. A purpose does not grant a policy engine exclusive rights to the Tag, and it may be referenced by other policy engines. A purpose cannot be changed once set.
     
-    pub purpose: Option<String>,
+    pub purpose: Option<TagKeyPurposeEnum>,
     /// Optional. Purpose data corresponds to the policy system that the tag is intended for. See documentation for `Purpose` for formatting of this field. Purpose data cannot be changed once set.
     #[serde(rename="purposeData")]
     

@@ -277,7 +277,7 @@ pub struct Permission {
     pub name: Option<String>,
     /// The role granted by this permission. The role determines the entity’s ability to read, write, and share notes.
     
-    pub role: Option<String>,
+    pub role: Option<PermissionRoleEnum>,
     /// Output only. The user to whom this role applies.
     
     pub user: Option<User>,

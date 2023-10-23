@@ -970,7 +970,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("surveyUrlId", self._survey_url_id);
+        params.push("surveyUrlId", &self._survey_url_id);
 
         params.extend(self._additional_params.iter());
 
@@ -1260,7 +1260,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("surveyUrlId", self._survey_url_id);
+        params.push("surveyUrlId", &self._survey_url_id);
 
         params.extend(self._additional_params.iter());
 
@@ -1518,7 +1518,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("surveyUrlId", self._survey_url_id);
+        params.push("surveyUrlId", &self._survey_url_id);
 
         params.extend(self._additional_params.iter());
 
@@ -2324,7 +2324,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("resourceId", self._resource_id);
+        params.push("resourceId", &self._resource_id);
 
         params.extend(self._additional_params.iter());
 
@@ -2604,7 +2604,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("resourceId", self._resource_id);
+        params.push("resourceId", &self._resource_id);
 
         params.extend(self._additional_params.iter());
 
@@ -2868,7 +2868,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("surveyUrlId", self._survey_url_id);
+        params.push("surveyUrlId", &self._survey_url_id);
 
         params.extend(self._additional_params.iter());
 

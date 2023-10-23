@@ -120,8 +120,8 @@ let mut req = Deployment::default();
 // Values shown here are possibly random and not representative !
 let result = hub.deployments().patch(req, "project", "deployment")
              .preview(true)
-             .delete_policy("voluptua.")
-             .create_policy("At")
+             .delete_policy(&Default::default())
+             .create_policy(&Default::default())
              .doit().await;
 
 match result {

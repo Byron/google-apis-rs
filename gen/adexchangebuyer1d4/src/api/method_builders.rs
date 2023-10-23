@@ -1065,13 +1065,13 @@ impl<'a, S> ProposalMethods<'a, S> {
     /// * `proposalId` - The proposal id to update.
     /// * `revisionNumber` - The last known revision number to update. If the head revision in the marketplace database has since changed, an error will be thrown. The caller should then fetch the latest proposal at head revision and retry the update at that revision.
     /// * `updateAction` - The proposed action to take on the proposal. This field is required and it must be set when updating a proposal.
-    pub fn patch(&self, request: Proposal, proposal_id: &str, revision_number: i64, update_action: &str) -> ProposalPatchCall<'a, S> {
+    pub fn patch(&self, request: Proposal, proposal_id: &str, revision_number: i64, update_action: &ProposalUpdateActionEnum) -> ProposalPatchCall<'a, S> {
         ProposalPatchCall {
             hub: self.hub,
             _request: request,
             _proposal_id: proposal_id.to_string(),
             _revision_number: revision_number,
-            _update_action: update_action.to_string(),
+            _update_action: update_action.clone(),
             _delegate: Default::default(),
             _additional_params: Default::default(),
             _scopes: Default::default(),
@@ -1118,13 +1118,13 @@ impl<'a, S> ProposalMethods<'a, S> {
     /// * `proposalId` - The proposal id to update.
     /// * `revisionNumber` - The last known revision number to update. If the head revision in the marketplace database has since changed, an error will be thrown. The caller should then fetch the latest proposal at head revision and retry the update at that revision.
     /// * `updateAction` - The proposed action to take on the proposal. This field is required and it must be set when updating a proposal.
-    pub fn update(&self, request: Proposal, proposal_id: &str, revision_number: i64, update_action: &str) -> ProposalUpdateCall<'a, S> {
+    pub fn update(&self, request: Proposal, proposal_id: &str, revision_number: i64, update_action: &ProposalUpdateActionEnum) -> ProposalUpdateCall<'a, S> {
         ProposalUpdateCall {
             hub: self.hub,
             _request: request,
             _proposal_id: proposal_id.to_string(),
             _revision_number: revision_number,
-            _update_action: update_action.to_string(),
+            _update_action: update_action.clone(),
             _delegate: Default::default(),
             _additional_params: Default::default(),
             _scopes: Default::default(),

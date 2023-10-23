@@ -116,15 +116,15 @@ let mut req = Job::default();
 // Values shown here are possibly random and not representative !
 let result = hub.jobs().patch(req, "teamId", 68)
              .title("no")
-             .progress("ipsum")
-             .note("voluptua.")
-             .lng(0.5857873539022715)
-             .lat(0.16568728368878083)
-             .customer_phone_number("takimata")
-             .customer_name("amet.")
-             .add_custom_field("duo")
-             .assignee("ipsum")
-             .address("gubergren")
+             .progress(&Default::default())
+             .note("ipsum")
+             .lng(0.5709789811505924)
+             .lat(0.7318948296136206)
+             .customer_phone_number("amet.")
+             .customer_name("takimata")
+             .add_custom_field("amet.")
+             .assignee("duo")
+             .address("ipsum")
              .doit().await;
 
 match result {

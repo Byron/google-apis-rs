@@ -117,7 +117,7 @@ let result = hub.beacons().diagnostics_list("beaconName")
              .project_id("magna")
              .page_token("no")
              .page_size(-55)
-             .alert_filter("voluptua.")
+             .alert_filter(&Default::default())
              .doit().await;
 
 match result {

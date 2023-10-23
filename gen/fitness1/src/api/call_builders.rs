@@ -1273,8 +1273,8 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("userId", self._user_id);
-        params.push("dataSourceId", self._data_source_id);
+        params.push("userId", &self._user_id);
+        params.push("dataSourceId", &self._data_source_id);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -1568,9 +1568,9 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("userId", self._user_id);
-        params.push("dataSourceId", self._data_source_id);
-        params.push("datasetId", self._dataset_id);
+        params.push("userId", &self._user_id);
+        params.push("dataSourceId", &self._data_source_id);
+        params.push("datasetId", &self._dataset_id);
 
         params.extend(self._additional_params.iter());
 
@@ -1847,9 +1847,9 @@ where
         }
 
         let mut params = Params::with_capacity(7 + self._additional_params.len());
-        params.push("userId", self._user_id);
-        params.push("dataSourceId", self._data_source_id);
-        params.push("datasetId", self._dataset_id);
+        params.push("userId", &self._user_id);
+        params.push("dataSourceId", &self._data_source_id);
+        params.push("datasetId", &self._dataset_id);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -2160,9 +2160,9 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("userId", self._user_id);
-        params.push("dataSourceId", self._data_source_id);
-        params.push("datasetId", self._dataset_id);
+        params.push("userId", &self._user_id);
+        params.push("dataSourceId", &self._data_source_id);
+        params.push("datasetId", &self._dataset_id);
 
         params.extend(self._additional_params.iter());
 
@@ -2474,7 +2474,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("userId", self._user_id);
+        params.push("userId", &self._user_id);
 
         params.extend(self._additional_params.iter());
 
@@ -2760,8 +2760,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("userId", self._user_id);
-        params.push("dataSourceId", self._data_source_id);
+        params.push("userId", &self._user_id);
+        params.push("dataSourceId", &self._data_source_id);
 
         params.extend(self._additional_params.iter());
 
@@ -3034,8 +3034,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("userId", self._user_id);
-        params.push("dataSourceId", self._data_source_id);
+        params.push("userId", &self._user_id);
+        params.push("dataSourceId", &self._data_source_id);
 
         params.extend(self._additional_params.iter());
 
@@ -3309,7 +3309,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("userId", self._user_id);
+        params.push("userId", &self._user_id);
         if self._data_type_name.len() > 0 {
             for f in self._data_type_name.iter() {
                 params.push("dataTypeName", f);
@@ -3592,8 +3592,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("userId", self._user_id);
-        params.push("dataSourceId", self._data_source_id);
+        params.push("userId", &self._user_id);
+        params.push("dataSourceId", &self._data_source_id);
 
         params.extend(self._additional_params.iter());
 
@@ -3895,7 +3895,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("userId", self._user_id);
+        params.push("userId", &self._user_id);
 
         params.extend(self._additional_params.iter());
 
@@ -4181,8 +4181,8 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("userId", self._user_id);
-        params.push("sessionId", self._session_id);
+        params.push("userId", &self._user_id);
+        params.push("sessionId", &self._session_id);
 
         params.extend(self._additional_params.iter());
 
@@ -4453,7 +4453,7 @@ where
         }
 
         let mut params = Params::with_capacity(8 + self._additional_params.len());
-        params.push("userId", self._user_id);
+        params.push("userId", &self._user_id);
         if let Some(value) = self._start_time.as_ref() {
             params.push("startTime", value);
         }
@@ -4776,8 +4776,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("userId", self._user_id);
-        params.push("sessionId", self._session_id);
+        params.push("userId", &self._user_id);
+        params.push("sessionId", &self._session_id);
 
         params.extend(self._additional_params.iter());
 

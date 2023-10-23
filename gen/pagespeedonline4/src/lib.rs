@@ -96,13 +96,13 @@
 //! // execute the final call using `doit()`.
 //! // Values shown here are possibly random and not representative !
 //! let result = hub.pagespeedapi().runpagespeed("url")
-//!              .utm_source("Lorem")
+//!              .utm_source("ipsum")
 //!              .utm_campaign("gubergren")
-//!              .strategy("eos")
+//!              .strategy(&Default::default())
 //!              .snapshots(true)
 //!              .screenshot(false)
-//!              .add_rule("amet")
-//!              .locale("duo")
+//!              .add_rule("dolor")
+//!              .locale("ea")
 //!              .filter_third_party_resources(true)
 //!              .doit().await;
 //! 

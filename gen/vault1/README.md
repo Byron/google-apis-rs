@@ -125,9 +125,9 @@ let mut hub = Vault::new(hyper::Client::builder().build(hyper_rustls::HttpsConne
 // execute the final call using `doit()`.
 // Values shown here are possibly random and not representative !
 let result = hub.matters().holds_list("matterId")
-             .view("magna")
-             .page_token("no")
-             .page_size(-55)
+             .view(&Default::default())
+             .page_token("magna")
+             .page_size(-11)
              .doit().await;
 
 match result {

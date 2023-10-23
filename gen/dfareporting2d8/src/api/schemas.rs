@@ -21,14 +21,14 @@ pub struct Account {
     /// Profile for this account. This is a read-only field that can be left blank.
     #[serde(rename="accountProfile")]
     
-    pub account_profile: Option<String>,
+    pub account_profile: Option<AccountAccountProfileEnum>,
     /// Whether this account is active.
     
     pub active: Option<bool>,
     /// Maximum number of active ads allowed for this account.
     #[serde(rename="activeAdsLimitTier")]
     
-    pub active_ads_limit_tier: Option<String>,
+    pub active_ads_limit_tier: Option<AccountActiveAdsLimitTierEnum>,
     /// Whether to serve creatives with Active View tags. If disabled, viewability data will not be available for any impressions.
     #[serde(rename="activeViewOptOut")]
     
@@ -189,7 +189,7 @@ pub struct AccountActiveAdSummary {
     /// Maximum number of active ads allowed for the account.
     #[serde(rename="activeAdsLimitTier")]
     
-    pub active_ads_limit_tier: Option<String>,
+    pub active_ads_limit_tier: Option<AccountActiveAdSummaryActiveAdsLimitTierEnum>,
     /// Ads that can be activated for the account.
     #[serde(rename="availableAds")]
     
@@ -222,7 +222,7 @@ pub struct AccountPermission {
     /// - "ACCOUNT_PROFILE_STANDARD"
     #[serde(rename="accountProfiles")]
     
-    pub account_profiles: Option<Vec<String>>,
+    pub account_profiles: Option<Vec<AccountPermissionAccountProfilesEnum>>,
     /// ID of this account permission.
     
     #[serde_as(as = "Option<::client::serde_with::DisplayFromStr>")]
@@ -232,7 +232,7 @@ pub struct AccountPermission {
     pub kind: Option<String>,
     /// Administrative level required to enable this account permission.
     
-    pub level: Option<String>,
+    pub level: Option<AccountPermissionLevelEnum>,
     /// Name of this account permission.
     
     pub name: Option<String>,
@@ -400,11 +400,11 @@ pub struct AccountUserProfile {
     /// Trafficker type of this user profile. This is a read-only field.
     #[serde(rename="traffickerType")]
     
-    pub trafficker_type: Option<String>,
+    pub trafficker_type: Option<AccountUserProfileTraffickerTypeEnum>,
     /// User type of the user profile. This is a read-only field that can be left blank.
     #[serde(rename="userAccessType")]
     
-    pub user_access_type: Option<String>,
+    pub user_access_type: Option<AccountUserProfileUserAccessTypeEnum>,
     /// Filter that describes which user roles are visible to the user profile.
     #[serde(rename="userRoleFilter")]
     
@@ -558,7 +558,7 @@ pub struct Ad {
     pub comments: Option<String>,
     /// Compatibility of this ad. Applicable when type is AD_SERVING_DEFAULT_AD. DISPLAY and DISPLAY_INTERSTITIAL refer to either rendering on desktop or on mobile devices or in mobile apps for regular or interstitial ads, respectively. APP and APP_INTERSTITIAL are only used for existing default ads. New mobile placements must be assigned DISPLAY or DISPLAY_INTERSTITIAL and default ads created for those placements will be limited to those compatibility types. IN_STREAM_VIDEO refers to rendering in-stream video ads developed with the VAST standard.
     
-    pub compatibility: Option<String>,
+    pub compatibility: Option<AdCompatibilityEnum>,
     /// Information about the creation of this ad. This is a read-only field.
     #[serde(rename="createInfo")]
     
@@ -665,7 +665,7 @@ pub struct Ad {
     /// Type of ad. This is a required field on insertion. Note that default ads (AD_SERVING_DEFAULT_AD) cannot be created directly (see Creative resource).
     #[serde(rename="type")]
     
-    pub type_: Option<String>,
+    pub type_: Option<AdTypeEnum>,
 }
 
 impl client::RequestValue for Ad {}
@@ -713,7 +713,7 @@ pub struct AdSlot {
     pub comment: Option<String>,
     /// Ad slot compatibility. DISPLAY and DISPLAY_INTERSTITIAL refer to rendering either on desktop, mobile devices or in mobile apps for regular or interstitial ads respectively. APP and APP_INTERSTITIAL are for rendering in mobile apps. IN_STREAM_VIDEO refers to rendering in in-stream video ads developed with the VAST standard.
     
-    pub compatibility: Option<String>,
+    pub compatibility: Option<AdSlotCompatibilityEnum>,
     /// Height of this ad slot.
     
     #[serde_as(as = "Option<::client::serde_with::DisplayFromStr>")]
@@ -729,7 +729,7 @@ pub struct AdSlot {
     /// Payment source type of this ad slot.
     #[serde(rename="paymentSourceType")]
     
-    pub payment_source_type: Option<String>,
+    pub payment_source_type: Option<AdSlotPaymentSourceTypeEnum>,
     /// Primary ad slot of a roadblock inventory item.
     
     pub primary: Option<bool>,
@@ -838,7 +838,7 @@ pub struct Advertiser {
     pub original_floodlight_configuration_id: Option<i64>,
     /// Status of this advertiser.
     
-    pub status: Option<String>,
+    pub status: Option<AdvertiserStatusEnum>,
     /// Subaccount ID of this advertiser.This is a read-only field that can be left blank.
     #[serde(rename="subaccountId")]
     
@@ -1798,7 +1798,7 @@ impl client::Resource for Conversion {}
 pub struct ConversionError {
     /// The error code.
     
-    pub code: Option<String>,
+    pub code: Option<ConversionErrorCodeEnum>,
     /// Identifies what kind of resource this is. Value: the fixed string "dfareporting#conversionError".
     
     pub kind: Option<String>,
@@ -2038,15 +2038,15 @@ pub struct Creative {
     /// Type of artwork used for the creative. This is a read-only field. Applicable to the following creative types: all RICH_MEDIA, and all VPAID.
     #[serde(rename="artworkType")]
     
-    pub artwork_type: Option<String>,
+    pub artwork_type: Option<CreativeArtworkTypeEnum>,
     /// Source application where creative was authored. Presently, only DBM authored creatives will have this field set. Applicable to all creative types.
     #[serde(rename="authoringSource")]
     
-    pub authoring_source: Option<String>,
+    pub authoring_source: Option<CreativeAuthoringSourceEnum>,
     /// Authoring tool for HTML5 banner creatives. This is a read-only field. Applicable to the following creative types: HTML5_BANNER.
     #[serde(rename="authoringTool")]
     
-    pub authoring_tool: Option<String>,
+    pub authoring_tool: Option<CreativeAuthoringToolEnum>,
     /// Whether images are automatically advanced for image gallery creatives. Applicable to the following creative types: DISPLAY_IMAGE_GALLERY.
     #[serde(rename="autoAdvanceImages")]
     
@@ -2062,7 +2062,7 @@ pub struct Creative {
     /// List of feature dependencies that will cause a backup image to be served if the browser that serves the ad does not support them. Feature dependencies are features that a browser must be able to support in order to render your HTML5 creative asset correctly. This field is initially auto-generated to contain all features detected by Campaign Manager for all the assets of this creative and can then be modified by the client. To reset this field, copy over all the creativeAssets' detected features. Applicable to the following creative types: HTML5_BANNER. Applicable to DISPLAY when the primary asset type is not HTML_IMAGE.
     #[serde(rename="backupImageFeatures")]
     
-    pub backup_image_features: Option<Vec<String>>,
+    pub backup_image_features: Option<Vec<CreativeBackupImageFeaturesEnum>>,
     /// Reporting label used for HTML5 banner backup image. Applicable to the following creative types: DISPLAY when the primary asset type is not HTML_IMAGE.
     #[serde(rename="backupImageReportingLabel")]
     
@@ -2093,7 +2093,7 @@ pub struct Creative {
     /// - "DISPLAY"
     /// - "DISPLAY_INTERSTITIAL"
     
-    pub compatibility: Option<Vec<String>>,
+    pub compatibility: Option<Vec<CreativeCompatibilityEnum>>,
     /// Whether Flash assets associated with the creative need to be automatically converted to HTML5. This flag is enabled by default and users can choose to disable it if they don't want the system to generate and use HTML5 asset for this creative. Applicable to the following creative type: FLASH_INPAGE. Applicable to DISPLAY when the primary asset type is not HTML_IMAGE.
     #[serde(rename="convertFlashToHtml5")]
     
@@ -2254,7 +2254,7 @@ pub struct Creative {
     /// Note: FLASH_INPAGE, HTML5_BANNER, and IMAGE are only used for existing creatives. New creatives should use DISPLAY as a replacement for these types.
     #[serde(rename="type")]
     
-    pub type_: Option<String>,
+    pub type_: Option<CreativeTypeEnum>,
     /// A Universal Ad ID as per the VAST 4.0 spec. Applicable to the following creative types: INSTREAM_VIDEO and VPAID.
     #[serde(rename="universalAdId")]
     
@@ -2297,11 +2297,11 @@ pub struct CreativeAsset {
     pub active: Option<bool>,
     /// Possible alignments for an asset. This is a read-only field. Applicable to the following creative types: RICH_MEDIA_DISPLAY_MULTI_FLOATING_INTERSTITIAL.
     
-    pub alignment: Option<String>,
+    pub alignment: Option<CreativeAssetAlignmentEnum>,
     /// Artwork type of rich media creative. This is a read-only field. Applicable to the following creative types: all RICH_MEDIA.
     #[serde(rename="artworkType")]
     
-    pub artwork_type: Option<String>,
+    pub artwork_type: Option<CreativeAssetArtworkTypeEnum>,
     /// Identifier of this asset. This is the same identifier returned during creative asset insert operation. This is a required field. Applicable to all but the following creative types: all REDIRECT and TRACKING_TEXT.
     #[serde(rename="assetIdentifier")]
     
@@ -2317,7 +2317,7 @@ pub struct CreativeAsset {
     /// Rich media child asset type. This is a read-only field. Applicable to the following creative types: all VPAID.
     #[serde(rename="childAssetType")]
     
-    pub child_asset_type: Option<String>,
+    pub child_asset_type: Option<CreativeAssetChildAssetTypeEnum>,
     /// Size of an asset when collapsed. This is a read-only field. Applicable to the following creative types: all RICH_MEDIA and all VPAID. Additionally, applicable to assets whose displayType is ASSET_DISPLAY_TYPE_EXPANDING or ASSET_DISPLAY_TYPE_PEEL_DOWN.
     #[serde(rename="collapsedSize")]
     
@@ -2334,18 +2334,18 @@ pub struct CreativeAsset {
     /// List of feature dependencies for the creative asset that are detected by Campaign Manager. Feature dependencies are features that a browser must be able to support in order to render your HTML5 creative correctly. This is a read-only, auto-generated field. Applicable to the following creative types: HTML5_BANNER. Applicable to DISPLAY when the primary asset type is not HTML_IMAGE.
     #[serde(rename="detectedFeatures")]
     
-    pub detected_features: Option<Vec<String>>,
+    pub detected_features: Option<Vec<CreativeAssetDetectedFeaturesEnum>>,
     /// Type of rich media asset. This is a read-only field. Applicable to the following creative types: all RICH_MEDIA.
     #[serde(rename="displayType")]
     
-    pub display_type: Option<String>,
+    pub display_type: Option<CreativeAssetDisplayTypeEnum>,
     /// Duration in seconds for which an asset will be displayed. Applicable to the following creative types: INSTREAM_VIDEO and VPAID_LINEAR_VIDEO. Value must be greater than or equal to 1.
     
     pub duration: Option<i32>,
     /// Duration type for which an asset will be displayed. Applicable to the following creative types: all RICH_MEDIA.
     #[serde(rename="durationType")]
     
-    pub duration_type: Option<String>,
+    pub duration_type: Option<CreativeAssetDurationTypeEnum>,
     /// Detected expanded dimension for video asset. This is a read-only field. Applicable to the following creative types: INSTREAM_VIDEO and all VPAID.
     #[serde(rename="expandedDimension")]
     
@@ -2396,11 +2396,11 @@ pub struct CreativeAsset {
     /// Offset left unit for an asset. This is a read-only field. Applicable to the following creative types: all RICH_MEDIA.
     #[serde(rename="positionLeftUnit")]
     
-    pub position_left_unit: Option<String>,
+    pub position_left_unit: Option<CreativeAssetPositionLeftUnitEnum>,
     /// Offset top unit for an asset. This is a read-only field if the asset displayType is ASSET_DISPLAY_TYPE_OVERLAY. Applicable to the following creative types: all RICH_MEDIA.
     #[serde(rename="positionTopUnit")]
     
-    pub position_top_unit: Option<String>,
+    pub position_top_unit: Option<CreativeAssetPositionTopUnitEnum>,
     /// Progressive URL for video asset. This is a read-only field. Applicable to the following creative types: INSTREAM_VIDEO and all VPAID.
     #[serde(rename="progressiveServingUrl")]
     
@@ -2422,7 +2422,7 @@ pub struct CreativeAsset {
     /// ALTERNATE_VIDEO refers to the Campaign Manager representation of child asset videos from Studio, and is applicable to VPAID_LINEAR_VIDEO creatives. These cannot be added or removed within Campaign Manager.
     /// For VPAID_LINEAR_VIDEO creatives, PARENT_VIDEO, TRANSCODED_VIDEO and ALTERNATE_VIDEO assets that are marked active serve as backup in case the VPAID creative cannot be served. Only PARENT_VIDEO assets can be added or removed for an INSTREAM_VIDEO or VPAID_LINEAR_VIDEO creative.
     
-    pub role: Option<String>,
+    pub role: Option<CreativeAssetRoleEnum>,
     /// Size associated with this creative asset. This is a required field when applicable; however for IMAGE and FLASH_INPAGE, creatives if left blank, this field will be automatically set using the actual size of the associated image asset. Applicable to the following creative types: DISPLAY_IMAGE_GALLERY, FLASH_INPAGE, HTML5_BANNER, IMAGE, and all RICH_MEDIA. Applicable to DISPLAY when the primary asset type is not HTML_IMAGE.
     
     pub size: Option<Size>,
@@ -2433,7 +2433,7 @@ pub struct CreativeAsset {
     /// Initial wait time type before making the asset visible. Applicable to the following creative types: all RICH_MEDIA.
     #[serde(rename="startTimeType")]
     
-    pub start_time_type: Option<String>,
+    pub start_time_type: Option<CreativeAssetStartTimeTypeEnum>,
     /// Streaming URL for video asset. This is a read-only field. Applicable to the following creative types: INSTREAM_VIDEO and all VPAID.
     #[serde(rename="streamingServingUrl")]
     
@@ -2452,7 +2452,7 @@ pub struct CreativeAsset {
     /// Window mode options for flash assets. Applicable to the following creative types: FLASH_INPAGE, RICH_MEDIA_DISPLAY_EXPANDING, RICH_MEDIA_IM_EXPAND, RICH_MEDIA_DISPLAY_BANNER, and RICH_MEDIA_INPAGE_FLOATING.
     #[serde(rename="windowMode")]
     
-    pub window_mode: Option<String>,
+    pub window_mode: Option<CreativeAssetWindowModeEnum>,
     /// zIndex value of an asset. Applicable to the following creative types: all RICH_MEDIA.Additionally, only applicable to assets whose displayType is NOT one of the following types: ASSET_DISPLAY_TYPE_INPAGE or ASSET_DISPLAY_TYPE_OVERLAY. Acceptable values are -999999999 to 999999999, inclusive.
     #[serde(rename="zIndex")]
     
@@ -2483,7 +2483,7 @@ pub struct CreativeAssetId {
     /// Type of asset to upload. This is a required field. FLASH and IMAGE are no longer supported for new uploads. All image assets should use HTML_IMAGE.
     #[serde(rename="type")]
     
-    pub type_: Option<String>,
+    pub type_: Option<CreativeAssetIdTypeEnum>,
 }
 
 impl client::Part for CreativeAssetId {}
@@ -2511,7 +2511,7 @@ pub struct CreativeAssetMetadata {
     /// List of feature dependencies for the creative asset that are detected by Campaign Manager. Feature dependencies are features that a browser must be able to support in order to render your HTML5 creative correctly. This is a read-only, auto-generated field.
     #[serde(rename="detectedFeatures")]
     
-    pub detected_features: Option<Vec<String>>,
+    pub detected_features: Option<Vec<CreativeAssetMetadataDetectedFeaturesEnum>>,
     /// Numeric ID of the asset. This is a read-only, auto-generated field.
     
     #[serde_as(as = "Option<::client::serde_with::DisplayFromStr>")]
@@ -2552,7 +2552,7 @@ pub struct CreativeAssetMetadata {
     /// - "ZIP_INVALID"
     #[serde(rename="warnedValidationRules")]
     
-    pub warned_validation_rules: Option<Vec<String>>,
+    pub warned_validation_rules: Option<Vec<CreativeAssetMetadataWarnedValidationRulesEnum>>,
 }
 
 impl client::RequestValue for CreativeAssetMetadata {}
@@ -2672,7 +2672,7 @@ pub struct CreativeCustomEvent {
     /// Type of the event. This is a read-only field.
     #[serde(rename="advertiserCustomEventType")]
     
-    pub advertiser_custom_event_type: Option<String>,
+    pub advertiser_custom_event_type: Option<CreativeCustomEventAdvertiserCustomEventTypeEnum>,
     /// Artwork label column, used to link events in Campaign Manager back to events in Studio. This is a required field and should not be modified after insertion.
     #[serde(rename="artworkLabel")]
     
@@ -2680,7 +2680,7 @@ pub struct CreativeCustomEvent {
     /// Artwork type used by the creative.This is a read-only field.
     #[serde(rename="artworkType")]
     
-    pub artwork_type: Option<String>,
+    pub artwork_type: Option<CreativeCustomEventArtworkTypeEnum>,
     /// Exit URL of the event. This field is used only for exit events.
     #[serde(rename="exitUrl")]
     
@@ -2696,7 +2696,7 @@ pub struct CreativeCustomEvent {
     /// Target type used by the event.
     #[serde(rename="targetType")]
     
-    pub target_type: Option<String>,
+    pub target_type: Option<CreativeCustomEventTargetTypeEnum>,
     /// Video reporting ID, used to differentiate multiple videos in a single creative. This is a read-only field.
     #[serde(rename="videoReportingId")]
     
@@ -2937,7 +2937,7 @@ pub struct CreativeGroupAssignment {
     /// Creative group number of the creative group assignment.
     #[serde(rename="creativeGroupNumber")]
     
-    pub creative_group_number: Option<String>,
+    pub creative_group_number: Option<CreativeGroupAssignmentCreativeGroupNumberEnum>,
 }
 
 impl client::Part for CreativeGroupAssignment {}
@@ -2991,7 +2991,7 @@ pub struct CreativeOptimizationConfiguration {
     /// Optimization model for this configuration.
     #[serde(rename="optimizationModel")]
     
-    pub optimization_model: Option<String>,
+    pub optimization_model: Option<CreativeOptimizationConfigurationOptimizationModelEnum>,
 }
 
 impl client::Part for CreativeOptimizationConfiguration {}
@@ -3016,11 +3016,11 @@ pub struct CreativeRotation {
     /// Type of creative rotation. Can be used to specify whether to use sequential or random rotation.
     #[serde(rename="type")]
     
-    pub type_: Option<String>,
+    pub type_: Option<CreativeRotationTypeEnum>,
     /// Strategy for calculating weights. Used with CREATIVE_ROTATION_TYPE_RANDOM.
     #[serde(rename="weightCalculationStrategy")]
     
-    pub weight_calculation_strategy: Option<String>,
+    pub weight_calculation_strategy: Option<CreativeRotationWeightCalculationStrategyEnum>,
 }
 
 impl client::Part for CreativeRotation {}
@@ -3114,7 +3114,7 @@ pub struct CustomFloodlightVariable {
     /// The type of custom floodlight variable to supply a value for. These map to the "u[1-20]=" in the tags.
     #[serde(rename="type")]
     
-    pub type_: Option<String>,
+    pub type_: Option<CustomFloodlightVariableTypeEnum>,
     /// The value of the custom floodlight variable. The length of string must not exceed 50 characters.
     
     pub value: Option<String>,
@@ -3159,7 +3159,7 @@ pub struct DateRange {
     /// The date range relative to the date of when the report is run.
     #[serde(rename="relativeDateRange")]
     
-    pub relative_date_range: Option<String>,
+    pub relative_date_range: Option<DateRangeRelativeDateRangeEnum>,
     /// The start date of the date range, inclusive. A string of the format: "yyyy-MM-dd".
     #[serde(rename="startDate")]
     
@@ -3188,7 +3188,7 @@ pub struct DayPartTargeting {
     /// - "SATURDAY"
     #[serde(rename="daysOfWeek")]
     
-    pub days_of_week: Option<Vec<String>>,
+    pub days_of_week: Option<Vec<DayPartTargetingDaysOfWeekEnum>>,
     /// Hours of the day when the ad will serve, where 0 is midnight to 1 AM and 23 is 11 PM to midnight. Can be specified with days of week, in which case the ad would serve during these hours on the specified days. For example if Monday, Wednesday, Friday are the days of week specified and 9-10am, 3-5pm (hours 9, 15, and 16) is specified, the ad would serve Monday, Wednesdays, and Fridays at 9-10am and 3-5pm. Acceptable values are 0 to 23, inclusive.
     #[serde(rename="hoursOfDay")]
     
@@ -3245,7 +3245,7 @@ pub struct DeliverySchedule {
     pub impression_ratio: Option<i64>,
     /// Serving priority of an ad, with respect to other ads. The lower the priority number, the greater the priority with which it is served.
     
-    pub priority: Option<String>,
+    pub priority: Option<DeliverySchedulePriorityEnum>,
 }
 
 impl client::Part for DeliverySchedule {}
@@ -3350,7 +3350,7 @@ pub struct DimensionValue {
     /// Determines how the 'value' field is matched when filtering. If not specified, defaults to EXACT. If set to WILDCARD_EXPRESSION, '*' is allowed as a placeholder for variable length character sequences, and it can be escaped with a backslash. Note, only paid search dimensions ('dfa:paidSearch*') allow a matchType other than EXACT.
     #[serde(rename="matchType")]
     
-    pub match_type: Option<String>,
+    pub match_type: Option<DimensionValueMatchTypeEnum>,
     /// The value of the dimension.
     
     pub value: Option<String>,
@@ -3522,7 +3522,7 @@ pub struct DirectorySite {
     /// - "JAVASCRIPT_INPAGE"
     #[serde(rename="inpageTagFormats")]
     
-    pub inpage_tag_formats: Option<Vec<String>>,
+    pub inpage_tag_formats: Option<Vec<DirectorySiteInpageTagFormatsEnum>>,
     /// Tag types for interstitial placements.
     /// 
     /// Acceptable values are:
@@ -3531,7 +3531,7 @@ pub struct DirectorySite {
     /// - "JAVASCRIPT_INTERSTITIAL"
     #[serde(rename="interstitialTagFormats")]
     
-    pub interstitial_tag_formats: Option<Vec<String>>,
+    pub interstitial_tag_formats: Option<Vec<DirectorySiteInterstitialTagFormatsEnum>>,
     /// Identifies what kind of resource this is. Value: the fixed string "dfareporting#directorySite".
     
     pub kind: Option<String>,
@@ -3594,14 +3594,14 @@ pub struct DirectorySiteContact {
     pub phone: Option<String>,
     /// Directory site contact role.
     
-    pub role: Option<String>,
+    pub role: Option<DirectorySiteContactRoleEnum>,
     /// Title or designation of this directory site contact.
     
     pub title: Option<String>,
     /// Directory site contact type.
     #[serde(rename="type")]
     
-    pub type_: Option<String>,
+    pub type_: Option<DirectorySiteContactTypeEnum>,
 }
 
 impl client::Resource for DirectorySiteContact {}
@@ -3622,7 +3622,7 @@ pub struct DirectorySiteContactAssignment {
     pub contact_id: Option<i64>,
     /// Visibility of this directory site contact assignment. When set to PUBLIC this contact assignment is visible to all account and agency users; when set to PRIVATE it is visible only to the site.
     
-    pub visibility: Option<String>,
+    pub visibility: Option<DirectorySiteContactAssignmentVisibilityEnum>,
 }
 
 impl client::Part for DirectorySiteContactAssignment {}
@@ -3749,7 +3749,7 @@ pub struct DynamicTargetingKey {
     /// Type of the object of this dynamic targeting key. This is a required field.
     #[serde(rename="objectType")]
     
-    pub object_type: Option<String>,
+    pub object_type: Option<DynamicTargetingKeyObjectTypeEnum>,
 }
 
 impl client::RequestValue for DynamicTargetingKey {}
@@ -3795,11 +3795,11 @@ pub struct EncryptionInfo {
     /// The encryption entity type. This should match the encryption configuration for ad serving or Data Transfer.
     #[serde(rename="encryptionEntityType")]
     
-    pub encryption_entity_type: Option<String>,
+    pub encryption_entity_type: Option<EncryptionInfoEncryptionEntityTypeEnum>,
     /// Describes whether the encrypted cookie was received from ad serving (the %m macro) or from Data Transfer.
     #[serde(rename="encryptionSource")]
     
-    pub encryption_source: Option<String>,
+    pub encryption_source: Option<EncryptionInfoEncryptionSourceEnum>,
     /// Identifies what kind of resource this is. Value: the fixed string "dfareporting#encryptionInfo".
     
     pub kind: Option<String>,
@@ -3868,7 +3868,7 @@ pub struct EventTag {
     /// Site filter type for this event tag. If no type is specified then the event tag will be applied to all sites.
     #[serde(rename="siteFilterType")]
     
-    pub site_filter_type: Option<String>,
+    pub site_filter_type: Option<EventTagSiteFilterTypeEnum>,
     /// Filter list of site IDs associated with this event tag. The siteFilterType determines whether this is a whitelist or blacklist filter.
     #[serde(rename="siteIds")]
     
@@ -3880,7 +3880,7 @@ pub struct EventTag {
     pub ssl_compliant: Option<bool>,
     /// Status of this event tag. Must be ENABLED for this event tag to fire. This is a required field.
     
-    pub status: Option<String>,
+    pub status: Option<EventTagStatusEnum>,
     /// Subaccount ID of this event tag. This is a read-only field that can be left blank.
     #[serde(rename="subaccountId")]
     
@@ -3889,7 +3889,7 @@ pub struct EventTag {
     /// Event tag type. Can be used to specify whether to use a third-party pixel, a third-party JavaScript URL, or a third-party click-through URL for either impression or click tracking. This is a required field.
     #[serde(rename="type")]
     
-    pub type_: Option<String>,
+    pub type_: Option<EventTagTypeEnum>,
     /// Payload URL for this event tag. The URL on a click-through event tag should have a landing page URL appended to the end of it. This field is required on insertion.
     
     pub url: Option<String>,
@@ -3973,7 +3973,7 @@ pub struct File {
     pub file_name: Option<String>,
     /// The output format of the report. Only available once the file is available.
     
-    pub format: Option<String>,
+    pub format: Option<FileFormatEnum>,
     /// The unique ID of this report file.
     
     #[serde_as(as = "Option<::client::serde_with::DisplayFromStr>")]
@@ -3993,7 +3993,7 @@ pub struct File {
     pub report_id: Option<i64>,
     /// The status of the report file.
     
-    pub status: Option<String>,
+    pub status: Option<FileStatusEnum>,
     /// The URLs where the completed report file can be downloaded.
     
     pub urls: Option<FileUrls>,
@@ -4143,11 +4143,11 @@ pub struct FloodlightActivity {
     /// Code type used for cache busting in the generated tag. Applicable only when floodlightActivityGroupType is COUNTER and countingMethod is STANDARD_COUNTING or UNIQUE_COUNTING.
     #[serde(rename="cacheBustingType")]
     
-    pub cache_busting_type: Option<String>,
+    pub cache_busting_type: Option<FloodlightActivityCacheBustingTypeEnum>,
     /// Counting method for conversions for this floodlight activity. This is a required field.
     #[serde(rename="countingMethod")]
     
-    pub counting_method: Option<String>,
+    pub counting_method: Option<FloodlightActivityCountingMethodEnum>,
     /// Dynamic floodlight tags.
     #[serde(rename="defaultTags")]
     
@@ -4172,7 +4172,7 @@ pub struct FloodlightActivity {
     /// Type of the associated floodlight activity group. This is a read-only field.
     #[serde(rename="floodlightActivityGroupType")]
     
-    pub floodlight_activity_group_type: Option<String>,
+    pub floodlight_activity_group_type: Option<FloodlightActivityFloodlightActivityGroupTypeEnum>,
     /// Floodlight configuration ID of this floodlight activity. If this field is left blank, the value will be copied over either from the activity group's floodlight configuration or from the existing activity's floodlight configuration.
     #[serde(rename="floodlightConfigurationId")]
     
@@ -4229,7 +4229,7 @@ pub struct FloodlightActivity {
     /// Tag format type for the floodlight activity. If left blank, the tag format will default to HTML.
     #[serde(rename="tagFormat")]
     
-    pub tag_format: Option<String>,
+    pub tag_format: Option<FloodlightActivityTagFormatEnum>,
     /// Value of the cat= parameter in the floodlight tag, which the ad servers use to identify the activity. This is optional: if empty, a new tag string will be generated for you. This string must be 1 to 8 characters long, with valid characters being [a-z][A-Z][0-9][-][ _ ]. This tag string must also be unique among activities of the same activity group. This field is read-only after insertion.
     #[serde(rename="tagString")]
     
@@ -4238,7 +4238,7 @@ pub struct FloodlightActivity {
     /// Acceptable values are U1 to U100, inclusive.
     #[serde(rename="userDefinedVariableTypes")]
     
-    pub user_defined_variable_types: Option<Vec<String>>,
+    pub user_defined_variable_types: Option<Vec<FloodlightActivityUserDefinedVariableTypesEnum>>,
 }
 
 impl client::RequestValue for FloodlightActivity {}
@@ -4331,7 +4331,7 @@ pub struct FloodlightActivityGroup {
     /// Type of the floodlight activity group. This is a required field that is read-only after insertion.
     #[serde(rename="type")]
     
-    pub type_: Option<String>,
+    pub type_: Option<FloodlightActivityGroupTypeEnum>,
 }
 
 impl client::RequestValue for FloodlightActivityGroup {}
@@ -4443,7 +4443,7 @@ pub struct FloodlightConfiguration {
     /// Day that will be counted as the first day of the week in reports. This is a required field.
     #[serde(rename="firstDayOfWeek")]
     
-    pub first_day_of_week: Option<String>,
+    pub first_day_of_week: Option<FloodlightConfigurationFirstDayOfWeekEnum>,
     /// ID of this floodlight configuration. This is a read-only, auto-generated field.
     
     #[serde_as(as = "Option<::client::serde_with::DisplayFromStr>")]
@@ -4466,7 +4466,7 @@ pub struct FloodlightConfiguration {
     /// Types of attribution options for natural search conversions.
     #[serde(rename="naturalSearchConversionAttributionOption")]
     
-    pub natural_search_conversion_attribution_option: Option<String>,
+    pub natural_search_conversion_attribution_option: Option<FloodlightConfigurationNaturalSearchConversionAttributionOptionEnum>,
     /// Settings for Campaign Manager Omniture integration.
     #[serde(rename="omnitureSettings")]
     
@@ -4576,7 +4576,7 @@ pub struct FsCommand {
     /// Position in the browser where the window will open.
     #[serde(rename="positionOption")]
     
-    pub position_option: Option<String>,
+    pub position_option: Option<FsCommandPositionOptionEnum>,
     /// Distance from the top of the browser. Applicable when positionOption is DISTANCE_FROM_TOP_LEFT_CORNER.
     
     pub top: Option<i32>,
@@ -4725,7 +4725,7 @@ pub struct InventoryItem {
     /// Type of inventory item.
     #[serde(rename="type")]
     
-    pub type_: Option<String>,
+    pub type_: Option<InventoryItemTypeEnum>,
 }
 
 impl client::Resource for InventoryItem {}
@@ -4974,7 +4974,7 @@ pub struct ListPopulationTerm {
     pub negation: Option<bool>,
     /// Comparison operator of this term. This field is only relevant when type is left unset or set to CUSTOM_VARIABLE_TERM or REFERRER_TERM.
     
-    pub operator: Option<String>,
+    pub operator: Option<ListPopulationTermOperatorEnum>,
     /// ID of the list in question. This field is only relevant when type is set to LIST_MEMBERSHIP_TERM.
     #[serde(rename="remarketingListId")]
     
@@ -4983,7 +4983,7 @@ pub struct ListPopulationTerm {
     /// List population term type determines the applicable fields in this object. If left unset or set to CUSTOM_VARIABLE_TERM, then variableName, variableFriendlyName, operator, value, and negation are applicable. If set to LIST_MEMBERSHIP_TERM then remarketingListId and contains are applicable. If set to REFERRER_TERM then operator, value, and negation are applicable.
     #[serde(rename="type")]
     
-    pub type_: Option<String>,
+    pub type_: Option<ListPopulationTermTypeEnum>,
     /// Literal to compare the variable to. This field is only relevant when type is left unset or set to CUSTOM_VARIABLE_TERM or REFERRER_TERM.
     
     pub value: Option<String>,
@@ -5197,7 +5197,7 @@ pub struct ObjectFilter {
     pub object_ids: Option<Vec<i64>>,
     /// Status of the filter. NONE means the user has access to none of the objects. ALL means the user has access to all objects. ASSIGNED means the user has access to the objects with IDs in the objectIds list.
     
-    pub status: Option<String>,
+    pub status: Option<ObjectFilterStatusEnum>,
 }
 
 impl client::Part for ObjectFilter {}
@@ -5508,7 +5508,7 @@ pub struct OrderContact {
     /// Type of this contact.
     #[serde(rename="contactType")]
     
-    pub contact_type: Option<String>,
+    pub contact_type: Option<OrderContactContactTypeEnum>,
     /// ID of the user profile containing the signature that will be embedded into order documents.
     #[serde(rename="signatureUserProfileId")]
     
@@ -5601,7 +5601,7 @@ pub struct OrderDocument {
     /// Type of this order document
     #[serde(rename="type")]
     
-    pub type_: Option<String>,
+    pub type_: Option<OrderDocumentTypeEnum>,
 }
 
 impl client::Resource for OrderDocument {}
@@ -5742,7 +5742,7 @@ pub struct Placement {
     pub comment: Option<String>,
     /// Placement compatibility. DISPLAY and DISPLAY_INTERSTITIAL refer to rendering on desktop, on mobile devices or in mobile apps for regular or interstitial ads respectively. APP and APP_INTERSTITIAL are no longer allowed for new placement insertions. Instead, use DISPLAY or DISPLAY_INTERSTITIAL. IN_STREAM_VIDEO refers to rendering in in-stream video ads developed with the VAST standard. This field is required on insertion.
     
-    pub compatibility: Option<String>,
+    pub compatibility: Option<PlacementCompatibilityEnum>,
     /// ID of the content category assigned to this placement.
     #[serde(rename="contentCategoryId")]
     
@@ -5798,7 +5798,7 @@ pub struct Placement {
     /// Payment source for this placement. This is a required field that is read-only after insertion.
     #[serde(rename="paymentSource")]
     
-    pub payment_source: Option<String>,
+    pub payment_source: Option<PlacementPaymentSourceEnum>,
     /// ID of this placement's group, if applicable.
     #[serde(rename="placementGroupId")]
     
@@ -5842,7 +5842,7 @@ pub struct Placement {
     pub ssl_required: Option<bool>,
     /// Third-party placement status.
     
-    pub status: Option<String>,
+    pub status: Option<PlacementStatusEnum>,
     /// Subaccount ID of this placement. This field can be left blank.
     #[serde(rename="subaccountId")]
     
@@ -5867,7 +5867,7 @@ pub struct Placement {
     /// - "PLACEMENT_TAG_TRACKING_JAVASCRIPT"
     #[serde(rename="tagFormats")]
     
-    pub tag_formats: Option<Vec<String>>,
+    pub tag_formats: Option<Vec<PlacementTagFormatsEnum>>,
     /// Tag settings for this placement.
     #[serde(rename="tagSetting")]
     
@@ -5885,7 +5885,7 @@ pub struct Placement {
     /// Note: Flash is no longer supported. This field now defaults to HTML5 when the following values are provided: FLASH, BOTH.
     #[serde(rename="vpaidAdapterChoice")]
     
-    pub vpaid_adapter_choice: Option<String>,
+    pub vpaid_adapter_choice: Option<PlacementVpaidAdapterChoiceEnum>,
 }
 
 impl client::RequestValue for Placement {}
@@ -6013,7 +6013,7 @@ pub struct PlacementGroup {
     /// Type of this placement group. A package is a simple group of placements that acts as a single pricing point for a group of tags. A roadblock is a group of placements that not only acts as a single pricing point, but also assumes that all the tags in it will be served at the same time. A roadblock requires one of its assigned placements to be marked as primary for reporting. This field is required on insertion.
     #[serde(rename="placementGroupType")]
     
-    pub placement_group_type: Option<String>,
+    pub placement_group_type: Option<PlacementGroupPlacementGroupTypeEnum>,
     /// ID of the placement strategy assigned to this placement group.
     #[serde(rename="placementStrategyId")]
     
@@ -6279,7 +6279,7 @@ pub struct PopupWindowProperties {
     /// Popup window position either centered or at specific coordinate.
     #[serde(rename="positionType")]
     
-    pub position_type: Option<String>,
+    pub position_type: Option<PopupWindowPropertyPositionTypeEnum>,
     /// Whether to display the browser address bar.
     #[serde(rename="showAddressBar")]
     
@@ -6377,7 +6377,7 @@ pub struct Pricing {
     /// Cap cost type of this inventory item.
     #[serde(rename="capCostType")]
     
-    pub cap_cost_type: Option<String>,
+    pub cap_cost_type: Option<PricingCapCostTypeEnum>,
     /// End date of this inventory item.
     #[serde(rename="endDate")]
     
@@ -6388,11 +6388,11 @@ pub struct Pricing {
     /// Group type of this inventory item if it represents a placement group. Is null otherwise. There are two type of placement groups: PLANNING_PLACEMENT_GROUP_TYPE_PACKAGE is a simple group of inventory items that acts as a single pricing point for a group of tags. PLANNING_PLACEMENT_GROUP_TYPE_ROADBLOCK is a group of inventory items that not only acts as a single pricing point, but also assumes that all the tags in it will be served at the same time. A roadblock requires one of its assigned inventory items to be marked as primary.
     #[serde(rename="groupType")]
     
-    pub group_type: Option<String>,
+    pub group_type: Option<PricingGroupTypeEnum>,
     /// Pricing type of this inventory item.
     #[serde(rename="pricingType")]
     
-    pub pricing_type: Option<String>,
+    pub pricing_type: Option<PricingPricingTypeEnum>,
     /// Start date of this inventory item.
     #[serde(rename="startDate")]
     
@@ -6412,7 +6412,7 @@ pub struct PricingSchedule {
     /// Placement cap cost option.
     #[serde(rename="capCostOption")]
     
-    pub cap_cost_option: Option<String>,
+    pub cap_cost_option: Option<PricingScheduleCapCostOptionEnum>,
     /// Whether cap costs are ignored by ad serving.
     #[serde(rename="disregardOverdelivery")]
     
@@ -6436,7 +6436,7 @@ pub struct PricingSchedule {
     /// Placement pricing type. This field is required on insertion.
     #[serde(rename="pricingType")]
     
-    pub pricing_type: Option<String>,
+    pub pricing_type: Option<PricingSchedulePricingTypeEnum>,
     /// Placement start date. This date must be later than, or the same day as, the campaign start date. The hours, minutes, and seconds of the start date should not be set, as doing so will result in an error. This field is required on insertion.
     #[serde(rename="startDate")]
     
@@ -6508,11 +6508,11 @@ pub struct Project {
     /// Audience age group of this project.
     #[serde(rename="audienceAgeGroup")]
     
-    pub audience_age_group: Option<String>,
+    pub audience_age_group: Option<ProjectAudienceAgeGroupEnum>,
     /// Audience gender of this project.
     #[serde(rename="audienceGender")]
     
-    pub audience_gender: Option<String>,
+    pub audience_gender: Option<ProjectAudienceGenderEnum>,
     /// Budget of this project in the currency specified by the current account. The value stored in this field represents only the non-fractional amount. For example, for USD, the smallest value that can be represented by this field is 1 US dollar.
     
     #[serde_as(as = "Option<::client::serde_with::DisplayFromStr>")]
@@ -6665,7 +6665,7 @@ pub struct Recipient {
     /// The delivery type for the recipient.
     #[serde(rename="deliveryType")]
     
-    pub delivery_type: Option<String>,
+    pub delivery_type: Option<RecipientDeliveryTypeEnum>,
     /// The email address of the recipient.
     
     pub email: Option<String>,
@@ -6798,7 +6798,7 @@ pub struct RemarketingList {
     /// Product from which this remarketing list was originated.
     #[serde(rename="listSource")]
     
-    pub list_source: Option<String>,
+    pub list_source: Option<RemarketingListListSourceEnum>,
     /// Name of the remarketing list. This is a required field. Must be no greater than 128 characters long.
     
     pub name: Option<String>,
@@ -6927,7 +6927,7 @@ pub struct Report {
     pub floodlight_criteria: Option<ReportFloodlightCriteria>,
     /// The output format of the report. If not specified, default format is "CSV". Note that the actual format in the completed report file might differ if for instance the report's size exceeds the format's capabilities. "CSV" will then be the fallback format.
     
-    pub format: Option<String>,
+    pub format: Option<ReportFormatEnum>,
     /// The unique ID identifying this report resource.
     
     #[serde_as(as = "Option<::client::serde_with::DisplayFromStr>")]
@@ -6967,7 +6967,7 @@ pub struct Report {
     /// The type of the report.
     #[serde(rename="type")]
     
-    pub type_: Option<String>,
+    pub type_: Option<ReportTypeEnum>,
 }
 
 impl client::RequestValue for Report {}
@@ -7205,7 +7205,7 @@ pub struct SiteContact {
     /// Site contact type.
     #[serde(rename="contactType")]
     
-    pub contact_type: Option<String>,
+    pub contact_type: Option<SiteContactContactTypeEnum>,
     /// Email address of this site contact. This is a required field.
     
     pub email: Option<String>,
@@ -7272,7 +7272,7 @@ pub struct SiteSettings {
     /// Note: Flash is no longer supported. This field now defaults to HTML5 when the following values are provided: FLASH, BOTH.
     #[serde(rename="vpaidAdapterChoiceTemplate")]
     
-    pub vpaid_adapter_choice_template: Option<String>,
+    pub vpaid_adapter_choice_template: Option<SiteSettingVpaidAdapterChoiceTemplateEnum>,
 }
 
 impl client::Part for SiteSettings {}
@@ -7404,7 +7404,7 @@ pub struct SortedDimension {
     /// An optional sort order for the dimension column.
     #[serde(rename="sortOrder")]
     
-    pub sort_order: Option<String>,
+    pub sort_order: Option<SortedDimensionSortOrderEnum>,
 }
 
 impl client::Part for SortedDimension {}
@@ -7501,7 +7501,7 @@ pub struct TagData {
     pub creative_id: Option<i64>,
     /// TagData tag format of this tag.
     
-    pub format: Option<String>,
+    pub format: Option<TagDataFormatEnum>,
     /// Tag string for serving an ad.
     #[serde(rename="impressionTag")]
     
@@ -7533,7 +7533,7 @@ pub struct TagSetting {
     /// Option specifying how keywords are embedded in ad tags. This setting can be used to specify whether keyword placeholders are inserted in placement tags for this site. Publishers can then add keywords to those placeholders.
     #[serde(rename="keywordOption")]
     
-    pub keyword_option: Option<String>,
+    pub keyword_option: Option<TagSettingKeywordOptionEnum>,
 }
 
 impl client::Part for TagSetting {}
@@ -7573,7 +7573,7 @@ pub struct TargetWindow {
     /// Type of browser window for which the backup image of the flash creative can be displayed.
     #[serde(rename="targetWindowOption")]
     
-    pub target_window_option: Option<String>,
+    pub target_window_option: Option<TargetWindowTargetWindowOptionEnum>,
 }
 
 impl client::Part for TargetWindow {}
@@ -7631,7 +7631,7 @@ pub struct TargetableRemarketingList {
     /// Product from which this targetable remarketing list was originated.
     #[serde(rename="listSource")]
     
-    pub list_source: Option<String>,
+    pub list_source: Option<TargetableRemarketingListListSourceEnum>,
     /// Name of the targetable remarketing list. Is no greater than 128 characters long.
     
     pub name: Option<String>,
@@ -7838,7 +7838,7 @@ pub struct ThirdPartyTrackingUrl {
     /// Third-party URL type for in-stream video creatives.
     #[serde(rename="thirdPartyUrlType")]
     
-    pub third_party_url_type: Option<String>,
+    pub third_party_url_type: Option<ThirdPartyTrackingUrlThirdPartyUrlTypeEnum>,
     /// URL for the specified third-party URL type.
     
     pub url: Option<String>,
@@ -7875,7 +7875,7 @@ impl client::Part for TranscodeSetting {}
 pub struct UniversalAdId {
     /// Registry used for the Ad ID value.
     
-    pub registry: Option<String>,
+    pub registry: Option<UniversalAdIdRegistryEnum>,
     /// ID value for this creative. Only alphanumeric characters and the following symbols are valid: "_/\-". Maximum length is 64 characters. Read only when registry is DCM.
     
     pub value: Option<String>,
@@ -7894,7 +7894,7 @@ pub struct UserDefinedVariableConfiguration {
     /// Data type for the variable. This is a required field.
     #[serde(rename="dataType")]
     
-    pub data_type: Option<String>,
+    pub data_type: Option<UserDefinedVariableConfigurationDataTypeEnum>,
     /// User-friendly name for the variable which will appear in reports. This is a required field, must be less than 64 characters long, and cannot contain the following characters: ""<>".
     #[serde(rename="reportName")]
     
@@ -7902,7 +7902,7 @@ pub struct UserDefinedVariableConfiguration {
     /// Variable name in the tag. This is a required field.
     #[serde(rename="variableType")]
     
-    pub variable_type: Option<String>,
+    pub variable_type: Option<UserDefinedVariableConfigurationVariableTypeEnum>,
 }
 
 impl client::Part for UserDefinedVariableConfiguration {}
@@ -8053,7 +8053,7 @@ impl client::ResponseResult for UserRole {}
 pub struct UserRolePermission {
     /// Levels of availability for a user role permission.
     
-    pub availability: Option<String>,
+    pub availability: Option<UserRolePermissionAvailabilityEnum>,
     /// ID of this user role permission.
     
     #[serde_as(as = "Option<::client::serde_with::DisplayFromStr>")]
@@ -8191,7 +8191,7 @@ pub struct VideoFormat {
     /// File type of the video format.
     #[serde(rename="fileType")]
     
-    pub file_type: Option<String>,
+    pub file_type: Option<VideoFormatFileTypeEnum>,
     /// ID of the video format.
     
     pub id: Option<i32>,
@@ -8354,7 +8354,7 @@ pub struct ReportCrossDimensionReachCriteria {
     pub date_range: Option<DateRange>,
     /// The dimension option.
     
-    pub dimension: Option<String>,
+    pub dimension: Option<ReportCrossDimensionReachCriterionDimensionEnum>,
     /// The list of filters on which dimensions are filtered.
     #[serde(rename="dimensionFilters")]
     
@@ -8390,7 +8390,7 @@ pub struct ReportDelivery {
     /// The type of delivery for the owner to receive, if enabled.
     #[serde(rename="emailOwnerDeliveryType")]
     
-    pub email_owner_delivery_type: Option<String>,
+    pub email_owner_delivery_type: Option<ReportDeliveryEmailOwnerDeliveryTypeEnum>,
     /// The message to be sent with each email.
     
     pub message: Option<String>,
@@ -8637,12 +8637,12 @@ pub struct ReportSchedule {
     /// List of week days "WEEKLY" on which scheduled reports should run.
     #[serde(rename="repeatsOnWeekDays")]
     
-    pub repeats_on_week_days: Option<Vec<String>>,
+    pub repeats_on_week_days: Option<Vec<ReportScheduleRepeatsOnWeekDaysEnum>>,
     /// Enum to define for "MONTHLY" scheduled reports whether reports should be repeated on the same day of the month as "startDate" or the same day of the week of the month.
     /// Example: If 'startDate' is Monday, April 2nd 2012 (2012-04-02), "DAY_OF_MONTH" would run subsequent reports on the 2nd of every Month, and "WEEK_OF_MONTH" would run subsequent reports on the first Monday of the month.
     #[serde(rename="runsOnDayOfMonth")]
     
-    pub runs_on_day_of_month: Option<String>,
+    pub runs_on_day_of_month: Option<ReportScheduleRunsOnDayOfMonthEnum>,
     /// Start date of date range for which scheduled reports should be run.
     #[serde(rename="startDate")]
     

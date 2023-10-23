@@ -118,17 +118,17 @@ let mut hub = Blogger::new(hyper::Client::builder().build(hyper_rustls::HttpsCon
 // execute the final call using `doit()`.
 // Values shown here are possibly random and not representative !
 let result = hub.posts().list("blogId")
-             .view("magna")
-             .add_status("no")
-             .start_date("ipsum")
-             .sort_option("voluptua.")
-             .page_token("At")
-             .order_by("sanctus")
-             .max_results(21)
-             .labels("amet.")
-             .fetch_images(true)
+             .view(&Default::default())
+             .add_status(&Default::default())
+             .start_date("magna")
+             .sort_option(&Default::default())
+             .page_token("no")
+             .order_by(&Default::default())
+             .max_results(46)
+             .labels("voluptua.")
+             .fetch_images(false)
              .fetch_bodies(true)
-             .end_date("duo")
+             .end_date("amet.")
              .doit().await;
 
 match result {

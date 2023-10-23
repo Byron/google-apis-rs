@@ -31,19 +31,19 @@ use super::*;
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.videos().list(&vec!["gubergren".into()])
-///              .video_category_id("rebum.")
-///              .region_code("est")
-///              .page_token("ipsum")
-///              .on_behalf_of_content_owner("ipsum")
-///              .my_rating("est")
-///              .max_width(-62)
-///              .max_results(84)
-///              .max_height(-99)
-///              .locale("Lorem")
-///              .add_id("eos")
-///              .hl("labore")
-///              .chart("sed")
+/// let result = hub.videos().list(&vec!["duo".into()])
+///              .video_category_id("ipsum")
+///              .region_code("sed")
+///              .page_token("ut")
+///              .on_behalf_of_content_owner("gubergren")
+///              .my_rating(&Default::default())
+///              .max_width(-16)
+///              .max_results(44)
+///              .max_height(-50)
+///              .locale("ipsum")
+///              .add_id("est")
+///              .hl("gubergren")
+///              .chart(&Default::default())
 ///              .doit().await;
 /// 
 /// match result {

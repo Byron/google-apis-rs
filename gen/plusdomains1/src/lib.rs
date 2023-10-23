@@ -111,9 +111,9 @@
 //! // execute the final call using `doit()`.
 //! // Values shown here are possibly random and not representative !
 //! let result = hub.comments().list("activityId")
-//!              .sort_order("At")
-//!              .page_token("sanctus")
-//!              .max_results(21)
+//!              .sort_order(&Default::default())
+//!              .page_token("voluptua.")
+//!              .max_results(74)
 //!              .doit().await;
 //! 
 //! match result {

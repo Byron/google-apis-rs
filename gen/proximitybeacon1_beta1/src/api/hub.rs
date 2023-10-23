@@ -32,10 +32,10 @@ use super::*;
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.beacons().diagnostics_list("beaconName")
-///              .project_id("duo")
-///              .page_token("ipsum")
-///              .page_size(-62)
-///              .alert_filter("Lorem")
+///              .project_id("takimata")
+///              .page_token("amet.")
+///              .page_size(-20)
+///              .alert_filter(&Default::default())
 ///              .doit().await;
 /// 
 /// match result {

@@ -132,7 +132,7 @@ pub struct AuditLogConfig {
     /// The log type that this config enables.
     #[serde(rename="logType")]
     
-    pub log_type: Option<String>,
+    pub log_type: Option<AuditLogConfigLogTypeEnum>,
 }
 
 impl client::Part for AuditLogConfig {}
@@ -319,18 +319,18 @@ pub struct CertificateAuthority {
     pub pem_ca_certificates: Option<Vec<String>>,
     /// Output only. The State for this CertificateAuthority.
     
-    pub state: Option<String>,
+    pub state: Option<CertificateAuthorityStateEnum>,
     /// Optional. If this is a subordinate CertificateAuthority, this field will be set with the subordinate configuration, which describes its issuers. This may be updated, but this CertificateAuthority must continue to validate.
     #[serde(rename="subordinateConfig")]
     
     pub subordinate_config: Option<SubordinateConfig>,
     /// Required. Immutable. The Tier of this CertificateAuthority.
     
-    pub tier: Option<String>,
+    pub tier: Option<CertificateAuthorityTierEnum>,
     /// Required. Immutable. The Type of this CertificateAuthority.
     #[serde(rename="type")]
     
-    pub type_: Option<String>,
+    pub type_: Option<CertificateAuthorityTypeEnum>,
     /// Output only. The time at which this CertificateAuthority was updated.
     #[serde(rename="updateTime")]
     
@@ -507,7 +507,7 @@ pub struct CertificateRevocationList {
     pub sequence_number: Option<i64>,
     /// Output only. The State for this CertificateRevocationList.
     
-    pub state: Option<String>,
+    pub state: Option<CertificateRevocationListStateEnum>,
     /// Output only. The time at which this CertificateRevocationList was updated.
     #[serde(rename="updateTime")]
     
@@ -791,7 +791,7 @@ impl client::Part for KeyUsageOptions {}
 pub struct KeyVersionSpec {
     /// Required. The algorithm to use for creating a managed Cloud KMS key for a for a simplified experience. All managed keys will be have their ProtectionLevel as `HSM`.
     
-    pub algorithm: Option<String>,
+    pub algorithm: Option<KeyVersionSpecAlgorithmEnum>,
     /// Required. The resource name for an existing Cloud KMS CryptoKeyVersion in the format `projects/*/locations/*/keyRings/*/cryptoKeys/*/cryptoKeyVersions/*`. This option enables full flexibility in the key's capabilities and properties.
     #[serde(rename="cloudKmsKeyVersion")]
     
@@ -1091,7 +1091,7 @@ pub struct PublicKey {
     /// Optional. The type of public key. If specified, it must match the public key used for the`key` field.
     #[serde(rename="type")]
     
-    pub type_: Option<String>,
+    pub type_: Option<PublicKeyTypeEnum>,
 }
 
 impl client::Part for PublicKey {}
@@ -1215,7 +1215,7 @@ pub struct RevocationDetails {
     /// Indicates why a Certificate was revoked.
     #[serde(rename="revocationState")]
     
-    pub revocation_state: Option<String>,
+    pub revocation_state: Option<RevocationDetailRevocationStateEnum>,
     /// The time at which this Certificate was revoked.
     #[serde(rename="revocationTime")]
     
@@ -1238,7 +1238,7 @@ impl client::Part for RevocationDetails {}
 pub struct RevokeCertificateRequest {
     /// Required. The RevocationReason for revoking this certificate.
     
-    pub reason: Option<String>,
+    pub reason: Option<RevokeCertificateRequestReasonEnum>,
     /// Optional. An ID to identify requests. Specify a unique request ID so that if you must retry your request, the server will know to ignore the request if it has already been completed. The server will guarantee that for at least 60 minutes since the first request. For example, consider a situation where you make an initial request and t he request times out. If you make the request again with the same request ID, the server can check if original operation with the same request ID was received, and if so, will ignore the second request. This prevents clients from accidentally creating duplicate commitments. The request ID must be a valid UUID with the exception that zero UUID is not supported (00000000-0000-0000-0000-000000000000).
     #[serde(rename="requestId")]
     
@@ -1265,7 +1265,7 @@ pub struct RevokedCertificate {
     /// The reason the Certificate was revoked.
     #[serde(rename="revocationReason")]
     
-    pub revocation_reason: Option<String>,
+    pub revocation_reason: Option<RevokedCertificateRevocationReasonEnum>,
 }
 
 impl client::Part for RevokedCertificate {}

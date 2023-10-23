@@ -29,7 +29,7 @@ pub struct Area {
     /// The polygon encoding type used for this area.
     #[serde(rename="type")]
     
-    pub type_: Option<String>,
+    pub type_: Option<AreaTypeEnum>,
     /// The vertices present in the polygon defining the area.
     #[serde(rename="vertexOffsets")]
     
@@ -118,7 +118,7 @@ pub struct Feature {
     /// The type of this feature.
     #[serde(rename="type")]
     
-    pub type_: Option<String>,
+    pub type_: Option<FeatureTypeEnum>,
 }
 
 impl client::Part for Feature {}
@@ -149,7 +149,7 @@ pub struct FeatureTile {
     pub providers: Option<Vec<ProviderInfo>>,
     /// Tile response status code to support tile caching.
     
-    pub status: Option<String>,
+    pub status: Option<FeatureTileStatusEnum>,
     /// An opaque value, usually less than 30 characters, that contains version info about this tile and the data that was used to generate it. The client should store this value in its tile cache and pass it back to the API in the client_tile_version_id field of subsequent tile requests in order to enable the API to detect when the new tile would be the same as the one the client already has in its cache. Also see STATUS_OK_DATA_UNCHANGED.
     #[serde(rename="versionId")]
     
@@ -277,7 +277,7 @@ pub struct Relation {
     /// Relation type between the origin feature to the related feature.
     #[serde(rename="relationType")]
     
-    pub relation_type: Option<String>,
+    pub relation_type: Option<RelationRelationTypeEnum>,
 }
 
 impl client::Part for Relation {}

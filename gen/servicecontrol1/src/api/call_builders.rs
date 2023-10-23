@@ -77,7 +77,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("serviceName", self._service_name);
+        params.push("serviceName", &self._service_name);
 
         params.extend(self._additional_params.iter());
 
@@ -369,7 +369,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("serviceName", self._service_name);
+        params.push("serviceName", &self._service_name);
 
         params.extend(self._additional_params.iter());
 
@@ -661,7 +661,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("serviceName", self._service_name);
+        params.push("serviceName", &self._service_name);
 
         params.extend(self._additional_params.iter());
 

@@ -1525,11 +1525,11 @@ impl<'a, S> OrderMethods<'a, S> {
     ///
     /// * `merchantId` - The ID of the account that should manage the order. This cannot be a multi-client account.
     /// * `templateName` - The name of the template to retrieve.
-    pub fn gettestordertemplate(&self, merchant_id: u64, template_name: &str) -> OrderGettestordertemplateCall<'a, S> {
+    pub fn gettestordertemplate(&self, merchant_id: u64, template_name: &OrderTemplateNameEnum) -> OrderGettestordertemplateCall<'a, S> {
         OrderGettestordertemplateCall {
             hub: self.hub,
             _merchant_id: merchant_id,
-            _template_name: template_name.to_string(),
+            _template_name: template_name.clone(),
             _country: Default::default(),
             _delegate: Default::default(),
             _additional_params: Default::default(),

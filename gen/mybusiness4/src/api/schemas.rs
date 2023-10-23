@@ -112,11 +112,11 @@ pub struct Account {
     /// Output only. Specifies the PermissionLevel the caller has for this account.
     #[serde(rename="permissionLevel")]
     
-    pub permission_level: Option<String>,
+    pub permission_level: Option<AccountPermissionLevelEnum>,
     /// Output only. Specifies the AccountRole
     /// the caller has for this account.
     
-    pub role: Option<String>,
+    pub role: Option<AccountRoleEnum>,
     /// Output only. Indicates the AccountState of this account.
     
     pub state: Option<AccountState>,
@@ -124,7 +124,7 @@ pub struct Account {
     /// of this account.
     #[serde(rename="type")]
     
-    pub type_: Option<String>,
+    pub type_: Option<AccountTypeEnum>,
 }
 
 impl client::RequestValue for Account {}
@@ -144,12 +144,12 @@ pub struct AccountState {
     /// connected to Google Maps, and have Google+ pages created, without requiring
     /// moderation.
     
-    pub status: Option<String>,
+    pub status: Option<AccountStateStatusEnum>,
     /// Indicates whether the account is vetted by Google. A vetted account is able
     /// to verify locations via the VETTED_PARTNER method.
     #[serde(rename="vettedStatus")]
     
-    pub vetted_status: Option<String>,
+    pub vetted_status: Option<AccountStateVettedStatusEnum>,
 }
 
 impl client::Part for AccountState {}
@@ -245,7 +245,7 @@ pub struct Admin {
     /// admin uses with the specified Account
     /// or Location resource.
     
-    pub role: Option<String>,
+    pub role: Option<AdminRoleEnum>,
 }
 
 impl client::RequestValue for Admin {}
@@ -343,7 +343,7 @@ pub struct Attribute {
     /// used to determine how to interpret the value.
     #[serde(rename="valueType")]
     
-    pub value_type: Option<String>,
+    pub value_type: Option<AttributeValueTypeEnum>,
     /// The values for this attribute. The type of the values supplied must match
     /// that expected for that attribute; see
     /// [AttributeValueType](https://developers.google.com/my-business/reference/rest/v4/AttributeValueType).
@@ -402,7 +402,7 @@ pub struct AttributeMetadata {
     /// expected to be of this type.
     #[serde(rename="valueType")]
     
-    pub value_type: Option<String>,
+    pub value_type: Option<AttributeMetadataValueTypeEnum>,
 }
 
 impl client::Part for AttributeMetadata {}
@@ -480,7 +480,7 @@ pub struct Author {
     /// The type of user the author is.
     #[serde(rename="type")]
     
-    pub type_: Option<String>,
+    pub type_: Option<AuthorTypeEnum>,
 }
 
 impl client::Part for Author {}
@@ -645,7 +645,7 @@ pub struct CallToAction {
     /// The type of action that will be performed.
     #[serde(rename="actionType")]
     
-    pub action_type: Option<String>,
+    pub action_type: Option<CallToActionActionTypeEnum>,
     /// The URL the user will be directed to upon clicking. This field should be
     /// left unset for Call CTA.
     
@@ -861,7 +861,7 @@ pub struct DimensionalMetricValue {
     /// The option that requested this dimensional value.
     #[serde(rename="metricOption")]
     
-    pub metric_option: Option<String>,
+    pub metric_option: Option<DimensionalMetricValueMetricOptionEnum>,
     /// The dimension for the value.
     #[serde(rename="timeDimension")]
     
@@ -912,7 +912,7 @@ pub struct DrivingDirectionMetricsRequest {
     /// Valid values are 7, 30, and 90.
     #[serde(rename="numDays")]
     
-    pub num_days: Option<String>,
+    pub num_days: Option<DrivingDirectionMetricsRequestNumDaysEnum>,
 }
 
 impl client::Part for DrivingDirectionMetricsRequest {}
@@ -927,7 +927,7 @@ impl client::Part for DrivingDirectionMetricsRequest {}
 pub struct Duplicate {
     /// Indicates whether the user has access to the location it duplicates.
     
-    pub access: Option<String>,
+    pub access: Option<DuplicateAccessEnum>,
     /// The resource name of the location that this duplicates. Only populated
     /// if the authenticated user has access rights to that location and that
     /// location is not deleted.
@@ -1276,7 +1276,7 @@ pub struct Invitation {
     pub name: Option<String>,
     /// The invited role on the account.
     
-    pub role: Option<String>,
+    pub role: Option<InvitationRoleEnum>,
     /// The sparsely populated account this invitation is for.
     #[serde(rename="targetAccount")]
     
@@ -1801,7 +1801,7 @@ pub struct LocalPost {
     /// for posts of topic_type Alert, and behaves as a sub-type of Alerts.
     #[serde(rename="alertType")]
     
-    pub alert_type: Option<String>,
+    pub alert_type: Option<LocalPostAlertTypeEnum>,
     /// The URL that users are sent to when clicking through the promotion. Ignored
     /// for topic type `OFFER`.
     #[serde(rename="callToAction")]
@@ -1838,14 +1838,14 @@ pub struct LocalPost {
     /// Output only. The state of the post, indicating what part of its lifecycle
     /// it is in.
     
-    pub state: Option<String>,
+    pub state: Option<LocalPostStateEnum>,
     /// Description/body of the local post.
     
     pub summary: Option<String>,
     /// Required. The topic type of the post: standard, event, offer, or alert.
     #[serde(rename="topicType")]
     
-    pub topic_type: Option<String>,
+    pub topic_type: Option<LocalPostTopicTypeEnum>,
     /// Output only. Time of the last modification of the post made by the user.
     #[serde(rename="updateTime")]
     
@@ -2086,7 +2086,7 @@ impl client::ResponseResult for Location {}
 pub struct LocationAssociation {
     /// The category that this location photo belongs to.
     
-    pub category: Option<String>,
+    pub category: Option<LocationAssociationCategoryEnum>,
     /// The ID of a price list item that this location photo is associated
     /// with.
     #[serde(rename="priceListItemId")]
@@ -2393,7 +2393,7 @@ pub struct MediaItem {
     /// and is read-only on all other requests. Cannot be updated.
     #[serde(rename="mediaFormat")]
     
-    pub media_format: Option<String>,
+    pub media_format: Option<MediaItemMediaFormatEnum>,
     /// The resource name for this media item.
     /// `accounts/{account_id}/locations/{location_id}/media/{media_key}`
     
@@ -2491,10 +2491,10 @@ impl client::Part for Metadata {}
 pub struct MetricRequest {
     /// The requested metric.
     
-    pub metric: Option<String>,
+    pub metric: Option<MetricRequestMetricEnum>,
     /// How the values should appear when returned.
     
-    pub options: Option<Vec<String>>,
+    pub options: Option<Vec<MetricRequestOptionsEnum>>,
 }
 
 impl client::Part for MetricRequest {}
@@ -2513,7 +2513,7 @@ pub struct MetricValue {
     pub dimensional_values: Option<Vec<DimensionalMetricValue>>,
     /// The metric for which the value applies.
     
-    pub metric: Option<String>,
+    pub metric: Option<MetricValueMetricEnum>,
     /// The total aggregated value for this metric.
     /// Set for the AGGREGATED_TOTAL option.
     #[serde(rename="totalValue")]
@@ -2575,7 +2575,7 @@ pub struct Notifications {
     /// use DeleteNotifications.
     #[serde(rename="notificationTypes")]
     
-    pub notification_types: Option<Vec<String>>,
+    pub notification_types: Option<Vec<NotificationNotificationTypesEnum>>,
     /// The Google Cloud Pub/Sub topic that will receive notifications when
     /// locations managed by this account are updated. If unset, no notifications
     /// will be posted.
@@ -2611,7 +2611,7 @@ pub struct OpenInfo {
     /// Indicates whether or not the Location is currently open for business.
     /// All locations are open by default, unless updated to be closed.
     
-    pub status: Option<String>,
+    pub status: Option<OpenInfoStatusEnum>,
 }
 
 impl client::Part for OpenInfo {}
@@ -3037,13 +3037,13 @@ pub struct ReportGoogleLocationRequest {
     /// is with the location itself.
     #[serde(rename="reportReasonBadLocation")]
     
-    pub report_reason_bad_location: Option<String>,
+    pub report_reason_bad_location: Option<ReportGoogleLocationRequestReportReasonBadLocationEnum>,
     /// The reason for which the user is reporting this location when the issue
     /// is with the recommendation. This report is useful if the location has
     /// been recommended to the GMB account.
     #[serde(rename="reportReasonBadRecommendation")]
     
-    pub report_reason_bad_recommendation: Option<String>,
+    pub report_reason_bad_recommendation: Option<ReportGoogleLocationRequestReportReasonBadRecommendationEnum>,
     /// Optional. A text entry for elaborating on the reason for which the user is
     /// reporting this location. The maximum length is 512 characters.
     #[serde(rename="reportReasonElaboration")]
@@ -3200,7 +3200,7 @@ pub struct Review {
     /// The star rating of the review.
     #[serde(rename="starRating")]
     
-    pub star_rating: Option<String>,
+    pub star_rating: Option<ReviewStarRatingEnum>,
     /// The timestamp for when the review was last modified.
     #[serde(rename="updateTime")]
     
@@ -3357,7 +3357,7 @@ pub struct Section {
     /// Optional. Type of the current price list section. Default value is FOOD.
     #[serde(rename="sectionType")]
     
-    pub section_type: Option<String>,
+    pub section_type: Option<SectionSectionTypeEnum>,
 }
 
 impl client::Part for Section {}
@@ -3375,7 +3375,7 @@ pub struct ServiceAreaBusiness {
     /// business.
     #[serde(rename="businessType")]
     
-    pub business_type: Option<String>,
+    pub business_type: Option<ServiceAreaBusinesBusinessTypeEnum>,
     /// The area that this business serves defined through a set of places.
     
     pub places: Option<Places>,
@@ -3530,7 +3530,7 @@ pub struct TimeDimension {
     /// Set for BREAKDOWN_DAY_OF_WEEK option.
     #[serde(rename="dayOfWeek")]
     
-    pub day_of_week: Option<String>,
+    pub day_of_week: Option<TimeDimensionDayOfWeekEnum>,
     /// The hour of the day (0 to 23) this value corresponds to.
     /// Set for BREAKDOWN_HOUR_OF_DAY option.
     #[serde(rename="timeOfDay")]
@@ -3617,7 +3617,7 @@ pub struct TimePeriod {
     /// on.
     #[serde(rename="closeDay")]
     
-    pub close_day: Option<String>,
+    pub close_day: Option<TimePeriodCloseDayEnum>,
     /// Time in 24hr ISO 8601 extended format (hh:mm). Valid values are
     /// 00:00-24:00, where 24:00 represents midnight at the end of the specified
     /// day field.
@@ -3628,7 +3628,7 @@ pub struct TimePeriod {
     /// on.
     #[serde(rename="openDay")]
     
-    pub open_day: Option<String>,
+    pub open_day: Option<TimePeriodOpenDayEnum>,
     /// Time in 24hr ISO 8601 extended format (hh:mm). Valid values are
     /// 00:00-24:00, where 24:00 represents midnight at the end of the specified
     /// day field.
@@ -3749,13 +3749,13 @@ pub struct Verification {
     pub create_time: Option<client::chrono::DateTime<client::chrono::offset::Utc>>,
     /// The method of the verification.
     
-    pub method: Option<String>,
+    pub method: Option<VerificationMethodEnum>,
     /// Resource name of the verification.
     
     pub name: Option<String>,
     /// The state of the verification.
     
-    pub state: Option<String>,
+    pub state: Option<VerificationStateEnum>,
 }
 
 impl client::Part for Verification {}
@@ -3785,7 +3785,7 @@ pub struct VerificationOption {
     /// Method to verify the location.
     #[serde(rename="verificationMethod")]
     
-    pub verification_method: Option<String>,
+    pub verification_method: Option<VerificationOptionVerificationMethodEnum>,
 }
 
 impl client::Part for VerificationOption {}
@@ -3846,7 +3846,7 @@ pub struct VerifyLocationRequest {
     pub language_code: Option<String>,
     /// Verification method.
     
-    pub method: Option<String>,
+    pub method: Option<VerifyLocationRequestMethodEnum>,
     /// The input for PHONE_CALL/SMS method
     #[serde(rename="phoneInput")]
     
