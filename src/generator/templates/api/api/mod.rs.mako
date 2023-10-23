@@ -47,5 +47,5 @@ pub use method_builders::*;
 mod call_builders;
 pub use call_builders::*;
 
-mod enums;
-pub use enums::*;
+pub mod enums;
+pub(crate) use enums::*;
